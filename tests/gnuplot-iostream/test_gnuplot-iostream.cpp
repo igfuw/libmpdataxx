@@ -21,8 +21,8 @@ void setup(T &solver, int n[2], real_t C[2]) {
     -sqr(i-n[x]/2.) / (2.*pow(n[x]/10, 2))
     -sqr(j-n[y]/2.) / (2.*pow(n[y]/10, 2))
   );  
-  solver.Cx() = C[x]; 
-  solver.Cy() = C[y];
+  solver.courant(x) = C[x]; 
+  solver.courant(y) = C[y];
 }
 
 int main() {
@@ -46,8 +46,7 @@ int main() {
      << "set pm3d at b\n";
   std::string binfmt;
   {
-    solver_2D<mpdata<1>, 
-      cyclic<x>, cyclic<y>> solver(n[x],n[y]);
+    donorcell_2D<cyclic<x>, cyclic<y>> solver(n[x],n[y]);
     setup(solver, n, C);
     binfmt = gp.binfmt(solver.state());
     gp << "set title 't=0'\n"
@@ -61,8 +60,7 @@ int main() {
     gp.sendBinary(solver.state().copy());
   } {
     const int it = 2;
-    solver_2D<mpdata<it>, 
-      cyclic<x>, cyclic<y>> solver(n[x],n[y]); 
+    mpdata_2D<it, cyclic<x>, cyclic<y>> solver(n[x],n[y]); 
     setup(solver, n, C); 
     solver.solve(nt);
     gp << "set title 'mpdata<" << it << "> "
@@ -72,8 +70,7 @@ int main() {
     gp.sendBinary(solver.state().copy());
   } {
     const int it = 4;
-    solver_2D<mpdata<it>, 
-      cyclic<x>, cyclic<y>> solver(n[x],n[y]); 
+    mpdata_2D<it, cyclic<x>, cyclic<y>> solver(n[x],n[y]); 
     setup(solver, n, C); 
     solver.solve(nt); 
     gp << "set title 'mpdata<" << it << "> "
@@ -83,5 +80,3 @@ int main() {
     gp.sendBinary(solver.state().copy());
   }
 }
-//listing19
-
