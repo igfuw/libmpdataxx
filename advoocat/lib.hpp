@@ -6,6 +6,7 @@
 /** @mainpage
  * List of examples (subset of list of tests):
  * - test_gnuplot-iostream.cpp
+ * - test_var_sign_2d.cpp
  */
 //listing00
 // code licensed under the terms of GNU GPL v3
@@ -19,7 +20,7 @@ using rng_t = blitz::Range;
 using idx_t = blitz::RectDomain<2>;
 //listing03
 #define return_macro(expr) \
-  -> decltype(safeToReturn(expr)) \
+  -> decltype(blitz::safeToReturn(expr)) \
 { return safeToReturn(expr); } 
 //listing04
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -218,137 +219,5 @@ struct donorcell_2D : solver_2D<bcx_t, bcy_t>
     );
   }
 };
-//listing16
-namespace mpdata
-{
-//listing17
-  template<class nom_t, class den_t>
-  inline auto frac(
-    const nom_t &nom, const den_t &den
-  ) return_macro(
-    where(den > 0, nom / den, 0)
-  ) 
-//listing18
-  template<int d>
-  inline auto A(const arr_t &psi, 
-    const rng_t &i, const rng_t &j
-  ) return_macro(
-    frac(
-      psi(pi<d>(i+1, j)) - psi(pi<d>(i,j)),
-      psi(pi<d>(i+1, j)) + psi(pi<d>(i,j))
-    ) 
-  ) 
-//listing19
-  template<int d>
-  inline auto B(const arr_t &psi, 
-    const rng_t &i, const rng_t &j
-  ) return_macro(
-   frac(
-      psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) -
-      psi(pi<d>(i+1, j-1)) - psi(pi<d>(i, j-1)),
-      psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) +
-      psi(pi<d>(i+1, j-1)) + psi(pi<d>(i, j-1))
-    ) / 2
-  )
-//listing20
-  template<int d>
-  inline auto C_bar(
-    const arr_t &C, 
-    const rng_t &i, 
-    const rng_t &j
-  ) return_macro(
-    (
-      C(pi<d>(i+1, j+h)) + 
-      C(pi<d>(i,   j+h)) +
-      C(pi<d>(i+1, j-h)) + 
-      C(pi<d>(i,   j-h)) 
-    ) / 4
-  )
-//listing21
-  template<int d>
-  inline auto antidiff_2D(
-    const arr_t &psi, 
-    const rng_t &i, const rng_t &j,
-    const arrvec_t &C
-  ) return_macro(
-    abs(C[d](pi<d>(i+h, j))) 
-    * (1 - abs(C[d](pi<d>(i+h, j)))) 
-    * A<d>(psi, i, j) 
-    - C[d](pi<d>(i+h, j)) 
-    * C_bar<d>(C[d-1], i, j)
-    * B<d>(psi, i, j)
-  ) 
-//listing22
-};
-//listing23
-template<int n_iters, class bcx_t, class bcy_t>
-struct mpdata_2D : solver_2D<bcx_t, bcy_t>
-{
-  // member fields
-  arrvec_t tmp[2];
-  rng_t im, jm;
 
-  // ctor
-  mpdata_2D(int nx, int ny) : 
-    solver_2D<bcx_t, bcy_t>(nx, ny, 1), 
-    im(this->i.first() - 1, this->i.last()),
-    jm(this->j.first() - 1, this->j.last())
-  {
-    int n_tmp = n_iters > 2 ? 2 : 1;
-    for (int n = 0; n < n_tmp; ++n)
-    {
-      tmp[n].push_back(new arr_t(
-        this->i^h, this->j^this->hlo));
-      tmp[n].push_back(new arr_t(
-        this->i^this->hlo, this->j^h));
-    }
-  }
-
-  // method invoked by the solver
-  void advop()
-  {
-    for (int step = 0; step < n_iters; ++step) 
-    {
-      if (step == 0) 
-        donorcell::op_2D(this->psi, 
-          this->n, this->C, this->i, this->j);
-      else
-      {
-        this->cycle();
-        this->bcx.fill_halos(this->psi[this->n]);
-        this->bcy.fill_halos(this->psi[this->n]);
-
-        // choosing input/output for antidiff C
-        const arrvec_t 
-          &C_unco = (step == 1) 
-            ? this->C 
-            : (step % 2) 
-              ? tmp[1]  // odd steps
-              : tmp[0], // even steps
-          &C_corr = (step  % 2) 
-            ? tmp[0]    // odd steps
-            : tmp[1];   // even steps
-
-        // calculating the antidiffusive C 
-        C_corr[0](this->im+h, this->j) = 
-          mpdata::antidiff_2D<0>(
-            this->psi[this->n], 
-            this->im, this->j, C_unco
-          );
-        this->bcy.fill_halos(C_corr[0]);
-
-        C_corr[1](this->i, this->jm+h) = 
-          mpdata::antidiff_2D<1>(
-            this->psi[this->n], 
-            this->jm, this->i, C_unco
-        );
-        this->bcx.fill_halos(C_corr[1]);
-
-        // donor-cell step 
-        donorcell::op_2D(this->psi, 
-          this->n, C_corr, this->i, this->j);
-      }
-    }
-  }
-};
-//listing24
+#include "mpdata.hpp"
