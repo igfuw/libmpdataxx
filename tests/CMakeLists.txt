@@ -1,3 +1,4 @@
 set(CMAKE_CXX_FLAGS "-I../.. ${CMAKE_CXX_FLAGS}")
-add_subdirectory(gnuplot-iostream)
+add_subdirectory(gnuplot-iostream_1d)
+add_subdirectory(gnuplot-iostream_2d)
 add_subdirectory(var_sign_2d)

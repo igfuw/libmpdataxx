@@ -8,22 +8,25 @@
  * - test_gnuplot-iostream.cpp
  * - test_var_sign_2d.cpp
  */
-//listing00
+
 // code licensed under the terms of GNU GPL v3
 // copyright holder: University of Warsaw
-//listing01
+
 typedef double real_t;
-//listing02
+
 #include <blitz/array.h>
-using arr_t = blitz::Array<real_t, 2>;
+using arr_1d_t = blitz::Array<real_t, 1>;
+using arr_2d_t = blitz::Array<real_t, 2>;
 using rng_t = blitz::Range;
-using idx_t = blitz::RectDomain<2>;
-//listing03
+using idx_1d_t = blitz::RectDomain<1>;
+using idx_2d_t = blitz::RectDomain<2>;
+
 #define return_macro(expr) \
   -> decltype(blitz::safeToReturn(expr)) \
 { return safeToReturn(expr); } 
-//listing04
+
 #include <boost/ptr_container/ptr_vector.hpp>
+template <class arr_t>
 struct arrvec_t : boost::ptr_vector<arr_t> {
   const arr_t &operator[](const int i) const {   
     return this->at(
@@ -31,7 +34,7 @@ struct arrvec_t : boost::ptr_vector<arr_t> {
     ); 
   }
 };
-//listing05
+
 struct hlf_t {} h;
 
 inline rng_t operator+(
@@ -57,87 +60,56 @@ inline rng_t operator^(
 } 
 //listing07
 template<int d> 
-inline idx_t pi(const rng_t &i, const rng_t &j);
+inline idx_2d_t pi(const rng_t &i, const rng_t &j);
 
 template<>
-inline idx_t pi<0>(
+inline idx_2d_t pi<0>(
   const rng_t &i, const rng_t &j
 ) {
-  return idx_t({i,j});
+  return idx_2d_t({i,j});
 };
 
 template<>
-inline idx_t pi<1>(
+inline idx_2d_t pi<1>(
   const rng_t &j, const rng_t &i
 ) {
-  return idx_t({i,j});
+  return idx_2d_t({i,j});
 }; 
-//listing08
-template<class bcx_t, class bcy_t>
-struct solver_2D
+#include "solvers.hpp"
+
+struct cyclic_1d
 {
   // member fields
-  arrvec_t psi, C;
-  int n, hlo;
-  rng_t i, j;
-  bcx_t bcx;
-  bcy_t bcy;
+  idx_1d_t left_halo, rght_halo;
+  idx_1d_t left_edge, rght_edge;;
 
   // ctor
-  solver_2D(int nx, int ny, int hlo) :
-    hlo(hlo),
-    n(0), 
-    i(0, nx-1), 
-    j(0, ny-1),  
-    bcx(i, j, hlo), 
-    bcy(j, i, hlo)
+  cyclic_1d(
+    const rng_t &i, int hlo
+  ) :
+    left_halo( rng_t(i.first()-hlo,   i.first()-1    )),
+    rght_edge( rng_t(i.last() -hlo+1, i.last()       )),
+    rght_halo( rng_t(i.last() +1,     i.last() +hlo  )),
+    left_edge( rng_t(i.first(),       i.first()+hlo-1))
+  {} 
+
+  // method invoked by the solver
+  void fill_halos(const arr_1d_t &a)
   {
-    for (int l = 0; l < 2; ++l) 
-      psi.push_back(new arr_t(i^hlo, j^hlo));
-    C.push_back(new arr_t(i^h, j^hlo));
-    C.push_back(new arr_t(i^hlo, j^h));
-  }
-
-  // accessor methods
-  arr_t state() {
-    return psi[n](i,j).reindex({0,0});
-  }
-
-  arr_t courant(int d) 
-  { 
-    return C[d]; 
-  }
-
-  // helper methods invoked by solve()
-  virtual void advop() = 0;
-
-  void cycle() 
-  { 
-    n = (n + 1) % 2 - 2; 
-  }
-
-  // integration logic
-  void solve(const int nt) 
-  {
-    for (int t = 0; t < nt; ++t) 
-    {
-      bcx.fill_halos(psi[n]);
-      bcy.fill_halos(psi[n]);
-      advop();
-      cycle();
-    }
+    a(left_halo) = a(rght_edge);     
+    a(rght_halo) = a(left_edge);     
   }
 };
-//listing09
+
 template<int d>
-struct cyclic
+struct cyclic_2d
 {
   // member fields
-  idx_t left_halo, rght_halo;
-  idx_t left_edge, rght_edge;;
+  idx_2d_t left_halo, rght_halo;
+  idx_2d_t left_edge, rght_edge;;
 
   // ctor
-  cyclic(
+  cyclic_2d(
     const rng_t &i, const rng_t &j, int hlo
   ) :
     left_halo(pi<d>(
@@ -155,69 +127,12 @@ struct cyclic
   {} 
 
   // method invoked by the solver
-  void fill_halos(const arr_t &a)
+  void fill_halos(const arr_2d_t &a)
   {
     a(left_halo) = a(rght_edge);     
     a(rght_halo) = a(left_edge);     
   }
 };
-//listing10
-namespace donorcell
-{
-//listing11
-  template<class T1, class T2, class T3> 
-  inline auto F(
-    const T1 &psi_l, const T2 &psi_r, const T3 &C
-  ) return_macro(
-    (
-      (C + abs(C)) * psi_l + 
-      (C - abs(C)) * psi_r
-    ) / 2
-  )
-//listing12
-  template<int d>  
-  inline auto donorcell( 
-    const arr_t &psi, const arr_t &C, 
-    const rng_t &i, const rng_t &j
-  ) return_macro(
-    F(
-      psi(pi<d>(i,   j)), 
-      psi(pi<d>(i+1, j)), 
-        C(pi<d>(i+h, j))
-    ) -
-    F(
-      psi(pi<d>(i-1, j)), 
-      psi(pi<d>(i,   j)), 
-        C(pi<d>(i-h, j))
-    )
-  )
-//listing13
-  void op_2D(
-    const arrvec_t &psi, const int n,
-    const arrvec_t &C, 
-    const rng_t &i, const rng_t &j
-  ) { 
-    psi[n+1](i,j) = psi[n](i,j)
-      - donorcell<0>(psi[n], C[0], i, j)
-      - donorcell<1>(psi[n], C[1], j, i); 
-  }
-//listing14
-}; 
-//listing15
-template<class bcx_t, class bcy_t>
-struct donorcell_2D : solver_2D<bcx_t, bcy_t> 
-{
-  donorcell_2D(int nx, int ny) :
-    solver_2D<bcx_t, bcy_t>(nx, ny, 1)
-  {}  
 
-  void advop()
-  {
-    donorcell::op_2D(
-      this->psi, this->n, this->C, 
-      this->i, this->j
-    );
-  }
-};
-
+#include "donorcell.hpp"
 #include "mpdata.hpp"
