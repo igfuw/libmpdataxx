@@ -75,64 +75,8 @@ inline idx_2d_t pi<1>(
 ) {
   return idx_2d_t({i,j});
 }; 
+
 #include "solvers.hpp"
-
-struct cyclic_1d
-{
-  // member fields
-  idx_1d_t left_halo, rght_halo;
-  idx_1d_t left_edge, rght_edge;;
-
-  // ctor
-  cyclic_1d(
-    const rng_t &i, int hlo
-  ) :
-    left_halo( rng_t(i.first()-hlo,   i.first()-1    )),
-    rght_edge( rng_t(i.last() -hlo+1, i.last()       )),
-    rght_halo( rng_t(i.last() +1,     i.last() +hlo  )),
-    left_edge( rng_t(i.first(),       i.first()+hlo-1))
-  {} 
-
-  // method invoked by the solver
-  void fill_halos(const arr_1d_t &a)
-  {
-    a(left_halo) = a(rght_edge);     
-    a(rght_halo) = a(left_edge);     
-  }
-};
-
-template<int d>
-struct cyclic_2d
-{
-  // member fields
-  idx_2d_t left_halo, rght_halo;
-  idx_2d_t left_edge, rght_edge;;
-
-  // ctor
-  cyclic_2d(
-    const rng_t &i, const rng_t &j, int hlo
-  ) :
-    left_halo(pi<d>(
-      rng_t(i.first()-hlo, i.first()-1), j//^hlo // TODO Range::all()
-    )),
-    rght_edge(pi<d>(
-      rng_t(i.last()-hlo+1, i.last()  ), j//^hlo // TODO Range::all()
-    )),
-    rght_halo(pi<d>(
-      rng_t(i.last()+1, i.last()+hlo  ), j//^hlo // TODO Range::all()
-    )),
-    left_edge(pi<d>(
-      rng_t(i.first(), i.first()+hlo-1), j//^hlo // TODO Range::all()
-    ))
-  {} 
-
-  // method invoked by the solver
-  void fill_halos(const arr_2d_t &a)
-  {
-    a(left_halo) = a(rght_edge);     
-    a(rght_halo) = a(left_edge);     
-  }
-};
-
+#include "cyclic.hpp"
 #include "donorcell.hpp"
 #include "mpdata.hpp"
