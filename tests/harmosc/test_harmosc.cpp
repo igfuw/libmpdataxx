@@ -33,14 +33,14 @@ template <int n_iters>
 class coupled_harmosc : public inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_1d, 2>>
 {
   real_t omega;
+  arr_1d_t tmp;
 
   void forcings(real_t dt)
   {
     auto Psi = this->state(psi);
     auto Phi = this->state(phi);
 
-    //arr_1d_t tmp(1000);
-    //tmp() = Psi(i);
+    tmp = Psi;
 
     // explicit part
     Psi += dt * omega * Phi;
@@ -48,7 +48,7 @@ class coupled_harmosc : public inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_
     Psi /= (1 + pow(dt * omega, 2));
 
     // explicit part
-    Phi += - dt * omega * Psi; // TODO: Psi already modified!!
+    Phi += - dt * omega * tmp;
     // implicit part
     Phi /= (1 + pow(dt * omega, 2));
   }
@@ -57,7 +57,7 @@ class coupled_harmosc : public inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_
 
   coupled_harmosc(int n, real_t dt, real_t omega) :
     inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_1d, 2>>(n, dt),
-    omega(omega)
+    omega(omega), tmp(this->state(0).extent(0))
   {
   }
 };
@@ -68,10 +68,10 @@ int main()
   const real_t C = .5, dt = 1;
   const real_t omega = 2*pi<real_t>() / dt / 400;
  
-  coupled_harmosc<2> solver(nx, dt, omega);
+  coupled_harmosc<3> solver(nx, dt, omega);
 
   Gnuplot gp;
-  gp << "set term svg size 1000,500 dynamic\n" 
+  gp << "set term svg size 1000,500 dynamic enhanced\n" 
      << "set output 'figure.svg'\n";
 
   gp << "set grid\n";
@@ -87,20 +87,20 @@ int main()
   gp << "plot"
      << "'-' lt 1 with lines title 'psi',"
      << "'-' lt 2 with lines title 'phi',"
-     << "'-' lt 3 with lines title '|psi| + |phi|'";
+     << "'-' lt 3 with lines title 'psi^2 + phi^2 + 1'";
   for (int t = n_out; t <= nt; t+=n_out) 
     gp << ", '-' lt 1 with lines notitle"
        << ", '-' lt 2 with lines notitle"
        << ", '-' lt 3 with lines notitle";
   gp << "\n";
 
-  arr_1d_t sum(nx);
+  arr_1d_t en(nx);
 
   // sending initial condition
   gp.send(solver.state(psi));
   gp.send(solver.state(phi));
-    sum = abs(solver.state(psi)) + abs(solver.state(phi));
-  gp.send(sum);
+  en = 1 + pow(solver.state(psi),2) + pow(solver.state(phi),2);
+  gp.send(en);
 
   // integration
   for (int t = n_out; t <= nt; t+=n_out)
@@ -108,7 +108,7 @@ int main()
     solver.solve(n_out);
     gp.send(solver.state(psi));
     gp.send(solver.state(phi));
-      sum = abs(solver.state(psi)) + abs(solver.state(phi));
-    gp.send(sum);
+    en = 1 + pow(solver.state(psi),2) + pow(solver.state(phi),2);
+    gp.send(en);
   }
 }

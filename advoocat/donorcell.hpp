@@ -87,7 +87,7 @@ struct donorcell_1d : solver_1d<bcx_t, n_eqs>
   void advop(int e)
   {
     donorcell::op_1d(
-      this->psi[e], this->n, this->C[0], this->i
+      this->psi[e], this->n[e], this->C[0], this->i
     );
   }
 };
@@ -102,7 +102,7 @@ struct donorcell_2d : solver_2d<bcx_t, bcy_t, n_eqs>
   void advop(int e)
   {
     donorcell::op_2d(
-      this->psi[e], this->n, this->C, this->i, this->j
+      this->psi[e], this->n[e], this->C, this->i, this->j
     );
   }
 };

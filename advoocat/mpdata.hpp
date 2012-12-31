@@ -140,11 +140,11 @@ namespace solvers
       for (int step = 0; step < n_iters; ++step) 
       {
         if (step == 0) 
-          donorcell::op_1d(this->psi[e], this->n, this->C[0], this->i);
+          donorcell::op_1d(this->psi[e], this->n[e], this->C[0], this->i);
         else
         {
-          this->cycle();
-          this->bcx.fill_halos(this->psi[e][this->n]);
+          this->cycle(e);
+          this->bcx.fill_halos(this->psi[e][this->n[e]]);
 
           // choosing input/output for antidiff C
           const arr_1d_t
@@ -160,13 +160,13 @@ namespace solvers
           // calculating the antidiffusive C 
           C_corr(this->im+h) = 
             mpdata::antidiff(
-              this->psi[e][this->n], 
+              this->psi[e][this->n[e]], 
               this->im, C_unco[0]
             );
 
           // donor-cell step 
           donorcell::op_1d(this->psi[e], 
-            this->n, C_corr[0], this->i);
+            this->n[e], C_corr[0], this->i);
         }
       }
     }
@@ -205,12 +205,12 @@ namespace solvers
         if (step == 0) 
           donorcell::op_2d(
             this->psi[e], 
-            this->n, this->C, this->i, this->j);
+            this->n[e], this->C, this->i, this->j);
         else
         {
-          this->cycle();
-          this->bcx.fill_halos(this->psi[e][this->n], this->j^this->halo);
-          this->bcy.fill_halos(this->psi[e][this->n], this->i^this->halo);
+          this->cycle(e);
+          this->bcx.fill_halos(this->psi[e][this->n[e]], this->j^this->halo);
+          this->bcy.fill_halos(this->psi[e][this->n[e]], this->i^this->halo);
 
           // choosing input/output for antidiff C
           const arrvec_t<arr_2d_t>
@@ -226,21 +226,21 @@ namespace solvers
           // calculating the antidiffusive C 
           C_corr[0](this->im+h, this->j) = 
             mpdata::antidiff<0>(
-              this->psi[e][this->n], 
+              this->psi[e][this->n[e]], 
               this->im, this->j, C_unco
             );
           this->bcy.fill_halos(C_corr[0], this->i^h);
 
           C_corr[1](this->i, this->jm+h) = 
             mpdata::antidiff<1>(
-              this->psi[e][this->n], 
+              this->psi[e][this->n[e]], 
               this->jm, this->i, C_unco
           );
           this->bcx.fill_halos(C_corr[1], this->j^h);
 
           // donor-cell step 
           donorcell::op_2d(this->psi[e], 
-            this->n, C_corr, this->i, this->j);
+            this->n[e], C_corr, this->i, this->j);
         }
       }
     }
