@@ -4,6 +4,8 @@
 * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
 */
 
+#pragma once
+
 namespace mpdata 
 {
 

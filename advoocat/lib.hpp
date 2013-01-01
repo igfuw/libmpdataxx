@@ -12,6 +12,8 @@
 // code licensed under the terms of GNU GPL v3
 // copyright holder: University of Warsaw
 
+#pragma once
+
 typedef double real_t;
 
 #include <blitz/array.h>
@@ -48,7 +50,6 @@ inline rng_t operator-(
 ) { 
   return i-1; 
 }
-//listing06
 template<class n_t>
 inline rng_t operator^(
   const rng_t &r, const n_t &n
@@ -58,7 +59,6 @@ inline rng_t operator^(
     (r + n).last()
   ); 
 } 
-//listing07
 template<int d> 
 inline idx_2d_t pi(const rng_t &i, const rng_t &j);
 

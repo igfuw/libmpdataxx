@@ -4,11 +4,15 @@
 * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
 */
 
-struct cyclic_1d
+#pragma once
+
+class cyclic_1d
 {
   // member fields
   rng_t left_halo, rght_halo;
   rng_t left_edge, rght_edge;;
+
+  public:
 
   // ctor
   cyclic_1d(
@@ -29,11 +33,13 @@ struct cyclic_1d
 };
 
 template<int d>
-struct cyclic_2d
+class cyclic_2d
 {
   // member fields
   rng_t left_halo, rght_halo;
   rng_t left_edge, rght_edge;;
+
+  public:
 
   // ctor
   cyclic_2d(

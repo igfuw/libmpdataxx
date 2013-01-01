@@ -4,9 +4,10 @@
 * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
 */
 
+#pragma once
+
 namespace donorcell
 {
-//listing11
   template<class T1, class T2, class T3> 
   inline auto F(
     const T1 &psi_l, const T2 &psi_r, const T3 &C

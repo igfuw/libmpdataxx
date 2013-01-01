@@ -8,6 +8,8 @@
  *        (cf. eq. 32 in Smolarkiewicz 1998)
  */
 
+#pragma once
+
 template <class homo_solver>
 class inhomo_solver : public homo_solver
 {
