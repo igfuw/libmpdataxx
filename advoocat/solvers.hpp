@@ -113,7 +113,6 @@ namespace solvers
 
     arrvec_t<arr_2d_t> C, psi[n_eqs];
     int halo;
-    std::vector<int> n;
     rng_t i, j;
 
     void xchng() 
