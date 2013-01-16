@@ -1,0 +1,53 @@
+general:
+
+ * all classes and methods should be covered by the docs and testsuite!
+
+ * KISS [Wikipedia, KISS principle]
+
+coding conventions:
+
+ * one class per one header file [CERN, C05]
+
+ * each header file should be self-contained [CERN, C01]
+
+ * avoid unnecessary inclusions [CERN, C02]
+
+ * protect header files from multiple inclusion [CERN, C03]
+   using #pragma once
+
+ * avoid multiple inheritance [CERN CB5]
+
+ * filenames should be all-lowercase
+
+ * double space indentation - no tabs (Google 'Spaces vs. Tabs')
+
+ * avoid overly long files (let's say 200 lines excluding comments) and 
+   avoid overly long lines (let's say 100 chars)
+
+ * avoid use of preprocessor, if really needed always suffix
+   macro names with _macro
+
+ * both opening and closing braces on separate lines
+
+ * only Unix-style carriage returns ("\n")
+
+ * "two or more, use a for" (E.W. Dijkstra)
+
+ * declare local variables as near to their use as possible
+
+ * use references instead of pointers if possible
+
+ * mark function arguments as const where possible
+
+
+References:
+[Wikipedia] - KISS principle
+  http://en.wikipedia.org/wiki/KISS_principle
+[CERN] - CERN C++ Coding Standard Specification
+  http://pst.web.cern.ch/PST/HandBookWorkBook/Handbook/Programming/CodingStandard/c++standard.pdf
+[Google] - Google C++ Style Guide
+  http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
+[GNU] - GNU Coding Standards
+  http://www.gnu.org/prep/standards/
+[GCC] - GCC C++ Coding Conventions
+  http://gcc.gnu.org/wiki/CppConventions
