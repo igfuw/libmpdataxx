@@ -7,22 +7,17 @@
  * @brief a bombel 
  */
 
-// advection
-#include <advoocat/lib.hpp>
-#include <advoocat/solver_inhomo.hpp>
+// advection (<> should be used instead of "" in normal usage) 
+#include "advoocat/lib.hpp"
+#include "advoocat/solver_inhomo.hpp"
 
 // plotting
-// (<> should be used instead of "" in normal usage) 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
 
 // auto-deallocating containers
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
-
-// 
-#include <boost/math/constants/constants.hpp>
-using boost::math::constants::pi;
 
 enum {tht, prs};
 enum {x, y};
@@ -57,12 +52,16 @@ int main()
     solver.state(tht) = real_t(0); 
     solver.state(prs) = real_t(0);
   }
-  solver.courant(x) = C;
+  solver.courant(x) = C; // uwaga: aktualnie courant() (w przeciwienstwie do state()) zwraca cala tablice razem z halo!
   solver.courant(y) = C;
 
   // integration
-  for (int t = n_out; t <= nt; t+=n_out)
+  for (int t = 0; t <= nt; ++t)
   {
-    solver.solve(n_out);
+    if (t % n_out == 0) ; // TODO: output / plotting
+
+    // TODO: trzeba pamiętać o odpowiedniku fill_halos dla courantów
+
+    solver.solve(1); // 1 tymczasowo
   }
 };
