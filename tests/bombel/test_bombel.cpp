@@ -4,81 +4,64 @@
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
- * \include "gnuplot-iostream_2d/test_gnuplot-iostream_2d.cpp"
- * \image html "../../tests/gnuplot-iostream_2d/figure.svg"
+ * @brief a bombel 
  */
 
+// advection
 #include <advoocat/lib.hpp>
+#include <advoocat/solver_inhomo.hpp>
+
+// plotting
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
+
+// auto-deallocating containers
+#include <boost/ptr_container/ptr_map.hpp>
+#include <boost/assign/ptr_map_inserter.hpp>
+
+// 
+#include <boost/math/constants/constants.hpp>
+using boost::math::constants::pi;
+
+enum {tht, prs};
 enum {x, y};
 
-template <class T>
-void setup(T &solver, int n[2], real_t C[2]) {
-  blitz::firstIndex i;
-  blitz::secondIndex j;
-  solver.state() = exp(
-    -sqr(i-n[x]/2.) / (2.*pow(n[x]/10, 2))
-    -sqr(j-n[y]/2.) / (2.*pow(n[y]/10, 2))
-  );  
-  solver.courant(x) = C[x]; 
-  solver.courant(y) = C[y];
-}
-
-int main() {
-  int n[] = {24, 24}, nt = 96;
-  real_t C[] = {.5, .25};
-  Gnuplot gp;
-  gp << "set term svg size 500,1500 dynamic\n" 
-     << "set output 'figure.svg'\n"     
-     << "set multiplot layout 4,1\n" 
-     << "set border 4095\n"
-     << "set xtics out\n"
-     << "set ytics out\n"
-     << "unset ztics\n"    
-     << "set xlabel 'X'\n"
-     << "set ylabel 'Y'\n"
-     << "set xrange [0:" << n[x]-1 << "]\n"   
-     << "set yrange [0:" << n[y]-1 << "]\n"   
-     << "set zrange [-.666:1]\n"   
-     << "set cbrange [-.025:1.025]\n"     
-     << "set palette maxcolors 42\n"
-     << "set pm3d at b\n";
-  std::string binfmt;
+template <int n_iters>
+class bombel : public inhomo_solver<solvers::mpdata_2d<n_iters, cyclic_2d<x>, cyclic_2d<y>,2>>
+{
+  void forcings(real_t dt)
   {
-    solvers::donorcell_2d<cyclic_2d<x>, cyclic_2d<y>> solver(n[x], n[y]);
-    setup(solver, n, C);
-    binfmt = gp.binfmt(solver.state());
-    gp << "set title 't=0'\n"
-       << "splot '-' binary" << binfmt
-       << "with lines notitle\n";
-    gp.sendBinary(solver.state().copy());
-    solver.solve(nt);
-    gp << "set title 'donorcell t="<<nt<<"'\n"
-       << "splot '-' binary" << binfmt
-       << "with lines notitle\n";
-    gp.sendBinary(solver.state().copy());
-  } 
-  {
-    const int it = 2;
-    solvers::mpdata_2d<it, cyclic_2d<x>, cyclic_2d<y>> solver(n[x], n[y]); 
-    setup(solver, n, C); 
-    solver.solve(nt);
-    gp << "set title 'mpdata<" << it << "> "
-       << "t=" << nt << "'\n"
-       << "splot '-' binary" << binfmt
-       << "with lines notitle\n";
-    gp.sendBinary(solver.state().copy());
-  } 
-  {
-    const int it = 4;
-    solvers::mpdata_2d<it, cyclic_2d<x>, cyclic_2d<y>> solver(n[x], n[y]); 
-    setup(solver, n, C); 
-    solver.solve(nt); 
-    gp << "set title 'mpdata<" << it << "> "
-       << "t=" << nt << "'\n"
-       << "splot '-' binary" << binfmt
-       << "with lines notitle\n";
-    gp.sendBinary(solver.state().copy());
+  //TODO
   }
-}
+
+  public:
+
+  bombel(int nx, int ny, real_t dt) :
+    inhomo_solver<solvers::mpdata_2d<n_iters, cyclic_2d<x>, cyclic_2d<y>, 2>>(nx, ny, dt)
+  {
+  }
+};
+
+int main() 
+{
+  const int nx = 100, ny = 100, nt = 10, n_out=1;
+  const real_t C = .5, dt = 1;
+ 
+  bombel<2> solver(nx, ny, dt);
+
+  // initial condition
+  {
+    blitz::firstIndex i;
+    blitz::firstIndex j;
+    solver.state(tht) = real_t(0); 
+    solver.state(prs) = real_t(0);
+  }
+  solver.courant(x) = C;
+  solver.courant(y) = C;
+
+  // integration
+  for (int t = n_out; t <= nt; t+=n_out)
+  {
+    solver.solve(n_out);
+  }
+};
