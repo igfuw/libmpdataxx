@@ -76,7 +76,8 @@ inline idx_2d_t pi<1>(
   return idx_2d_t({i,j});
 }; 
 
-#include "solvers.hpp"
+#include "solver_1d.hpp"
+#include "solver_2d.hpp"
 #include "cyclic.hpp"
 #include "donorcell.hpp"
 #include "mpdata.hpp"

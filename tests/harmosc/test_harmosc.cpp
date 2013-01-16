@@ -13,7 +13,7 @@
 
 // advection
 #include <advoocat/lib.hpp>
-#include <advoocat/rhs.hpp>
+#include <advoocat/solver_inhomo.hpp>
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
@@ -41,7 +41,7 @@ class coupled_harmosc : public inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_
     auto Phi = this->state(phi);
 
     tmp = Psi;
-
+    ///   (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
     // explicit part
     Psi += dt * omega * Phi;
     // implicit part
