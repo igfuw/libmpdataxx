@@ -55,6 +55,10 @@ int main()
     blitz::firstIndex i;
     blitz::firstIndex j;
     solver.state(tht) = real_t(0); 
+//    solver.state(tht) = exp(
+//      -sqr(i-n[x]/2.) / (2.*pow(n[x]/10, 2))
+//      -sqr(j-n[y]/2.) / (2.*pow(n[y]/10, 2))
+//    );
     solver.state(prs) = real_t(0);
   }
   solver.courant(x) = C;
