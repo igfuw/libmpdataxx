@@ -8,7 +8,9 @@
  * \image html "../../tests/gnuplot-iostream_2d/figure.svg"
  */
 
-#include <advoocat/lib.hpp>
+// (<> should be used instead of "" in normal usage)
+#include "advoocat/lib.hpp"
+
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
 enum {x, y};
