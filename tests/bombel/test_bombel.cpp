@@ -12,6 +12,7 @@
 #include <advoocat/solver_inhomo.hpp>
 
 // plotting
+// (<> should be used instead of "" in normal usage) 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
 

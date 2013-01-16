@@ -11,9 +11,9 @@
  * \image html "../../tests/harmosc/figure.svg"
  */
 
-// advection
-#include <advoocat/lib.hpp>
-#include <advoocat/solver_inhomo.hpp>
+// advection (<> should be used instead of "" in normal usage)
+#include "advoocat/lib.hpp"
+#include "advoocat/solver_inhomo.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
