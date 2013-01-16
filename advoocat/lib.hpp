@@ -4,9 +4,7 @@
 * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
 */
 /** @mainpage
- * List of examples (subset of list of tests):
- * - test_gnuplot-iostream.cpp
- * - test_var_sign_2d.cpp
+ * Hello world!
  */
 
 // code licensed under the terms of GNU GPL v3
