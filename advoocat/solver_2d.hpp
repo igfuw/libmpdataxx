@@ -24,6 +24,12 @@ namespace solvers
     int halo;
     rng_t i, j;
 
+    void xchng(int e) 
+    {
+      bcx.fill_halos(psi[e][ this->n[e] ], j^halo);
+      bcy.fill_halos(psi[e][ this->n[e] ], i^halo);
+    }
+
     void xchng() 
     {
       for (int e = 0; e < n_eqs; ++e) 
@@ -32,6 +38,7 @@ namespace solvers
         bcy.fill_halos(psi[e][ this->n[e] ], i^halo);
       }
     }
+
 
     // ctor
     solver_2d(int nx, int ny, int halo) :
