@@ -26,25 +26,16 @@ class pressure_solver : public homo_solver
   {
     for (int t = 0; t < nt; ++t)
     {
-/*
-- liczymy nowe psi
-- ekstrapolujemy (łatwo, bo zawsze mamy zapisane stare psi)
-- teraz pewnie czas wypełnić halo dla tego psi
-- interpolowanie do brzegów oczek, żeby wyliczyć kuranty powinno 
-  dać się zapisać jednym wyrażeniem blitzowym bez żadnych pętli, 
-   bo prędkości potzebujemy tylko 
-  "wewnątrz" obszaru "domena+halo" 
-  (a po fill_halos w całym tym obszarze są sensowne prędkości)
-*/
-
       //filing halos for velocity filed
       this->xchng(u);
       this->xchng(w);
     
-      //interpolate to fill courant field
+      //interpolate velocity to fill courant field
 
-      //extrapolate courant field for mpdata
-      // w tej kolejności mogę ciągle zaaplikowac prawą stronę do prędkości
+
+      //extrapolate courant field for mpdata (t+1/2)
+      //(w tej kolejności mogę ciągle zaaplikowac prawą stronę do prędkości)
+
 
       forcings(dt / 2);
       this->xchng();

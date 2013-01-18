@@ -8,7 +8,6 @@
 
 namespace mpdata 
 {
-
 // TODO
 /*
   struct varsgn
