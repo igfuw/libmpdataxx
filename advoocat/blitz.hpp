@@ -4,7 +4,11 @@
 * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
 */
 /** @mainpage
- * Hello world!
+ *  TODO: table of examples with columns:
+ *  - adv. algorithm
+ *  - Jacobian
+ *  - number of dimensions
+ *  - equation set
  */
 
 // code licensed under the terms of GNU GPL v3
@@ -31,51 +35,7 @@ struct arrvec_t : boost::ptr_vector<arr_t> {
   const arr_t &operator[](const int i) const {   
     return this->at(
       (i + this->size()) % this->size()
-    ); 
+    );  
   }
 };
 
-struct hlf_t {} h;
-
-inline rng_t operator+(
-  const rng_t &i, const hlf_t &
-) { 
-  return i; 
-} 
-
-inline rng_t operator-(
-  const rng_t &i, const hlf_t &
-) { 
-  return i-1; 
-}
-template<class n_t>
-inline rng_t operator^(
-  const rng_t &r, const n_t &n
-) { 
-  return rng_t(
-    (r - n).first(), 
-    (r + n).last()
-  ); 
-} 
-template<int d> 
-inline idx_2d_t pi(const rng_t &i, const rng_t &j);
-
-template<>
-inline idx_2d_t pi<0>(
-  const rng_t &i, const rng_t &j
-) {
-  return idx_2d_t({i,j});
-};
-
-template<>
-inline idx_2d_t pi<1>(
-  const rng_t &j, const rng_t &i
-) {
-  return idx_2d_t({i,j});
-}; 
-
-#include "solver_1d.hpp"
-#include "solver_2d.hpp"
-#include "cyclic.hpp"
-#include "donorcell.hpp"
-#include "mpdata.hpp"
