@@ -1,5 +1,6 @@
 /** 
  * @file
+ * @example var_sign_2d/test_var_sign_2d.cpp
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
