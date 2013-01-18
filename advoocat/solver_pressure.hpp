@@ -33,8 +33,8 @@ class pressure_solver : public homo_solver
   
 //    tmp_c = this->courant(0);
 //    tmp = this->state(u);
-    this->(i+h,j) = .5*(tmp(i^h,j)+tmp((i^h)+1,j));
-    this->courant(0) = tmp_c;
+    this->courant(0)(i+h,j) = .5*(this->state(u)(i^h,j)+this->state(u)((i^h)+1,j));
+//    this->courant(0) = tmp_c;
 
   }
 
