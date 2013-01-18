@@ -24,8 +24,19 @@ enum {tht, prs, u, w};
 
 enum {x, y};
 
-template <int n_iters>
-class bombel : public pressure_solver<solvers::mpdata_2d<n_iters, cyclic_2d<x>, cyclic_2d<y>,4>>
+template <int n_iters, typename real_t>
+using parent = pressure_solver<
+  solvers::mpdata_2d<
+    n_iters, 
+    cyclic_2d<x, real_t>, 
+    cyclic_2d<y, real_t>,
+    4, 
+    real_t
+  >
+>;
+
+template <int n_iters, typename real_t = float>
+class bombel : public parent<n_iters, real_t>
 {
   void forcings(real_t dt)
   {
@@ -46,13 +57,15 @@ class bombel : public pressure_solver<solvers::mpdata_2d<n_iters, cyclic_2d<x>, 
   public:
 
   bombel(int nx, int ny, real_t dt) :
-    pressure_solver<solvers::mpdata_2d<n_iters, cyclic_2d<x>, cyclic_2d<y>, 4>>(nx, ny, dt)
+    parent<n_iters, real_t>(nx, ny, dt)
   {
   }
 };
 
 int main() 
 {
+  using real_t = float;
+
   const int nx = 50, ny = 50, nt = 10, n_out=7;
   const real_t C = .5, dt = 1;
 

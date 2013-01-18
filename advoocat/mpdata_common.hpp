@@ -39,6 +39,7 @@ namespace mpdata
     ) 
 
     // 1D
+    template <class arr_1d_t>
     inline auto A(
       const arr_1d_t &psi, 
       const rng_t &i 
@@ -53,7 +54,7 @@ namespace mpdata
     ) 
 
     // 2D
-    template<int d>
+    template<int d, class arr_2d_t>
     inline auto A(
       const arr_2d_t &psi, 
       const rng_t &i, 
@@ -68,7 +69,7 @@ namespace mpdata
       ) 
     ) 
 
-    template<int d>
+    template<int d, class arr_2d_t>
     inline auto B(
       const arr_2d_t &psi, 
       const rng_t &i, 
@@ -87,7 +88,7 @@ namespace mpdata
       ) / 2
     )
 
-    template<int d>
+    template<int d, class arr_2d_t>
     inline auto C_bar(
       const arr_2d_t &C, 
       const rng_t &i, 
@@ -101,6 +102,7 @@ namespace mpdata
       ) / 4
     )
 
+    template<class arr_1d_t>
     inline auto antidiff(
       const arr_1d_t &psi, 
       const rng_t &i, 
@@ -111,7 +113,7 @@ namespace mpdata
       * A(psi, i) 
     ) 
 
-    template <int dim>
+    template <int dim, class arr_2d_t>
     inline auto antidiff(
       const arr_2d_t &psi, 
       const rng_t &i, 

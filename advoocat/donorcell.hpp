@@ -21,6 +21,7 @@ namespace donorcell
     ) / 2
   )
 
+  template <class arr_1d_t>
   inline auto donorcell( 
     const arr_1d_t &psi, 
     const arr_1d_t &C, 
@@ -38,7 +39,7 @@ namespace donorcell
     )
   )
 
-  template<int d>  
+  template<int d, class arr_2d_t>  
   inline auto donorcell( 
     const arr_2d_t &psi, 
     const arr_2d_t &C, 
@@ -57,6 +58,7 @@ namespace donorcell
     )
   )
 
+  template <class arr_1d_t>
   void op_1d(
     const arrvec_t<arr_1d_t> &psi, 
     const int n,
@@ -67,6 +69,7 @@ namespace donorcell
       - donorcell(psi[n], C, i);
   }
 
+  template <class arr_2d_t>
   void op_2d(
     const arrvec_t<arr_2d_t> &psi, const int n,
     const arrvec_t<arr_2d_t> &C, 
@@ -81,11 +84,11 @@ namespace donorcell
 namespace solvers
 {
 
-  template<class bcx_t, int n_eqs = 1>
-  struct donorcell_1d : solver_1d<bcx_t, n_eqs> 
+  template<class bcx_t, int n_eqs = 1, typename real_t = float>
+  struct donorcell_1d : solver_1d<bcx_t, n_eqs, real_t> 
   {
     donorcell_1d(int nx) :
-      solver_1d<bcx_t, n_eqs>(nx, /* halo = */ 1)
+      solver_1d<bcx_t, n_eqs, real_t>(nx, /* halo = */ 1)
     {}  
 
     void advop(int e)
@@ -96,11 +99,11 @@ namespace solvers
     }
   };
 
-  template<class bcx_t, class bcy_t, int n_eqs = 1>
-  struct donorcell_2d : solver_2d<bcx_t, bcy_t, n_eqs> 
+  template<class bcx_t, class bcy_t, int n_eqs = 1, typename real_t = float>
+  struct donorcell_2d : solver_2d<bcx_t, bcy_t, n_eqs, real_t> 
   {
     donorcell_2d(int nx, int ny) :
-      solver_2d<bcx_t, bcy_t, n_eqs>(nx, ny, /* halo = */ 1)
+      solver_2d<bcx_t, bcy_t, n_eqs, real_t>(nx, ny, /* halo = */ 1)
     {}  
 
     void advop(int e)

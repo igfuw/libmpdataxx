@@ -8,7 +8,7 @@
 
 namespace solvers
 {
-  template <int n_eqs>
+  template <int n_eqs, typename _real_t>
   class solver_common
   {
     protected: 
@@ -32,6 +32,8 @@ namespace solvers
     }
 
     public:
+
+    typedef _real_t real_t;
  
     solver_common() :
       n(n_eqs, 0) 

@@ -12,6 +12,8 @@ class pressure_solver : public homo_solver
 {
   enum{tht, prs, u, w};
 
+  using real_t = typename homo_solver::real_t;
+
   //arrvec_t<typename homo_solver::arr_t> rhs;
   real_t dt;
   virtual void forcings(real_t dt) = 0;

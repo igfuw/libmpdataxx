@@ -6,24 +6,22 @@
 
 #pragma once
 
-#include "solvers_common.hpp"
+#include "solver_common.hpp"
 
 namespace solvers
 {
-  template<class bcx_t, int n_eqs>
-  class solver_1d : public solver_common<n_eqs>
+  template<class bcx_t, int n_eqs, typename real_t>
+  class solver_1d : public solver_common<n_eqs, real_t>
   {
-    //typedef arr_1d_t arr_t;
-
     protected:
 
     bcx_t bcx;
  
     // member fields
-    arrvec_t<arr_1d_t> C;
+    arrvec_t<arr_1d_t<real_t>> C;
 
     // psi contains model state including halo region
-    arrvec_t<arr_1d_t> psi[n_eqs];
+    arrvec_t<arr_1d_t<real_t>> psi[n_eqs];
 
     int halo;
     rng_t i;
@@ -42,9 +40,9 @@ namespace solvers
     {
       for (int e = 0; e < n_eqs; ++e) // equations
         for (int l = 0; l < 2; ++l) // time levels
-          psi[e].push_back(new arr_1d_t(i^halo));
+          psi[e].push_back(new arr_1d_t<real_t>(i^halo));
 
-      C.push_back(new arr_1d_t(i^h));
+      C.push_back(new arr_1d_t<real_t>(i^h));
     }
 
     public:
@@ -61,13 +59,13 @@ namespace solvers
     }
 
     // accessor method for psi (hides the halo region)
-    arr_1d_t state(int e = 0) 
+    arr_1d_t<real_t> state(int e = 0) 
     {
       return psi[e][ this->n[e] ](i).reindex({0});
     }
 
     // accessor method for the Courant number field
-    arr_1d_t courant() 
+    arr_1d_t<real_t> courant() 
     { 
       return C[0]; 
     }

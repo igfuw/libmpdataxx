@@ -6,6 +6,7 @@
 
 #pragma once
 
+template <typename real_t = float>
 class cyclic_1d
 {
   // member fields
@@ -25,14 +26,14 @@ class cyclic_1d
   {} 
 
   // method invoked by the solver
-  void fill_halos(const arr_1d_t &a)
+  void fill_halos(const arr_1d_t<real_t> &a)
   {
     a(left_halo) = a(rght_edge);     
     a(rght_halo) = a(left_edge);     
   }
 };
 
-template<int d>
+template<int d, typename real_t = float>
 class cyclic_2d
 {
   // member fields
@@ -52,7 +53,7 @@ class cyclic_2d
   {} 
 
   // method invoked by the solver
-  void fill_halos(const arr_2d_t &a, const rng_t &j)
+  void fill_halos(const arr_2d_t<real_t> &a, const rng_t &j)
   {
     a(pi<d>(left_halo, j)) = a(pi<d>(rght_edge, j));     
     a(pi<d>(rght_halo, j)) = a(pi<d>(left_edge, j));     

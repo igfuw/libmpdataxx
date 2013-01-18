@@ -67,11 +67,21 @@ using boost::math::constants::pi;
 
 enum {psi, phi};
 
-template <int n_iters>
-class coupled_harmosc : public inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_1d, 2>>
+template <int n_iters, typename real_t>
+using parent = inhomo_solver<
+  solvers::mpdata_1d<
+    n_iters, 
+    cyclic_1d<real_t>, 
+    2, 
+    real_t
+  >
+>;
+
+template <int n_iters, typename real_t = float>
+class coupled_harmosc : public parent<n_iters, real_t>
 {
   real_t omega;
-  arr_1d_t tmp;
+  arr_1d_t<real_t> tmp;
 
   void forcings(real_t dt)
   {
@@ -94,7 +104,7 @@ class coupled_harmosc : public inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_
   public:
 
   coupled_harmosc(int n, real_t dt, real_t omega) :
-    inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_1d, 2>>(n, dt),
+    parent<n_iters, real_t>(n, dt),
     omega(omega), tmp(this->state(0).extent(0))
   {
   }
@@ -102,11 +112,13 @@ class coupled_harmosc : public inhomo_solver<solvers::mpdata_1d<n_iters, cyclic_
 
 int main() 
 {
+  using real_t = double;
+
   const int nx = 1000, nt = 750, n_out=10;
   const real_t C = .5, dt = 1;
   const real_t omega = 2*pi<real_t>() / dt / 400;
  
-  coupled_harmosc<3> solver(nx, dt, omega);
+  coupled_harmosc<3, real_t> solver(nx, dt, omega);
 
   Gnuplot gp;
   gp << "set term svg size 1000,500 dynamic enhanced\n" 
@@ -132,7 +144,7 @@ int main()
        << ", '-' lt 3 with lines notitle";
   gp << "\n";
 
-  arr_1d_t en(nx);
+  arr_1d_t<real_t> en(nx);
 
   // sending initial condition
   gp.send(solver.state(psi));

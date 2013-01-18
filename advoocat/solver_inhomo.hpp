@@ -13,7 +13,8 @@
 template <class homo_solver>
 class inhomo_solver : public homo_solver
 {
-  //arrvec_t<typename homo_solver::arr_t> rhs;
+  using real_t = typename homo_solver::real_t;
+
   real_t dt;
 
   virtual void forcings(real_t dt) = 0;
