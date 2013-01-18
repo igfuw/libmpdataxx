@@ -19,8 +19,8 @@
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
 
+//TODO as a template
 enum {tht, prs, u, w};
-
 enum {x, y};
 
 template <int n_iters>
@@ -52,7 +52,7 @@ class bombel : public pressure_solver<solvers::mpdata_2d<n_iters, cyclic_2d<x>, 
 
 int main() 
 {
-  const int nx = 50, ny = 50, nt = 10, n_out=7;
+  const int nx = 10, ny = 10, nt = 2, n_out=1;
   const real_t C = .5, dt = 1;
 
   rng_t i(0, nx-1);
