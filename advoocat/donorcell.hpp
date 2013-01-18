@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include "solver_1d.hpp"
+#include "solver_2d.hpp"
+
 namespace donorcell
 {
   template<class T1, class T2, class T3> 
@@ -78,34 +81,34 @@ namespace donorcell
 namespace solvers
 {
 
-template<class bcx_t, int n_eqs = 1>
-struct donorcell_1d : solver_1d<bcx_t, n_eqs> 
-{
-  donorcell_1d(int nx) :
-    solver_1d<bcx_t, n_eqs>(nx, /* halo = */ 1)
-  {}  
-
-  void advop(int e)
+  template<class bcx_t, int n_eqs = 1>
+  struct donorcell_1d : solver_1d<bcx_t, n_eqs> 
   {
-    donorcell::op_1d(
-      this->psi[e], this->n[e], this->C[0], this->i
-    );
-  }
-};
+    donorcell_1d(int nx) :
+      solver_1d<bcx_t, n_eqs>(nx, /* halo = */ 1)
+    {}  
 
-template<class bcx_t, class bcy_t, int n_eqs = 1>
-struct donorcell_2d : solver_2d<bcx_t, bcy_t, n_eqs> 
-{
-  donorcell_2d(int nx, int ny) :
-    solver_2d<bcx_t, bcy_t, n_eqs>(nx, ny, /* halo = */ 1)
-  {}  
+    void advop(int e)
+    {
+      donorcell::op_1d(
+        this->psi[e], this->n[e], this->C[0], this->i
+      );
+    }
+  };
 
-  void advop(int e)
+  template<class bcx_t, class bcy_t, int n_eqs = 1>
+  struct donorcell_2d : solver_2d<bcx_t, bcy_t, n_eqs> 
   {
-    donorcell::op_2d(
-      this->psi[e], this->n[e], this->C, this->i, this->j
-    );
-  }
-};
+    donorcell_2d(int nx, int ny) :
+      solver_2d<bcx_t, bcy_t, n_eqs>(nx, ny, /* halo = */ 1)
+    {}  
+
+    void advop(int e)
+    {
+      donorcell::op_2d(
+        this->psi[e], this->n[e], this->C, this->i, this->j
+      );
+    }
+  };
 }; // namespace solvers
 

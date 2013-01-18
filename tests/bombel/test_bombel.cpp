@@ -8,8 +8,9 @@
  */
 
 // advection (<> should be used instead of "" in normal usage) 
-#include "advoocat/lib.hpp"
+#include "advoocat/mpdata_2d.hpp"
 #include "advoocat/solver_pressure.hpp"
+#include "advoocat/cyclic.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
