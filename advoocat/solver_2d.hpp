@@ -43,8 +43,8 @@ namespace solvers
       halo(halo),
       i(0, nx-1), 
       j(0, ny-1),  
-      bcx(rng_t(0, nx-1), rng_t(0, ny-1), halo), 
-      bcy(rng_t(0, ny-1), rng_t(0, nx-1), halo)
+      bcx(rng_t(0, nx-1), halo), 
+      bcy(rng_t(0, ny-1), halo)
     {
       for (int e = 0; e < n_eqs; ++e) // equations
         for (int l = 0; l < 2; ++l) // time levels
