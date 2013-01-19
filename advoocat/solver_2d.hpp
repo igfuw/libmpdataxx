@@ -7,6 +7,8 @@
 #pragma once
 
 #include "solver_common.hpp"
+#include "blitz.hpp"
+#include "arakawa_c.hpp"
 
 namespace solvers
 {
@@ -27,16 +29,6 @@ namespace solvers
       bcx.fill_halos(psi[e][ this->n[e] ], j^halo);
       bcy.fill_halos(psi[e][ this->n[e] ], i^halo);
     }
-
-    void xchng() 
-    {
-      for (int e = 0; e < n_eqs; ++e) 
-      {
-        bcx.fill_halos(psi[e][ this->n[e] ], j^halo);
-        bcy.fill_halos(psi[e][ this->n[e] ], i^halo);
-      }
-    }
-
 
     // ctor
     solver_2d(int nx, int ny, int halo) :
@@ -65,17 +57,6 @@ namespace solvers
     arr_2d_t<real_t> courant(int d) 
     { 
       return C[d]; 
-    }
-
-    // integration logic
-    void solve(const int nt) 
-    {
-      for (int t = 0; t < nt; ++t) 
-      {
-        xchng();
-        this->adv();
-        this->cycle();
-      }
     }
   };
 }; // namespace solvers

@@ -40,11 +40,11 @@ class pressure_solver : public homo_solver
 
 
       forcings(dt / 2);
-      this->xchng();
+      this->xchng_all();
       this->advop(tht);
       this->advop(u); 
       this->advop(w);   
-      this->cycle(); 
+      this->cycle_all(); 
       forcings(dt / 2);
     }
   }

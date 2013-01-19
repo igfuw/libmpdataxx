@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include "solver_1d.hpp"
-#include "solver_2d.hpp"
+#include "pi.hpp"
 
 namespace donorcell
 {
@@ -58,6 +57,26 @@ namespace donorcell
     )
   )
 
+  template<int d, class arr_3d_t>  
+  inline auto donorcell( 
+    const arr_3d_t &psi, 
+    const arr_3d_t &C, 
+    const rng_t &i, 
+    const rng_t &j,
+    const rng_t &k
+  ) return_macro(
+    F(
+      psi(pi<d>(i,   j, k)), 
+      psi(pi<d>(i+1, j, k)), 
+        C(pi<d>(i+h, j, k))
+    ) -
+    F(
+      psi(pi<d>(i-1, j, k)), 
+      psi(pi<d>(i,   j, k)), 
+        C(pi<d>(i-h, j, k))
+    )
+  )
+
   template <class arr_1d_t>
   void op_1d(
     const arrvec_t<arr_1d_t> &psi, 
@@ -79,39 +98,16 @@ namespace donorcell
       - donorcell<0>(psi[n], C[0], i, j)
       - donorcell<1>(psi[n], C[1], j, i); 
   }
+
+  template <class arr_3d_t>
+  void op_3d(
+    const arrvec_t<arr_3d_t> &psi, const int n,
+    const arrvec_t<arr_3d_t> &C, 
+    const rng_t &i, const rng_t &j, const rng_t &k
+  ) { 
+    psi[n+1](i,j) = psi[n](i,j)
+      - donorcell<0>(psi[n], C[0], i, j, k)
+      - donorcell<1>(psi[n], C[1], j, k, i)
+      - donorcell<2>(psi[n], C[2], k, i, j); 
+  }
 }; // namespace donorcell 
-
-namespace solvers
-{
-
-  template<class bcx_t, int n_eqs = 1, typename real_t = float>
-  struct donorcell_1d : solver_1d<bcx_t, n_eqs, real_t> 
-  {
-    donorcell_1d(int nx) :
-      solver_1d<bcx_t, n_eqs, real_t>(nx, /* halo = */ 1)
-    {}  
-
-    void advop(int e)
-    {
-      donorcell::op_1d(
-        this->psi[e], this->n[e], this->C[0], this->i
-      );
-    }
-  };
-
-  template<class bcx_t, class bcy_t, int n_eqs = 1, typename real_t = float>
-  struct donorcell_2d : solver_2d<bcx_t, bcy_t, n_eqs, real_t> 
-  {
-    donorcell_2d(int nx, int ny) :
-      solver_2d<bcx_t, bcy_t, n_eqs, real_t>(nx, ny, /* halo = */ 1)
-    {}  
-
-    void advop(int e)
-    {
-      donorcell::op_2d(
-        this->psi[e], this->n[e], this->C, this->i, this->j
-      );
-    }
-  };
-}; // namespace solvers
-

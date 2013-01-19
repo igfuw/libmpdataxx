@@ -12,6 +12,7 @@
  */
 
 // (<> should be used instead of "" in normal usage)
+#include "advoocat/donorcell_2d.hpp"
 #include "advoocat/mpdata_2d.hpp"
 #include "advoocat/cyclic_2d.hpp"
 
@@ -41,7 +42,6 @@ int main() {
      << "set border 4095\n"
      << "set xtics out\n"
      << "set ytics out\n"
-//     << "unset ztics\n"    
      << "set xlabel 'X'\n"
      << "set ylabel 'Y'\n"
      << "set xrange [0:" << n[x]-1 << "]\n"   
