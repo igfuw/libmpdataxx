@@ -10,10 +10,14 @@
 
 #pragma once
 
-template <class homo_solver>
+template <class homo_solver, bool naive = false>
 class inhomo_solver : public homo_solver
 {
-  using real_t = typename homo_solver::real_t;
+  public:
+
+  typedef typename homo_solver::real_t real_t;
+
+  private:
 
   real_t dt;
 
@@ -35,12 +39,18 @@ class inhomo_solver : public homo_solver
   {
     for (int t = 0; t < nt; ++t)
     {
-      forcings(dt / 2);
-      this->xchng();
-      this->adv();    
-      this->cycle(); 
-      forcings(dt / 2);
+      if (!naive) forcings(dt / 2);
+      else forcings(dt);
+
+      homo_solver::solve(1);
+      //this->xchng();
+      //this->adv();    
+      //this->cycle(); 
+
+      if (!naive) forcings(dt / 2);
     }
   }
 };
 
+template <class homo_solver>
+using inhomo_solver_naive = inhomo_solver<homo_solver, true>;
