@@ -51,7 +51,7 @@
 // advection (<> should be used instead of "" in normal usage)
 #include "advoocat/mpdata_1d.hpp"
 #include "advoocat/solver_inhomo.hpp"
-#include "advoocat/cyclic.hpp"
+#include "advoocat/cyclic_1d.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
