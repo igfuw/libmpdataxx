@@ -16,11 +16,14 @@
 
 #pragma once
 
-typedef double real_t;
-
 #include <blitz/array.h>
+
+template <typename real_t>
 using arr_1d_t = blitz::Array<real_t, 1>;
+
+template <typename real_t>
 using arr_2d_t = blitz::Array<real_t, 2>;
+
 using rng_t = blitz::Range;
 using idx_1d_t = blitz::RectDomain<1>;
 using idx_2d_t = blitz::RectDomain<2>;

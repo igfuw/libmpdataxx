@@ -6,21 +6,19 @@
 
 #pragma once
 
-#include "solvers_common.hpp"
+#include "solver_common.hpp"
 
 namespace solvers
 {
-  template<class bcx_t, class bcy_t, int n_eqs>
-  class solver_2d : public solver_common<n_eqs>
+  template<class bcx_t, class bcy_t, int n_eqs, typename real_t>
+  class solver_2d : public solver_common<n_eqs, real_t>
   {
-    //typedef arr_2d_t arr_t;
-
     protected:
   
     bcx_t bcx;
     bcy_t bcy;
 
-    arrvec_t<arr_2d_t> C, psi[n_eqs];
+    arrvec_t<arr_2d_t<real_t>> C, psi[n_eqs];
     int halo;
     rng_t i, j;
 
@@ -50,21 +48,21 @@ namespace solvers
     {
       for (int e = 0; e < n_eqs; ++e) // equations
         for (int l = 0; l < 2; ++l) // time levels
-          psi[e].push_back(new arr_2d_t(i^halo, j^halo));
+          psi[e].push_back(new arr_2d_t<real_t>(i^halo, j^halo));
 
-      C.push_back(new arr_2d_t(i^h, j^halo));
-      C.push_back(new arr_2d_t(i^halo, j^h));
+      C.push_back(new arr_2d_t<real_t>(i^h, j^halo));
+      C.push_back(new arr_2d_t<real_t>(i^halo, j^h));
     }
 
     public:
 
     // accessor methods
-    arr_2d_t state(int e = 0) 
+    arr_2d_t<real_t> state(int e = 0) 
     {
       return psi[e][ this->n[e] ](i,j).reindex({0,0});
     }
 
-    arr_2d_t courant(int d) 
+    arr_2d_t<real_t> courant(int d) 
     { 
       return C[d]; 
     }

@@ -6,7 +6,7 @@
  */
 
 #pragma once
-#include "solvers_common.hpp"
+#include "solver_common.hpp"
 
 template <class homo_solver>
 class pressure_solver : public homo_solver
@@ -14,28 +14,33 @@ class pressure_solver : public homo_solver
   //TODO as a template
   enum{tht, prs, u, w};
 
+  using real_t = typename homo_solver::real_t;
+
   //arrvec_t<typename homo_solver::arr_t> rhs;
   real_t dt;
   virtual void forcings(real_t dt) = 0;
 
-  arrvec_t<arr_2d_t> C;
-  //interpolate from "skalar filed" velocity to  shifted grid courant field
-  void intrp_courant()
+  void update_courant(real_t dt)
   {
-    arr_2d_t tmp, tmp_u;
+    // psi[n-1] will not be used anymore, and
+    // it will be intentionally overwritten!
+    arr_2d_t<real_t> tmp;
+    tmp = this->psi[u][n-1];
+    tmp /= -2;
+    tmp += 3./2 * this->psi[u][n];
+    //this->C = interpol(tmp); 
 
     const rng_t &i = this->i;
     const rng_t &j = this->j;
 
     //filing halos for velocity filed
+    //TODO remeber to take those that were extrapolated before
     this->xchng(u);
     this->xchng(w);
   
-//    tmp_c = this->courant(0);
-//    tmp = this->state(u);
-    this->courant(0)(i+h,j) = .5*(this->state(u)(i^h,j)+this->state(u)((i^h)+1,j));
-//    this->courant(0) = tmp_c;
-
+    //TODO - don't assume dx=1
+    this->courant(0)(i+h,j)   = .5 / dt * (this->state(u)(i^h,j  )+this->state(u)((i^h)+1, j     ));
+    this->courant(1)(i  ,j+h) = .5 / dt * (this->state(w)(i  ,j^h)+this->state(w)( i     ,(j^h)+1));
   }
 
   public:
@@ -48,12 +53,9 @@ class pressure_solver : public homo_solver
   {
     for (int t = 0; t < nt; ++t)
     {
-   
+      //extrapolate velocity field in time (t+1/2)
       //interpolate velocity to fill courant field
-      intrp_courant();
-
-      //extrapolate courant field for mpdata (t+1/2)
-      //(w tej kolejności mogę ciągle zaaplikowac prawą stronę do prędkości)
+      update_courant(dt);
 
       forcings(dt / 2);
       this->xchng();
