@@ -21,15 +21,15 @@
 #include <boost/assign/ptr_map_inserter.hpp>
 
 //TODO as a template
-enum {tht, prs, u, w};
-enum {x, y};
+// u, w must be first and second
+enum {u, w, tht, prs};
 
 template <int n_iters, typename real_t>
 using parent = pressure_solver<
   solvers::mpdata_2d<
     n_iters, 
-    cyclic_2d<x, real_t>, 
-    cyclic_2d<y, real_t>,
+    cyclic_2d<u, real_t>, 
+    cyclic_2d<w, real_t>,
     4, 
     real_t
   >
@@ -64,9 +64,9 @@ class bombel : public parent<n_iters, real_t>
 
 int main() 
 {
-  const int nx = 10, ny = 10, nt = 2, n_out=1;
+  const int nx = 50, ny = 50, nt = 3, n_out=1;
   using real_t = float;
-  const real_t C = .5, dt = 1;
+  const real_t dt = .5;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
@@ -79,10 +79,10 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    solver.state(tht) = real_t(287) + 2*exp(
-      -sqr(i-nx/2.) / (2.*pow(nx/10, 2))
-      -sqr(j-ny/4.) / (2.*pow(ny/10, 2))
-    );
+    solver.state(tht) = real_t(287) 
+      + 2*exp( -sqr(i-nx/2.) / (2.*pow(nx/10, 2))
+               -sqr(j-ny/4.) / (2.*pow(ny/10, 2)) )
+    ;
     solver.state(prs) = real_t(101300);
     solver.state(u) = real_t(0);
     solver.state(w) = real_t(0);
@@ -91,9 +91,9 @@ int main()
   //ploting
   Gnuplot gp;
   gp << "reset\n"
-     << "set term svg size 1000,1000 dynamic\n"
+     << "set term svg size 2000,500 dynamic\n"
      << "set output 'figure.svg'\n"
-     << "set multiplot layout 2,2\n"
+     << "set multiplot layout 1,4\n"
      << "set xlabel 'X'\n"
      << "set ylabel 'Y'\n"
      << "set xrange [0:" << nx-1 << "]\n"
@@ -109,40 +109,21 @@ int main()
   std::string binfmt;
   binfmt = gp.binfmt(solver.state());
 
-  // plot initial conditions
-  gp << "set title 'theta'\n"
-     << "set cbrange [287:289]\n"
-     << "splot '-' binary" << binfmt << "with image notitle\n";
-  gp.sendBinary(solver.state(tht).copy());
-
-  gp << "set title 'pressure'\n"
-     << "set cbrange [101200:101400]\n"
-     << "splot '-' binary" << binfmt << "with image notitle\n";
-  gp.sendBinary(solver.state(prs).copy());
-
   // integration
   for (int t = 0; t <= nt; ++t)
   {
     // TODO: trzeba pamiętać o odpowiedniku fill_halos dla courantów
-
     // uwaga: aktualnie courant() (w przeciwienstwie do state()) 
     // zwraca cala tablice razem z halo!
-    solver.courant(x) = real_t(0); 
-    solver.courant(y) = real_t(0);
 
     solver.solve(1); // 1 tymczasowo
 
-    if (t % n_out == 0 && t != 0)  
+    if (t % n_out == 0 /*&& t != 0*/)  
     {    
-      gp << "set cbrange [287:289]\n"
-         << "set title ' '\n"
+      gp << "set title ' '\n"
+         << "set cbrange [287:289]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
-
-      gp << "set cbrange [101200:101400]\n"
-         << "set title ' '\n"
-         << "splot '-' binary" << binfmt << "with image notitle\n";
-      gp.sendBinary(solver.state(prs).copy());
     }
   }
 };

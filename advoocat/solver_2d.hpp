@@ -24,11 +24,18 @@ namespace solvers
     int halo;
     rng_t i, j;
 
-    void xchng(int e) 
+    void xchng(int e) // for current time level
     {
       bcx.fill_halos(psi[e][ this->n[e] ], j^halo);
       bcy.fill_halos(psi[e][ this->n[e] ], i^halo);
     }
+
+    void xchng(int e, int lev) //for previous time level
+    {
+      bcx.fill_halos(psi[e][ this->n[e] - lev], j^halo);
+      bcy.fill_halos(psi[e][ this->n[e] - lev], i^halo);
+    }
+
 
     // ctor
     solver_2d(int nx, int ny, int halo) :
