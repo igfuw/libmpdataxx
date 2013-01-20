@@ -13,6 +13,8 @@ namespace solvers
   template<class bcx_t, int n_eqs, typename real_t>
   class solver_1d : public solver_common<n_eqs, real_t>
   {
+    using parent = solver_common<n_eqs, real_t>;
+
     protected:
 
     bcx_t bcx;
@@ -26,10 +28,9 @@ namespace solvers
     int halo;
     rng_t i;
 
-    void xchng() 
+    void xchng(int e) 
     {
-      for (int e = 0; e < n_eqs; ++e) 
-        bcx.fill_halos( psi[e][ this->n[e] ] );
+      bcx.fill_halos( psi[e][ this->n[e] ] );
     }
 
     // ctor
@@ -46,17 +47,6 @@ namespace solvers
     }
 
     public:
-
-    // integration logic
-    void solve(const int nt) 
-    {
-      for (int t = 0; t < nt; ++t) 
-      {
-        xchng();
-        this->adv();
-        this->cycle();
-      }
-    }
 
     // accessor method for psi (hides the halo region)
     arr_1d_t<real_t> state(int e = 0) 

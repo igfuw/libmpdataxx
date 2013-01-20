@@ -51,7 +51,7 @@
 // advection (<> should be used instead of "" in normal usage)
 #include "advoocat/mpdata_1d.hpp"
 #include "advoocat/solver_inhomo.hpp"
-#include "advoocat/cyclic.hpp"
+#include "advoocat/cyclic_1d.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
@@ -67,19 +67,11 @@ using boost::math::constants::pi;
 
 enum {psi, phi};
 
-template <int n_iters, typename real_t>
-using parent = inhomo_solver<
-  solvers::mpdata_1d<
-    n_iters, 
-    cyclic_1d<real_t>, 
-    2, 
-    real_t
-  >
->;
-
-template <int n_iters, typename real_t = float>
-class coupled_harmosc : public parent<n_iters, real_t>
+template <class inhomo_solver_t>
+class coupled_harmosc : public inhomo_solver_t
 {
+  using real_t = typename inhomo_solver_t::real_t;
+
   real_t omega;
   arr_1d_t<real_t> tmp;
 
@@ -104,7 +96,7 @@ class coupled_harmosc : public parent<n_iters, real_t>
   public:
 
   coupled_harmosc(int n, real_t dt, real_t omega) :
-    parent<n_iters, real_t>(n, dt),
+    inhomo_solver_t(n, dt),
     omega(omega), tmp(this->state(0).extent(0))
   {
   }
@@ -118,7 +110,15 @@ int main()
   const real_t C = .5, dt = 1;
   const real_t omega = 2*pi<real_t>() / dt / 400;
  
-  coupled_harmosc<3, real_t> solver(nx, dt, omega);
+  const int n_iters = 3, n_eqs = 2;
+
+  coupled_harmosc<
+    inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
+      solvers::mpdata_1d<
+        n_iters, cyclic_1d<real_t>, n_eqs, real_t
+      >
+    >
+  > solver(nx, dt, omega);
 
   Gnuplot gp;
   gp << "set term svg size 1000,500 dynamic enhanced\n" 

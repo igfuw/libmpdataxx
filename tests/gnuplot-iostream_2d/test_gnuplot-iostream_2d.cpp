@@ -11,7 +11,8 @@
 
 // (<> should be used instead of "" in normal usage)
 #include "advoocat/mpdata_2d.hpp"
-#include "advoocat/cyclic.hpp"
+#include "advoocat/donorcell_2d.hpp"
+#include "advoocat/cyclic_2d.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>

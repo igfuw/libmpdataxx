@@ -18,20 +18,27 @@
 
 #include <blitz/array.h>
 
-template <typename real_t>
-using arr_1d_t = blitz::Array<real_t, 1>;
-
-template <typename real_t>
-using arr_2d_t = blitz::Array<real_t, 2>;
-
-using rng_t = blitz::Range;
+// 1D
+template <typename real_t> using arr_1d_t = blitz::Array<real_t, 1>;
 using idx_1d_t = blitz::RectDomain<1>;
+
+// 2D
+template <typename real_t> using arr_2d_t = blitz::Array<real_t, 2>;
 using idx_2d_t = blitz::RectDomain<2>;
 
+// 3D
+template <typename real_t> using arr_3d_t = blitz::Array<real_t, 3>;
+using idx_3d_t = blitz::RectDomain<3>;
+
+// range
+using rng_t = blitz::Range;
+
+// C++11 auto return type macro
 #define return_macro(expr) \
   -> decltype(blitz::safeToReturn(expr)) \
 { return safeToReturn(expr); } 
 
+// Boost ptr_vector 
 #include <boost/ptr_container/ptr_vector.hpp>
 template <class arr_t>
 struct arrvec_t : boost::ptr_vector<arr_t> {
