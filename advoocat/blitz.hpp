@@ -18,19 +18,7 @@
 
 #include <blitz/array.h>
 
-// 1D
-template <typename real_t> using arr_1d_t = blitz::Array<real_t, 1>;
-using idx_1d_t = blitz::RectDomain<1>;
-
-// 2D
-template <typename real_t> using arr_2d_t = blitz::Array<real_t, 2>;
-using idx_2d_t = blitz::RectDomain<2>;
-
-// 3D
-template <typename real_t> using arr_3d_t = blitz::Array<real_t, 3>;
-using idx_3d_t = blitz::RectDomain<3>;
-
-// range
+template <int n_dims> using idx_t = blitz::RectDomain<n_dims>;
 using rng_t = blitz::Range;
 
 // C++11 auto return type macro

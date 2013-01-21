@@ -9,17 +9,20 @@
 #include "cyclic_common.hpp"
 
 template <typename real_t = float>
-class cyclic_1d : cyclic_common<real_t>
+class cyclic_1d : cyclic_common<1, real_t>
 {
+  using parent = cyclic_common<1, real_t>;
+  using arr_1d_t = typename parent::arr_t;
+
   public:
 
   // ctor
   cyclic_1d(const rng_t &i, int halo) :
-    cyclic_common<real_t>(i, halo)
+    parent(i, halo)
   {}
 
   // method invoked by the solver
-  void fill_halos(const arr_1d_t<real_t> &a)
+  void fill_halos(const arr_1d_t &a)
   {
     a(this->left_halo) = a(this->rght_edge);     
     a(this->rght_halo) = a(this->left_edge);     

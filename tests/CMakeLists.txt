@@ -4,4 +4,4 @@ add_subdirectory(gnuplot-iostream_2d)
 add_subdirectory(var_sign_2d)
 add_subdirectory(harmosc)
 add_subdirectory(bombel)
-
+add_subdirectory(todo_3d)

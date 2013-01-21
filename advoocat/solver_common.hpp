@@ -6,14 +6,27 @@
 
 #pragma once
 
+#include "blitz.hpp"
 #include <vector>
+#include <blitz/array.h>
 
 namespace solvers
 {
-  template <int n_eqs, typename _real_t>
+  template <int n_eqs, int n_dims, typename _real_t>
   class solver_common
   {
+    public:
+
+    typedef _real_t real_t;
+    typedef blitz::Array<real_t, n_dims> arr_t;
+
     protected: 
+
+    // member fields
+    arrvec_t<arr_t> C;
+
+    // psi contains model state including halo region
+    arrvec_t<arr_t> psi[n_eqs];
 
     std::vector<int> n;
 
@@ -41,8 +54,6 @@ namespace solvers
 
     public:
 
-    typedef _real_t real_t;
- 
     solver_common() :
       n(n_eqs, 0) 
     {}
@@ -56,5 +67,13 @@ namespace solvers
         cycle_all();
       }   
     }
+
+    public:
+
+    // accessor method for the Courant number field
+    arr_t courant(int d = 0) 
+    {   
+      return this->C[d]; 
+    }   
   };
 }; // namespace solvers

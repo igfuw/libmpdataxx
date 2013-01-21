@@ -71,9 +71,10 @@ template <class inhomo_solver_t>
 class coupled_harmosc : public inhomo_solver_t
 {
   using real_t = typename inhomo_solver_t::real_t;
+  using arr_1d_t = typename inhomo_solver_t::arr_t;
 
   real_t omega;
-  arr_1d_t<real_t> tmp;
+  arr_1d_t tmp;
 
   void forcings(real_t dt)
   {
@@ -144,7 +145,7 @@ int main()
        << ", '-' lt 3 with lines notitle";
   gp << "\n";
 
-  arr_1d_t<real_t> en(nx);
+  decltype(solver)::arr_t en(nx);
 
   // sending initial condition
   gp.send(solver.state(psi));

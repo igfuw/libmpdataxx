@@ -6,9 +6,15 @@
 
 #pragma once
 
-template <typename real_t = float>
+#include <blitz/array.h>
+
+template <int n_dims, typename real_t = float>
 class cyclic_common
 {
+  public:
+
+  typedef blitz::Array<real_t, n_dims> arr_t;
+
   protected:
 
   // member fields

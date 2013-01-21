@@ -15,8 +15,11 @@ namespace solvers
   template<int n_iters, class bcx_t, class bcy_t, int n_eqs = 1, typename real_t = float>
   class mpdata_2d : public solver_2d<bcx_t, bcy_t, n_eqs, real_t>
   {
+    using parent = solver_2d<bcx_t, bcy_t, n_eqs, real_t>;
+    using arr_2d_t = typename parent::arr_t;
+
     // member fields
-    arrvec_t<arr_2d_t<real_t>> tmp[2];
+    arrvec_t<arr_2d_t> tmp[2];
     rng_t im, jm;
 
     protected:
@@ -37,7 +40,7 @@ namespace solvers
           this->bcy.fill_halos(this->psi[e][this->n[e]], this->i^this->halo);
 
           // choosing input/output for antidiff C
-          const arrvec_t<arr_2d_t<real_t>>
+          const arrvec_t<arr_2d_t>
             &C_unco = (step == 1) 
               ? this->C 
               : (step % 2) 
@@ -80,12 +83,8 @@ namespace solvers
       int n_tmp = n_iters > 2 ? 2 : 1;
       for (int n = 0; n < n_tmp; ++n)
       {
-        tmp[n].push_back(new arr_2d_t<real_t>(
-          this->i^h, this->j^this->halo 
-        ));
-        tmp[n].push_back(new arr_2d_t<real_t>(
-          this->i^this->halo, this->j^h
-        ));
+        tmp[n].push_back(new arr_2d_t( this->i^h, this->j^this->halo ));
+        tmp[n].push_back(new arr_2d_t( this->i^this->halo, this->j^h ));
       }
     }
   };

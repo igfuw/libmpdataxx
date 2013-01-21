@@ -15,8 +15,11 @@ namespace solvers
   template<int n_iters, class bcx_t, int n_eqs = 1, typename real_t = float>
   class mpdata_1d : public solver_1d<bcx_t, n_eqs, real_t>
   {
+    using parent = solver_1d<bcx_t, n_eqs, real_t>;
+    using arr_1d_t = typename parent::arr_t;
+
     // member fields
-    arrvec_t<arr_1d_t<real_t>> tmp[2];
+    arrvec_t<arr_1d_t> tmp[2];
     rng_t im;
 
     protected:
@@ -34,7 +37,7 @@ namespace solvers
           this->bcx.fill_halos(this->psi[e][this->n[e]]);
 
           // choosing input/output for antidiff C
-          const arr_1d_t<real_t>
+          const arr_1d_t
             &C_unco = (step == 1) 
               ? this->C[0] 
               : (step % 2) 
@@ -62,14 +65,13 @@ namespace solvers
 
     // ctor
     mpdata_1d(int nx) : 
-      solver_1d<bcx_t, n_eqs, real_t>(nx, /* halo = */1), 
+      parent(nx, /* halo = */1), 
       im(this->i.first() - 1, this->i.last())
     {
       int n_tmp = n_iters > 2 ? 2 : 1;
       for (int n = 0; n < n_tmp; ++n)
       {
-        tmp[n].push_back(new arr_1d_t<real_t>(
-          this->i^h));
+        tmp[n].push_back(new arr_1d_t( this->i^h ));
       }
     }
 

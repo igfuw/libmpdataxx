@@ -19,59 +19,59 @@
 // 2D
 
 template<int d> 
-inline idx_2d_t pi(
+inline idx_t<2> pi(
   const rng_t &i, 
   const rng_t &j
 );
 
 template<>
-inline idx_2d_t pi<0>(
+inline idx_t<2> pi<0>(
   const rng_t &i, 
   const rng_t &j
 ) {
-  return idx_2d_t({i,j});
+  return idx_t<2>({i,j});
 }
 
 template<>
-inline idx_2d_t pi<1>(
+inline idx_t<2> pi<1>(
   const rng_t &j, 
   const rng_t &i
 ) {
-  return idx_2d_t({i,j});
+  return idx_t<2>({i,j});
 } 
 
 // 3D
 
 template<int d> 
-inline idx_3d_t pi(
+inline idx_t<3> pi(
   const rng_t &i, 
   const rng_t &j,
   const rng_t &k
 );
 
 template<>
-inline idx_3d_t pi<0>(
+inline idx_t<3> pi<0>(
   const rng_t &i, 
   const rng_t &j,
   const rng_t &k
 ) {
-  return idx_3d_t({i,j,k});
+  return idx_t<3>({i,j,k});
 }
 
 template<>
-inline idx_3d_t pi<1>(
+inline idx_t<3> pi<1>(
   const rng_t &j, 
   const rng_t &k,
   const rng_t &i
 ) {
-  return idx_3d_t({i,j,k});
+  return idx_t<3>({i,j,k});
 }
 
 template<>
-inline idx_3d_t pi<2>(
+inline idx_t<3> pi<2>(
   const rng_t &k, 
   const rng_t &i,
   const rng_t &j
 ) {
-  return idx_3d_t({i,j,k});
+  return idx_t<3>({i,j,k});
 }
