@@ -7,7 +7,7 @@
 #pragma once
 
 #include "solver_3d.hpp"
-#include "donorcell_common.hpp"
+#include "donorcell_formulae.hpp"
 
 namespace solvers
 {
