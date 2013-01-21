@@ -81,7 +81,7 @@ int main()
 
     solver.state(tht) = real_t(287) 
       + 2*exp( -sqr(i-nx/2.) / (2.*pow(nx/10, 2))
-               -sqr(j-ny/4.) / (2.*pow(ny/10, 2)) )
+               -sqr(j-ny/3.) / (2.*pow(ny/10, 2)) )
     ;
     solver.state(prs) = real_t(101300);
     solver.state(u) = real_t(0);
@@ -93,7 +93,8 @@ int main()
   gp << "reset\n"
      << "set term svg size 2000,1000 dynamic\n"
      << "set output 'figure.svg'\n"
-     << "set multiplot layout 2,4\n"
+     << "set multiplot layout 2,5 columnsfirst\n"
+     << "set grid\n"
      << "set xlabel 'X'\n"
      << "set ylabel 'Y'\n"
      << "set xrange [0:" << nx-1 << "]\n"
@@ -120,11 +121,11 @@ int main()
 
     if (t % n_out == 0 /*&& t != 0*/)  
     {    
-      gp << "set title 'tht'\n"
+      gp << "set title 'tht @ t=" << t+1 << "'\n"
          << "set cbrange [287:289]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
-      gp << "set title 'w'\n"
+      gp << "set title 'w @ t=" << t+1 << "'\n"
          << "set cbrange [0:.4]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(w).copy());
