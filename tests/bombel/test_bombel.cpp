@@ -64,9 +64,9 @@ class bombel : public parent<n_iters, real_t>
 
 int main() 
 {
-  const int nx = 50, ny = 50, nt = 3, n_out=1;
+  const int nx = 50, ny = 50, nt = 8, n_out=2;
   using real_t = float;
-  const real_t dt = .5;
+  const real_t dt = .25;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
@@ -84,16 +84,16 @@ int main()
                -sqr(j-ny/4.) / (2.*pow(ny/10, 2)) )
     ;
     solver.state(prs) = real_t(101300);
-    solver.state(u) = real_t(.1);
+    solver.state(u) = real_t(0);
     solver.state(w) = real_t(0);
   }
 
   //ploting
   Gnuplot gp;
   gp << "reset\n"
-     << "set term svg size 2000,500 dynamic\n"
+     << "set term svg size 2000,1000 dynamic\n"
      << "set output 'figure.svg'\n"
-     << "set multiplot layout 1,4\n"
+     << "set multiplot layout 2,4\n"
      << "set xlabel 'X'\n"
      << "set ylabel 'Y'\n"
      << "set xrange [0:" << nx-1 << "]\n"
@@ -120,10 +120,16 @@ int main()
 
     if (t % n_out == 0 /*&& t != 0*/)  
     {    
-      gp << "set title ' '\n"
+      gp << "set title 'tht'\n"
          << "set cbrange [287:289]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
+      gp << "set title 'w'\n"
+         << "set cbrange [0:.4]\n"
+         << "splot '-' binary" << binfmt << "with image notitle\n";
+      gp.sendBinary(solver.state(w).copy());
+ 
+
     }
   }
 };

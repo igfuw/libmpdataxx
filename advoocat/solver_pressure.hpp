@@ -24,9 +24,16 @@ class pressure_solver : public homo_solver
   void extrp_velocity(int e, int t) //extrapolate in time to t+1/2
   {                  // psi[n-1] will not be used anymore, and it will be intentionally overwritten!
 
-      auto tmp = this->psi[e][this->n[e] -1];
+    auto tmp = this->psi[e][this->n[e] -1];
+    if(t == 0)
+    {
+      tmp = this->psi[e][this->n[e]];      
+    }
+    if(t != 0)
+    {
       tmp /= -2;
       tmp += 3./2 * this->psi[e][this->n[e]]; 
+    }
   }
 
   void intrp_courant(real_t dt) //interpolate in space to courant field
@@ -42,9 +49,9 @@ class pressure_solver : public homo_solver
   
     //TODO - don't assume dx=1
     real_t dx = 1;
-
-    this->courant(u)(im+h,j  ) = dt / dx * .5 * (tmp_u(im,j  )+tmp_u(im+1, j     ));
-    this->courant(w)(i  ,jm+h) = dt / dx * .5 * (tmp_w(i  ,jm)+tmp_w( i     ,jm+1));
+    real_t dy = 1;
+    this->courant(u)(im+h,j   ) = dt / dx * .5 * (tmp_u(im,j ) + tmp_u(im+1,j   ));
+    this->courant(w)(i   ,jm+h) = dt / dy * .5 * (tmp_w(i ,jm) + tmp_w(i   ,jm+1));
   }
 
   public:
