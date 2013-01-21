@@ -48,7 +48,7 @@ class bombel : public parent<n_iters, real_t>
   const real_t Tht_amb = 287;    //[K]
 
   //TODO  can't work yet - no pressure gradient force
-  W += dt * g * (Tht - Tht_amb) / Tht_amb; 
+//  W += dt * g * (Tht - Tht_amb) / Tht_amb; 
 
   //TODO forcings for theta
  
@@ -66,7 +66,7 @@ int main()
 {
   const int nx = 50, ny = 50, nt = 3, n_out=1;
   using real_t = float;
-  const real_t dt = .5;
+  const real_t dt = 1;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
@@ -84,7 +84,7 @@ int main()
                -sqr(j-ny/4.) / (2.*pow(ny/10, 2)) )
     ;
     solver.state(prs) = real_t(101300);
-    solver.state(u) = real_t(0);
+    solver.state(u) = real_t(.75);
     solver.state(w) = real_t(0);
   }
 
