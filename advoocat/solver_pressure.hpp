@@ -8,22 +8,23 @@
 #pragma once
 #include "solver_common.hpp"
 
-template <class homo_solver>
+template <class homo_solver, int u, int w, int tht, int prs>
 class pressure_solver : public homo_solver
 {
-  //TODO as a template
-  // u, w must be first and second
-  enum{u, w, tht, prs};
+  public:
 
-  using real_t = typename homo_solver::real_t;
+  typedef typename homo_solver::real_t real_t;
+
+  private:
 
   real_t dt;
   rng_t im, jm;
+
   virtual void forcings(real_t dt) = 0;
 
   void extrp_velocity(int e, int t) //extrapolate in time to t+1/2
-  {                  // psi[n-1] will not be used anymore, and it will be intentionally overwritten!
-
+  {                  
+    // psi[n-1] will not be used anymore, and it will be intentionally overwritten!
     auto tmp = this->psi[e][this->n[e] -1];
     if(t == 0)
     {
@@ -71,11 +72,12 @@ class pressure_solver : public homo_solver
       intrp_courant(dt);      //interpolate velocity to fill courant field
  
       forcings(dt / 2);
-      this->xchng_all();
-      this->advop(tht);
-      this->advop(u); 
-      this->advop(w);   
-      this->cycle_all(); 
+      
+      homo_solver::solve(1);
+//      this->xchng_all();
+//      this->advop_all();
+//      this->cycle_all(); 
+
       forcings(dt / 2);
     }
   }

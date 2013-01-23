@@ -51,8 +51,8 @@ namespace solvers
         for (int l = 0; l < 2; ++l) // time levels
           this->psi[e].push_back(new arr_2d_t(i^halo, j^halo));
 
-      this->C.push_back(new arr_2d_t(i^h, j^halo));
-      this->C.push_back(new arr_2d_t(i^halo, j^h));
+      this->C.push_back(new arr_2d_t(i^h   , j^halo));
+      this->C.push_back(new arr_2d_t(i^halo, j^h   ));
     }
 
     public:

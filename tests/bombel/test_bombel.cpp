@@ -20,7 +20,10 @@
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
 
-//TODO as a template
+//gradient
+#include <blitz/array/stencils.h>
+#include <blitz/array/stencilops.h>
+
 // u, w must be first and second
 enum {u, w, tht, prs};
 
@@ -32,26 +35,40 @@ using parent = pressure_solver<
     cyclic_2d<w, real_t>,
     4, 
     real_t
-  >
+  >, u, w, tht, prs
 >;
 
 template <int n_iters, typename real_t = float>
 class bombel : public parent<n_iters, real_t>
 {
+  typedef blitz::Array<real_t, 2> arr_2d_t;
+
   void forcings(real_t dt)
   {
-  auto W = this->state(w);
-  auto Tht = this->state(tht);
+    auto W   = this->state(w);
+    auto U   = this->state(u);
+    auto Tht = this->state(tht);
+    auto Prs = this->state(prs);
   
-  //TODO units, physical constants
-  const real_t g = 9.81;         //[m/s]
-  const real_t Tht_amb = 287;    //[K]
+    arr_2d_t tmp;
 
-  //TODO  can't work yet - no pressure gradient force
-  W += dt * g * (Tht - Tht_amb) / Tht_amb; 
+    //TODO units, physical constants
+    const real_t g = 9.81;          //[m/s]
+    const real_t Tht_amb = 287;     //[K]
+    const real_t Prs_amb = 101300;  //[Pa]
 
-  //TODO forcings for theta
- 
+    //stencil declaration
+    BZ_DECLARE_STENCIL3(pres_grad, tmp, Prs, Prs_amb)
+      tmp = grad2D(Prs-Prs_amb);
+    BZ_END_STENCIL
+
+    //TODO  can't work yet - no pressure gradient force
+    W +=  dt * g * (Tht - Tht_amb) / Tht_amb 
+        - dt * applyStencil(pres_grad(), tmp, Prs, Prs_amb)
+     ;
+
+    //TODO forcings for theta
+    // Tht -= dt * (u*grad_x(Tht) + w*grad_z(Tht))
   }
 
   public:
@@ -64,9 +81,9 @@ class bombel : public parent<n_iters, real_t>
 
 int main() 
 {
-  const int nx = 50, ny = 50, nt = 8, n_out=2;
+  const int nx = 50, ny = 50, nt = 41, n_out=10;
   using real_t = float;
-  const real_t dt = .25;
+  const real_t dt = .1;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
@@ -84,8 +101,8 @@ int main()
                -sqr(j-ny/3.) / (2.*pow(ny/10, 2)) )
     ;
     solver.state(prs) = real_t(101300);
-    solver.state(u) = real_t(0);
-    solver.state(w) = real_t(0);
+    solver.state(u) = real_t(0); 
+    solver.state(w) = real_t(0); 
   }
 
   //ploting
@@ -119,18 +136,16 @@ int main()
 
     solver.solve(1); // 1 tymczasowo
 
-    if (t % n_out == 0 /*&& t != 0*/)  
-    {    
+   if (t % n_out == 0 /*&& t != 0*/)  
+   {    
       gp << "set title 'tht @ t=" << t+1 << "'\n"
-         << "set cbrange [287:289]\n"
+//         << "set cbrange [268:308]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
       gp << "set title 'w @ t=" << t+1 << "'\n"
-         << "set cbrange [0:.4]\n"
+//         << "set cbrange [-.2:.4]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(w).copy());
- 
-
-    }
+   }
   }
 };
