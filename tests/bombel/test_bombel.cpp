@@ -46,7 +46,7 @@ pressure_solver<
 template <int n_iters, typename real_t = float>
 class bombel : public parent<n_iters, real_t>
 {
-  typedef blitz::Array<real_t, 2> arr_2d_t;
+  using arr_2d_t = typename parent<n_iters, real_t>::arr_t;
 
   void forcings(real_t dt)
   {
@@ -59,17 +59,9 @@ class bombel : public parent<n_iters, real_t>
 
     this->xchng(tht); //for gradient
 
-    //TODO make it work with diagnose::p()
     // diagnose pressure from theta field
     arr_2d_t Prs(this->nx, this->ny+2);
-    for(int k=0; k<=this->nx-1; k++){
-      for(int l=0; l<=this->ny+1; l++){ 
-        Prs(k,l) = phc::p_1000<real_t>() / si::pascals * real_t(pow(
-          (Tht(k,l) * si::kilograms / si::cubic_metres * si::kelvins * phc::R_d<real_t>()) / phc::p_1000<real_t>(), 
-          real_t(1) / (real_t(1) - phc::R_d_over_c_pd<real_t>())
-          ));
-      }
-    }
+    Prs = diagnose::p(Tht);
 
     //reference state for pressure
     blitz::Array<real_t, 1> Prs_amb(this->ny+2);  //[Pa]  TODO units, physical constants

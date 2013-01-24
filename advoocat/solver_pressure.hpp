@@ -21,7 +21,6 @@ class pressure_solver : public inhomo_solver
 
   private:
 
-  real_t dt;
   rng_t im, jm;
   //TODO don't assume dx=dz=1
   real_t dx = 1;
@@ -50,14 +49,14 @@ class pressure_solver : public inhomo_solver
     this->xchng(u, 1);      // filling halos for velocity filed
     this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
 
-    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]-1], im, this->j, dt, dx);
-    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]-1], jm, this->i, dt, dz);
+    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]-1], im, this->j, this->dt, dx);
+    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]-1], jm, this->i, this->dt, dz);
   } 
 
   public:
   // ctor
   pressure_solver(int nx, int ny, real_t dt) :
-    inhomo_solver(nx, ny, dt), dt(dt),
+    inhomo_solver(nx, ny, dt),
     ny(ny), nx(nx),
     im(this->i.first() - 1, this->i.last()),
     jm(this->j.first() - 1, this->j.last())
@@ -77,4 +76,3 @@ class pressure_solver : public inhomo_solver
     }
   }
 };
-

@@ -19,9 +19,11 @@ class inhomo_solver : public homo_solver
 
   private:
 
-  real_t dt;
-
   virtual void forcings(real_t dt) = 0;
+
+  protected:
+
+  real_t dt;
 
   public:
 
@@ -43,9 +45,6 @@ class inhomo_solver : public homo_solver
       else forcings(dt);
 
       homo_solver::solve(1);
-      //this->xchng();
-      //this->adv();    
-      //this->cycle(); 
 
       if (!naive) forcings(dt / 2);
     }
