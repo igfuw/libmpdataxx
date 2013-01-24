@@ -11,6 +11,12 @@
 #include "advoocat/mpdata_2d.hpp"
 #include "advoocat/solver_pressure.hpp"
 #include "advoocat/cyclic_2d.hpp"
+//gradient
+#include "advoocat/nabla_formulae.hpp"
+//physical constants
+#include "advoocat/phc.hpp"
+//theta->pressure
+#include "advoocat/diagnose_formulae.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
@@ -20,22 +26,21 @@
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
 
-//gradient
-#include <blitz/array/stencils.h>
-#include <blitz/array/stencilops.h>
-
-// u, w must be first and second
-enum {u, w, tht, prs};
+enum {u, w, tht};  //eqations
+enum {x, z};       //dimensions
 
 template <int n_iters, typename real_t>
-using parent = pressure_solver<
-  solvers::mpdata_2d<
-    n_iters, 
-    cyclic_2d<u, real_t>, 
-    cyclic_2d<w, real_t>,
-    4, 
-    real_t
-  >, u, w, tht, prs
+using parent = 
+pressure_solver<
+  inhomo_solver<
+    solvers::mpdata_2d<
+      n_iters, 
+      cyclic_2d<x, real_t>, 
+      cyclic_2d<z, real_t>,
+      3, 
+      real_t
+    >
+  >, u, w, tht, x, z
 >;
 
 template <int n_iters, typename real_t = float>
@@ -48,27 +53,38 @@ class bombel : public parent<n_iters, real_t>
     auto W   = this->state(w);
     auto U   = this->state(u);
     auto Tht = this->state(tht);
-    auto Prs = this->state(prs);
-  
-    arr_2d_t tmp;
 
     //TODO units, physical constants
-    const real_t g = 9.81;          //[m/s]
-    const real_t Tht_amb = 287;     //[K]
-    const real_t Prs_amb = 101300;  //[Pa]
+    const real_t Tht_amb = 300;     //[K]
 
-    //stencil declaration
-    BZ_DECLARE_STENCIL3(pres_grad, tmp, Prs, Prs_amb)
-      tmp = grad2D(Prs-Prs_amb);
-    BZ_END_STENCIL
+    this->xchng(tht); //for gradient
+
+    //TODO make it work with diagnose::p()
+    // diagnose pressure from theta field
+    arr_2d_t Prs(this->nx, this->ny+2);
+    for(int k=0; k<=this->nx-1; k++){
+      for(int l=0; l<=this->ny+1; l++){ 
+        Prs(k,l) = phc::p_1000<real_t>() / si::pascals * real_t(pow(
+          (Tht(k,l) * si::kilograms / si::cubic_metres * si::kelvins * phc::R_d<real_t>()) / phc::p_1000<real_t>(), 
+          real_t(1) / (real_t(1) - phc::R_d_over_c_pd<real_t>())
+          ));
+      }
+    }
+
+    //reference state for pressure
+    blitz::Array<real_t, 1> Prs_amb(this->ny+2);  //[Pa]  TODO units, physical constants
+    Prs_amb = 81138.2;
+    blitz::secondIndex k;
+
+    rng_t l(1, this->ny-1);
 
     //TODO  can't work yet - no pressure gradient force
-    W +=  dt * g * (Tht - Tht_amb) / Tht_amb 
-        - dt * applyStencil(pres_grad(), tmp, Prs, Prs_amb)
-     ;
+    W += (dt * si:: seconds) * phc::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb
+        - dt * nabla_op::grad<1>(/*diagnose::p(Tht, this->i, this->j)*/ (Prs - Prs_amb(k) / Prs_amb(k)), l, this->i, real_t(1))
+    ;
 
     //TODO forcings for theta
-    // Tht -= dt * (u*grad_x(Tht) + w*grad_z(Tht))
+    // Tht -= dt * (U*nabla_op::grad<0>(Tht_amb) + W*nabla_op::grad<1>(Tht_amb))
   }
 
   public:
@@ -81,7 +97,8 @@ class bombel : public parent<n_iters, real_t>
 
 int main() 
 {
-  const int nx = 50, ny = 50, nt = 41, n_out=10;
+  const int nx = 50, ny = 50, nt = 4, n_out=1;
+//  const int nx = 50, ny = 50, nt = 41, n_out=10;
   using real_t = float;
   const real_t dt = .1;
 
@@ -96,11 +113,10 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    solver.state(tht) = real_t(287) 
-      + 2*exp( -sqr(i-nx/2.) / (2.*pow(nx/10, 2))
+    solver.state(tht) = real_t(300) 
+      + exp( -sqr(i-nx/2.) / (2.*pow(nx/10, 2))
                -sqr(j-ny/3.) / (2.*pow(ny/10, 2)) )
     ;
-    solver.state(prs) = real_t(101300);
     solver.state(u) = real_t(0); 
     solver.state(w) = real_t(0); 
   }
@@ -130,16 +146,12 @@ int main()
   // integration
   for (int t = 0; t <= nt; ++t)
   {
-    // TODO: trzeba pamiętać o odpowiedniku fill_halos dla courantów
-    // uwaga: aktualnie courant() (w przeciwienstwie do state()) 
-    // zwraca cala tablice razem z halo!
-
     solver.solve(1); // 1 tymczasowo
 
    if (t % n_out == 0 /*&& t != 0*/)  
    {    
       gp << "set title 'tht @ t=" << t+1 << "'\n"
-//         << "set cbrange [268:308]\n"
+//         << "set cbrange [286:290]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
       gp << "set title 'w @ t=" << t+1 << "'\n"

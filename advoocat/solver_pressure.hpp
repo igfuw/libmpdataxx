@@ -7,20 +7,25 @@
 
 #pragma once
 #include "solver_common.hpp"
+#include "solver_inhomo.hpp"
+#include "courant_formulae.hpp"
 
-template <class homo_solver, int u, int w, int tht, int prs>
-class pressure_solver : public homo_solver
+template <class inhomo_solver, int u, int w, int tht, int x, int z>
+class pressure_solver : public inhomo_solver
 {
   public:
 
-  typedef typename homo_solver::real_t real_t;
+  typedef typename inhomo_solver::real_t real_t;
+  real_t ny;
+  real_t nx;
 
   private:
 
   real_t dt;
   rng_t im, jm;
-
-  virtual void forcings(real_t dt) = 0;
+  //TODO don't assume dx=dz=1
+  real_t dx = 1;
+  real_t dz = 1;
 
   void extrp_velocity(int e, int t) //extrapolate in time to t+1/2
   {                  
@@ -37,28 +42,23 @@ class pressure_solver : public homo_solver
     }
   }
 
-  void intrp_courant(real_t dt) //interpolate in space to courant field
-  { 
-    const rng_t &i = this->i;
-    const rng_t &j = this->j;
+  void update_courant(int t)
+  {
+    extrp_velocity(u, t);   //extrapolate velocity field in time (t+1/2)
+    extrp_velocity(w, t);
 
-    this->xchng(u, 1);  // filling halos for velocity filed
-    this->xchng(w, 1);  // psi[n-1] was overwriten for that by extrp_velocity
+    this->xchng(u, 1);      // filling halos for velocity filed
+    this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
 
-    auto tmp_u = this->psi[u][this->n[u]-1];
-    auto tmp_w = this->psi[w][this->n[w]-1];
-  
-    //TODO - don't assume dx=1
-    real_t dx = 1;
-    real_t dy = 1;
-    this->courant(u)(im+h,j   ) = dt / dx * .5 * (tmp_u(im,j ) + tmp_u(im+1,j   ));
-    this->courant(w)(i   ,jm+h) = dt / dy * .5 * (tmp_w(i ,jm) + tmp_w(i   ,jm+1));
-  }
+    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]-1], im, this->j, dt, dx);
+    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]-1], jm, this->i, dt, dz);
+  } 
 
   public:
   // ctor
   pressure_solver(int nx, int ny, real_t dt) :
-    homo_solver(nx, ny), dt(dt),
+    inhomo_solver(nx, ny, dt), dt(dt),
+    ny(ny), nx(nx),
     im(this->i.first() - 1, this->i.last()),
     jm(this->j.first() - 1, this->j.last())
   {}
@@ -67,18 +67,13 @@ class pressure_solver : public homo_solver
   {
     for (int t = 0; t < nt; ++t)
     {
-      extrp_velocity(u, t);   //extrapolate velocity field in time (t+1/2)
-      extrp_velocity(w, t);
-      intrp_courant(dt);      //interpolate velocity to fill courant field
- 
-      forcings(dt / 2);
-      
-      homo_solver::solve(1);
-//      this->xchng_all();
-//      this->advop_all();
-//      this->cycle_all(); 
-
-      forcings(dt / 2);
+      update_courant(t);
+      inhomo_solver::solve(1);
+      // forcings(dt / 2);
+      // this->xchng_all();
+      // this->advop_all();
+      // this->cycle_all(); 
+      // forcings(dt / 2);
     }
   }
 };
