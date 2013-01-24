@@ -12,16 +12,35 @@
 
 namespace diagnose 
 {
-  // pressure as a function of "theta times dry air density"
-  template <class arg_t, typename real_t>
-  inline auto p(
-    const arg_t &tht,
-    const rng_t &i,
-    const rng_t &j
-  ) return_macro(
-      phc::p_1000<real_t>() * real_t(pow(
-      (tht(i,j) * si::kilograms / si::cubic_metres  * si::kelvins * phc::R_d<real_t>()) / phc::p_1000<real_t>(), 1 / (1 - phc::R_d_over_c_pd<real_t>())
-    )) / si::pascals
-  )
+  namespace detail 
+  {
+    // pressure as a function of "theta times dry air density"
+    template <typename real_t>
+    inline quantity<si::pressure, real_t> p(
+      const quantity<multiply_typeof_helper<si::mass_density, si::temperature>::type, real_t> rhod_th 
+    )
+    {  
+      return phc::p_1000<real_t>() * real_t(pow(  // real_t() needed due to a bug in Boost.units [1]
+        rhod_th * phc::R_d<real_t>() / phc::p_1000<real_t>(), 
+        1 / (1 - phc::R_d_over_c_pd<real_t>())
+      ));
+    }
+
+    template <typename real_t>
+    inline real_t p_dimles(const real_t rhod_th)
+    {
+      return p(rhod_th * si::kelvins * si::kilograms / si::cubic_metres) / si::pascals;
+    }
+  }
+
+  float p(float rhod_th) { return detail::p_dimles(rhod_th); }
+  double p(double rhod_th) { return detail::p_dimles(rhod_th); }
+  long double p(long double rhod_th) { return detail::p_dimles(rhod_th); }
+
+  BZ_DECLARE_FUNCTION(p) // works with Blitz > 0.10 [2]
+
+  // [1] https://svn.boost.org/trac/boost/ticket/6957
+  // [2] http://sourceforge.net/mailarchive/message.php?msg_id=30394213
+
 }; //diagnose
 
