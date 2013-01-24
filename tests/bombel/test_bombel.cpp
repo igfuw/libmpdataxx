@@ -57,7 +57,7 @@ class bombel : public parent<n_iters, real_t>
     //TODO units, physical constants
     const real_t Tht_amb = 300;     //[K]
 
-    this->xchng(tht); //for gradient
+    this->xchng(tht); //filling halos for calculating gradient
 
     //TODO make it work with diagnose::p()
     // diagnose pressure from theta field
@@ -72,6 +72,7 @@ class bombel : public parent<n_iters, real_t>
     }
 
     //reference state for pressure
+    //TODO add vertical changes
     blitz::Array<real_t, 1> Prs_amb(this->ny+2);  //[Pa]  TODO units, physical constants
     Prs_amb = 81138.2;
     blitz::secondIndex k;
@@ -80,7 +81,7 @@ class bombel : public parent<n_iters, real_t>
 
     //TODO  can't work yet - no pressure gradient force
     W += (dt * si:: seconds) * phc::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb
-        - dt * nabla_op::grad<1>(/*diagnose::p(Tht, this->i, this->j)*/ (Prs - Prs_amb(k) / Prs_amb(k)), l, this->i, real_t(1))
+     -  .001 * dt * nabla_op::grad<1>(/*diagnose::p(Tht, this->i, this->j)*/ (Prs - Prs_amb(k) / Prs_amb(k)), l, this->i, real_t(1))
     ;
 
     //TODO forcings for theta
