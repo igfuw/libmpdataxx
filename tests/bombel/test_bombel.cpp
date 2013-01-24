@@ -65,15 +65,15 @@ class bombel : public parent<n_iters, real_t>
 
     //reference state for pressure
     //TODO add vertical changes
+    //TODO move to initail condition
     blitz::Array<real_t, 1> Prs_amb(this->ny+2);  //[Pa]  TODO units, physical constants
     Prs_amb = 81138.2;
     blitz::secondIndex k;
 
     rng_t l(1, this->ny-1);
 
-    //TODO  can't work yet - no pressure gradient force
     W += (dt * si:: seconds) * phc::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb
-     -  .001 * dt * nabla_op::grad<1>(/*diagnose::p(Tht, this->i, this->j)*/ (Prs - Prs_amb(k) / Prs_amb(k)), l, this->i, real_t(1))
+     -  .001 * dt * nabla_op::grad<1>(Prs - Prs_amb(k) / Prs_amb(k), l, this->i, real_t(1))
     ;
 
     //TODO forcings for theta
