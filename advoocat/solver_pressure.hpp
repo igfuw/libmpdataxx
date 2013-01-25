@@ -9,6 +9,8 @@
 #include "solver_common.hpp"
 #include "solver_inhomo.hpp"
 #include "courant_formulae.hpp"
+//gradient, diveregnce
+#include "nabla_formulae.hpp"
 
 template <class inhomo_solver, int u, int w, int tht, int x, int z>
 class pressure_solver : public inhomo_solver
@@ -19,7 +21,9 @@ class pressure_solver : public inhomo_solver
   real_t ny;
   real_t nx;
   real_t dt;
-  real_t Prs;
+  real_t Prs_amb;
+
+  blitz::Array<real_t, 2> Prs;
 
   virtual void forcings(real_t dt) = 0;
 
@@ -37,60 +41,64 @@ class pressure_solver : public inhomo_solver
     tmp += 3./2 * this->psi[e][this->n[e]]; 
   }
 
-  void update_courant(int t)
-  {
-    if (t==0)
-    {
-      this->xchng(u);      
-      this->xchng(w);     
-
-      courant::intrp<x>(this->C[x], this->psi[u][this->n[u]], im, this->j, this->dt, dx);
-      courant::intrp<z>(this->C[z], this->psi[w][this->n[w]], jm, this->i, this->dt, dz);
-    }
-    if (t!=0)
-    {
-      extrp_velocity(u);   //extrapolate velocity field in time (t+1/2)
-      extrp_velocity(w);
-
-      this->xchng(u, 1);      // filling halos for velocity filed
-      this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
-
-      courant::intrp<x>(this->C[x], this->psi[u][this->n[u]-1], im, this->j, this->dt, dx);
-      courant::intrp<z>(this->C[z], this->psi[w][this->n[w]-1], jm, this->i, this->dt, dz);
-    }
-  } 
-
-  void pressure_solver_update(real_t Prs)
+  void ini_courant()
   {
     this->xchng(u);      
     this->xchng(w);     
 
-std::cerr<<Prs<<std::endl;
+    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]], im, this->j, this->dt, dx);
+    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]], jm, this->i, this->dt, dz);
+  }
+
+  void update_courant()
+  {
+    extrp_velocity(u);   //extrapolate velocity field in time (t+1/2)
+    extrp_velocity(w);
+
+    this->xchng(u, 1);      // filling halos for velocity filed
+    this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
+
+    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]-1], im, this->j, this->dt, dx);
+    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]-1], jm, this->i, this->dt, dz);
+  } 
+
+  void ini_pressure()
+  {
+    Prs(this->i, this->j) = this->Prs_amb;
+  }
+
+  void pressure_solver_update()
+  {
+    this->xchng(u);      
+    this->xchng(w);     
 
     real_t beta = 1; //TODO
-/*
-    tmp_p = beta * nabla_op::div(
+
+    this->bcx.fill_halos(this->Prs, this->j^this->halo);
+    this->bcy.fill_halos(this->Prs, this->i^this->halo);
+
+    this->Prs += beta * nabla_op::div(
       //TODO add density field
-      1 * this->psi[u] - dt/2 * nabla_op::grad<0>(p, this->i, this->j, real_t(1)),
-      1 * this->psi[w] - dt/2 * nabla_op::grad<1>(p, this->j, this->i, real_t(1)),
+      /*real_t(1) */ this->psi[u] - dt/2 * nabla_op::grad<0>(Prs, this->i, this->j, real_t(1)),
+      /*real_t(1) */ this->psi[w] - dt/2 * nabla_op::grad<1>(Prs, this->j, this->i, real_t(1)),
       this->i,
       this->j,
       real_t(1),   //dx  TODO
       real_t(1)    //dy
     );
 
-    tmp_u = - nabla_op::grad<0>(p-prs_amb/rho, this->i, this->j, real_t(1));
-    tmp_w = - nabla_op::grad<1>(p-prs_amb/rho, this->j, this->i, real_t(1));
-*/
+//    tmp_u = - nabla_op::grad<0>(p-prs_amb/rho, this->i, this->j, real_t(1));
+//    tmp_w = - nabla_op::grad<1>(p-prs_amb/rho, this->j, this->i, real_t(1));
+
   }
 
 
   public:
   // ctor
-  pressure_solver(int nx, int ny, real_t dt, real_t Prs) :
+  pressure_solver(int nx, int ny, real_t dt, real_t Prs_amb) :
     inhomo_solver(nx, ny, dt), dt(dt),
     ny(ny), nx(nx),
-    Prs(Prs),
+    Prs_amb(Prs_amb),
     im(this->i.first() - 1, this->i.last()),
     jm(this->j.first() - 1, this->j.last())
   {}
@@ -99,18 +107,29 @@ std::cerr<<Prs<<std::endl;
   {
     for (int t = 0; t < nt; ++t)
     {
-      update_courant(t);
-
-      forcings(dt / 2);
-//if(t!=0)  pressure_solver_apply
-      inhomo_solver::parent::solve(1);
+      if (t==0)
+      {
+        ini_courant();
+        ini_pressure();
+        forcings(dt / 2);
+        inhomo_solver::parent::solve(1);
+        forcings(dt / 2);
+        pressure_solver_update();
+//pressure_solver_apply
+      }
+      if (t!=0)
+      {
+        update_courant();
+        forcings(dt / 2);
+//pressure_solver_apply
+        inhomo_solver::parent::solve(1);
         // this->xchng_all();
         // this->advop_all();
         // this->cycle_all(); 
-      forcings(dt / 2);
-//      pressure_solver_update();
+        forcings(dt / 2);
+        pressure_solver_update();
 //pressure_solver_apply
-
+      }
     }
   }
 };
