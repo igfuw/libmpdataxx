@@ -46,46 +46,22 @@ pressure_solver<
 template <int n_iters, typename real_t = float>
 class bombel : public parent<n_iters, real_t>
 {
-  using arr_2d_t = typename parent<n_iters, real_t>::arr_t;
 
-  void forcings(real_t dt)
+  real_t Tht_amb;
+
+  void forcings(real_t dt)  //explicit forcings (to be applied before the eliptic solver)
   {
     auto W   = this->state(w);
-    auto U   = this->state(u);
     auto Tht = this->state(tht);
 
-    //TODO units, physical constants
-    const real_t Tht_amb = 300;     //[K]
-
-    this->xchng(tht); //filling halos for calculating gradient
-
-    // diagnose pressure from theta field
-    arr_2d_t Prs(this->nx, this->ny+2);
-    Prs = diagnose::p(Tht);
-
-    //reference state for pressure
-    //TODO add vertical changes
-    //TODO move to initail condition
-    blitz::Array<real_t, 1> Prs_amb(this->ny+2);  //[Pa]  TODO units, physical constants
-    Prs_amb = 81138.2;
-    blitz::secondIndex k;
-
-    rng_t l(1, this->ny-1);
-
-    W += (dt * si:: seconds) * phc::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb
-     -  .001 * dt * nabla_op::grad<1>(Prs - Prs_amb(k) / Prs_amb(k), l, this->i, real_t(1))
-    ;
-
-    //TODO forcings for theta
-    // Tht -= dt * (U*nabla_op::grad<0>(Tht_amb) + W*nabla_op::grad<1>(Tht_amb))
+    W += (dt * si:: seconds) * phc::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb;
   }
 
   public:
 
-  bombel(int nx, int ny, real_t dt) :
-    parent<n_iters, real_t>(nx, ny, dt)
-  {
-  }
+  bombel(int nx, int ny, real_t dt, real_t Tht_amb, real_t Prs_amb) :
+    parent<n_iters, real_t>(nx, ny, dt, Prs_amb),
+    Tht_amb(Tht_amb)
 };
 
 int main() 
@@ -98,15 +74,19 @@ int main()
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
   const real_t halo = 1;  
- 
-  bombel<2> solver(nx, ny, dt);
+
+  //ambient state (constant thoughout the domain)
+  real_t Tht_amb = 300;  
+  real_t Prs_amb = diagnose::p(Tht_amb);
+
+  bombel<2> solver(nx, ny, dt, Tht_amb, Prs_amb);
 
   // initial condition
   {
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    solver.state(tht) = real_t(300) 
+    solver.state(tht) = Tht_amb 
       + exp( -sqr(i-nx/2.) / (2.*pow(nx/10, 2))
                -sqr(j-ny/3.) / (2.*pow(ny/10, 2)) )
     ;
@@ -144,11 +124,11 @@ int main()
    if (t % n_out == 0 /*&& t != 0*/)  
    {    
       gp << "set title 'tht @ t=" << t+1 << "'\n"
-//         << "set cbrange [286:290]\n"
+//         << "set cbrange [300:301]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
       gp << "set title 'w @ t=" << t+1 << "'\n"
-//         << "set cbrange [-.2:.4]\n"
+//         << "set cbrange [0:.01]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(w).copy());
    }
