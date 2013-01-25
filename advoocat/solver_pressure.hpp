@@ -103,12 +103,12 @@ std::cerr<<Prs<<std::endl;
 
       forcings(dt / 2);
 //if(t!=0)  pressure_solver_apply
-      homo_solver::solve(1);
+      inhomo_solver::parent::solve(1);
         // this->xchng_all();
         // this->advop_all();
         // this->cycle_all(); 
       forcings(dt / 2);
-      pressure_solver_update();
+//      pressure_solver_update();
 //pressure_solver_apply
 
     }

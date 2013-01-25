@@ -24,6 +24,7 @@ class inhomo_solver : public homo_solver
   protected:
 
   real_t dt;
+  typedef homo_solver parent;
 
   public:
 
@@ -34,7 +35,7 @@ class inhomo_solver : public homo_solver
 
   // 2D
   inhomo_solver(int nx, int ny, real_t dt) :
-    homo_solver(nx, ny), dt(dt)
+    parent(nx, ny), dt(dt)
   {}
 
   void solve(int nt)
@@ -44,7 +45,7 @@ class inhomo_solver : public homo_solver
       if (!naive) forcings(dt / 2);
       else forcings(dt);
 
-      homo_solver::solve(1);
+      parent::solve(1);
 
       if (!naive) forcings(dt / 2);
     }

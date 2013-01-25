@@ -62,6 +62,7 @@ class bombel : public parent<n_iters, real_t>
   bombel(int nx, int ny, real_t dt, real_t Tht_amb, real_t Prs_amb) :
     parent<n_iters, real_t>(nx, ny, dt, Prs_amb),
     Tht_amb(Tht_amb)
+  {}
 };
 
 int main() 
