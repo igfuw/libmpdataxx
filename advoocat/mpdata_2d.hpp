@@ -15,6 +15,8 @@ namespace solvers
   template<int n_iters, class bcx_t, class bcy_t, int n_eqs = 1, typename real_t = float>
   class mpdata_2d : public solver_2d<bcx_t, bcy_t, n_eqs, real_t>
   {
+    static_assert(n_iters > 0, "n_iters <= 0");
+
     using parent = solver_2d<bcx_t, bcy_t, n_eqs, real_t>;
     using arr_2d_t = typename parent::arr_t;
 

@@ -15,6 +15,8 @@ namespace solvers
   template<int n_iters, class bcx_t, int n_eqs = 1, typename real_t = float>
   class mpdata_1d : public solver_1d<bcx_t, n_eqs, real_t>
   {
+    static_assert(n_iters > 0, "n_iters <= 0");
+
     using parent = solver_1d<bcx_t, n_eqs, real_t>;
     using arr_1d_t = typename parent::arr_t;
 
@@ -70,9 +72,7 @@ namespace solvers
     {
       int n_tmp = n_iters > 2 ? 2 : 1;
       for (int n = 0; n < n_tmp; ++n)
-      {
         tmp[n].push_back(new arr_1d_t( this->i^h ));
-      }
     }
 
   };

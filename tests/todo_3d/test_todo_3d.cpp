@@ -14,7 +14,7 @@ enum {x, y, z};
 
 int main() 
 {
-  int n[] = {24, 24};
+  int n[] = {24, 24, 24};
   {
     solvers::donorcell_3d<
       cyclic_3d<x>, 
