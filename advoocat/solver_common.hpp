@@ -1,8 +1,8 @@
 /** @file
-* @copyright University of Warsaw
-* @section LICENSE
-* GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
-*/
+ * @copyright University of Warsaw
+ * @section LICENSE
+ * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
+ */
 
 #pragma once
 
@@ -22,6 +22,8 @@ namespace solvers
 
     protected: 
 
+    const int n_tlev = 2;
+
     // member fields
     arrvec_t<arr_t> C;
 
@@ -39,7 +41,7 @@ namespace solvers
 
     void cycle(int e) 
     { 
-      n[e] = (n[e] + 1) % 2 - 2; 
+      n[e] = (n[e] + 1) % n_tlev - n_tlev; 
     }
     void cycle_all()
     { 
@@ -54,9 +56,12 @@ namespace solvers
 
     public:
 
+    /**
+     * @brief fills all arrays with NaNs if in debug mode
+     */
     solver_common() :
       n(n_eqs, 0) 
-    {}
+    { }
 
     void solve(const int nt) 
     {   
@@ -73,7 +78,7 @@ namespace solvers
     // accessor method for the Courant number field
     arr_t courant(int d = 0) 
     {   
-      return this->C[d]; 
+      return C[d]; 
     }   
   };
 }; // namespace solvers

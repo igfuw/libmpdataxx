@@ -48,7 +48,7 @@ namespace solvers
       bcy(rng_t(0, ny-1), halo)
     {
       for (int e = 0; e < n_eqs; ++e) // equations
-        for (int l = 0; l < 2; ++l) // time levels
+        for (int n = 0; n < this->n_tlev; ++n) // time levels
           this->psi[e].push_back(new arr_2d_t(i^halo, j^halo));
 
       this->C.push_back(new arr_2d_t(i^h   , j^halo));

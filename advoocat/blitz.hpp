@@ -9,6 +9,10 @@
  *  - Jacobian
  *  - number of dimensions
  *  - equation set
+ *
+ *  blitz-based
+ * 
+ *  suggested compiler options (by compiler): -march=native, -Ofast, -DNDEBUG
  */
 
 // code licensed under the terms of GNU GPL v3
@@ -29,11 +33,25 @@ using rng_t = blitz::Range;
 // Boost ptr_vector 
 #include <boost/ptr_container/ptr_vector.hpp>
 template <class arr_t>
-struct arrvec_t : boost::ptr_vector<arr_t> {
-  const arr_t &operator[](const int i) const {   
+struct arrvec_t : boost::ptr_vector<arr_t> 
+{
+  using parent = boost::ptr_vector<arr_t>;
+
+  const arr_t &operator[](const int i) const 
+  {   
     return this->at(
       (i + this->size()) % this->size()
     );  
+  }
+
+  void push_back(arr_t *arr)
+  {
+    parent::push_back(arr);
+
+    // filling the array with NaNs to ease debugging
+    *arr = blitz::has_signalling_NaN(*arr->dataFirst())
+      ? blitz::signalling_NaN(*arr->dataFirst())
+      : blitz::quiet_NaN(*arr->dataFirst());
   }
 };
 

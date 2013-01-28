@@ -70,9 +70,7 @@ namespace solvers
     {
       int n_tmp = n_iters > 2 ? 2 : 1;
       for (int n = 0; n < n_tmp; ++n)
-      {
         tmp[n].push_back(new arr_1d_t( this->i^h ));
-      }
     }
 
   };

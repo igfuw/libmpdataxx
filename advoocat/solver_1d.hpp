@@ -1,8 +1,8 @@
 /** @file
-* @copyright University of Warsaw
-* @section LICENSE
-* GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
-*/
+ * @copyright University of Warsaw
+ * @section LICENSE
+ * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
+ */
 
 #pragma once
 
@@ -35,7 +35,7 @@ namespace solvers
       bcx(rng_t(0, nx-1), halo)
     {
       for (int e = 0; e < n_eqs; ++e) // equations
-        for (int l = 0; l < 2; ++l) // time levels
+        for (int n = 0; n < this->n_tlev; ++n) // time levels
           this->psi[e].push_back(new arr_1d_t(i^halo));
 
       this->C.push_back(new arr_1d_t(i^h));
