@@ -12,7 +12,7 @@
  *
  *  blitz-based
  * 
- *  suggested compiler options (by compiler): -march=native, -Ofast, -DNDEBUG
+ *  suggested compiler options (by compiler): -march=native, -Ofast, -DNDEBUG, -lblitz (opt), -DBZDEBUG (opt), -std=c++11
  */
 
 // code licensed under the terms of GNU GPL v3

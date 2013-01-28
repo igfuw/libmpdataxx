@@ -15,6 +15,9 @@ namespace solvers
   template <int n_eqs, int n_dims, typename _real_t>
   class solver_common
   {
+    static_assert(n_dims > 0, "n_dims <= 0");
+    static_assert(n_eqs > 0, "n_eqs <= 0");
+
     public:
 
     typedef _real_t real_t;
