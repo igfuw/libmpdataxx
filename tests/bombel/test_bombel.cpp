@@ -67,7 +67,7 @@ class bombel : public parent<n_iters, real_t>
 
 int main() 
 {
-  const int nx = 50, ny = 50, nt = 4, n_out=1;
+  const int nx = 10, ny = 10, nt = 2, n_out=1;
 //  const int nx = 50, ny = 50, nt = 41, n_out=10;
   using real_t = float;
   const real_t dt = .1;
@@ -89,7 +89,7 @@ int main()
 
     solver.state(tht) = Tht_amb 
       + exp( -sqr(i-nx/2.) / (2.*pow(nx/10, 2))
-               -sqr(j-ny/3.) / (2.*pow(ny/10, 2)) )
+             -sqr(j-ny/3.) / (2.*pow(ny/10, 2)) )
     ;
     solver.state(u) = real_t(0); 
     solver.state(w) = real_t(0); 
@@ -100,7 +100,7 @@ int main()
   gp << "reset\n"
      << "set term svg size 2000,1000 dynamic\n"
      << "set output 'figure.svg'\n"
-     << "set multiplot layout 2,5 columnsfirst\n"
+     << "set multiplot layout 3,5 columnsfirst\n"
      << "set grid\n"
      << "set xlabel 'X'\n"
      << "set ylabel 'Y'\n"
@@ -118,20 +118,26 @@ int main()
   binfmt = gp.binfmt(solver.state());
 
   // integration
-  for (int t = 0; t <= nt; ++t)
-  {
-    solver.solve(1); // 1 tymczasowo
-
-   if (t % n_out == 0 /*&& t != 0*/)  
-   {    
-      gp << "set title 'tht @ t=" << t+1 << "'\n"
+//  for (int t = 1; t <= 5; ++t)
+//  {
+int t=2;
+    solver.solve(t); // 1 tymczasowo
+//   if (t % n_out == 0 /*&& t != 0*/)  
+//   {    
+//      gp << "set title 'tht @ t=" << t+1 << "'\n"
+      gp << "set title 'tht @ t=" << int(t * dt) << "'\n"
 //         << "set cbrange [300:301]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
-      gp << "set title 'w @ t=" << t+1 << "'\n"
+//      gp << "set title 'w @ t=" << t+1 << "'\n"
+      gp << "set title 'u @ t=" << int(t * dt) << "'\n"
+//         << "set cbrange [0:.01]\n"
+         << "splot '-' binary" << binfmt << "with image notitle\n";
+      gp.sendBinary(solver.state(u).copy());
+      gp << "set title 'w @ t=" << int(t * dt) << "'\n"
 //         << "set cbrange [0:.01]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(w).copy());
-   }
-  }
+//   }
+//  }
 };
