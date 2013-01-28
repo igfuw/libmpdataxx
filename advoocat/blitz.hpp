@@ -48,10 +48,12 @@ struct arrvec_t : boost::ptr_vector<arr_t>
   {
     parent::push_back(arr);
 
+#if !defined(NDEBUG)
     // filling the array with NaNs to ease debugging
     *arr = blitz::has_signalling_NaN(*arr->dataFirst())
       ? blitz::signalling_NaN(*arr->dataFirst())
       : blitz::quiet_NaN(*arr->dataFirst());
+#endif
   }
 };
 
