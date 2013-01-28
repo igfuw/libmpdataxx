@@ -43,7 +43,7 @@ pressure_solver<
   >, u, w, tht, x, z
 >;
 
-template <int n_iters, typename real_t = float>
+template <int n_iters, typename real_t = double>
 class bombel : public parent<n_iters, real_t>
 {
 

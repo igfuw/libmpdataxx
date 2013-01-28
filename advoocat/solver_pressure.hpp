@@ -80,22 +80,26 @@ std::cerr<<"------------pressure solver update-------------"<<std::endl;
  
     real_t beta = .5; //TODO
     real_t rho = 1.;  //TODO    
-
-    this->xchng(u);      
-    this->xchng(w);     
     this->bcx.fill_halos(this->Prs, this->j^this->halo);
     this->bcy.fill_halos(this->Prs, this->i^this->halo);
 
-std::cerr<<"pressure before solver"<<std::endl;
-std::cerr<<"Prs = "<<Prs(this->i, this->j)<<std::endl;
+    this->xchng(u);      
+    this->xchng(w);     
+    tmp_u(this->i, this->j) = this->psi[u][this->n[u]](this->i, this->j);  //making copy of velocity field before entering pressure solver 
+    tmp_w(this->i, this->j) = this->psi[w][this->n[w]](this->i, this->j);  //TODO not needed?
+//    this->bcx.fill_halos(this->tmp_u, this->j^this->halo);
+//    this->bcy.fill_halos(this->tmp_u, this->i^this->halo);
+//    this->bcx.fill_halos(this->tmp_w, this->j^this->halo);
+//    this->bcy.fill_halos(this->tmp_w, this->i^this->halo);
 
-    tmp_u = this->psi[u][this->n[u]];  //making copy of velocity field before entering pressure solver 
-    tmp_w = this->psi[w][this->n[w]];  //TODO not needed?
+//std::cerr<<"tmp_u "<<tmp_u(this->i, this->j)<<std::endl;
+//std::cerr<<"tmp_w "<<tmp_w(this->i^this->halo, this->j^this->halo)<<std::endl;
+
 //---------------pseudo-time loop
-std::cerr<<"pseudo_time loop:"<<std::endl;
-    for (int tau = 0; tau <= 10; tau++)
+//std::cerr<<"pseudo_time loop:"<<std::endl;
+    for (int tau = 0; tau <= 1; tau++)
     {
-std::cerr<<"tau= "<<tau<<std::endl;
+//std::cerr<<"tau= "<<tau<<std::endl;
 tmp_x(this->i, this->j) = rho * (tmp_u - dt/2 * nabla_op::grad<0>(Prs(this->i^this->halo, this->j^this->halo), this->i, this->j, real_t(1)));
 tmp_z(this->i, this->j) = rho * (tmp_w - dt/2 * nabla_op::grad<1>(Prs(this->i^this->halo, this->j^this->halo), this->j, this->i, real_t(1)));
  
@@ -104,15 +108,15 @@ this->bcy.fill_halos(tmp_x, this->i^this->halo);
 this->bcx.fill_halos(tmp_z, this->j^this->halo);
 this->bcy.fill_halos(tmp_z, this->i^this->halo);
 
-//if (tau == 10) std::cerr<<"rho * (u - grad_x(p)) "<<tmp_x(this->i^this->halo, this->j^this->halo)<<std::endl;
-//if (tau == 10) std::cerr<<"rho * (w - grad_z(p)) "<<tmp_z(this->i^this->halo, this->j^this->halo)<<std::endl;
+//std::cerr<<"rho * (u - grad_x(p)) "<<tmp_x(this->i^this->halo, this->j^this->halo)<<std::endl;
+//std::cerr<<"rho * (w - grad_z(p)) "<<tmp_z(this->i^this->halo, this->j^this->halo)<<std::endl;
 
 tmptmp(this->i, this->j) = nabla_op::div(
                              tmp_x(this->i^this->halo, this->j^this->halo), 
                              tmp_z(this->i^this->halo, this->j^this->halo),
                              this->i,this->j, real_t(1), real_t(1));
 
-if (tau ==10) std::cerr<<"div(rho * (u - grad(p))) "<<tmptmp<<std::endl;
+//std::cerr<<"div(rho * (u - grad(p))) "<<tmptmp<<std::endl;
 
       Prs(this->i, this->j) += beta * tmptmp(this->i, this->j);
 //        nabla_op::div(
@@ -125,9 +129,9 @@ if (tau ==10) std::cerr<<"div(rho * (u - grad(p))) "<<tmptmp<<std::endl;
 //        real_t(1)    //dy
 //      );
 
-if (tau ==10) std::cerr<<"pressure after solver"<<std::endl;
-if (tau ==10) std::cerr<<"(should be different than initial pressure)"<<std::endl;
-if (tau ==10) std::cerr<<"Prs = Prs + div(rho * (u -grad(p)) "<<Prs(this->i, this->j)<<std::endl;
+//std::cerr<<"pressure after solver"<<std::endl;
+//std::cerr<<"(should be different than initial pressure)"<<std::endl;
+//std::cerr<<"Prs = Prs + div(rho * (u -grad(p)) "<<Prs(this->i, this->j)<<std::endl;
 
       this->bcx.fill_halos(this->Prs, this->j^this->halo);
       this->bcy.fill_halos(this->Prs, this->i^this->halo);
@@ -135,7 +139,7 @@ if (tau ==10) std::cerr<<"Prs = Prs + div(rho * (u -grad(p)) "<<Prs(this->i, thi
       tmp_u(this->i, this->j) -= nabla_op::grad<0>(Prs(this->i^this->halo, this->j^this->halo)-Prs_amb/rho, this->i, this->j, real_t(1));
       tmp_w(this->i, this->j) -= nabla_op::grad<1>(Prs(this->i^this->halo, this->j^this->halo)-Prs_amb/rho, this->j, this->i, real_t(1));
     }
-std::cerr<<"end of pseudo_time loop"<<std::endl;
+//std::cerr<<"end of pseudo_time loop"<<std::endl;
 
 //----------------------------------------------
     tmp_u(this->i, this->j) -= this->psi[u][this->n[u]];
@@ -178,7 +182,11 @@ std::cerr<<"initial step"<<std::endl;
         ini_courant();
         ini_pressure();
         forcings(dt / 2);
+std::cerr<<"psi before solve"<<std::endl;
+std::cerr<<this->psi[u][this->n[u]]<<std::endl;
         inhomo_solver::parent::solve(1);
+std::cerr<<"psi after solve"<<std::endl;
+std::cerr<<this->psi[u][this->n[u]]<<std::endl;
         forcings(dt / 2);
         pressure_solver_update(dt);
         pressure_solver_apply(dt);
