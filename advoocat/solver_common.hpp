@@ -59,9 +59,6 @@ namespace solvers
 
     public:
 
-    /**
-     * @brief fills all arrays with NaNs if in debug mode
-     */
     solver_common() :
       n(n_eqs, 0) 
     { }
