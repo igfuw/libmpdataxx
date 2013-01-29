@@ -53,8 +53,8 @@ class pressure_solver : public inhomo_solver
     this->xchng(u);      
     this->xchng(w);     
 
-    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]], im, this->j, this->dt, dx);
-    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]], jm, this->i, this->dt, dz);
+    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]], im, this->j^this->halo, this->dt, dx);
+    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]], jm, this->i^this->halo, this->dt, dz);
   }
 
   void update_courant()
@@ -65,8 +65,8 @@ class pressure_solver : public inhomo_solver
     this->xchng(u, 1);      // filling halos for velocity filed
     this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
 
-    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]-1], im, this->j, this->dt, dx);
-    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]-1], jm, this->i, this->dt, dz);
+    courant::intrp<x>(this->C[x], this->psi[u][this->n[u]-1], im, this->j^this->halo, this->dt, dx);
+    courant::intrp<z>(this->C[z], this->psi[w][this->n[w]-1], jm, this->i^this->halo, this->dt, dz);
   } 
 
   void ini_pressure()
