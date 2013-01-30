@@ -27,8 +27,7 @@ class pressure_solver : public inhomo_solver
   //TODO probably don't need those
   blitz::Array<real_t, 2> tmp_u;
   blitz::Array<real_t, 2> tmp_w;
-  blitz::Array<real_t, 2> tmp;
-  blitz::Array<real_t, 2> tmptmp;
+  blitz::Array<real_t, 2> tmp_div;
   blitz::Array<real_t, 2> tmp_x;
   blitz::Array<real_t, 2> tmp_z;
 
@@ -59,7 +58,7 @@ class pressure_solver : public inhomo_solver
 
   void update_courant()
   {
-    extrp_velocity(u);   //extrapolate velocity field in time (t+1/2)
+    extrp_velocity(u);      //extrapolate velocity field in time (t+1/2)
     extrp_velocity(w);
 
     this->xchng(u, 1);      // filling halos for velocity filed
@@ -76,74 +75,66 @@ class pressure_solver : public inhomo_solver
 
   void pressure_solver_update(real_t dt)
   {
-std::cerr<<"------------pressure solver update-------------"<<std::endl;
- 
-    real_t beta = .5; //TODO
+    real_t beta = .25; //TODO
     real_t rho = 1.;  //TODO    
-    this->bcx.fill_halos(this->Prs, this->j^this->halo);
-    this->bcy.fill_halos(this->Prs, this->i^this->halo);
 
-    this->xchng(u);      
-    this->xchng(w);     
-    tmp_u(this->i, this->j) = this->psi[u][this->n[u]](this->i, this->j);  //making copy of velocity field before entering pressure solver 
-    tmp_w(this->i, this->j) = this->psi[w][this->n[w]](this->i, this->j);  //TODO not needed?
-    this->bcx.fill_halos(this->tmp_u, this->j^this->halo);
-    this->bcy.fill_halos(this->tmp_u, this->i^this->halo);
-    this->bcx.fill_halos(this->tmp_w, this->j^this->halo);
-    this->bcy.fill_halos(this->tmp_w, this->i^this->halo);
+    tmp_u = this->psi[u][this->n[u]];  //making copy of velocity field before entering pressure solver 
+    tmp_w = this->psi[w][this->n[w]];  //TODO not needed?
 
-std::cerr<<"tmp_u "<<tmp_u(this->i, this->j)<<std::endl;
-std::cerr<<"tmp_w "<<tmp_w(this->i^this->halo, this->j^this->halo)<<std::endl;
-
-//---------------pseudo-time loop
-std::cerr<<"pseudo_time loop:"<<std::endl;
-    for (int tau = 0; tau <= 1; tau++)
+std::cerr<<"--------------------------------------------------------------"<<std::endl;
+    //---------------pseudo-time loop
+    real_t err = 1.;
+    while (err > .01)
     {
-std::cerr<<"tau= "<<tau<<std::endl;
-tmp_x(this->i, this->j) = rho * (tmp_u - dt/2 * nabla_op::grad<0>(Prs(this->i^this->halo, this->j^this->halo), this->i, this->j, real_t(1)));
-tmp_z(this->i, this->j) = rho * (tmp_w - dt/2 * nabla_op::grad<1>(Prs(this->i^this->halo, this->j^this->halo), this->j, this->i, real_t(1)));
- 
-this->bcx.fill_halos(tmp_x, this->j^this->halo);
-this->bcy.fill_halos(tmp_x, this->i^this->halo);
-this->bcx.fill_halos(tmp_z, this->j^this->halo);
-this->bcy.fill_halos(tmp_z, this->i^this->halo);
-
-//std::cerr<<"rho * (u - grad_x(p)) "<<tmp_x(this->i^this->halo, this->j^this->halo)<<std::endl;
-//std::cerr<<"rho * (w - grad_z(p)) "<<tmp_z(this->i^this->halo, this->j^this->halo)<<std::endl;
-
-tmptmp(this->i, this->j) = nabla_op::div(
-                             tmp_x(this->i^this->halo, this->j^this->halo), 
-                             tmp_z(this->i^this->halo, this->j^this->halo),
-                             this->i,this->j, real_t(1), real_t(1));
-
-//std::cerr<<"div(rho * (u - grad(p))) "<<tmptmp<<std::endl;
-
-      Prs(this->i, this->j) += beta * tmptmp(this->i, this->j);
-//        nabla_op::div(
-//        //TODO add density field
-//        tmp_x(this->i^this->halo, this->j^this->halo),
-//        tmp_z(this->i^this->halo, this->j^this->halo),
-//        this->i,
-//        this->j,
-//        real_t(1),   //dx  TODO
-//        real_t(1)    //dy
-//      );
-
-//std::cerr<<"pressure after solver"<<std::endl;
-//std::cerr<<"(should be different than initial pressure)"<<std::endl;
-//std::cerr<<"Prs = Prs + div(rho * (u -grad(p)) "<<Prs(this->i, this->j)<<std::endl;
-
       this->bcx.fill_halos(this->Prs, this->j^this->halo);
       this->bcy.fill_halos(this->Prs, this->i^this->halo);
+      this->bcx.fill_halos(tmp_u, this->j^this->halo);
+      this->bcy.fill_halos(tmp_u, this->i^this->halo);
+      this->bcx.fill_halos(tmp_w, this->j^this->halo);
+      this->bcy.fill_halos(tmp_w, this->i^this->halo);
 
-      tmp_u(this->i, this->j) -= nabla_op::grad<0>(Prs(this->i^this->halo, this->j^this->halo)-Prs_amb/rho, this->i, this->j, real_t(1));
-      tmp_w(this->i, this->j) -= nabla_op::grad<1>(Prs(this->i^this->halo, this->j^this->halo)-Prs_amb/rho, this->j, this->i, real_t(1));
+      tmp_x(this->i, this->j) = rho * (tmp_u(this->i, this->j) - dt/2 * 
+        nabla_op::grad<0>(
+          (Prs(this->i^this->halo, this->j^this->halo)-Prs_amb)/rho, 
+          this->i, this->j, real_t(1)
+      ));
+      tmp_z(this->i, this->j) = rho * (tmp_w(this->i, this->j) - dt/2 * 
+        nabla_op::grad<1>(
+          (Prs(this->i^this->halo, this->j^this->halo)-Prs_amb)/rho, 
+          this->j, this->i, real_t(1)
+      ));
+ 
+      this->bcx.fill_halos(tmp_x, this->j^this->halo);
+      this->bcy.fill_halos(tmp_x, this->i^this->halo);
+      this->bcx.fill_halos(tmp_z, this->j^this->halo);
+      this->bcy.fill_halos(tmp_z, this->i^this->halo);
+
+      tmp_div(this->i, this->j) = 
+        nabla_op::div(
+          tmp_x(this->i^this->halo, this->j^this->halo), 
+          tmp_z(this->i^this->halo, this->j^this->halo),
+          this->i,this->j, real_t(1), real_t(1)
+        );
+
+std::cerr<<"pseudo time loop div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
+err = max(tmp_div);
+
+      Prs(this->i, this->j) -= beta * tmp_div(this->i, this->j);
+
+      this->bcx.fill_halos(tmp_u, this->j^this->halo);
+      this->bcy.fill_halos(tmp_u, this->i^this->halo);
+      this->bcx.fill_halos(tmp_w, this->j^this->halo);
+      this->bcy.fill_halos(tmp_w, this->i^this->halo);
     }
-//std::cerr<<"end of pseudo_time loop"<<std::endl;
+    //end of pseudo_time loop
+    //----------------------------------------------
+    this->bcx.fill_halos(this->Prs, this->j^this->halo);
+    this->bcy.fill_halos(this->Prs, this->i^this->halo);
+    tmp_u(this->i, this->j) -= nabla_op::grad<0>((Prs(this->i^this->halo, this->j^this->halo)-Prs_amb)/rho, this->i, this->j, real_t(1));
+    tmp_w(this->i, this->j) -= nabla_op::grad<1>((Prs(this->i^this->halo, this->j^this->halo)-Prs_amb)/rho, this->j, this->i, real_t(1));
 
-//----------------------------------------------
-    tmp_u(this->i, this->j) -= this->psi[u][this->n[u]];
-    tmp_w(this->i, this->j) -= this->psi[w][this->n[w]];
+    tmp_u -= this->psi[u][this->n[u]];
+    tmp_w -= this->psi[w][this->n[w]];
   }
 
   void pressure_solver_apply(real_t dt)
@@ -151,8 +142,8 @@ tmptmp(this->i, this->j) = nabla_op::div(
     auto U = this->psi[u][this->n[u]];
     auto W = this->psi[w][this->n[w]];
 
-    U += tmp_u * dt/2.;
-    W += tmp_w * dt/2.;
+    U += tmp_u;
+    W += tmp_w;
   }
 
   public:
@@ -162,12 +153,11 @@ tmptmp(this->i, this->j) = nabla_op::div(
     ny(ny), nx(nx),
     Prs_amb(Prs_amb),
     Prs(this->i^this->halo, this->j^this->halo),
-    tmp_u(this->i^this->halo, this->j^this->halo),
-    tmp_w(this->i^this->halo, this->j^this->halo),
     tmp_x(this->i^this->halo, this->j^this->halo),
     tmp_z(this->i^this->halo, this->j^this->halo),
-    tmp(this->i, this->j),
-    tmptmp(this->i, this->j),
+    tmp_div(this->i, this->j),
+    tmp_u(this->i^this->halo, this->j^this->halo),
+    tmp_w(this->i^this->halo, this->j^this->halo),
     im(this->i.first() - 1, this->i.last()),
     jm(this->j.first() - 1, this->j.last())
   {}
@@ -178,22 +168,16 @@ tmptmp(this->i, this->j) = nabla_op::div(
     {
       if (t==0)
       {
-std::cerr<<"initial step"<<std::endl;
         ini_courant();
         ini_pressure();
         forcings(dt / 2);
-std::cerr<<"psi before solve"<<std::endl;
-std::cerr<<this->psi[u][this->n[u]]<<std::endl;
         inhomo_solver::parent::solve(1);
-std::cerr<<"psi after solve"<<std::endl;
-std::cerr<<this->psi[u][this->n[u]]<<std::endl;
         forcings(dt / 2);
         pressure_solver_update(dt);
         pressure_solver_apply(dt);
       }
       if (t!=0)
       {
-std::cerr<<"time stepping t= "<<t<<std::endl;
         update_courant();
         forcings(dt / 2);
         pressure_solver_apply(dt);
