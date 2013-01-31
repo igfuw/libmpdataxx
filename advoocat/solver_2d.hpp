@@ -38,6 +38,11 @@ namespace solvers
       bcy.fill_halos(this->psi[e][ this->n[e] - lev], i^halo);
     }
 
+    void xchng(arr_2d_t psi, rng_t range_i, rng_t range_j) // for a given array
+    {
+      bcx.fill_halos(psi, range_j);
+      bcy.fill_halos(psi, range_i);
+    }
 
     // ctor
     solver_2d(int nx, int ny, int halo) :

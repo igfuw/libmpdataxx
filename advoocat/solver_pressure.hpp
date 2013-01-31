@@ -23,7 +23,7 @@ class pressure_solver : public inhomo_solver
   real_t dt;
   real_t Prs_amb;
 
-  blitz::Array<real_t, 2> Prs;
+  blitz::Array<real_t, 2> Phi;
   //TODO probably don't need those
   blitz::Array<real_t, 2> tmp_u;
   blitz::Array<real_t, 2> tmp_w;
@@ -70,68 +70,51 @@ class pressure_solver : public inhomo_solver
 
   void ini_pressure()
   {
-    Prs(this->i^this->halo, this->j^this->halo) = this->Prs_amb;
+    // dt/2 * (Prs-Prs_amb) / rho
+    Phi(this->i^this->halo, this->j^this->halo) = real_t(0);
   }
 
   void pressure_solver_update(real_t dt)
   {
-    real_t beta = .25; //TODO
-    real_t rho = 1.;  //TODO    
+    real_t beta = .25;  //TODO
+    real_t rho = 1.;   //TODO    
+
+    int halo = this->halo;
+    rng_t i = this->i;
+    rng_t j = this->j;
 
     tmp_u = this->psi[u][this->n[u]];  //making copy of velocity field before entering pressure solver 
     tmp_w = this->psi[w][this->n[w]];  //TODO not needed?
 
 std::cerr<<"--------------------------------------------------------------"<<std::endl;
-    //---------------pseudo-time loop
+    //pseudo-time loop
     real_t err = 1.;
     while (err > .01)
     {
-      this->bcx.fill_halos(this->Prs, this->j^this->halo);
-      this->bcy.fill_halos(this->Prs, this->i^this->halo);
-      this->bcx.fill_halos(tmp_u, this->j^this->halo);
-      this->bcy.fill_halos(tmp_u, this->i^this->halo);
-      this->bcx.fill_halos(tmp_w, this->j^this->halo);
-      this->bcy.fill_halos(tmp_w, this->i^this->halo);
+      this->xchng(Phi,   i^halo, j^halo);
+      this->xchng(tmp_u, i^halo, j^halo);
+      this->xchng(tmp_w, i^halo, j^halo);
 
-      tmp_x(this->i, this->j) = rho * (tmp_u(this->i, this->j) - dt/2 * 
-        nabla_op::grad<0>(
-          (Prs(this->i^this->halo, this->j^this->halo)-Prs_amb)/rho, 
-          this->i, this->j, real_t(1)
-      ));
-      tmp_z(this->i, this->j) = rho * (tmp_w(this->i, this->j) - dt/2 * 
-        nabla_op::grad<1>(
-          (Prs(this->i^this->halo, this->j^this->halo)-Prs_amb)/rho, 
-          this->j, this->i, real_t(1)
-      ));
+      tmp_x(i, j) = rho * tmp_u(i, j) - nabla_op::grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
+      tmp_z(i, j) = rho * tmp_w(i, j) - nabla_op::grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
  
-      this->bcx.fill_halos(tmp_x, this->j^this->halo);
-      this->bcy.fill_halos(tmp_x, this->i^this->halo);
-      this->bcx.fill_halos(tmp_z, this->j^this->halo);
-      this->bcy.fill_halos(tmp_z, this->i^this->halo);
+      this->xchng(tmp_x, i^halo, j^halo);
+      this->xchng(tmp_z, i^halo, j^halo);
 
-      tmp_div(this->i, this->j) = 
-        nabla_op::div(
-          tmp_x(this->i^this->halo, this->j^this->halo), 
-          tmp_z(this->i^this->halo, this->j^this->halo),
-          this->i,this->j, real_t(1), real_t(1)
-        );
+      tmp_div(i, j) = nabla_op::div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1));
+      Phi(i, j) -= beta * tmp_div(i, j);
 
-std::cerr<<"pseudo time loop div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
-err = max(tmp_div);
+      this->xchng(tmp_u, i^halo, j^halo);
+      this->xchng(tmp_w, i^halo, j^halo);
 
-      Prs(this->i, this->j) -= beta * tmp_div(this->i, this->j);
-
-      this->bcx.fill_halos(tmp_u, this->j^this->halo);
-      this->bcy.fill_halos(tmp_u, this->i^this->halo);
-      this->bcx.fill_halos(tmp_w, this->j^this->halo);
-      this->bcy.fill_halos(tmp_w, this->i^this->halo);
+      err = std::abs(max(tmp_div)) + std::abs(min(tmp_div));
+std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
     }
     //end of pseudo_time loop
-    //----------------------------------------------
-    this->bcx.fill_halos(this->Prs, this->j^this->halo);
-    this->bcy.fill_halos(this->Prs, this->i^this->halo);
-    tmp_u(this->i, this->j) -= nabla_op::grad<0>((Prs(this->i^this->halo, this->j^this->halo)-Prs_amb)/rho, this->i, this->j, real_t(1));
-    tmp_w(this->i, this->j) -= nabla_op::grad<1>((Prs(this->i^this->halo, this->j^this->halo)-Prs_amb)/rho, this->j, this->i, real_t(1));
+    this->xchng(this->Phi, i^halo, j^halo);
+
+    tmp_u(i, j) -= nabla_op::grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
+    tmp_w(i, j) -= nabla_op::grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
 
     tmp_u -= this->psi[u][this->n[u]];
     tmp_w -= this->psi[w][this->n[w]];
@@ -152,7 +135,7 @@ err = max(tmp_div);
     inhomo_solver(nx, ny, dt), dt(dt),
     ny(ny), nx(nx),
     Prs_amb(Prs_amb),
-    Prs(this->i^this->halo, this->j^this->halo),
+    Phi(this->i^this->halo, this->j^this->halo), //perturbation of pressure for pressure solver
     tmp_x(this->i^this->halo, this->j^this->halo),
     tmp_z(this->i^this->halo, this->j^this->halo),
     tmp_div(this->i, this->j),
@@ -178,6 +161,7 @@ err = max(tmp_div);
       }
       if (t!=0)
       {
+std::cerr<<"t= "<<t<<std::endl;
         update_courant();
         forcings(dt / 2);
         pressure_solver_apply(dt);
