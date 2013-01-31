@@ -13,7 +13,7 @@ namespace solvers
   template<class bcx_t, class mem_t>
   class solver_1d : public solver_common<mem_t>
   {
-    using parent = solver_common<mem_t>;
+    using parent_t = solver_common<mem_t>;
     using arr_1d_t = typename mem_t::arr_t;
 
     protected:
@@ -30,7 +30,7 @@ namespace solvers
 
     // ctor
     solver_1d(mem_t &mem, const rng_t &i, int halo) :
-      parent(mem),
+      parent_t(mem),
       halo(halo),
       i(i), 
       bcx(i, halo)

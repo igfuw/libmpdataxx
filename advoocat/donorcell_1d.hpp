@@ -23,10 +23,10 @@ namespace solvers
 
     public:
 
-    struct params {};
+    struct params_t {};
 
     // ctor
-    donorcell_1d(mem_t &mem, const rng_t &i, const params &) :
+    donorcell_1d(mem_t &mem, const rng_t &i, const params_t &) :
       solver_1d<bcx_t, mem_t>(mem, i, /* halo = */ 1)
     { }  
   };

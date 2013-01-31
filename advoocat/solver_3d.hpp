@@ -14,7 +14,7 @@ namespace solvers
   template<class bcx_t, class bcy_t, class bcz_t, class mem_t>
   class solver_3d : public solver_common<mem_t>
   {
-    using parent = solver_common<mem_t>;
+    using parent_t = solver_common<mem_t>;
     using arr_3d_t = typename mem_t::arr_t;
 
     protected:
@@ -44,7 +44,7 @@ namespace solvers
       const rng_t &k,
       int halo
     ) :
-      parent(mem),
+      parent_t(mem),
       halo(halo),
       i(i), 
       j(j),  

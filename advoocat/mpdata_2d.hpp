@@ -17,7 +17,7 @@ namespace solvers
   {
     static_assert(n_iters > 0, "n_iters <= 0");
 
-    using parent = solver_2d<bcx_t, bcy_t, mem_t>;
+    using parent_t = solver_2d<bcx_t, bcy_t, mem_t>;
     using arr_2d_t = typename mem_t::arr_t;
 
     // member fields
@@ -76,10 +76,10 @@ namespace solvers
 
     public:
 
-    struct params {};
+    struct params_t {};
 
     // ctor
-    mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params &) : 
+    mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) : 
       solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, 1), 
       im(i.first() - 1, i.last()),
       jm(j.first() - 1, j.last())

@@ -71,7 +71,7 @@ enum {psi, phi};
 template <class inhomo_solver_t>
 class coupled_harmosc : public inhomo_solver_t
 {
-  using parent = inhomo_solver_t;
+  using parent_t = inhomo_solver_t;
   using real_t = typename inhomo_solver_t::real_t;
   using arr_1d_t = typename inhomo_solver_t::mem_t::arr_t;
 
@@ -80,8 +80,8 @@ class coupled_harmosc : public inhomo_solver_t
 
   void forcings(real_t dt)
   {
-    auto Psi = this->state(psi);
-    auto Phi = this->state(phi);
+    auto Psi = this->psi(psi);
+    auto Phi = this->psi(phi);
 
     tmp = Psi;
     ///   (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
@@ -98,11 +98,11 @@ class coupled_harmosc : public inhomo_solver_t
 
   public:
 
-  struct params : parent::params { real_t omega; };
+  struct params_t : parent_t::params_t { real_t omega; };
 
   // ctor
-  coupled_harmosc(typename parent::mem_t &mem, const rng_t &i, params p) :
-    parent(mem, i, p),
+  coupled_harmosc(typename parent_t::mem_t &mem, const rng_t &i, params_t p) :
+    parent_t(mem, i, p),
     omega(p.omega), 
     tmp(this->mem.psi[0][0].extent(0)) // TODO! alloc()
   {
@@ -129,7 +129,7 @@ int main()
     >
   >;
 
-  solver_t::params p;
+  solver_t::params_t p;
   p.dt = dt;
   p.omega = omega;
   equip<solver_t> slv(nx, p);

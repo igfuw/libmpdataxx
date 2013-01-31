@@ -28,7 +28,7 @@ namespace solvers
 
     public:
 
-    struct params {};
+    struct params_t {};
 
     // ctor
     donorcell_3d(
@@ -36,7 +36,7 @@ namespace solvers
       const rng_t &i, 
       const rng_t &j, 
       const rng_t &k, 
-      const params &
+      const params_t &
     ) :
       solver_3d<bcx_t, bcy_t, bcz_t, mem_t>(mem, i, j, k, /* halo = */ 1)
     {}  

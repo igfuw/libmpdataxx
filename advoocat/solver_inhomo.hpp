@@ -15,7 +15,9 @@ class inhomo_solver : public homo_solver
 {
   public:
 
-  typedef typename homo_solver::mem_t::real_t real_t;
+  typedef homo_solver parent_t;
+  typedef typename parent_t::mem_t mem_t;
+  typedef typename mem_t::real_t real_t;
 
   private:
 
@@ -23,28 +25,35 @@ class inhomo_solver : public homo_solver
 
   protected:
 
-  typedef homo_solver parent;
-
-  // for use within forcings
-  typename parent::mem_t::arr_t state(int e)
+  // psi getter
+  typename parent_t::mem_t::arr_t psi(int e, int add = 0)
   {
-    return this->mem.psi[e][this->mem.n[e]];
+    return this->mem.psi[e][this->mem.n[e] + add];
   }
 
   real_t dt;
 
   public:
 
-  struct params : parent::params { real_t dt; };
+  struct params_t : parent_t::params_t { real_t dt; };
 
   // 1D
-  inhomo_solver(typename parent::mem_t &mem, const rng_t &i, params p) :
-    parent(mem, i, p), dt(p.dt)
+  inhomo_solver(
+    typename parent_t::mem_t &mem, 
+    const rng_t &i, 
+    const params_t &p
+  ) :
+    parent_t(mem, i, p), dt(p.dt)
   {}
 
   // 2D
-  inhomo_solver(typename parent::mem_t &mem, const rng_t &i, const rng_t &j, real_t dt) :
-    parent(mem, i, j), dt(dt)
+  inhomo_solver(
+    typename parent_t::mem_t &mem, 
+    const rng_t &i, 
+    const rng_t &j, 
+    const params_t &p
+  ) :
+    parent_t(mem, i, j, p), dt(p.dt)
   {}
 
   // 3D
@@ -57,7 +66,7 @@ class inhomo_solver : public homo_solver
       if (!naive) forcings(dt / 2);
       else forcings(dt);
 
-      parent::solve(1);
+      parent_t::solve(1);
 
       if (!naive) forcings(dt / 2);
     }

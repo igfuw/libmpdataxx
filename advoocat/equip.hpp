@@ -32,7 +32,7 @@ class equip
   // 1D ctor
   equip(
     const int s0, 
-    const typename solver_t::params &p = typename solver_t::params()
+    const typename solver_t::params_t &p = typename solver_t::params_t()
   )
     : mem(s0)
   {
@@ -51,7 +51,7 @@ class equip
   equip(
     const int s0, 
     const int s1, 
-    const typename solver_t::params &p = typename solver_t::params()
+    const typename solver_t::params_t &p = typename solver_t::params_t()
   )
     : mem(s0, s1)
   {
@@ -77,7 +77,7 @@ class equip
     const int s0, 
     const int s1, 
     const int s2, 
-    const typename solver_t::params &p = typename solver_t::params()
+    const typename solver_t::params_t &p = typename solver_t::params_t()
   )
     : mem(s0, s1, s2)
   {

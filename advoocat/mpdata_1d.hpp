@@ -17,7 +17,7 @@ namespace solvers
   {
     static_assert(n_iters > 0, "n_iters <= 0");
 
-    using parent = solver_1d<bcx_t, mem_t>;
+    using parent_t = solver_1d<bcx_t, mem_t>;
     using arr_1d_t = typename mem_t::arr_t;
 
     // member fields
@@ -65,11 +65,11 @@ namespace solvers
 
     public:
 
-    struct params {};
+    struct params_t {};
 
     // ctor
-    mpdata_1d(mem_t &mem, const rng_t &i, const params &) : 
-      parent(mem, i, /* halo = */1), 
+    mpdata_1d(mem_t &mem, const rng_t &i, const params_t &) : 
+      parent_t(mem, i, /* halo = */1), 
       im(i.first() - 1, i.last())
     {
       int n_tmp = n_iters > 2 ? 2 : 1;
