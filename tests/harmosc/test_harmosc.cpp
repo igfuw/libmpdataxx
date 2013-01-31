@@ -52,6 +52,7 @@
 #include "advoocat/mpdata_1d.hpp"
 #include "advoocat/solver_inhomo.hpp"
 #include "advoocat/cyclic_1d.hpp"
+#include "advoocat/equip.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
@@ -70,8 +71,9 @@ enum {psi, phi};
 template <class inhomo_solver_t>
 class coupled_harmosc : public inhomo_solver_t
 {
+  using parent = inhomo_solver_t;
   using real_t = typename inhomo_solver_t::real_t;
-  using arr_1d_t = typename inhomo_solver_t::arr_t;
+  using arr_1d_t = typename inhomo_solver_t::mem_t::arr_t;
 
   real_t omega;
   arr_1d_t tmp;
@@ -96,9 +98,13 @@ class coupled_harmosc : public inhomo_solver_t
 
   public:
 
-  coupled_harmosc(int n, real_t dt, real_t omega) :
-    inhomo_solver_t(n, dt),
-    omega(omega), tmp(this->state(0).extent(0))
+  struct params : parent::params { real_t omega; };
+
+  // ctor
+  coupled_harmosc(typename parent::mem_t &mem, const rng_t &i, params p) :
+    parent(mem, i, p),
+    omega(p.omega), 
+    tmp(this->mem.psi[0][0].extent(0)) // TODO! alloc()
   {
   }
 };
@@ -113,13 +119,20 @@ int main()
  
   const int n_iters = 3, n_eqs = 2;
 
-  coupled_harmosc<
+  using solver_t = coupled_harmosc<
     inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
       solvers::mpdata_1d<
-        n_iters, cyclic_1d<real_t>, n_eqs, real_t
+        n_iters, 
+        cyclic_1d<real_t>, 
+        sharedmem_1d<n_eqs, real_t>
       >
     >
-  > solver(nx, dt, omega);
+  >;
+
+  solver_t::params p;
+  p.dt = dt;
+  p.omega = omega;
+  equip<solver_t> slv(nx, p);
 
   Gnuplot gp;
   gp << "set term svg size 1000,500 dynamic enhanced\n" 
@@ -130,10 +143,10 @@ int main()
   // initial condition
   {
     blitz::firstIndex i;
-    solver.state(psi) = pow(sin(i * pi<real_t>() / nx), 300);
-    solver.state(phi) = real_t(0);
+    slv.state(psi) = pow(sin(i * pi<real_t>() / nx), 300);
+    slv.state(phi) = real_t(0);
   }
-  solver.courant() = C;
+  slv.courant() = C;
 
   gp << "plot"
      << "'-' lt 1 with lines title 'psi',"
@@ -145,21 +158,21 @@ int main()
        << ", '-' lt 3 with lines notitle";
   gp << "\n";
 
-  decltype(solver)::arr_t en(nx);
+  decltype(slv.state()) en(nx);
 
   // sending initial condition
-  gp.send(solver.state(psi));
-  gp.send(solver.state(phi));
-  en = 1 + pow(solver.state(psi),2) + pow(solver.state(phi),2);
+  gp.send(slv.state(psi));
+  gp.send(slv.state(phi));
+  en = 1 + pow(slv.state(psi),2) + pow(slv.state(phi),2);
   gp.send(en);
 
   // integration
   for (int t = n_out; t <= nt; t+=n_out)
   {
-    solver.solve(n_out);
-    gp.send(solver.state(psi));
-    gp.send(solver.state(phi));
-    en = 1 + pow(solver.state(psi),2) + pow(solver.state(phi),2);
+    slv.advance(n_out);
+    gp.send(slv.state(psi));
+    gp.send(slv.state(phi));
+    en = 1 + pow(slv.state(psi),2) + pow(slv.state(phi),2);
     gp.send(en);
   }
 }

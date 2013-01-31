@@ -56,4 +56,3 @@ struct arrvec_t : boost::ptr_vector<arr_t>
 #endif
   }
 };
-

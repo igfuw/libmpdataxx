@@ -12,13 +12,13 @@
 
 namespace solvers
 {
-  template<int n_iters, class bcx_t, class bcy_t, int n_eqs = 1, typename real_t = float>
-  class mpdata_2d : public solver_2d<bcx_t, bcy_t, n_eqs, real_t>
+  template<int n_iters, class bcx_t, class bcy_t, class mem_t>
+  class mpdata_2d : public solver_2d<bcx_t, bcy_t, mem_t>
   {
     static_assert(n_iters > 0, "n_iters <= 0");
 
-    using parent = solver_2d<bcx_t, bcy_t, n_eqs, real_t>;
-    using arr_2d_t = typename parent::arr_t;
+    using parent = solver_2d<bcx_t, bcy_t, mem_t>;
+    using arr_2d_t = typename mem_t::arr_t;
 
     // member fields
     arrvec_t<arr_2d_t> tmp[2];
@@ -33,18 +33,18 @@ namespace solvers
       {
         if (step == 0) 
           donorcell::op_2d(
-            this->psi[e], 
-            this->n[e], this->C, this->i, this->j);
+            this->mem.psi[e], 
+            this->mem.n[e], this->mem.C, this->i, this->j);
         else
         {
           this->cycle(e);
-          this->bcx.fill_halos(this->psi[e][this->n[e]], this->j^this->halo);
-          this->bcy.fill_halos(this->psi[e][this->n[e]], this->i^this->halo);
+          this->bcx.fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^this->halo);
+          this->bcy.fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^this->halo);
 
           // choosing input/output for antidiff C
           const arrvec_t<arr_2d_t>
             &C_unco = (step == 1) 
-              ? this->C 
+              ? this->mem.C 
               : (step % 2) 
                 ? tmp[1]  // odd steps
                 : tmp[0], // even steps
@@ -55,32 +55,34 @@ namespace solvers
           // calculating the antidiffusive C 
           C_corr[0](this->im+h, this->j) = 
             mpdata::antidiff<0>(
-              this->psi[e][this->n[e]], 
+              this->mem.psi[e][this->mem.n[e]], 
               this->im, this->j, C_unco
             );
           this->bcy.fill_halos(C_corr[0], this->i^h);
 
           C_corr[1](this->i, this->jm+h) = 
             mpdata::antidiff<1>(
-              this->psi[e][this->n[e]], 
+              this->mem.psi[e][this->mem.n[e]], 
               this->jm, this->i, C_unco
           );
           this->bcx.fill_halos(C_corr[1], this->j^h);
 
           // donor-cell step 
-          donorcell::op_2d(this->psi[e], 
-            this->n[e], C_corr, this->i, this->j);
+          donorcell::op_2d(this->mem.psi[e], 
+            this->mem.n[e], C_corr, this->i, this->j);
         }
       }
     }
 
     public:
 
+    struct params {};
+
     // ctor
-    mpdata_2d(int nx, int ny) : 
-      solver_2d<bcx_t, bcy_t, n_eqs, real_t>(nx, ny, 1), 
-      im(this->i.first() - 1, this->i.last()),
-      jm(this->j.first() - 1, this->j.last())
+    mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params &) : 
+      solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, 1), 
+      im(i.first() - 1, i.last()),
+      jm(j.first() - 1, j.last())
     {
       int n_tmp = n_iters > 2 ? 2 : 1;
       for (int n = 0; n < n_tmp; ++n)

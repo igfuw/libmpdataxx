@@ -12,11 +12,11 @@
 
 namespace solvers
 {
-  template<class bcx_t, class bcy_t, int n_eqs, typename real_t>
-  class solver_2d : public solver_common<n_eqs, 2, real_t>
+  template<class bcx_t, class bcy_t, class mem_t>
+  class solver_2d : public solver_common<mem_t>
   {
-    using parent = solver_common<n_eqs, 2, real_t>;
-    using arr_2d_t = typename parent::arr_t;
+    using parent = solver_common<mem_t>;
+    using arr_2d_t = typename mem_t::arr_t;
 
     protected:
   
@@ -28,39 +28,32 @@ namespace solvers
 
     void xchng(int e) // for current time level
     {
-      bcx.fill_halos(this->psi[e][ this->n[e] ], j^halo);
-      bcy.fill_halos(this->psi[e][ this->n[e] ], i^halo);
+      bcx.fill_halos(this->mem.psi[e][ this->mem.n[e] ], j^halo);
+      bcy.fill_halos(this->mem.psi[e][ this->mem.n[e] ], i^halo);
     }
 
     void xchng(int e, int lev) //for previous time level
     {
-      bcx.fill_halos(this->psi[e][ this->n[e] - lev], j^halo);
-      bcy.fill_halos(this->psi[e][ this->n[e] - lev], i^halo);
+      bcx.fill_halos(this->mem.psi[e][ this->mem.n[e] - lev], j^halo);
+      bcy.fill_halos(this->mem.psi[e][ this->mem.n[e] - lev], i^halo);
     }
 
 
     // ctor
-    solver_2d(int nx, int ny, int halo) :
+    solver_2d(mem_t &mem, const rng_t &i, const rng_t &j, const int halo) :
+      parent(mem),
       halo(halo),
-      i(0, nx-1), 
-      j(0, ny-1),  
-      bcx(rng_t(0, nx-1), halo), 
-      bcy(rng_t(0, ny-1), halo)
+      i(i), 
+      j(j),  
+      bcx(i, halo), 
+      bcy(j, halo)
     {
-      for (int e = 0; e < n_eqs; ++e) // equations
+      for (int e = 0; e < mem_t::n_eqs; ++e) // equations
         for (int n = 0; n < this->n_tlev; ++n) // time levels
-          this->psi[e].push_back(new arr_2d_t(i^halo, j^halo));
+          mem.psi[e].push_back(new arr_2d_t(i^halo, j^halo));
 
-      this->C.push_back(new arr_2d_t(i^h   , j^halo));
-      this->C.push_back(new arr_2d_t(i^halo, j^h   ));
-    }
-
-    public:
-
-    // accessor methods
-    arr_2d_t state(int e = 0) 
-    {
-      return this->psi[e][ this->n[e] ](i,j).reindex({0,0});
+      mem.C.push_back(new arr_2d_t(i^h   , j^halo));
+      mem.C.push_back(new arr_2d_t(i^halo, j^h   ));
     }
   };
 }; // namespace solvers

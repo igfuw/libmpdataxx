@@ -15,23 +15,30 @@ namespace solvers
     class bcx_t, 
     class bcy_t, 
     class bcz_t, 
-    int n_eqs = 1, 
-    typename real_t = float
+    class mem_t
   > 
-  class donorcell_3d : public solver_3d<bcx_t, bcy_t, bcz_t, n_eqs, real_t> 
+  class donorcell_3d : public solver_3d<bcx_t, bcy_t, bcz_t, mem_t> 
   {
     void advop(int e)
     {
       donorcell::op_3d(
-        this->psi[e], this->n[e], this->C, this->i, this->j, this->k
+        this->mem.psi[e], this->mem.n[e], this->mem.C, this->i, this->j, this->k
       );
     }
 
     public:
 
+    struct params {};
+
     // ctor
-    donorcell_3d(int nx, int ny, int nz) :
-      solver_3d<bcx_t, bcy_t, bcz_t, n_eqs, real_t>(nx, ny, nz, /* halo = */ 1)
+    donorcell_3d(
+      mem_t &mem, 
+      const rng_t &i, 
+      const rng_t &j, 
+      const rng_t &k, 
+      const params &
+    ) :
+      solver_3d<bcx_t, bcy_t, bcz_t, mem_t>(mem, i, j, k, /* halo = */ 1)
     {}  
   };
 }; // namespace solvers

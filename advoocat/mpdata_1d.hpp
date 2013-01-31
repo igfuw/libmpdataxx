@@ -12,13 +12,13 @@
 
 namespace solvers
 {
-  template<int n_iters, class bcx_t, int n_eqs = 1, typename real_t = float>
-  class mpdata_1d : public solver_1d<bcx_t, n_eqs, real_t>
+  template<int n_iters, class bcx_t, class mem_t>
+  class mpdata_1d : public solver_1d<bcx_t, mem_t>
   {
     static_assert(n_iters > 0, "n_iters <= 0");
 
-    using parent = solver_1d<bcx_t, n_eqs, real_t>;
-    using arr_1d_t = typename parent::arr_t;
+    using parent = solver_1d<bcx_t, mem_t>;
+    using arr_1d_t = typename mem_t::arr_t;
 
     // member fields
     arrvec_t<arr_1d_t> tmp[2];
@@ -32,16 +32,16 @@ namespace solvers
       for (int step = 0; step < n_iters; ++step) 
       {
         if (step == 0) 
-          donorcell::op_1d(this->psi[e], this->n[e], this->C[0], this->i);
+          donorcell::op_1d(this->mem.psi[e], this->mem.n[e], this->mem.C[0], this->i);
         else
         {
           this->cycle(e);
-          this->bcx.fill_halos(this->psi[e][this->n[e]]);
+          this->bcx.fill_halos(this->mem.psi[e][this->mem.n[e]]);
 
           // choosing input/output for antidiff C
           const arr_1d_t
             &C_unco = (step == 1) 
-              ? this->C[0] 
+              ? this->mem.C[0] 
               : (step % 2) 
                 ? tmp[1][0]  // odd steps
                 : tmp[0][0], // even steps
@@ -50,29 +50,31 @@ namespace solvers
               : tmp[1][0];   // even steps
 
           // calculating the antidiffusive C 
-          C_corr(this->im+h) = 
+          C_corr(im+h) = 
             mpdata::antidiff(
-              this->psi[e][this->n[e]], 
-              this->im, C_unco[0]
+              this->mem.psi[e][this->mem.n[e]], 
+              im, C_unco[0]
             );
 
           // donor-cell step 
-          donorcell::op_1d(this->psi[e], 
-            this->n[e], C_corr[0], this->i);
+          donorcell::op_1d(this->mem.psi[e], 
+            this->mem.n[e], C_corr[0], this->i);
         }
       }
     }
 
     public:
 
+    struct params {};
+
     // ctor
-    mpdata_1d(int nx) : 
-      parent(nx, /* halo = */1), 
-      im(this->i.first() - 1, this->i.last())
+    mpdata_1d(mem_t &mem, const rng_t &i, const params &) : 
+      parent(mem, i, /* halo = */1), 
+      im(i.first() - 1, i.last())
     {
       int n_tmp = n_iters > 2 ? 2 : 1;
       for (int n = 0; n < n_tmp; ++n)
-        tmp[n].push_back(new arr_1d_t( this->i^h ));
+        tmp[n].push_back(new arr_1d_t( i^h )); // TODO: alloc()
     }
 
   };

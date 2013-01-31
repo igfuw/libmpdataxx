@@ -11,21 +11,23 @@
 
 namespace solvers
 {
-  template<class bcx_t, class bcy_t, int n_eqs = 1, typename real_t = float>
-  class donorcell_2d : public solver_2d<bcx_t, bcy_t, n_eqs, real_t> 
+  template<class bcx_t, class bcy_t, class mem_t>
+  class donorcell_2d : public solver_2d<bcx_t, bcy_t, mem_t> 
   {
     void advop(int e)
     {
       donorcell::op_2d(
-        this->psi[e], this->n[e], this->C, this->i, this->j
+        this->mem.psi[e], this->mem.n[e], this->mem.C, this->i, this->j
       );
     }
 
     public:
 
+    struct params {};
+
     // ctor
-    donorcell_2d(int nx, int ny) :
-      solver_2d<bcx_t, bcy_t, n_eqs, real_t>(nx, ny, /* halo = */ 1)
+    donorcell_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params &) :
+      solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, /* halo = */ 1)
     {}  
   };
 }; // namespace solvers

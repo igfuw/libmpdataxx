@@ -11,22 +11,24 @@
 
 namespace solvers
 {
-  template<class bcx_t, int n_eqs = 1, typename real_t = float>
-  class donorcell_1d : public solver_1d<bcx_t, n_eqs, real_t> 
+  template<class bcx_t, class mem_t>
+  class donorcell_1d : public solver_1d<bcx_t, mem_t> 
   {
     void advop(int e)
     {
       donorcell::op_1d(
-        this->psi[e], this->n[e], this->C[0], this->i
+        this->mem.psi[e], this->mem.n[e], this->mem.C[0], this->i
       );
     }
 
     public:
 
+    struct params {};
+
     // ctor
-    donorcell_1d(int nx) :
-      solver_1d<bcx_t, n_eqs, real_t>(nx, /* halo = */ 1)
-    {}  
+    donorcell_1d(mem_t &mem, const rng_t &i, const params &) :
+      solver_1d<bcx_t, mem_t>(mem, i, /* halo = */ 1)
+    { }  
   };
 }; // namespace solvers
 
