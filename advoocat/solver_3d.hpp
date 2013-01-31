@@ -11,11 +11,11 @@
 
 namespace solvers
 {
-  template<class bcx_t, class bcy_t, class bcz_t, int n_eqs, typename real_t>
-  class solver_3d : public solver_common<n_eqs, 3, real_t>
+  template<class bcx_t, class bcy_t, class bcz_t, class mem_t>
+  class solver_3d : public solver_common<mem_t>
   {
-    using parent = solver_common<n_eqs, 3, real_t>;
-    using arr_3d_t = typename parent::arr_t;
+    using parent_t = solver_common<mem_t>;
+    using arr_3d_t = typename mem_t::arr_t;
 
     protected:
   
@@ -31,36 +31,35 @@ namespace solvers
 
     void xchng(int e) 
     {
-      bcx.fill_halos(this->psi[e][ this->n[e] ], j^halo, k^halo);
-      bcy.fill_halos(this->psi[e][ this->n[e] ], k^halo, i^halo);
-      bcz.fill_halos(this->psi[e][ this->n[e] ], i^halo, j^halo);
+      bcx.fill_halos(this->mem.psi[e][ this->mem.n[e] ], j^halo, k^halo);
+      bcy.fill_halos(this->mem.psi[e][ this->mem.n[e] ], k^halo, i^halo);
+      bcz.fill_halos(this->mem.psi[e][ this->mem.n[e] ], i^halo, j^halo);
     }
 
     // ctor
-    solver_3d(int nx, int ny, int nz, int halo) :
+    solver_3d(
+      mem_t &mem,
+      const rng_t &i,
+      const rng_t &j,
+      const rng_t &k,
+      int halo
+    ) :
+      parent_t(mem),
       halo(halo),
-      i(0, nx-1), 
-      j(0, ny-1),  
-      k(0, nz-1),  
-      bcx(rng_t(0, nx-1), halo), 
-      bcy(rng_t(0, ny-1), halo),
-      bcz(rng_t(0, nz-1), halo)
-    {
-      for (int e = 0; e < n_eqs; ++e) // equations
+      i(i), 
+      j(j),  
+      k(k),  
+      bcx(rng_t(i), halo), 
+      bcy(rng_t(j), halo),
+      bcz(rng_t(k), halo)
+    { // TODO: alloc method
+      for (int e = 0; e < mem_t::n_eqs; ++e) // equations
         for (int n = 0; n < this->n_tlev; ++n) // time levels
-          this->psi[e].push_back(new arr_3d_t(i^halo, j^halo, k^halo));
+          mem.psi[e].push_back(new arr_3d_t(i^halo, j^halo, k^halo)); 
 
-      this->C.push_back(new arr_3d_t(i^h, j^halo, k^halo));
-      this->C.push_back(new arr_3d_t(i^halo, j^h, k^halo));
-      this->C.push_back(new arr_3d_t(i^halo, j^halo, k^h));
-    }
-
-    public:
-
-    // accessor methods
-    arr_3d_t state(int e = 0) 
-    {
-      return this->psi[e][ this->n[e] ](i,j,k).reindex({0,0,0});
+      mem.C.push_back(new arr_3d_t(i^h, j^halo, k^halo));
+      mem.C.push_back(new arr_3d_t(i^halo, j^h, k^halo));
+      mem.C.push_back(new arr_3d_t(i^halo, j^halo, k^h));
     }
   };
 }; // namespace solvers

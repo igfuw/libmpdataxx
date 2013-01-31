@@ -35,7 +35,7 @@ using rng_t = blitz::Range;
 template <class arr_t>
 struct arrvec_t : boost::ptr_vector<arr_t> 
 {
-  using parent = boost::ptr_vector<arr_t>;
+  using parent_t = boost::ptr_vector<arr_t>;
 
   const arr_t &operator[](const int i) const 
   {   
@@ -46,7 +46,7 @@ struct arrvec_t : boost::ptr_vector<arr_t>
 
   void push_back(arr_t *arr)
   {
-    parent::push_back(arr);
+    parent_t::push_back(arr);
 
 #if !defined(NDEBUG)
     // filling the array with NaNs to ease debugging
@@ -56,4 +56,3 @@ struct arrvec_t : boost::ptr_vector<arr_t>
 #endif
   }
 };
-

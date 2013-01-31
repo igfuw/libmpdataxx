@@ -6,61 +6,50 @@
 
 #pragma once
 
-#include "blitz.hpp"
-#include <vector>
-#include <blitz/array.h>
+#include "sharedmem.hpp"
 
 namespace solvers
 {
-  template <int n_eqs, int n_dims, typename _real_t>
+  template <class sharedmem>
   class solver_common
   {
-    static_assert(n_dims > 0, "n_dims <= 0");
-    static_assert(n_eqs > 0, "n_eqs <= 0");
-
     public:
 
-    typedef _real_t real_t;
-    typedef blitz::Array<real_t, n_dims> arr_t;
+    typedef sharedmem mem_t;
 
     protected: 
 
+    mem_t &mem;
+
     const int n_tlev = 2;
-
-    // member fields
-    arrvec_t<arr_t> C;
-
-    // psi contains model state including halo region
-    arrvec_t<arr_t> psi[n_eqs];
-
-    std::vector<int> n;
 
     // helper methods invoked by solve()
     virtual void advop(int e) = 0;
     void advop_all()
     {
-      for (int e = 0; e < n_eqs; ++e) advop(e);
+      for (int e = 0; e < mem_t::n_eqs; ++e) advop(e);
     }
 
     void cycle(int e) 
     { 
-      n[e] = (n[e] + 1) % n_tlev - n_tlev; 
+      mem.n[e] = (mem.n[e] + 1) % n_tlev - n_tlev; 
     }
     void cycle_all()
     { 
-      for (int e = 0; e < n_eqs; ++e) cycle(e);
+      for (int e = 0; e < mem_t::n_eqs; ++e) cycle(e);
     }
 
     virtual void xchng(int e) = 0;
     void xchng_all() 
     {   
-      for (int e = 0; e < n_eqs; ++e) xchng(e);
+      for (int e = 0; e < mem_t::n_eqs; ++e) xchng(e);
     }
 
     public:
-
-    solver_common() :
-      n(n_eqs, 0) 
+  
+    // ctor
+    solver_common(mem_t &mem) :
+      mem(mem) 
     { }
 
     void solve(const int nt) 
@@ -72,13 +61,5 @@ namespace solvers
         cycle_all();
       }   
     }
-
-    public:
-
-    // accessor method for the Courant number field
-    arr_t courant(int d = 0) 
-    {   
-      return C[d]; 
-    }   
   };
 }; // namespace solvers

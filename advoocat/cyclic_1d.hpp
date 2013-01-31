@@ -11,14 +11,14 @@
 template <typename real_t = float>
 class cyclic_1d : cyclic_common<1, real_t>
 {
-  using parent = cyclic_common<1, real_t>;
-  using arr_1d_t = typename parent::arr_t;
+  using parent_t = cyclic_common<1, real_t>;
+  using arr_1d_t = typename parent_t::arr_t;
 
   public:
 
   // ctor
   cyclic_1d(const rng_t &i, int halo) :
-    parent(i, halo)
+    parent_t(i, halo)
   {}
 
   // method invoked by the solver

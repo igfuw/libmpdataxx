@@ -11,6 +11,7 @@
 #include "advoocat/mpdata_2d.hpp"
 #include "advoocat/solver_pressure.hpp"
 #include "advoocat/cyclic_2d.hpp"
+#include "advoocat/equip.hpp"
 //gradient
 #include "advoocat/nabla_formulae.hpp"
 //physical constants
@@ -33,39 +34,48 @@
 enum {u, w, tht};  //eqations
 enum {x, z};       //dimensions
 
-template <int n_iters, typename real_t>
-using parent = 
+using real_t = double;
+const int n_iters = 2;
+
+using parent_t_ = 
 pressure_solver<
   inhomo_solver<
     solvers::mpdata_2d<
       n_iters, 
       cyclic_2d<x, real_t>, 
       cyclic_2d<z, real_t>,
-      3, 
-      real_t
+      sharedmem_2d<3, real_t>
     >
-  >, u, w, tht, x, z
+  >, u, w, tht
 >;
 
-template <int n_iters, typename real_t = double>
-class bombel : public parent<n_iters, real_t>
+class bombel : public parent_t_
 {
+  using parent_t = parent_t_;
 
   real_t Tht_amb;
 
   void forcings(real_t dt)  //explicit forcings (to be applied before the eliptic solver)
   {
-    auto W   = this->state(w);
-    auto Tht = this->state(tht);
+    auto W   = this->psi(w);
+    auto Tht = this->psi(tht);
 
     W += (dt * si:: seconds) * phc::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb;
   }
 
   public:
 
-  bombel(int nx, int ny, real_t dt, real_t Tht_amb, real_t Prs_amb) :
-    parent<n_iters, real_t>(nx, ny, dt, Prs_amb),
-    Tht_amb(Tht_amb)
+  struct params_t : parent_t::params_t { real_t Tht_amb; };
+
+  // ctor
+  bombel(
+    parent_t::mem_t &mem, 
+    const rng_t &i,
+    const rng_t &j,
+    const params_t &p
+  ) :
+    parent_t(mem, i, j, p),
+    Tht_amb(p.Tht_amb)
   {}
 };
 
@@ -73,25 +83,24 @@ int main()
 {
   const int nx = 150, ny = 150, nt = 50, n_out=1;
 //  const int nx = 50, ny = 50, nt = 41, n_out=10;
-  using real_t = float;
-  const real_t dt = .1;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
   const real_t halo = 1;  
 
+  typename bombel::params_t p;
+  p.dt = .1;
   //ambient state (constant thoughout the domain)
-  real_t Tht_amb = 300;  
-  real_t Prs_amb = diagnose::p(Tht_amb);
-
-  bombel<2> solver(nx, ny, dt, Tht_amb, Prs_amb);
+  p.Tht_amb = 300;
+  p.Prs_amb = diagnose::p(p.Tht_amb);
+  equip<bombel> solver(nx, ny, p);
 
   // initial condition
   {
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    solver.state(tht) = Tht_amb 
+    solver.state(tht) = p.Tht_amb 
       + exp( -sqr(i-nx/2.) / (2.*pow(nx/20, 2))
              -sqr(j-ny/4.) / (2.*pow(ny/20, 2)) )
     ;
@@ -124,18 +133,18 @@ int main()
   // integration
 //  for (int t = 1; t <= 5; ++t)
 //  {
-    solver.solve(nt); // 1 tymczasowo
+    solver.advance(nt); // 1 tymczasowo
 //   if (t % n_out == 0 /*&& t != 0*/)  
 //   {    
 //      gp << "set title 'tht @ t=" << t+1 << "'\n"
-      gp << "set title 'tht @ t=" << std::setprecision(3) << nt * dt << "'\n"
+      gp << "set title 'tht @ t=" << std::setprecision(3) << nt * p.dt << "'\n"
 //         << "set cbrange [300:301]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
-      gp << "set title 'u @ t=" << std::setprecision(3) << nt * dt << "'\n"
+      gp << "set title 'u @ t=" << std::setprecision(3) << nt * p.dt << "'\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(u).copy());
-      gp << "set title 'w @ t=" <<std::setprecision(3) << nt * dt << "'\n"
+      gp << "set title 'w @ t=" <<std::setprecision(3) << nt * p.dt << "'\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(w).copy());
 

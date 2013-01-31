@@ -15,6 +15,7 @@
 #include "advoocat/donorcell_2d.hpp"
 #include "advoocat/mpdata_2d.hpp"
 #include "advoocat/cyclic_2d.hpp"
+#include "advoocat/equip.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
@@ -49,42 +50,52 @@ int main() {
      << "set zrange [-.666:1]\n"   
      << "set palette maxcolors 42\n"
      << "set pm3d at b\n";
+
   std::string binfmt;
+  using mem_t = sharedmem_2d<>;
+
   for (auto &offset : std::vector<float>({0,-.5})){
     gp << "set cbrange ["<< offset -.025<<":"<<offset+1.025<<"]\n";
     {
-      solvers::donorcell_2d<cyclic_2d<x>, cyclic_2d<y>> solver(n[x],n[y]);
-      setup(solver, n, offset);
-      binfmt = gp.binfmt(solver.state());
+      equip<
+        solvers::donorcell_2d<cyclic_2d<x>, cyclic_2d<y>, mem_t>
+      > slv(n[x],n[y]);
+
+      setup(slv, n, offset);
+      binfmt = gp.binfmt(slv.state());
       gp << "set title 't=0'\n"
          << "splot '-' binary" << binfmt
          << "with lines notitle\n";
-      gp.sendBinary(solver.state().copy());
-      solver.solve(nt);
+      gp.sendBinary(slv.state().copy());
+      slv.advance(nt);
       gp << "set title 'donorcell t="<<nt<<"'\n"
          << "splot '-' binary" << binfmt
          << "with lines notitle\n";
-      gp.sendBinary(solver.state().copy());
+      gp.sendBinary(slv.state().copy());
     } {
       const int it = 2;
-      solvers::mpdata_2d<it, cyclic_2d<x>, cyclic_2d<y>> solver(n[x],n[y]); 
-      setup(solver, n, offset); 
-      solver.solve(nt);
+      equip<
+        solvers::mpdata_2d<it, cyclic_2d<x>, cyclic_2d<y>, mem_t>
+      > slv(n[x],n[y]); 
+      setup(slv, n, offset); 
+      slv.advance(nt);
       gp << "set title 'mpdata<" << it << "> "
          << "t=" << nt << "'\n"
          << "splot '-' binary" << binfmt
          << "with lines notitle\n";
-      gp.sendBinary(solver.state().copy());
+      gp.sendBinary(slv.state().copy());
     } {
       const int it = 4;
-      solvers::mpdata_2d<it, cyclic_2d<x>, cyclic_2d<y>> solver(n[x],n[y]); 
-      setup(solver, n, offset); 
-      solver.solve(nt); 
+      equip<
+        solvers::mpdata_2d<it, cyclic_2d<x>, cyclic_2d<y>, mem_t>
+      > slv(n[x],n[y]); 
+      setup(slv, n, offset); 
+      slv.advance(nt); 
       gp << "set title 'mpdata<" << it << "> "
          << "t=" << nt << "'\n"
          << "splot '-' binary" << binfmt
          << "with lines notitle\n";
-      gp.sendBinary(solver.state().copy());
+      gp.sendBinary(slv.state().copy());
     }
   }
 }

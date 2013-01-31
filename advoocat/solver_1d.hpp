@@ -10,11 +10,11 @@
 
 namespace solvers
 {
-  template<class bcx_t, int n_eqs, typename real_t>
-  class solver_1d : public solver_common<n_eqs, 1, real_t>
+  template<class bcx_t, class mem_t>
+  class solver_1d : public solver_common<mem_t>
   {
-    using parent = solver_common<n_eqs, 1, real_t>;
-    using arr_1d_t = typename parent::arr_t;
+    using parent_t = solver_common<mem_t>;
+    using arr_1d_t = typename mem_t::arr_t;
 
     protected:
 
@@ -25,28 +25,26 @@ namespace solvers
 
     void xchng(int e) 
     {
-      bcx.fill_halos( this->psi[e][ this->n[e] ] );
+      bcx.fill_halos( this->mem.psi[e][ this->mem.n[e] ] );
     }
 
     // ctor
-    solver_1d(int nx, int halo) :
+    solver_1d(mem_t &mem, const rng_t &i, int halo) :
+      parent_t(mem),
       halo(halo),
-      i(0, nx-1), 
-      bcx(rng_t(0, nx-1), halo)
+      i(i), 
+      bcx(i, halo)
     {
-      for (int e = 0; e < n_eqs; ++e) // equations
+      // TODO: move to an alloc() method
+      for (int e = 0; e < mem_t::n_eqs; ++e) // equations
+      {
         for (int n = 0; n < this->n_tlev; ++n) // time levels
-          this->psi[e].push_back(new arr_1d_t(i^halo));
+        {
+          mem.psi[e].push_back(new arr_1d_t(i^halo));
+        }
+      }
 
-      this->C.push_back(new arr_1d_t(i^h));
-    }
-
-    public:
-
-    // accessor method for psi (hides the halo region)
-    arr_1d_t state(int e = 0) 
-    {
-      return this->psi[e][ this->n[e] ](i).reindex({0});
+      mem.C.push_back(new arr_1d_t(i^h));
     }
   };
 }; // namespace solvers
