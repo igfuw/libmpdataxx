@@ -10,6 +10,11 @@
 
 #pragma once
 
+namespace advoocat
+{
+  namespace solvers
+  {
+// TODO: indent
 template <class homo_solver, bool naive = false>
 class inhomo_solver : public homo_solver
 {
@@ -75,3 +80,5 @@ class inhomo_solver : public homo_solver
 
 template <class homo_solver>
 using inhomo_solver_naive = inhomo_solver<homo_solver, true>;
+  }; // namespace solvers
+}; // namespace advoocat

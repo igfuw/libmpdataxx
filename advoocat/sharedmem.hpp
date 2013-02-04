@@ -9,6 +9,8 @@
 #include "blitz.hpp"
 #include <vector>
 
+namespace advoocat
+{
 template <int n_dims, int n_eqs_, typename real_t_>
 struct sharedmem_common
 {
@@ -92,3 +94,4 @@ struct sharedmem_3d : sharedmem_common<3, n_eqs, real_t>
     this->span[2] = s2;
   }
 };
+}; // namespace advoocat

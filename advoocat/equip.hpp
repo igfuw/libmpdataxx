@@ -6,6 +6,9 @@
 
 #pragma once
 
+namespace advoocat
+{
+// TODO: indent
 template <class solver_t>
 class equip
 {
@@ -32,18 +35,15 @@ class equip
   // 1D ctor
   equip(
     const int s0, 
-    const typename solver_t::params_t &p = typename solver_t::params_t()
+    const typename solver_t::params_t &params = typename solver_t::params_t()
   )
     : mem(s0)
   {
     for (int i0 = 0; i0 < n0; ++i0) 
       algos.push_back(new solver_t(
         mem, 
-        rng_t(
-          min(s0, i0, n0), 
-          max(s0, i0, n0)
-        ),
-        p
+        rng_t( min(s0, i0, n0), max(s0, i0, n0)),
+        params
       ));
   }
 
@@ -51,7 +51,7 @@ class equip
   equip(
     const int s0, 
     const int s1, 
-    const typename solver_t::params_t &p = typename solver_t::params_t()
+    const typename solver_t::params_t &params = typename solver_t::params_t()
   )
     : mem(s0, s1)
   {
@@ -59,15 +59,9 @@ class equip
       for (int i1 = 0; i1 < n1; ++i1) 
         algos.push_back(new solver_t(
           mem, 
-          rng_t(
-            min(s0, i0, n0), 
-            max(s0, i0, n0)
-          ),
-          rng_t(
-            min(s1, i1, n1), 
-            max(s1, i1, n1)
-          ),
-          p
+          rng_t( min(s0, i0, n0), max(s0, i0, n0)),
+          rng_t( min(s1, i1, n1), max(s1, i1, n1)),
+          params
         )
       );
   }
@@ -77,7 +71,7 @@ class equip
     const int s0, 
     const int s1, 
     const int s2, 
-    const typename solver_t::params_t &p = typename solver_t::params_t()
+    const typename solver_t::params_t &params = typename solver_t::params_t()
   )
     : mem(s0, s1, s2)
   {
@@ -86,19 +80,10 @@ class equip
         for (int i2 = 0; i2 < n2; ++i2) 
           algos.push_back(new solver_t(
             mem, 
-            rng_t(
-              min(s0, i0, n0), 
-              max(s0, i0, n0)
-            ),
-            rng_t(
-              min(s1, i1, n1), 
-              max(s1, i1, n1)
-            ),
-            rng_t(
-              min(s2, i2, n2), 
-              max(s2, i2, n2)
-            ),
-            p
+            rng_t( min(s0, i0, n0), max(s0, i0, n0)),
+            rng_t( min(s1, i1, n1), max(s1, i1, n1)),
+            rng_t( min(s2, i2, n2), max(s2, i2, n2)),
+            params
           )
         );
   }
@@ -119,3 +104,4 @@ class equip
     return mem.courant(d);
   }
 };
+}; // namespace advoocat

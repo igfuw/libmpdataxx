@@ -6,14 +6,23 @@
 
 #pragma once
 
-#include "pi.hpp"
+#include "../idxperm.hpp"
 
-namespace donorcell
+namespace advoocat
 {
+  namespace formulae
+  {
+    namespace donorcell
+    {
+      using namespace arakawa_c;
+      using idxperm::pi;
+
+  // TODO: indent
+
   template<class T1, class T2, class T3> 
   inline auto F(
     const T1 &psi_l, const T2 &psi_r, const T3 &C
-  ) return_macro(
+  ) return_macro(,
     (
       (C + abs(C)) * psi_l + 
       (C - abs(C)) * psi_r
@@ -25,7 +34,7 @@ namespace donorcell
     const arr_1d_t &psi, 
     const arr_1d_t &C, 
     const rng_t &i
-  ) return_macro(
+  ) return_macro(,
     F(
       psi(i  ), 
       psi(i+1), 
@@ -44,7 +53,7 @@ namespace donorcell
     const arr_2d_t &C, 
     const rng_t &i, 
     const rng_t &j
-  ) return_macro(
+  ) return_macro(,
     F(
       psi(pi<d>(i,   j)), 
       psi(pi<d>(i+1, j)), 
@@ -64,7 +73,7 @@ namespace donorcell
     const rng_t &i, 
     const rng_t &j,
     const rng_t &k
-  ) return_macro(
+  ) return_macro(,
     F(
       psi(pi<d>(i,   j, k)), 
       psi(pi<d>(i+1, j, k)), 
@@ -110,4 +119,6 @@ namespace donorcell
       - donorcell<1>(psi[n], C[1], j, k, i)
       - donorcell<2>(psi[n], C[2], k, i, j); 
   }
-}; // namespace donorcell 
+    }; // namespace donorcell 
+  }; // namespace formulae
+}; // namespace advoocat

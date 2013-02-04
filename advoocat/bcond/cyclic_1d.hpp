@@ -8,6 +8,11 @@
 
 #include "cyclic_common.hpp"
 
+namespace advoocat
+{
+  namespace bcond
+  {
+// TODO: indent
 template <typename real_t = float>
 class cyclic_1d : cyclic_common<1, real_t>
 {
@@ -28,3 +33,5 @@ class cyclic_1d : cyclic_common<1, real_t>
     a(this->rght_halo) = a(this->left_edge);     
   }
 };
+  }; // namespace bcond
+}; // namespace advoocat

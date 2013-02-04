@@ -6,23 +6,31 @@
 
 #pragma once
 
-#include "blitz.hpp"
-#include "pi.hpp"
-#include "arakawa_c.hpp"
+#include "../blitz.hpp"
+#include "../idxperm.hpp"
+#include "../arakawa_c.hpp"
 
-namespace nabla_op 
+namespace advoocat
 {
+  namespace formulae
+  {
+    namespace nabla_op 
+    {
+      using idxperm::pi;
+
+// TODO indent
+
   template <int d, class arg_t, typename real_t>
   inline auto grad(
     const arg_t &x,
     const rng_t &i,
     const rng_t &j,
-    const real_t h
-  ) return_macro(
+    const real_t dx
+  ) return_macro(,
     (
       x(pi<d>(i+1, j)) - 
       x(pi<d>(i-1, j))
-    ) / h / 2.
+    ) / dx / 2.
   )
   
   template <class arg_t, typename real_t>
@@ -33,11 +41,12 @@ namespace nabla_op
     const rng_t &j,
     const real_t hx,
     const real_t hy
-  ) return_macro(
+  ) return_macro(;,
     (x(i+1,j  ) - x(i-1,j  )) / hx / 2.
     +
     (y(i  ,j+1) - y(i  ,j-1)) / hy / 2.
   )
 
-}; //nabla
-
+    }; // namespace nabla_op
+  }; // namespace formulae
+}; // namespace advoocat

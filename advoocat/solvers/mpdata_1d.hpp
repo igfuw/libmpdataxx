@@ -6,10 +6,12 @@
 
 #pragma once
 
-#include "mpdata_formulae.hpp"
-#include "donorcell_formulae.hpp"
+#include "../formulae/mpdata_formulae.hpp"
+#include "../formulae/donorcell_formulae.hpp"
 #include "solver_1d.hpp"
 
+namespace advoocat
+{
 namespace solvers
 {
   template<int n_iters, class bcx_t, class mem_t>
@@ -32,7 +34,7 @@ namespace solvers
       for (int step = 0; step < n_iters; ++step) 
       {
         if (step == 0) 
-          donorcell::op_1d(this->mem.psi[e], this->mem.n[e], this->mem.C[0], this->i);
+          formulae::donorcell::op_1d(this->mem.psi[e], this->mem.n[e], this->mem.C[0], this->i);
         else
         {
           this->cycle(e);
@@ -51,13 +53,13 @@ namespace solvers
 
           // calculating the antidiffusive C 
           C_corr(im+h) = 
-            mpdata::antidiff(
+            formulae::mpdata::antidiff(
               this->mem.psi[e][this->mem.n[e]], 
               im, C_unco[0]
             );
 
           // donor-cell step 
-          donorcell::op_1d(this->mem.psi[e], 
+          formulae::donorcell::op_1d(this->mem.psi[e], 
             this->mem.n[e], C_corr[0], this->i);
         }
       }
@@ -78,4 +80,5 @@ namespace solvers
     }
 
   };
-};
+}; // namespace solvers
+}; // namescpae advoocat

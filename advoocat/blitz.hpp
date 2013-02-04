@@ -26,9 +26,12 @@ template <int n_dims> using idx_t = blitz::RectDomain<n_dims>;
 using rng_t = blitz::Range;
 
 // C++11 auto return type macro
-#define return_macro(expr) \
+#define return_macro(init,expr)          \
   -> decltype(blitz::safeToReturn(expr)) \
-{ return safeToReturn(expr); } 
+{                                        \
+  init                                   \
+  return safeToReturn(expr);             \
+} 
 
 // Boost ptr_vector 
 #include <boost/ptr_container/ptr_vector.hpp>

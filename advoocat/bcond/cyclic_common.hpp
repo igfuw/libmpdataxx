@@ -8,6 +8,11 @@
 
 #include <blitz/array.h>
 
+namespace advoocat
+{
+  namespace bcond
+  {
+  // TODO: indent
 template <int n_dims, typename real_t = float>
 class cyclic_common
 {
@@ -31,3 +36,5 @@ class cyclic_common
     left_edge(i.first()           , i.first() + halo - 1)
   {} 
 };
+  }; // namespace bcond
+}; // namespace advoocat

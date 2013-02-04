@@ -6,12 +6,17 @@
 
 #pragma once
 
-#include "mpdata_formulae.hpp"
-#include "donorcell_formulae.hpp"
+#include "../formulae/mpdata_formulae.hpp"
+#include "../formulae/donorcell_formulae.hpp"
 #include "solver_2d.hpp"
 
-namespace solvers
+namespace advoocat
 {
+  namespace solvers
+  {
+    using namespace arakawa_c;
+
+// TODO indent
   template<int n_iters, class bcx_t, class bcy_t, class mem_t>
   class mpdata_2d : public solver_2d<bcx_t, bcy_t, mem_t>
   {
@@ -32,7 +37,7 @@ namespace solvers
       for (int step = 0; step < n_iters; ++step) 
       {
         if (step == 0) 
-          donorcell::op_2d(
+          formulae::donorcell::op_2d(
             this->mem.psi[e], 
             this->mem.n[e], this->mem.C, this->i, this->j);
         else
@@ -54,21 +59,21 @@ namespace solvers
 
           // calculating the antidiffusive C 
           C_corr[0](this->im+h, this->j) = 
-            mpdata::antidiff<0>(
+            formulae::mpdata::antidiff<0>(
               this->mem.psi[e][this->mem.n[e]], 
               this->im, this->j, C_unco
             );
           this->bcy.fill_halos(C_corr[0], this->i^h);
 
           C_corr[1](this->i, this->jm+h) = 
-            mpdata::antidiff<1>(
+            formulae::mpdata::antidiff<1>(
               this->mem.psi[e][this->mem.n[e]], 
               this->jm, this->i, C_unco
           );
           this->bcx.fill_halos(C_corr[1], this->j^h);
 
           // donor-cell step 
-          donorcell::op_2d(this->mem.psi[e], 
+          formulae::donorcell::op_2d(this->mem.psi[e], 
             this->mem.n[e], C_corr, this->i, this->j);
         }
       }
@@ -93,3 +98,4 @@ namespace solvers
     }
   };
 }; // namespace solvers
+}; // namespace advoocat

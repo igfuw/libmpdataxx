@@ -8,9 +8,14 @@
 #pragma once
 #include "solver_common.hpp"
 #include "solver_inhomo.hpp"
-#include "courant_formulae.hpp"
-#include "nabla_formulae.hpp" //gradient, diveregnce
+#include "../formulae/courant_formulae.hpp"
+#include "../formulae/nabla_formulae.hpp" //gradient, diveregnce
 
+namespace advoocat
+{
+  namespace solvers
+  {
+// TODO: indent
 template <class parent_t_, int u, int w, int tht>
 class pressure_solver : public parent_t_
 {
@@ -51,8 +56,8 @@ class pressure_solver : public parent_t_
     this->xchng(u);      
     this->xchng(w);     
 
-    courant::intrp<0>(this->mem.C[0], this->psi(u), im, this->j^this->halo, this->dt, dx);
-    courant::intrp<1>(this->mem.C[1], this->psi(u), jm, this->i^this->halo, this->dt, dz);
+    formulae::courant::intrp<0>(this->mem.C[0], this->psi(u), im, this->j^this->halo, this->dt, dx);
+    formulae::courant::intrp<1>(this->mem.C[1], this->psi(u), jm, this->i^this->halo, this->dt, dz);
   }
 
   void update_courant()
@@ -63,8 +68,8 @@ class pressure_solver : public parent_t_
     this->xchng(u, 1);      // filling halos for velocity filed
     this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
 
-    courant::intrp<0>(this->mem.C[0], this->psi(u, -1), im, this->j^this->halo, this->dt, dx);
-    courant::intrp<1>(this->mem.C[1], this->psi(w, -1), jm, this->i^this->halo, this->dt, dz);
+    formulae::courant::intrp<0>(this->mem.C[0], this->psi(u, -1), im, this->j^this->halo, this->dt, dx);
+    formulae::courant::intrp<1>(this->mem.C[1], this->psi(w, -1), jm, this->i^this->halo, this->dt, dz);
   } 
 
   void ini_pressure()
@@ -75,6 +80,10 @@ class pressure_solver : public parent_t_
 
   void pressure_solver_update(real_t dt)
   {
+    using namespace arakawa_c;
+    using formulae::nabla_op::grad;
+    using formulae::nabla_op::div;
+
     real_t beta = .25;  //TODO
     real_t rho = 1.;   //TODO    
 
@@ -94,13 +103,13 @@ std::cerr<<"--------------------------------------------------------------"<<std
       this->xchng(tmp_u, i^halo, j^halo);
       this->xchng(tmp_w, i^halo, j^halo);
 
-      tmp_x(i, j) = rho * tmp_u(i, j) - nabla_op::grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-      tmp_z(i, j) = rho * tmp_w(i, j) - nabla_op::grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+      tmp_x(i, j) = rho * tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
+      tmp_z(i, j) = rho * tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
  
       this->xchng(tmp_x, i^halo, j^halo);
       this->xchng(tmp_z, i^halo, j^halo);
 
-      tmp_div(i, j) = nabla_op::div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1));
+      tmp_div(i, j) = div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1));
       Phi(i, j) -= beta * tmp_div(i, j);
 
       this->xchng(tmp_u, i^halo, j^halo);
@@ -112,8 +121,8 @@ std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
     //end of pseudo_time loop
     this->xchng(this->Phi, i^halo, j^halo);
 
-    tmp_u(i, j) -= nabla_op::grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-    tmp_w(i, j) -= nabla_op::grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+    tmp_u(i, j) -= grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
+    tmp_w(i, j) -= grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
 
     tmp_u -= this->psi(u);
     tmp_w -= this->psi(w);
@@ -183,4 +192,6 @@ std::cerr<<"t= "<<t<<std::endl;
       }
     }
   }
-};
+}; 
+}; // namespace solvers
+}; // namespace advoocat

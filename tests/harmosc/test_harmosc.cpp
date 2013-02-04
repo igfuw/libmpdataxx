@@ -49,9 +49,9 @@
  */
 
 // advection (<> should be used instead of "" in normal usage)
-#include "advoocat/mpdata_1d.hpp"
-#include "advoocat/solver_inhomo.hpp"
-#include "advoocat/cyclic_1d.hpp"
+#include "advoocat/solvers/mpdata_1d.hpp"
+#include "advoocat/solvers/solver_inhomo.hpp"
+#include "advoocat/bcond/cyclic_1d.hpp"
 #include "advoocat/equip.hpp"
 
 // plotting
@@ -112,6 +112,7 @@ class coupled_harmosc : public inhomo_solver_t
 int main() 
 {
   using real_t = double;
+  using namespace advoocat;
 
   const int nx = 1000, nt = 750, n_out=10;
   const real_t C = .5, dt = 1;
@@ -120,10 +121,10 @@ int main()
   const int n_iters = 3, n_eqs = 2;
 
   using solver_t = coupled_harmosc<
-    inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
+    solvers::inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
       solvers::mpdata_1d<
         n_iters, 
-        cyclic_1d<real_t>, 
+        bcond::cyclic_1d<real_t>, 
         sharedmem_1d<n_eqs, real_t>
       >
     >

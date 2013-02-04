@@ -7,10 +7,13 @@
 #pragma once
 
 #include "solver_3d.hpp"
-#include "donorcell_formulae.hpp"
+#include "../formulae/donorcell_formulae.hpp"
 
-namespace solvers
+namespace advoocat
 {
+  namespace solvers
+  {
+  // TODO: indent
   template<
     class bcx_t, 
     class bcy_t, 
@@ -21,7 +24,7 @@ namespace solvers
   {
     void advop(int e)
     {
-      donorcell::op_3d(
+      formulae::donorcell::op_3d(
         this->mem.psi[e], this->mem.n[e], this->mem.C, this->i, this->j, this->k
       );
     }
@@ -42,4 +45,4 @@ namespace solvers
     {}  
   };
 }; // namespace solvers
-
+}; // namespace advoocat

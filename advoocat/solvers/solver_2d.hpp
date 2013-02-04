@@ -7,11 +7,16 @@
 #pragma once
 
 #include "solver_common.hpp"
-#include "blitz.hpp"
-#include "arakawa_c.hpp"
+#include "../blitz.hpp"
+#include "../arakawa_c.hpp"
 
-namespace solvers
+namespace advoocat
 {
+  namespace solvers
+  {
+    using namespace advoocat::arakawa_c;
+
+// TODO: indent
   template<class bcx_t, class bcy_t, class mem_t>
   class solver_2d : public solver_common<mem_t>
   {
@@ -60,5 +65,6 @@ namespace solvers
       mem.C.push_back(new arr_2d_t(i^h   , j^halo));
       mem.C.push_back(new arr_2d_t(i^halo, j^h   ));
     }
-  };
-}; // namespace solvers
+    };
+  }; // namespace solvers
+}; // namespace advoocat

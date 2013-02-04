@@ -16,6 +16,12 @@
 
 #pragma once
 
+namespace advoocat
+{
+  namespace idxperm
+  {
+  // TODO: indent
+
 // 2D
 
 template<int d> 
@@ -75,3 +81,5 @@ inline idx_t<3> pi<2>(
 ) {
   return idx_t<3>({i,j,k});
 }
+}; // namespace idxperm
+}; // namespace advoocat

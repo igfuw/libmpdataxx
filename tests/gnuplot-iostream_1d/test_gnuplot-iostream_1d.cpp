@@ -10,9 +10,9 @@
  */
 
 // (<> should be used instead of "" in normal usage)
-#include "advoocat/mpdata_1d.hpp"
-#include "advoocat/donorcell_1d.hpp"
-#include "advoocat/cyclic_1d.hpp"
+#include "advoocat/solvers/mpdata_1d.hpp"
+#include "advoocat/solvers/donorcell_1d.hpp"
+#include "advoocat/bcond/cyclic_1d.hpp"
 #include "advoocat/equip.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
@@ -28,7 +28,10 @@ void setup(T &solver, int n)
   solver.courant() = .5; 
 }
 
-int main() {
+int main() 
+{
+  using namespace advoocat;
+
   Gnuplot gp;
   gp << "set term svg size 1500,500 dynamic\n" 
      << "set output 'figure.svg'\n"     
@@ -49,7 +52,10 @@ int main() {
 
   {
     equip<
-      solvers::mpdata_1d<4, cyclic_1d<>, mem_t>
+      solvers::mpdata_1d<4, bcond::cyclic_1d<>, mem_t>
+      // ...
+      // ...
+      // ...
     > slv(n);
 
     setup(slv, n);

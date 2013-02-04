@@ -8,8 +8,14 @@
 
 #include "solver_common.hpp"
 
-namespace solvers
+namespace advoocat
 {
+  namespace solvers
+  {
+    using namespace advoocat::arakawa_c;
+
+// TODO: indent
+
   template<class bcx_t, class mem_t>
   class solver_1d : public solver_common<mem_t>
   {
@@ -47,4 +53,5 @@ namespace solvers
       mem.C.push_back(new arr_1d_t(i^h));
     }
   };
-}; // namespace solvers
+  }; // namespace solvers
+}; // namespace advoocat

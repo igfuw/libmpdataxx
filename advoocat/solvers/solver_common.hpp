@@ -6,10 +6,15 @@
 
 #pragma once
 
-#include "sharedmem.hpp"
+#include "../sharedmem.hpp"
 
-namespace solvers
+namespace advoocat
 {
+  namespace solvers
+  {
+
+// TODO: indent
+
   template <class sharedmem>
   class solver_common
   {
@@ -62,4 +67,5 @@ namespace solvers
       }   
     }
   };
-}; // namespace solvers
+  }; // namespace solvers
+}; // namespace advoocat
