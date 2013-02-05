@@ -23,22 +23,18 @@ namespace advoocat
       using parent_t = parent_t_;
       typedef typename parent_t::mem_t mem_t;
       typedef typename parent_t::real_t real_t;
+      using arr_2d_t = typename mem_t::arr_t;
 
       real_t Prs_amb;
 
-      blitz::Array<real_t, 2> Phi;
       //TODO probably don't need those
-      blitz::Array<real_t, 2> tmp_u;
-      blitz::Array<real_t, 2> tmp_w;
-      blitz::Array<real_t, 2> tmp_div;
-      blitz::Array<real_t, 2> tmp_x;
-      blitz::Array<real_t, 2> tmp_z;
+      arr_2d_t Phi, tmp_u, tmp_w, tmp_div, tmp_x, tmp_z;
 
       virtual void forcings(real_t dt) = 0;
 
       private:
 
-      rng_t im, jm, i_domain, j_domain;
+      rng_t im, jm;
       //TODO don't assume dx=dz=1
       real_t dx = 1;
       real_t dz = 1;
@@ -151,15 +147,30 @@ std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
       ) :
 	parent_t(mem, i, j, p),
 	Prs_amb(p.Prs_amb),
-	Phi(i^this->halo, j^this->halo),
-	tmp_x(i^this->halo, j^this->halo),
-	tmp_z(i^this->halo, j^this->halo),
-	tmp_div(i, j),
-	tmp_u(i^this->halo, j^this->halo),
-	tmp_w(i^this->halo, j^this->halo),
+	tmp_div(mem.tmp[std::string(__FILE__)][0][0]),
+	tmp_x(mem.tmp[std::string(__FILE__)][0][1]),
+	tmp_z(mem.tmp[std::string(__FILE__)][0][2]),
+	tmp_u(mem.tmp[std::string(__FILE__)][0][3]),
+	tmp_w(mem.tmp[std::string(__FILE__)][0][4]),
+	Phi(mem.tmp[std::string(__FILE__)][0][5]),
 	im(i.first() - 1, i.last()),
 	jm(j.first() - 1, j.last())
       {}
+
+      static void alloctmp(
+        std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_2d_t>>> &tmp,  
+        const int nx, 
+        const int ny
+      )
+      {
+        parent_t::alloctmp(tmp, nx, ny);
+        const rng_t i(0, nx-1), j(0, ny-1);
+        const int hlo = formulae::mpdata::halo; // TODO!!!
+        tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
+        tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i, j )); 
+        for (int n=0; n < 5; ++n) 
+          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^hlo, j^hlo )); 
+      }
 
       void solve(int nt)
       {

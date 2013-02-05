@@ -50,6 +50,7 @@
 
 // advection (<> should be used instead of "" in normal usage)
 #include "advoocat/solvers/mpdata_1d.hpp"
+#include "advoocat/solvers/donorcell_1d.hpp"
 #include "advoocat/solvers/solver_inhomo.hpp"
 #include "advoocat/bcond/cyclic_1d.hpp"
 #include "advoocat/equip.hpp"
@@ -106,8 +107,19 @@ class coupled_harmosc : public inhomo_solver_t
   coupled_harmosc(typename parent_t::mem_t &mem, const rng_t &i, params_t p) :
     parent_t(mem, i, p),
     omega(p.omega), 
-    tmp(this->mem.psi[0][0].extent(0)) // TODO! alloc()
+    tmp(mem.tmp[std::string(__FILE__)][0][0]) 
   {
+  }
+
+  static void alloctmp(
+    std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_1d_t>>> &tmp, 
+    const int nx
+  )
+  {
+    parent_t::alloctmp(tmp, nx);
+    tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_1d_t>()); 
+    tmp[std::string(__FILE__)].back().push_back(new arr_1d_t( rng_t(0, nx-1) )); 
+ 
   }
 };
 
@@ -121,8 +133,9 @@ int main()
 
   using solver_t = coupled_harmosc<
     solvers::inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
-      solvers::mpdata_1d<
-        n_iters, 
+      solvers::donorcell_1d<
+//      solvers::mpdata_1d<
+//        n_iters, 
         bcond::cyclic_1d<real_t>, 
         sharedmem_1d<n_eqs, real_t>
       >

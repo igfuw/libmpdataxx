@@ -47,6 +47,15 @@ namespace advoocat
   
         mem.C.push_back(new arr_1d_t(i^h));
       }
+
+      public:
+
+      // empty by default
+      static void alloctmp(
+        std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_1d_t>>> &,  
+        const int
+      )   
+      {} 
     };
   }; // namespace solvers
 }; // namespace advoocat
