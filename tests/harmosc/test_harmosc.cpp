@@ -67,6 +67,8 @@
 using boost::math::constants::pi;
 
 enum {psi, phi};
+using real_t = double;
+using namespace advoocat;
 
 template <class inhomo_solver_t>
 class coupled_harmosc : public inhomo_solver_t
@@ -111,9 +113,6 @@ class coupled_harmosc : public inhomo_solver_t
 
 int main() 
 {
-  using real_t = double;
-  using namespace advoocat;
-
   const int nx = 1000, nt = 750, n_out=10;
   const real_t C = .5, dt = 1;
   const real_t omega = 2*pi<real_t>() / dt / 400;

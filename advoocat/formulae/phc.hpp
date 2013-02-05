@@ -54,7 +54,5 @@ namespace advoocat
     // Exner function exponent for dry air
     phc_derived_const_macro(R_d_over_c_pd, R_d<real_t>() / c_pd<real_t>())
 
-// TODO: undef macros?
-
   }; // namespace formulae
 }; // namespace advoocat

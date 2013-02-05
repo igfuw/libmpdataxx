@@ -13,36 +13,35 @@ namespace advoocat
 {
   namespace solvers
   {
-  // TODO: indent
-  template<
-    class bcx_t, 
-    class bcy_t, 
-    class bcz_t, 
-    class mem_t
-  > 
-  class donorcell_3d : public solver_3d<bcx_t, bcy_t, bcz_t, mem_t> 
-  {
-    void advop(int e)
+    template<
+      class bcx_t, 
+      class bcy_t, 
+      class bcz_t, 
+      class mem_t
+    > 
+    class donorcell_3d : public solver_3d<bcx_t, bcy_t, bcz_t, mem_t> 
     {
-      formulae::donorcell::op_3d(
-        this->mem.psi[e], this->mem.n[e], this->mem.C, this->i, this->j, this->k
-      );
-    }
+      void advop(int e)
+      {
+	formulae::donorcell::op_3d(
+	  this->mem.psi[e], this->mem.n[e], this->mem.C, this->i, this->j, this->k
+	);
+      }
 
-    public:
+      public:
 
-    struct params_t {};
+      struct params_t {};
 
-    // ctor
-    donorcell_3d(
-      mem_t &mem, 
-      const rng_t &i, 
-      const rng_t &j, 
-      const rng_t &k, 
-      const params_t &
-    ) :
-      solver_3d<bcx_t, bcy_t, bcz_t, mem_t>(mem, i, j, k, /* halo = */ 1)
-    {}  
-  };
-}; // namespace solvers
+      // ctor
+      donorcell_3d(
+	mem_t &mem, 
+	const rng_t &i, 
+	const rng_t &j, 
+	const rng_t &k, 
+	const params_t &
+      ) :
+	solver_3d<bcx_t, bcy_t, bcz_t, mem_t>(mem, i, j, k, /* halo = */ 1)
+      {}  
+    }; // class donorcell_3d
+  }; // namespace solvers
 }; // namespace advoocat
