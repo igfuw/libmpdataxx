@@ -7,17 +7,18 @@
  * @brief a bombel 
  */
 
+
 // advection (<> should be used instead of "" in normal usage) 
-#include "advoocat/mpdata_2d.hpp"
-#include "advoocat/solver_pressure.hpp"
-#include "advoocat/cyclic_2d.hpp"
+#include "advoocat/solvers/mpdata_2d.hpp"
+#include "advoocat/solvers/solver_pressure.hpp"
+#include "advoocat/bcond/cyclic_2d.hpp"
 #include "advoocat/equip.hpp"
 //gradient
-#include "advoocat/nabla_formulae.hpp"
-//physical constants
-#include "advoocat/phc.hpp"
+#include "advoocat/formulae/nabla_formulae.hpp"
 //theta->pressure
-#include "advoocat/diagnose_formulae.hpp"
+#include "advoocat/formulae/diagnose_formulae.hpp"
+//physical constants
+#include "advoocat/formulae/phc.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
@@ -33,13 +34,15 @@ enum {x, z};       //dimensions
 using real_t = double;
 const int n_iters = 2;
 
+using namespace advoocat;
+
 using parent_t_ = 
-pressure_solver<
-  inhomo_solver<
+solvers::pressure_solver<
+  solvers::inhomo_solver<
     solvers::mpdata_2d<
       n_iters, 
-      cyclic_2d<x, real_t>, 
-      cyclic_2d<z, real_t>,
+      bcond::cyclic_2d<x, real_t>, 
+      bcond::cyclic_2d<z, real_t>,
       sharedmem_2d<3, real_t>
     >
   >, u, w, tht
@@ -47,7 +50,7 @@ pressure_solver<
 
 class bombel : public parent_t_
 {
-  using parent_t = parent_t_;
+  using parent_t = parent_t_; // parent_t is a typedef in parent_t_
 
   real_t Tht_amb;
 
@@ -56,7 +59,7 @@ class bombel : public parent_t_
     auto W   = this->psi(w);
     auto Tht = this->psi(tht);
 
-    W += (dt * si:: seconds) * phc::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb;
+    W += (dt * si:: seconds) * formulae::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb;
   }
 
   public:
@@ -88,7 +91,7 @@ int main()
   p.dt = .1;
   //ambient state (constant thoughout the domain)
   p.Tht_amb = 300;
-  p.Prs_amb = diagnose::p(p.Tht_amb);
+  p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
   equip<bombel> solver(nx, ny, p);
 
   // initial condition

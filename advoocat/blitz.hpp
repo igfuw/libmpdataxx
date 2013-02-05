@@ -21,38 +21,44 @@
 #pragma once
 
 #include <blitz/array.h>
-
-template <int n_dims> using idx_t = blitz::RectDomain<n_dims>;
-using rng_t = blitz::Range;
+#include <boost/ptr_container/ptr_vector.hpp>
 
 // C++11 auto return type macro
-#define return_macro(expr) \
+#define return_macro(init,expr)          \
   -> decltype(blitz::safeToReturn(expr)) \
-{ return safeToReturn(expr); } 
+{                                        \
+  init                                   \
+  return safeToReturn(expr);             \
+} 
 
-// Boost ptr_vector 
-#include <boost/ptr_container/ptr_vector.hpp>
-template <class arr_t>
-struct arrvec_t : boost::ptr_vector<arr_t> 
+namespace advoocat
 {
-  using parent_t = boost::ptr_vector<arr_t>;
+  template <int n_dims> using idx_t = blitz::RectDomain<n_dims>;
+  using rng_t = blitz::Range;
 
-  const arr_t &operator[](const int i) const 
-  {   
-    return this->at(
-      (i + this->size()) % this->size()
-    );  
-  }
-
-  void push_back(arr_t *arr)
+  // Boost ptr_vector 
+  template <class arr_t>
+  struct arrvec_t : boost::ptr_vector<arr_t> 
   {
-    parent_t::push_back(arr);
+    using parent_t = boost::ptr_vector<arr_t>;
+
+    const arr_t &operator[](const int i) const 
+    {   
+      return this->at(
+	(i + this->size()) % this->size()
+      );  
+    }
+
+    void push_back(arr_t *arr)
+    {
+      parent_t::push_back(arr);
 
 #if !defined(NDEBUG)
-    // filling the array with NaNs to ease debugging
-    *arr = blitz::has_signalling_NaN(*arr->dataFirst())
-      ? blitz::signalling_NaN(*arr->dataFirst())
-      : blitz::quiet_NaN(*arr->dataFirst());
+      // filling the array with NaNs to ease debugging
+      *arr = blitz::has_signalling_NaN(*arr->dataFirst())
+	? blitz::signalling_NaN(*arr->dataFirst())
+	: blitz::quiet_NaN(*arr->dataFirst());
 #endif
-  }
-};
+    }
+  };
+}; // namespace advoocat

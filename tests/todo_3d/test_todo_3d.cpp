@@ -7,21 +7,23 @@
 
 // (<> should be used instead of "" in normal usage)
 //#include "advoocat/mpdata_3d.hpp"
-#include "advoocat/donorcell_3d.hpp"
-#include "advoocat/cyclic_3d.hpp"
+#include "advoocat/solvers/donorcell_3d.hpp"
+#include "advoocat/bcond/cyclic_3d.hpp"
 #include "advoocat/equip.hpp"
 
 enum {x, y, z};
 
 int main() 
 {
+  using namespace advoocat;
+
   int n[] = {24, 24, 24};
   {
     equip<
-      solvers::donorcell_3d<
-        cyclic_3d<x>, 
-        cyclic_3d<y>,
-        cyclic_3d<z>,
+      advoocat::solvers::donorcell_3d<
+        bcond::cyclic_3d<x>, 
+        bcond::cyclic_3d<y>,
+        bcond::cyclic_3d<z>,
         sharedmem_3d<>
       >
     > slv(n[x], n[y], n[z]);

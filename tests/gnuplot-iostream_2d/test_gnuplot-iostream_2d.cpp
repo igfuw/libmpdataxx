@@ -10,9 +10,9 @@
  */
 
 // (<> should be used instead of "" in normal usage)
-#include "advoocat/mpdata_2d.hpp"
-#include "advoocat/donorcell_2d.hpp"
-#include "advoocat/cyclic_2d.hpp"
+#include "advoocat/solvers/mpdata_2d.hpp"
+#include "advoocat/solvers/donorcell_2d.hpp"
+#include "advoocat/bcond/cyclic_2d.hpp"
 #include "advoocat/equip.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
@@ -20,7 +20,8 @@
 enum {x, y};
 
 template <class T>
-void setup(T &solver, int n[2]) {
+void setup(T &solver, int n[2]) 
+{
   blitz::firstIndex i;
   blitz::secondIndex j;
   solver.state() = exp(
@@ -31,7 +32,10 @@ void setup(T &solver, int n[2]) {
   solver.courant(y) = .25;
 }
 
-int main() {
+int main() 
+{
+  using namespace advoocat;
+
   int n[] = {24, 24}, nt = 96;
   Gnuplot gp;
   gp << "set term svg size 500,1500 dynamic\n" 
@@ -53,7 +57,7 @@ int main() {
   using mem_t = sharedmem_2d<>;
   {
     equip<
-      solvers::donorcell_2d<cyclic_2d<x>, cyclic_2d<y>, mem_t>
+      solvers::donorcell_2d<bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
     > slv(n[x], n[y]);
 
     setup(slv, n);
@@ -71,7 +75,7 @@ int main() {
   {
     const int it = 2;
     equip<
-      solvers::mpdata_2d<it, cyclic_2d<x>, cyclic_2d<y>, mem_t>
+      solvers::mpdata_2d<it, bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
     > slv(n[x], n[y]); 
 
     setup(slv, n); 
@@ -85,7 +89,7 @@ int main() {
   {
     const int it = 4;
     equip<
-      solvers::mpdata_2d<it, cyclic_2d<x>, cyclic_2d<y>, mem_t>
+      solvers::mpdata_2d<it, bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
     > slv(n[x], n[y]); 
 
     setup(slv, n); 
