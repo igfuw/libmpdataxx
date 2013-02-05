@@ -8,6 +8,7 @@
 
 #include "blitz.hpp"
 #include <vector>
+#include <unordered_map>
 
 namespace advoocat
 {
@@ -23,7 +24,8 @@ namespace advoocat
     static const int n_eqs = n_eqs_;
 
     std::vector<int> n;
-    arrvec_t<arr_t> C, psi[n_eqs], tmp;
+    arrvec_t<arr_t> C, psi[n_eqs];
+    std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_t>>> tmp; // intended for addressing with string(__FILE__)
     int span[n_dims];
 
     // accessor method for the Courant number field

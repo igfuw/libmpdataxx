@@ -24,8 +24,10 @@ namespace advoocat
       using parent_t = solver_2d<bcx_t, bcy_t, mem_t>;
       using arr_2d_t = typename mem_t::arr_t;
 
+      static const int n_tmp = n_iters > 2 ? 2 : 1;
+
       // member fields
-      arrvec_t<arr_2d_t> tmp[2];
+      arrvec_t<arr_2d_t> *tmp[2];
       rng_t im, jm;
 
       protected:
@@ -46,15 +48,15 @@ namespace advoocat
 	    this->bcy.fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^this->halo);
 
 	    // choosing input/output for antidiff C
-	    const arrvec_t<arr_2d_t>
+            const arrvec_t<arr_2d_t>
 	      &C_unco = (step == 1) 
 		? this->mem.C 
 		: (step % 2) 
-		  ? tmp[1]  // odd steps
-		  : tmp[0], // even steps
+		  ? *tmp[1]  // odd steps
+		  : *tmp[0], // even steps
 	      &C_corr = (step  % 2) 
-		? tmp[0]    // odd steps
-		: tmp[1];   // even steps
+		? *tmp[0]    // odd steps
+		: *tmp[1];   // even steps
 
 	    // calculating the antidiffusive C 
 	    C_corr[0](this->im+h, this->j) = 
@@ -84,17 +86,30 @@ namespace advoocat
 
       // ctor
       mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) : 
-	solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, 1), 
+	solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, formulae::mpdata::halo), 
 	im(i.first() - 1, i.last()),
 	jm(j.first() - 1, j.last())
       {
-	int n_tmp = n_iters > 2 ? 2 : 1;
 	for (int n = 0; n < n_tmp; ++n)
-	{
-	  tmp[n].push_back(new arr_2d_t( this->i^h, this->j^this->halo ));
-	  tmp[n].push_back(new arr_2d_t( this->i^this->halo, this->j^h ));
-	}
+          tmp[n] = &mem.tmp[std::string(__FILE__)][n];
       }
+
+      // memory allocation (to be called once per shared-mem node)
+      static void alloctmp(
+        std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_2d_t>>> &tmp, 
+        const int nx,
+        const int ny
+      )   
+      {   
+        const rng_t i(0, nx-1), j(0, ny-1);
+        const int halo = formulae::mpdata::halo;
+        for (int n = 0; n < n_tmp; ++n)
+        {
+          tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
+          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^h, j^halo ));
+          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^halo, j^h ));
+        }
+      }   
     };
   }; // namespace solvers
 }; // namespace advoocat

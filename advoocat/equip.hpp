@@ -38,6 +38,7 @@ namespace advoocat
     )
       : mem(s0)
     {
+      solver_t::alloctmp(mem.tmp, s0);
       for (int i0 = 0; i0 < n0; ++i0) 
 	algos.push_back(new solver_t(
 	  mem, 
@@ -54,6 +55,7 @@ namespace advoocat
     )
       : mem(s0, s1)
     {
+      solver_t::alloctmp(mem.tmp, s0, s1);
       for (int i0 = 0; i0 < n0; ++i0) 
 	for (int i1 = 0; i1 < n1; ++i1) 
 	  algos.push_back(new solver_t(
@@ -61,8 +63,7 @@ namespace advoocat
           rng_t( min(s0, i0, n0), max(s0, i0, n0)),
           rng_t( min(s1, i1, n1), max(s1, i1, n1)),
           params
-        )
-      );
+        ));
     }
 
     // 3D ctor
@@ -83,8 +84,7 @@ namespace advoocat
 	      rng_t( min(s1, i1, n1), max(s1, i1, n1)),
 	      rng_t( min(s2, i2, n2), max(s2, i2, n2)),
 	      params
-	    )
-	  );
+	    ));
     }
 
     // methods
