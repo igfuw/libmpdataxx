@@ -21,14 +21,18 @@ class pressure_solver : public parent_t_
   typedef typename parent_t::real_t real_t;
 
   real_t Prs_amb;
+  real_t iters;
 
   blitz::Array<real_t, 2> Phi;
   //TODO probably don't need those
   blitz::Array<real_t, 2> tmp_u;
   blitz::Array<real_t, 2> tmp_w;
-  blitz::Array<real_t, 2> tmp_div;
+  blitz::Array<real_t, 2> err;
   blitz::Array<real_t, 2> tmp_x;
   blitz::Array<real_t, 2> tmp_z;
+  blitz::Array<real_t, 2> lap_err;
+  blitz::Array<real_t, 2> tmp_e1;
+  blitz::Array<real_t, 2> tmp_e2;
 
   virtual void forcings(real_t dt) = 0;
 
@@ -76,44 +80,60 @@ class pressure_solver : public parent_t_
   void pressure_solver_update(real_t dt)
   {
     real_t beta = .25;  //TODO
-    real_t rho = 1.;   //TODO    
+    real_t rho = 1.;    //TODO    
 
+    //because I'm tired of this-> everywhere 
     int halo = this->halo;
     rng_t i = this->i;
     rng_t j = this->j;
 
     tmp_u = this->psi(u);
     tmp_w = this->psi(w);
-
-std::cerr<<"--------------------------------------------------------------"<<std::endl;
-    //pseudo-time loop
-    real_t err = 1.;
-    while (err > .01)
-    {
+   
+std::cerr<<"-------------------------"<<std::endl;
+    real_t error = 1.;
+    while (error > .0001)
+    { //pseudo-time loop
       this->xchng(Phi,   i^halo, j^halo);
       this->xchng(tmp_u, i^halo, j^halo);
       this->xchng(tmp_w, i^halo, j^halo);
 
-      tmp_x(i, j) = rho * tmp_u(i, j) - nabla_op::grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-      tmp_z(i, j) = rho * tmp_w(i, j) - nabla_op::grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+      tmp_x(i, j) = rho * (tmp_u(i, j) - nabla_op::grad<0>(Phi(i^halo, j^halo), i, j, real_t(1)));
+      tmp_z(i, j) = rho * (tmp_w(i, j) - nabla_op::grad<1>(Phi(i^halo, j^halo), j, i, real_t(1)));
  
       this->xchng(tmp_x, i^halo, j^halo);
       this->xchng(tmp_z, i^halo, j^halo);
 
-      tmp_div(i, j) = nabla_op::div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1));
-      Phi(i, j) -= beta * tmp_div(i, j);
+      err(i, j) = 1./ rho * nabla_op::div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
 
-      this->xchng(tmp_u, i^halo, j^halo);
-      this->xchng(tmp_w, i^halo, j^halo);
+      this->xchng(err, i^halo, j^halo);
 
-      err = std::abs(max(tmp_div)) + std::abs(min(tmp_div));
-std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
-    }
-    //end of pseudo_time loop
+      tmp_e1(i, j) = nabla_op::grad<0>(err(i^halo, j^halo), i, j, real_t(1));
+      tmp_e2(i, j) = nabla_op::grad<1>(err(i^halo, j^halo), j, i, real_t(1));
+      this->xchng(tmp_e1, i^halo, j^halo);
+      this->xchng(tmp_e2, i^halo, j^halo);
+
+      lap_err(i,j) = nabla_op::div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
+
+      tmp_e1(i,j) = err(i,j)*lap_err(i,j);
+      tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
+      beta = - blitz::sum(tmp_e1(i,j))/blitz::sum(tmp_e2(i,j));
+
+std::cerr<<"beta = "<< -1. * blitz::sum(tmp_e1(i,j))<<"/"<< blitz::sum(tmp_e2(i,j))<<" = "<<beta<<std::endl;
+
+      Phi(i, j) -= beta * err(i, j);
+
+      error = std::max(std::abs(max(err)), std::abs(min(err)));
+      iters++;
+    } //end of pseudo_time loop
+
     this->xchng(this->Phi, i^halo, j^halo);
 
     tmp_u(i, j) -= nabla_op::grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
     tmp_w(i, j) -= nabla_op::grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+
+    this->xchng(tmp_u, i^halo, j^halo);
+    this->xchng(tmp_w, i^halo, j^halo);
 
     tmp_u -= this->psi(u);
     tmp_w -= this->psi(w);
@@ -133,8 +153,6 @@ std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
   struct params_t : parent_t::params_t { real_t Prs_amb; };
 
   // ctor
-
-  // ctor
   pressure_solver(
     mem_t &mem,
     const rng_t &i,
@@ -146,11 +164,15 @@ std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
     Phi(i^this->halo, j^this->halo),
     tmp_x(i^this->halo, j^this->halo),
     tmp_z(i^this->halo, j^this->halo),
-    tmp_div(i, j),
+    err(i^this->halo, j^this->halo),
     tmp_u(i^this->halo, j^this->halo),
     tmp_w(i^this->halo, j^this->halo),
+    lap_err(i, j),
+    tmp_e1(i^this->halo, j^this->halo),
+    tmp_e2(i^this->halo, j^this->halo),
     im(i.first() - 1, i.last()),
-    jm(j.first() - 1, j.last())
+    jm(j.first() - 1, j.last()),
+    iters(0)
   {}
 
   void solve(int nt)
@@ -182,5 +204,6 @@ std::cerr<<"t= "<<t<<std::endl;
         pressure_solver_apply(this->dt);
       }
     }
+std::cerr<<"total number of pseudotime iterations = "<<iters<<std::endl;
   }
 };
