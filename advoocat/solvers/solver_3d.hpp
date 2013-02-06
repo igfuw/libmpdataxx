@@ -63,6 +63,17 @@ namespace advoocat
 	mem.C.push_back(new arr_3d_t(i^halo, j^h, k^halo));
 	mem.C.push_back(new arr_3d_t(i^halo, j^halo, k^h));
       }
+
+      public:
+
+      // empty by default
+      static void alloctmp(
+        std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_3d_t>>> &,  
+        const int,
+        const int,
+        const int 
+      )   
+      {}  
     };
   }; // namespace solvers
 }; // namespace advoocat
