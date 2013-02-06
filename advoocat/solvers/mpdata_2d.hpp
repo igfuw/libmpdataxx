@@ -86,8 +86,8 @@ namespace advoocat
 
       // ctor
       mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) : 
-	solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, formulae::mpdata::halo), 
-	im(i.first() - 1, i.last()),
+	solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, 1), 
+	im(i.first() - 1, i.last()),             //TODO get correct version from sylwester
 	jm(j.first() - 1, j.last())
       {
 	for (int n = 0; n < n_tmp; ++n)
@@ -102,7 +102,7 @@ namespace advoocat
       )   
       {   
         const rng_t i(0, nx-1), j(0, ny-1);
-        const int halo = formulae::mpdata::halo;
+        const int halo = 1;  //TODO get correct version from sylwester
         for (int n = 0; n < n_tmp; ++n)
         {
           tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());

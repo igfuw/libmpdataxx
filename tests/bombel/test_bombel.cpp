@@ -80,7 +80,7 @@ class bombel : public parent_t_
 
 int main() 
 {
-  const int nx = 150, ny = 150, nt = 50, n_out=1;
+  const int nx = 100, ny = 100, nt = 200, n_out=1;
 //  const int nx = 50, ny = 50, nt = 41, n_out=10;
 
   rng_t i(0, nx-1);
@@ -137,45 +137,15 @@ int main()
 //   {    
 //      gp << "set title 'tht @ t=" << t+1 << "'\n"
       gp << "set title 'tht @ t=" << std::setprecision(3) << nt * p.dt << "'\n"
-//         << "set cbrange [300:301]\n"
+//         << "set cbrange [298.5:302]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(tht).copy());
       gp << "set title 'u @ t=" << std::setprecision(3) << nt * p.dt << "'\n"
+//         << "set cbrange [-.03:.03]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(u).copy());
       gp << "set title 'w @ t=" <<std::setprecision(3) << nt * p.dt << "'\n"
+//         << "set cbrange [-.03:.07]\n"
          << "splot '-' binary" << binfmt << "with image notitle\n";
       gp.sendBinary(solver.state(w).copy());
-
-//real_t bx[10];
-//real_t by[nx*ny];
-//real_t ex[nx*ny];
-//real_t ey[nx*ny];
-
-//for (int k=0; 9; k++){
-//  for(int l=0; ny-1; l++){
-//    bx[k] = k;
-//    by[k*10+l] = l;
-//  }
-//for (int n=0; n<=nx*ny-1; n++){
-//std::cerr<<"---------------"<<std::endl;
-//}
-
-//ex = bx;
-//ey = by;
-//ex += solver.state(u)/(solver.state(u) + solver.state(w));
-//ey += solver.state(w)/(solver.state(u) + solver.state(w));
-
-//std::vector<real_t> vec(nx*ny-1);
-//std::copy(vec.begin(), vec.end(), bx);
-
-//std::vector<std::vector <real_t> > vecs(4);
-//vecs(1) = bx;
-//vecs(2) = by;
-//vecs(3) = ex;
-//vecs(4) = ey;
-
-//      gp << "set title 'vel @ t=" << std::setprecision(3) << nt * dt << "'\n"
-//         << "plot '-' binary" << binfmt << "with vec notitle using 1:2:3:4 with vec\n";
-//      gp.send(vecs);
 };

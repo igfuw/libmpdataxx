@@ -26,9 +26,12 @@ namespace advoocat
       using arr_2d_t = typename mem_t::arr_t;
 
       real_t Prs_amb;
+      real_t iters;
 
+      arr_2d_t Phi; 
       //TODO probably don't need those
-      arr_2d_t Phi, tmp_u, tmp_w, tmp_div, tmp_x, tmp_z;
+      arr_2d_t tmp_u, tmp_w, tmp_x, tmp_z;
+      arr_2d_t err, lap_err, tmp_e1, tmp_e2;
 
       virtual void forcings(real_t dt) = 0;
 
@@ -91,8 +94,8 @@ namespace advoocat
 
     std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
-	real_t err = 1.;
-	while (err > .01)
+	real_t error = 1.;
+	while (error > .0001)
 	{
 	  this->xchng(Phi,   i^halo, j^halo);
 	  this->xchng(tmp_u, i^halo, j^halo);
@@ -104,14 +107,25 @@ namespace advoocat
 	  this->xchng(tmp_x, i^halo, j^halo);
 	  this->xchng(tmp_z, i^halo, j^halo);
 
-	  tmp_div(i, j) = div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1));
-	  Phi(i, j) -= beta * tmp_div(i, j);
+          err(i, j) = 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
 
-	  this->xchng(tmp_u, i^halo, j^halo);
-	  this->xchng(tmp_w, i^halo, j^halo);
+          this->xchng(err, i^halo, j^halo);
 
-	  err = std::abs(max(tmp_div)) + std::abs(min(tmp_div));
-std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
+          tmp_e1(i, j) = grad<0>(err(i^halo, j^halo), i, j, real_t(1));
+          tmp_e2(i, j) = grad<1>(err(i^halo, j^halo), j, i, real_t(1));
+          this->xchng(tmp_e1, i^halo, j^halo);
+          this->xchng(tmp_e2, i^halo, j^halo);
+
+          lap_err(i,j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
+
+          tmp_e1(i,j) = err(i,j)*lap_err(i,j);
+          tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
+          beta = - blitz::sum(tmp_e1(i,j))/blitz::sum(tmp_e2(i,j));
+
+          Phi(i, j) -= beta * err(i, j);
+
+          error = std::max(std::abs(max(err)), std::abs(min(err)));
+          iters++;
 	}
 	//end of pseudo_time loop
 	this->xchng(this->Phi, i^halo, j^halo);
@@ -137,8 +151,6 @@ std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
       struct params_t : parent_t::params_t { real_t Prs_amb; };
 
       // ctor
-
-      // ctor
       pressure_solver(
 	mem_t &mem,
 	const rng_t &i,
@@ -147,12 +159,17 @@ std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
       ) :
 	parent_t(mem, i, j, p),
 	Prs_amb(p.Prs_amb),
-	tmp_div(mem.tmp[std::string(__FILE__)][0][0]),
-	tmp_x(mem.tmp[std::string(__FILE__)][0][1]),
-	tmp_z(mem.tmp[std::string(__FILE__)][0][2]),
-	tmp_u(mem.tmp[std::string(__FILE__)][0][3]),
-	tmp_w(mem.tmp[std::string(__FILE__)][0][4]),
-	Phi(mem.tmp[std::string(__FILE__)][0][5]),
+        // (i, j)
+        lap_err(mem.tmp[std::string(__FILE__)][0][0]),
+        // (i^hlo, j^hlo))
+	err(mem.tmp[std::string(__FILE__)][0][1]),
+	tmp_x(mem.tmp[std::string(__FILE__)][0][2]),
+	tmp_z(mem.tmp[std::string(__FILE__)][0][3]),
+	tmp_u(mem.tmp[std::string(__FILE__)][0][4]),
+	tmp_w(mem.tmp[std::string(__FILE__)][0][5]),
+	Phi(mem.tmp[std::string(__FILE__)][0][6]),
+	tmp_e1(mem.tmp[std::string(__FILE__)][0][7]),
+	tmp_e2(mem.tmp[std::string(__FILE__)][0][8]),
 	im(i.first() - 1, i.last()),
 	jm(j.first() - 1, j.last())
       {}
@@ -164,12 +181,15 @@ std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
       )
       {
         parent_t::alloctmp(tmp, nx, ny);
-        const rng_t i(0, nx-1), j(0, ny-1);
-        const int hlo = formulae::mpdata::halo; // TODO!!!
         tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
-        tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i, j )); 
-        for (int n=0; n < 5; ++n) 
-          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^hlo, j^hlo )); 
+        {
+          const rng_t i(0, nx-1), j(0, ny-1);
+          const int hlo = 1; // TODO!!!
+          for (int n=0; n < 1; ++n) 
+            tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i, j)); 
+          for (int n=0; n < 8; ++n) 
+            tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^hlo, j^hlo )); 
+        }
       }
 
       void solve(int nt)
@@ -201,6 +221,7 @@ std::cerr<<"div:  ( "<<min(tmp_div)<<" --> "<<max(tmp_div)<<" )"<<std::endl;
 	    pressure_solver_apply(this->dt);
 	  }
 	}
+std::cerr<<"total number of pseudotime iterations = "<<iters<<std::endl;
       }
     }; 
   }; // namespace solvers
