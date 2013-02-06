@@ -15,7 +15,7 @@
 #include "advoocat/solvers/donorcell_2d.hpp"
 #include "advoocat/solvers/mpdata_2d.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
-#include "advoocat/equip.hpp"
+#include "advoocat/openmp.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
@@ -61,7 +61,7 @@ int main()
   for (auto &offset : std::vector<float>({0,-.5})){
     gp << "set cbrange ["<< offset -.025<<":"<<offset+1.025<<"]\n";
     {
-      equip<
+      openmp<
         solvers::donorcell_2d<bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
       > slv(n[x],n[y]);
 
@@ -78,7 +78,7 @@ int main()
       gp.sendBinary(slv.state().copy());
     } {
       const int it = 2;
-      equip<
+      openmp<
         solvers::mpdata_2d<it, bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
       > slv(n[x],n[y]); 
       setup(slv, n, offset); 
@@ -90,7 +90,7 @@ int main()
       gp.sendBinary(slv.state().copy());
     } {
       const int it = 4;
-      equip<
+      openmp<
         solvers::mpdata_2d<it, bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
       > slv(n[x],n[y]); 
       setup(slv, n, offset); 

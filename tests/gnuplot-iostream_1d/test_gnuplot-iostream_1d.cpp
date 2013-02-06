@@ -13,7 +13,7 @@
 #include "advoocat/solvers/mpdata_1d.hpp"
 #include "advoocat/solvers/donorcell_1d.hpp"
 #include "advoocat/bcond/cyclic_1d.hpp"
-#include "advoocat/equip.hpp"
+#include "advoocat/openmp.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
@@ -51,7 +51,7 @@ int main()
   using mem_t = sharedmem_1d<>;
 
   {
-    equip<
+    openmp<
       solvers::mpdata_1d<4, bcond::cyclic_1d<>, mem_t>
       // ...
       // ...

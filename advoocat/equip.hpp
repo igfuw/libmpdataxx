@@ -25,6 +25,9 @@ namespace advoocat
 
     // member fields
     typename solver_t::mem_t mem;
+   
+    protected:
+
     boost::ptr_vector<solver_t> algos; 
 
     public:
@@ -34,7 +37,7 @@ namespace advoocat
     // 1D ctor
     equip(
       const int s0, 
-      const typename solver_t::params_t &params = typename solver_t::params_t()
+      const typename solver_t::params_t &params 
     )
       : mem(s0)
     {
@@ -86,11 +89,6 @@ namespace advoocat
 	      rng_t( min(s2, i2, n2), max(s2, i2, n2)),
 	      params
 	    ));
-    }
-
-    void advance(const int nt)
-    {
-      algos[0].solve(nt);
     }
 
     typename solver_t::mem_t::arr_t state(int e = 0)

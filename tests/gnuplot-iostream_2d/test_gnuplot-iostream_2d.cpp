@@ -13,7 +13,7 @@
 #include "advoocat/solvers/mpdata_2d.hpp"
 #include "advoocat/solvers/donorcell_2d.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
-#include "advoocat/equip.hpp"
+#include "advoocat/openmp.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
@@ -56,7 +56,7 @@ int main()
   std::string binfmt;
   using mem_t = sharedmem_2d<>;
   {
-    equip<
+    openmp<
       solvers::donorcell_2d<bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
     > slv(n[x], n[y]);
 
@@ -74,7 +74,7 @@ int main()
   } 
   {
     const int it = 2;
-    equip<
+    openmp<
       solvers::mpdata_2d<it, bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
     > slv(n[x], n[y]); 
 
@@ -88,7 +88,7 @@ int main()
   } 
   {
     const int it = 4;
-    equip<
+    openmp<
       solvers::mpdata_2d<it, bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
     > slv(n[x], n[y]); 
 
