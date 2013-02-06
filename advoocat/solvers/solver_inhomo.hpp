@@ -23,11 +23,9 @@ namespace advoocat
       typedef typename parent_t::mem_t mem_t;
       typedef typename mem_t::real_t real_t;
 
-      private:
+      protected:
 
       virtual void forcings(real_t dt) = 0;
-
-      protected:
 
       // psi getter
       typename parent_t::mem_t::arr_t psi(int e, int add = 0)

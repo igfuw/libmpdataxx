@@ -10,7 +10,9 @@
 
 // advection (<> should be used instead of "" in normal usage) 
 #include "advoocat/solvers/mpdata_2d.hpp"
-#include "advoocat/solvers/solver_pressure.hpp"
+#include "advoocat/solvers/solver_inhomo.hpp"
+#include "advoocat/solvers/solver_pressure_maxgrad.hpp"
+#include "advoocat/solvers/solver_pressure_gcrk.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
 #include "advoocat/equip.hpp"
 //gradient
@@ -37,7 +39,8 @@ const int n_iters = 2;
 using namespace advoocat;
 
 using parent_t_ = 
-solvers::pressure_solver<
+//solvers::pressure_maxgrad<
+solvers::pressure_gcrk<
   solvers::inhomo_solver<
     solvers::mpdata_2d<
       n_iters, 
@@ -80,7 +83,7 @@ class bombel : public parent_t_
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 200, n_out=1;
+  const int nx = 100, ny = 100, nt = 2, n_out=1;
 //  const int nx = 50, ny = 50, nt = 41, n_out=10;
 
   rng_t i(0, nx-1);
@@ -91,7 +94,7 @@ int main()
   p.dt = .1;
   //ambient state (constant thoughout the domain)
   p.Tht_amb = 300;
-  p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
+  //p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
   equip<bombel> solver(nx, ny, p);
 
   // initial condition

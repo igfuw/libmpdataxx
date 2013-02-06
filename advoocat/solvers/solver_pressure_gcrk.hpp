@@ -6,27 +6,24 @@
  */
 
 #pragma once
-#include "solver_common.hpp"
-#include "solver_inhomo.hpp"
-#include "../formulae/courant_formulae.hpp"
+#include "solver_pressure_common.hpp"
 #include "../formulae/nabla_formulae.hpp" //gradient, diveregnce
 
 namespace advoocat
 {
   namespace solvers
   {
-    template <class parent_t_, int u, int w, int tht>
-    class cr_solver : public parent_t_
+    template <class inhomo_solver_t, int u, int w, int tht>
+    class pressure_gcrk : public pressure_solver_common<inhomo_solver_t, u, w, tht>
     {
       public:
 
-      using parent_t = parent_t_;
+      using parent_t = pressure_solver_common<inhomo_solver_t, u, w, tht>;
       typedef typename parent_t::mem_t mem_t;
       typedef typename parent_t::real_t real_t;
       using arr_2d_t = typename mem_t::arr_t;
 
-      real_t Prs_amb;
-      real_t iters;
+      int iters = 0;
       
       // timelevels
       int n;
@@ -38,47 +35,12 @@ namespace advoocat
       arrvec_t<arr_2d_t> *err;
       arrvec_t<arr_2d_t> *Phi;
 
-      virtual void forcings(real_t dt) = 0;
-
       private:
-
-      rng_t im, jm;
-      //TODO don't assume dx=dz=1
-      real_t dx = 1;
-      real_t dz = 1;
 
       void cycle_timelevels(int n)
       {
-       n = (n+1) % 3;
+        n = (n+1) % 3;
       }
-
-      void extrp_velocity(int e) // extrapolate in time to t+1/2
-      {            // psi[n-1] will not be used anymore, and it will be intentionally overwritten!
-	auto tmp = this->psi(e, -1);
-	tmp /= -2;
-	tmp += 3./2 * this->psi(e);
-      }
-
-      void ini_courant()
-      {
-	this->xchng(u);      
-	this->xchng(w);     
-
-	formulae::courant::intrp<0>(this->mem.C[0], this->psi(u), im, this->j^this->halo, this->dt, dx);
-	formulae::courant::intrp<1>(this->mem.C[1], this->psi(u), jm, this->i^this->halo, this->dt, dz);
-      }
-
-      void update_courant()
-      {
-	extrp_velocity(u);      //extrapolate velocity field in time (t+1/2)
-	extrp_velocity(w);
-
-	this->xchng(u, 1);      // filling halos for velocity filed
-	this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
-
-	formulae::courant::intrp<0>(this->mem.C[0], this->psi(u, -1), im, this->j^this->halo, this->dt, dx);
-	formulae::courant::intrp<1>(this->mem.C[1], this->psi(w, -1), jm, this->i^this->halo, this->dt, dz);
-      } 
 
       void ini_pressure()
       {
@@ -88,9 +50,10 @@ namespace advoocat
 	(*Phi)[n](this->i^this->halo, this->j^this->halo) = real_t(0);
       }
 
-      void cr_solver_update(real_t dt)
+      void pressure_solver_update(real_t dt)
       {
-/*	using namespace arakawa_c;
+/*	
+        using namespace arakawa_c;
 	using formulae::nabla_op::grad;
 	using formulae::nabla_op::div;
 
@@ -146,31 +109,32 @@ namespace advoocat
 	tmp_w(i, j) -= grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
 
 	tmp_u -= this->psi(u);
-	tmp_w -= this->psi(w);*/
+	tmp_w -= this->psi(w);
+*/
       }
 
-      void cr_solver_apply(real_t dt)
+      void pressure_solver_apply(real_t dt)
       {
 /*	auto U = this->psi(u);
 	auto W = this->psi(w);
 
 	U += tmp_u;
-	W += tmp_w;*/
+	W += tmp_w;
+*/
       }
 
       public:
 
-      struct params_t : parent_t::params_t { real_t Prs_amb; };
+      struct params_t : parent_t::params_t { };
 
       // ctor
-      cr_solver(
+      pressure_gcrk(
 	mem_t &mem,
 	const rng_t &i,
 	const rng_t &j,
 	const params_t &p
       ) :
 	parent_t(mem, i, j, p),
-	Prs_amb(p.Prs_amb),
         n(2),
         // (i, j)
         lap_err(mem.tmp[std::string(__FILE__)][0][0]),
@@ -180,9 +144,7 @@ namespace advoocat
 	tmp_u(mem.tmp[std::string(__FILE__)][0][3]),
 	tmp_w(mem.tmp[std::string(__FILE__)][0][4]),
 	tmp_e1(mem.tmp[std::string(__FILE__)][0][5]),
-	tmp_e2(mem.tmp[std::string(__FILE__)][0][6]),
-        im(i.first() - 1, i.last()),
-	jm(j.first() - 1, j.last())
+	tmp_e2(mem.tmp[std::string(__FILE__)][0][6])
       {
         // time levels
         err = &mem.tmp[std::string(__FILE__)][1];
@@ -202,7 +164,7 @@ namespace advoocat
         
         // temporary fields
         tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
-        for (int n=0; n < 1; ++n)  
+        for (int n=0; n < 1; ++n)   // lap_err
            tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i, j));  
         for (int n=0; n < 6; ++n)   
            tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^hlo, j^hlo ));  
@@ -210,43 +172,12 @@ namespace advoocat
         // vector for err[n-2], err[n-1], err[n]
         tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
         for (int n=0; n < 3; ++n)
-          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i,j));           
+          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i^hlo, j^hlo));           
+
         // vector for Phi[n-2], Phi[n-1], Phi[n]
         tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
         for (int n=0; n < 3; ++n)
-          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i,j));           
-      }
-
-      void solve(int nt)
-      {
-	for (int t = 0; t < nt; ++t)
-	{
-	  if (t==0)
-	  {
-	    ini_courant();
-	    ini_pressure();
-	    forcings(this->dt / 2);
-	    parent_t::parent_t::solve(1);
-	    forcings(this->dt / 2);
-	    cr_solver_update(this->dt);
-	    cr_solver_apply(this->dt);
-	  }
-	  if (t!=0)
-	  {
-std::cerr<<"t= "<<t<<std::endl;
-	    update_courant();
-	    forcings(this->dt / 2);
-	    cr_solver_apply(this->dt);
-	    parent_t::parent_t::solve(1);
-	    // this->xchng_all();
-	    // this->advop_all();
-	    // this->cycle_all(); 
-	    forcings(this->dt / 2);
-	    cr_solver_update(this->dt);
-	    cr_solver_apply(this->dt);
-	  }
-	}
-std::cerr<<"total number of pseudotime iterations = "<<iters<<std::endl;
+          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i^hlo, j^hlo));           
       }
     }; 
   }; // namespace solvers

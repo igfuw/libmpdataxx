@@ -88,8 +88,7 @@ namespace advoocat
 	    ));
     }
 
-    // methods
-    void advance(int nt)
+    void advance(const int nt)
     {
       algos[0].solve(nt);
     }
