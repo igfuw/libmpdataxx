@@ -183,7 +183,7 @@ namespace advoocat
         const int hlo = 1; // TODO!!!
         tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
         tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i, j)); 
-        for (int n=0; n < 8; ++n) 
+        for (int n=0; n < 7; ++n) 
           tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^hlo, j^hlo )); 
         tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i,j));
       }
