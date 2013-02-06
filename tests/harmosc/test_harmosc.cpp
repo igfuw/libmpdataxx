@@ -119,7 +119,6 @@ class coupled_harmosc : public inhomo_solver_t
     parent_t::alloctmp(tmp, nx);
     tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_1d_t>()); 
     tmp[std::string(__FILE__)].back().push_back(new arr_1d_t( rng_t(0, nx-1) )); 
- 
   }
 };
 
