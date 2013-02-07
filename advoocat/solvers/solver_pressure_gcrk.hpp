@@ -52,7 +52,7 @@ namespace advoocat
 
       void pressure_solver_update(real_t dt)
       {
-/*	
+	
         using namespace arakawa_c;
 	using formulae::nabla_op::grad;
 	using formulae::nabla_op::div;
@@ -72,7 +72,9 @@ namespace advoocat
 	real_t error = 1.;
 	while (error > .0001)
 	{
-	  this->xchng(Phi,   i^halo, j^halo);
+	  this->xchng(Phi[n],   i^halo, j^halo);
+	  this->xchng(Phi[n-1],   i^halo, j^halo);
+	  this->xchng(Phi[n-2],   i^halo, j^halo);
 	  this->xchng(tmp_u, i^halo, j^halo);
 	  this->xchng(tmp_w, i^halo, j^halo);
 
@@ -110,17 +112,17 @@ namespace advoocat
 
 	tmp_u -= this->psi(u);
 	tmp_w -= this->psi(w);
-*/
+
       }
 
       void pressure_solver_apply(real_t dt)
       {
-/*	auto U = this->psi(u);
+	auto U = this->psi(u);
 	auto W = this->psi(w);
 
 	U += tmp_u;
 	W += tmp_w;
-*/
+
       }
 
       public:
