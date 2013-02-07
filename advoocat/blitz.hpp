@@ -20,7 +20,11 @@
 
 #pragma once
 
+#if defined(_OPENMP)
+#  define BZ_THREADSAFE
+#endif
 #include <blitz/array.h>
+
 #include <boost/ptr_container/ptr_vector.hpp>
 
 // C++11 auto return type macro

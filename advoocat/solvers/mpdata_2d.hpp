@@ -17,11 +17,11 @@ namespace advoocat
     using namespace arakawa_c;
 
     template<int n_iters, class bcx_t, class bcy_t, class mem_t>
-    class mpdata_2d : public solver_2d<bcx_t, bcy_t, mem_t>
+    class mpdata_2d : public detail::solver_2d<bcx_t, bcy_t, mem_t, /* n_tlev = */ 2>
     {
       static_assert(n_iters > 0, "n_iters <= 0");
 
-      using parent_t = solver_2d<bcx_t, bcy_t, mem_t>;
+      using parent_t = detail::solver_2d<bcx_t, bcy_t, mem_t, 2>;
       using arr_2d_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
@@ -86,7 +86,7 @@ namespace advoocat
 
       // ctor
       mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) : 
-	solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, 1), 
+	parent_t(mem, i, j, 1), 
 	im(i.first() - 1, i.last()),             //TODO get correct version from sylwester
 	jm(j.first() - 1, j.last())
       {
@@ -95,19 +95,19 @@ namespace advoocat
       }
 
       // memory allocation (to be called once per shared-mem node)
-      static void alloctmp(
-        std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_2d_t>>> &tmp, 
-        const int nx,
-        const int ny
-      )   
+      static void alloc(mem_t &mem, const int nx, const int ny)   
       {   
+        parent_t::alloc(mem, nx, ny);
+
+        const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
         const int halo = 1;  //TODO get correct version from sylwester
+
         for (int n = 0; n < n_tmp; ++n)
         {
-          tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
-          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^h, j^halo ));
-          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^halo, j^h ));
+          mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
+          mem.tmp[file].back().push_back(new arr_2d_t( i^h, j^halo ));
+          mem.tmp[file].back().push_back(new arr_2d_t( i^halo, j^h ));
         }
       }   
     };

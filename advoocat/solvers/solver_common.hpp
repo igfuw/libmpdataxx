@@ -12,57 +12,58 @@ namespace advoocat
 {
   namespace solvers
   {
-    template <class sharedmem>
-    class solver_common
+    namespace detail
     {
-      public:
-
-      typedef sharedmem mem_t;
-
-      protected: 
-
-      mem_t &mem;
-
-      const int n_tlev = 2;
-
-      // helper methods invoked by solve()
-      virtual void advop(int e) = 0;
-      void advop_all()
+      template <class sharedmem, int n_tlev>
+      class solver_common
       {
-	for (int e = 0; e < mem_t::n_eqs; ++e) advop(e);
-      }
+	public:
 
-      void cycle(int e) 
-      { 
-	mem.n[e] = (mem.n[e] + 1) % n_tlev - n_tlev; 
-      }
-      void cycle_all()
-      { 
-	for (int e = 0; e < mem_t::n_eqs; ++e) cycle(e);
-      }
+	typedef sharedmem mem_t;
 
-      virtual void xchng(int e) = 0;
-      void xchng_all() 
-      {   
-	for (int e = 0; e < mem_t::n_eqs; ++e) xchng(e);
-      }
+	protected: 
 
-      public:
-    
-      // ctor
-      solver_common(mem_t &mem) :
-	mem(mem) 
-      { }
+	mem_t &mem;
 
-      void solve(const int nt) 
-      {   
-	for (int t = 0; t < nt; ++t) 
+	// helper methods invoked by solve()
+	virtual void advop(int e) = 0;
+	void advop_all()
+	{
+	  for (int e = 0; e < mem_t::n_eqs; ++e) advop(e);
+	}
+
+	void cycle(int e) 
+	{ 
+	  mem.n[e] = (mem.n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
+	}
+	void cycle_all()
+	{ 
+	  for (int e = 0; e < mem_t::n_eqs; ++e) cycle(e);
+	}
+
+	virtual void xchng(int e, int l = 0) = 0;
+	void xchng_all() 
 	{   
-	  xchng_all();
-	  advop_all();
-	  cycle_all();
-	}   
-      }
-    };
+	  for (int e = 0; e < mem_t::n_eqs; ++e) xchng(e);
+	}
+
+	public:
+      
+	// ctor
+	solver_common(mem_t &mem) :
+	  mem(mem) 
+	{ }
+
+	void solve(const int nt) 
+	{   
+	  for (int t = 0; t < nt; ++t) 
+	  {   
+	    xchng_all();
+	    advop_all();
+	    cycle_all();
+	  }   
+        }
+      };
+    }; // namespace detail
   }; // namespace solvers
 }; // namespace advoocat

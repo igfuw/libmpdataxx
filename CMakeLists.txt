@@ -5,6 +5,11 @@ project(advoocat CXX)
 set(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors")
 add_subdirectory(advoocat) 
 
+#TODO: search for Blitz
+
+# blitz Debug mode
+set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG") 
+
 # docs
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
