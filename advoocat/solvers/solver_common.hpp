@@ -14,7 +14,7 @@ namespace advoocat
   {
     namespace detail
     {
-      template <class sharedmem>
+      template <class sharedmem, int n_tlev>
       class solver_common
       {
 	public:
@@ -24,8 +24,6 @@ namespace advoocat
 	protected: 
 
 	mem_t &mem;
-
-	const int n_tlev = 2;
 
 	// helper methods invoked by solve()
 	virtual void advop(int e) = 0;

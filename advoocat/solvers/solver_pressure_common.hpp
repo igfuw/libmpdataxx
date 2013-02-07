@@ -108,13 +108,9 @@ namespace advoocat
 	  jm(j.first() - 1, j.last())
 	{} 
 
-	static void alloctmp(
-	  std::unordered_map<std::string, boost::ptr_vector<arrvec_t<typename mem_t::arr_t>>> &tmp,
-	  const int nx,
-	  const int ny
-	)
+	static void alloc(mem_t &mem, const int nx, const int ny)
 	{
-	  parent_t::alloctmp(tmp, nx, ny);
+	  parent_t::alloc(mem, nx, ny);
           // TODO: for sure there will be some common temporaries!
         }
       }; 

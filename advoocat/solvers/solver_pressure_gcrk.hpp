@@ -151,33 +151,30 @@ namespace advoocat
         Phi = &mem.tmp[std::string(__FILE__)][2];
       }
 
-      static void alloctmp(
-        std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_2d_t>>> &tmp,
-        const int nx,
-        const int ny
-      )
+      static void alloc(mem_t &mem, const int nx, const int ny)
       {
-        parent_t::alloctmp(tmp, nx, ny);
+        parent_t::alloc(mem, nx, ny);
           
+        const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
         const int hlo = 1; // TODO!!!
         
         // temporary fields
-        tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
+        mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
         for (int n=0; n < 1; ++n)   // lap_err
-           tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i, j));  
+           mem.tmp[file].back().push_back(new arr_2d_t(i, j));  
         for (int n=0; n < 6; ++n)   
-           tmp[std::string(__FILE__)].back().push_back(new arr_2d_t( i^hlo, j^hlo ));  
+           mem.tmp[file].back().push_back(new arr_2d_t( i^hlo, j^hlo ));  
          
         // vector for err[n-2], err[n-1], err[n]
-        tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
+        mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
         for (int n=0; n < 3; ++n)
-          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i^hlo, j^hlo));           
+          mem.tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo));           
 
         // vector for Phi[n-2], Phi[n-1], Phi[n]
-        tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_2d_t>());
+        mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
         for (int n=0; n < 3; ++n)
-          tmp[std::string(__FILE__)].back().push_back(new arr_2d_t(i^hlo, j^hlo));           
+          mem.tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo));           
       }
     }; 
   }; // namespace solvers

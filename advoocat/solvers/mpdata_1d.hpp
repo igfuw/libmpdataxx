@@ -18,11 +18,11 @@ namespace advoocat
     using namespace advoocat::arakawa_c;
 
     template<int n_iters, class bcx_t, class mem_t>
-    class mpdata_1d : public detail::solver_1d<bcx_t, mem_t>
+    class mpdata_1d : public detail::solver_1d<bcx_t, mem_t, /* n_tlev = */ 2>
     {
       static_assert(n_iters > 0, "n_iters <= 0");
 
-      using parent_t = detail::solver_1d<bcx_t, mem_t>;
+      using parent_t = detail::solver_1d<bcx_t, mem_t, 2>;
       using arr_1d_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
@@ -84,16 +84,16 @@ namespace advoocat
       }
 
       // memory allocation (to be called once per shared-mem node)
-      static void alloctmp(
-        std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_1d_t>>> &tmp, 
-        const int nx
-      )
+      static void alloc(mem_t &mem, const int nx)
       {
-        // TODO: call parent's alloctmp?
+        parent_t::alloc(mem, nx);
+
+        const std::string file(__FILE__);
+
 	for (int n = 0; n < n_tmp; ++n)
         {
-	  tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_1d_t>()); 
-	  tmp[std::string(__FILE__)].back().push_back(new arr_1d_t( rng_t(0, nx-1)^h )); 
+	  mem.tmp[file].push_back(new arrvec_t<arr_1d_t>()); 
+	  mem.tmp[file].back().push_back(new arr_1d_t( rng_t(0, nx-1)^h )); 
         }
       }
     };
