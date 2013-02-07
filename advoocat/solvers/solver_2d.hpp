@@ -32,16 +32,9 @@ namespace advoocat
 	int halo;
 	rng_t i, j;
 
-	void xchng(int e) // for current time level
+	void xchng(int e, int lev = 0) // for previous time levels
 	{
-	  bcx.fill_halos(this->mem.psi[e][ this->mem.n[e] ], j^halo);
-	  bcy.fill_halos(this->mem.psi[e][ this->mem.n[e] ], i^halo);
-	}
-
-	void xchng(int e, int lev) //for previous time level
-	{
-	  bcx.fill_halos(this->mem.psi[e][ this->mem.n[e] - lev], j^halo);
-	  bcy.fill_halos(this->mem.psi[e][ this->mem.n[e] - lev], i^halo);
+          this->xchng(this->mem.psi[e][ this->mem.n[e] - lev], i^halo, j^halo);
 	}
 
 	void xchng(arr_2d_t psi, rng_t range_i, rng_t range_j) // for a given array

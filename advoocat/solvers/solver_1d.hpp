@@ -29,9 +29,9 @@ namespace advoocat
 	int halo;
 	rng_t i;
 
-	void xchng(int e) 
+	void xchng(int e, int lev = 0) 
 	{
-	  bcx.fill_halos( this->mem.psi[e][ this->mem.n[e] ] );
+	  bcx.fill_halos( this->mem.psi[e][ this->mem.n[e] - lev ] );
 	}
 
 	// ctor

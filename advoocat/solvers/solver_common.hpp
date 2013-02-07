@@ -36,14 +36,14 @@ namespace advoocat
 
 	void cycle(int e) 
 	{ 
-	  mem.n[e] = (mem.n[e] + 1) % n_tlev - n_tlev; 
+	  mem.n[e] = (mem.n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
 	}
 	void cycle_all()
 	{ 
 	  for (int e = 0; e < mem_t::n_eqs; ++e) cycle(e);
 	}
 
-	virtual void xchng(int e) = 0;
+	virtual void xchng(int e, int l = 0) = 0;
 	void xchng_all() 
 	{   
 	  for (int e = 0; e < mem_t::n_eqs; ++e) xchng(e);

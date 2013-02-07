@@ -35,11 +35,11 @@ namespace advoocat
 
 	rng_t i, j, k; // TODO: if stored as idx_t this also could be placed in solver_common
 
-	void xchng(int e) 
+	void xchng(int e, int lev = 0) 
 	{
-	  bcx.fill_halos(this->mem.psi[e][ this->mem.n[e] ], j^halo, k^halo);
-	  bcy.fill_halos(this->mem.psi[e][ this->mem.n[e] ], k^halo, i^halo);
-	  bcz.fill_halos(this->mem.psi[e][ this->mem.n[e] ], i^halo, j^halo);
+	  bcx.fill_halos(this->mem.psi[e][ this->mem.n[e] - lev ], j^halo, k^halo);
+	  bcy.fill_halos(this->mem.psi[e][ this->mem.n[e] - lev ], k^halo, i^halo);
+	  bcz.fill_halos(this->mem.psi[e][ this->mem.n[e] - lev ], i^halo, j^halo);
 	}
 
 	// ctor
