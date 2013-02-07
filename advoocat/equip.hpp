@@ -6,13 +6,14 @@
 
 #pragma once
 
+#include <boost/ptr_container/ptr_vector.hpp>
+#include "blitz.hpp"
+
 namespace advoocat
 {
   template <class solver_t>
   class equip
   {
-    const int n0 = 1, n1 = 1, n2 = 1;
-
     int min(int span, int rank, int size) 
     { 
       return rank * span / size; 
@@ -37,7 +38,8 @@ namespace advoocat
     // 1D ctor
     equip(
       const int s0, 
-      const typename solver_t::params_t &params 
+      const typename solver_t::params_t &params,
+      const int n0
     )
       : mem(s0)
     {
@@ -45,7 +47,7 @@ namespace advoocat
       for (int i0 = 0; i0 < n0; ++i0) 
 	algos.push_back(new solver_t(
 	  mem, 
-	  rng_t( min(s0, i0, n0), max(s0, i0, n0)),
+	  rng_t( min(s0, i0, n0), max(s0, i0, n0) ),
 	  params
 	));
     }
@@ -54,7 +56,9 @@ namespace advoocat
     equip(
       const int s0, 
       const int s1, 
-      const typename solver_t::params_t &params = typename solver_t::params_t()
+      const typename solver_t::params_t &params,
+      const int n0,
+      const int n1
     )
       : mem(s0, s1)
     {
@@ -63,8 +67,8 @@ namespace advoocat
 	for (int i1 = 0; i1 < n1; ++i1) 
 	  algos.push_back(new solver_t(
           mem, 
-          rng_t( min(s0, i0, n0), max(s0, i0, n0)),
-          rng_t( min(s1, i1, n1), max(s1, i1, n1)),
+          rng_t( min(s0, i0, n0), max(s0, i0, n0) ),
+          rng_t( min(s1, i1, n1), max(s1, i1, n1) ),
           params
         ));
     }
@@ -74,7 +78,10 @@ namespace advoocat
       const int s0, 
       const int s1, 
       const int s2, 
-      const typename solver_t::params_t &params = typename solver_t::params_t()
+      const typename solver_t::params_t &params,
+      const int n0,
+      const int n1,
+      const int n2
     )
       : mem(s0, s1, s2)
     {
@@ -84,9 +91,9 @@ namespace advoocat
 	  for (int i2 = 0; i2 < n2; ++i2) 
 	    algos.push_back(new solver_t(
 	      mem, 
-	      rng_t( min(s0, i0, n0), max(s0, i0, n0)),
-	      rng_t( min(s1, i1, n1), max(s1, i1, n1)),
-	      rng_t( min(s2, i2, n2), max(s2, i2, n2)),
+	      rng_t( min(s0, i0, n0), max(s0, i0, n0) ),
+	      rng_t( min(s1, i1, n1), max(s1, i1, n1) ),
+	      rng_t( min(s2, i2, n2), max(s2, i2, n2) ),
 	      params
 	    ));
     }

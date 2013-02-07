@@ -14,11 +14,11 @@ namespace advoocat
   namespace solvers
   {
     template <class inhomo_solver_t, int u, int w, int tht>
-    class pressure_maxgrad : public pressure_solver_common<inhomo_solver_t, u, w, tht>
+    class pressure_maxgrad : public detail::pressure_solver_common<inhomo_solver_t, u, w, tht>
     {
       public:
 
-      using parent_t = pressure_solver_common<inhomo_solver_t, u, w, tht>;
+      using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w, tht>;
       typedef typename parent_t::mem_t mem_t;
       typedef typename parent_t::real_t real_t;
       using arr_2d_t = typename mem_t::arr_t;

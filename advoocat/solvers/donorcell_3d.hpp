@@ -19,7 +19,7 @@ namespace advoocat
       class bcz_t, 
       class mem_t
     > 
-    class donorcell_3d : public solver_3d<bcx_t, bcy_t, bcz_t, mem_t> 
+    class donorcell_3d : public detail::solver_3d<bcx_t, bcy_t, bcz_t, mem_t> 
     {
       void advop(int e)
       {
@@ -40,7 +40,7 @@ namespace advoocat
 	const rng_t &k, 
 	const params_t &
       ) :
-	solver_3d<bcx_t, bcy_t, bcz_t, mem_t>(mem, i, j, k, /* halo = */ 1)
+	detail::solver_3d<bcx_t, bcy_t, bcz_t, mem_t>(mem, i, j, k, /* halo = */ 1)
       {}  
     }; // class donorcell_3d
   }; // namespace solvers

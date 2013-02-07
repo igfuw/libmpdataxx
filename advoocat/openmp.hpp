@@ -17,6 +17,8 @@ namespace advoocat
   template <class solver_t>
   class openmp : public equip<solver_t>
   {
+    using parent_t = equip<solver_t>;
+
     void barrier()
     {
 #pragma omp barrier
@@ -36,12 +38,24 @@ namespace advoocat
       } 
     }
 
+    // TODO: inheriting constructors 
+    // using equip<solver_t>::equip; 
+
+    int size() 
+    {
+#if defined(_OPENMP)
+      return omp_get_num_procs();
+#else
+      return 1;
+#endif
+    }
+
     // 1D ctor
     openmp(
       const int s0,
       const typename solver_t::params_t &params = typename solver_t::params_t()
-    )
-      : equip<solver_t>(s0, params)
+    ) : 
+      equip<solver_t>(s0, params, size())
     {}
 
     // 2D ctor
@@ -49,8 +63,8 @@ namespace advoocat
       const int s0,
       const int s1,
       const typename solver_t::params_t &params = typename solver_t::params_t()
-    )
-      : equip<solver_t>(s0, s1, params)
+    ) : 
+      equip<solver_t>(s0, s1, params, size(), 1)
     {}
 
     // 3D ctor
@@ -59,8 +73,8 @@ namespace advoocat
       const int s1,
       const int s2,
       const typename solver_t::params_t &params = typename solver_t::params_t()
-    )
-      : equip<solver_t>(s0, s1, s2, params)
+    ) :
+      equip<solver_t>(s0, s1, s2, params, size(), 1, 1)
     {}
   };
 }; // namespace advoocat

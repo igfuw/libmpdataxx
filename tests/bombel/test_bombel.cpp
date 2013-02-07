@@ -39,8 +39,8 @@ const int n_iters = 2;
 using namespace advoocat;
 
 using parent_t_ = 
-//solvers::pressure_maxgrad<
-solvers::pressure_gcrk<
+solvers::pressure_maxgrad<
+//solvers::pressure_gcrk<
   solvers::inhomo_solver<
     solvers::mpdata_2d<
       n_iters, 
@@ -83,7 +83,7 @@ class bombel : public parent_t_
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 2, n_out=1;
+  const int nx = 100, ny = 100, nt = 200, n_out=1;
 //  const int nx = 50, ny = 50, nt = 41, n_out=10;
 
   rng_t i(0, nx-1);

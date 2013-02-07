@@ -14,7 +14,7 @@ namespace advoocat
   namespace solvers
   {
     template<class bcx_t, class bcy_t, class mem_t>
-    class donorcell_2d : public solver_2d<bcx_t, bcy_t, mem_t> 
+    class donorcell_2d : public detail::solver_2d<bcx_t, bcy_t, mem_t> 
     {
       void advop(int e)
       {
@@ -29,7 +29,7 @@ namespace advoocat
 
       // ctor
       donorcell_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) :
-        solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, /* halo = */ 1)
+        detail::solver_2d<bcx_t, bcy_t, mem_t>(mem, i, j, /* halo = */ 1)
       {}  
     };
   }; // namespace solvers
