@@ -30,6 +30,8 @@ namespace advoocat
 	rng_t im, jm;
 	real_t dx = 1, dz = 1;  //TODO don't assume dx=dz=1
 
+        virtual void ini_solver() = 0;
+
 	void ini_courant()
 	{
 	  this->xchng(u);
@@ -75,6 +77,7 @@ namespace advoocat
 	      this->forcings(this->dt / 2);
 	      inhomo_solver_t::parent_t::solve(1);
 	      this->forcings(this->dt / 2);
+              this->ini_solver();
 	      pressure_solver_update(this->dt);
 	      pressure_solver_apply(this->dt);
 	    }

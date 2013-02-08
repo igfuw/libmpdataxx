@@ -5,6 +5,17 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 
+/*
+eqs 12a and 12b from Smolarkiewicz & Margolin 1994
+
+for it to work one would need another scheme to initialize first guess
+for phi[n] and err[n]
+
+also, it's more expansive than the other method
+//TODO - finish later(?) or remove
+*/
+
+
 #pragma once
 #include "solver_pressure_common.hpp"
 #include "../formulae/nabla_formulae.hpp" //gradient, diveregnce
@@ -14,7 +25,7 @@ namespace advoocat
   namespace solvers
   {
     template <class inhomo_solver_t, int u, int w, int tht>
-    class pressure_gcrk : public detail::pressure_solver_common<inhomo_solver_t, u, w, tht>
+    class pressure_crk2 : public detail::pressure_solver_common<inhomo_solver_t, u, w, tht>
     {
       public:
 
@@ -58,7 +69,10 @@ namespace advoocat
 	using formulae::nabla_op::div;
 
 	real_t beta = .25;  //TODO
-	real_t rho = 1.;   //TODO    
+        real_t gamma = 1.;  //TODO
+	real_t rho = 1.;    //TODO    
+
+        real_t max_err = .0001;
 
 	int halo = this->halo;
 	rng_t i = this->i;
@@ -70,49 +84,61 @@ namespace advoocat
     std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
-	while (error > .0001)
+	while (error > max_err)
 	{
-	  this->xchng(Phi[n],   i^halo, j^halo);
-	  this->xchng(Phi[n-1],   i^halo, j^halo);
-	  this->xchng(Phi[n-2],   i^halo, j^halo);
+	  this->xchng((*Phi)[n],   i^halo, j^halo);
+	  this->xchng((*Phi)[n-1],   i^halo, j^halo);  //some better initial guess needed
+	  this->xchng((*Phi)[n-2],   i^halo, j^halo);
 	  this->xchng(tmp_u, i^halo, j^halo);
 	  this->xchng(tmp_w, i^halo, j^halo);
 
-	  tmp_x(i, j) = rho * tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-	  tmp_z(i, j) = rho * tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+          //err[n-2]
+	  tmp_x(i, j) = rho * tmp_u(i, j) - grad<0>((*Phi)[n-2](i^halo, j^halo), i, j, real_t(1));
+	  tmp_z(i, j) = rho * tmp_w(i, j) - grad<1>((*Phi)[n-2](i^halo, j^halo), j, i, real_t(1));
      
 	  this->xchng(tmp_x, i^halo, j^halo);
 	  this->xchng(tmp_z, i^halo, j^halo);
 
-          err(i, j) = 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
+          (*err)[n-2](i, j) = 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
 
-          this->xchng(err, i^halo, j^halo);
+          //err[n-1]
+	  tmp_x(i, j) = rho * tmp_u(i, j) - grad<0>((*Phi)[n-1](i^halo, j^halo), i, j, real_t(1));
+	  tmp_z(i, j) = rho * tmp_w(i, j) - grad<1>((*Phi)[n-1](i^halo, j^halo), j, i, real_t(1));
+     
+	  this->xchng(tmp_x, i^halo, j^halo);
+	  this->xchng(tmp_z, i^halo, j^halo);
 
-          tmp_e1(i, j) = grad<0>(err(i^halo, j^halo), i, j, real_t(1));
-          tmp_e2(i, j) = grad<1>(err(i^halo, j^halo), j, i, real_t(1));
+          (*err)[n-1](i, j) = 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
+
+          this->xchng((*err)[n-1], i^halo, j^halo);
+
+          tmp_e1(i, j) = grad<0>((*err)[n-1](i^halo, j^halo), i, j, real_t(1));
+          tmp_e2(i, j) = grad<1>((*err)[n-1](i^halo, j^halo), j, i, real_t(1));
           this->xchng(tmp_e1, i^halo, j^halo);
           this->xchng(tmp_e2, i^halo, j^halo);
 
           lap_err(i,j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
 
-          tmp_e1(i,j) = err(i,j)*lap_err(i,j);
-          tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
-          beta = - blitz::sum(tmp_e1(i,j))/blitz::sum(tmp_e2(i,j));
+//          tmp_e1(i,j) = err(i,j)*lap_err(i,j);
+//          tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
+//          beta = - blitz::sum(tmp_e1(i,j))/blitz::sum(tmp_e2(i,j));
 
-          Phi(i, j) -= beta * err(i, j);
-
-          error = std::max(std::abs(max(err)), std::abs(min(err)));
+          (*Phi)[n](i, j) = gamma * ((*Phi)[n-1](i,j) - (*Phi)[n-2](i,j)) + (*Phi)[n-2](i,j) + beta * (*err)[n-1](i, j);
+          (*err)[n](i, j) = gamma * ((*err)[n-1](i,j) - (*err)[n-2](i,j)) + (*err)[n-1](i,j) + beta * lap_err(i,j); 
+                                                                                                      //lap(err)[n-1]
+          error = std::max(std::abs(max((*err)[n])), std::abs(min((*err)[n])));
+std::cerr<<"wip !!! "<<std::endl;
           iters++;
+          if (error > max_err) cycle_timelevels(n);
 	}
 	//end of pseudo_time loop
-	this->xchng(this->Phi, i^halo, j^halo);
+	this->xchng((*Phi)[n], i^halo, j^halo);
 
-	tmp_u(i, j) -= grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-	tmp_w(i, j) -= grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+	tmp_u(i, j) -= grad<0>((*Phi)[n](i^halo, j^halo), i, j, real_t(1));
+	tmp_w(i, j) -= grad<1>((*Phi)[n](i^halo, j^halo), j, i, real_t(1));
 
 	tmp_u -= this->psi(u);
 	tmp_w -= this->psi(w);
-
       }
 
       void pressure_solver_apply(real_t dt)
@@ -122,7 +148,6 @@ namespace advoocat
 
 	U += tmp_u;
 	W += tmp_w;
-
       }
 
       public:
@@ -130,7 +155,7 @@ namespace advoocat
       struct params_t : parent_t::params_t { };
 
       // ctor
-      pressure_gcrk(
+      pressure_crk2(
 	mem_t &mem,
 	const rng_t &i,
 	const rng_t &j,
