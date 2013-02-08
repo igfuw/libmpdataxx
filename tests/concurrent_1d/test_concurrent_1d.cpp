@@ -8,10 +8,10 @@
  * \include "concurrent_1d/test_concurrent_1d.cpp"
  */
 
-#include "advoocat/openmp.hpp"
+#include "advoocat/concurr/openmp.hpp"
 #include "advoocat/solvers/mpdata_1d.hpp"
 #include "advoocat/bcond/cyclic_1d.hpp"
-#include "advoocat/sharedmem.hpp"
+#include "advoocat/storage/sharedmem.hpp"
 
 int main()
 {
@@ -31,8 +31,8 @@ int main()
    
   // OpenMP
   {
-    openmp<solvers::mpdata_1d<n_iters, bcond::cyclic_1d<real_t>, mem_t>> slv(nx);
-    slv.advance(10);
+    concurr::openmp<solvers::mpdata_1d<n_iters, bcond::cyclic_1d<real_t>, mem_t>> slv(nx);
+    slv.advance(10000);
   }
 
   // Boost.Thread

@@ -53,7 +53,7 @@
 #include "advoocat/solvers/donorcell_1d.hpp"
 #include "advoocat/solvers/solver_inhomo.hpp"
 #include "advoocat/bcond/cyclic_1d.hpp"
-#include "advoocat/openmp.hpp"
+#include "advoocat/concurr/openmp.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
@@ -144,7 +144,7 @@ int main()
   solver_t::params_t p;
   p.dt = dt;
   p.omega = omega;
-  openmp<solver_t> slv(nx, p);
+  concurr::openmp<solver_t> slv(nx, p);
 
   Gnuplot gp;
   gp << "set term svg size 1000,500 dynamic enhanced\n" 
