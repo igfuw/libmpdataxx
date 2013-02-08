@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.6) # for CMakePushCheckState
-project(advoocat CXX)
+project(advoocat CXX C)
 
 # library
 set(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors")

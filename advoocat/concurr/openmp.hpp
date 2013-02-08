@@ -21,6 +21,15 @@ namespace advoocat
     {
       using parent_t = detail::concurr_common<solver_t>;
  
+      int size() 
+      {
+#if defined(_OPENMP)
+        return omp_get_num_procs();
+#else
+        return 1;
+#endif
+      }
+
       void barrier()
       {
 #pragma omp barrier
@@ -38,15 +47,6 @@ namespace advoocat
 #endif
           this->algos[i].solve(nt);
         } 
-      }
-
-      int size() 
-      {
-#if defined(_OPENMP)
-        return omp_get_num_procs();
-#else
-        return 1;
-#endif
       }
 
       // 1D ctor

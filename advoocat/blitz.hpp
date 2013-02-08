@@ -20,7 +20,7 @@
 
 #pragma once
 
-#if defined(_OPENMP)
+#if defined(_OPENMP) || defined(_REENTRANT)
 #  define BZ_THREADSAFE
 #endif
 #include <blitz/array.h>
