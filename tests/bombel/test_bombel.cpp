@@ -15,7 +15,7 @@
 #include "advoocat/solvers/solver_pressure_crk.hpp"
 #include "advoocat/solvers/solver_pressure_crk2.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
-#include "advoocat/openmp.hpp"
+#include "advoocat/concurr/openmp.hpp"
 //gradient
 #include "advoocat/formulae/nabla_formulae.hpp"
 //theta->pressure
@@ -96,7 +96,7 @@ int main()
   //ambient state (constant thoughout the domain)
   p.Tht_amb = 300;
   //p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
-  openmp<bombel> solver(nx, ny, p);
+  concurr::openmp<bombel> solver(nx, ny, p);
 
   // initial condition
   {

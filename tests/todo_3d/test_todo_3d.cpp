@@ -9,7 +9,7 @@
 //#include "advoocat/mpdata_3d.hpp"
 #include "advoocat/solvers/donorcell_3d.hpp"
 #include "advoocat/bcond/cyclic_3d.hpp"
-#include "advoocat/openmp.hpp"
+#include "advoocat/concurr/openmp.hpp"
 
 enum {x, y, z};
 
@@ -19,7 +19,7 @@ int main()
 
   int n[] = {24, 24, 24};
   {
-    openmp<
+    concurr::openmp<
       advoocat::solvers::donorcell_3d<
         bcond::cyclic_3d<x>, 
         bcond::cyclic_3d<y>,

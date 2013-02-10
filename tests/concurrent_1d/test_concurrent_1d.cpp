@@ -8,10 +8,11 @@
  * \include "concurrent_1d/test_concurrent_1d.cpp"
  */
 
-#include "advoocat/openmp.hpp"
+#include "advoocat/concurr/openmp.hpp"
+#include "advoocat/concurr/boost_thread.hpp"
 #include "advoocat/solvers/mpdata_1d.hpp"
 #include "advoocat/bcond/cyclic_1d.hpp"
-#include "advoocat/sharedmem.hpp"
+#include "advoocat/storage/sharedmem.hpp"
 
 int main()
 {
@@ -27,19 +28,19 @@ int main()
   using real_t = long double;
   using mem_t = sharedmem_1d<1, real_t>;
   int nx = 10;
-  const int n_iters = 1;
+  const int n_iters = 3;
    
   // OpenMP
+  std::cerr << "OpenMP run" << std::endl;
   {
-    openmp<solvers::mpdata_1d<n_iters, bcond::cyclic_1d<real_t>, mem_t>> slv(nx);
-    slv.advance(10);
+    concurr::openmp<solvers::mpdata_1d<n_iters, bcond::cyclic_1d<real_t>, mem_t>> slv(nx);
+    slv.advance(100);
   }
 
   // Boost.Thread
+  std::cerr << "Boost.Thread run" << std::endl;
   {
-  }
-
-  // C++11 Thread
-  {
+    concurr::boost_thread<solvers::mpdata_1d<n_iters, bcond::cyclic_1d<real_t>, mem_t>> slv(nx);
+    slv.advance(100);
   }
 }

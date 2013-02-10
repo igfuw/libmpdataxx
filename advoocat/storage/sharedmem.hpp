@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "blitz.hpp"
+#include "../blitz.hpp"
 #include <vector>
 #include <unordered_map>
 

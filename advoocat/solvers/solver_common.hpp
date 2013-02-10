@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../sharedmem.hpp"
+#include "../storage/sharedmem.hpp"
 
 namespace advoocat
 {

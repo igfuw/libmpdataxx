@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <blitz/array.h>
+#include <../blitz.hpp>
 
 namespace advoocat
 {
