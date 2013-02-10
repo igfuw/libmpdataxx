@@ -29,8 +29,7 @@ namespace advoocat
 	// member fields
 	rng_t im, jm;
 	real_t dx = 1, dz = 1;  //TODO don't assume dx=dz=1
-
-        virtual void ini_solver() = 0;
+        int iters;
 
 	void ini_courant()
 	{
@@ -77,7 +76,6 @@ namespace advoocat
 	      this->forcings(this->dt / 2);
 	      inhomo_solver_t::parent_t::solve(1);
 	      this->forcings(this->dt / 2);
-              this->ini_solver();
 	      pressure_solver_update(this->dt);
 	      pressure_solver_apply(this->dt);
 	    }
@@ -96,7 +94,7 @@ namespace advoocat
 	      pressure_solver_apply(this->dt);
 	    }
 	  }
-	  //std::cerr<<"total number of pseudotime iterations = "<<iters<<std::endl;
+std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	}
 
 	// ctor

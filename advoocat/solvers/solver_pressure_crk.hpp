@@ -39,44 +39,6 @@ namespace advoocat
 	Phi(this->i^this->halo, this->j^this->halo) = real_t(0);
       }
 
-      void ini_solver()
-      {
-        lap_p_err(this->i, this->j) = real_t(0);
-	using namespace arakawa_c;
-	using formulae::nabla_op::grad;
-	using formulae::nabla_op::div;
-
-	real_t rho = 1.;     //TODO    
-
-	int halo = this->halo;
-	rng_t i = this->i;
-	rng_t j = this->j;
-
-	tmp_u = this->psi(u);
-	tmp_w = this->psi(w);
-
-        this->xchng(Phi,   i^halo, j^halo);
-        this->xchng(tmp_u, i^halo, j^halo);
-	this->xchng(tmp_w, i^halo, j^halo);
-
-	tmp_x(i, j) = rho * tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-	tmp_z(i, j) = rho * tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
-     
-	this->xchng(tmp_x, i^halo, j^halo);
-	this->xchng(tmp_z, i^halo, j^halo);
-
-        err(i, j) = 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
-
-        p_err(i ,j) = err(i, j);
-        this->xchng(p_err, i^halo, j^halo);
-        tmp_e1(i, j) = grad<0>(p_err(i^halo, j^halo), i, j, real_t(1));
-        tmp_e2(i, j) = grad<1>(p_err(i^halo, j^halo), j, i, real_t(1));
-        this->xchng(tmp_e1, i^halo, j^halo);
-        this->xchng(tmp_e2, i^halo, j^halo);
-        lap_p_err(i,j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
-      }
-
-
       void pressure_solver_update(real_t dt)
       {
 	using namespace arakawa_c;
@@ -95,6 +57,26 @@ namespace advoocat
 	tmp_u = this->psi(u);
 	tmp_w = this->psi(w);
 
+        this->xchng(Phi,   i^halo, j^halo);
+        this->xchng(tmp_u, i^halo, j^halo);
+	this->xchng(tmp_w, i^halo, j^halo);
+
+	tmp_x(i, j) = rho * tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
+	tmp_z(i, j) = rho * tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+     
+	this->xchng(tmp_x, i^halo, j^halo);
+	this->xchng(tmp_z, i^halo, j^halo);
+
+        err(i, j) = - 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
+
+        p_err(i ,j) = err(i, j);
+        this->xchng(p_err, i^halo, j^halo);
+        tmp_e1(i, j) = grad<0>(p_err(i^halo, j^halo), i, j, real_t(1));
+        tmp_e2(i, j) = grad<1>(p_err(i^halo, j^halo), j, i, real_t(1));
+        this->xchng(tmp_e1, i^halo, j^halo);
+        this->xchng(tmp_e2, i^halo, j^halo);
+        lap_p_err(i,j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
+
     std::cerr<<"--------------------------------------------------------------"<<std::endl;
 
 	//pseudo-time loop
@@ -106,7 +88,7 @@ namespace advoocat
           tmp_den = blitz::sum(tmp_e2(i,j));
           if (tmp_den != 0) {beta = - blitz::sum(tmp_e1(i,j))/tmp_den;}
           Phi(i, j) += beta * p_err(i, j);
-          err(i, j) += beta * lap_p_err(i,j);
+          err(i, j) += beta * lap_p_err(i, j);
 
           this->xchng(err, i^halo, j^halo);
           tmp_e1(i, j) = grad<0>(err(i^halo, j^halo), i, j, real_t(1));
@@ -189,7 +171,7 @@ std::cerr<<"error "<<error<<std::endl;
           for (int n=0; n < 2; ++n) 
             mem.tmp[file].back().push_back(new arr_2d_t(i, j)); 
           for (int n=0; n < 9; ++n) 
-            mem.tmp[file].back().push_back(new arr_2d_t( i^hlo, j^hlo )); 
+            mem.tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo)); 
         }
       }
     }; 

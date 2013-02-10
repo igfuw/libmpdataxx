@@ -38,9 +38,6 @@ namespace advoocat
 	Phi(this->i^this->halo, this->j^this->halo) = real_t(0);
       }
 
-      void ini_solver()
-      {}
-
       void pressure_solver_update(real_t dt)
       {
 	using namespace arakawa_c;
@@ -57,23 +54,23 @@ namespace advoocat
 	tmp_u = this->psi(u);
 	tmp_w = this->psi(w);
 
-    std::cerr<<"--------------------------------------------------------------"<<std::endl;
+        this->xchng(Phi,   i^halo, j^halo);
+        this->xchng(tmp_u, i^halo, j^halo);
+        this->xchng(tmp_w, i^halo, j^halo);
+
+        tmp_x(i, j) = rho * (tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1)));
+        tmp_z(i, j) = rho * (tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1)));
+     
+        this->xchng(tmp_x, i^halo, j^halo);
+        this->xchng(tmp_z, i^halo, j^halo);
+
+        err(i, j) = - 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
+
+std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
-	while (error > .0001)
+	while (error > .00001)
 	{
-	  this->xchng(Phi,   i^halo, j^halo);
-	  this->xchng(tmp_u, i^halo, j^halo);
-	  this->xchng(tmp_w, i^halo, j^halo);
-
-	  tmp_x(i, j) = rho * tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-	  tmp_z(i, j) = rho * tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
-     
-	  this->xchng(tmp_x, i^halo, j^halo);
-	  this->xchng(tmp_z, i^halo, j^halo);
-
-          err(i, j) = 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
-
           this->xchng(err, i^halo, j^halo);
 
           tmp_e1(i, j) = grad<0>(err(i^halo, j^halo), i, j, real_t(1));
@@ -87,19 +84,18 @@ namespace advoocat
           tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
           beta = - blitz::sum(tmp_e1(i,j))/blitz::sum(tmp_e2(i,j));
 
-          Phi(i, j) -= beta * err(i, j);
+          Phi(i, j) += beta * err(i, j);
+          err(i, j) += beta * lap_err(i, j);
 
           error = std::max(std::abs(max(err)), std::abs(min(err)));
           iters++;
+std::cerr<<error<<std::endl;
 	}
 	//end of pseudo_time loop
 	this->xchng(this->Phi, i^halo, j^halo);
 
-	tmp_u(i, j) -= grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-	tmp_w(i, j) -= grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
-
-	tmp_u -= this->psi(u);
-	tmp_w -= this->psi(w);
+	tmp_u(i, j) = - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
+	tmp_w(i, j) = - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
       }
 
       void pressure_solver_apply(real_t dt)
