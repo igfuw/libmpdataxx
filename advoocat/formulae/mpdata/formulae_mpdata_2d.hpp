@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include "../blitz.hpp"
-#include "../idxperm.hpp"
-#include "../arakawa_c.hpp"
+#include "formulae_mpdata_common.hpp"
 
 namespace advoocat 
 { 
@@ -16,51 +14,6 @@ namespace advoocat
   { 
     namespace mpdata 
     {
-      using namespace arakawa_c;
-      using idxperm::pi;
-
-      const int halo = 1;
-// TODO
-/*
-  struct varsgn
-  {
-    template<class T> auto aon(const T &x) -> decltype(abs(x))
-    {
-      return abs(x);
-    }
-  };
-
-  struct posdef
-  {
-    template<class T> T aon(const T &x)
-    {
-      return x;
-    }
-  };
-*/
-
-      template<class nom_t, class den_t>
-      inline auto frac(
-        const nom_t &nom, const den_t &den
-      ) return_macro(,
-        where(den > 0, nom / den, 0)
-      ) 
-
-      // 1D
-      template <class arr_1d_t>
-      inline auto A(
-        const arr_1d_t &psi, 
-        const rng_t &i 
-      ) return_macro(,
-        frac(
-            abs(psi(i+1)) 
-          - abs(psi(i  )),
-          // ----------------------
-            abs(psi(i+1)) 
-          + abs(psi(i  ))
-        ) 
-      ) 
-
       // 2D
       template<int d, class arr_2d_t>
       inline auto A(
@@ -109,17 +62,6 @@ namespace advoocat
           C(pi<d>(i,   j-h)) 
         ) / 4
       )
-
-      template<class arr_1d_t>
-      inline auto antidiff(
-        const arr_1d_t &psi, 
-        const rng_t &i, 
-        const arr_1d_t &C
-      ) return_macro(,
-        abs(C(i+h)) 
-        * (1 - abs(C(i+h))) 
-        * A(psi, i) 
-      ) 
 
       template <int dim, class arr_2d_t>
       inline auto antidiff(

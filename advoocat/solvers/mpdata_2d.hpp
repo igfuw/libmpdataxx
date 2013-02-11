@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../formulae/mpdata_formulae.hpp"
+#include "../formulae/mpdata/formulae_mpdata_2d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
 #include "solver_2d.hpp"
 

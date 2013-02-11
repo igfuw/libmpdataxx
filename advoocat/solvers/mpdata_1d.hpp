@@ -6,10 +6,12 @@
 
 #pragma once
 
-#include "../formulae/mpdata_formulae.hpp"
+#include "../formulae/mpdata/formulae_mpdata_1d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
 #include "solver_1d.hpp"
 #include <unordered_map>
+
+// TODO: an mpdata_common class?
 
 namespace advoocat
 {
