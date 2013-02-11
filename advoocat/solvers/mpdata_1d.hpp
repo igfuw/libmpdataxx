@@ -20,17 +20,17 @@ namespace advoocat
     using namespace advoocat::arakawa_c;
 
     template<int n_iters, class bcx_t, class mem_t>
-    class mpdata_1d : public detail::solver_1d<bcx_t, mem_t, /* n_tlev = */ 2>
+    class mpdata_1d : public detail::solver_1d<bcx_t, mem_t, formulae::mpdata::n_tlev>
     {
       static_assert(n_iters > 0, "n_iters <= 0");
 
-      using parent_t = detail::solver_1d<bcx_t, mem_t, 2>;
+      using parent_t = detail::solver_1d<bcx_t, mem_t, formulae::mpdata::n_tlev>;
       using arr_1d_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
 
       // member fields
-      arrvec_t<arr_1d_t> *tmp[2];
+      arrvec_t<arr_1d_t> *tmp[n_tmp];
       rng_t im;
 
       protected:
