@@ -184,24 +184,24 @@ std::cerr<<"wip !!! "<<std::endl;
           
         const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
-        const int hlo = 1; // TODO!!!
+        const int halo = parent_t::halo;
         
         // temporary fields
         mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
         for (int n=0; n < 1; ++n)   // lap_err
            mem.tmp[file].back().push_back(new arr_2d_t(i, j));  
         for (int n=0; n < 6; ++n)   
-           mem.tmp[file].back().push_back(new arr_2d_t( i^hlo, j^hlo ));  
+           mem.tmp[file].back().push_back(new arr_2d_t( i^halo, j^halo ));  
          
         // vector for err[n-2], err[n-1], err[n]
         mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
         for (int n=0; n < 3; ++n)
-          mem.tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo));           
+          mem.tmp[file].back().push_back(new arr_2d_t(i^halo, j^halo));           
 
         // vector for Phi[n-2], Phi[n-1], Phi[n]
         mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
         for (int n=0; n < 3; ++n)
-          mem.tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo));           
+          mem.tmp[file].back().push_back(new arr_2d_t(i^halo, j^halo));           
       }
     }; 
   }; // namespace solvers

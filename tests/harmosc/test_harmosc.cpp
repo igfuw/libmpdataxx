@@ -111,14 +111,15 @@ class coupled_harmosc : public inhomo_solver_t
   {
   }
 
-  static void alloctmp(
-    std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_1d_t>>> &tmp, 
+  static void alloc(
+    typename parent_t::mem_t &mem,
     const int nx
   )
   {
-    parent_t::alloctmp(tmp, nx);
-    tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_1d_t>()); 
-    tmp[std::string(__FILE__)].back().push_back(new arr_1d_t( rng_t(0, nx-1) )); 
+    parent_t::alloc(mem, nx);
+    const std::string file(__FILE__);
+    mem.tmp[file].push_back(new arrvec_t<arr_1d_t>()); 
+    mem.tmp[file].back().push_back(new arr_1d_t( rng_t(0, nx-1) )); 
   }
 };
 
