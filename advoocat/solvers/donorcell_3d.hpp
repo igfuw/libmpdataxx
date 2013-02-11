@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "solver_3d.hpp"
+#include "detail/solver_3d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
 
 namespace advoocat

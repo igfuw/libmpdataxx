@@ -8,7 +8,7 @@
 
 #include "../formulae/mpdata/formulae_mpdata_2d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
-#include "solver_2d.hpp"
+#include "detail/solver_2d.hpp"
 
 namespace advoocat
 {

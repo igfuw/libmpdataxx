@@ -8,7 +8,7 @@
 
 #include "../formulae/mpdata/formulae_mpdata_1d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
-#include "solver_1d.hpp"
+#include "detail/solver_1d.hpp"
 #include <unordered_map>
 
 // TODO: an mpdata_common class?

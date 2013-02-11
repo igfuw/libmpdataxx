@@ -9,16 +9,18 @@
 #include "detail/solver_1d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
 
+// TODO: this doesn't work yet - just a draft!
+
 namespace advoocat
 {
   namespace solvers
   {
     template<class bcx_t, class mem_t>
-    class donorcell_1d : public detail::solver_1d<bcx_t, mem_t, /* n_tlev = */ 2> 
+    class leapfrog_1d : public detail::solver_1d<bcx_t, mem_t, /* n_tlev = */ 3> 
     {
       void advop(int e)
       {
-        formulae::donorcell::op_1d(
+        formulae::leapfrog::op_1d(
           this->mem.psi[e], this->mem.n[e], this->mem.C[0], this->i
         );
       }
@@ -28,8 +30,8 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      donorcell_1d(mem_t &mem, const rng_t &i, const params_t &) :
-        detail::solver_1d<bcx_t, mem_t, 2>(mem, i, /* halo = */ 1)
+      leapfrog_1d(mem_t &mem, const rng_t &i, const params_t &) :
+        detail::solver_1d<bcx_t, mem_t, 3>(mem, i, /* halo = */ 1)
       { }  
     };
   }; // namespace solvers

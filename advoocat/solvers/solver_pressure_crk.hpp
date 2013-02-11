@@ -6,7 +6,7 @@
   */
 
 #pragma once
-#include "solver_pressure_common.hpp"
+#include "detail/solver_pressure_common.hpp"
 #include "../formulae/nabla_formulae.hpp" //gradient, diveregnce
 
 namespace advoocat
