@@ -19,9 +19,15 @@ namespace advoocat
       class bcz_t, 
       class mem_t
     > 
-    class donorcell_3d : public detail::solver_3d<bcx_t, bcy_t, bcz_t, mem_t, /* n_tlev = */ 2> 
+    class donorcell_3d : public detail::solver_3d<
+      bcx_t, bcy_t, bcz_t, mem_t, 
+      formulae::donorcell::n_tlev, formulae::donorcell::halo
+    >
     {
-      using parent_t = detail::solver_3d<bcx_t, bcy_t, bcz_t, mem_t, /* n_tlev = */ 2>;
+      using parent_t = detail::solver_3d<
+        bcx_t, bcy_t, bcz_t, mem_t, 
+        formulae::donorcell::n_tlev, formulae::donorcell::halo
+      >;
 
       void advop(int e)
       {
@@ -42,7 +48,7 @@ namespace advoocat
 	const rng_t &k, 
 	const params_t &
       ) :
-	parent_t(mem, i, j, k, /* halo = */ 1)
+	parent_t(mem, i, j, k)
       {}  
     }; // class donorcell_3d
   }; // namespace solvers

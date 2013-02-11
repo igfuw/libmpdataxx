@@ -20,11 +20,21 @@ namespace advoocat
     using namespace advoocat::arakawa_c;
 
     template<int n_iters, class bcx_t, class mem_t>
-    class mpdata_1d : public detail::solver_1d<bcx_t, mem_t, formulae::mpdata::n_tlev>
+    class mpdata_1d : public detail::solver_1d<
+      bcx_t, 
+      mem_t, 
+      formulae::mpdata::n_tlev,
+      formulae::mpdata::halo
+    >
     {
       static_assert(n_iters > 0, "n_iters <= 0");
 
-      using parent_t = detail::solver_1d<bcx_t, mem_t, formulae::mpdata::n_tlev>;
+      using parent_t = detail::solver_1d< 
+        bcx_t, 
+        mem_t, 
+        formulae::mpdata::n_tlev,
+        formulae::mpdata::halo
+      >;
       using arr_1d_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
@@ -78,7 +88,7 @@ namespace advoocat
 
       // ctor
       mpdata_1d(mem_t &mem, const rng_t &i, const params_t &) : 
-	parent_t(mem, i, /* halo = */1), 
+	parent_t(mem, i), 
 	im(i.first() - 1, i.last())
       {
 	for (int n = 0; n < n_tmp; ++n)

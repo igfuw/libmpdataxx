@@ -17,6 +17,8 @@ namespace advoocat
       using namespace arakawa_c;
       using idxperm::pi;
 
+      const int n_tlev = 2, halo = 1;
+
       template<class T1, class T2, class T3> 
       inline auto F(
 	const T1 &psi_l, const T2 &psi_r, const T3 &C

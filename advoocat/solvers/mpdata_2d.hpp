@@ -17,11 +17,17 @@ namespace advoocat
     using namespace arakawa_c;
 
     template<int n_iters, class bcx_t, class bcy_t, class mem_t>
-    class mpdata_2d : public detail::solver_2d<bcx_t, bcy_t, mem_t, formulae::mpdata::n_tlev>
+    class mpdata_2d : public detail::solver_2d<
+      bcx_t,  
+      bcy_t, 
+      mem_t, 
+      formulae::mpdata::n_tlev,
+      formulae::mpdata::halo
+    >
     {
       static_assert(n_iters > 0, "n_iters <= 0");
 
-      using parent_t = detail::solver_2d<bcx_t, bcy_t, mem_t, formulae::mpdata::n_tlev>;
+      using parent_t = detail::solver_2d<bcx_t, bcy_t, mem_t, formulae::mpdata::n_tlev, formulae::mpdata::halo>;
       using arr_2d_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
@@ -86,8 +92,8 @@ namespace advoocat
 
       // ctor
       mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) : 
-	parent_t(mem, i, j, 1), 
-	im(i.first() - 1, i.last()),             //TODO get correct version from sylwester
+	parent_t(mem, i, j), 
+	im(i.first() - 1, i.last()),
 	jm(j.first() - 1, j.last())
       {
 	for (int n = 0; n < n_tmp; ++n)
@@ -101,7 +107,7 @@ namespace advoocat
 
         const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
-        const int halo = 1;  //TODO get correct version from sylwester
+        const int halo = formulae::mpdata::halo;
 
         for (int n = 0; n < n_tmp; ++n)
         {
