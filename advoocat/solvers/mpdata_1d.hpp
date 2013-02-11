@@ -19,12 +19,12 @@ namespace advoocat
   {
     using namespace advoocat::arakawa_c;
 
-    template<int n_iters, class bcx_t, class mem_t>
+    template<int n_iters, class bcx_t, class mem_t, int halo = formulae::mpdata::halo>
     class mpdata_1d : public detail::solver_1d<
       bcx_t, 
       mem_t, 
       formulae::mpdata::n_tlev,
-      formulae::mpdata::halo
+      detail::max(halo, formulae::mpdata::halo)
     >
     {
       static_assert(n_iters > 0, "n_iters <= 0");
@@ -33,7 +33,7 @@ namespace advoocat
         bcx_t, 
         mem_t, 
         formulae::mpdata::n_tlev,
-        formulae::mpdata::halo
+        detail::max(halo, formulae::mpdata::halo)
       >;
       using arr_1d_t = typename mem_t::arr_t;
 

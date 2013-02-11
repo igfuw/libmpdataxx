@@ -17,16 +17,19 @@ namespace advoocat
       class bcx_t, 
       class bcy_t, 
       class bcz_t, 
-      class mem_t
+      class mem_t,
+      int halo = formulae::donorcell::halo
     > 
     class donorcell_3d : public detail::solver_3d<
       bcx_t, bcy_t, bcz_t, mem_t, 
-      formulae::donorcell::n_tlev, formulae::donorcell::halo
+      formulae::donorcell::n_tlev, 
+      detail::max(halo, formulae::donorcell::halo)
     >
     {
       using parent_t = detail::solver_3d<
         bcx_t, bcy_t, bcz_t, mem_t, 
-        formulae::donorcell::n_tlev, formulae::donorcell::halo
+        formulae::donorcell::n_tlev, 
+        detail::max(halo, formulae::donorcell::halo)
       >;
 
       void advop(int e)
