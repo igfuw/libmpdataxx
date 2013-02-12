@@ -33,12 +33,12 @@ namespace advoocat
         formulae::mpdata::n_tlev,
         detail::max(halo, formulae::mpdata::halo)
       >;
-      using arr_1d_t = typename mem_t::arr_t;
+      using arr_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
 
       // member fields
-      arrvec_t<arr_1d_t> *tmp[n_tmp];
+      arrvec_t<arr_t> *tmp[n_tmp];
       rng_t im;
 
       protected:
@@ -57,7 +57,7 @@ namespace advoocat
 	    this->bcxr->fill_halos(this->mem.psi[e][this->mem.n[e]]);
 
 	    // choosing input/output for antidiff C
-            const arrvec_t<arr_1d_t>
+            const arrvec_t<arr_t>
 	      &C_unco = (step == 1) 
 		? this->mem.C 
 		: (step % 2) 
@@ -109,8 +109,8 @@ namespace advoocat
 
 	for (int n = 0; n < n_tmp; ++n)
         {
-	  mem.tmp[file].push_back(new arrvec_t<arr_1d_t>()); 
-	  mem.tmp[file].back().push_back(new arr_1d_t( rng_t(0, nx-1)^h )); 
+	  mem.tmp[file].push_back(new arrvec_t<arr_t>()); 
+	  mem.tmp[file].back().push_back(new arr_t( rng_t(0, nx-1)^h )); 
         }
       }
     };

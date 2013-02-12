@@ -139,10 +139,7 @@ int main()
 
   using solver_t = coupled_harmosc<
     solvers::inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
-      solvers::donorcell_1d<sharedmem_1d<n_eqs, real_t>,
-//      solvers::mpdata_1d< ... n_iters, 
-        bcond::cyclic
-      >
+      solvers::donorcell_1d<sharedmem_1d<n_eqs, real_t>>
     >
   >;
 

@@ -12,7 +12,7 @@
 #include "../bcond/cyclic_1d.hpp"
 #include "../bcond/cyclic_2d.hpp"
 #include "../bcond/cyclic_3d.hpp"
-// TODO: split into 1D, 2Dand3D files?
+// TODO: split into 1D, 2D and 3D files?
 
 namespace advoocat
 {
