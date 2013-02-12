@@ -8,6 +8,7 @@
 
 #include "concurr_common.hpp"
 
+// TODO: make it work with clang as well!
 #if !defined(_REENTRANT)
 #  error _REENTRANT not defined, pleas use something like -pthread flag for gcc
 #endif
@@ -48,11 +49,14 @@ namespace advoocat
 
       void advance(int nt)
       {
-        boost::thread_group threads; // member field?
-// TODO!
-//        for (int i = 0; i < this->algos.size(); ++i) threads.add_thread(new boost::thread(
-//          &solver_t::solve, this->algos[i], nt 
-//        ));
+        boost::thread_group threads; // TODO: member field?
+        for (int i = 0; i < this->algos.size(); ++i) 
+        {  
+          threads.add_thread(new boost::thread(
+            //boost::ref(boost::bind(&solver_t::solve, this->algos[i], nt))
+            &solver_t::solve, boost::ref(this->algos[i]), nt
+          ));
+        }
         threads.join_all();
       }
 
