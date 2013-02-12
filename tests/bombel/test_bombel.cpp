@@ -40,8 +40,8 @@ using namespace advoocat;
 
 using parent_t_ = 
 //solvers::pressure_mr<
-solvers::pressure_cr<
-//solvers::pressure_pc<
+//solvers::pressure_cr<
+solvers::pressure_pc<
   solvers::inhomo_solver<
     solvers::mpdata_2d<n_iters, sharedmem_2d<3, real_t>>
   >, u, w, tht
