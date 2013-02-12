@@ -16,10 +16,8 @@ namespace advoocat
   {
     using namespace arakawa_c;
 
-    template<int n_iters, class bcx_t, class bcy_t, class mem_t, int halo = formulae::mpdata::halo>
+    template<int n_iters, class mem_t, int halo = formulae::mpdata::halo>
     class mpdata_2d : public detail::solver_2d<
-      bcx_t,  
-      bcy_t, 
       mem_t, 
       formulae::mpdata::n_tlev,
       detail::max(halo, formulae::mpdata::halo)
@@ -28,8 +26,6 @@ namespace advoocat
       static_assert(n_iters > 0, "n_iters <= 0");
 
       using parent_t = detail::solver_2d<
-        bcx_t, 
-        bcy_t,
         mem_t, 
         formulae::mpdata::n_tlev, 
         detail::max(halo, formulae::mpdata::halo)
@@ -56,8 +52,8 @@ namespace advoocat
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcx.fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo);
-	    this->bcy.fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
+	    this->bcx->fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo);
+	    this->bcy->fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
 
 	    // choosing input/output for antidiff C
             const arrvec_t<arr_2d_t>
@@ -76,14 +72,14 @@ namespace advoocat
 		this->mem.psi[e][this->mem.n[e]], 
 		this->im, this->j, C_unco
 	      );
-	    this->bcy.fill_halos(C_corr[0], this->i^h);
+	    this->bcy->fill_halos(C_corr[0], this->i^h);
 
 	    C_corr[1](this->i, this->jm+h) = 
 	      formulae::mpdata::antidiff<1>(
               this->mem.psi[e][this->mem.n[e]], 
               this->jm, this->i, C_unco
 	    );
-	    this->bcx.fill_halos(C_corr[1], this->j^h);
+	    this->bcx->fill_halos(C_corr[1], this->j^h);
 
 	    // donor-cell step 
 	    formulae::donorcell::op_2d(this->mem.psi[e], 
@@ -97,8 +93,15 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) : 
-	parent_t(mem, i, j), 
+      mpdata_2d(
+        mem_t &mem, 
+        typename parent_t::bc_p &bcx, 
+        typename parent_t::bc_p &bcy, 
+        const rng_t &i, 
+        const rng_t &j,
+        const params_t &
+      ) : 
+	parent_t(mem, bcx, bcy, i, j), 
 	im(i.first() - 1, i.last()),
 	jm(j.first() - 1, j.last())
       {

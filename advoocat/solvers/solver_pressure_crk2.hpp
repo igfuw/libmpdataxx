@@ -157,11 +157,13 @@ std::cerr<<"wip !!! "<<std::endl;
       // ctor
       pressure_crk2(
 	mem_t &mem,
+        typename parent_t::bc_p &bcx,
+        typename parent_t::bc_p &bcy,
 	const rng_t &i,
 	const rng_t &j,
 	const params_t &p
       ) :
-	parent_t(mem, i, j, p),
+	parent_t(mem, bcx, bcy, i, j, p),
         n(2),
         // (i, j)
         lap_err(mem.tmp[std::string(__FILE__)][0][0]),

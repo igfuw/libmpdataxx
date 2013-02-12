@@ -71,6 +71,7 @@ enum {psi, phi};
 using real_t = double;
 using namespace advoocat;
 
+// TODO: move into a separate file
 template <class inhomo_solver_t>
 class coupled_harmosc : public inhomo_solver_t
 {
@@ -104,12 +105,16 @@ class coupled_harmosc : public inhomo_solver_t
   struct params_t : parent_t::params_t { real_t omega; };
 
   // ctor
-  coupled_harmosc(typename parent_t::mem_t &mem, const rng_t &i, params_t p) :
-    parent_t(mem, i, p),
+  coupled_harmosc(
+    typename parent_t::mem_t &mem, 
+    typename parent_t::bc_p &bcx,
+    const rng_t &i, 
+    params_t p
+  ) :
+    parent_t(mem, bcx, i, p),
     omega(p.omega), 
     tmp(mem.tmp[std::string(__FILE__)][0][0]) 
-  {
-  }
+  {}
 
   static void alloc(
     typename parent_t::mem_t &mem,
@@ -133,11 +138,9 @@ int main()
 
   using solver_t = coupled_harmosc<
     solvers::inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
-      solvers::donorcell_1d<
-//      solvers::mpdata_1d<
-//        n_iters, 
-        bcond::cyclic_1d<real_t>, 
-        sharedmem_1d<n_eqs, real_t>
+      solvers::donorcell_1d<sharedmem_1d<n_eqs, real_t>,
+//      solvers::mpdata_1d< ... n_iters, 
+        bcond::cyclic
       >
     >
   >;
@@ -145,7 +148,7 @@ int main()
   solver_t::params_t p;
   p.dt = dt;
   p.omega = omega;
-  concurr::openmp<solver_t> slv(nx, p);
+  concurr::openmp<solver_t, bcond::cyclic> slv(nx, p);
 
   Gnuplot gp;
   gp << "set term svg size 1000,500 dynamic enhanced\n" 

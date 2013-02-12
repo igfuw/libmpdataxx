@@ -57,7 +57,9 @@ int main()
   using mem_t = sharedmem_2d<>;
   {
     concurr::openmp<
-      solvers::donorcell_2d<bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
+      solvers::donorcell_2d<mem_t>,
+      bcond::cyclic, 
+      bcond::cyclic
     > slv(n[x], n[y]);
 
     setup(slv, n);
@@ -75,7 +77,9 @@ int main()
   {
     const int it = 2;
     concurr::openmp<
-      solvers::mpdata_2d<it, bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
+      solvers::mpdata_2d<it, mem_t>,
+      bcond::cyclic, 
+      bcond::cyclic
     > slv(n[x], n[y]); 
 
     setup(slv, n); 
@@ -89,7 +93,9 @@ int main()
   {
     const int it = 4;
     concurr::openmp<
-      solvers::mpdata_2d<it, bcond::cyclic_2d<x>, bcond::cyclic_2d<y>, mem_t>
+      solvers::mpdata_2d<it, mem_t>,
+      bcond::cyclic, 
+      bcond::cyclic
     > slv(n[x], n[y]); 
 
     setup(slv, n); 

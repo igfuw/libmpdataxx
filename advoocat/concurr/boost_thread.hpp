@@ -17,10 +17,15 @@ namespace advoocat
 {
   namespace concurr
   {
-    template <class solver_t>
-    class boost_thread : public detail::concurr_common<solver_t>
+    template <
+      class solver_t,
+      bcond::bcond_e bcx,
+      bcond::bcond_e bcy = bcond::null,
+      bcond::bcond_e bcz = bcond::null
+    >
+    class boost_thread : public detail::concurr_common<solver_t, bcx, bcy, bcz>
     {
-      using parent_t = detail::concurr_common<solver_t>;
+      using parent_t = detail::concurr_common<solver_t, bcx, bcy, bcz>;
  
       std::unique_ptr<boost::barrier> b;
 
@@ -44,9 +49,10 @@ namespace advoocat
       void advance(int nt)
       {
         boost::thread_group threads; // member field?
-        for (int i = 0; i < this->algos.size(); ++i) threads.add_thread(new boost::thread(
-          &solver_t::solve, this->algos[i], nt 
-        ));
+// TODO!
+//        for (int i = 0; i < this->algos.size(); ++i) threads.add_thread(new boost::thread(
+//          &solver_t::solve, this->algos[i], nt 
+//        ));
         threads.join_all();
       }
 

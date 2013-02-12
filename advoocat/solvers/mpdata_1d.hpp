@@ -19,9 +19,8 @@ namespace advoocat
   {
     using namespace advoocat::arakawa_c;
 
-    template<int n_iters, class bcx_t, class mem_t, int halo = formulae::mpdata::halo>
+    template<int n_iters, class mem_t, int halo = formulae::mpdata::halo>
     class mpdata_1d : public detail::solver_1d<
-      bcx_t, 
       mem_t, 
       formulae::mpdata::n_tlev,
       detail::max(halo, formulae::mpdata::halo)
@@ -30,7 +29,6 @@ namespace advoocat
       static_assert(n_iters > 0, "n_iters <= 0");
 
       using parent_t = detail::solver_1d< 
-        bcx_t, 
         mem_t, 
         formulae::mpdata::n_tlev,
         detail::max(halo, formulae::mpdata::halo)
@@ -55,7 +53,7 @@ namespace advoocat
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcx.fill_halos(this->mem.psi[e][this->mem.n[e]]);
+	    this->bcx->fill_halos(this->mem.psi[e][this->mem.n[e]]);
 
 	    // choosing input/output for antidiff C
             const arrvec_t<arr_1d_t>
@@ -87,8 +85,8 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      mpdata_1d(mem_t &mem, const rng_t &i, const params_t &) : 
-	parent_t(mem, i), 
+      mpdata_1d(mem_t &mem, typename parent_t::bc_p &bcx, const rng_t &i, const params_t &) : 
+	parent_t(mem, bcx, i), 
 	im(i.first() - 1, i.last())
       {
 	for (int n = 0; n < n_tmp; ++n)

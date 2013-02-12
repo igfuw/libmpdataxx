@@ -42,31 +42,37 @@ namespace advoocat
       // 1D
       inhomo_solver(
 	typename parent_t::mem_t &mem, 
+	typename parent_t::bc_p &bcx, 
 	const rng_t &i, 
 	const params_t &p
       ) :
-	parent_t(mem, i, p), dt(p.dt)
+	parent_t(mem, bcx, i, p), dt(p.dt)
       {}
 
       // 2D
       inhomo_solver(
 	typename parent_t::mem_t &mem, 
+	typename parent_t::bc_p &bcx, 
+	typename parent_t::bc_p &bcy, 
 	const rng_t &i, 
 	const rng_t &j, 
 	const params_t &p
       ) :
-	parent_t(mem, i, j, p), dt(p.dt)
+	parent_t(mem, bcx, bcy, i, j, p), dt(p.dt)
       {}
 
       // 3D
       inhomo_solver(
 	typename parent_t::mem_t &mem, 
+	typename parent_t::bc_p &bcx, 
+	typename parent_t::bc_p &bcy, 
+	typename parent_t::bc_p &bcz, 
 	const rng_t &i, 
 	const rng_t &j, 
 	const rng_t &k, 
 	const params_t &p
       ) :
-	parent_t(mem, i, j, k, p), dt(p.dt)
+	parent_t(mem, bcx, bcy, bcz, i, j, k, p), dt(p.dt)
       {}
 
       void solve(int nt)

@@ -7,13 +7,14 @@
 #pragma once
 
 #include "../blitz.hpp"
+#include "bcond.hpp"
 
 namespace advoocat
 {
   namespace bcond
   {
     template <int n_dims, typename real_t = float>
-    class cyclic_common
+    class cyclic_common : public bcond_t<real_t>
     {
       public:
 

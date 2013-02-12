@@ -14,7 +14,7 @@ namespace advoocat
   namespace bcond
   {
     template<int d, typename real_t = float>
-    class cyclic_2d : cyclic_common<2, real_t>
+    class cyclic_2d : public cyclic_common<2, real_t>
     {
       using parent_t = cyclic_common<2, real_t>;
       using arr_2d_t = typename parent_t::arr_t;

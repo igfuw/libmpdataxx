@@ -13,7 +13,7 @@ namespace advoocat
   namespace bcond
   {
     template <typename real_t = float>
-    class cyclic_1d : cyclic_common<1, real_t>
+    class cyclic_1d : public cyclic_common<1, real_t>
     {
       using parent_t = cyclic_common<1, real_t>;
       using arr_1d_t = typename parent_t::arr_t;

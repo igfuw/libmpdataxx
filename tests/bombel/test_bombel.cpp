@@ -43,15 +43,11 @@ using parent_t_ =
 //solvers::pressure_maxgrad<
 solvers::pressure_crk<
   solvers::inhomo_solver<
-    solvers::mpdata_2d<
-      n_iters, 
-      bcond::cyclic_2d<x, real_t>, 
-      bcond::cyclic_2d<z, real_t>,
-      sharedmem_2d<3, real_t>
-    >
+    solvers::mpdata_2d<n_iters, sharedmem_2d<3, real_t>>
   >, u, w, tht
 >;
 
+// TODO: separate file
 class bombel : public parent_t_
 {
   using parent_t = parent_t_; // parent_t is a typedef in parent_t_
@@ -73,11 +69,13 @@ class bombel : public parent_t_
   // ctor
   bombel(
     parent_t::mem_t &mem, 
+    parent_t::bc_p &bcx,
+    parent_t::bc_p &bcy,
     const rng_t &i,
     const rng_t &j,
     const params_t &p
   ) :
-    parent_t(mem, i, j, p),
+    parent_t(mem, bcx, bcy, i, j, p),
     Tht_amb(p.Tht_amb)
   {}
 };
@@ -96,7 +94,11 @@ int main()
   //ambient state (constant thoughout the domain)
   p.Tht_amb = 300;
   //p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
-  concurr::openmp<bombel> solver(nx, ny, p);
+  concurr::openmp<
+    bombel,
+    bcond::cyclic,
+    bcond::cyclic
+  > solver(nx, ny, p);
 
   // initial condition
   {

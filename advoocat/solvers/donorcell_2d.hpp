@@ -13,18 +13,14 @@ namespace advoocat
 {
   namespace solvers
   {
-    template<class bcx_t, class bcy_t, class mem_t, int halo = formulae::donorcell::halo>
+    template<class mem_t, int halo = formulae::donorcell::halo>
     class donorcell_2d : public detail::solver_2d<
-      bcx_t, 
-      bcy_t, 
       mem_t, 
       formulae::donorcell::n_tlev,
       detail::max(halo, formulae::donorcell::halo)
     > 
     {
       using parent_t = detail::solver_2d<
-        bcx_t, 
-        bcy_t, 
         mem_t, 
         formulae::donorcell::n_tlev, 
         detail::max(halo, formulae::donorcell::halo)
@@ -42,8 +38,15 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      donorcell_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) :
-        parent_t(mem, i, j)
+      donorcell_2d(
+        mem_t &mem, 
+        typename parent_t::bc_p &bcx,
+        typename parent_t::bc_p &bcy,
+        const rng_t &i, 
+        const rng_t &j, 
+        const params_t &
+      ) :
+        parent_t(mem, bcx, bcy, i, j)
       {}  
     };
   }; // namespace solvers
