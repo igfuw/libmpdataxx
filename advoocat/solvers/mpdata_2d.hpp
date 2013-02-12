@@ -52,8 +52,10 @@ namespace advoocat
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcx->fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo);
-	    this->bcy->fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
+	    this->bcxl->fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo); // TODO: two xchng calls?
+	    this->bcxr->fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo);
+	    this->bcyl->fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
+	    this->bcyr->fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
 
 	    // choosing input/output for antidiff C
             const arrvec_t<arr_2d_t>
@@ -72,14 +74,16 @@ namespace advoocat
 		this->mem.psi[e][this->mem.n[e]], 
 		this->im, this->j, C_unco
 	      );
-	    this->bcy->fill_halos(C_corr[0], this->i^h);
+	    this->bcyl->fill_halos(C_corr[0], this->i^h); // TODO: one xchng?
+	    this->bcyr->fill_halos(C_corr[0], this->i^h);
 
 	    C_corr[1](this->i, this->jm+h) = 
 	      formulae::mpdata::antidiff<1>(
               this->mem.psi[e][this->mem.n[e]], 
               this->jm, this->i, C_unco
 	    );
-	    this->bcx->fill_halos(C_corr[1], this->j^h);
+	    this->bcxl->fill_halos(C_corr[1], this->j^h); // TODO: one xchng?
+	    this->bcxr->fill_halos(C_corr[1], this->j^h);
 
 	    // donor-cell step 
 	    formulae::donorcell::op_2d(this->mem.psi[e], 
@@ -95,13 +99,15 @@ namespace advoocat
       // ctor
       mpdata_2d(
         mem_t &mem, 
-        typename parent_t::bc_p &bcx, 
-        typename parent_t::bc_p &bcy, 
+        typename parent_t::bc_p &bcxl, 
+        typename parent_t::bc_p &bcxr, 
+        typename parent_t::bc_p &bcyl, 
+        typename parent_t::bc_p &bcyr, 
         const rng_t &i, 
         const rng_t &j,
         const params_t &
       ) : 
-	parent_t(mem, bcx, bcy, i, j), 
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j), 
 	im(i.first() - 1, i.last()),
 	jm(j.first() - 1, j.last())
       {

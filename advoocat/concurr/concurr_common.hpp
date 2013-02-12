@@ -20,7 +20,12 @@ namespace advoocat
   {
     namespace detail
     {
-      template <class solver_t, bcond::bcond_e bcx, bcond::bcond_e bcy, bcond::bcond_e bcz>
+      template <
+        class solver_t, 
+        bcond::bcond_e bcx,
+        bcond::bcond_e bcy,
+        bcond::bcond_e bcz
+      >
       class concurr_common
       {
         // helper method to define subdomain ranges
@@ -54,20 +59,20 @@ namespace advoocat
 	  : mem(s0)
 	{
 	  solver_t::alloc(mem, s0);
+
+          std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr;
+
+          if (bcx == bcond::cyclic)  // TODO: make a function taht does it
+          {
+            bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, s0-1), solver_t::halo));
+            bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, s0-1), solver_t::halo));
+          }
+          else assert(false);
+
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
             const rng_t i(min(s0, i0, n0), max(s0, i0, n0)); 
-
-            std::unique_ptr<bcond::bcond_t<real_t>> bx;
-            switch (bcx) 
-            {
-              case bcond::cyclic:
-                bx.reset(new bcond::cyclic_1d<real_t>(i, solver_t::halo));
-                break;
-              default: assert(false);
-            }
-
-	    algos.push_back(new solver_t(mem, bx, i, params));
+	    algos.push_back(new solver_t(mem, bxl, bxr, i, params));
           }
 	}
 
@@ -80,6 +85,23 @@ namespace advoocat
 	  : mem(s0, s1)
 	{
           solver_t::alloc(mem, s0, s1);
+
+	  std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, byl, byr;
+
+	  if (bcx == bcond::cyclic)  // TODO: make a function taht does it
+	  {
+	    bxl.reset(new bcond::cyclic_left_2d<0, real_t>(rng_t(0, s0-1), solver_t::halo));
+	    bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(rng_t(0, s0-1), solver_t::halo));
+	  } 
+	  else assert(false);
+
+	  if (bcy == bcond::cyclic)  // TODO: make a function taht does it
+	  {
+	    byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, s1-1), solver_t::halo));
+	    byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, s1-1), solver_t::halo));
+	  }
+	  else assert(false);
+
           for (int i0 = 0; i0 < n0; ++i0) 
           {
             for (int i1 = 0; i1 < n1; ++i1) 
@@ -87,24 +109,7 @@ namespace advoocat
               const rng_t 
                 i( min(s0, i0, n0), max(s0, i0, n0) ),
                 j( min(s1, i1, n1), max(s1, i1, n1) );
-
-              std::unique_ptr<bcond::bcond_t<real_t>> bx, by;
-              switch (bcx) 
-              {
-                case bcond::cyclic:
-                  bx.reset(new bcond::cyclic_2d<0, real_t>(i, solver_t::halo));
-                  break;
-                default: assert(false);
-              }
-              switch (bcy) 
-              {
-                case bcond::cyclic:
-                  by.reset(new bcond::cyclic_2d<1, real_t>(j, solver_t::halo));
-                  break;
-                default: assert(false);
-              }
-
-              algos.push_back(new solver_t(mem, bx, by, i, j, params));
+              algos.push_back(new solver_t(mem, bxl, bxr, byl, byr, i, j, params));
             }
           }
 	}
@@ -118,6 +123,30 @@ namespace advoocat
 	  : mem(s0, s1, s2)
 	{
 	  solver_t::alloc(mem, s0, s1, s2);
+
+	  std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, byl, byr, bzl, bzr;
+
+	  if (bcx == bcond::cyclic) // TODO: make a function that does it
+	  {
+	    bxl.reset(new bcond::cyclic_left_3d<0, real_t>(rng_t(0, s0-1), solver_t::halo));
+	    bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(rng_t(0, s0-1), solver_t::halo));
+	  }
+	  else assert(false);
+
+	  if (bcy == bcond::cyclic) // TODO: make a function taht does it
+	  {
+	    byl.reset(new bcond::cyclic_left_3d<1, real_t>(rng_t(0, s1-1), solver_t::halo));
+	    byr.reset(new bcond::cyclic_rght_3d<1, real_t>(rng_t(0, s1-1), solver_t::halo));
+	  }
+	  else assert(false);
+
+	  if (bcz == bcond::cyclic)  // TODO: make a function taht does it
+	  {
+	    bzl.reset(new bcond::cyclic_left_3d<2, real_t>(rng_t(0, s2-1), solver_t::halo));
+	    bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(rng_t(0, s2-1), solver_t::halo));
+	  }
+	  else assert(false);
+
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
 	    for (int i1 = 0; i1 < n1; ++i1) 
@@ -128,31 +157,7 @@ namespace advoocat
                   i( min(s0, i0, n0), max(s0, i0, n0) ),
                   j( min(s1, i1, n1), max(s1, i1, n1) ),
                   k( min(s2, i2, n2), max(s2, i2, n2) );
-
-		std::unique_ptr<bcond::bcond_t<real_t>> bx, by, bz;
-		switch (bcx) 
-		{
-		  case bcond::cyclic:
-		    bx.reset(new bcond::cyclic_3d<0, real_t>(i, solver_t::halo));
-		    break;
-		  default: assert(false);
-		}
-		switch (bcy) 
-		{
-		  case bcond::cyclic:
-		    by.reset(new bcond::cyclic_3d<1, real_t>(j, solver_t::halo));
-		    break;
-		  default: assert(false);
-		}
-		switch (bcz) 
-		{
-		  case bcond::cyclic:
-		    bz.reset(new bcond::cyclic_3d<2, real_t>(k, solver_t::halo));
-		    break;
-		  default: assert(false);
-		}
-
-		algos.push_back(new solver_t( mem, bx, by, bz, i, j, k, params));
+		algos.push_back(new solver_t( mem, bxl, bxr, byl, byr, bzl, bzr, i, j, k, params));
               }
             }
           }

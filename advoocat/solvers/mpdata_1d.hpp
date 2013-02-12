@@ -53,7 +53,8 @@ namespace advoocat
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcx->fill_halos(this->mem.psi[e][this->mem.n[e]]);
+	    this->bcxl->fill_halos(this->mem.psi[e][this->mem.n[e]]); // TODO: one xchng call?
+	    this->bcxr->fill_halos(this->mem.psi[e][this->mem.n[e]]);
 
 	    // choosing input/output for antidiff C
             const arrvec_t<arr_1d_t>
@@ -85,8 +86,14 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      mpdata_1d(mem_t &mem, typename parent_t::bc_p &bcx, const rng_t &i, const params_t &) : 
-	parent_t(mem, bcx, i), 
+      mpdata_1d(
+        mem_t &mem, 
+        typename parent_t::bc_p &bcxl, 
+        typename parent_t::bc_p &bcxr, 
+        const rng_t &i, 
+        const params_t &
+      ) : 
+	parent_t(mem, bcxl, bcxr, i), 
 	im(i.first() - 1, i.last())
       {
 	for (int n = 0; n < n_tmp; ++n)

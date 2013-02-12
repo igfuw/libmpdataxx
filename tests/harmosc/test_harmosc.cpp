@@ -107,11 +107,12 @@ class coupled_harmosc : public inhomo_solver_t
   // ctor
   coupled_harmosc(
     typename parent_t::mem_t &mem, 
-    typename parent_t::bc_p &bcx,
+    typename parent_t::bc_p &bcxl,
+    typename parent_t::bc_p &bcxr,
     const rng_t &i, 
     params_t p
   ) :
-    parent_t(mem, bcx, i, p),
+    parent_t(mem, bcxl, bcxr, i, p),
     omega(p.omega), 
     tmp(mem.tmp[std::string(__FILE__)][0][0]) 
   {}

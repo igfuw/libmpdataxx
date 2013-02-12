@@ -114,13 +114,15 @@ std::cerr<<error<<std::endl;
       // ctor
       pressure_maxgrad(
 	mem_t &mem,
-        typename parent_t::bc_p &bcx,
-        typename parent_t::bc_p &bcy,
+        typename parent_t::bc_p &bcxl,
+        typename parent_t::bc_p &bcxr,
+        typename parent_t::bc_p &bcyl,
+        typename parent_t::bc_p &bcyr,
 	const rng_t &i,
 	const rng_t &j,
 	const params_t &p
       ) :
-	parent_t(mem, bcx, bcy, i, j, p),
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
         // (i, j)
         lap_err(mem.tmp[std::string(__FILE__)][0][0]),
         // (i^hlo, j^hlo))

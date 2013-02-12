@@ -37,7 +37,7 @@ int main()
       solvers::mpdata_1d<n_iters, mem_t>,
       bcond::cyclic
     > slv(nx);
-    slv.advance(100);
+    slv.advance(1000);
   }
 
   // Boost.Thread
@@ -47,6 +47,6 @@ int main()
       solvers::mpdata_1d<n_iters, mem_t>,
       bcond::cyclic
     > slv(nx);
-    slv.advance(100);
+    slv.advance(1000);
   }
 }

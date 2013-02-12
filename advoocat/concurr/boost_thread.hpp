@@ -14,6 +14,8 @@
 #endif
 #include <boost/thread.hpp>
 
+#include <cstdlib> // std::getenv()
+
 namespace advoocat
 {
   namespace concurr
@@ -32,7 +34,10 @@ namespace advoocat
 
       int size() 
       {
-        return boost::thread::hardware_concurrency();
+        const char *env_var("OMP_NUM_THREADS");
+        return (std::getenv(env_var) != NULL)
+          ? std::atoi(std::getenv(env_var)) // TODO: check if convesion OK?
+          : boost::thread::hardware_concurrency();
       }
 
       void init()
@@ -53,7 +58,6 @@ namespace advoocat
         for (int i = 0; i < this->algos.size(); ++i) 
         {  
           threads.add_thread(new boost::thread(
-            //boost::ref(boost::bind(&solver_t::solve, this->algos[i], nt))
             &solver_t::solve, boost::ref(this->algos[i]), nt
           ));
         }

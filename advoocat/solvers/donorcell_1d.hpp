@@ -38,8 +38,14 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      donorcell_1d(mem_t &mem, typename parent_t::bc_p &bcx, const rng_t &i, const params_t &) :
-        parent_t(mem, bcx, i)
+      donorcell_1d(
+        mem_t &mem, 
+        typename parent_t::bc_p &bcxl, 
+        typename parent_t::bc_p &bcxr, 
+        const rng_t &i, 
+        const params_t &
+      ) :
+        parent_t(mem, bcxl, bcxr, i)
       { }  
     };
   }; // namespace solvers

@@ -69,13 +69,15 @@ class bombel : public parent_t_
   // ctor
   bombel(
     parent_t::mem_t &mem, 
-    parent_t::bc_p &bcx,
-    parent_t::bc_p &bcy,
+    parent_t::bc_p &bcxl,
+    parent_t::bc_p &bcxr,
+    parent_t::bc_p &bcyl,
+    parent_t::bc_p &bcyr,
     const rng_t &i,
     const rng_t &j,
     const params_t &p
   ) :
-    parent_t(mem, bcx, bcy, i, j, p),
+    parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
     Tht_amb(p.Tht_amb)
   {}
 };

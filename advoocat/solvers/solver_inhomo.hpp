@@ -42,37 +42,43 @@ namespace advoocat
       // 1D
       inhomo_solver(
 	typename parent_t::mem_t &mem, 
-	typename parent_t::bc_p &bcx, 
+	typename parent_t::bc_p &bcxl, 
+	typename parent_t::bc_p &bcxr, 
 	const rng_t &i, 
 	const params_t &p
       ) :
-	parent_t(mem, bcx, i, p), dt(p.dt)
+	parent_t(mem, bcxl, bcxr, i, p), dt(p.dt)
       {}
 
       // 2D
       inhomo_solver(
 	typename parent_t::mem_t &mem, 
-	typename parent_t::bc_p &bcx, 
-	typename parent_t::bc_p &bcy, 
+	typename parent_t::bc_p &bcxl, 
+	typename parent_t::bc_p &bcxr, 
+	typename parent_t::bc_p &bcyl, 
+	typename parent_t::bc_p &bcyr, 
 	const rng_t &i, 
 	const rng_t &j, 
 	const params_t &p
       ) :
-	parent_t(mem, bcx, bcy, i, j, p), dt(p.dt)
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p), dt(p.dt)
       {}
 
       // 3D
       inhomo_solver(
 	typename parent_t::mem_t &mem, 
-	typename parent_t::bc_p &bcx, 
-	typename parent_t::bc_p &bcy, 
-	typename parent_t::bc_p &bcz, 
+	typename parent_t::bc_p &bcxl, 
+	typename parent_t::bc_p &bcxr, 
+	typename parent_t::bc_p &bcyl, 
+	typename parent_t::bc_p &bcyr, 
+	typename parent_t::bc_p &bczl, 
+	typename parent_t::bc_p &bczr, 
 	const rng_t &i, 
 	const rng_t &j, 
 	const rng_t &k, 
 	const params_t &p
       ) :
-	parent_t(mem, bcx, bcy, bcz, i, j, k, p), dt(p.dt)
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, bczl, bczr, i, j, k, p), dt(p.dt)
       {}
 
       void solve(int nt)

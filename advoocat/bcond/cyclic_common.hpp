@@ -13,28 +13,39 @@ namespace advoocat
 {
   namespace bcond
   {
-    template <int n_dims, typename real_t = float>
-    class cyclic_common : public bcond_t<real_t>
+    template <typename real_t>
+    class cyclic_left_common : public bcond_t<real_t>
     {
-      public:
-
-      typedef blitz::Array<real_t, n_dims> arr_t;
-
       protected:
 
       // member fields
-      rng_t left_halo, rght_halo;
-      rng_t left_edge, rght_edge;
+      rng_t left_halo, rght_edge;
 
       public:
 
       // ctor
-      cyclic_common(const rng_t &i, int halo) :
+      cyclic_left_common(const rng_t &i, int halo) :
 	left_halo(i.first() - halo    , i.first() - 1       ),
-	rght_edge(i.last()  - halo + 1, i.last()            ),
+	rght_edge(i.last()  - halo + 1, i.last()            )
+      {} 
+    };
+
+    template <typename real_t>
+    class cyclic_rght_common : public bcond_t<real_t>
+    {
+      protected:
+
+      // member fields
+      rng_t left_edge, rght_halo;
+
+      public:
+
+      // ctor
+      cyclic_rght_common(const rng_t &i, int halo) :
 	rght_halo(i.last()  + 1       , i.last()  + halo    ),
 	left_edge(i.first()           , i.first() + halo - 1)
       {} 
     };
+
   }; // namespace bcond
 }; // namespace advoocat
