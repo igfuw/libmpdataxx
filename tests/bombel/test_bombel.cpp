@@ -7,13 +7,12 @@
  * @brief a bombel 
  */
 
-
 // advection (<> should be used instead of "" in normal usage) 
 #include "advoocat/solvers/mpdata_2d.hpp"
 #include "advoocat/solvers/solver_inhomo.hpp"
-#include "advoocat/solvers/solver_pressure_maxgrad.hpp"
-#include "advoocat/solvers/solver_pressure_crk.hpp"
-#include "advoocat/solvers/solver_pressure_crk2.hpp"
+#include "advoocat/solvers/solver_pressure_mr.hpp"
+#include "advoocat/solvers/solver_pressure_cr.hpp"
+#include "advoocat/solvers/solver_pressure_pc.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
 #include "advoocat/concurr/openmp.hpp"
 //gradient
@@ -40,8 +39,9 @@ const int n_iters = 2;
 using namespace advoocat;
 
 using parent_t_ = 
-//solvers::pressure_maxgrad<
-solvers::pressure_crk<
+//solvers::pressure_mr<
+//solvers::pressure_cr<
+solvers::pressure_pc<
   solvers::inhomo_solver<
     solvers::mpdata_2d<
       n_iters, 
@@ -84,7 +84,7 @@ class bombel : public parent_t_
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 41, n_out=1;
+  const int nx = 100, ny = 100, nt = 40, n_out=1;
 //  const int nx = 50, ny = 50, nt = 41, n_out=10;
 
   rng_t i(0, nx-1);

@@ -4,7 +4,6 @@ project(advoocat CXX C)
 # library
 set(CMAKE_CXX_FLAGS "-std=c++0x -Wfatal-errors")
 add_subdirectory(advoocat) 
-
 #TODO: search for Blitz
 
 # blitz Debug mode

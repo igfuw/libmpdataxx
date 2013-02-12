@@ -29,7 +29,7 @@ namespace advoocat
 	// member fields
 	rng_t im, jm;
 	real_t dx = 1, dz = 1;  //TODO don't assume dx=dz=1
-        int iters;
+        int iters = 0;
 
 	void ini_courant()
 	{
