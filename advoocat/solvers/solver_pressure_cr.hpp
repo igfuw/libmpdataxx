@@ -6,7 +6,7 @@
   */
 
 #pragma once
-#include "solver_pressure_common.hpp"
+#include "detail/solver_pressure_common.hpp"
 #include "../formulae/nabla_formulae.hpp" //gradient, diveregnce
 
 namespace advoocat
@@ -135,11 +135,15 @@ std::cerr<<"error "<<error<<std::endl;
       // ctor
       pressure_cr(
 	mem_t &mem,
+        typename parent_t::bc_p &bcxl,
+        typename parent_t::bc_p &bcxr,
+        typename parent_t::bc_p &bcyl,
+        typename parent_t::bc_p &bcyr,
 	const rng_t &i,
 	const rng_t &j,
 	const params_t &p
       ) :
-	parent_t(mem, i, j, p),
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
         // (i, j)
         lap_err(mem.tmp[std::string(__FILE__)][0][0]),
         lap_p_err(mem.tmp[std::string(__FILE__)][0][1]),
@@ -161,7 +165,7 @@ std::cerr<<"error "<<error<<std::endl;
 
         const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
-        const int hlo = 1; // TODO!!!
+        const int halo = parent_t::halo; 
 
         // temporary fields
         mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
@@ -169,7 +173,7 @@ std::cerr<<"error "<<error<<std::endl;
           for (int n=0; n < 2; ++n) 
             mem.tmp[file].back().push_back(new arr_2d_t(i, j)); 
           for (int n=0; n < 9; ++n) 
-            mem.tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo)); 
+            mem.tmp[file].back().push_back(new arr_2d_t(i^halo, j^halo)); 
         }
       }
     }; 

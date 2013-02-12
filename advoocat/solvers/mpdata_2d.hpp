@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "../formulae/mpdata_formulae.hpp"
+#include "../formulae/mpdata/formulae_mpdata_2d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
-#include "solver_2d.hpp"
+#include "detail/solver_2d.hpp"
 
 namespace advoocat
 {
@@ -16,18 +16,26 @@ namespace advoocat
   {
     using namespace arakawa_c;
 
-    template<int n_iters, class bcx_t, class bcy_t, class mem_t>
-    class mpdata_2d : public detail::solver_2d<bcx_t, bcy_t, mem_t, /* n_tlev = */ 2>
+    template<int n_iters, class mem_t, int halo = formulae::mpdata::halo>
+    class mpdata_2d : public detail::solver_2d<
+      mem_t, 
+      formulae::mpdata::n_tlev,
+      detail::max(halo, formulae::mpdata::halo)
+    >
     {
       static_assert(n_iters > 0, "n_iters <= 0");
 
-      using parent_t = detail::solver_2d<bcx_t, bcy_t, mem_t, 2>;
+      using parent_t = detail::solver_2d<
+        mem_t, 
+        formulae::mpdata::n_tlev, 
+        detail::max(halo, formulae::mpdata::halo)
+      >;
       using arr_2d_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
 
       // member fields
-      arrvec_t<arr_2d_t> *tmp[2];
+      arrvec_t<arr_2d_t> *tmp[n_tmp];
       rng_t im, jm;
 
       protected:
@@ -44,8 +52,10 @@ namespace advoocat
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcx.fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^this->halo);
-	    this->bcy.fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^this->halo);
+	    this->bcxl->fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo); // TODO: two xchng calls?
+	    this->bcxr->fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo);
+	    this->bcyl->fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
+	    this->bcyr->fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
 
 	    // choosing input/output for antidiff C
             const arrvec_t<arr_2d_t>
@@ -64,14 +74,16 @@ namespace advoocat
 		this->mem.psi[e][this->mem.n[e]], 
 		this->im, this->j, C_unco
 	      );
-	    this->bcy.fill_halos(C_corr[0], this->i^h);
+	    this->bcyl->fill_halos(C_corr[0], this->i^h); // TODO: one xchng?
+	    this->bcyr->fill_halos(C_corr[0], this->i^h);
 
 	    C_corr[1](this->i, this->jm+h) = 
 	      formulae::mpdata::antidiff<1>(
               this->mem.psi[e][this->mem.n[e]], 
               this->jm, this->i, C_unco
 	    );
-	    this->bcx.fill_halos(C_corr[1], this->j^h);
+	    this->bcxl->fill_halos(C_corr[1], this->j^h); // TODO: one xchng?
+	    this->bcxr->fill_halos(C_corr[1], this->j^h);
 
 	    // donor-cell step 
 	    formulae::donorcell::op_2d(this->mem.psi[e], 
@@ -85,9 +97,18 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      mpdata_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) : 
-	parent_t(mem, i, j, 1), 
-	im(i.first() - 1, i.last()),             //TODO get correct version from sylwester
+      mpdata_2d(
+        mem_t &mem, 
+        typename parent_t::bc_p &bcxl, 
+        typename parent_t::bc_p &bcxr, 
+        typename parent_t::bc_p &bcyl, 
+        typename parent_t::bc_p &bcyr, 
+        const rng_t &i, 
+        const rng_t &j,
+        const params_t &
+      ) : 
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j), 
+	im(i.first() - 1, i.last()),
 	jm(j.first() - 1, j.last())
       {
 	for (int n = 0; n < n_tmp; ++n)
@@ -101,7 +122,6 @@ namespace advoocat
 
         const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
-        const int halo = 1;  //TODO get correct version from sylwester
 
         for (int n = 0; n < n_tmp; ++n)
         {

@@ -33,14 +33,20 @@ int main()
   // OpenMP
   std::cerr << "OpenMP run" << std::endl;
   {
-    concurr::openmp<solvers::mpdata_1d<n_iters, bcond::cyclic_1d<real_t>, mem_t>> slv(nx);
-    slv.advance(100);
+    concurr::openmp<
+      solvers::mpdata_1d<n_iters, mem_t>,
+      bcond::cyclic
+    > slv(nx);
+    slv.advance(1000);
   }
 
   // Boost.Thread
   std::cerr << "Boost.Thread run" << std::endl;
   {
-    concurr::boost_thread<solvers::mpdata_1d<n_iters, bcond::cyclic_1d<real_t>, mem_t>> slv(nx);
-    slv.advance(100);
+    concurr::boost_thread<
+      solvers::mpdata_1d<n_iters, mem_t>,
+      bcond::cyclic
+    > slv(nx);
+    slv.advance(1000);
   }
 }

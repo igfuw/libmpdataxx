@@ -6,16 +6,26 @@
 
 #pragma once
 
-#include "solver_1d.hpp"
+#include "detail/solver_1d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
 
 namespace advoocat
 {
   namespace solvers
   {
-    template<class bcx_t, class mem_t>
-    class donorcell_1d : public detail::solver_1d<bcx_t, mem_t, /* n_tlev = */ 2> 
+    template<class mem_t, int halo = formulae::donorcell::halo>
+    class donorcell_1d : public detail::solver_1d<
+      mem_t, 
+      formulae::donorcell::n_tlev, 
+      detail::max(halo, formulae::donorcell::halo)
+    > 
     {
+      using parent_t = detail::solver_1d<
+        mem_t, 
+        formulae::donorcell::n_tlev, 
+        detail::max(halo, formulae::donorcell::halo)
+      >;
+   
       void advop(int e)
       {
         formulae::donorcell::op_1d(
@@ -28,8 +38,14 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      donorcell_1d(mem_t &mem, const rng_t &i, const params_t &) :
-        detail::solver_1d<bcx_t, mem_t, 2>(mem, i, /* halo = */ 1)
+      donorcell_1d(
+        mem_t &mem, 
+        typename parent_t::bc_p &bcxl, 
+        typename parent_t::bc_p &bcxr, 
+        const rng_t &i, 
+        const params_t &
+      ) :
+        parent_t(mem, bcxl, bcxr, i)
       { }  
     };
   }; // namespace solvers

@@ -16,10 +16,15 @@ namespace advoocat
 {
   namespace concurr
   {
-    template <class solver_t>
-    class openmp : public detail::concurr_common<solver_t>
+    template <
+      class solver_t,
+      bcond::bcond_e bcx,
+      bcond::bcond_e bcy = bcond::null,
+      bcond::bcond_e bcz = bcond::null
+    >
+    class openmp : public detail::concurr_common<solver_t, bcx, bcy, bcz>
     {
-      using parent_t = detail::concurr_common<solver_t>;
+      using parent_t = detail::concurr_common<solver_t, bcx, bcy, bcz>;
  
       int size() 
       {

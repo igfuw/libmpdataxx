@@ -12,7 +12,7 @@
 // (<> should be used instead of "" in normal usage)
 #include "advoocat/solvers/mpdata_1d.hpp"
 #include "advoocat/solvers/donorcell_1d.hpp"
-#include "advoocat/bcond/cyclic_1d.hpp"
+#include "advoocat/bcond/bcond.hpp"
 #include "advoocat/concurr/openmp.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
@@ -52,10 +52,8 @@ int main()
 
   {
     concurr::openmp<
-      solvers::mpdata_1d<4, bcond::cyclic_1d<>, mem_t>
-      // ...
-      // ...
-      // ...
+      solvers::mpdata_1d<4, mem_t>,
+      bcond::cyclic
     > slv(n);
 
     setup(slv, n);

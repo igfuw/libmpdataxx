@@ -12,25 +12,45 @@ namespace advoocat
 {
   namespace bcond
   {
-    template <typename real_t = float>
-    class cyclic_1d : cyclic_common<1, real_t>
+    template <typename real_t>
+    class cyclic_left_1d : public cyclic_left_common<real_t>
     {
-      using parent_t = cyclic_common<1, real_t>;
-      using arr_1d_t = typename parent_t::arr_t;
+      using parent_t = cyclic_left_common<real_t>;
+      using arr_t = blitz::Array<real_t, 1>;
 
       public:
 
       // ctor
-      cyclic_1d(const rng_t &i, int halo) :
+      cyclic_left_1d(const rng_t &i, int halo) : // TODO: inherit ctor
 	parent_t(i, halo)
       {}
 
       // method invoked by the solver
-      void fill_halos(const arr_1d_t &a)
+      void fill_halos(const arr_t &a)
       {
 	a(this->left_halo) = a(this->rght_edge);     
+      }
+    };
+
+    template <typename real_t>
+    class cyclic_rght_1d : public cyclic_rght_common<real_t>
+    {
+      using parent_t = cyclic_rght_common<real_t>;
+      using arr_t = blitz::Array<real_t, 1>;
+
+      public:
+
+      // ctor
+      cyclic_rght_1d(const rng_t &i, int halo) : // TODO: inherit ctor
+	parent_t(i, halo)
+      {}
+
+      // method invoked by the solver
+      void fill_halos(const arr_t &a)
+      {
 	a(this->rght_halo) = a(this->left_edge);     
       }
     };
+
   }; // namespace bcond
 }; // namespace advoocat

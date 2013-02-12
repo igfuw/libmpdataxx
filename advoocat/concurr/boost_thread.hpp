@@ -8,25 +8,36 @@
 
 #include "concurr_common.hpp"
 
+// TODO: make it work with clang as well!
 #if !defined(_REENTRANT)
 #  error _REENTRANT not defined, pleas use something like -pthread flag for gcc
 #endif
 #include <boost/thread.hpp>
 
+#include <cstdlib> // std::getenv()
+
 namespace advoocat
 {
   namespace concurr
   {
-    template <class solver_t>
-    class boost_thread : public detail::concurr_common<solver_t>
+    template <
+      class solver_t,
+      bcond::bcond_e bcx,
+      bcond::bcond_e bcy = bcond::null,
+      bcond::bcond_e bcz = bcond::null
+    >
+    class boost_thread : public detail::concurr_common<solver_t, bcx, bcy, bcz>
     {
-      using parent_t = detail::concurr_common<solver_t>;
+      using parent_t = detail::concurr_common<solver_t, bcx, bcy, bcz>;
  
       std::unique_ptr<boost::barrier> b;
 
       int size() 
       {
-        return boost::thread::hardware_concurrency();
+        const char *env_var("OMP_NUM_THREADS");
+        return (std::getenv(env_var) != NULL)
+          ? std::atoi(std::getenv(env_var)) // TODO: check if convesion OK?
+          : boost::thread::hardware_concurrency();
       }
 
       void init()
@@ -43,10 +54,13 @@ namespace advoocat
 
       void advance(int nt)
       {
-        boost::thread_group threads; // member field?
-        for (int i = 0; i < this->algos.size(); ++i) threads.add_thread(new boost::thread(
-          &solver_t::solve, this->algos[i], nt 
-        ));
+        boost::thread_group threads; // TODO: member field?
+        for (int i = 0; i < this->algos.size(); ++i) 
+        {  
+          threads.add_thread(new boost::thread(
+            &solver_t::solve, boost::ref(this->algos[i]), nt
+          ));
+        }
         threads.join_all();
       }
 

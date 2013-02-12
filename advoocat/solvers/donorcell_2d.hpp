@@ -6,17 +6,25 @@
 
 #pragma once
 
-#include "solver_2d.hpp"
+#include "detail/solver_2d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
 
 namespace advoocat
 {
   namespace solvers
   {
-    template<class bcx_t, class bcy_t, class mem_t>
-    class donorcell_2d : public detail::solver_2d<bcx_t, bcy_t, mem_t, /* n_tlev = */ 2> 
+    template<class mem_t, int halo = formulae::donorcell::halo>
+    class donorcell_2d : public detail::solver_2d<
+      mem_t, 
+      formulae::donorcell::n_tlev,
+      detail::max(halo, formulae::donorcell::halo)
+    > 
     {
-      using parent_t = detail::solver_2d<bcx_t, bcy_t, mem_t, 2>;
+      using parent_t = detail::solver_2d<
+        mem_t, 
+        formulae::donorcell::n_tlev, 
+        detail::max(halo, formulae::donorcell::halo)
+      >;
 
       void advop(int e)
       {
@@ -30,8 +38,17 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      donorcell_2d(mem_t &mem, const rng_t &i, const rng_t &j, const params_t &) :
-        parent_t(mem, i, j, /* halo = */ 1)
+      donorcell_2d(
+        mem_t &mem, 
+        typename parent_t::bc_p &bcxl,
+        typename parent_t::bc_p &bcxr,
+        typename parent_t::bc_p &bcyl,
+        typename parent_t::bc_p &bcyr,
+        const rng_t &i, 
+        const rng_t &j, 
+        const params_t &
+      ) :
+        parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j)
       {}  
     };
   }; // namespace solvers

@@ -71,6 +71,7 @@ enum {psi, phi};
 using real_t = double;
 using namespace advoocat;
 
+// TODO: move into a separate file
 template <class inhomo_solver_t>
 class coupled_harmosc : public inhomo_solver_t
 {
@@ -104,21 +105,27 @@ class coupled_harmosc : public inhomo_solver_t
   struct params_t : parent_t::params_t { real_t omega; };
 
   // ctor
-  coupled_harmosc(typename parent_t::mem_t &mem, const rng_t &i, params_t p) :
-    parent_t(mem, i, p),
+  coupled_harmosc(
+    typename parent_t::mem_t &mem, 
+    typename parent_t::bc_p &bcxl,
+    typename parent_t::bc_p &bcxr,
+    const rng_t &i, 
+    params_t p
+  ) :
+    parent_t(mem, bcxl, bcxr, i, p),
     omega(p.omega), 
     tmp(mem.tmp[std::string(__FILE__)][0][0]) 
-  {
-  }
+  {}
 
-  static void alloctmp(
-    std::unordered_map<std::string, boost::ptr_vector<arrvec_t<arr_1d_t>>> &tmp, 
+  static void alloc(
+    typename parent_t::mem_t &mem,
     const int nx
   )
   {
-    parent_t::alloctmp(tmp, nx);
-    tmp[std::string(__FILE__)].push_back(new arrvec_t<arr_1d_t>()); 
-    tmp[std::string(__FILE__)].back().push_back(new arr_1d_t( rng_t(0, nx-1) )); 
+    parent_t::alloc(mem, nx);
+    const std::string file(__FILE__);
+    mem.tmp[file].push_back(new arrvec_t<arr_1d_t>()); 
+    mem.tmp[file].back().push_back(new arr_1d_t( rng_t(0, nx-1) )); 
   }
 };
 
@@ -132,19 +139,14 @@ int main()
 
   using solver_t = coupled_harmosc<
     solvers::inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
-      solvers::donorcell_1d<
-//      solvers::mpdata_1d<
-//        n_iters, 
-        bcond::cyclic_1d<real_t>, 
-        sharedmem_1d<n_eqs, real_t>
-      >
+      solvers::donorcell_1d<sharedmem_1d<n_eqs, real_t>>
     >
   >;
 
   solver_t::params_t p;
   p.dt = dt;
   p.omega = omega;
-  concurr::openmp<solver_t> slv(nx, p);
+  concurr::openmp<solver_t, bcond::cyclic> slv(nx, p);
 
   Gnuplot gp;
   gp << "set term svg size 1000,500 dynamic enhanced\n" 

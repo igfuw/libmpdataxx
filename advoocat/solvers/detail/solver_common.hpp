@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../storage/sharedmem.hpp"
+#include "../../storage/sharedmem.hpp"
 
 namespace advoocat
 {
@@ -14,15 +14,20 @@ namespace advoocat
   {
     namespace detail
     {
-      template <class sharedmem, int n_tlev>
+      constexpr int max(const int a, const int b)
+      {
+        return a > b ? a : b;
+      }
+
+      template <class sharedmem, int n_tlev, int halo_>
       class solver_common
       {
 	public:
 
 	typedef sharedmem mem_t;
+        enum { halo = halo_ }; // "static const int" would need instantiation
 
 	protected: 
-
 	mem_t &mem;
 
 	// helper methods invoked by solve()
@@ -51,7 +56,7 @@ namespace advoocat
       
 	// ctor
 	solver_common(mem_t &mem) :
-	  mem(mem) 
+	  mem(mem)
 	{ }
 
 	void solve(const int nt) 

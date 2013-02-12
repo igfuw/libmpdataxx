@@ -6,10 +6,12 @@
 
 #pragma once
 
-#include "../formulae/mpdata_formulae.hpp"
+#include "../formulae/mpdata/formulae_mpdata_1d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
-#include "solver_1d.hpp"
+#include "detail/solver_1d.hpp"
 #include <unordered_map>
+
+// TODO: an mpdata_common class?
 
 namespace advoocat
 {
@@ -17,18 +19,26 @@ namespace advoocat
   {
     using namespace advoocat::arakawa_c;
 
-    template<int n_iters, class bcx_t, class mem_t>
-    class mpdata_1d : public detail::solver_1d<bcx_t, mem_t, /* n_tlev = */ 2>
+    template<int n_iters, class mem_t, int halo = formulae::mpdata::halo>
+    class mpdata_1d : public detail::solver_1d<
+      mem_t, 
+      formulae::mpdata::n_tlev,
+      detail::max(halo, formulae::mpdata::halo)
+    >
     {
       static_assert(n_iters > 0, "n_iters <= 0");
 
-      using parent_t = detail::solver_1d<bcx_t, mem_t, 2>;
-      using arr_1d_t = typename mem_t::arr_t;
+      using parent_t = detail::solver_1d< 
+        mem_t, 
+        formulae::mpdata::n_tlev,
+        detail::max(halo, formulae::mpdata::halo)
+      >;
+      using arr_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
 
       // member fields
-      arrvec_t<arr_1d_t> *tmp[2];
+      arrvec_t<arr_t> *tmp[n_tmp];
       rng_t im;
 
       protected:
@@ -43,10 +53,11 @@ namespace advoocat
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcx.fill_halos(this->mem.psi[e][this->mem.n[e]]);
+	    this->bcxl->fill_halos(this->mem.psi[e][this->mem.n[e]]); // TODO: one xchng call?
+	    this->bcxr->fill_halos(this->mem.psi[e][this->mem.n[e]]);
 
 	    // choosing input/output for antidiff C
-            const arrvec_t<arr_1d_t>
+            const arrvec_t<arr_t>
 	      &C_unco = (step == 1) 
 		? this->mem.C 
 		: (step % 2) 
@@ -75,8 +86,14 @@ namespace advoocat
       struct params_t {};
 
       // ctor
-      mpdata_1d(mem_t &mem, const rng_t &i, const params_t &) : 
-	parent_t(mem, i, /* halo = */1), 
+      mpdata_1d(
+        mem_t &mem, 
+        typename parent_t::bc_p &bcxl, 
+        typename parent_t::bc_p &bcxr, 
+        const rng_t &i, 
+        const params_t &
+      ) : 
+	parent_t(mem, bcxl, bcxr, i), 
 	im(i.first() - 1, i.last())
       {
 	for (int n = 0; n < n_tmp; ++n)
@@ -92,8 +109,8 @@ namespace advoocat
 
 	for (int n = 0; n < n_tmp; ++n)
         {
-	  mem.tmp[file].push_back(new arrvec_t<arr_1d_t>()); 
-	  mem.tmp[file].back().push_back(new arr_1d_t( rng_t(0, nx-1)^h )); 
+	  mem.tmp[file].push_back(new arrvec_t<arr_t>()); 
+	  mem.tmp[file].back().push_back(new arr_t( rng_t(0, nx-1)^h )); 
         }
       }
     };

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "solver_3d.hpp"
+#include "detail/solver_3d.hpp"
 #include "../formulae/donorcell_formulae.hpp"
 
 namespace advoocat
@@ -14,14 +14,20 @@ namespace advoocat
   namespace solvers
   {
     template<
-      class bcx_t, 
-      class bcy_t, 
-      class bcz_t, 
-      class mem_t
+      class mem_t,
+      int halo = formulae::donorcell::halo
     > 
-    class donorcell_3d : public detail::solver_3d<bcx_t, bcy_t, bcz_t, mem_t, /* n_tlev = */ 2> 
+    class donorcell_3d : public detail::solver_3d<
+      mem_t, 
+      formulae::donorcell::n_tlev, 
+      detail::max(halo, formulae::donorcell::halo)
+    >
     {
-      using parent_t = detail::solver_3d<bcx_t, bcy_t, bcz_t, mem_t, /* n_tlev = */ 2>;
+      using parent_t = detail::solver_3d<
+        mem_t, 
+        formulae::donorcell::n_tlev, 
+        detail::max(halo, formulae::donorcell::halo)
+      >;
 
       void advop(int e)
       {
@@ -37,12 +43,18 @@ namespace advoocat
       // ctor
       donorcell_3d(
 	mem_t &mem, 
+        typename parent_t::bc_p &bcxl,
+        typename parent_t::bc_p &bcxr,
+        typename parent_t::bc_p &bcyl,
+        typename parent_t::bc_p &bcyr,
+        typename parent_t::bc_p &bczl,
+        typename parent_t::bc_p &bczr,
 	const rng_t &i, 
 	const rng_t &j, 
 	const rng_t &k, 
 	const params_t &
       ) :
-	parent_t(mem, i, j, k, /* halo = */ 1)
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, bczl, bczr, i, j, k)
       {}  
     }; // class donorcell_3d
   }; // namespace solvers

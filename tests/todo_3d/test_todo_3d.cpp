@@ -20,30 +20,11 @@ int main()
   int n[] = {24, 24, 24};
   {
     concurr::openmp<
-      advoocat::solvers::donorcell_3d<
-        bcond::cyclic_3d<x>, 
-        bcond::cyclic_3d<y>,
-        bcond::cyclic_3d<z>,
-        sharedmem_3d<>
-      >
+      advoocat::solvers::donorcell_3d<sharedmem_3d<>>,
+      bcond::cyclic,
+      bcond::cyclic,
+      bcond::cyclic
     > slv(n[x], n[y], n[z]);
   } 
-/*
-  {
-    solvers::mpdata_3d<
-      2,
-      cyclic_3d<x>, 
-      cyclic_3d<y>,
-      cyclic_3d<z>
-    > solver(n[x], n[y], n[z]);
-  } 
-  {
-    solvers::mpdata_3d<
-      44,
-      cyclic_3d<x>, 
-      cyclic_3d<y>,
-      cyclic_3d<z>
-    > solver(n[x], n[y], n[z]);
-  } 
-*/
+  // TODO: test mpdata
 }

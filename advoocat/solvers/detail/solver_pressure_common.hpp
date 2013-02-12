@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../formulae/courant_formulae.hpp"
+#include "../../formulae/courant_formulae.hpp"
 
 namespace advoocat
 {
@@ -100,11 +100,15 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	// ctor
 	pressure_solver_common(
 	  mem_t &mem,
+          typename parent_t::bc_p &bcxl,
+          typename parent_t::bc_p &bcxr,
+          typename parent_t::bc_p &bcyl,
+          typename parent_t::bc_p &bcyr,
 	  const rng_t &i, 
 	  const rng_t &j, 
 	  const params_t &p
 	) : 
-	  parent_t(mem, i, j, p),
+	  parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
 	  im(i.first() - 1, i.last()),
 	  jm(j.first() - 1, j.last())
 	{} 
