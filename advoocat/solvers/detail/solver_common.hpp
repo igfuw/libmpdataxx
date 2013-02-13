@@ -31,7 +31,7 @@ namespace advoocat
         enum { n_eqs = n_eqs_ };
 
         typedef real_t_ real_t;
-        typedef blitz::Array<real_t, n_dims> arr_t;
+        typedef blitz::Array<real_t_, n_dims_> arr_t;
 
 	protected: 
 

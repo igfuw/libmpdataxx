@@ -60,7 +60,6 @@ namespace advoocat
 
 	public:
 
-	// empty by default
 	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny) 
         {
           const rng_t i(0, nx-1), j(0, ny-1);

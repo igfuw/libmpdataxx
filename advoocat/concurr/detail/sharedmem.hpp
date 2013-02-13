@@ -104,7 +104,7 @@ namespace advoocat
       };
 
       template<typename real_t, int n_eqs>
-      class sharedmem<real_t, 3, n_eqs> : public sharedmem_common<real_t, 2, n_eqs>
+      class sharedmem<real_t, 3, n_eqs> : public sharedmem_common<real_t, 3, n_eqs>
       {
 	public:
 
