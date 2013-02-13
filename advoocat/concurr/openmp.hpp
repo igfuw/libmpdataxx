@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "concurr_common.hpp"
+#include "detail/concurr_common.hpp"
 
 #ifdef _OPENMP
 # include <omp.h>
@@ -41,6 +41,11 @@ namespace advoocat
         {
 #pragma omp barrier
         }
+
+        // TODO: inherit ctors
+        mem_t(int s0) : parent_t::mem_t(s0) {};
+        mem_t(int s0, int s1) : parent_t::mem_t(s0, s1) {};
+        mem_t(int s0, int s1, int s2) : parent_t::mem_t(s0, s1, s2) {};
       };
 
       public:
@@ -62,7 +67,7 @@ namespace advoocat
 	const int s0,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
-        parent_t(s0, params, size())
+        parent_t(s0, params, new mem_t(s0), size())
       {}
 
       // 2D ctor
@@ -71,7 +76,7 @@ namespace advoocat
 	const int s1,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
-	parent_t(s0, s1, params, size(), 1)
+	parent_t(s0, s1, params, new mem_t(s0, s1), size(), 1)
       {}
 
       // 3D ctor
@@ -81,7 +86,7 @@ namespace advoocat
 	const int s2,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) :
-	parent_t(s0, s1, s2, params, size(), 1, 1)
+	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2), size(), 1, 1)
       {}
     };
   }; // namespace concurr

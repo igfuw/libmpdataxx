@@ -18,25 +18,24 @@ namespace advoocat
     {
       using namespace advoocat::arakawa_c;
 
-      template<class mem_t, int n_tlev, int halo>
-      class solver_2d : public solver_common<mem_t, n_tlev, halo>
+      template<typename real_t, int n_dims, int n_eqs, int n_tlev, int halo>
+      class solver_2d : public solver_common<real_t, n_dims, n_eqs, n_tlev, halo>
       {
-	using parent_t = solver_common<mem_t, n_tlev, halo>;
-	using arr_2d_t = typename mem_t::arr_t;
+	using parent_t = solver_common<real_t, n_dims, n_eqs, n_tlev, halo>;
 
 	protected:
       
-        typedef std::unique_ptr<bcond::bcond_t<typename mem_t::real_t>> bc_p; // TODO: move to parent
+        typedef std::unique_ptr<bcond::bcond_t<real_t>> bc_p; // TODO: move to parent
 	bc_p bcxl, bcxr, bcyl, bcyr;
 
 	rng_t i, j;
 
 	void xchng(int e, int lev = 0) // for previous time levels
 	{
-          this->xchng(this->mem.psi[e][ this->mem.n[e] - lev], i^halo, j^halo);
+          this->xchng(this->mem->psi[e][ this->mem->n[e] - lev], i^halo, j^halo);
 	}
 
-	void xchng(arr_2d_t psi, rng_t range_i, rng_t range_j) // for a given array
+	void xchng(typename parent_t::arr_t psi, rng_t range_i, rng_t range_j) // for a given array
 	{
 	  bcxl->fill_halos(psi, range_j);
 	  bcxr->fill_halos(psi, range_j);
@@ -45,7 +44,11 @@ namespace advoocat
 	}
 
 	// ctor
-	solver_2d(mem_t &mem, bc_p &bcxl, bc_p &bcxr, bc_p &bcyl, bc_p &bcyr, const rng_t &i, const rng_t &j) :
+	solver_2d(
+          typename parent_t::mem_t *mem, 
+          bc_p &bcxl, bc_p &bcxr, bc_p &bcyl, bc_p &bcyr, 
+          const rng_t &i, const rng_t &j
+        ) :
 	  parent_t(mem),
 	  i(i), 
 	  j(j),  
@@ -58,16 +61,16 @@ namespace advoocat
 	public:
 
 	// empty by default
-	static void alloc(mem_t &mem, const int nx, const int ny) 
+	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny) 
         {
           const rng_t i(0, nx-1), j(0, ny-1);
 
-	  for (int e = 0; e < mem_t::n_eqs; ++e) // equations
+	  for (int e = 0; e < n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem.psi[e].push_back(new arr_2d_t(i^halo, j^halo));
+	      mem->psi[e].push_back(new typename parent_t::arr_t(i^halo, j^halo));
 
-	  mem.C.push_back(new arr_2d_t(i^h   , j^halo));
-	  mem.C.push_back(new arr_2d_t(i^halo, j^h   ));
+	  mem->C.push_back(new typename parent_t::arr_t(i^h   , j^halo));
+	  mem->C.push_back(new typename parent_t::arr_t(i^halo, j^h   ));
         }
       };
     }; // namespace detail

@@ -49,23 +49,15 @@
 
 using namespace advoocat;
 
-template <class inhomo_solver_t>
+template <class inhomo_solver_t, int psi, int phi>
 class coupled_harmosc : public inhomo_solver_t
 {
-  public:
- 
-  enum {psi, phi};
-
-  private:
-
   using parent_t = inhomo_solver_t;
-  using real_t = typename inhomo_solver_t::real_t;
-  using arr_1d_t = typename inhomo_solver_t::mem_t::arr_t;
 
-  real_t omega;
-  arr_1d_t tmp;
+  typename parent_t::real_t omega;
+  typename parent_t::arr_t tmp;
 
-  void forcings(real_t dt)
+  void forcings(typename parent_t::real_t dt)
   {
     auto Psi = parent_t::psi(psi);
     auto Phi = parent_t::psi(phi);
@@ -85,11 +77,11 @@ class coupled_harmosc : public inhomo_solver_t
 
   public:
 
-  struct params_t : parent_t::params_t { real_t omega; };
+  struct params_t : parent_t::params_t { typename parent_t::real_t omega; };
 
   // ctor
   coupled_harmosc(
-    typename parent_t::mem_t &mem, 
+    typename parent_t::mem_t *mem, 
     typename parent_t::bc_p &bcxl,
     typename parent_t::bc_p &bcxr,
     const rng_t &i, 
@@ -97,17 +89,17 @@ class coupled_harmosc : public inhomo_solver_t
   ) :
     parent_t(mem, bcxl, bcxr, i, p),
     omega(p.omega), 
-    tmp(mem.tmp[std::string(__FILE__)][0][0]) 
+    tmp(mem->tmp[std::string(__FILE__)][0][0]) 
   {}
 
   static void alloc(
-    typename parent_t::mem_t &mem,
+    typename parent_t::mem_t *mem,
     const int nx
   )
   {
     parent_t::alloc(mem, nx);
     const std::string file(__FILE__);
-    mem.tmp[file].push_back(new arrvec_t<arr_1d_t>()); 
-    mem.tmp[file].back().push_back(new arr_1d_t( rng_t(0, nx-1) )); 
+    mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>()); 
+    mem->tmp[file].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1) )); 
   }
 };

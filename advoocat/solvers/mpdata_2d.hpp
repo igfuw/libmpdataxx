@@ -16,9 +16,11 @@ namespace advoocat
   {
     using namespace arakawa_c;
 
-    template<int n_iters, class mem_t, int halo = formulae::mpdata::halo>
+    template<typename real_t, int n_iters, int n_eqs = 1, int halo = formulae::mpdata::halo>
     class mpdata_2d : public detail::solver_2d<
-      mem_t, 
+      real_t,
+      2,
+      n_eqs,
       formulae::mpdata::n_tlev,
       detail::max(halo, formulae::mpdata::halo)
     >
@@ -26,16 +28,17 @@ namespace advoocat
       static_assert(n_iters > 0, "n_iters <= 0");
 
       using parent_t = detail::solver_2d<
-        mem_t, 
+        real_t,
+        2,
+        n_eqs,
         formulae::mpdata::n_tlev, 
         detail::max(halo, formulae::mpdata::halo)
       >;
-      using arr_2d_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
 
       // member fields
-      arrvec_t<arr_2d_t> *tmp[n_tmp];
+      arrvec_t<typename parent_t::arr_t> *tmp[n_tmp];
       rng_t im, jm;
 
       protected:
@@ -47,20 +50,20 @@ namespace advoocat
 	{
 	  if (step == 0) 
 	    formulae::donorcell::op_2d(
-	      this->mem.psi[e], 
-	      this->mem.n[e], this->mem.C, this->i, this->j);
+	      this->mem->psi[e], 
+	      this->mem->n[e], this->mem->C, this->i, this->j);
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcxl->fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo); // TODO: two xchng calls?
-	    this->bcxr->fill_halos(this->mem.psi[e][this->mem.n[e]], this->j^halo);
-	    this->bcyl->fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
-	    this->bcyr->fill_halos(this->mem.psi[e][this->mem.n[e]], this->i^halo);
+	    this->bcxl->fill_halos(this->mem->psi[e][this->mem->n[e]], this->j^halo); // TODO: two xchng calls?
+	    this->bcxr->fill_halos(this->mem->psi[e][this->mem->n[e]], this->j^halo);
+	    this->bcyl->fill_halos(this->mem->psi[e][this->mem->n[e]], this->i^halo);
+	    this->bcyr->fill_halos(this->mem->psi[e][this->mem->n[e]], this->i^halo);
 
 	    // choosing input/output for antidiff C
-            const arrvec_t<arr_2d_t>
+            const arrvec_t<typename parent_t::arr_t>
 	      &C_unco = (step == 1) 
-		? this->mem.C 
+		? this->mem->C 
 		: (step % 2) 
 		  ? *tmp[1]  // odd steps
 		  : *tmp[0], // even steps
@@ -71,7 +74,7 @@ namespace advoocat
 	    // calculating the antidiffusive C 
 	    C_corr[0](this->im+h, this->j) = 
 	      formulae::mpdata::antidiff<0>(
-		this->mem.psi[e][this->mem.n[e]], 
+		this->mem->psi[e][this->mem->n[e]], 
 		this->im, this->j, C_unco
 	      );
 	    this->bcyl->fill_halos(C_corr[0], this->i^h); // TODO: one xchng?
@@ -79,15 +82,15 @@ namespace advoocat
 
 	    C_corr[1](this->i, this->jm+h) = 
 	      formulae::mpdata::antidiff<1>(
-              this->mem.psi[e][this->mem.n[e]], 
+              this->mem->psi[e][this->mem->n[e]], 
               this->jm, this->i, C_unco
 	    );
 	    this->bcxl->fill_halos(C_corr[1], this->j^h); // TODO: one xchng?
 	    this->bcxr->fill_halos(C_corr[1], this->j^h);
 
 	    // donor-cell step 
-	    formulae::donorcell::op_2d(this->mem.psi[e], 
-	      this->mem.n[e], C_corr, this->i, this->j);
+	    formulae::donorcell::op_2d(this->mem->psi[e], 
+	      this->mem->n[e], C_corr, this->i, this->j);
 	  }
 	}
       }
@@ -98,7 +101,7 @@ namespace advoocat
 
       // ctor
       mpdata_2d(
-        mem_t &mem, 
+        typename parent_t::mem_t *mem, 
         typename parent_t::bc_p &bcxl, 
         typename parent_t::bc_p &bcxr, 
         typename parent_t::bc_p &bcyl, 
@@ -112,11 +115,14 @@ namespace advoocat
 	jm(j.first() - 1, j.last())
       {
 	for (int n = 0; n < n_tmp; ++n)
-          tmp[n] = &mem.tmp[std::string(__FILE__)][n];
+          tmp[n] = &mem->tmp[std::string(__FILE__)][n];
       }
 
       // memory allocation (to be called once per shared-mem node)
-      static void alloc(mem_t &mem, const int nx, const int ny)   
+      static void alloc(
+        typename parent_t::mem_t *mem, 
+        const int nx, const int ny
+      )   
       {   
         parent_t::alloc(mem, nx, ny);
 
@@ -125,9 +131,9 @@ namespace advoocat
 
         for (int n = 0; n < n_tmp; ++n)
         {
-          mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
-          mem.tmp[file].back().push_back(new arr_2d_t( i^h, j^halo ));
-          mem.tmp[file].back().push_back(new arr_2d_t( i^halo, j^h ));
+          mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
+          mem->tmp[file].back().push_back(new typename parent_t::arr_t( i^h, j^halo ));
+          mem->tmp[file].back().push_back(new typename parent_t::arr_t( i^halo, j^h ));
         }
       }   
     };

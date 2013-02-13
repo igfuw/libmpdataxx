@@ -54,10 +54,9 @@ int main()
      << "set palette maxcolors 42\n"
      << "set pm3d at b\n";
   std::string binfmt;
-  using mem_t = sharedmem_2d<>;
   {
     concurr::openmp<
-      solvers::donorcell_2d<mem_t>,
+      solvers::donorcell_2d<float>,
       bcond::cyclic, 
       bcond::cyclic
     > slv(n[x], n[y]);
@@ -77,7 +76,7 @@ int main()
   {
     const int it = 2;
     concurr::openmp<
-      solvers::mpdata_2d<it, mem_t>,
+      solvers::mpdata_2d<float, it>,
       bcond::cyclic, 
       bcond::cyclic
     > slv(n[x], n[y]); 
@@ -93,7 +92,7 @@ int main()
   {
     const int it = 4;
     concurr::openmp<
-      solvers::mpdata_2d<it, mem_t>,
+      solvers::mpdata_2d<float, it>,
       bcond::cyclic, 
       bcond::cyclic
     > slv(n[x], n[y]); 

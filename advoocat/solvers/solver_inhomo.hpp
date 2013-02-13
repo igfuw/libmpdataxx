@@ -21,38 +21,41 @@ namespace advoocat
 
       typedef homo_solver parent_t;
       typedef typename parent_t::mem_t mem_t;
-      typedef typename mem_t::real_t real_t;
 
       protected:
 
-      virtual void forcings(real_t dt) = 0;
+      virtual void forcings(typename parent_t::real_t dt) = 0;
 
       // psi getter
-      typename parent_t::mem_t::arr_t psi(int e, int add = 0)
+      typename parent_t::arr_t psi(int e, int add = 0)
       {
-	return this->mem.psi[e][this->mem.n[e] + add];
+	return this->mem->psi[e][this->mem->n[e] + add];
       }
 
-      real_t dt;
+      typename parent_t::real_t dt;
 
       public:
 
-      struct params_t : parent_t::params_t { real_t dt; };
+      struct params_t : parent_t::params_t 
+      { 
+        typename parent_t::real_t dt; 
+      };
 
       // 1D
       inhomo_solver(
-	typename parent_t::mem_t &mem, 
+	typename parent_t::mem_t *mem, 
 	typename parent_t::bc_p &bcxl, 
 	typename parent_t::bc_p &bcxr, 
 	const rng_t &i, 
 	const params_t &p
       ) :
-	parent_t(mem, bcxl, bcxr, i, p), dt(p.dt)
+	parent_t(mem, bcxl, bcxr, i, p), 
+        dt(p.dt)
       {}
 
       // 2D
       inhomo_solver(
-	typename parent_t::mem_t &mem, 
+	typename parent_t::mem_t *mem, 
 	typename parent_t::bc_p &bcxl, 
 	typename parent_t::bc_p &bcxr, 
 	typename parent_t::bc_p &bcyl, 
@@ -61,24 +64,26 @@ namespace advoocat
 	const rng_t &j, 
 	const params_t &p
       ) :
-	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p), dt(p.dt)
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p), 
+        dt(p.dt)
       {}
 
       // 3D
       inhomo_solver(
-	typename parent_t::mem_t &mem, 
-	typename parent_t::bc_p &bcxl, 
+	typename parent_t::mem_t *mem, 
+	typename parent_t::bc_p &bcxl, // TODO: encapsulating all these into a struct would shorten by 5 lines!
 	typename parent_t::bc_p &bcxr, 
 	typename parent_t::bc_p &bcyl, 
 	typename parent_t::bc_p &bcyr, 
 	typename parent_t::bc_p &bczl, 
 	typename parent_t::bc_p &bczr, 
-	const rng_t &i, 
+	const rng_t &i, // TODO: ditto
 	const rng_t &j, 
 	const rng_t &k, 
 	const params_t &p
       ) :
-	parent_t(mem, bcxl, bcxr, bcyl, bcyr, bczl, bczr, i, j, k, p), dt(p.dt)
+	parent_t(mem, bcxl, bcxr, bcyl, bcyr, bczl, bczr, i, j, k, p), 
+        dt(p.dt)
       {}
 
       void solve(int nt)

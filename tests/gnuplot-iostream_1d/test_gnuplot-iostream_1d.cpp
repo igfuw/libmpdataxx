@@ -48,11 +48,11 @@ int main()
      << "set palette maxcolors 18 defined (-1. \"red\", -.5 \"red\", -.5 \"blue\", -.17 \"green\", .16 \"brown\", .5 \"black\")\n";
 
   int n = 10, nt = 10;
-  using mem_t = sharedmem_1d<>;
 
   {
+    const int n_iters = 4;
     concurr::openmp<
-      solvers::mpdata_1d<4, mem_t>,
+      solvers::mpdata_1d<float, n_iters>,
       bcond::cyclic
     > slv(n);
 

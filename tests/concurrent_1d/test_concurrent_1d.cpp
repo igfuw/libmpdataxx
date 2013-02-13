@@ -12,7 +12,6 @@
 #include "advoocat/concurr/boost_thread.hpp"
 #include "advoocat/solvers/mpdata_1d.hpp"
 #include "advoocat/bcond/cyclic_1d.hpp"
-#include "advoocat/storage/sharedmem.hpp"
 
 int main()
 {
@@ -26,7 +25,6 @@ int main()
 #endif
 
   using real_t = long double;
-  using mem_t = sharedmem_1d<1, real_t>;
   int nx = 10;
   const int n_iters = 3;
    
@@ -34,7 +32,7 @@ int main()
   std::cerr << "OpenMP run" << std::endl;
   {
     concurr::openmp<
-      solvers::mpdata_1d<n_iters, mem_t>,
+      solvers::mpdata_1d<real_t, n_iters>,
       bcond::cyclic
     > slv(nx);
     slv.advance(1000);
@@ -44,7 +42,7 @@ int main()
   std::cerr << "Boost.Thread run" << std::endl;
   {
     concurr::boost_thread<
-      solvers::mpdata_1d<n_iters, mem_t>,
+      solvers::mpdata_1d<real_t, n_iters>,
       bcond::cyclic
     > slv(nx);
     slv.advance(1000);

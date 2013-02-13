@@ -21,7 +21,6 @@ namespace advoocat
 	protected:
 
 	using parent_t = inhomo_solver_t;
-	typedef typename parent_t::mem_t mem_t;
 	typedef typename parent_t::real_t real_t;
 
 	struct params_t : parent_t::params_t { };
@@ -36,8 +35,8 @@ namespace advoocat
 	  this->xchng(u);
 	  this->xchng(w);
 
-	  formulae::courant::intrp<0>(this->mem.C[0], this->psi(u), im, this->j^this->halo, this->dt, dx);
-	  formulae::courant::intrp<1>(this->mem.C[1], this->psi(u), jm, this->i^this->halo, this->dt, dz);
+	  formulae::courant::intrp<0>(this->mem->C[0], this->psi(u), im, this->j^this->halo, this->dt, dx);
+	  formulae::courant::intrp<1>(this->mem->C[1], this->psi(u), jm, this->i^this->halo, this->dt, dz);
 	}
 
 	void update_courant()
@@ -48,8 +47,8 @@ namespace advoocat
 	  this->xchng(u, 1);      // filling halos for velocity filed
 	  this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
 
-	  formulae::courant::intrp<0>(this->mem.C[0], this->psi(u, -1), im, this->j^this->halo, this->dt, dx);
-	  formulae::courant::intrp<1>(this->mem.C[1], this->psi(w, -1), jm, this->i^this->halo, this->dt, dz);
+	  formulae::courant::intrp<0>(this->mem->C[0], this->psi(u, -1), im, this->j^this->halo, this->dt, dx);
+	  formulae::courant::intrp<1>(this->mem->C[1], this->psi(w, -1), jm, this->i^this->halo, this->dt, dz);
 	}
 
 	void extrp_velocity(int e) // extrapolate in time to t+1/2
@@ -99,7 +98,7 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 
 	// ctor
 	pressure_solver_common(
-	  mem_t &mem,
+	  typename parent_t::mem_t *mem,
           typename parent_t::bc_p &bcxl,
           typename parent_t::bc_p &bcxr,
           typename parent_t::bc_p &bcyl,
@@ -113,7 +112,7 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	  jm(j.first() - 1, j.last())
 	{} 
 
-	static void alloc(mem_t &mem, const int nx, const int ny)
+	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
 	{
 	  parent_t::alloc(mem, nx, ny);
           // TODO: for sure there will be some common temporaries!

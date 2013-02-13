@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include "../../storage/sharedmem.hpp"
+#include "../../blitz.hpp"
+#include "../../concurr/detail/sharedmem.hpp" 
 
 namespace advoocat
 {
@@ -19,43 +20,50 @@ namespace advoocat
         return a > b ? a : b;
       }
 
-      template <class sharedmem, int n_tlev, int halo_>
+      template <typename real_t_, int n_dims_, int n_eqs_, int n_tlev, int halo_>
       class solver_common
       {
 	public:
 
-	typedef sharedmem mem_t;
-        enum { halo = halo_ }; // "static const int" would need instantiation
+        // using enums as "static const int" would need instantiation
+        enum { halo = halo_ }; 
+        enum { n_dims = n_dims_ };
+        enum { n_eqs = n_eqs_ };
+
+        typedef real_t_ real_t;
+        typedef blitz::Array<real_t, n_dims> arr_t;
 
 	protected: 
-	mem_t &mem;
+
+        typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs> mem_t;
+	mem_t *mem;
 
 	// helper methods invoked by solve()
 	virtual void advop(int e) = 0;
 	void advop_all()
 	{
-	  for (int e = 0; e < mem_t::n_eqs; ++e) advop(e);
+	  for (int e = 0; e < n_eqs; ++e) advop(e);
 	}
 
 	void cycle(int e) 
 	{ 
-	  mem.n[e] = (mem.n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
+	  mem->n[e] = (mem->n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
 	}
 	void cycle_all()
 	{ 
-	  for (int e = 0; e < mem_t::n_eqs; ++e) cycle(e);
+	  for (int e = 0; e < n_eqs; ++e) cycle(e);
 	}
 
 	virtual void xchng(int e, int l = 0) = 0;
 	void xchng_all() 
 	{   
-	  for (int e = 0; e < mem_t::n_eqs; ++e) xchng(e);
+	  for (int e = 0; e < n_eqs; ++e) xchng(e);
 	}
 
 	public:
       
 	// ctor
-	solver_common(mem_t &mem) :
+	solver_common(mem_t *mem) :
 	  mem(mem)
 	{ }
 

@@ -56,13 +56,12 @@ int main()
      << "set pm3d at b\n";
 
   std::string binfmt;
-  using mem_t = sharedmem_2d<>;
 
   for (auto &offset : std::vector<float>({0,-.5})){
     gp << "set cbrange ["<< offset -.025<<":"<<offset+1.025<<"]\n";
     {
       concurr::openmp<
-        solvers::donorcell_2d<mem_t>,
+        solvers::donorcell_2d<float>,
         bcond::cyclic,
         bcond::cyclic
       > slv(n[x],n[y]);
@@ -82,7 +81,7 @@ int main()
     {
       const int it = 2;
       concurr::openmp<
-        solvers::mpdata_2d<it, mem_t>,
+        solvers::mpdata_2d<float, it>,
         bcond::cyclic,
         bcond::cyclic
       > slv(n[x],n[y]); 
@@ -97,7 +96,7 @@ int main()
     {
       const int it = 4;
       concurr::openmp<
-        solvers::mpdata_2d<it, mem_t>,
+        solvers::mpdata_2d<float, it>,
         bcond::cyclic,
         bcond::cyclic
       > slv(n[x],n[y]); 

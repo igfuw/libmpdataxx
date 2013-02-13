@@ -19,15 +19,13 @@ namespace advoocat
       public:
 
       using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w, tht>;
-      typedef typename parent_t::mem_t mem_t;
-      typedef typename parent_t::real_t real_t;
-      using arr_2d_t = typename mem_t::arr_t;
+      using real_t = typename parent_t::real_t;
 
-      arr_2d_t Phi, err, p_err;
-      arr_2d_t lap_err, lap_p_err; 
+      typename parent_t::arr_t Phi, err, p_err;
+      typename parent_t::arr_t lap_err, lap_p_err; 
       //TODO probably don't need those
-      arr_2d_t tmp_u, tmp_w, tmp_x, tmp_z;
-      arr_2d_t tmp_e1, tmp_e2;
+      typename parent_t::arr_t tmp_u, tmp_w, tmp_x, tmp_z;
+      typename parent_t::arr_t tmp_e1, tmp_e2;
 
       private:
 
@@ -134,7 +132,7 @@ std::cerr<<"error "<<error<<std::endl;
 
       // ctor
       pressure_cr(
-	mem_t &mem,
+	typename parent_t::mem_t *mem,
         typename parent_t::bc_p &bcxl,
         typename parent_t::bc_p &bcxr,
         typename parent_t::bc_p &bcyl,
@@ -145,21 +143,21 @@ std::cerr<<"error "<<error<<std::endl;
       ) :
 	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
         // (i, j)
-        lap_err(mem.tmp[std::string(__FILE__)][0][0]),
-        lap_p_err(mem.tmp[std::string(__FILE__)][0][1]),
+        lap_err(mem->tmp[std::string(__FILE__)][0][0]),
+        lap_p_err(mem->tmp[std::string(__FILE__)][0][1]),
         // (i^hlo, j^hlo))
-	err(mem.tmp[std::string(__FILE__)][0][2]),
-	tmp_x(mem.tmp[std::string(__FILE__)][0][3]),
-	tmp_z(mem.tmp[std::string(__FILE__)][0][4]),
-	tmp_u(mem.tmp[std::string(__FILE__)][0][5]),
-	tmp_w(mem.tmp[std::string(__FILE__)][0][6]),
-	Phi(mem.tmp[std::string(__FILE__)][0][7]),
-	tmp_e1(mem.tmp[std::string(__FILE__)][0][8]),
-	tmp_e2(mem.tmp[std::string(__FILE__)][0][9]),
-	p_err(mem.tmp[std::string(__FILE__)][0][10])
+	err(mem->tmp[std::string(__FILE__)][0][2]),
+	tmp_x(mem->tmp[std::string(__FILE__)][0][3]),
+	tmp_z(mem->tmp[std::string(__FILE__)][0][4]),
+	tmp_u(mem->tmp[std::string(__FILE__)][0][5]),
+	tmp_w(mem->tmp[std::string(__FILE__)][0][6]),
+	Phi(mem->tmp[std::string(__FILE__)][0][7]),
+	tmp_e1(mem->tmp[std::string(__FILE__)][0][8]),
+	tmp_e2(mem->tmp[std::string(__FILE__)][0][9]),
+	p_err(mem->tmp[std::string(__FILE__)][0][10])
       {}
 
-      static void alloc(mem_t &mem, const int nx, const int ny)
+      static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
       {
         parent_t::alloc(mem, nx, ny);
 
@@ -168,12 +166,12 @@ std::cerr<<"error "<<error<<std::endl;
         const int halo = parent_t::halo; 
 
         // temporary fields
-        mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
+        mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
         {
           for (int n=0; n < 2; ++n) 
-            mem.tmp[file].back().push_back(new arr_2d_t(i, j)); 
+            mem->tmp[file].back().push_back(new typename parent_t::arr_t(i, j)); 
           for (int n=0; n < 9; ++n) 
-            mem.tmp[file].back().push_back(new arr_2d_t(i^halo, j^halo)); 
+            mem->tmp[file].back().push_back(new typename parent_t::arr_t(i^halo, j^halo)); 
         }
       }
     }; 

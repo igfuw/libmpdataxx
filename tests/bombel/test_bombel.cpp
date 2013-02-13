@@ -39,11 +39,11 @@ const int n_iters = 2;
 using namespace advoocat;
 
 using parent_t_ = 
-//solvers::pressure_mr<
+solvers::pressure_mr<
 //solvers::pressure_cr<
-solvers::pressure_pc<
+//solvers::pressure_pc<
   solvers::inhomo_solver<
-    solvers::mpdata_2d<n_iters, sharedmem_2d<3, real_t>>
+    solvers::mpdata_2d<real_t, n_iters, 3>
   >, u, w, tht
 >;
 
@@ -68,7 +68,7 @@ class bombel : public parent_t_
 
   // ctor
   bombel(
-    parent_t::mem_t &mem, 
+    typename parent_t::mem_t *mem, 
     parent_t::bc_p &bcxl,
     parent_t::bc_p &bcxr,
     parent_t::bc_p &bcyl,

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "concurr_common.hpp"
+#include "detail/concurr_common.hpp"
 
 // TODO: make it work with clang as well!
 #if !defined(_REENTRANT)
@@ -45,6 +45,15 @@ namespace advoocat
         b.reset(new boost::barrier(size()));
       }
 
+      class mem_t : public parent_t::mem_t 
+      {
+        public:
+        // TODO: inherit ctors
+        mem_t(int s0) : parent_t::mem_t(s0) {}; 
+        mem_t(int s0, int s1) : parent_t::mem_t(s0, s1) {}; 
+        mem_t(int s0, int s1, int s2) : parent_t::mem_t(s0, s1, s2) {}; 
+      };
+
 // TODO: mem_t class with barrier() method
       void barrier()
       {
@@ -70,7 +79,7 @@ namespace advoocat
 	const int s0,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
-        parent_t(s0, params, size())
+        parent_t(s0, params, new mem_t(s0), size())
       {
         init();
       }
@@ -81,7 +90,7 @@ namespace advoocat
 	const int s1,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
-	parent_t(s0, s1, params, size(), 1)
+	parent_t(s0, s1, params, new mem_t(s0, s1), size(), 1)
       {
         init();
       }
@@ -93,7 +102,7 @@ namespace advoocat
 	const int s2,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) :
-	parent_t(s0, s1, s2, params, size(), 1, 1)
+	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2), size(), 1, 1)
       {
         init();
       }

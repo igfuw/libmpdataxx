@@ -13,15 +13,23 @@ namespace advoocat
 {
   namespace solvers
   {
-    template<class mem_t, int halo = formulae::donorcell::halo>
+    template<
+      typename real_t, 
+      int n_eqs = 1,
+      int halo = formulae::donorcell::halo
+    >
     class donorcell_1d : public detail::solver_1d<
-      mem_t, 
+      real_t,
+      1,
+      n_eqs,
       formulae::donorcell::n_tlev, 
       detail::max(halo, formulae::donorcell::halo)
     > 
     {
       using parent_t = detail::solver_1d<
-        mem_t, 
+        real_t,
+        1,
+        n_eqs,
         formulae::donorcell::n_tlev, 
         detail::max(halo, formulae::donorcell::halo)
       >;
@@ -29,7 +37,7 @@ namespace advoocat
       void advop(int e)
       {
         formulae::donorcell::op_1d(
-          this->mem.psi[e], this->mem.n[e], this->mem.C[0], this->i
+          this->mem->psi[e], this->mem->n[e], this->mem->C[0], this->i
         );
       }
 
@@ -39,7 +47,7 @@ namespace advoocat
 
       // ctor
       donorcell_1d(
-        mem_t &mem, 
+        typename parent_t::mem_t *mem, 
         typename parent_t::bc_p &bcxl, 
         typename parent_t::bc_p &bcxr, 
         const rng_t &i, 

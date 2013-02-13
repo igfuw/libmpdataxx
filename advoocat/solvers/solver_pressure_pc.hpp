@@ -21,7 +21,7 @@ namespace advoocat
       using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w, tht>;
       typedef typename parent_t::mem_t mem_t;
       typedef typename parent_t::real_t real_t;
-      using arr_2d_t = typename mem_t::arr_t;
+      using arr_2d_t = typename parent_t::arr_t;
 
       arr_2d_t Phi, err, p_err, q_err;
       arr_2d_t lap_err, lap_p_err, lap_q_err; 
@@ -160,7 +160,7 @@ std::cerr<<"error "<<error<<std::endl;
 
       // ctor
       pressure_pc(
-	mem_t &mem,
+	typename parent_t::mem_t *mem,
         typename parent_t::bc_p &bcxl,
         typename parent_t::bc_p &bcxr,
         typename parent_t::bc_p &bcyl,
@@ -171,23 +171,23 @@ std::cerr<<"error "<<error<<std::endl;
       ) :
 	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
         // (i, j)
-        lap_err(mem.tmp[std::string(__FILE__)][0][0]),
-        lap_p_err(mem.tmp[std::string(__FILE__)][0][1]),
-        lap_q_err(mem.tmp[std::string(__FILE__)][0][2]),
+        lap_err(mem->tmp[std::string(__FILE__)][0][0]),
+        lap_p_err(mem->tmp[std::string(__FILE__)][0][1]),
+        lap_q_err(mem->tmp[std::string(__FILE__)][0][2]),
         // (i^hlo, j^hlo))
-	err(mem.tmp[std::string(__FILE__)][0][3]),
-	tmp_x(mem.tmp[std::string(__FILE__)][0][4]),
-	tmp_z(mem.tmp[std::string(__FILE__)][0][5]),
-	tmp_u(mem.tmp[std::string(__FILE__)][0][6]),
-	tmp_w(mem.tmp[std::string(__FILE__)][0][7]),
-	Phi(mem.tmp[std::string(__FILE__)][0][8]),
-	tmp_e1(mem.tmp[std::string(__FILE__)][0][9]),
-	tmp_e2(mem.tmp[std::string(__FILE__)][0][10]),
-	p_err(mem.tmp[std::string(__FILE__)][0][11]),
-	q_err(mem.tmp[std::string(__FILE__)][0][12])
+	err(mem->tmp[std::string(__FILE__)][0][3]),
+	tmp_x(mem->tmp[std::string(__FILE__)][0][4]),
+	tmp_z(mem->tmp[std::string(__FILE__)][0][5]),
+	tmp_u(mem->tmp[std::string(__FILE__)][0][6]),
+	tmp_w(mem->tmp[std::string(__FILE__)][0][7]),
+	Phi(mem->tmp[std::string(__FILE__)][0][8]),
+	tmp_e1(mem->tmp[std::string(__FILE__)][0][9]),
+	tmp_e2(mem->tmp[std::string(__FILE__)][0][10]),
+	p_err(mem->tmp[std::string(__FILE__)][0][11]),
+	q_err(mem->tmp[std::string(__FILE__)][0][12])
       {}
 
-      static void alloc(mem_t &mem, const int nx, const int ny)
+      static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
       {
         parent_t::alloc(mem, nx, ny);
 
@@ -196,12 +196,12 @@ std::cerr<<"error "<<error<<std::endl;
         const int hlo = 1; // TODO!!!
 
         // temporary fields
-        mem.tmp[file].push_back(new arrvec_t<arr_2d_t>());
+        mem->tmp[file].push_back(new arrvec_t<arr_2d_t>());
         {
           for (int n=0; n < 3; ++n) 
-            mem.tmp[file].back().push_back(new arr_2d_t(i, j)); 
+            mem->tmp[file].back().push_back(new arr_2d_t(i, j)); 
           for (int n=0; n < 10; ++n) 
-            mem.tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo)); 
+            mem->tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo)); 
         }
       }
     }; 

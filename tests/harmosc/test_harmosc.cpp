@@ -41,15 +41,17 @@ int main()
  
   const int n_iters = 3, n_eqs = 2;
 
+  enum {psi, phi};
   using solver_t = coupled_harmosc<
     solvers::inhomo_solver_naive< // TODO: plot for both naive and non-naive solver
-      solvers::donorcell_1d<sharedmem_1d<n_eqs, real_t>>
-    >
+      solvers::donorcell_1d<real_t, n_eqs>
+    >, psi, phi
   >;
 
   solver_t::params_t p;
   p.dt = dt;
   p.omega = omega;
+
   concurr::openmp<solver_t, bcond::cyclic> slv(nx, p);
 
   Gnuplot gp;
@@ -61,8 +63,8 @@ int main()
   // initial condition
   {
     blitz::firstIndex i;
-    slv.state(solver_t::psi) = pow(sin(i * pi<real_t>() / nx), 300);
-    slv.state(solver_t::phi) = real_t(0);
+    slv.state(psi) = pow(sin(i * pi<real_t>() / nx), 300);
+    slv.state(phi) = real_t(0);
   }
   slv.courant() = C;
 
@@ -79,18 +81,18 @@ int main()
   decltype(slv.state()) en(nx);
 
   // sending initial condition
-  gp.send(slv.state(solver_t::psi));
-  gp.send(slv.state(solver_t::phi));
-  en = 1 + pow(slv.state(solver_t::psi),2) + pow(slv.state(solver_t::phi),2);
+  gp.send(slv.state(psi));
+  gp.send(slv.state(phi));
+  en = 1 + pow(slv.state(psi),2) + pow(slv.state(phi),2);
   gp.send(en);
 
   // integration
   for (int t = n_out; t <= nt; t+=n_out)
   {
     slv.advance(n_out);
-    gp.send(slv.state(solver_t::psi));
-    gp.send(slv.state(solver_t::phi));
-    en = 1 + pow(slv.state(solver_t::psi),2) + pow(slv.state(solver_t::phi),2);
+    gp.send(slv.state(psi));
+    gp.send(slv.state(phi));
+    en = 1 + pow(slv.state(psi),2) + pow(slv.state(phi),2);
     gp.send(en);
   }
 }

@@ -19,9 +19,11 @@ namespace advoocat
   {
     using namespace advoocat::arakawa_c;
 
-    template<int n_iters, class mem_t, int halo = formulae::mpdata::halo>
+    template<typename real_t, int n_iters, int n_eqs = 1, int halo = formulae::mpdata::halo>
     class mpdata_1d : public detail::solver_1d<
-      mem_t, 
+      real_t, 
+      1,
+      n_eqs,
       formulae::mpdata::n_tlev,
       detail::max(halo, formulae::mpdata::halo)
     >
@@ -29,16 +31,17 @@ namespace advoocat
       static_assert(n_iters > 0, "n_iters <= 0");
 
       using parent_t = detail::solver_1d< 
-        mem_t, 
+        real_t,
+        1,
+        n_eqs,
         formulae::mpdata::n_tlev,
         detail::max(halo, formulae::mpdata::halo)
       >;
-      using arr_t = typename mem_t::arr_t;
 
       static const int n_tmp = n_iters > 2 ? 2 : 1;
 
       // member fields
-      arrvec_t<arr_t> *tmp[n_tmp];
+      arrvec_t<typename parent_t::arr_t> *tmp[n_tmp];
       rng_t im;
 
       protected:
@@ -49,17 +52,17 @@ namespace advoocat
 	for (int step = 0; step < n_iters; ++step) 
 	{
 	  if (step == 0) 
-	    formulae::donorcell::op_1d(this->mem.psi[e], this->mem.n[e], this->mem.C[0], this->i);
+	    formulae::donorcell::op_1d(this->mem->psi[e], this->mem->n[e], this->mem->C[0], this->i);
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcxl->fill_halos(this->mem.psi[e][this->mem.n[e]]); // TODO: one xchng call?
-	    this->bcxr->fill_halos(this->mem.psi[e][this->mem.n[e]]);
+	    this->bcxl->fill_halos(this->mem->psi[e][this->mem->n[e]]); // TODO: one xchng call?
+	    this->bcxr->fill_halos(this->mem->psi[e][this->mem->n[e]]);
 
 	    // choosing input/output for antidiff C
-            const arrvec_t<arr_t>
+            const arrvec_t<typename parent_t::arr_t>
 	      &C_unco = (step == 1) 
-		? this->mem.C 
+		? this->mem->C 
 		: (step % 2) 
 		  ? *tmp[1]  // odd steps
 		  : *tmp[0], // even steps
@@ -70,13 +73,13 @@ namespace advoocat
 	    // calculating the antidiffusive C 
 	    C_corr[0](im+h) = 
 	      formulae::mpdata::antidiff(
-		this->mem.psi[e][this->mem.n[e]], 
+		this->mem->psi[e][this->mem->n[e]], 
 		im, C_unco[0]
 	      );
 
 	    // donor-cell step 
-	    formulae::donorcell::op_1d(this->mem.psi[e], 
-	      this->mem.n[e], C_corr[0], this->i);
+	    formulae::donorcell::op_1d(this->mem->psi[e], 
+	      this->mem->n[e], C_corr[0], this->i);
 	  }
 	}
       }
@@ -87,7 +90,7 @@ namespace advoocat
 
       // ctor
       mpdata_1d(
-        mem_t &mem, 
+        typename parent_t::mem_t *mem, 
         typename parent_t::bc_p &bcxl, 
         typename parent_t::bc_p &bcxr, 
         const rng_t &i, 
@@ -97,11 +100,11 @@ namespace advoocat
 	im(i.first() - 1, i.last())
       {
 	for (int n = 0; n < n_tmp; ++n)
-          tmp[n] = &mem.tmp[std::string(__FILE__)][n];
+          tmp[n] = &mem->tmp[std::string(__FILE__)][n];
       }
 
       // memory allocation (to be called once per shared-mem node)
-      static void alloc(mem_t &mem, const int nx)
+      static void alloc(typename parent_t::mem_t *mem, const int nx)
       {
         parent_t::alloc(mem, nx);
 
@@ -109,8 +112,8 @@ namespace advoocat
 
 	for (int n = 0; n < n_tmp; ++n)
         {
-	  mem.tmp[file].push_back(new arrvec_t<arr_t>()); 
-	  mem.tmp[file].back().push_back(new arr_t( rng_t(0, nx-1)^h )); 
+	  mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>()); 
+	  mem->tmp[file].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1)^h )); 
         }
       }
     };

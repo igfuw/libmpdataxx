@@ -8,7 +8,7 @@
 // (<> should be used instead of "" in normal usage)
 //#include "advoocat/mpdata_3d.hpp"
 #include "advoocat/solvers/donorcell_3d.hpp"
-#include "advoocat/bcond/cyclic_3d.hpp"
+#include "advoocat/bcond/cyclic_3d.hpp" // TODO: needed?
 #include "advoocat/concurr/openmp.hpp"
 
 enum {x, y, z};
@@ -20,7 +20,7 @@ int main()
   int n[] = {24, 24, 24};
   {
     concurr::openmp<
-      advoocat::solvers::donorcell_3d<sharedmem_3d<>>,
+      advoocat::solvers::donorcell_3d<float>,
       bcond::cyclic,
       bcond::cyclic,
       bcond::cyclic
