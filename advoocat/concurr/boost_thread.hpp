@@ -45,6 +45,7 @@ namespace advoocat
         b.reset(new boost::barrier(size()));
       }
 
+// TODO: mem_t class with barrier() method
       void barrier()
       {
         b->wait();

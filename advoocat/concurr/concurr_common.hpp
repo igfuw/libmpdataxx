@@ -44,6 +44,10 @@ namespace advoocat
        
 	protected:
 
+        // nested class
+        struct mem_t {};
+
+	// member fields
 	boost::ptr_vector<solver_t> algos; 
 
 	public:

@@ -35,10 +35,13 @@ namespace advoocat
 #endif
       }
 
-      void barrier()
+      struct mem_t : parent_t::mem_t
       {
+        void barrier()
+        {
 #pragma omp barrier
-      }
+        }
+      };
 
       public:
 

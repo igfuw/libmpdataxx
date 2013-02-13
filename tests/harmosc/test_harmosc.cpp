@@ -8,41 +8,6 @@
  * @brief a minimalistic model of a harmonic oscillator
  * (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
  *
- * @section DERIVATION
- *
- * A system of two 1-dimensional advection equations representing 
- * coupled harmonic oscillators is considered:
- *
- * \f$ \partial_t \psi + \nabla (\vec{u} \psi) =  \omega \phi \f$
- * 
- * \f$ \partial_t \phi + \nabla (\vec{u} \phi) = -\omega \psi \f$
- *
- * Discretisation in time yields:
- *
- * \f$ \frac{\psi^{n+1} - \psi^n}{\Delta t} + A(\psi^n) = \omega \phi^{n+1} \f$
- *
- * \f$ \frac{\phi^{n+1} - \phi^n}{\Delta t} + A(\phi^n) = - \omega \psi^{n+1} \f$
- * 
- * and after some regrouping:
- *
- * \f$ \psi^{n+1} = \Delta t \cdot \omega \phi^{n+1} + \left.\psi^{n+1}\right|_{RHS=0}\f$
- *
- * \f$ \phi^{n+1} = - \Delta t \cdot \omega \psi^{n+1} + \left.\phi^{n+1}\right|_{RHS=0}\f$
- * 
- * solving for \f$ \psi^{n+1} \f$ and \f$ \phi^{n+1} \f$ yields:
- *
- * \f$ \psi^{n+1} = \Delta t \cdot \omega \left( \left.\phi^{n+1}\right|_{RHS=0} - \Delta t \cdot \omega \psi^{n+1} \right) + \left.\psi^{n+1}\right|_{RHS=0} \f$
- *
- * \f$ \phi^{n+1} = - \Delta t \cdot \omega \left( \left.\psi^{n+1}\right|_{RHS=0} + \Delta t \cdot \omega \phi^{n+1} \right) + \left.\phi^{n+1}\right|_{RHS=0}\f$
- *
- * what can be further rearranged to yield:
- *
- * \f$ \psi^{n+1} = \left[ \Delta t \cdot \omega \left.\phi^{n+1}\right|_{RHS=0} + \left.\psi^{n+1}\right|_{RHS=0} \right] / \left[ 1 + \Delta t^2 \cdot \omega^2 \right] \f$
- * 
- * \f$ \phi^{n+1} = \left[ - \Delta t \cdot \omega \left.\psi^{n+1}\right|_{RHS=0} + \left.\phi^{n+1}\right|_{RHS=0} \right] / \left[ 1 + \Delta t^2 \cdot \omega^2 \right] \f$
- *
- * what is represented by the forcings() method in the example below.
- *
  * @section FIGURE
  *
  * \image html "../../tests/harmosc/figure.svg"
@@ -59,78 +24,17 @@
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
 
-// auto-deallocating containers
-#include <boost/ptr_container/ptr_map.hpp>
-#include <boost/assign/ptr_map_inserter.hpp>
-
 // 
 #include <boost/math/constants/constants.hpp>
-using boost::math::constants::pi;
 
-enum {psi, phi};
-using real_t = double;
-using namespace advoocat;
-
-// TODO: move into a separate file
-template <class inhomo_solver_t>
-class coupled_harmosc : public inhomo_solver_t
-{
-  using parent_t = inhomo_solver_t;
-  using real_t = typename inhomo_solver_t::real_t;
-  using arr_1d_t = typename inhomo_solver_t::mem_t::arr_t;
-
-  real_t omega;
-  arr_1d_t tmp;
-
-  void forcings(real_t dt)
-  {
-    auto Psi = this->psi(psi);
-    auto Phi = this->psi(phi);
-
-    tmp = Psi;
-    ///   (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
-    // explicit part
-    Psi += dt * omega * Phi;
-    // implicit part
-    Psi /= (1 + pow(dt * omega, 2));
-
-    // explicit part
-    Phi += - dt * omega * tmp;
-    // implicit part
-    Phi /= (1 + pow(dt * omega, 2));
-  }
-
-  public:
-
-  struct params_t : parent_t::params_t { real_t omega; };
-
-  // ctor
-  coupled_harmosc(
-    typename parent_t::mem_t &mem, 
-    typename parent_t::bc_p &bcxl,
-    typename parent_t::bc_p &bcxr,
-    const rng_t &i, 
-    params_t p
-  ) :
-    parent_t(mem, bcxl, bcxr, i, p),
-    omega(p.omega), 
-    tmp(mem.tmp[std::string(__FILE__)][0][0]) 
-  {}
-
-  static void alloc(
-    typename parent_t::mem_t &mem,
-    const int nx
-  )
-  {
-    parent_t::alloc(mem, nx);
-    const std::string file(__FILE__);
-    mem.tmp[file].push_back(new arrvec_t<arr_1d_t>()); 
-    mem.tmp[file].back().push_back(new arr_1d_t( rng_t(0, nx-1) )); 
-  }
-};
+#include "coupled_harmosc.hpp"
 
 int main() 
 {
+  using real_t = double;
+  using namespace advoocat;
+  using boost::math::constants::pi;
+
   const int nx = 1000, nt = 750, n_out=10;
   const real_t C = .5, dt = 1;
   const real_t omega = 2*pi<real_t>() / dt / 400;
@@ -157,8 +61,8 @@ int main()
   // initial condition
   {
     blitz::firstIndex i;
-    slv.state(psi) = pow(sin(i * pi<real_t>() / nx), 300);
-    slv.state(phi) = real_t(0);
+    slv.state(solver_t::psi) = pow(sin(i * pi<real_t>() / nx), 300);
+    slv.state(solver_t::phi) = real_t(0);
   }
   slv.courant() = C;
 
@@ -175,18 +79,18 @@ int main()
   decltype(slv.state()) en(nx);
 
   // sending initial condition
-  gp.send(slv.state(psi));
-  gp.send(slv.state(phi));
-  en = 1 + pow(slv.state(psi),2) + pow(slv.state(phi),2);
+  gp.send(slv.state(solver_t::psi));
+  gp.send(slv.state(solver_t::phi));
+  en = 1 + pow(slv.state(solver_t::psi),2) + pow(slv.state(solver_t::phi),2);
   gp.send(en);
 
   // integration
   for (int t = n_out; t <= nt; t+=n_out)
   {
     slv.advance(n_out);
-    gp.send(slv.state(psi));
-    gp.send(slv.state(phi));
-    en = 1 + pow(slv.state(psi),2) + pow(slv.state(phi),2);
+    gp.send(slv.state(solver_t::psi));
+    gp.send(slv.state(solver_t::phi));
+    en = 1 + pow(slv.state(solver_t::psi),2) + pow(slv.state(solver_t::phi),2);
     gp.send(en);
   }
 }
