@@ -30,8 +30,6 @@ namespace advoocat
     {
       using parent_t = detail::concurr_common<solver_t, bcx, bcy, bcz>;
  
-      std::unique_ptr<boost::barrier> b;
-
       int size() 
       {
         const char *env_var("OMP_NUM_THREADS");
@@ -40,25 +38,33 @@ namespace advoocat
           : boost::thread::hardware_concurrency();
       }
 
-      void init()
-      {
-        b.reset(new boost::barrier(size()));
-      }
-
       class mem_t : public parent_t::mem_t 
       {
-        public:
-        // TODO: inherit ctors
-        mem_t(int s0) : parent_t::mem_t(s0) {}; 
-        mem_t(int s0, int s1) : parent_t::mem_t(s0, s1) {}; 
-        mem_t(int s0, int s1, int s2) : parent_t::mem_t(s0, s1, s2) {}; 
-      };
+        boost::barrier b;
 
-// TODO: mem_t class with barrier() method
-      void barrier()
-      {
-        b->wait();
-      }
+        public:
+
+        // TODO:  could one constructor be enough if n_dims a template param?
+        mem_t(int s0, int bsize) : 
+          b(bsize),
+          parent_t::mem_t(s0) 
+        {}; 
+
+        mem_t(int s0, int s1, int bsize) : 
+          b(bsize),
+          parent_t::mem_t(s0, s1) 
+        {}; 
+
+        mem_t(int s0, int s1, int s2, int bsize) : 
+          b(bsize),
+          parent_t::mem_t(s0, s1, s2) 
+        {}; 
+
+	void barrier()
+	{
+	  b.wait();
+	}
+      };
 
       public:
 
@@ -79,10 +85,8 @@ namespace advoocat
 	const int s0,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
-        parent_t(s0, params, new mem_t(s0), size())
-      {
-        init();
-      }
+        parent_t(s0, params, new mem_t(s0, size()), size())
+      {}
 
       // 2D ctor
       boost_thread(
@@ -90,10 +94,8 @@ namespace advoocat
 	const int s1,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
-	parent_t(s0, s1, params, new mem_t(s0, s1), size(), 1)
-      {
-        init();
-      }
+	parent_t(s0, s1, params, new mem_t(s0, s1, size()), size(), 1)
+      {}
 
       // 3D ctor
       boost_thread(
@@ -102,10 +104,8 @@ namespace advoocat
 	const int s2,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) :
-	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2), size(), 1, 1)
-      {
-        init();
-      }
+	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2, size()), size(), 1, 1)
+      {}
     };
   }; // namespace concurr
 }; // namespace advoocat
