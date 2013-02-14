@@ -17,6 +17,9 @@ namespace advoocat
       using namespace arakawa_c;
       using idxperm::pi;
 
+      const int halo = 1;
+      const int n_tlev = 3;
+
       /// Implements a leapfrog-type scheme on an Arakawa-C grid.
       /// \f$
       /// \psi^{n+1}_i = \psi^{n-1}_i - C^{n}_{i} \cdot (\psi^{n}_{i+1} - \psi^{n}_{i-1})
