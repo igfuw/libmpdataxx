@@ -34,85 +34,61 @@ enum {u, w, tht};  //eqations
 enum {x, z};       //dimensions
 
 using real_t = double;
-const int n_iters = 2;
+const int n_iters = 2, n_eqs = 3;
 
 using namespace advoocat;
 
-using parent_t_ = 
-solvers::pressure_mr<
-//solvers::pressure_cr<
-//solvers::pressure_pc<
-  solvers::inhomo_solver<
-    solvers::mpdata_2d<real_t, n_iters, 3>
-  >, u, w, tht
->;
-
-// TODO: separate file
-class bombel : public parent_t_
-{
-  using parent_t = parent_t_; // parent_t is a typedef in parent_t_
-
-  real_t Tht_amb;
-
-  void forcings(real_t dt)  //explicit forcings (to be applied before the eliptic solver)
-  {
-    auto W   = this->psi(w);
-    auto Tht = this->psi(tht);
-
-    W += (dt * si:: seconds) * formulae::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb;
-  }
-
-  public:
-
-  struct params_t : parent_t::params_t { real_t Tht_amb; };
-
-  // ctor
-  bombel(
-    typename parent_t::mem_t *mem, 
-    parent_t::bc_p &bcxl,
-    parent_t::bc_p &bcxr,
-    parent_t::bc_p &bcyl,
-    parent_t::bc_p &bcyr,
-    const rng_t &i,
-    const rng_t &j,
-    const params_t &p
-  ) :
-    parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
-    Tht_amb(p.Tht_amb)
-  {}
-};
+#include "bombel.hpp"
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 40, n_out=1;
+  const int nx = 100, ny = 100, nt = 10, n_out=1;
 //  const int nx = 50, ny = 50, nt = 41, n_out=10;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
   const real_t halo = 1;  
 
-  typename bombel::params_t p;
-  p.dt = .1;
-  //ambient state (constant thoughout the domain)
-  p.Tht_amb = 300;
-  //p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
-  concurr::openmp<
-    bombel,
-    bcond::cyclic,
-    bcond::cyclic
-  > solver(nx, ny, p);
+  // TODO p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
+  real_t dt = .1; // timestep
+  real_t Tht_amb = 300; // ambient state (constant thoughout the domain)
 
-  // initial condition
-  {
-    blitz::firstIndex i;
-    blitz::secondIndex j;
+  boost::ptr_vector<concurr::any<real_t, 2>> slvs;
 
-    solver.state(tht) = p.Tht_amb 
-      + exp( -sqr(i-nx/2.) / (2.*pow(nx/20, 2))
-             -sqr(j-ny/4.) / (2.*pow(ny/20, 2)) )
-    ;
-    solver.state(u) = real_t(0); 
-    solver.state(w) = real_t(0); 
+  { // minimum residual
+    using solver_t = bombel<
+      solvers::pressure_mr<
+	solvers::inhomo_solver<
+	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
+	>, u, w, tht
+      >
+    >;
+    solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
+    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
+  }
+
+  { // conjugate residual
+    using solver_t = bombel<
+      solvers::pressure_cr<
+	solvers::inhomo_solver<
+	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
+	>, u, w, tht
+      >
+    >;
+    solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
+    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
+  }
+
+  { // conjugate residual + preconditioner
+    using solver_t = bombel<
+      solvers::pressure_pc<
+	solvers::inhomo_solver<
+	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
+	>, u, w, tht
+      >
+    >;
+    solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
+    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
 
   //ploting
@@ -120,7 +96,7 @@ int main()
   gp << "reset\n"
      << "set term svg size 2000,750 dynamic\n"
      << "set output 'figure.svg'\n"
-     << "set multiplot layout 1,3 columnsfirst\n"
+     << "set multiplot layout 3,3\n" // columnsfirst\n"
      << "set grid\n"
      << "set xlabel 'X'\n"
      << "set ylabel 'Y'\n"
@@ -134,26 +110,42 @@ int main()
      << "set nosurface\n"
      << "set cntrparam levels 0\n";
 
-  std::string binfmt;
-  binfmt = gp.binfmt(solver.state());
+  for (auto &slv : slvs)
+  {
+    // initial condition
+    {
+      blitz::firstIndex i;
+      blitz::secondIndex j;
 
-  // integration
-//  for (int t = 1; t <= 5; ++t)
-//  {
-    solver.advance(nt); // 1 tymczasowo
-//   if (t % n_out == 0 /*&& t != 0*/)  
-//   {    
-//      gp << "set title 'tht @ t=" << t+1 << "'\n"
-      gp << "set title 'tht @ t=" << std::setprecision(3) << nt * p.dt << "'\n"
-//         << "set cbrange [298.5:302]\n"
-         << "splot '-' binary" << binfmt << "with image notitle\n";
-      gp.sendBinary(solver.state(tht).copy());
-      gp << "set title 'u @ t=" << std::setprecision(3) << nt * p.dt << "'\n"
-//         << "set cbrange [-.03:.03]\n"
-         << "splot '-' binary" << binfmt << "with image notitle\n";
-      gp.sendBinary(solver.state(u).copy());
-      gp << "set title 'w @ t=" <<std::setprecision(3) << nt * p.dt << "'\n"
-//         << "set cbrange [-.03:.07]\n"
-         << "splot '-' binary" << binfmt << "with image notitle\n";
-      gp.sendBinary(solver.state(w).copy());
+      slv.state(tht) = Tht_amb 
+	+ exp( -sqr(i-nx/2.) / (2.*pow(nx/20, 2))
+	       -sqr(j-ny/4.) / (2.*pow(ny/20, 2)) )
+      ;
+      slv.state(u) = real_t(0); 
+      slv.state(w) = real_t(0); 
+    }
+
+    std::string binfmt;
+    binfmt = gp.binfmt(slv.state());
+
+    // integration
+  //  for (int t = 1; t <= 5; ++t)
+  //  {
+      slv.advance(nt); // 1 tymczasowo
+  //   if (t % n_out == 0 /*&& t != 0*/)  
+  //   {    
+  //      gp << "set title 'tht @ t=" << t+1 << "'\n"
+	gp << "set title 'tht @ t=" << std::setprecision(3) << nt * dt << "'\n"
+  //         << "set cbrange [298.5:302]\n"
+	   << "splot '-' binary" << binfmt << "with image notitle\n";
+	gp.sendBinary(slv.state(tht).copy());
+	gp << "set title 'u @ t=" << std::setprecision(3) << nt * dt << "'\n"
+  //         << "set cbrange [-.03:.03]\n"
+	   << "splot '-' binary" << binfmt << "with image notitle\n";
+	gp.sendBinary(slv.state(u).copy());
+	gp << "set title 'w @ t=" <<std::setprecision(3) << nt * dt << "'\n"
+  //         << "set cbrange [-.03:.07]\n"
+	   << "splot '-' binary" << binfmt << "with image notitle\n";
+	gp.sendBinary(slv.state(w).copy());
+  }
 };
