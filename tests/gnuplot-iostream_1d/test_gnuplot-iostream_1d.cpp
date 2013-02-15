@@ -12,6 +12,7 @@
 // (<> should be used instead of "" in normal usage)
 #include "advoocat/solvers/mpdata_1d.hpp"
 #include "advoocat/solvers/donorcell_1d.hpp"
+#include "advoocat/solvers/leapfrog_1d.hpp"
 #include "advoocat/bcond/bcond.hpp"
 #include "advoocat/concurr/openmp.hpp"
 
@@ -35,7 +36,7 @@ int main()
   Gnuplot gp;
   gp << "set term svg size 1500,500 dynamic\n" 
      << "set output 'figure.svg'\n"     
-     << "set multiplot layout 1,1\n" 
+     << "set multiplot layout 2,2\n" 
      << "set noxtics\n"
      << "set ztics .5\n"
      << "set xlabel 'X'\n"
@@ -49,13 +50,17 @@ int main()
 
   int n = 10, nt = 10;
 
+  using real_t = float;
+  boost::ptr_vector<concurr::any<real_t, 1>> slvs;
   {
-    const int n_iters = 4;
-    concurr::openmp<
-      solvers::mpdata_1d<float, n_iters>,
-      bcond::cyclic
-    > slv(n);
+    slvs.push_back(new concurr::openmp<solvers::mpdata_1d<real_t, 1>, bcond::cyclic>(n));
+    slvs.push_back(new concurr::openmp<solvers::mpdata_1d<real_t, 2>, bcond::cyclic>(n));
+    slvs.push_back(new concurr::openmp<solvers::mpdata_1d<real_t, 3>, bcond::cyclic>(n));
+    slvs.push_back(new concurr::openmp<solvers::leapfrog_1d<real_t>, bcond::cyclic>(n));
+  }
 
+  for (auto &slv : slvs)
+  {
     setup(slv, n);
 
     // instructing gnuplot what to plot
