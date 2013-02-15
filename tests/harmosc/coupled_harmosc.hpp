@@ -45,14 +45,15 @@
  *
  */
 
+#include "advoocat/solvers/solver_inhomo.hpp"
 #include "advoocat/blitz.hpp"
 
 using namespace advoocat;
 
-template <class inhomo_solver_t, int psi, int phi>
-class coupled_harmosc : public inhomo_solver_t
+template <typename real_t, int n_iters, solvers::inhomo_e inhomo, int psi, int phi, int n_eqs = 2>
+class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters, n_eqs>, inhomo>
 {
-  using parent_t = inhomo_solver_t;
+  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters, n_eqs>, inhomo>;
 
   typename parent_t::real_t omega;
   typename parent_t::arr_t tmp;
@@ -97,6 +98,7 @@ class coupled_harmosc : public inhomo_solver_t
     const int nx
   )
   {
+    // TODO: move to inhomo!
     parent_t::alloc(mem, nx);
     const std::string file(__FILE__);
     mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>()); 
