@@ -35,5 +35,16 @@ namespace advoocat
         assert(false && "bcond::fill_halos() called!");
       };
     };
+
+    template <typename real_t>
+    class shared : public bcond_t<real_t>
+    {
+      public:
+
+      virtual void fill_halos(const blitz::Array<real_t, 1> &) { };
+      virtual void fill_halos(const blitz::Array<real_t, 2> &, const rng_t &) { };
+      virtual void fill_halos(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) { };
+    };
+
   }; // namespace bcond
 }; // namespace advoocat

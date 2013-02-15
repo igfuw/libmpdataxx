@@ -52,12 +52,14 @@ namespace advoocat
 	for (int step = 0; step < n_iters; ++step) 
 	{
 	  if (step == 0) 
-	    formulae::donorcell::op_1d(this->mem->psi[e], this->mem->n[e], this->mem->C[0], this->i);
+	    formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->mem->C[0], this->i);
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcxl->fill_halos(this->mem->psi[e][this->mem->n[e]]); // TODO: one xchng call?
-	    this->bcxr->fill_halos(this->mem->psi[e][this->mem->n[e]]);
+            this->mem->barrier();
+	    this->bcxl->fill_halos(this->mem->psi[e][this->n[e]]); // TODO: one xchng call?
+	    this->bcxr->fill_halos(this->mem->psi[e][this->n[e]]);
+            this->mem->barrier();
 
 	    // choosing input/output for antidiff C
             const arrvec_t<typename parent_t::arr_t>
@@ -73,13 +75,13 @@ namespace advoocat
 	    // calculating the antidiffusive C 
 	    C_corr[0](im+h) = 
 	      formulae::mpdata::antidiff(
-		this->mem->psi[e][this->mem->n[e]], 
+		this->mem->psi[e][this->n[e]], 
 		im, C_unco[0]
 	      );
 
 	    // donor-cell step 
 	    formulae::donorcell::op_1d(this->mem->psi[e], 
-	      this->mem->n[e], C_corr[0], this->i);
+	      this->n[e], C_corr[0], this->i);
 	  }
 	}
       }

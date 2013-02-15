@@ -14,7 +14,9 @@ namespace advoocat
 {
   namespace solvers
   {
-    template <class homo_solver, bool naive = false>
+    enum inhomo_e { euler, strang };
+
+    template <class homo_solver, inhomo_e inhomo>
     class inhomo_solver : public homo_solver
     {
       public:
@@ -29,7 +31,7 @@ namespace advoocat
       // psi getter
       typename parent_t::arr_t psi(int e, int add = 0)
       {
-	return this->mem->psi[e][this->mem->n[e] + add];
+	return this->mem->psi[e][this->n[e] + add];
       }
 
       typename parent_t::real_t dt;
@@ -86,21 +88,38 @@ namespace advoocat
         dt(p.dt)
       {}
 
-      void solve(int nt)
+      void hook_ante_step()
       {
-	for (int t = 0; t < nt; ++t)
-	{
-	  if (!naive) forcings(dt / 2);
-	  else forcings(dt);
-
-	  parent_t::solve(1);
-
-	  if (!naive) forcings(dt / 2);
-	}
+        this->mem->barrier();
+        switch (inhomo)
+        {
+          case euler: 
+            forcings(dt); 
+            break;
+          case strang: 
+            forcings(dt / 2); 
+            break;
+          default: 
+            assert(false);
+        }
+        this->mem->barrier();
       }
-    };
 
-    template <class homo_solver>
-    using inhomo_solver_naive = inhomo_solver<homo_solver, true>;
+      void hook_post_step()
+      {
+        switch (inhomo)
+        {
+          case euler: 
+            break;
+          case strang: 
+            this->mem->barrier();
+            forcings(dt / 2);
+            this->mem->barrier();
+            break;
+          default:
+            assert(false);
+        }
+      } 
+    };
   }; // namespace solvers
 }; // namespace advoocat

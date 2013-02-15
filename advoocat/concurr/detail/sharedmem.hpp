@@ -20,20 +20,20 @@ namespace advoocat
       template <
 	typename real_t,
 	int n_dims,
-	int n_eqs
+	int n_eqs,
+        int n_tlev
       >  
       class sharedmem_common
       {
 	static_assert(n_eqs > 0, "n_eqs <= 0");
 	static_assert(n_dims > 0, "n_dims <= 0");
+	static_assert(n_tlev > 0, "n_tlev <= 0");
 
         protected:
 
-	int span[n_dims];
+	int n, span[n_dims];
 
 	public:
-
-	std::vector<int> n;
 
 	arrvec_t<blitz::Array<real_t, n_dims>> C, psi[n_eqs];
 
@@ -48,29 +48,29 @@ namespace advoocat
 	  return C[d]; // TODO: what about halo? (in y)
 	}   
 
-	// ctor
-	sharedmem_common()
-	  : n(n_eqs, 0)
-	{}
-
         virtual void barrier()
         {
           assert(false && "sharedmem_common::barrier() called!");
         }
+     
+        void cycle()
+        {
+          n = (n + 1) % n_tlev - n_tlev; // TODO: czy potrzebne - n_tlev?
+        }
       };
 
-      template<typename real_t, int n_dims, int n_eqs>
+      template<typename real_t, int n_dims, int n_eqs, int n_tlev>
       class sharedmem
       {};
 
-      template<typename real_t, int n_eqs>
-      class sharedmem<real_t, 1, n_eqs> : public sharedmem_common<real_t, 1, n_eqs>
+      template<typename real_t, int n_eqs, int n_tlev>
+      class sharedmem<real_t, 1, n_eqs, n_tlev> : public sharedmem_common<real_t, 1, n_eqs, n_tlev>
       {
 	public:
 
 	blitz::Array<real_t, 1> state(int e)
 	{
-	  return this->psi[e][ this->n[e] ](
+	  return this->psi[e][ this->n ](
 	    rng_t(0, this->span[0]-1)
 	  ).reindex({0});
 	}
@@ -82,14 +82,14 @@ namespace advoocat
 	}
       };
 
-      template<typename real_t, int n_eqs>
-      class sharedmem<real_t, 2, n_eqs> : public sharedmem_common<real_t, 2, n_eqs>
+      template<typename real_t, int n_eqs, int n_tlev>
+      class sharedmem<real_t, 2, n_eqs, n_tlev> : public sharedmem_common<real_t, 2, n_eqs, n_tlev>
       {
 	public:
 
 	blitz::Array<real_t, 2> state(int e)
 	{
-	  return this->psi[e][ this->n[e] ](idx_t<2>({
+	  return this->psi[e][ this->n ](idx_t<2>({
 	    rng_t(0, this->span[0]-1),
 	    rng_t(0, this->span[1]-1)
 	  })).reindex({0, 0});
@@ -103,14 +103,14 @@ namespace advoocat
 	}
       };
 
-      template<typename real_t, int n_eqs>
-      class sharedmem<real_t, 3, n_eqs> : public sharedmem_common<real_t, 3, n_eqs>
+      template<typename real_t, int n_eqs, int n_tlev>
+      class sharedmem<real_t, 3, n_eqs, n_tlev> : public sharedmem_common<real_t, 3, n_eqs, n_tlev>
       {
 	public:
 
 	blitz::Array<real_t, 3> state(int e)
 	{
-	  return this->psi[e][ this->n[e] ](idx_t<3>({
+	  return this->psi[e][ this->n ](idx_t<3>({
 	    rng_t(0, this->span[0]-1),
 	    rng_t(0, this->span[1]-1),
 	    rng_t(0, this->span[2]-1)

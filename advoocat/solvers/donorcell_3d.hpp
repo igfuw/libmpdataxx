@@ -37,7 +37,7 @@ namespace advoocat
       void advop(int e)
       {
 	formulae::donorcell::op_3d(
-	  this->mem->psi[e], this->mem->n[e], this->mem->C, this->i, this->j, this->k
+	  this->mem->psi[e], this->n[e], this->mem->C, this->i, this->j, this->k
 	);
       }
 

@@ -20,7 +20,7 @@ namespace advoocat
         return a > b ? a : b;
       }
 
-      template <typename real_t_, int n_dims_, int n_eqs_, int n_tlev, int halo_>
+      template <typename real_t_, int n_dims_, int n_eqs_, int n_tlev_, int halo_>
       class solver_common
       {
 	public:
@@ -29,13 +29,16 @@ namespace advoocat
         enum { halo = halo_ }; 
         enum { n_dims = n_dims_ };
         enum { n_eqs = n_eqs_ };
+        enum { n_tlev = n_tlev_ };
 
         typedef real_t_ real_t;
         typedef blitz::Array<real_t_, n_dims_> arr_t;
 
 	protected: 
 
-        typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs> mem_t;
+        std::vector<int> n;
+
+        typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs, n_tlev> mem_t;
 	mem_t *mem;
 
 	// helper methods invoked by solve()
@@ -47,8 +50,9 @@ namespace advoocat
 
 	void cycle(int e) 
 	{ 
-	  mem->n[e] = (mem->n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
+	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
 	}
+
 	void cycle_all()
 	{ 
 	  for (int e = 0; e < n_eqs; ++e) cycle(e);
@@ -57,23 +61,30 @@ namespace advoocat
 	virtual void xchng(int e, int l = 0) = 0;
 	void xchng_all() 
 	{   
+          this->mem->barrier();
 	  for (int e = 0; e < n_eqs; ++e) xchng(e);
+          this->mem->barrier();
 	}
 
 	public:
       
 	// ctor
 	solver_common(mem_t *mem) :
-	  mem(mem)
+	  n(n_eqs, 0), mem(mem)
 	{ }
+
+        virtual void hook_ante_step() {}
+        virtual void hook_post_step() {}
 
 	void solve(const int nt) 
 	{   
 	  for (int t = 0; t < nt; ++t) 
 	  {   
+            hook_ante_step();
 	    xchng_all();
 	    advop_all();
 	    cycle_all();
+            hook_post_step();
 	  }   
         }
       };

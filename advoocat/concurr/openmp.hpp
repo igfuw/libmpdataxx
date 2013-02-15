@@ -29,7 +29,7 @@ namespace advoocat
       int size() 
       {
 #if defined(_OPENMP)
-        return omp_get_num_procs();
+        return omp_get_max_threads();
 #else
         return 1;
 #endif
@@ -48,9 +48,7 @@ namespace advoocat
         mem_t(int s0, int s1, int s2) : parent_t::mem_t(s0, s1, s2) {};
       };
 
-      public:
-
-      void advance(int nt)
+      void solve(int nt)
       {
         int i = 0;
 #pragma omp parallel private(i)
@@ -62,6 +60,9 @@ namespace advoocat
         } 
       }
 
+      public:
+
+// TODO: coud it be just one ctor with int[solver_t::n_dims]?
       // 1D ctor
       openmp(
 	const int s0,

@@ -31,17 +31,14 @@ namespace advoocat
 
 	void xchng(int e, int lev = 0) 
 	{
-          this->mem->barrier();
-	  bcxl->fill_halos( this->mem->psi[e][ this->mem->n[e] - lev ] );
-	  bcxr->fill_halos( this->mem->psi[e][ this->mem->n[e] - lev ] );
-          this->mem->barrier();
+	  bcxl->fill_halos( this->mem->psi[e][ this->n[e] - lev ] );
+	  bcxr->fill_halos( this->mem->psi[e][ this->n[e] - lev ] );
 	}
 
 	// ctor
 	solver_1d(typename parent_t::mem_t *mem, bc_p &bcxl, bc_p &bcxr, const rng_t &i) :
 	  parent_t(mem), i(i), bcxl(std::move(bcxl)), bcxr(std::move(bcxr))
-	{
-	}
+	{}
 
 	public:
 

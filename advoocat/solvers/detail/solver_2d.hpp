@@ -32,7 +32,7 @@ namespace advoocat
 
 	void xchng(int e, int lev = 0) // for previous time levels
 	{
-          this->xchng(this->mem->psi[e][ this->mem->n[e] - lev], i^halo, j^halo);
+          this->xchng(this->mem->psi[e][ this->n[e] - lev], i^halo, j^halo);
 	}
 
 	void xchng(typename parent_t::arr_t psi, rng_t range_i, rng_t range_j) // for a given array

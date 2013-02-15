@@ -1,4 +1,9 @@
 set(CMAKE_CXX_FLAGS "-I../.. ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -Wfatal-errors")
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Ofast -march=native")
+
+find_package(OpenMP)
+
 add_subdirectory(gnuplot-iostream_1d)
 add_subdirectory(gnuplot-iostream_2d)
 add_subdirectory(var_sign_2d)

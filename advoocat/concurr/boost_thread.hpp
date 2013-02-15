@@ -10,7 +10,7 @@
 
 // TODO: make it work with clang as well!
 #if !defined(_REENTRANT)
-#  error _REENTRANT not defined, pleas use something like -pthread flag for gcc
+#  error _REENTRANT not defined, please use something like -pthread flag for gcc
 #endif
 #include <boost/thread.hpp>
 
@@ -68,7 +68,7 @@ namespace advoocat
 
       public:
 
-      void advance(int nt)
+      void solve(int nt)
       {
         boost::thread_group threads; // TODO: member field?
         for (int i = 0; i < this->algos.size(); ++i) 
@@ -80,6 +80,7 @@ namespace advoocat
         threads.join_all();
       }
 
+// could it be just one ctor with int[solver_t::n_dims]?
       // 1D ctor
       boost_thread(
 	const int s0,

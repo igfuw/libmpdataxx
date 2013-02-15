@@ -51,14 +51,16 @@ namespace advoocat
 	  if (step == 0) 
 	    formulae::donorcell::op_2d(
 	      this->mem->psi[e], 
-	      this->mem->n[e], this->mem->C, this->i, this->j);
+	      this->n[e], this->mem->C, this->i, this->j);
 	  else
 	  {
 	    this->cycle(e);
-	    this->bcxl->fill_halos(this->mem->psi[e][this->mem->n[e]], this->j^halo); // TODO: two xchng calls?
-	    this->bcxr->fill_halos(this->mem->psi[e][this->mem->n[e]], this->j^halo);
-	    this->bcyl->fill_halos(this->mem->psi[e][this->mem->n[e]], this->i^halo);
-	    this->bcyr->fill_halos(this->mem->psi[e][this->mem->n[e]], this->i^halo);
+            this->mem->barrier();
+	    this->bcxl->fill_halos(this->mem->psi[e][this->n[e]], this->j^halo); // TODO: two xchng calls?
+	    this->bcxr->fill_halos(this->mem->psi[e][this->n[e]], this->j^halo);
+	    this->bcyl->fill_halos(this->mem->psi[e][this->n[e]], this->i^halo);
+	    this->bcyr->fill_halos(this->mem->psi[e][this->n[e]], this->i^halo);
+            this->mem->barrier();
 
 	    // choosing input/output for antidiff C
             const arrvec_t<typename parent_t::arr_t>
@@ -74,23 +76,26 @@ namespace advoocat
 	    // calculating the antidiffusive C 
 	    C_corr[0](this->im+h, this->j) = 
 	      formulae::mpdata::antidiff<0>(
-		this->mem->psi[e][this->mem->n[e]], 
+		this->mem->psi[e][this->n[e]], 
 		this->im, this->j, C_unco
 	      );
-	    this->bcyl->fill_halos(C_corr[0], this->i^h); // TODO: one xchng?
-	    this->bcyr->fill_halos(C_corr[0], this->i^h);
 
 	    C_corr[1](this->i, this->jm+h) = 
 	      formulae::mpdata::antidiff<1>(
-              this->mem->psi[e][this->mem->n[e]], 
+              this->mem->psi[e][this->n[e]], 
               this->jm, this->i, C_unco
 	    );
+ 
+            this->mem->barrier();
+	    this->bcyl->fill_halos(C_corr[0], this->i^h); // TODO: one xchng?
+	    this->bcyr->fill_halos(C_corr[0], this->i^h);
 	    this->bcxl->fill_halos(C_corr[1], this->j^h); // TODO: one xchng?
 	    this->bcxr->fill_halos(C_corr[1], this->j^h);
+            this->mem->barrier();
 
 	    // donor-cell step 
 	    formulae::donorcell::op_2d(this->mem->psi[e], 
-	      this->mem->n[e], C_corr, this->i, this->j);
+	      this->n[e], C_corr, this->i, this->j);
 	  }
 	}
       }

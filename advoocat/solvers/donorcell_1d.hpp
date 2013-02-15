@@ -37,7 +37,7 @@ namespace advoocat
       void advop(int e)
       {
         formulae::donorcell::op_1d(
-          this->mem->psi[e], this->mem->n[e], this->mem->C[0], this->i
+          this->mem->psi[e], this->n[e], this->mem->C[0], this->i
         );
       }
 
@@ -58,4 +58,3 @@ namespace advoocat
     };
   }; // namespace solvers
 }; // namespace advoocat
-

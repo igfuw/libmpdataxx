@@ -51,6 +51,5 @@ namespace advoocat
 	a(this->rght_halo) = a(this->left_edge);     
       }
     };
-
   }; // namespace bcond
 }; // namespace advoocat
