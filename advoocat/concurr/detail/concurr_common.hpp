@@ -79,7 +79,7 @@ namespace advoocat
           mem.reset(mem_p);
 	  solver_t::alloc(mem.get(), s0);
 
-          std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, shrd; // TODO: solver_t::bc_p
+          std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, shrdl, shrdr; // TODO: solver_t::bc_p
 
           if (bcx == bcond::cyclic)  // TODO: make a function taht does it
           {
@@ -90,11 +90,12 @@ namespace advoocat
 
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
-            shrd.reset(new bcond::shared<real_t>());
+            shrdl.reset(new bcond::shared<real_t>());
+            shrdr.reset(new bcond::shared<real_t>());
             const rng_t i(min(s0, i0, n0), max(s0, i0, n0)); 
 	    algos.push_back(new solver_t(mem.get(), 
-              i0 == 0      ? bxl : shrd,
-              i0 == n0 - 1 ? bxr : shrd,
+              i0 == 0      ? bxl : shrdl,
+              i0 == n0 - 1 ? bxr : shrdr,
               i, params
             ));
           }
@@ -117,7 +118,7 @@ namespace advoocat
           {
             for (int i1 = 0; i1 < n1; ++i1) 
             {
-	      std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, byl, byr, shrd;
+	      std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, byl, byr, shrdl, shrdr;
 
 	      if (bcx == bcond::cyclic)  // TODO: make a function taht does it
 	      {
@@ -133,14 +134,15 @@ namespace advoocat
 	      }
 	      else assert(false);
 
-              shrd.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
+              shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
+              shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
 
               const rng_t 
                 i( min(s0, i0, n0), max(s0, i0, n0) ),
                 j( min(s1, i1, n1), max(s1, i1, n1) );
               algos.push_back(new solver_t(mem.get(), 
-                i0 == 0      ? bxl : shrd,
-                i0 == n0 - 1 ? bxr : shrd,
+                i0 == 0      ? bxl : shrdl,
+                i0 == n0 - 1 ? bxr : shrdr,
                 byl, 
                 byr, 
                 i, j, params

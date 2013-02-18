@@ -23,7 +23,7 @@ namespace advoocat
       // ctor
       cyclic_left_1d(const rng_t &i, int halo) : // TODO: inherit ctor
 	parent_t(i, halo)
-      {}
+      { }
 
       // method invoked by the solver
       void fill_halos(const arr_t &a)
@@ -43,7 +43,7 @@ namespace advoocat
       // ctor
       cyclic_rght_1d(const rng_t &i, int halo) : // TODO: inherit ctor
 	parent_t(i, halo)
-      {}
+      { }
 
       // method invoked by the solver
       void fill_halos(const arr_t &a)
