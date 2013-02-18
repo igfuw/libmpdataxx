@@ -63,6 +63,7 @@ namespace advoocat
       public:
 
 // TODO: coud it be just one ctor with int[solver_t::n_dims]?
+// TODO: document that current;y paralllisation only in one dimension
       // 1D ctor
       openmp(
 	const int s0,

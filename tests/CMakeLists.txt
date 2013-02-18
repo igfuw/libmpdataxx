@@ -1,6 +1,12 @@
 set(CMAKE_CXX_FLAGS "-I../.. ${CMAKE_CXX_FLAGS}")
+
 set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -Wfatal-errors")
-set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Ofast -march=native")
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Ofast -march=native")
+else()
+  set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native")
+endif()
 
 find_package(OpenMP)
 

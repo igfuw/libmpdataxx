@@ -42,7 +42,7 @@ using namespace advoocat;
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 10, n_out=1;
+  const int nx = 100, ny = 100, nt = 40, n_out=1;
 //  const int nx = 50, ny = 50, nt = 41, n_out=10;
 
   rng_t i(0, nx-1);
