@@ -61,9 +61,7 @@ namespace advoocat
 	virtual void xchng(int e, int l = 0) = 0;
 	void xchng_all() 
 	{   
-          this->mem->barrier();
 	  for (int e = 0; e < n_eqs; ++e) xchng(e);
-          this->mem->barrier();
 	}
 
 	public:
@@ -80,11 +78,17 @@ namespace advoocat
 	{   
 	  for (int t = 0; t < nt; ++t) 
 	  {   
+            this->mem->barrier();
             hook_ante_step();
+            this->mem->barrier();
 	    xchng_all();
+            this->mem->barrier();
 	    advop_all();
+            this->mem->barrier();
 	    cycle_all();
+            this->mem->barrier();
             hook_post_step();
+            this->mem->barrier(); // should not be needed if output was included in hook_post_step
 	  }   
         }
       };

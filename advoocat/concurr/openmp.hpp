@@ -49,6 +49,9 @@ namespace advoocat
 
         void barrier()
         {
+#if defined(_OPENMP)
+std::cerr << "openmp barrier! (rank=" << mem_t::rank() << ")" << std::endl;
+#endif
 #pragma omp barrier
         }
 

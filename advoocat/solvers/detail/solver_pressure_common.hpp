@@ -36,14 +36,17 @@ namespace advoocat
 	  this->xchng(w);
 
 	  formulae::courant::intrp<0>(this->mem->C[0], this->psi(u), im, this->j^this->halo, this->dt, dx);
-	  formulae::courant::intrp<1>(this->mem->C[1], this->psi(u), jm, this->i^this->halo, this->dt, dz);
+	  formulae::courant::intrp<1>(this->mem->C[1], this->psi(w), jm, this->i^this->halo, this->dt, dz);
 	}
 
-	void update_courant()
+	void extrp_courant()
 	{
 	  extrp_velocity(u);      //extrapolate velocity field in time (t+1/2)
 	  extrp_velocity(w);
+        }
 
+	void intrp_courant()
+	{
 	  this->xchng(u, 1);      // filling halos for velocity filed
 	  this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
 
@@ -70,27 +73,42 @@ namespace advoocat
 	  {   
 	    if (t==0)
 	    {
+              this->mem->barrier();	
 	      ini_courant();
+              this->mem->barrier();	
 	      ini_pressure();
+              this->mem->barrier();	
 	      this->forcings(this->dt / 2);
+              //this->mem->barrier();
 	      inhomo_solver_t::parent_t::solve(1);
+              //this->mem->barrier();
 	      this->forcings(this->dt / 2);
+              this->mem->barrier();	
 	      pressure_solver_update(this->dt);
+              this->mem->barrier();	
 	      pressure_solver_apply(this->dt);
+              this->mem->barrier();	
 	    }
 	    if (t!=0)
 	    {
 	      std::cerr<<"t= "<<t<<std::endl;
-	      update_courant();
+              this->mem->barrier();
+	      extrp_courant();
+              this->mem->barrier();
+	      intrp_courant();
+              this->mem->barrier();
 	      this->forcings(this->dt / 2);
+              this->mem->barrier();
 	      pressure_solver_apply(this->dt);
+              //this->mem->barrier();
 	      inhomo_solver_t::parent_t::solve(1);
-	      // this->xchng_all();
-	      // this->advop_all();
-	      // this->cycle_all(); 
+              //this->mem->barrier();
 	      this->forcings(this->dt / 2);
+              this->mem->barrier();
 	      pressure_solver_update(this->dt);
+              this->mem->barrier();
 	      pressure_solver_apply(this->dt);
+              this->mem->barrier();
 	    }
 	  }
 std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;

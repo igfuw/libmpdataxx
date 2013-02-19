@@ -49,13 +49,15 @@ namespace advoocat
 	tmp_u = this->psi(u);
 	tmp_w = this->psi(w);
 
+        this->mem->barrier();
         this->xchng(Phi,   i^halo, j^halo);
         this->xchng(tmp_u, i^halo, j^halo);
         this->xchng(tmp_w, i^halo, j^halo);
 
         tmp_x(i, j) = rho * (tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1)));
         tmp_z(i, j) = rho * (tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1)));
-     
+
+        this->mem->barrier();
         this->xchng(tmp_x, i^halo, j^halo);
         this->xchng(tmp_z, i^halo, j^halo);
 
@@ -66,13 +68,16 @@ std::cerr<<"--------------------------------------------------------------"<<std
 	real_t error = 1.;
 	while (error > .00001)
 	{
+          this->mem->barrier();
           this->xchng(err, i^halo, j^halo);
 
           tmp_e1(i, j) = grad<0>(err(i^halo, j^halo), i, j, real_t(1));
           tmp_e2(i, j) = grad<1>(err(i^halo, j^halo), j, i, real_t(1));
+          this->mem->barrier();
           this->xchng(tmp_e1, i^halo, j^halo);
           this->xchng(tmp_e2, i^halo, j^halo);
-
+          this->mem->barrier();
+ 
           lap_err(i,j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
 
           tmp_e1(i,j) = err(i,j)*lap_err(i,j);
@@ -82,11 +87,12 @@ std::cerr<<"--------------------------------------------------------------"<<std
           Phi(i, j) += beta * err(i, j);
           err(i, j) += beta * lap_err(i, j);
 
-          error = std::max(std::abs(this->mem->max(err)), std::abs(this->mem->min(err)));
+          error = std::max(std::abs(this->mem->max(err(i,j))), std::abs(this->mem->min(err(i,j))));
           this->iters++;
 std::cerr<<error<<std::endl;
 	}
 	//end of pseudo_time loop
+        this->mem->barrier();
 	this->xchng(this->Phi, i^halo, j^halo);
 
 	tmp_u(i, j) = - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));

@@ -62,7 +62,7 @@ namespace advoocat
           assert(false && "sharedmem_common::rank() called!");
         }
      
-        void cycle()
+        void cycle() // TODO: this should probably be placed outside as it is not to be called from within threads!
         {
           n = (n + 1) % n_tlev - n_tlev; // TODO: czy potrzebne - n_tlev?
         }
@@ -79,21 +79,27 @@ namespace advoocat
         {
           (*reducetmp)(rank()) = blitz::sum(arr); 
           barrier();
-          return blitz::sum(*reducetmp);
+          real_t result = blitz::sum(*reducetmp);
+          barrier();
+          return result;
         }
 
         real_t min(const arr_t &arr)
         {
           (*reducetmp)(rank()) = blitz::min(arr); 
           barrier();
-          return blitz::min(*reducetmp);
+          real_t result = blitz::min(*reducetmp);
+          barrier();
+          return result;
         }
 
         real_t max(const arr_t &arr)
         {
           (*reducetmp)(rank()) = blitz::max(arr); 
           barrier();
-          return blitz::max(*reducetmp);
+          real_t result = blitz::max(*reducetmp);
+          barrier();
+          return result;
         }
       };
 
