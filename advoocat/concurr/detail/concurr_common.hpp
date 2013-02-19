@@ -207,7 +207,6 @@ namespace advoocat
         void advance(int nt) 
         {   
           solve(nt);
-          mem->cycle();
         }  
 
 	typename solver_t::arr_t state(int e = 0)

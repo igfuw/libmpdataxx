@@ -73,42 +73,25 @@ namespace advoocat
 	  {   
 	    if (t==0)
 	    {
-              this->mem->barrier();	
 	      ini_courant();
-              this->mem->barrier();	
 	      ini_pressure();
-              this->mem->barrier();	
 	      this->forcings(this->dt / 2);
-              //this->mem->barrier();
 	      inhomo_solver_t::parent_t::solve(1);
-              //this->mem->barrier();
 	      this->forcings(this->dt / 2);
-              this->mem->barrier();	
 	      pressure_solver_update(this->dt);
-              this->mem->barrier();	
 	      pressure_solver_apply(this->dt);
-              this->mem->barrier();	
 	    }
 	    if (t!=0)
 	    {
 	      std::cerr<<"t= "<<t<<std::endl;
-              this->mem->barrier();
 	      extrp_courant();
-              this->mem->barrier();
 	      intrp_courant();
-              this->mem->barrier();
 	      this->forcings(this->dt / 2);
-              this->mem->barrier();
 	      pressure_solver_apply(this->dt);
-              //this->mem->barrier();
 	      inhomo_solver_t::parent_t::solve(1);
-              //this->mem->barrier();
 	      this->forcings(this->dt / 2);
-              this->mem->barrier();
 	      pressure_solver_update(this->dt);
-              this->mem->barrier();
 	      pressure_solver_apply(this->dt);
-              this->mem->barrier();
 	    }
 	  }
 std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;

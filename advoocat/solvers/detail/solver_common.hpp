@@ -34,6 +34,14 @@ namespace advoocat
         typedef real_t_ real_t;
         typedef blitz::Array<real_t_, n_dims_> arr_t;
 
+	void cycle_all()
+	{ 
+	  for (int e = 0; e < n_eqs; ++e) cycle(e);
+          this->mem->barrier(); 
+          if (this->mem->rank() == 0) this->mem->cycle();
+          this->mem->barrier(); 
+	}
+
 	protected: 
 
         std::vector<int> n;
@@ -51,11 +59,6 @@ namespace advoocat
 	void cycle(int e) 
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
-	}
-
-	void cycle_all()
-	{ 
-	  for (int e = 0; e < n_eqs; ++e) cycle(e);
 	}
 
 	virtual void xchng(int e, int l = 0) = 0;
@@ -78,17 +81,11 @@ namespace advoocat
 	{   
 	  for (int t = 0; t < nt; ++t) 
 	  {   
-            this->mem->barrier();
             hook_ante_step();
-            this->mem->barrier();
 	    xchng_all();
-            this->mem->barrier();
 	    advop_all();
-            this->mem->barrier();
 	    cycle_all();
-            this->mem->barrier();
             hook_post_step();
-            this->mem->barrier(); // should not be needed if output was included in hook_post_step
 	  }   
         }
       };

@@ -32,12 +32,14 @@ namespace advoocat
 
 	void xchng(int e, int lev = 0) 
 	{
+          this->mem->barrier();
 	  bcxl->fill_halos(this->mem->psi[e][ this->n[e] - lev ], j^halo, k^halo);
 	  bcxr->fill_halos(this->mem->psi[e][ this->n[e] - lev ], j^halo, k^halo);
 	  bcyl->fill_halos(this->mem->psi[e][ this->n[e] - lev ], k^halo, i^halo);
 	  bcyr->fill_halos(this->mem->psi[e][ this->n[e] - lev ], k^halo, i^halo);
 	  bczl->fill_halos(this->mem->psi[e][ this->n[e] - lev ], i^halo, j^halo);
 	  bczr->fill_halos(this->mem->psi[e][ this->n[e] - lev ], i^halo, j^halo);
+          this->mem->barrier();
 	}
 
 	// ctor
