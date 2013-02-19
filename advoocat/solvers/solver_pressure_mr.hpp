@@ -77,12 +77,12 @@ std::cerr<<"--------------------------------------------------------------"<<std
 
           tmp_e1(i,j) = err(i,j)*lap_err(i,j);
           tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
-          real_t beta = - blitz::sum(tmp_e1(i,j))/blitz::sum(tmp_e2(i,j));
+          real_t beta = - this->mem->sum(tmp_e1(i,j))/this->mem->sum(tmp_e2(i,j));
 
           Phi(i, j) += beta * err(i, j);
           err(i, j) += beta * lap_err(i, j);
 
-          error = std::max(std::abs(max(err)), std::abs(min(err)));
+          error = std::max(std::abs(this->mem->max(err)), std::abs(this->mem->min(err)));
           this->iters++;
 std::cerr<<error<<std::endl;
 	}

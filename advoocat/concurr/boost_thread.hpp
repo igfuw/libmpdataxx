@@ -30,34 +30,41 @@ namespace advoocat
     {
       using parent_t = detail::concurr_common<solver_t, bcx, bcy, bcz>;
  
-      int size() 
-      {
-        const char *env_var("OMP_NUM_THREADS");
-        return (std::getenv(env_var) != NULL)
-          ? std::atoi(std::getenv(env_var)) // TODO: check if convesion OK?
-          : boost::thread::hardware_concurrency();
-      }
-
       class mem_t : public parent_t::mem_t 
       {
         boost::barrier b;
 
         public:
 
+/* TODO!
+        int rank()
+        {
+        }
+*/
+
+	static int size() 
+	{
+	  const char *env_var("OMP_NUM_THREADS");
+	  return (std::getenv(env_var) != NULL)
+	    ? std::atoi(std::getenv(env_var)) // TODO: check if convesion OK?
+	    : boost::thread::hardware_concurrency();
+	}
+
+
         // TODO:  could one constructor be enough if n_dims a template param?
-        mem_t(int s0, int bsize) : 
-          b(bsize),
-          parent_t::mem_t(s0) 
+        mem_t(int s0) : 
+          b(size()),
+          parent_t::mem_t(s0, size()) 
         {}; 
 
-        mem_t(int s0, int s1, int bsize) : 
-          b(bsize),
-          parent_t::mem_t(s0, s1) 
+        mem_t(int s0, int s1) : 
+          b(size()),
+          parent_t::mem_t(s0, s1, size()) 
         {}; 
 
-        mem_t(int s0, int s1, int s2, int bsize) : 
-          b(bsize),
-          parent_t::mem_t(s0, s1, s2) 
+        mem_t(int s0, int s1, int s2) : 
+          b(size()),
+          parent_t::mem_t(s0, s1, s2, size()) 
         {}; 
 
 	void barrier()
@@ -86,7 +93,7 @@ namespace advoocat
 	const int s0,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
-        parent_t(s0, params, new mem_t(s0, size()), size())
+        parent_t(s0, params, new mem_t(s0), mem_t::size())
       {}
 
       // 2D ctor
@@ -95,7 +102,7 @@ namespace advoocat
 	const int s1,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
-	parent_t(s0, s1, params, new mem_t(s0, s1, size()), size(), 1)
+	parent_t(s0, s1, params, new mem_t(s0, s1), mem_t::size(), 1)
       {}
 
       // 3D ctor
@@ -105,7 +112,7 @@ namespace advoocat
 	const int s2,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) :
-	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2, size()), size(), 1, 1)
+	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2), mem_t::size(), 1, 1)
       {}
     };
   }; // namespace concurr
