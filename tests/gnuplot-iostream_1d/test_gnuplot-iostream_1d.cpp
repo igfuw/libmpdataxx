@@ -14,7 +14,7 @@
 #include "advoocat/solvers/donorcell_1d.hpp"
 #include "advoocat/solvers/leapfrog_1d.hpp"
 #include "advoocat/bcond/bcond.hpp"
-#include "advoocat/concurr/openmp.hpp"
+#include "advoocat/concurr/threads.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
@@ -48,15 +48,15 @@ int main()
      << "set noytics\n"
      << "set palette maxcolors 18 defined (-1. \"red\", -.5 \"red\", -.5 \"blue\", -.17 \"green\", .16 \"brown\", .5 \"black\")\n";
 
-  int n = 10, nt = 10;
+  int n = 20, nt = 20;
 
   using real_t = float;
   boost::ptr_vector<concurr::any<real_t, 1>> slvs;
   {
-    slvs.push_back(new concurr::openmp<solvers::mpdata_1d<real_t, 1>, bcond::cyclic>(n));
-    slvs.push_back(new concurr::openmp<solvers::mpdata_1d<real_t, 2>, bcond::cyclic>(n));
-    slvs.push_back(new concurr::openmp<solvers::mpdata_1d<real_t, 3>, bcond::cyclic>(n));
-    slvs.push_back(new concurr::openmp<solvers::leapfrog_1d<real_t>, bcond::cyclic>(n));
+    slvs.push_back(new concurr::threads<solvers::mpdata_1d<real_t, 1>, bcond::cyclic>(n));
+    slvs.push_back(new concurr::threads<solvers::mpdata_1d<real_t, 2>, bcond::cyclic>(n));
+    slvs.push_back(new concurr::threads<solvers::mpdata_1d<real_t, 3>, bcond::cyclic>(n));
+    slvs.push_back(new concurr::threads<solvers::leapfrog_1d<real_t>, bcond::cyclic>(n));
   }
 
   for (auto &slv : slvs)

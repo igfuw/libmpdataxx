@@ -14,7 +14,7 @@
 #include "advoocat/solvers/solver_pressure_cr.hpp"
 #include "advoocat/solvers/solver_pressure_pc.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
-#include "advoocat/concurr/openmp.hpp"
+#include "advoocat/concurr/threads.hpp"
 //gradient
 #include "advoocat/formulae/nabla_formulae.hpp"
 //theta->pressure
@@ -64,7 +64,7 @@ int main()
       >
     >;
     solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
-    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
+    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
 
 /*
@@ -77,7 +77,7 @@ int main()
       >
     >;
     solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
-    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
+    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
 
   { // conjugate residual + preconditioner
@@ -89,7 +89,7 @@ int main()
       >
     >;
     solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
-    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
+    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
 */
 

@@ -62,18 +62,19 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t,
   {
     auto Psi = parent_t::psi(psi);
     auto Phi = parent_t::psi(phi);
+    rng_t &i = this->i;
 
-    tmp = Psi;
+    tmp(i) = Psi(i);
     ///   (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
     // explicit part
-    Psi += dt * omega * Phi;
+    Psi(i) += dt * omega * Phi(i);
     // implicit part
-    Psi /= (1 + pow(dt * omega, 2));
+    Psi(i) /= (1 + pow(dt * omega, 2));
 
     // explicit part
-    Phi += - dt * omega * tmp;
+    Phi(i) += - dt * omega * tmp(i);
     // implicit part
-    Phi /= (1 + pow(dt * omega, 2));
+    Phi(i) /= (1 + pow(dt * omega, 2));
   }
 
   public:

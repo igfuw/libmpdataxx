@@ -64,7 +64,9 @@ namespace advoocat
      
         void cycle()
         {
+          barrier();
           if (rank() == 0) n = (n + 1) % n_tlev - n_tlev; // TODO: czy potrzebne - n_tlev?
+          barrier();
         }
 
         // ctor

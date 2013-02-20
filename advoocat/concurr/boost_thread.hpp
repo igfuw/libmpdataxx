@@ -88,7 +88,7 @@ namespace advoocat
           thp.reset(new boost::thread(
             &solver_t::solve, boost::ref(this->algos[i]), nt
           ));
-          detail::boost_thread_id[boost::this_thread::get_id()] = i;
+          detail::boost_thread_id[thp->get_id()] = i;
           threads.add_thread(thp.release());
         }
         threads.join_all();

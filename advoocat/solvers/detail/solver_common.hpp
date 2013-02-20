@@ -37,9 +37,7 @@ namespace advoocat
 	void cycle_all()
 	{ 
 	  for (int e = 0; e < n_eqs; ++e) cycle(e);
-          this->mem->barrier(); 
           this->mem->cycle();
-          this->mem->barrier(); 
 	}
 
 	protected: 
