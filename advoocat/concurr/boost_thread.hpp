@@ -20,6 +20,11 @@ namespace advoocat
 {
   namespace concurr
   {
+    namespace detail
+    {
+      std::map<boost::thread::id, int> boost_thread_id;
+    };
+
     template <
       class solver_t,
       bcond::bcond_e bcx,
@@ -36,11 +41,10 @@ namespace advoocat
 
         public:
 
-/* TODO!
         int rank()
         {
+          return detail::boost_thread_id[boost::this_thread::get_id()];
         }
-*/
 
 	static int size() 
 	{
@@ -80,9 +84,12 @@ namespace advoocat
         boost::thread_group threads; // TODO: member field?
         for (int i = 0; i < this->algos.size(); ++i) 
         {  
-          threads.add_thread(new boost::thread(
+          std::unique_ptr<boost::thread> thp;
+          thp.reset(new boost::thread(
             &solver_t::solve, boost::ref(this->algos[i]), nt
           ));
+          detail::boost_thread_id[boost::this_thread::get_id()] = i;
+          threads.add_thread(thp.release());
         }
         threads.join_all();
       }

@@ -17,7 +17,7 @@
 #include "advoocat/solvers/mpdata_1d.hpp"
 #include "advoocat/solvers/donorcell_1d.hpp"
 #include "advoocat/bcond/cyclic_1d.hpp"
-#include "advoocat/concurr/openmp.hpp"
+#include "advoocat/concurr/threads.hpp"
 
 // plotting
 #define GNUPLOT_ENABLE_BLITZ
@@ -45,22 +45,22 @@ int main()
   { // euler / donor-cell
     using solver_t = coupled_harmosc<real_t, /* n_iters = */ 1, solvers::euler, psi, phi>;
     solver_t::params_t p; p.dt = dt; p.omega = omega;
-    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic>(nx, p));
+    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
   }
   { // euler / mpdata
     using solver_t = coupled_harmosc<real_t, /* n_iters = */ 2, solvers::euler, psi, phi>;
     solver_t::params_t p; p.dt = dt; p.omega = omega;
-    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic>(nx, p));
+    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
   }
   { // strang / donor-cell
     using solver_t = coupled_harmosc<real_t, /* n_iters = */ 1, solvers::strang, psi, phi>;
     solver_t::params_t p; p.dt = dt; p.omega = omega;
-    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic>(nx, p));
+    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
   }
   { // strang / mpdata
     using solver_t = coupled_harmosc<real_t, /* n_iters = */ 2, solvers::strang, psi, phi>;
     solver_t::params_t p; p.dt = dt; p.omega = omega;
-    slvs.push_back(new concurr::openmp<solver_t, bcond::cyclic>(nx, p));
+    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
   }
 
   Gnuplot gp;

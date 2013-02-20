@@ -38,7 +38,7 @@ namespace advoocat
 	{ 
 	  for (int e = 0; e < n_eqs; ++e) cycle(e);
           this->mem->barrier(); 
-          if (this->mem->rank() == 0) this->mem->cycle();
+          this->mem->cycle();
           this->mem->barrier(); 
 	}
 

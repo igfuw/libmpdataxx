@@ -62,9 +62,9 @@ namespace advoocat
           assert(false && "sharedmem_common::rank() called!");
         }
      
-        void cycle() // TODO: this should probably be placed outside as it is not to be called from within threads!
+        void cycle()
         {
-          n = (n + 1) % n_tlev - n_tlev; // TODO: czy potrzebne - n_tlev?
+          if (rank() == 0) n = (n + 1) % n_tlev - n_tlev; // TODO: czy potrzebne - n_tlev?
         }
 
         // ctor
@@ -77,9 +77,13 @@ namespace advoocat
         // concurrency-aware reductions
         real_t sum(const arr_t &arr)
         {
+std::cerr << "summing ... " << std::endl;
           (*reducetmp)(rank()) = blitz::sum(arr); 
           barrier();
           real_t result = blitz::sum(*reducetmp);
+std::ostringstream s;
+s << "result: " << result << " rank=" << rank();
+std::cerr << s << std::endl;
           barrier();
           return result;
         }
