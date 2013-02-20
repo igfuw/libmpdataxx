@@ -13,7 +13,7 @@
 #include "advoocat/solvers/mpdata_2d.hpp"
 #include "advoocat/solvers/donorcell_2d.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
-#include "advoocat/concurr/openmp.hpp"
+#include "advoocat/concurr/threads.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
@@ -55,7 +55,7 @@ int main()
      << "set pm3d at b\n";
   std::string binfmt;
   {
-    concurr::openmp<
+    concurr::threads<
       solvers::donorcell_2d<float>,
       bcond::cyclic, 
       bcond::cyclic
@@ -75,7 +75,7 @@ int main()
   } 
   {
     const int it = 2;
-    concurr::openmp<
+    concurr::threads<
       solvers::mpdata_2d<float, it>,
       bcond::cyclic, 
       bcond::cyclic
@@ -91,7 +91,7 @@ int main()
   } 
   {
     const int it = 4;
-    concurr::openmp<
+    concurr::threads<
       solvers::mpdata_2d<float, it>,
       bcond::cyclic, 
       bcond::cyclic

@@ -104,7 +104,7 @@ namespace advoocat
 
 	//pseudo-time loop
 	real_t error = 1.;
-	while (error > .00001)
+	while (error > .0001)
 	{
           tmp_e1(i,j) = err(i,j) * lap_p_err(i,j);
           tmp_e2(i,j) = lap_p_err(i,j) * lap_p_err(i,j);
