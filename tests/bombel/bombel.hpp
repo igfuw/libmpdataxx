@@ -14,8 +14,9 @@ class bombel : public parent_t
   {
     auto W   = this->psi(w);
     auto Tht = this->psi(tht);
+    rng_t &i = this->i, &j = this->j;
 
-    W += (dt * si:: seconds) * formulae::g<real_t>() * si::seconds / si::metres * (Tht - Tht_amb) / Tht_amb;
+    W(i,j) += (dt * si:: seconds) * formulae::g<real_t>() * si::seconds / si::metres * (Tht(i,j) - Tht_amb) / Tht_amb;
   }
 
   public:

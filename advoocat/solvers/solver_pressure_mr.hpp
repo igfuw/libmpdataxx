@@ -30,8 +30,10 @@ namespace advoocat
 
       void ini_pressure()
       {
+        const int halo = parent_t::halo;
 	// dt/2 * (Prs-Prs_amb) / rho
-	Phi(this->i^this->halo, this->j^this->halo) = real_t(0);
+	Phi(this->i, this->j) = real_t(0);
+        this->xchng(Phi,   this->i^halo, this->j^halo);
       }
 
       void pressure_solver_update(real_t dt)
@@ -46,8 +48,8 @@ namespace advoocat
 	rng_t &i = this->i;
 	rng_t &j = this->j;
 
-	tmp_u = this->psi(u);
-	tmp_w = this->psi(w);
+	tmp_u(i,j) = this->psi(u)(i,j);
+	tmp_w(i,j) = this->psi(w)(i,j);
 
         this->xchng(Phi,   i^halo, j^halo);
         this->xchng(tmp_u, i^halo, j^halo);
@@ -97,9 +99,11 @@ std::cerr<<error<<std::endl;
       {
 	auto U = this->psi(u);
 	auto W = this->psi(w);
+        rng_t &i = this->i;
+        rng_t &j = this->j;
 
-	U += tmp_u;
-	W += tmp_w;
+	U(i,j) += tmp_u(i,j);
+	W(i,j) += tmp_w(i,j);
       }
 
       public:

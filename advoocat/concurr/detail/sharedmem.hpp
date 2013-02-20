@@ -79,13 +79,9 @@ namespace advoocat
         // concurrency-aware reductions
         real_t sum(const arr_t &arr)
         {
-std::cerr << "summing ... " << std::endl;
           (*reducetmp)(rank()) = blitz::sum(arr); 
           barrier();
           real_t result = blitz::sum(*reducetmp);
-std::ostringstream s;
-s << "result: " << result << " rank=" << rank();
-std::cerr << s << std::endl;
           barrier();
           return result;
         }

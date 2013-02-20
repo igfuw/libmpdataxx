@@ -56,9 +56,11 @@ namespace advoocat
 
 	void extrp_velocity(int e) // extrapolate in time to t+1/2
 	{            // psi[n-1] will not be used anymore, and it will be intentionally overwritten!
+          rng_t &i = this->i, &j = this->j;
 	  auto tmp = this->psi(e, -1);
-	  tmp /= -2;
-	  tmp += 3./2 * this->psi(e);
+
+	  tmp(i,j) /= -2;
+	  tmp(i,j) += 3./2 * this->psi(e)(i,j);
 	}
 
 	virtual void ini_pressure() = 0;
