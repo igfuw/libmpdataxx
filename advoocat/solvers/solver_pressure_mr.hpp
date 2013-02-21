@@ -43,25 +43,26 @@ namespace advoocat
 	using formulae::nabla_op::div;
 
 	real_t rho = 1.;   //TODO    
+        real_t beta = .25; //TODO tmp
 
 	int halo = this->halo;
 	rng_t &i = this->i;
 	rng_t &j = this->j;
 
-	tmp_u(i,j) = this->psi(u)(i,j);
-	tmp_w(i,j) = this->psi(w)(i,j);
+	tmp_u(i,j) = this->state(u)(i,j);
+	tmp_w(i,j) = this->state(w)(i,j);
 
         this->xchng(Phi,   i^halo, j^halo);
         this->xchng(tmp_u, i^halo, j^halo);
         this->xchng(tmp_w, i^halo, j^halo);
 
-        tmp_x(i, j) = rho * (tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1)));
-        tmp_z(i, j) = rho * (tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1)));
+        tmp_x(i, j) = rho * (tmp_u(i, j) - grad<0>(Phi, i, j, real_t(1)));
+        tmp_z(i, j) = rho * (tmp_w(i, j) - grad<1>(Phi, j, i, real_t(1)));
 
         this->xchng(tmp_x, i^halo, j^halo);
         this->xchng(tmp_z, i^halo, j^halo);
 
-        err(i, j) = - 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
+        err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
 
 std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
@@ -70,37 +71,44 @@ std::cerr<<"--------------------------------------------------------------"<<std
 	{
           this->xchng(err, i^halo, j^halo);
 
-          tmp_e1(i, j) = grad<0>(err(i^halo, j^halo), i, j, real_t(1));
-          tmp_e2(i, j) = grad<1>(err(i^halo, j^halo), j, i, real_t(1));
+          tmp_e1(i, j) = grad<0>(err, i, j, real_t(1));
+          tmp_e2(i, j) = grad<1>(err, j, i, real_t(1));
           this->xchng(tmp_e1, i^halo, j^halo);
           this->xchng(tmp_e2, i^halo, j^halo);
  
-          lap_err(i,j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
+          lap_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
 
+// if (!richardson)
           tmp_e1(i,j) = err(i,j)*lap_err(i,j);
           tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
-          real_t beta = - this->mem->sum(tmp_e1(i,j))/this->mem->sum(tmp_e2(i,j));
+          beta = - this->mem->sum(tmp_e1(i,j))/this->mem->sum(tmp_e2(i,j));
+// endif
 
+std::ostringstream s;
+//s<<"wątek "<<this->mem->rank();
+//s<<" beta wynioslaby " <<  "-" << this->mem->sum(tmp_e1(i,j)) << "/" << this->mem->sum(tmp_e2(i,j));
+//s<<" beta "<<beta;
+	
           Phi(i, j) += beta * err(i, j);
           err(i, j) += beta * lap_err(i, j);
 
           error = std::max(std::abs(this->mem->max(err(i,j))), std::abs(this->mem->min(err(i,j))));
           this->iters++;
-std::cerr<<error<<std::endl;
+s<<" error "<<error;
+std::cerr << s.str() << std::endl;
 	}
 	//end of pseudo_time loop
-	this->xchng(this->Phi, i^halo, j^halo);
 
-	tmp_u(i, j) = - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-	tmp_w(i, j) = - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+	this->xchng(this->Phi, i^halo, j^halo);
+	tmp_u(i, j) = - grad<0>(Phi, i, j, real_t(1));
+	tmp_w(i, j) = - grad<1>(Phi, j, i, real_t(1));
       }
 
       void pressure_solver_apply(real_t dt)
       {
-	auto U = this->psi(u);
-	auto W = this->psi(w);
-        rng_t &i = this->i;
-        rng_t &j = this->j;
+	auto U = this->state(u);
+	auto W = this->state(w);
+        const rng_t &i = this->i, &j = this->j;
 
 	U(i,j) += tmp_u(i,j);
 	W(i,j) += tmp_w(i,j);

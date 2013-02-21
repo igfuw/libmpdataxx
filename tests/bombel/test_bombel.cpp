@@ -43,7 +43,6 @@ using namespace advoocat;
 int main() 
 {
   const int nx = 100, ny = 100, nt = 40, n_out=1;
-//  const int nx = 50, ny = 50, nt = 41, n_out=10;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
@@ -66,7 +65,7 @@ int main()
     solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
-
+/*
   { // conjugate residual
     using solver_t = bombel<
       solvers::pressure_cr<
@@ -90,13 +89,13 @@ int main()
     solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
-
+*/
   //ploting
   Gnuplot gp;
   gp << "reset\n"
      << "set term svg size 2000,750 dynamic\n"
      << "set output 'figure.svg'\n"
-     << "set multiplot layout 3," << slvs.size() << "\n" // columnsfirst\n"
+     << "set multiplot layout " << slvs.size() << ",3\n" // columnsfirst\n"
      << "set grid\n"
      << "set xlabel 'X'\n"
      << "set ylabel 'Y'\n"

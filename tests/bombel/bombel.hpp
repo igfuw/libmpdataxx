@@ -12,8 +12,8 @@ class bombel : public parent_t
 
   void forcings(real_t dt)  //explicit forcings (to be applied before the eliptic solver)
   {
-    auto W   = this->psi(w);
-    auto Tht = this->psi(tht);
+    auto W   = this->state(w);
+    auto Tht = this->state(tht);
     rng_t &i = this->i, &j = this->j;
 
     W(i,j) += (dt * si:: seconds) * formulae::g<real_t>() * si::seconds / si::metres * (Tht(i,j) - Tht_amb) / Tht_amb;

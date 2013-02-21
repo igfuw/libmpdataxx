@@ -35,32 +35,29 @@ namespace advoocat
 	  this->xchng(u);
 	  this->xchng(w);
 
-	  formulae::courant::intrp<0>(this->mem->C[0], this->psi(u), im, this->j^this->halo, this->dt, dx);
-	  formulae::courant::intrp<1>(this->mem->C[1], this->psi(w), jm, this->i^this->halo, this->dt, dz);
+	  formulae::courant::intrp<0>(this->mem->C[0], this->state(u), im, this->j^this->halo, this->dt, dx);
+	  formulae::courant::intrp<1>(this->mem->C[1], this->state(w), jm, this->i^this->halo, this->dt, dz);
 	}
 
 	void extrp_courant()
 	{
 	  extrp_velocity(u);      //extrapolate velocity field in time (t+1/2)
 	  extrp_velocity(w);
-        }
 
-	void intrp_courant()
-	{
-	  this->xchng(u, 1);      // filling halos for velocity filed
-	  this->xchng(w, 1);      // psi[n-1] was overwriten for that by extrp_velocity
+	  this->xchng(u, -1);      // filling halos for velocity filed
+	  this->xchng(w, -1);      // psi[n-1] was overwriten for that by extrp_velocity
 
-	  formulae::courant::intrp<0>(this->mem->C[0], this->psi(u, -1), im, this->j^this->halo, this->dt, dx);
-	  formulae::courant::intrp<1>(this->mem->C[1], this->psi(w, -1), jm, this->i^this->halo, this->dt, dz);
+	  formulae::courant::intrp<0>(this->mem->C[0], this->state(u, -1), im, this->j^this->halo, this->dt, dx);
+	  formulae::courant::intrp<1>(this->mem->C[1], this->state(w, -1), jm, this->i^this->halo, this->dt, dz);
 	}
 
 	void extrp_velocity(int e) // extrapolate in time to t+1/2
 	{            // psi[n-1] will not be used anymore, and it will be intentionally overwritten!
           rng_t &i = this->i, &j = this->j;
-	  auto tmp = this->psi(e, -1);
+	  auto tmp = this->state(e, -1);
 
 	  tmp(i,j) /= -2;
-	  tmp(i,j) += 3./2 * this->psi(e)(i,j);
+	  tmp(i,j) += 3./2 * this->state(e)(i,j);
 	}
 
 	virtual void ini_pressure() = 0;
@@ -87,7 +84,6 @@ namespace advoocat
 	    {
 	      std::cerr<<"t= "<<t<<std::endl;
 	      extrp_courant();
-	      intrp_courant();
 	      this->forcings(this->dt / 2);
 	      pressure_solver_apply(this->dt);
 	      inhomo_solver_t::parent_t::solve(1);

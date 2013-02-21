@@ -28,12 +28,6 @@ namespace advoocat
 
       virtual void forcings(typename parent_t::real_t dt) = 0;
 
-      // psi getter
-      typename parent_t::arr_t psi(int e, int add = 0)
-      {
-	return this->mem->psi[e][this->n[e] + add];
-      }
-
       typename parent_t::real_t dt;
 
       public:

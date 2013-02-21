@@ -59,7 +59,7 @@ namespace advoocat
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
 	}
 
-	virtual void xchng(int e, int l = 0) = 0;
+	virtual void xchng(int e, int l = 0) = 0; // TODO: make l -> -l
 	void xchng_all() 
 	{   
 	  for (int e = 0; e < n_eqs; ++e) xchng(e);
@@ -86,6 +86,12 @@ namespace advoocat
             hook_post_step();
 	  }   
         }
+
+	// psi getter
+	arr_t state(int e, int add = 0)
+	{
+	  return this->mem->psi[e][this->n[e] + add];
+	}
       };
     }; // namespace detail
   }; // namespace solvers
