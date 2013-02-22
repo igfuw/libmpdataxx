@@ -39,7 +39,7 @@ namespace advoocat
 	const rng_t &j,
 	const real_t hx,
 	const real_t hy
-      ) return_macro(;,
+      ) return_macro(,
 	(x(i+1,j  ) - x(i-1,j  )) / hx / 2.
 	+
 	(y(i  ,j+1) - y(i  ,j-1)) / hy / 2.

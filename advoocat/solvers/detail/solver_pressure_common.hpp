@@ -78,7 +78,13 @@ namespace advoocat
 	      inhomo_solver_t::parent_t::solve(1);
 	      this->forcings(this->dt / 2);
 	      pressure_solver_update(this->dt);
+// Tu równolegle state(u) jest losowe
+std::ostringstream s;
+s << "rank=" << this->mem->rank() 
+  << " sum(state(u)) = " << this->mem->sum(this->state(u)(this->i, this->j)) << std::endl;
 	      pressure_solver_apply(this->dt);
+s << " sum(state(u)) = " << this->mem->sum(this->state(u)(this->i, this->j)) << std::endl;
+std::cerr << s.str();
 	    }
 	    if (t!=0)
 	    {

@@ -64,6 +64,15 @@ namespace advoocat
 
         err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
 
+/*
+std::ostringstream s;
+s<<"wątek "<<this->mem->rank() 
+  << " sum(tmp_u)=" << this->mem->sum(tmp_u(i,j))
+  << " sum(tmp_w)=" << this->mem->sum(tmp_w(i,j))
+  << " sum(state(u))=" << this->mem->sum(this->state(u)(i,j))
+  << " sum(state(w))=" << this->mem->sum(this->state(w)(i,j));
+*/
+
 std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
@@ -78,15 +87,12 @@ std::cerr<<"--------------------------------------------------------------"<<std
  
           lap_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
 
-// if (!richardson)
+// if (!richardson) TODO
           tmp_e1(i,j) = err(i,j)*lap_err(i,j);
           tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
           beta = - this->mem->sum(tmp_e1(i,j))/this->mem->sum(tmp_e2(i,j));
 // endif
 
-std::ostringstream s;
-//s<<"wątek "<<this->mem->rank();
-//s<<" beta wynioslaby " <<  "-" << this->mem->sum(tmp_e1(i,j)) << "/" << this->mem->sum(tmp_e2(i,j));
 //s<<" beta "<<beta;
 	
           Phi(i, j) += beta * err(i, j);
@@ -94,9 +100,9 @@ std::ostringstream s;
 
           error = std::max(std::abs(this->mem->max(err(i,j))), std::abs(this->mem->min(err(i,j))));
           this->iters++;
-s<<" error "<<error;
-std::cerr << s.str() << std::endl;
 	}
+//s << " error " << error << std::endl;
+//std::cerr << s.str();
 	//end of pseudo_time loop
 
 	this->xchng(this->Phi, i^halo, j^halo);
