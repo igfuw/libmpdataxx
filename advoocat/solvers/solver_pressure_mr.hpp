@@ -63,20 +63,24 @@ namespace advoocat
         this->xchng(tmp_z, i^halo, j^halo);
 
         err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
+        this->xchng(err, i^halo, j^halo);
 
-/*
 std::ostringstream s;
-s<<"wątek "<<this->mem->rank() 
-  << " sum(tmp_u)=" << this->mem->sum(tmp_u(i,j))
-  << " sum(tmp_w)=" << this->mem->sum(tmp_w(i,j))
-  << " sum(state(u))=" << this->mem->sum(this->state(u)(i,j))
-  << " sum(state(w))=" << this->mem->sum(this->state(w)(i,j));
-*/
+s << "prs_solve: " <<"wątek "<<this->mem->rank()<<std::endl 
+  << "sum(err)=" << this->mem->sum(err(i,j))<<std::endl;
+//  << " sum(tmp_u)=" << this->mem->sum(tmp_u(i,j))<<std::endl
+//  << " sum(state(u))=" << this->mem->sum(this->state(u)(i,j))<<std::endl
+//  << " sum(tmp_w)=" << this->mem->sum(tmp_w(i,j))<<std::endl
+//  << " sum(state(w))=" << this->mem->sum(this->state(w)(i,j))<<std::endl
+//  << " sum(tmp_x)=" << this->mem->sum(tmp_x(i,j))<<std::endl
+//  << " sum(tmp_z)=" << this->mem->sum(tmp_z(i,j))<<std::endl;
+//  << err<<std::endl;
+std::cerr<<s.str();
 
 std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
-	while (error > .00001)
+	while (error > .01) //TODO tmp TODO tmp !!!
 	{
           this->xchng(err, i^halo, j^halo);
 
