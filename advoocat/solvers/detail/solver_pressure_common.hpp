@@ -92,7 +92,7 @@ namespace advoocat
 	      pressure_solver_apply(this->dt);
 	    }
 	  }
-//std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
+std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	}
 
 	// ctor

@@ -65,22 +65,10 @@ namespace advoocat
         err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
         this->xchng(err, i^halo, j^halo);
 
-std::ostringstream s;
-s << "prs_solve: " <<"wątek "<<this->mem->rank()<<std::endl 
-  << "sum(err)=" << this->mem->sum(err(i,j))<<std::endl;
-//  << " sum(tmp_u)=" << this->mem->sum(tmp_u(i,j))<<std::endl
-//  << " sum(state(u))=" << this->mem->sum(this->state(u)(i,j))<<std::endl
-//  << " sum(tmp_w)=" << this->mem->sum(tmp_w(i,j))<<std::endl
-//  << " sum(state(w))=" << this->mem->sum(this->state(w)(i,j))<<std::endl
-//  << " sum(tmp_x)=" << this->mem->sum(tmp_x(i,j))<<std::endl
-//  << " sum(tmp_z)=" << this->mem->sum(tmp_z(i,j))<<std::endl;
-//  << err<<std::endl;
-std::cerr<<s.str();
-
 std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
-	while (error > .01) //TODO tmp TODO tmp !!!
+	while (error > .00001) //TODO tmp TODO tmp !!!
 	{
           this->xchng(err, i^halo, j^halo);
 
@@ -94,7 +82,10 @@ std::cerr<<"--------------------------------------------------------------"<<std
 // if (!richardson) TODO
           tmp_e1(i,j) = err(i,j)*lap_err(i,j);
           tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
-          beta = - this->mem->sum(tmp_e1(i,j))/this->mem->sum(tmp_e2(i,j));
+          beta = - this->mem->sum(tmp_e1,i,j) / this->mem->sum(tmp_e2,i,j);
+std::ostringstream s;
+s << beta << std::endl;
+std::cerr << s.str();
 // endif
 
 //s<<" beta "<<beta;
@@ -102,7 +93,10 @@ std::cerr<<"--------------------------------------------------------------"<<std
           Phi(i, j) += beta * err(i, j);
           err(i, j) += beta * lap_err(i, j);
 
-          error = std::max(std::abs(this->mem->max(err(i,j))), std::abs(this->mem->min(err(i,j))));
+	  error = std::max(
+	    std::abs(this->mem->max(err(i,j))),
+	    std::abs(this->mem->min(err(i,j)))
+	  );
           this->iters++;
 	}
 //s << " error " << error << std::endl;
@@ -116,12 +110,10 @@ std::cerr<<"--------------------------------------------------------------"<<std
 
       void pressure_solver_apply(real_t dt)
       {
-	auto U = this->state(u);
-	auto W = this->state(w);
         const rng_t &i = this->i, &j = this->j;
 
-	U(i,j) += tmp_u(i,j);
-	W(i,j) += tmp_w(i,j);
+	this->state(u)(i,j) += tmp_u(i,j);
+	this->state(w)(i,j) += tmp_w(i,j);
       }
 
       public:
@@ -165,7 +157,7 @@ std::cerr<<"--------------------------------------------------------------"<<std
         mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
         {
           for (int n=0; n < 1; ++n) 
-            mem->tmp[file].back().push_back(new typename parent_t::arr_t(i, j)); 
+            mem->tmp[file].back().push_back(new typename parent_t::arr_t(i, j)); // TODO: is it possible? Bitz forbids differently-based arrays in one expression!
           for (int n=0; n < 8; ++n) 
             mem->tmp[file].back().push_back(new typename parent_t::arr_t( i^halo, j^halo )); 
         }

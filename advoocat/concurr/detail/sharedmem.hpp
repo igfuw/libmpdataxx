@@ -31,7 +31,8 @@ namespace advoocat
 	static_assert(n_dims > 0, "n_dims <= 0");
 	static_assert(n_tlev > 0, "n_tlev <= 0");
 
-        std::unique_ptr<blitz::Array<real_t, 1>> reducetmp;
+        std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; // TODO: T_sumtype
+        std::unique_ptr<blitz::Array<real_t, 2>> sumtmp; // TODO: T_sumtype
 
         protected:
 
@@ -69,48 +70,53 @@ namespace advoocat
           barrier();
         }
 
-        // ctor
-        sharedmem_common(int size)
+        // ctors
+        // TODO: fill reducetmp with NaNs
+        sharedmem_common(int s0, int size)
         {
-          reducetmp.reset(new blitz::Array<real_t, 1>(size));
-          // TODO: fill reducetmp with NaNs
+          //sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));  // TODO: write a different sum that would't use sumtmp
+          xtmtmp.reset(new blitz::Array<real_t, 1>(size));
+        }
+        sharedmem_common(int s0, int s1, int size)
+        {
+          sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));
+          xtmtmp.reset(new blitz::Array<real_t, 1>(size));
+        }
+        sharedmem_common(int s0, int s1, int s2, int size)
+        {
+          sumtmp.reset(new blitz::Array<real_t, 2>(s0, s1));
+          xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
   
         // concurrency-aware reductions
-        real_t sum(const arr_t &arr)
+        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j)
         {
+          {
+            // doing a two-step sum to reduce numerical error 
+            // and make parallel results reproducible
+            for (int c = i.first(); c <= i.last(); ++c)
+              (*sumtmp)(c, 0) = blitz::sum(arr(c, j));
+          }
           barrier();
-
-std::ostringstream s;
-
-          (*reducetmp)(rank()) = blitz::sum(arr); 
-
-s<< "prs_solve: " <<"wątek "<<rank()<<std::endl  
- << blitz::sum(arr)<<std::endl;
-
-          barrier();
-
-std::cerr<<s.str()<<std::endl;
-
-          real_t result = blitz::sum(*reducetmp);
+          real_t result = blitz::sum(*sumtmp);
           barrier();
           return result;
         }
 
         real_t min(const arr_t &arr)
         {
-          (*reducetmp)(rank()) = blitz::min(arr); 
+          (*xtmtmp)(rank()) = blitz::min(arr); 
           barrier();
-          real_t result = blitz::min(*reducetmp);
+          real_t result = blitz::min(*xtmtmp);
           barrier();
           return result;
         }
 
         real_t max(const arr_t &arr)
         {
-          (*reducetmp)(rank()) = blitz::max(arr); 
+          (*xtmtmp)(rank()) = blitz::max(arr); 
           barrier();
-          real_t result = blitz::max(*reducetmp);
+          real_t result = blitz::max(*xtmtmp);
           barrier();
           return result;
         }
@@ -135,7 +141,7 @@ std::cerr<<s.str()<<std::endl;
 
 	// ctor
 	sharedmem(int s0, int size)
-          : parent_t(size)
+          : parent_t(s0, size)
 	{
 	  this->span[0] = s0; 
 	}
@@ -157,7 +163,7 @@ std::cerr<<s.str()<<std::endl;
 
 	// ctor
 	sharedmem(int s0, int s1, int size)
-          : parent_t(size)
+          : parent_t(s0, s1, size)
 	{
 	  this->span[0] = s0; 
 	  this->span[1] = s1; 
@@ -181,7 +187,7 @@ std::cerr<<s.str()<<std::endl;
 
 	// ctor
 	sharedmem(int s0, int s1, int s2, int size)
-          : parent_t(size)
+          : parent_t(s0, s1, s2, size)
 	{
 	  this->span[0] = s0; 
 	  this->span[1] = s1; 
