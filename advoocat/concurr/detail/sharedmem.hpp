@@ -95,10 +95,10 @@ namespace advoocat
             // doing a two-step sum to reduce numerical error 
             // and make parallel results reproducible
             for (int c = i.first(); c <= i.last(); ++c)
-              (*sumtmp)(c, 0) = blitz::sum(arr(c, j));
+              (*sumtmp)(c, 0) = blitz::kahan_sum(arr(c, j));
           }
           barrier();
-          real_t result = blitz::sum(*sumtmp);
+          real_t result = blitz::kahan_sum(*sumtmp);
           barrier();
           return result;
         }
