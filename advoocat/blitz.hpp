@@ -45,9 +45,8 @@ namespace blitz
     bool operator()(const T_sourcetype& x,const int=0) const 
     { 
       T_resulttype y, t;
-// TODO: check which level
 #pragma GCC push_options
-#pragma GCC optimize ("O0")
+#pragma GCC optimize ("O3") // assuming -Ofast could optimise out the algorithm
       y = x - c_;
       t = sum_ + y;
       c_ = (t - sum_) - y;
