@@ -14,6 +14,7 @@ find_package(OpenMP)
 find_package(Boost COMPONENTS thread date_time system)
 set(BOOST_THREAD_LIBS "${Boost_LIBRARIES}")
 
+add_subdirectory(kahan_sum)
 add_subdirectory(gnuplot-iostream_1d)
 add_subdirectory(gnuplot-iostream_2d)
 add_subdirectory(var_sign_2d)

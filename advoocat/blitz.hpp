@@ -45,6 +45,7 @@ namespace blitz
     bool operator()(const T_sourcetype& x,const int=0) const 
     { 
       T_resulttype y, t;
+// TODO: check which level
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
       y = x - c_;
