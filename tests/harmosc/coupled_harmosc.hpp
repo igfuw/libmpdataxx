@@ -1,6 +1,5 @@
 /** 
  * @file
- * @example harmosc/test_harmosc.cpp
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)

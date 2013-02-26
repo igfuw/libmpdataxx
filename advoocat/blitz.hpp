@@ -1,22 +1,8 @@
 /** @file
-* @copyright University of Warsaw
-* @section LICENSE
-* GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
-*/
-/** @mainpage
- *  TODO: table of examples with columns:
- *  - adv. algorithm
- *  - Jacobian
- *  - number of dimensions
- *  - equation set
- *
- *  blitz-based
- * 
- *  suggested compiler options (by compiler): -march=native, -Ofast, -DNDEBUG, -lblitz (opt), -DBZDEBUG (opt), -std=c++11
- */
-
-// code licensed under the terms of GNU GPL v3
-// copyright holder: University of Warsaw
+  * @copyright University of Warsaw
+  * @section LICENSE
+  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
+  */
 
 #pragma once
 

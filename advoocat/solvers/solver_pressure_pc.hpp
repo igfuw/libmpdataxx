@@ -3,6 +3,73 @@
   * @copyright University of Warsaw
   * @section LICENSE
   * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
+  *
+  * @brief conjugate residual pressure solver 
+  *   (for more detailed discussion consult Smolarkiewicz & Szmelter 2011
+  *    A Nonhydrostatic Unstructured-Mesh Soundproof Model for Simulation of Internal Gravity Waves
+  *    Acta Geophysica)
+  *
+  * @section DERIVATION
+  * 
+  * for introduction see the derivation of minimal residual pressure solver (solver_pressure_mr.hpp)
+  * and conjugate residual pressure solver (solver_pressure_cr.hpp)
+  * 
+  * in preconditioned solver initail equation \f$ \mathcal{L}(\Phi) - R = 0 \f$ 
+  * is replaced by \f$ \mathcal{L}^{\prime}(\Phi) - R^{\prime} = 0 \f$
+  * so that convergence of variational schmes is accelerated
+  *
+  * there is no set of rules explaining how to design a good preconditioner
+  * 
+  * assume that operator \f$ \mathcal{P} \f$ is our preconditioner
+  *
+  * In principle \f$ \mathcal{P} \f$ can be any linear operator 
+  * such that \f$ \mathcal{L} \mathcal{P} ^{-1} \f$ is negative definite.
+  * The goal is to augument the initial recurrence so that it converges faster.
+  * On the other hand, for the preconditioner to be useful, the convergence of the 
+  * auxiliary problem must be sufficiently rapid to overcome the additional effort
+  * of inverting \f$ \mathcal{P} \f$
+  * 
+  * For the preconditioned conjugate residual scheme we start from 
+  *
+  * \f$ \mathcal{L}(\Phi) - R = 
+  *   \frac{\partial^2 \mathcal{P}(\Phi)}{\partial \tau^2} + \frac{1}{T}\frac{\partial \mathcal{P}(\Phi)}{\partial \tau} \f$
+  *
+  * acting with \f$ \mathcal{P}^{-1} \f$ on the both sides of the above equation leads to the recurrence formulas
+  *
+  * \f$ \Phi^{n+1} = \Phi^{n} + \beta^{n} \mathcal{P}^{-1}(p^{n})\f$
+  *
+  * \f$ r^{n+1} = r^{n} + \beta^{n} \mathcal{L} \mathcal{P}^{-1}(p^{n}) \f$
+  *
+  * \f$ \mathcal{P}^{-1}(p^{n+1}) = \alpha^{n+1} \mathcal{P}^{-1}(p^{n}) + \mathcal{P}^{-1}(r^{n+1})  \f$
+  * 
+  * redefining \f$ p_{new} = \mathcal{P}^{-1}(p_{old}) \f$ leads to 
+  *
+  * \f$ p^{n+1} = \alpha^{n+1} p^{n} + q^{n+1} \f$
+  *
+  * where \f$ q^{n+1} = \mathcal{P}^{-1}(r^{n+1}) \f$
+  *
+  * and the coefficients
+  *
+  * \f$ \beta^{n} = - \frac{<r^{n} \mathcal{L}(p^{n})>}{<\mathcal{L}(p^{n}) \mathcal{L}(p^{n})>} \f$
+  *
+  * \f$ \alpha^{n+1} = - \frac{<\mathcal{L}(q^{n+1}) \mathcal{L}(p^{n})>}{< \mathcal{L}(p^{n}) \mathcal{L}(p^{n})>} \f$
+  *
+  * The recurrence of \f$ p \f$ implies a recurence for \f$ \mathcal{L}(p) \f$
+  *
+  * \f$ \mathcal{L}(p^{n+1}) = \mathcal{L}(q^{n+1}) + \alpha^{n+1} \mathcal{L}(p^{n}) \f$
+  * 
+  * iterations in pseudo-time stop when residual error is smaller than a given value (for example .0001)
+  *
+  * Added difficulty of preconditioned scheme stems from the need to solve the auxiliary elliptic problem at initialization
+  * \f$ p^{0} = \mathcal{P}^{-1}(r^{0}) \f$ and at each iteration \f$ q^{n+1} = \mathcal{P}^{-1}(r^{n+1}) \f$ .
+  * In this approach the inversion of \f$ \mathcal{P} \f$ is done using Richardson scheme (minimum residual scheme with \f$ \beta = .25 \f$).
+  * 
+  * \f$ e = \mathcal{P}^{-1}(r) \;\;\;\;\;\; / \mathcal{P} \f$
+  * 
+  * \f$ \mathcal{P}(e) - r = 0 \f$
+  *
+  * \f$ \mathcal{P}(e) - r = \frac{\partial e}{\partial \xi} \f$
+
   */
 
 #pragma once
@@ -23,20 +90,9 @@ namespace advoocat
       typedef typename parent_t::real_t real_t;
       using arr_2d_t = typename parent_t::arr_t;
 
-      arr_2d_t Phi, err, p_err, q_err;
-      arr_2d_t lap_err, lap_p_err, lap_q_err; 
-      //TODO probably don't need those
-      arr_2d_t tmp_u, tmp_w, tmp_x, tmp_z;
-      arr_2d_t tmp_e1, tmp_e2;
+      arr_2d_t p_err, q_err, lap_p_err, lap_q_err, tmp_x, tmp_z, tmp_e1, tmp_e2;
 
       private:
-
-      void ini_pressure()
-      {
-	// dt/2 * (Prs-Prs_amb) / rho
-	Phi(this->i, this->j) = real_t(0);
-	this->xchng(Phi, this->i^this->halo, this->j^this->halo);
-     }
 
       void precond()
       {
@@ -57,7 +113,7 @@ namespace advoocat
           this->xchng(tmp_e2, i^halo, j^halo);
           lap_q_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
 
-          q_err(i,j) += beta * (lap_q_err(i, j) - err(i,j));
+          q_err(i,j) += beta * (lap_q_err(i, j) - this->err(i,j));
           this->xchng(q_err, i^halo, j^halo);
         }
       }
@@ -77,18 +133,18 @@ namespace advoocat
 	rng_t &i = this->i;
 	rng_t &j = this->j;
 
-	tmp_u(i, j) = this->state(u)(i, j);
-	tmp_w(i, j) = this->state(w)(i, j);
+	this->tmp_u(i, j) = this->state(u)(i, j);
+	this->tmp_w(i, j) = this->state(w)(i, j);
 
-        this->xchng(Phi,   i^halo, j^halo);
-        this->xchng(tmp_u, i^halo, j^halo);
-	this->xchng(tmp_w, i^halo, j^halo);
-	tmp_x(i, j) = rho * (tmp_u(i, j) - grad<0>(Phi, i, j, real_t(1)));
-	tmp_z(i, j) = rho * (tmp_w(i, j) - grad<1>(Phi, j, i, real_t(1)));
+        this->xchng(this->Phi,   i^halo, j^halo);
+        this->xchng(this->tmp_u, i^halo, j^halo);
+	this->xchng(this->tmp_w, i^halo, j^halo);
+	tmp_x(i, j) = rho * (this->tmp_u(i, j) - grad<0>(this->Phi, i, j, real_t(1)));
+	tmp_z(i, j) = rho * (this->tmp_w(i, j) - grad<1>(this->Phi, j, i, real_t(1)));
 	this->xchng(tmp_x, i^halo, j^halo);
 	this->xchng(tmp_z, i^halo, j^halo);
 
-        err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
+        this->err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
 
         //initail q_err for preconditioner
         q_err(i, j) = real_t(0);
@@ -110,17 +166,17 @@ namespace advoocat
 	real_t error = 1.;
 	while (error > .0001)
 	{
-          tmp_e1(i,j) = err(i,j) * lap_p_err(i,j);
+          tmp_e1(i,j) = this->err(i,j) * lap_p_err(i,j);
           tmp_e2(i,j) = lap_p_err(i,j) * lap_p_err(i,j);
           tmp_den = this->mem->sum(tmp_e2, i, j);
           if (tmp_den != 0) beta = - this->mem->sum(tmp_e1, i, j) / tmp_den;
  
-          Phi(i, j) += beta * p_err(i, j);
-          err(i, j) += beta * lap_p_err(i, j);
+          this->Phi(i, j) += beta * p_err(i, j);
+          this->err(i, j) += beta * lap_p_err(i, j);
 
           error = std::max(
-            std::abs(this->mem->max(err(i, j))), 
-            std::abs(this->mem->min(err(i, j)))
+            std::abs(this->mem->max(this->err(i, j))), 
+            std::abs(this->mem->min(this->err(i, j)))
           );
 std::cerr<<"error "<<error<<std::endl;
           precond();
@@ -146,23 +202,11 @@ std::cerr<<"error "<<error<<std::endl;
 
 	this->xchng(this->Phi, i^halo, j^halo);
 
-	tmp_u(i, j) -= grad<0>(Phi, i, j, real_t(1));
-	tmp_w(i, j) -= grad<1>(Phi, j, i, real_t(1));
+	this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, real_t(1));
+	this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, real_t(1));
 
-	tmp_u(i, j) -= this->state(u)(i, j);
-	tmp_w(i, j) -= this->state(w)(i, j);
-      }
-
-      void pressure_solver_apply(real_t dt)
-      {
-	rng_t &i = this->i;
-	rng_t &j = this->j;
-        
-	auto U = this->state(u);
-	auto W = this->state(w);
-
-	U(i, j) += tmp_u(i, j);
-	W(i, j) += tmp_w(i, j);
+	this->tmp_u(i, j) -= this->state(u)(i, j);
+	this->tmp_w(i, j) -= this->state(w)(i, j);
       }
 
       public:
@@ -182,20 +226,15 @@ std::cerr<<"error "<<error<<std::endl;
       ) :
 	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
         // (i, j)
-        lap_err(mem->tmp[std::string(__FILE__)][0][0]),
-        lap_p_err(mem->tmp[std::string(__FILE__)][0][1]),
-        lap_q_err(mem->tmp[std::string(__FILE__)][0][2]),
+        lap_p_err(mem->tmp[std::string(__FILE__)][0][0]), // TODO: parent has unused lap_err
+        lap_q_err(mem->tmp[std::string(__FILE__)][0][1]),
         // (i^hlo, j^hlo))
-	err(mem->tmp[std::string(__FILE__)][0][3]),
-	tmp_x(mem->tmp[std::string(__FILE__)][0][4]),
-	tmp_z(mem->tmp[std::string(__FILE__)][0][5]),
-	tmp_u(mem->tmp[std::string(__FILE__)][0][6]),
-	tmp_w(mem->tmp[std::string(__FILE__)][0][7]),
-	Phi(mem->tmp[std::string(__FILE__)][0][8]),
-	tmp_e1(mem->tmp[std::string(__FILE__)][0][9]),
-	tmp_e2(mem->tmp[std::string(__FILE__)][0][10]),
-	p_err(mem->tmp[std::string(__FILE__)][0][11]),
-	q_err(mem->tmp[std::string(__FILE__)][0][12])
+	tmp_x(mem->tmp[std::string(__FILE__)][1][0]),
+	tmp_z(mem->tmp[std::string(__FILE__)][1][1]),
+	tmp_e1(mem->tmp[std::string(__FILE__)][1][2]),
+	tmp_e2(mem->tmp[std::string(__FILE__)][1][3]),
+	p_err(mem->tmp[std::string(__FILE__)][1][4]),
+	q_err(mem->tmp[std::string(__FILE__)][1][5])
       {}
 
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
@@ -208,12 +247,12 @@ std::cerr<<"error "<<error<<std::endl;
 
         // temporary fields
         mem->tmp[file].push_back(new arrvec_t<arr_2d_t>());
-        {
-          for (int n=0; n < 3; ++n) 
-            mem->tmp[file].back().push_back(new arr_2d_t(i, j)); 
-          for (int n=0; n < 10; ++n) 
-            mem->tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo)); 
-        }
+	for (int n=0; n < 2; ++n) 
+	  mem->tmp[file].back().push_back(new arr_2d_t(i, j)); 
+
+        mem->tmp[file].push_back(new arrvec_t<arr_2d_t>());
+	for (int n=0; n < 6; ++n) 
+	  mem->tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo)); 
       }
     }; 
   }; // namespace solvers

@@ -30,6 +30,8 @@ namespace advoocat
 	real_t dx = 1, dz = 1;  //TODO don't assume dx=dz=1
         int iters = 0;
 
+        typename parent_t::arr_t Phi, tmp_u, tmp_w, err, lap_err;
+
 	void ini_courant()
 	{
 	  this->xchng(u);
@@ -60,9 +62,23 @@ namespace advoocat
 	  tmp(i,j) += 3./2 * this->state(e)(i,j);
 	}
 
-	virtual void ini_pressure() = 0;
+	void ini_pressure()
+	{ 
+	  const int halo = parent_t::halo;
+	  // dt/2 * (Prs-Prs_amb) / rho 
+	  Phi(this->i, this->j) = real_t(0);
+	  this->xchng(Phi, this->i^halo, this->j^halo);
+	}
+
 	virtual void pressure_solver_update(real_t dt) = 0;
-	virtual void pressure_solver_apply(real_t dt) = 0;
+
+	void pressure_solver_apply(real_t dt)
+	{
+	  const rng_t &i = this->i, &j = this->j;
+
+	  this->state(u)(i,j) += tmp_u(i,j);
+	  this->state(w)(i,j) += tmp_w(i,j);
+	}
 
 	public:
 
@@ -108,13 +124,33 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	) : 
 	  parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
 	  im(i.first() - 1, i.last()),
-	  jm(j.first() - 1, j.last())
+	  jm(j.first() - 1, j.last()),
+          // (i,j)-sized temporary fields
+          lap_err(mem->tmp[std::string(__FILE__)][0][0]),
+          // (i^hlo,j^hlo)-sized temporary fields
+          tmp_u(mem->tmp[std::string(__FILE__)][1][0]),
+          tmp_w(mem->tmp[std::string(__FILE__)][1][1]),
+          Phi(mem->tmp[std::string(__FILE__)][1][2]),
+          err(mem->tmp[std::string(__FILE__)][1][3])
 	{} 
 
 	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
 	{
 	  parent_t::alloc(mem, nx, ny);
-          // TODO: for sure there will be some common temporaries!
+
+	  const std::string file(__FILE__);
+	  const rng_t i(0, nx-1), j(0, ny-1);
+	  const int halo = parent_t::halo;
+
+          // (i,j)-sized temporary fields
+	  mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
+          for (int n=0; n < 1; ++n)
+            mem->tmp[file].back().push_back(new typename parent_t::arr_t(i, j)); 
+
+          // (i^hlo,j^hlo)-sized temporary fields
+	  mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
+	  for (int n=0; n < 4; ++n)
+	    mem->tmp[file].back().push_back(new typename parent_t::arr_t( i^halo, j^halo ));
         }
       }; 
     }; // namespace detail
