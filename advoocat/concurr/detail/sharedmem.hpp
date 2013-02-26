@@ -74,16 +74,19 @@ namespace advoocat
         // TODO: fill reducetmp with NaNs
         sharedmem_common(int s0, int size)
         {
+          if (size > s0) throw std::exception(); // TODO: error_macro?
           //sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));  // TODO: write a different sum that would't use sumtmp
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
         sharedmem_common(int s0, int s1, int size)
         {
+          if (size > s0) throw std::exception(); // TODO: error_macro?
           sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
         sharedmem_common(int s0, int s1, int s2, int size)
         {
+          if (size > s0) throw std::exception(); // TODO: error_macro?
           sumtmp.reset(new blitz::Array<real_t, 2>(s0, s1));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }

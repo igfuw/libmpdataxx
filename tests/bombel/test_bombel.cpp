@@ -1,10 +1,16 @@
 /** 
  * @file
+ * @example bombel/test_bombel.cpp
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
  * @brief a bombel 
+ *
+ * @section FIGURE
+ *
+ * \image html "../../tests/bombel/figure.svg"
+ *
  */
 
 // advection (<> should be used instead of "" in normal usage) 
@@ -42,7 +48,8 @@ using namespace advoocat;
 
 int main() 
 {
-  const int nx = 20, ny = 20, nt = 1, n_out=1;
+  const int nx = 100, ny = 100, nt = 40, n_out=1;
+//  const int nx = 20, ny = 20, nt = 1, n_out=1;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
@@ -65,7 +72,6 @@ int main()
     solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
-/*
   { // conjugate residual
     using solver_t = bombel<
       solvers::pressure_cr<
@@ -89,7 +95,7 @@ int main()
     solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
-*/
+
   //ploting
   Gnuplot gp;
   gp << "reset\n"

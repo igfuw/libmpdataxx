@@ -34,7 +34,8 @@ namespace advoocat
       void ini_pressure()
       {
 	// dt/2 * (Prs-Prs_amb) / rho
-	Phi(this->i^this->halo, this->j^this->halo) = real_t(0);
+	Phi(this->i, this->j) = real_t(0);
+	this->xchng(Phi, this->i^this->halo, this->j^this->halo);
      }
 
       void precond()
@@ -46,17 +47,17 @@ namespace advoocat
 	real_t beta = .25;   //TODO
 
 	int halo = this->halo;
-	rng_t i = this->i;
-	rng_t j = this->j;
-        for (int it=0; it<=5; it++){
-
-          tmp_e1(i, j) = grad<0>(q_err(i^halo, j^halo), i, j, real_t(1));
-          tmp_e2(i, j) = grad<1>(q_err(i^halo, j^halo), j, i, real_t(1));
+	rng_t &i = this->i;
+	rng_t &j = this->j;
+        for (int it=0; it<=5; it++)
+        {
+          tmp_e1(i, j) = grad<0>(q_err, i, j, real_t(1));
+          tmp_e2(i, j) = grad<1>(q_err, j, i, real_t(1));
           this->xchng(tmp_e1, i^halo, j^halo);
           this->xchng(tmp_e2, i^halo, j^halo);
-          lap_q_err(i,j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
+          lap_q_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
 
-          q_err(i,j) += beta * (lap_q_err - err(i,j));
+          q_err(i,j) += beta * (lap_q_err(i, j) - err(i,j));
           this->xchng(q_err, i^halo, j^halo);
         }
       }
@@ -73,32 +74,35 @@ namespace advoocat
         real_t tmp_den = 1.; //TODO
 
 	int halo = this->halo;
-	rng_t i = this->i;
-	rng_t j = this->j;
+	rng_t &i = this->i;
+	rng_t &j = this->j;
 
-	tmp_u = this->psi(u);
-	tmp_w = this->psi(w);
+	tmp_u(i, j) = this->state(u)(i, j);
+	tmp_w(i, j) = this->state(w)(i, j);
 
         this->xchng(Phi,   i^halo, j^halo);
         this->xchng(tmp_u, i^halo, j^halo);
 	this->xchng(tmp_w, i^halo, j^halo);
-	tmp_x(i, j) = rho * (tmp_u(i, j) - grad<0>(Phi(i^halo, j^halo), i, j, real_t(1)));
-	tmp_z(i, j) = rho * (tmp_w(i, j) - grad<1>(Phi(i^halo, j^halo), j, i, real_t(1)));
+	tmp_x(i, j) = rho * (tmp_u(i, j) - grad<0>(Phi, i, j, real_t(1)));
+	tmp_z(i, j) = rho * (tmp_w(i, j) - grad<1>(Phi, j, i, real_t(1)));
 	this->xchng(tmp_x, i^halo, j^halo);
 	this->xchng(tmp_z, i^halo, j^halo);
 
-        err(i, j) = - 1./ rho * div(tmp_x(i^halo,j^halo), tmp_z(i^halo, j^halo), i, j, real_t(1), real_t(1)); //error
+        err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
 
         //initail q_err for preconditioner
-        q_err(this->i^this->halo, this->j^this->halo) = real_t(0);
+        q_err(i, j) = real_t(0);
+        this->xchng(q_err, i^this->halo, j^this->halo);
         precond();
-        p_err = q_err;
+        p_err(i, j) = q_err(i, j);
+        this->xchng(p_err, i^this->halo, j^this->halo);
 
-        tmp_e1(i, j) = grad<0>(p_err(i^halo, j^halo), i, j, real_t(1));
-        tmp_e2(i, j) = grad<1>(p_err(i^halo, j^halo), j, i, real_t(1));
+        tmp_e1(i, j) = grad<0>(p_err, i, j, real_t(1));
+        tmp_e2(i, j) = grad<1>(p_err, j, i, real_t(1));
         this->xchng(tmp_e1, i^halo, j^halo);
         this->xchng(tmp_e2, i^halo, j^halo);
-        lap_p_err(i,j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
+        lap_p_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
+        this->mem->barrier();
 
     std::cerr<<"--------------------------------------------------------------"<<std::endl;
 
@@ -108,24 +112,28 @@ namespace advoocat
 	{
           tmp_e1(i,j) = err(i,j) * lap_p_err(i,j);
           tmp_e2(i,j) = lap_p_err(i,j) * lap_p_err(i,j);
-          tmp_den = blitz::sum(tmp_e2(i,j));
-          if (tmp_den != 0) {beta = - blitz::sum(tmp_e1(i,j))/tmp_den;}
+          tmp_den = this->mem->sum(tmp_e2, i, j);
+          if (tmp_den != 0) beta = - this->mem->sum(tmp_e1, i, j) / tmp_den;
  
           Phi(i, j) += beta * p_err(i, j);
           err(i, j) += beta * lap_p_err(i, j);
 
-          error = std::max(std::abs(max(err)), std::abs(min(err)));
+          error = std::max(
+            std::abs(this->mem->max(err(i, j))), 
+            std::abs(this->mem->min(err(i, j)))
+          );
 std::cerr<<"error "<<error<<std::endl;
           precond();
 
-          tmp_e1(i, j) = grad<0>(q_err(i^halo, j^halo), i, j, real_t(1));
-          tmp_e2(i, j) = grad<1>(q_err(i^halo, j^halo), j, i, real_t(1));
+          tmp_e1(i, j) = grad<0>(q_err, i, j, real_t(1));
+          tmp_e2(i, j) = grad<1>(q_err, j, i, real_t(1));
           this->xchng(tmp_e1, i^halo, j^halo);
           this->xchng(tmp_e2, i^halo, j^halo);
-          lap_q_err(i, j) = div(tmp_e1(i^halo,j^halo), tmp_e2(i^halo, j^halo), i, j, real_t(1), real_t(1)); //laplasjan(error)
+          lap_q_err(i, j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
+          this->mem->barrier();
  
           tmp_e1(i, j) = lap_q_err(i,j) * lap_p_err(i,j);
-          if (tmp_den != 0) {alpha = - blitz::sum(tmp_e1(i,j))/tmp_den;}          
+          if (tmp_den != 0) alpha = - this->mem->sum(tmp_e1, i, j) / tmp_den;
 
           p_err(i, j) *= alpha;
           p_err(i, j) += q_err(i, j);  
@@ -138,20 +146,23 @@ std::cerr<<"error "<<error<<std::endl;
 
 	this->xchng(this->Phi, i^halo, j^halo);
 
-	tmp_u(i, j) -= grad<0>(Phi(i^halo, j^halo), i, j, real_t(1));
-	tmp_w(i, j) -= grad<1>(Phi(i^halo, j^halo), j, i, real_t(1));
+	tmp_u(i, j) -= grad<0>(Phi, i, j, real_t(1));
+	tmp_w(i, j) -= grad<1>(Phi, j, i, real_t(1));
 
-	tmp_u -= this->psi(u);
-	tmp_w -= this->psi(w);
+	tmp_u(i, j) -= this->state(u)(i, j);
+	tmp_w(i, j) -= this->state(w)(i, j);
       }
 
       void pressure_solver_apply(real_t dt)
       {
-	auto U = this->psi(u);
-	auto W = this->psi(w);
+	rng_t &i = this->i;
+	rng_t &j = this->j;
+        
+	auto U = this->state(u);
+	auto W = this->state(w);
 
-	U += tmp_u;
-	W += tmp_w;
+	U(i, j) += tmp_u(i, j);
+	W(i, j) += tmp_w(i, j);
       }
 
       public:

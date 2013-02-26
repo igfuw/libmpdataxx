@@ -42,18 +42,18 @@ namespace blitz
 
     ReduceKahanSum() { } 
 
+#pragma GCC push_options
+#pragma GCC optimize ("O3") // assuming -Ofast could optimise out the algorithm
     bool operator()(const T_sourcetype& x,const int=0) const 
     { 
       T_resulttype y, t;
-#pragma GCC push_options
-#pragma GCC optimize ("O3") // assuming -Ofast could optimise out the algorithm
       y = x - c_;
       t = sum_ + y;
       c_ = (t - sum_) - y;
       sum_ = t;
-#pragma GCC pop_options
       return true;
     }   
+#pragma GCC pop_options
 
     T_resulttype result(const int) const { return sum_; }
 

@@ -147,17 +147,13 @@ std::cerr<<"--------------------------------------------------------------"<<std
  
           lap_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
 
-// if (!richardson) TODO
+// if (!richardson) TODO - jako opcja (template?)
+          this->mem->barrier();
           tmp_e1(i,j) = err(i,j)*lap_err(i,j);
           tmp_e2(i,j) = lap_err(i,j)*lap_err(i,j);
           beta = - this->mem->sum(tmp_e1,i,j) / this->mem->sum(tmp_e2,i,j);
-std::ostringstream s;
-s << beta << std::endl;
-std::cerr << s.str();
 // endif
 
-//s<<" beta "<<beta;
-	
           Phi(i, j) += beta * err(i, j);
           err(i, j) += beta * lap_err(i, j);
 
@@ -167,8 +163,9 @@ std::cerr << s.str();
 	  );
           this->iters++;
 	}
-//s << " error " << error << std::endl;
-//std::cerr << s.str();
+std::ostringstream s;
+s << " error " << error << std::endl;
+std::cerr << s.str();
 	//end of pseudo_time loop
 
 	this->xchng(this->Phi, i^halo, j^halo);
