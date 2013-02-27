@@ -7,7 +7,7 @@
   *
   * @section INTRODUCTION
   *
-  * libmpdata++ is C++ library of object-oriented implementations
+  * libmpdata++ is C++ library of parallel, object-oriented implementations
   * of the MPDATA family solvers of generalised transport equations 
   * of the form:
   *
@@ -23,6 +23,7 @@
   * with funding from the Polish [National Science Centre](http://www.ncn.gov.pl/).
   *
   * libmpdata++ is based on the Blitz++ library for high-performance array handling.
+  * libmpdata++ (and Blitz++) is a header-only library.
   * 
   * @section EXAMPLES 
   * 
