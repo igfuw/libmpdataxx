@@ -80,34 +80,35 @@ namespace advoocat
 {
   namespace solvers
   {
-    template <class inhomo_solver_t, int u, int w, int tht>
-    class pressure_pc : public detail::pressure_solver_common<inhomo_solver_t, u, w, tht>
+    template <class inhomo_solver_t, int u, int w>
+    class pressure_pc : public detail::pressure_solver_common<inhomo_solver_t, u, w>
     {
       public:
 
-      using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w, tht>;
+      using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w>;
       typedef typename parent_t::mem_t mem_t;
       typedef typename parent_t::real_t real_t;
       using arr_2d_t = typename parent_t::arr_t;
 
-      arr_2d_t p_err, q_err, lap_p_err, lap_q_err, tmp_x, tmp_z;
+      arr_2d_t p_err, q_err, lap_p_err, lap_q_err;
 
       private:
+
+      const int pc_iters;
 
       void precond()  //Richardson scheme
       {
  	using namespace arakawa_c;
 	using formulae::nabla::grad;
-
-        real_t dx = 1., dz = 1.; // TODO
-        int iters = 5; //TODO should be a solver option
 	
 	int halo = this->halo;
 	rng_t &i = this->i;
 	rng_t &j = this->j;
-        for (int it=0; it<=iters; it++)
+
+        assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
+        for (int it=0; it<=pc_iters; it++)
         {
-          this->lap_q_err(i, j) = this->lap(this->q_err, i, j, dx, dz);
+          this->lap_q_err(i, j) = this->lap(this->q_err, i, j, this->dx, this->dz);
 
           q_err(i,j) += real_t(.25) * (lap_q_err(i, j) - this->err(i, j));
           this->xchng(q_err, i^halo, j^halo);
@@ -120,7 +121,6 @@ namespace advoocat
 	using formulae::nabla::grad;
 	using formulae::nabla::div;
 
-        real_t dx = 1., dz = 1.; // TODO
 	real_t beta = .25;   //TODO
         real_t alpha = 1.;   //TODO
 	real_t rho = 1.;     //TODO    
@@ -136,12 +136,12 @@ namespace advoocat
         this->xchng(this->Phi,   i^halo, j^halo);
         this->xchng(this->tmp_u, i^halo, j^halo);
 	this->xchng(this->tmp_w, i^halo, j^halo);
-	tmp_x(i, j) = rho * (this->tmp_u(i, j) - grad<0>(this->Phi, i, j, dx));
-	tmp_z(i, j) = rho * (this->tmp_w(i, j) - grad<1>(this->Phi, j, i, dz));
-	this->xchng(tmp_x, i^halo, j^halo);
-	this->xchng(tmp_z, i^halo, j^halo);
 
-        this->err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, dx, dz); //error
+        //initail error   
+        this->err(i, j) =
+          - 1./ rho * div(rho * this->tmp_u, rho * this->tmp_w , i, j, this->dx, this->dz)
+          + this->lap(this->Phi, i, j, this->dx, this->dz);
+          /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
         //initail q_err for preconditioner
         q_err(i, j) = real_t(0);
@@ -152,12 +152,12 @@ namespace advoocat
         p_err(i, j) = q_err(i, j);
         this->xchng(p_err, i^this->halo, j^this->halo);
 
-        this->lap_p_err(i, j) = this->lap(this->p_err, i, j, dx, dz);
+        this->lap_p_err(i, j) = this->lap(this->p_err, i, j, this->dx, this->dz);
 
         std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
-	while (error > .0001)
+	while (error > this->tol)
 	{
           tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
           if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
@@ -177,7 +177,7 @@ std::cerr<<"error "<<error<<std::endl;
 
           precond();
 
-          this->lap_q_err(i, j) = this->lap(this->q_err, i, j, dx, dz);
+          this->lap_q_err(i, j) = this->lap(this->q_err, i, j, this->dx, this->dz);
 
           if (tmp_den != 0) alpha = - this->mem->sum(lap_q_err, lap_p_err, i, j) / tmp_den;
 
@@ -192,8 +192,8 @@ std::cerr<<"error "<<error<<std::endl;
 
 	this->xchng(this->Phi, i^halo, j^halo);
 
-	this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, dx);
-	this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, dz);
+	this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, this->dx);
+	this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, this->dz);
 
 	this->tmp_u(i, j) -= this->state(u)(i, j);
 	this->tmp_w(i, j) -= this->state(w)(i, j);
@@ -201,7 +201,7 @@ std::cerr<<"error "<<error<<std::endl;
 
       public:
 
-      struct params_t : parent_t::params_t { };
+      struct params_t : parent_t::params_t { int pc_iters; };
 
       // ctor
       pressure_pc(
@@ -215,12 +215,11 @@ std::cerr<<"error "<<error<<std::endl;
 	const params_t &p
       ) :
 	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
+        pc_iters(p.pc_iters),
         lap_p_err(mem->tmp[std::string(__FILE__)][0][0]), // TODO: parent has unused lap_err
         lap_q_err(mem->tmp[std::string(__FILE__)][0][1]),
-	tmp_x(mem->tmp[std::string(__FILE__)][0][2]),
-	tmp_z(mem->tmp[std::string(__FILE__)][0][3]),
-	p_err(mem->tmp[std::string(__FILE__)][0][4]),
-	q_err(mem->tmp[std::string(__FILE__)][0][5])
+	p_err(mem->tmp[std::string(__FILE__)][0][2]),
+	q_err(mem->tmp[std::string(__FILE__)][0][3])
       {}
 
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
@@ -229,12 +228,11 @@ std::cerr<<"error "<<error<<std::endl;
 
         const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
-        const int hlo = 1; // TODO!!!
 
         // temporary fields
         mem->tmp[file].push_back(new arrvec_t<arr_2d_t>());
-	for (int n=0; n < 6; ++n) 
-	  mem->tmp[file].back().push_back(new arr_2d_t(i^hlo, j^hlo)); 
+	for (int n=0; n < 4; ++n) 
+	  mem->tmp[file].back().push_back(new arr_2d_t(i^parent_t::halo, j^parent_t::halo)); 
       }
     }; 
   }; // namespace solvers

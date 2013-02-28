@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../../formulae/courant_formulae.hpp"
 #include "../../formulae/nabla_formulae.hpp"
+#include "solver_velocity_common.hpp"
 
 namespace advoocat
 {
@@ -16,19 +16,17 @@ namespace advoocat
   {
     namespace detail
     {
-      template <class inhomo_solver_t, int u, int w, int tht>
-      class pressure_solver_common : public inhomo_solver_t
+      template <class inhomo_solver_t, int u, int w>
+      class pressure_solver_common : public solver_velocity_common<inhomo_solver_t, u, w>
       {
+// TODO: assert strang!
 	protected:
 
-	using parent_t = inhomo_solver_t;
+	using parent_t = solver_velocity_common<inhomo_solver_t, u, w>;
 	typedef typename parent_t::real_t real_t;
 
-	struct params_t : parent_t::params_t { };
-
 	// member fields
-	rng_t im, jm;
-	real_t dx = 1, dz = 1;  //TODO don't assume dx=dz=1
+	const real_t tol;
         int iters = 0;
 
         typename parent_t::arr_t Phi, tmp_u, tmp_w, err, lap_err, lap_tmp1, lap_tmp2;
@@ -43,36 +41,6 @@ namespace advoocat
           ,
           formulae::nabla::div(lap_tmp1, lap_tmp2, i, j, dx, dy)
         );
-
-	void ini_courant()
-	{
-	  this->xchng(u);
-	  this->xchng(w);
-
-	  formulae::courant::intrp<0>(this->mem->C[0], this->state(u), im, this->j^this->halo, this->dt, dx);
-	  formulae::courant::intrp<1>(this->mem->C[1], this->state(w), jm, this->i^this->halo, this->dt, dz);
-	}
-
-	void extrp_courant()
-	{
-	  extrp_velocity(u);      //extrapolate velocity field in time (t+1/2)
-	  extrp_velocity(w);
-
-	  this->xchng(u, -1);      // filling halos for velocity filed
-	  this->xchng(w, -1);      // psi[n-1] was overwriten for that by extrp_velocity
-
-	  formulae::courant::intrp<0>(this->mem->C[0], this->state(u, -1), im, this->j^this->halo, this->dt, dx);
-	  formulae::courant::intrp<1>(this->mem->C[1], this->state(w, -1), jm, this->i^this->halo, this->dt, dz);
-	}
-
-	void extrp_velocity(int e) // extrapolate in time to t+1/2
-	{            // psi[n-1] will not be used anymore, and it will be intentionally overwritten!
-          rng_t &i = this->i, &j = this->j;
-	  auto tmp = this->state(e, -1);
-
-	  tmp(i,j) /= -2;
-	  tmp(i,j) += 3./2 * this->state(e)(i,j);
-	}
 
 	void ini_pressure()
 	{ 
@@ -94,34 +62,38 @@ namespace advoocat
 
 	public:
 
-	void solve(int nt) 
-	{   
-	  for (int t = 0; t < nt; ++t)
-	  {   
-	    if (t==0)
-	    {
-	      ini_courant();
-	      ini_pressure();
-	      this->forcings(this->dt / 2);
-	      inhomo_solver_t::parent_t::solve(1);
-	      this->forcings(this->dt / 2);
-	      pressure_solver_update(this->dt);
-	      pressure_solver_apply(this->dt);
-	    }
-	    if (t!=0)
-	    {
-	      std::cerr<<"t= "<<t<<std::endl;
-	      extrp_courant();
-	      this->forcings(this->dt / 2);
-	      pressure_solver_apply(this->dt);
-	      inhomo_solver_t::parent_t::solve(1);
-	      this->forcings(this->dt / 2);
-	      pressure_solver_update(this->dt);
-	      pressure_solver_apply(this->dt);
-	    }
-	  }
+        void hook_ante_loop()
+        {
+          parent_t::hook_ante_loop();
+	  ini_pressure();
+ 
+          // allow pressure_solver_apply at the first time step
+          tmp_u(this->i, this->j) = 0;
+          tmp_w(this->i, this->j) = 0;
+        }
+
+        void hook_ante_step()
+        {
+          parent_t::hook_ante_step(); // velocity extrapolation + forcings
+	  pressure_solver_apply(this->dt);
+        }
+    
+        void hook_post_step()
+        {
+          parent_t::hook_post_step();
+	  pressure_solver_update(this->dt);
+	  pressure_solver_apply(this->dt);
+        }
+
+        void hook_post_loop()
+        {
 std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	}
+
+	struct params_t : parent_t::params_t 
+        { 
+          real_t tol;
+        };
 
 	// ctor
 	pressure_solver_common(
@@ -135,8 +107,7 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	  const params_t &p
 	) : 
 	  parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
-	  im(i.first() - 1, i.last()),
-	  jm(j.first() - 1, j.last()),
+          tol(p.tol),
           lap_err(mem->tmp[std::string(__FILE__)][0][0]),
           tmp_u(mem->tmp[std::string(__FILE__)][0][1]),
           tmp_w(mem->tmp[std::string(__FILE__)][0][2]),

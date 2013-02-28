@@ -74,9 +74,12 @@ namespace advoocat
 
         virtual void hook_ante_step() {}
         virtual void hook_post_step() {}
+        virtual void hook_ante_loop() {}
+        virtual void hook_post_loop() {}
 
-	void solve(const int nt) 
+	virtual void solve(const int nt) final
 	{   
+          hook_ante_loop();
 	  for (int t = 0; t < nt; ++t) 
 	  {   
             hook_ante_step();
@@ -85,6 +88,7 @@ namespace advoocat
 	    cycle_all();
             hook_post_step();
 	  }   
+          hook_post_loop();
         }
 
 	// psi getter

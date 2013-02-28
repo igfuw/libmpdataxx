@@ -84,7 +84,6 @@ namespace advoocat
 
       void hook_ante_step()
       {
-//        this->mem->barrier();
         switch (inhomo)
         {
           case euler: 
@@ -96,7 +95,6 @@ namespace advoocat
           default: 
             assert(false);
         }
-//        this->mem->barrier();
       }
 
       void hook_post_step()
@@ -106,9 +104,7 @@ namespace advoocat
           case euler: 
             break;
           case strang: 
-//            this->mem->barrier();
             forcings(dt / 2);
-//            this->mem->barrier();
             break;
           default:
             assert(false);

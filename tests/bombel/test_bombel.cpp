@@ -47,7 +47,7 @@ using namespace advoocat;
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 20, n_out=1;
+  const int nx = 100, ny = 100, nt = 5, n_out=1;
 //  const int nx = 20, ny = 20, nt = 1, n_out=1;
 
   rng_t i(0, nx-1);
@@ -55,32 +55,41 @@ int main()
   const real_t halo = 1;  
 
   // TODO p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
-  real_t dt = .1; // timestep
+  real_t dt = .1, dx = 1., dz = 1.; // timestep
   real_t Tht_amb = 300; // ambient state (constant thoughout the domain)
 
   boost::ptr_vector<concurr::any<real_t, 2>> slvs;
-/*
   { // minimum residual
     using solver_t = bombel<
       solvers::pressure_mr<
 	solvers::inhomo_solver<
 	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
-	>, u, w, tht
+	>, u, w
       >
     >;
-    solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
+    solver_t::params_t p; 
+    p.dt = dt; 
+    p.dx = dx; 
+    p.dz = dz; 
+    p.tol = 1e-5;
+    p.Tht_amb = Tht_amb;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
-*/
+
   { // conjugate residual
     using solver_t = bombel<
       solvers::pressure_cr<
 	solvers::inhomo_solver<
 	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
-	>, u, w, tht
+	>, u, w
       >
     >;
-    solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
+    solver_t::params_t p;
+    p.dt = dt; 
+    p.dx = dx; 
+    p.dz = dz; 
+    p.Tht_amb = Tht_amb;
+    p.tol = 1e-5;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
 
@@ -89,10 +98,16 @@ int main()
       solvers::pressure_pc<
 	solvers::inhomo_solver<
 	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
-	>, u, w, tht
+	>, u, w
       >
     >;
-    solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
+    solver_t::params_t p;
+    p.dt = dt; 
+    p.dx = dx; 
+    p.dz = dz; 
+    p.Tht_amb = Tht_amb;
+    p.tol = 1e-5;
+    p.pc_iters = 5;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
 
