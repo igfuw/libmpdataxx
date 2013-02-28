@@ -91,16 +91,17 @@ namespace advoocat
 
       //TODO probably don't need those
       typename parent_t::arr_t tmp_x, tmp_z;
-      typename parent_t::arr_t tmp_e1, tmp_e2;
+      //typename parent_t::arr_t tmp_e1, tmp_e2;
 
       private:
 
       void pressure_solver_update(real_t dt)
       {
 	using namespace arakawa_c;
-	using formulae::nabla_op::grad;
-	using formulae::nabla_op::div;
+	using formulae::nabla::grad;
+	using formulae::nabla::div;
 
+        real_t dx = 1., dz = 1.; // TODO
 	real_t rho = 1.;   //TODO    
         real_t beta = .25; //TODO tmp
 
@@ -115,13 +116,13 @@ namespace advoocat
         this->xchng(this->tmp_u, i^halo, j^halo);
         this->xchng(this->tmp_w, i^halo, j^halo);
 
-        tmp_x(i, j) = rho * (this->tmp_u(i, j) - grad<0>(this->Phi, i, j, real_t(1)));
-        tmp_z(i, j) = rho * (this->tmp_w(i, j) - grad<1>(this->Phi, j, i, real_t(1)));
+        tmp_x(i, j) = rho * (this->tmp_u(i, j) - grad<0>(this->Phi, i, j, dx));
+        tmp_z(i, j) = rho * (this->tmp_w(i, j) - grad<1>(this->Phi, j, i, dz));
 
         this->xchng(tmp_x, i^halo, j^halo);
         this->xchng(tmp_z, i^halo, j^halo);
 
-        this->err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
+        this->err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, dx, dz); //error
         this->xchng(this->err, i^halo, j^halo);
 
 std::cerr<<"--------------------------------------------------------------"<<std::endl;
@@ -129,20 +130,10 @@ std::cerr<<"--------------------------------------------------------------"<<std
 	real_t error = 1.;
 	while (error > .00001) //TODO tmp TODO tmp !!!
 	{
-          this->xchng(this->err, i^halo, j^halo);
-
-          tmp_e1(i, j) = grad<0>(this->err, i, j, real_t(1));
-          tmp_e2(i, j) = grad<1>(this->err, j, i, real_t(1));
-          this->xchng(tmp_e1, i^halo, j^halo);
-          this->xchng(tmp_e2, i^halo, j^halo);
- 
-          this->lap_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
+          this->lap_err(i,j) = this->lap(this->err, i, j, dx, dz); 
 
 // if (!richardson) TODO - jako opcja (template?)
-          this->mem->barrier();
-          tmp_e1(i,j) = this->err(i,j) * this->lap_err(i,j);
-          tmp_e2(i,j) = this->lap_err(i,j) * this->lap_err(i,j);
-          beta = - this->mem->sum(tmp_e1,i,j) / this->mem->sum(tmp_e2,i,j);
+          beta = - this->mem->sum(this->err, this->lap_err, i, j) / this->mem->sum(this->lap_err, this->lap_err, i, j);
 // endif
 
           this->Phi(i, j) += beta * this->err(i, j);
@@ -154,14 +145,14 @@ std::cerr<<"--------------------------------------------------------------"<<std
 	  );
           this->iters++;
 	}
+	//end of pseudo_time loop
 std::ostringstream s;
 s << " error " << error << std::endl;
 std::cerr << s.str();
-	//end of pseudo_time loop
 
 	this->xchng(this->Phi, i^halo, j^halo);
-	this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, real_t(1));
-	this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, real_t(1));
+	this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, dx);
+	this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, dz);
       }
 
       public:
@@ -182,9 +173,7 @@ std::cerr << s.str();
 	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
         // (i^hlo, j^hlo)
 	tmp_x(mem->tmp[std::string(__FILE__)][0][0]),
-	tmp_z(mem->tmp[std::string(__FILE__)][0][1]),
-	tmp_e1(mem->tmp[std::string(__FILE__)][0][2]),
-	tmp_e2(mem->tmp[std::string(__FILE__)][0][3])
+	tmp_z(mem->tmp[std::string(__FILE__)][0][1])
       {}
 
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
@@ -198,7 +187,7 @@ std::cerr << s.str();
         // temporary fields
         mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
         {
-          for (int n=0; n < 4; ++n) 
+          for (int n=0; n < 2; ++n) 
             mem->tmp[file].back().push_back(new typename parent_t::arr_t( i^halo, j^halo )); 
         }
       }

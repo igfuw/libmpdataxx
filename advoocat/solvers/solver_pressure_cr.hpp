@@ -94,20 +94,21 @@ namespace advoocat
       using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w, tht>;
       using real_t = typename parent_t::real_t;
 
-      typename parent_t::arr_t p_err, lap_p_err, tmp_x, tmp_z, tmp_e1, tmp_e2;
+      typename parent_t::arr_t p_err, lap_p_err, tmp_x, tmp_z;
 
       private:
 
       void pressure_solver_update(real_t dt)
       {
 	using namespace arakawa_c;
-	using formulae::nabla_op::grad;
-	using formulae::nabla_op::div;
+	using formulae::nabla::grad;
+	using formulae::nabla::div;
 
 	real_t beta = .25;   //TODO
         real_t alpha = 1.;   //TODO
 	real_t rho = 1.;     //TODO    
         real_t tmp_den = 1.; //TODO
+        real_t dx = 1., dz = 1.; // TODO
 
 	int halo = this->halo;
 	rng_t &i = this->i;
@@ -120,45 +121,30 @@ namespace advoocat
         this->xchng(this->tmp_u, i^halo, j^halo);
 	this->xchng(this->tmp_w, i^halo, j^halo);
 
-	tmp_x(i, j) = rho * this->tmp_u(i, j) - grad<0>(this->Phi, i, j, real_t(1));
-	tmp_z(i, j) = rho * this->tmp_w(i, j) - grad<1>(this->Phi, j, i, real_t(1));
+	tmp_x(i, j) = rho * this->tmp_u(i, j) - grad<0>(this->Phi, i, j, dx);
+	tmp_z(i, j) = rho * this->tmp_w(i, j) - grad<1>(this->Phi, j, i, dz);
      
 	this->xchng(tmp_x, i^halo, j^halo);
 	this->xchng(tmp_z, i^halo, j^halo);
 
-        this->err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, real_t(1), real_t(1)); //error
+        this->err(i, j) = - 1./ rho * div(tmp_x, tmp_z, i, j, dx, dz); //error
 
         p_err(i ,j) = this->err(i, j);
-        this->xchng(p_err, i^halo, j^halo);
-        tmp_e1(i, j) = grad<0>(p_err, i, j, real_t(1));
-        tmp_e2(i, j) = grad<1>(p_err, j, i, real_t(1));
-        this->xchng(tmp_e1, i^halo, j^halo);
-        this->xchng(tmp_e2, i^halo, j^halo);
-        lap_p_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
-        this->mem->barrier();
+        lap_p_err(i,j) = this->lap(p_err, i, j, dx, dz);
     std::cerr<<"--------------------------------------------------------------"<<std::endl;
 
 	//pseudo-time loop
 	real_t error = 1.;
 	while (error > .0001)
 	{
-          tmp_e1(i,j) = this->err(i,j) * lap_p_err(i,j);
-          tmp_e2(i,j) = lap_p_err(i,j) * lap_p_err(i,j);
-          tmp_den = this->mem->sum(tmp_e2, i, j);
-          if (tmp_den != 0) beta = - this->mem->sum(tmp_e1, i, j) / tmp_den;
+          tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
+          if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
           this->Phi(i, j) += beta * p_err(i, j);
           this->err(i, j) += beta * lap_p_err(i, j);
 
-          this->xchng(this->err, i^halo, j^halo);
-          tmp_e1(i, j) = grad<0>(this->err, i, j, real_t(1));
-          tmp_e2(i, j) = grad<1>(this->err, j, i, real_t(1));
-          this->xchng(tmp_e1, i^halo, j^halo);
-          this->xchng(tmp_e2, i^halo, j^halo);
-          this->lap_err(i,j) = div(tmp_e1, tmp_e2, i, j, real_t(1), real_t(1)); //laplasjan(error)
-          this->mem->barrier();
+          this->lap_err(i, j) = this->lap(this->err, i, j, dx, dz);         
 
-          tmp_e1(i,j) = this->lap_err(i,j) * lap_p_err(i,j);
-          if (tmp_den != 0) alpha = - this->mem->sum(tmp_e1, i, j) / tmp_den;          
+          if (tmp_den != 0) alpha = - this->mem->sum(this->lap_err, lap_p_err, i, j) / tmp_den;          
 
           p_err(i, j) *= alpha;
           p_err(i, j) += this->err(i, j);  
@@ -177,8 +163,8 @@ std::cerr<<"error "<<error<<std::endl;
 	//end of pseudo_time loop
 	this->xchng(this->Phi, i^halo, j^halo);
 
-	this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, real_t(1));
-	this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, real_t(1));
+	this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, dx);
+	this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, dz);
 
 	this->tmp_u(i, j) -= this->state(u)(i, j);
 	this->tmp_w(i, j) -= this->state(w)(i, j);
@@ -200,14 +186,10 @@ std::cerr<<"error "<<error<<std::endl;
 	const params_t &p
       ) :
 	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
-        // (i, j)
-        lap_p_err(mem->tmp[std::string(__FILE__)][0][1]),
-        // (i^hlo, j^hlo))
-	tmp_x(mem->tmp[std::string(__FILE__)][1][0]),
-	tmp_z(mem->tmp[std::string(__FILE__)][1][1]),
-	tmp_e1(mem->tmp[std::string(__FILE__)][1][2]),
-	tmp_e2(mem->tmp[std::string(__FILE__)][1][3]),
-	p_err(mem->tmp[std::string(__FILE__)][1][4])
+        lap_p_err(mem->tmp[std::string(__FILE__)][0][0]),
+	tmp_x(mem->tmp[std::string(__FILE__)][0][1]),
+	tmp_z(mem->tmp[std::string(__FILE__)][0][2]),
+	p_err(mem->tmp[std::string(__FILE__)][0][3])
       {}
 
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
@@ -220,11 +202,7 @@ std::cerr<<"error "<<error<<std::endl;
 
         // temporary fields
         mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
-	for (int n=0; n < 1; ++n) 
-	  mem->tmp[file].back().push_back(new typename parent_t::arr_t(i, j)); 
-
-        mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
-	for (int n=0; n < 5; ++n) 
+	for (int n=0; n < 4; ++n) 
 	  mem->tmp[file].back().push_back(new typename parent_t::arr_t(i^halo, j^halo)); 
       }
     }; 

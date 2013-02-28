@@ -14,7 +14,7 @@ namespace advoocat
 {
   namespace formulae
   {
-    namespace nabla_op 
+    namespace nabla
     {
       using idxperm::pi;
 

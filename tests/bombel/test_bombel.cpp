@@ -47,7 +47,7 @@ using namespace advoocat;
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 40, n_out=1;
+  const int nx = 100, ny = 100, nt = 20, n_out=1;
 //  const int nx = 20, ny = 20, nt = 1, n_out=1;
 
   rng_t i(0, nx-1);
@@ -59,7 +59,7 @@ int main()
   real_t Tht_amb = 300; // ambient state (constant thoughout the domain)
 
   boost::ptr_vector<concurr::any<real_t, 2>> slvs;
-
+/*
   { // minimum residual
     using solver_t = bombel<
       solvers::pressure_mr<
@@ -71,6 +71,7 @@ int main()
     solver_t::params_t p; p.dt = dt; p.Tht_amb = Tht_amb;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
+*/
   { // conjugate residual
     using solver_t = bombel<
       solvers::pressure_cr<

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../../formulae/courant_formulae.hpp"
+#include "../../formulae/nabla_formulae.hpp"
 
 namespace advoocat
 {
@@ -30,7 +31,18 @@ namespace advoocat
 	real_t dx = 1, dz = 1;  //TODO don't assume dx=dz=1
         int iters = 0;
 
-        typename parent_t::arr_t Phi, tmp_u, tmp_w, err, lap_err;
+        typename parent_t::arr_t Phi, tmp_u, tmp_w, err, lap_err, lap_tmp1, lap_tmp2;
+
+        auto lap(typename parent_t::arr_t &arr, rng_t i, rng_t j, real_t dx, real_t dy) 
+        return_macro(
+          this->xchng(arr, i^this->halo, j^this->halo);
+          lap_tmp1(i, j) = formulae::nabla::grad<0>(arr, i, j, dx);
+          lap_tmp2(i, j) = formulae::nabla::grad<1>(arr, j, i, dy);
+          this->xchng(lap_tmp1, i^this->halo, j^this->halo);
+          this->xchng(lap_tmp2, i^this->halo, j^this->halo);
+          ,
+          formulae::nabla::div(lap_tmp1, lap_tmp2, i, j, dx, dy)
+        );
 
 	void ini_courant()
 	{
@@ -125,13 +137,13 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	  parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
 	  im(i.first() - 1, i.last()),
 	  jm(j.first() - 1, j.last()),
-          // (i,j)-sized temporary fields
           lap_err(mem->tmp[std::string(__FILE__)][0][0]),
-          // (i^hlo,j^hlo)-sized temporary fields
-          tmp_u(mem->tmp[std::string(__FILE__)][1][0]),
-          tmp_w(mem->tmp[std::string(__FILE__)][1][1]),
-          Phi(mem->tmp[std::string(__FILE__)][1][2]),
-          err(mem->tmp[std::string(__FILE__)][1][3])
+          tmp_u(mem->tmp[std::string(__FILE__)][0][1]),
+          tmp_w(mem->tmp[std::string(__FILE__)][0][2]),
+          Phi(mem->tmp[std::string(__FILE__)][0][3]),
+          err(mem->tmp[std::string(__FILE__)][0][4]),
+	  lap_tmp1(mem->tmp[std::string(__FILE__)][0][5]),
+	  lap_tmp2(mem->tmp[std::string(__FILE__)][0][6])
 	{} 
 
 	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
@@ -142,14 +154,9 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	  const rng_t i(0, nx-1), j(0, ny-1);
 	  const int halo = parent_t::halo;
 
-          // (i,j)-sized temporary fields
-	  mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
-          for (int n=0; n < 1; ++n)
-            mem->tmp[file].back().push_back(new typename parent_t::arr_t(i, j)); 
-
           // (i^hlo,j^hlo)-sized temporary fields
 	  mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
-	  for (int n=0; n < 4; ++n)
+	  for (int n=0; n < 7; ++n)
 	    mem->tmp[file].back().push_back(new typename parent_t::arr_t( i^halo, j^halo ));
         }
       }; 
