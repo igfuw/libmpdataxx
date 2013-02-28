@@ -13,11 +13,10 @@
   *
   * \f$ \partial_t \psi + \nabla \cdot (\vec{v} \psi) = R \f$
   *
-  * The MPDATA-based solvers were developed by Piotr Smolarkiewicz et al.
-  * (see e.g. @copydetails Smolarkiewicz_2006, for a review and list of references)
-  *
-  * Development of libmpdata++ is carried out at the
-  * [Institute of Geophysics](http://www.igf.fuw.edu.pl/),
+  * The theory behind MPDATA solvers was developed by Piotr Smolarkiewicz et al.
+  * (see e.g. @copydetails Smolarkiewicz_2006, for a review and list of references).
+  * Development of libmpdata++ is carried out by Sylwester Arabas, Anna Jaruga and
+  * co-workers at the [Institute of Geophysics](http://www.igf.fuw.edu.pl/),
   * [Faculty of Physics](http://www.fuw.edu.pl/),
   * [University of Warsaw](http://www.uw.edu.pl/) (the copyright holder)
   * with funding from the Polish [National Science Centre](http://www.ncn.gov.pl/).
@@ -25,19 +24,38 @@
   * libmpdata++ is based on the Blitz++ library for high-performance array handling.
   * libmpdata++ (and Blitz++) is a header-only library.
   * 
-  * @section EXAMPLES 
+  * @section sec_concepts KEY CONCEPTS
+  *
+  * Shortest example:
+  * TODO
   * 
-  * @subsection HOMO HOMOGENEOUS TRANSPORT EQUATIONS WITH PRESCRIBED VELOCITY
+  * Library "layers":
+  * - solvers
+  * - boundary conditions
+  * - concurency schemes
+  * - output mechanisms
+  *
+  * At present libmpdata++ handles 1D, 2D and 3D computations in cartesian coordinates on an Arakawa-C grid.
+  *
+  * @section sec_solvers SUPPORTED SOLVER TYPES
+  * 
+  * @subsection sec_solvers_homo HOMOGENEOUS TRANSPORT EQUATIONS WITH PRESCRIBED VELOCITY
   *
   * \f$ \partial_t \psi + \nabla (\vec{u} \psi) = 0 \f$
   *
   * See:
+  * - solver classes:
+  *   - donorcell_1d.hpp
+  *   - donorcell_2d.hpp
+  *   - donorcell_3d.hpp
+  *   - mpdata_1d.hpp
+  *   - mpdata_2d.hpp
   * - examples:
   *   - test_gnuplot-iostream_1d.cpp 
   *   - test_gnuplot-iostream_2d.cpp 
   *   - test_var_sign_2d.cpp 
   *
-  * @subsection INHOMO INHOMOGENEOUS TRANSPORT EQUATIONS WITH PRESCRIBED VELOCITY
+  * @subsection sec_solvers_inhomo INHOMOGENEOUS TRANSPORT EQUATIONS WITH PRESCRIBED VELOCITY
   *
   * a pair of coupled 1-dimensional harmonic oscillators:
   *
@@ -49,7 +67,7 @@
   * - examples:
   *   - test_harmosc.cpp (system defined in coupled_harmosc.hpp)
   * 
-  * @subsection INHOMO-DYN INHOMOGENEOUS TRANSPORT EQUATIONS 
+  * @subsection sec_solvers_inhomo_vel INHOMOGENEOUS TRANSPORT EQUATIONS 
   *
   * 1-dimensional shallow-water equations:
   * 
@@ -57,7 +75,7 @@
   * 
   * \f$ \partial_t h + \nabla_z ( \vec{u} h ) = 0 \f$
   *
-  * @subsection INHOMO-DYN-PRES INHOMOGENEOUS TRANSPORT EQUATIONS COUPLED WITH PRESSURE SOLVER
+  * @subsection sec_solvers_inhomo_dyn_pres INHOMOGENEOUS TRANSPORT EQUATIONS COUPLED WITH PRESSURE SOLVER
   *
   * 2-dimensional Navier-Stokes coupled assuming adiabatic transport with constant density:
   *
@@ -75,13 +93,19 @@
   *   - Conjugate-Residual with preconditioner (solver_pressure_pc.hpp)
   * - examples:
   *   - test_bombel.cpp (system defined in bombel.hpp)
+  *
+  * @section sec_concurr SUPPORTES CONCURENCY SCHEMES
+  * 
+  * Shared-memory parallelisation:
+  * - OpenMP (openmp.hpp) 
+  * - Boost.Thread (boost_thread.hpp)
+  * - Threads (threads.hpp - OpenMP if supported, Boost.Thread otherwise)
+  *
+  * @section sec_output SUPPORTES OUTPUT MECHANISMS
+  * - gnuplot-iostream
   */
 
-  /*  table of examples with columns:
-  *  - adv. algorithm
-  *  - number of dimensions
-  *  - equation set
-  *
+  /*
   *  suggested compiler options (by compiler): -march=native, -Ofast, -DNDEBUG, -lblitz (opt), -DBZDEBUG (opt), -std=c++11
   */
 
