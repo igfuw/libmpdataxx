@@ -102,20 +102,17 @@ namespace advoocat
 	im(i.first() - 1, i.last())
       {
 	for (int n = 0; n < n_tmp; ++n)
-          tmp[n] = &mem->tmp[std::string(__FILE__)][n];
+          tmp[n] = &mem->tmp[__FILE__][n];
       }
 
       // memory allocation (to be called once per shared-mem node)
       static void alloc(typename parent_t::mem_t *mem, const int nx)
       {
         parent_t::alloc(mem, nx);
-
-        const std::string file(__FILE__);
-
 	for (int n = 0; n < n_tmp; ++n)
         {
-	  mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>()); 
-	  mem->tmp[file].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1)^h )); 
+	  mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1)^h )); 
         }
       }
     };

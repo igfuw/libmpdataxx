@@ -216,23 +216,21 @@ std::cerr<<"error "<<error<<std::endl;
       ) :
 	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
         pc_iters(p.pc_iters),
-        lap_p_err(mem->tmp[std::string(__FILE__)][0][0]), // TODO: parent has unused lap_err
-        lap_q_err(mem->tmp[std::string(__FILE__)][0][1]),
-	p_err(mem->tmp[std::string(__FILE__)][0][2]),
-	q_err(mem->tmp[std::string(__FILE__)][0][3])
+        lap_p_err(mem->tmp[__FILE__][0][0]), // TODO: parent has unused lap_err
+        lap_q_err(mem->tmp[__FILE__][0][1]),
+	p_err(mem->tmp[__FILE__][0][2]),
+	q_err(mem->tmp[__FILE__][0][3])
       {}
 
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
       {
         parent_t::alloc(mem, nx, ny);
-
-        const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
 
         // temporary fields
-        mem->tmp[file].push_back(new arrvec_t<arr_2d_t>());
+        mem->tmp[__FILE__].push_back(new arrvec_t<arr_2d_t>());
 	for (int n=0; n < 4; ++n) 
-	  mem->tmp[file].back().push_back(new arr_2d_t(i^parent_t::halo, j^parent_t::halo)); 
+	  mem->tmp[__FILE__].back().push_back(new arr_2d_t(i^parent_t::halo, j^parent_t::halo)); 
       }
     }; 
   }; // namespace solvers

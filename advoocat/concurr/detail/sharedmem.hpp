@@ -43,7 +43,7 @@ namespace advoocat
 	arrvec_t<arr_t> C, psi[n_eqs];
 
 	std::unordered_map< // TODO:! can string be used here (thread-safety!!!)
-	  std::string, // intended for addressing with string(__FILE__)
+	  const char*, // intended for addressing with __FILE__
 	  boost::ptr_vector<arrvec_t<arr_t>>
 	> tmp; 
 

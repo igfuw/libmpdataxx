@@ -183,22 +183,21 @@ std::cerr<<"error "<<error<<std::endl;
 	const params_t &p
       ) :
 	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
-        lap_p_err(mem->tmp[std::string(__FILE__)][0][0]),
-	p_err(mem->tmp[std::string(__FILE__)][0][1])
+        lap_p_err(mem->tmp[__FILE__][0][0]),
+	p_err(mem->tmp[__FILE__][0][1])
       {}
 
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
       {
         parent_t::alloc(mem, nx, ny);
 
-        const std::string file(__FILE__);
         const rng_t i(0, nx-1), j(0, ny-1);
         const int halo = parent_t::halo; 
 
         // temporary fields
-        mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>());
+        mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
 	for (int n=0; n < 2; ++n) 
-	  mem->tmp[file].back().push_back(new typename parent_t::arr_t(i^halo, j^halo)); 
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^halo, j^halo)); 
       }
     }; 
   }; // namespace solvers

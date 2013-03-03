@@ -90,7 +90,7 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t,
   ) :
     parent_t(mem, bcxl, bcxr, i, p),
     omega(p.omega), 
-    tmp(mem->tmp[std::string(__FILE__)][0][0]) 
+    tmp(mem->tmp[__FILE__][0][0]) 
   {}
 
   static void alloc(
@@ -100,8 +100,7 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t,
   {
     // TODO: move to inhomo!
     parent_t::alloc(mem, nx);
-    const std::string file(__FILE__);
-    mem->tmp[file].push_back(new arrvec_t<typename parent_t::arr_t>()); 
-    mem->tmp[file].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1) )); 
+    mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
+    mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1) )); 
   }
 };
