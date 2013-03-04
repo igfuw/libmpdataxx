@@ -106,11 +106,13 @@ namespace advoocat
 	rng_t &j = this->j;
 
         assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
-        for (int it=0; it<=pc_iters; it++)
+//        for (int it=0; it<=pc_iters; it++)
         {
-          this->lap_q_err(i, j) = this->lap(this->q_err, i, j, this->dx, this->dz);
+//          this->lap_q_err(i, j) = this->lap(this->q_err, i, j, this->dx, this->dz);
+          this->lap_q_err(i, j) = this->lap(this->err, i, j, this->dx, this->dz);
 
-          q_err(i,j) += real_t(.25) * (lap_q_err(i, j) - this->err(i, j));
+//          q_err(i,j) += real_t(.25) * (lap_q_err(i, j) - this->err(i, j));
+          q_err(i,j) = this->err(i, j);
           this->xchng(q_err, i^halo, j^halo);
         }
       }
@@ -154,7 +156,7 @@ namespace advoocat
 
         this->lap_p_err(i, j) = this->lap(this->p_err, i, j, this->dx, this->dz);
 
-        std::cerr<<"--------------------------------------------------------------"<<std::endl;
+std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
 	while (error > this->tol)

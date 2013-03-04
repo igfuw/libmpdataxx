@@ -43,7 +43,7 @@ namespace advoocat
       double p(double rhod_th) { return detail::p_dimles(rhod_th); }
       long double p(long double rhod_th) { return detail::p_dimles(rhod_th); }
 
-      BZ_DECLARE_FUNCTION(p) // works with Blitz > 0.10 [2]
+//      BZ_DECLARE_FUNCTION(p) // works with Blitz > 0.10 [2]
 
       // [1] https://svn.boost.org/trac/boost/ticket/6957
       // [2] http://sourceforge.net/mailarchive/message.php?msg_id=30394213

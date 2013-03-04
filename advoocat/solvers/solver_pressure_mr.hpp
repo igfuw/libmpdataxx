@@ -136,11 +136,12 @@ std::cerr<<"--------------------------------------------------------------"<<std
 	    std::abs(this->mem->min(this->err(i,j)))
 	  );
           this->iters++;
+std::cerr<<error<<std::endl;
 	}
 	//end of pseudo_time loop
-std::ostringstream s;
-s << " error " << error << std::endl;
-std::cerr << s.str();
+//std::ostringstream s;
+//s << " error " << error << std::endl;
+//std::cerr << s.str();
 
 	this->xchng(this->Phi, i^halo, j^halo);
 	this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->dx);

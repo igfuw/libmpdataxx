@@ -128,9 +128,9 @@ namespace advoocat
 
         p_err(i ,j) = this->err(i, j);
         lap_p_err(i,j) = this->lap(p_err, i, j, this->dx, this->dz);
-    std::cerr<<"--------------------------------------------------------------"<<std::endl;
 
 	//pseudo-time loop
+std::cerr<<"-------------------------------------------------"<<std::endl;
 	real_t error = 1.;
 	while (error > this->tol)
 	{
@@ -153,7 +153,7 @@ namespace advoocat
             std::abs(this->mem->max(this->err(i,j))), 
             std::abs(this->mem->min(this->err(i,j)))
           );
-std::cerr<<"error "<<error<<std::endl;
+std::cerr<<error<<std::endl;
           this->iters++;
 	}
 
