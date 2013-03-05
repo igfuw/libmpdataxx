@@ -87,6 +87,7 @@ namespace advoocat
 
         void hook_post_loop()
         {
+          parent_t::hook_post_loop();
 std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	}
 

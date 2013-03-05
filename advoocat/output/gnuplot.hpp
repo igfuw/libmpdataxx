@@ -22,10 +22,36 @@ namespace advoocat
       using parent_t = detail::output_timer<solver_t>;
 
       std::string plotfile;
+      std::string binfmt;
 
+      Gnuplot gp;
+
+      void setup()
+      {
+        binfmt = gp.binfmt(this->mem->state(0));
+
+        gp << "set term svg " /* size 2000,750 */ " dynamic\n"
+	  << "set grid\n"
+	  << "set xlabel 'X'\n"
+	  << "set ylabel 'Y'\n"
+	  << "set xrange [0:" << this->mem->state(0).extent(0)-1 << "]\n"
+	  << "set yrange [0:" << this->mem->state(0).extent(1)-1 << "]\n"
+	  // progressive-rock connoisseur palette ;)
+	  << "set palette defined (0 '#ffffff', 1 '#993399', 2 '#00CCFF', 3 '#66CC00', 4 '#FFFF00', 5 '#FC8727', 6 '#FD0000')\n"
+	  << "set view map\n"
+	  << "set key font \",5\"\n "
+	  << "set contour base\n"
+	  << "set nosurface\n"
+	  << "set cntrparam levels 0\n";
+      }
+ 
       void record(int var)
       {
-std::cerr << "aqq " << this->n << " var=" << var << std::endl;
+	gp << "set output '" << plotfile << "_" << this->outvars[var].name << ".svg'\n";    //TODO recording more than last timestep
+        gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n"
+  //         << "set cbrange [298.5:302]\n"
+           << "splot '-' binary" << binfmt << "with image notitle\n";
+        gp.sendBinary(this->mem->state(var).copy());
       }
 
       public:

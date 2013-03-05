@@ -36,7 +36,7 @@ namespace advoocat
 
 	void hook_post_loop()
 	{
-	  parent_t::hook_ante_loop();
+	  parent_t::hook_post_loop();
 	  if (this->mem->rank() == 0) 
           {
             tmr->stop();

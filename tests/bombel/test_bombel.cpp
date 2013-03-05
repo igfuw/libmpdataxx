@@ -43,7 +43,7 @@ using namespace advoocat;
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 40, n_out=1;
+  const int nx = 100, ny = 100, nt = 5, n_out=1;
 //  const int nx = 20, ny = 20, nt = 1, n_out=1;
 
   rng_t i(0, nx-1);
@@ -128,7 +128,7 @@ int main()
     p.dz = dz; 
     p.Tht_amb = Tht_amb;
     p.tol = 1e-5;
-    p.pc_iters = 8;
+    p.pc_iters = 5;
 
     p.n_out = 5;
     p.plotfile = "figure_pc.svg";
@@ -145,25 +145,6 @@ int main()
     >(nx, ny, p));
   }
 
-  //ploting
-  Gnuplot gp;
-  gp << "reset\n"
-     << "set term svg size 2000,750 dynamic\n"
-     << "set output 'figure.svg'\n"
-     << "set multiplot layout " << slvs.size() << ",3\n" // columnsfirst\n"
-     << "set grid\n"
-     << "set xlabel 'X'\n"
-     << "set ylabel 'Y'\n"
-     << "set xrange [0:" << nx-1 << "]\n"
-     << "set yrange [0:" << ny-1 << "]\n"
-     // progressive-rock connoisseur palette ;)
-     << "set palette defined (0 '#ffffff', 1 '#993399', 2 '#00CCFF', 3 '#66CC00', 4 '#FFFF00', 5 '#FC8727', 6 '#FD0000')\n" 
-     << "set view map\n"
-     << "set key font \",5\"\n "
-     << "set contour base\n" 
-     << "set nosurface\n"
-     << "set cntrparam levels 0\n";
-
   for (auto &slv : slvs)
   {
     // initial condition
@@ -179,25 +160,7 @@ int main()
       slv.state(w) = real_t(0); 
     }
 
-    std::string binfmt;
-    binfmt = gp.binfmt(slv.state());
-
     // integration
     slv.advance(nt); // 1 tymczasowo
-
-
-  //      gp << "set title 'tht @ t=" << t+1 << "'\n"
-	gp << "set title 'tht @ t=" << std::setprecision(3) << nt * dt << "'\n"
-  //         << "set cbrange [298.5:302]\n"
-	   << "splot '-' binary" << binfmt << "with image notitle\n";
-	gp.sendBinary(slv.state(tht).copy());
-	gp << "set title 'u @ t=" << std::setprecision(3) << nt * dt << "'\n"
-  //         << "set cbrange [-.03:.03]\n"
-	   << "splot '-' binary" << binfmt << "with image notitle\n";
-	gp.sendBinary(slv.state(u).copy());
-	gp << "set title 'w @ t=" <<std::setprecision(3) << nt * dt << "'\n"
-  //         << "set cbrange [-.03:.07]\n"
-	   << "splot '-' binary" << binfmt << "with image notitle\n";
-	gp.sendBinary(slv.state(w).copy());
   }
 };
