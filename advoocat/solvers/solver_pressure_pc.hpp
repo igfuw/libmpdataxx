@@ -80,12 +80,12 @@ namespace advoocat
 {
   namespace solvers
   {
-    template <class inhomo_solver_t, int u, int w>
-    class pressure_pc : public detail::pressure_solver_common<inhomo_solver_t, u, w>
+    template <class solver_t, int u, int w>
+    class pressure_pc : public detail::pressure_solver_common<solver_t, u, w>
     {
       public:
 
-      using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w>;
+      using parent_t = detail::pressure_solver_common<solver_t, u, w>;
       typedef typename parent_t::mem_t mem_t;
       typedef typename parent_t::real_t real_t;
       using arr_2d_t = typename parent_t::arr_t;

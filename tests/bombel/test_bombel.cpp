@@ -58,30 +58,42 @@ int main()
   real_t Tht_amb = 300; // ambient state (constant thoughout the domain)
 
   boost::ptr_vector<concurr::any<real_t, 2>> slvs;
-/*
+
   { // minimum residual
-    using solver_t = bombel<
-      solvers::pressure_mr<
-	solvers::inhomo_solver<
-	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
-	>, u, w
+    using solver_t = output::gnuplot<
+      bombel<
+	solvers::pressure_mr<
+	  solvers::mpdata_2d<real_t, n_iters, n_eqs>,
+	  u, w
+        >
       >
     >;
     solver_t::params_t p; 
+
     p.dt = dt; 
     p.dx = dx; 
     p.dz = dz; 
-    p.tol = 1e-4;
+    p.tol = 1e-5;
     p.Tht_amb = Tht_amb;
+
+    p.n_out = 5;
+    p.plotfile = "figure_mr.svg";
+    p.outvars = {
+      {u,   {.name = "u",   .unit = "m/s"}}, 
+      {w,   {.name = "w",   .unit = "m/s"}}, 
+      {tht, {.name = "tht", .unit = "K"  }}
+    };
+
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
 
   { // conjugate residual
-    using solver_t = bombel<
-      solvers::pressure_cr<
-	solvers::inhomo_solver<
-	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
-	>, u, w
+    using solver_t = output::gnuplot<
+      bombel<
+	solvers::pressure_cr<
+	  solvers::mpdata_2d<real_t, n_iters, n_eqs>, 
+	  u, w
+        >
       >
     >;
     solver_t::params_t p;
@@ -90,19 +102,25 @@ int main()
     p.dx = dx; 
     p.dz = dz; 
     p.Tht_amb = Tht_amb;
-    p.tol = 1e-4;
+    p.tol = 1e-5;
+
+    p.n_out = 5;
+    p.plotfile = "figure_cr.svg";
+    p.outvars = {
+      {u,   {.name = "u",   .unit = "m/s"}}, 
+      {w,   {.name = "w",   .unit = "m/s"}}, 
+      {tht, {.name = "tht", .unit = "K"  }}
+    };
+
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
  
-*/
-
   { // conjugate residual + preconditioner
     using solver_t = output::gnuplot<
       bombel<
         solvers::pressure_pc<
-          solvers::inhomo_solver<
-	    solvers::mpdata_2d<real_t, n_iters, n_eqs>, solvers::strang
-	  >, u, w
+	  solvers::mpdata_2d<real_t, n_iters, n_eqs>,
+	  u, w
         >
       >
     >;

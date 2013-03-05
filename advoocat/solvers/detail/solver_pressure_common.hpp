@@ -9,6 +9,7 @@
 
 #include "../../formulae/nabla_formulae.hpp"
 #include "solver_velocity_common.hpp"
+#include "../solver_inhomo.hpp"
 
 namespace advoocat
 {
@@ -16,13 +17,12 @@ namespace advoocat
   {
     namespace detail
     {
-      template <class inhomo_solver_t, int u, int w>
-      class pressure_solver_common : public solver_velocity_common<inhomo_solver_t, u, w>
+      template <class solver_t, int u, int w>
+      class pressure_solver_common : public solver_velocity_common<inhomo_solver<solver_t, solvers::strang>, u, w>
       {
-// TODO: assert strang!
 	protected:
 
-	using parent_t = solver_velocity_common<inhomo_solver_t, u, w>;
+	using parent_t = solver_velocity_common<inhomo_solver<solver_t, solvers::strang>, u, w>;
 	typedef typename parent_t::real_t real_t;
 
 	// member fields
