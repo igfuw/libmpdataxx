@@ -14,14 +14,11 @@
 
 // advection (<> should be used instead of "" in normal usage) 
 #include "advoocat/solvers/mpdata_2d.hpp"
-#include "advoocat/solvers/solver_inhomo.hpp"
 #include "advoocat/solvers/solver_pressure_mr.hpp"
 #include "advoocat/solvers/solver_pressure_cr.hpp"
 #include "advoocat/solvers/solver_pressure_pc.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
 #include "advoocat/concurr/threads.hpp"
-//gradient
-#include "advoocat/formulae/nabla_formulae.hpp"
 //theta->pressure
 #include "advoocat/formulae/diagnose_formulae.hpp"
 //physical constants

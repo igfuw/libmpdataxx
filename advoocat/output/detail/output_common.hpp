@@ -72,18 +72,12 @@ namespace advoocat
 	  std::map<int, info> outvars;
 	};
 
-	// 2D ctor
+	// ctor
 	output_common(
-	  typename parent_t::mem_t *mem,
-	  typename parent_t::bc_p &bcxl,
-	  typename parent_t::bc_p &bcxr,
-	  typename parent_t::bc_p &bcyl,
-	  typename parent_t::bc_p &bcyr,
-	  const rng_t &i,
-	  const rng_t &j,
+	  typename parent_t::ctor_args_t args,
 	  const params_t &p
 	) :
-	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
+	parent_t(args, p),
 	  n_out(p.n_out), outvars(p.outvars)
 	{}
       };

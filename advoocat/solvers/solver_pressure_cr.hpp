@@ -173,18 +173,12 @@ std::cerr<<error<<std::endl;
 
       // ctor
       pressure_cr(
-	typename parent_t::mem_t *mem,
-        typename parent_t::bc_p &bcxl,
-        typename parent_t::bc_p &bcxr,
-        typename parent_t::bc_p &bcyl,
-        typename parent_t::bc_p &bcyr,
-	const rng_t &i,
-	const rng_t &j,
+	typename parent_t::ctor_args_t args,
 	const params_t &p
       ) :
-	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
-        lap_p_err(mem->tmp[__FILE__][0][0]),
-	p_err(mem->tmp[__FILE__][0][1])
+	parent_t(args, p),
+        lap_p_err(args.mem->tmp[__FILE__][0][0]),
+	p_err(args.mem->tmp[__FILE__][0][1])
       {}
 
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)

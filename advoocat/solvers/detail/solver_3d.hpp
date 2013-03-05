@@ -42,27 +42,32 @@ namespace advoocat
           this->mem->barrier();
 	}
 
+        public:
+
+        struct ctor_args_t
+        {   
+          typename parent_t::mem_t *mem;
+          bc_p 
+            &bcxl, &bcxr, 
+            &bcyl, &bcyr,
+            &bczl, &bczr; 
+          const rng_t &i, &j, &k; 
+        };  
+
+        protected:
+
 	// ctor
-	solver_3d(
-	  typename parent_t::mem_t *mem,
-          bc_p &bcxl,
-          bc_p &bcxr,
-          bc_p &bcyl,
-          bc_p &bcyr,
-          bc_p &bczl,
-          bc_p &bczr,
-	  const rng_t &i,
-	  const rng_t &j,
-	  const rng_t &k
-	) :
-	  parent_t(mem),
-	  i(i), j(j),  k(k),  
-	  bcxl(std::move(bcxl)),
-	  bcxr(std::move(bcxr)),
-	  bcyl(std::move(bcyl)),
-	  bcyr(std::move(bcyr)),
-	  bczl(std::move(bczl)),
-	  bczr(std::move(bczr))
+	solver_3d(ctor_args_t args) :
+	  parent_t(args.mem),
+	  i(args.i), 
+          j(args.j), 
+          k(args.k),  
+	  bcxl(std::move(args.bcxl)),
+	  bcxr(std::move(args.bcxr)),
+	  bcyl(std::move(args.bcyl)),
+	  bcyr(std::move(args.bcyr)),
+	  bczl(std::move(args.bczl)),
+	  bczr(std::move(args.bczr))
 	{} 
 
 	public:

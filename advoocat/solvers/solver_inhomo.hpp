@@ -39,46 +39,10 @@ namespace advoocat
 
       // 1D
       inhomo_solver(
-	typename parent_t::mem_t *mem, 
-	typename parent_t::bc_p &bcxl, 
-	typename parent_t::bc_p &bcxr, 
-	const rng_t &i, 
+	typename parent_t::ctor_args_t args, 
 	const params_t &p
       ) :
-	parent_t(mem, bcxl, bcxr, i, p), 
-        dt(p.dt)
-      {}
-
-      // 2D
-      inhomo_solver(
-	typename parent_t::mem_t *mem, 
-	typename parent_t::bc_p &bcxl, 
-	typename parent_t::bc_p &bcxr, 
-	typename parent_t::bc_p &bcyl, 
-	typename parent_t::bc_p &bcyr, 
-	const rng_t &i, 
-	const rng_t &j, 
-	const params_t &p
-      ) :
-	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p), 
-        dt(p.dt)
-      {}
-
-      // 3D
-      inhomo_solver(
-	typename parent_t::mem_t *mem, 
-	typename parent_t::bc_p &bcxl, // TODO: encapsulating all these into a struct would shorten by 5 lines!
-	typename parent_t::bc_p &bcxr, 
-	typename parent_t::bc_p &bcyl, 
-	typename parent_t::bc_p &bcyr, 
-	typename parent_t::bc_p &bczl, 
-	typename parent_t::bc_p &bczr, 
-	const rng_t &i, // TODO: ditto
-	const rng_t &j, 
-	const rng_t &k, 
-	const params_t &p
-      ) :
-	parent_t(mem, bcxl, bcxr, bcyl, bcyr, bczl, bczr, i, j, k, p), 
+	parent_t(args, p), 
         dt(p.dt)
       {}
 

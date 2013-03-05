@@ -152,18 +152,11 @@ std::cerr<<error<<std::endl;
 
       // ctor
       pressure_mr(
-	typename parent_t::mem_t *mem,
-        typename parent_t::bc_p &bcxl,
-        typename parent_t::bc_p &bcxr,
-        typename parent_t::bc_p &bcyl,
-        typename parent_t::bc_p &bcyr,
-	const rng_t &i,
-	const rng_t &j,
+	typename parent_t::ctor_args_t args,
 	const typename parent_t::params_t &p
       ) :
-	parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p)
+	parent_t(args, p)
       {}
-
     }; 
   }; // namespace solvers
 }; // namespace advoocat

@@ -45,19 +45,26 @@ namespace advoocat
           this->mem->barrier();
 	}
 
+        public:
+ 
+        struct ctor_args_t
+        {   
+          typename parent_t::mem_t *mem;
+          bc_p &bcxl, &bcxr, &bcyl, &bcyr; 
+          const rng_t &i, &j; 
+        };  
+
+        protected:
+
 	// ctor
-	solver_2d(
-          typename parent_t::mem_t *mem, 
-          bc_p &bcxl, bc_p &bcxr, bc_p &bcyl, bc_p &bcyr, 
-          const rng_t &i, const rng_t &j
-        ) :
-	  parent_t(mem),
-	  i(i), 
-	  j(j),  
-	  bcxl(std::move(bcxl)), 
-	  bcxr(std::move(bcxr)), 
-	  bcyl(std::move(bcyl)),
-	  bcyr(std::move(bcyr))
+	solver_2d(ctor_args_t args) :
+	  parent_t(args.mem),
+	  i(args.i), 
+	  j(args.j),  
+	  bcxl(std::move(args.bcxl)), 
+	  bcxr(std::move(args.bcxr)), 
+	  bcyl(std::move(args.bcyl)),
+	  bcyr(std::move(args.bcyr))
 	{}
 
 	public:

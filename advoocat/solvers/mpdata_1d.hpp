@@ -92,17 +92,14 @@ namespace advoocat
 
       // ctor
       mpdata_1d(
-        typename parent_t::mem_t *mem, 
-        typename parent_t::bc_p &bcxl, 
-        typename parent_t::bc_p &bcxr, 
-        const rng_t &i, 
+        typename parent_t::ctor_args_t args,
         const params_t &
       ) : 
-	parent_t(mem, bcxl, bcxr, i), 
-	im(i.first() - 1, i.last())
+	parent_t(args),
+	im(args.i.first() - 1, args.i.last())
       {
 	for (int n = 0; n < n_tmp; ++n)
-          tmp[n] = &mem->tmp[__FILE__][n];
+          tmp[n] = &args.mem->tmp[__FILE__][n];
       }
 
       // memory allocation (to be called once per shared-mem node)

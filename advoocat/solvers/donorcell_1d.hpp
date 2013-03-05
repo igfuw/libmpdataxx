@@ -47,14 +47,11 @@ namespace advoocat
 
       // ctor
       donorcell_1d(
-        typename parent_t::mem_t *mem, 
-        typename parent_t::bc_p &bcxl, 
-        typename parent_t::bc_p &bcxr, 
-        const rng_t &i, 
+        typename parent_t::ctor_args_t args, 
         const params_t &
       ) :
-        parent_t(mem, bcxl, bcxr, i)
-      { }  
+        parent_t(args)
+      {}  
     };
   }; // namespace solvers
 }; // namespace advoocat

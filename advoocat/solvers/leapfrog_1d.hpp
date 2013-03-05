@@ -49,13 +49,16 @@ namespace advoocat
 
       // ctor
       leapfrog_1d(
+        typename parent_t::ctor_args_t args,
+/*
         typename parent_t::mem_t *mem, 
         typename parent_t::bc_p &bcxl, 
         typename parent_t::bc_p &bcxr, 
         const rng_t &i, 
+*/
         const params_t &
       ) :
-        parent_t(mem, bcxl, bcxr, i)
+        parent_t(args) //mem, bcxl, bcxr, i)
       {}  
     };
   }; // namespace solvers

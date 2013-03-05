@@ -24,17 +24,11 @@ class bombel : public parent_t
   struct params_t : parent_t::params_t { real_t Tht_amb; };
 
   // ctor
-  bombel( // TODO: ctor_arg_t
-    typename parent_t::mem_t *mem, 
-    typename parent_t::bc_p &bcxl,
-    typename parent_t::bc_p &bcxr,
-    typename parent_t::bc_p &bcyl,
-    typename parent_t::bc_p &bcyr,
-    const rng_t &i,
-    const rng_t &j,
+  bombel( 
+    typename parent_t::ctor_args_t args, 
     const params_t &p
   ) :
-    parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
+    parent_t(args, p),
     Tht_amb(p.Tht_amb)
   {}
 };

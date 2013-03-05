@@ -97,24 +97,18 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 
 	// ctor
 	pressure_solver_common(
-	  typename parent_t::mem_t *mem,
-          typename parent_t::bc_p &bcxl,
-          typename parent_t::bc_p &bcxr,
-          typename parent_t::bc_p &bcyl,
-          typename parent_t::bc_p &bcyr,
-	  const rng_t &i, 
-	  const rng_t &j, 
+	  typename parent_t::ctor_args_t args,
 	  const params_t &p
 	) : 
-	  parent_t(mem, bcxl, bcxr, bcyl, bcyr, i, j, p),
+	  parent_t(args, p),
           tol(p.tol),
-          lap_err(mem->tmp[__FILE__][0][0]),
-          tmp_u(mem->tmp[__FILE__][0][1]),
-          tmp_w(mem->tmp[__FILE__][0][2]),
-          Phi(mem->tmp[__FILE__][0][3]),
-          err(mem->tmp[__FILE__][0][4]),
-	  lap_tmp1(mem->tmp[__FILE__][0][5]),
-	  lap_tmp2(mem->tmp[__FILE__][0][6])
+          lap_err(args.mem->tmp[__FILE__][0][0]),
+          tmp_u(args.mem->tmp[__FILE__][0][1]),
+          tmp_w(args.mem->tmp[__FILE__][0][2]),
+          Phi(args.mem->tmp[__FILE__][0][3]),
+          err(args.mem->tmp[__FILE__][0][4]),
+	  lap_tmp1(args.mem->tmp[__FILE__][0][5]),
+	  lap_tmp2(args.mem->tmp[__FILE__][0][6])
 	{} 
 
 	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)

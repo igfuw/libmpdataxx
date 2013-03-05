@@ -93,11 +93,17 @@ namespace advoocat
             shrdl.reset(new bcond::shared<real_t>());
             shrdr.reset(new bcond::shared<real_t>());
             const rng_t i(min(s0, i0, n0), max(s0, i0, n0)); 
-	    algos.push_back(new solver_t(mem.get(), 
-              i0 == 0      ? bxl : shrdl,
-              i0 == n0 - 1 ? bxr : shrdr,
-              i, params
-            ));
+	    algos.push_back(
+              new solver_t(
+                typename solver_t::ctor_args_t({
+		  mem.get(), 
+		  i0 == 0      ? bxl : shrdl,
+		  i0 == n0 - 1 ? bxr : shrdr,
+		  i
+                }), 
+                params
+              )
+            );
           }
 	}
 
@@ -140,13 +146,19 @@ namespace advoocat
               const rng_t 
                 i( min(s0, i0, n0), max(s0, i0, n0) ),
                 j( min(s1, i1, n1), max(s1, i1, n1) );
-              algos.push_back(new solver_t(mem.get(), 
-                i0 == 0      ? bxl : shrdl,
-                i0 == n0 - 1 ? bxr : shrdr,
-                byl, 
-                byr, 
-                i, j, params
-              ));
+              algos.push_back(
+                new solver_t(
+                  typename solver_t::ctor_args_t({
+		    mem.get(), 
+		    i0 == 0      ? bxl : shrdl,
+		    i0 == n0 - 1 ? bxr : shrdr,
+		    byl, 
+		    byr, 
+		    i, j
+                  }), 
+                  params
+                )
+              );
             }
           }
 	}
@@ -196,7 +208,18 @@ namespace advoocat
                   i( min(s0, i0, n0), max(s0, i0, n0) ),
                   j( min(s1, i1, n1), max(s1, i1, n1) ),
                   k( min(s2, i2, n2), max(s2, i2, n2) );
-		algos.push_back(new solver_t(mem.get(), bxl, bxr, byl, byr, bzl, bzr, i, j, k, params));
+		algos.push_back(
+                  new solver_t(
+                    typename solver_t::ctor_args_t({
+                      mem.get(), 
+                      bxl, bxr, 
+                      byl, byr, 
+                      bzl, bzr, 
+                      i, j, k
+                    }), 
+                    params
+                  )
+                );
               }
             }
           }

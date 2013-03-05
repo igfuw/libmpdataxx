@@ -47,19 +47,10 @@ namespace advoocat
 
       // ctor
       donorcell_3d(
-	typename parent_t::mem_t *mem, 
-        typename parent_t::bc_p &bcxl,
-        typename parent_t::bc_p &bcxr,
-        typename parent_t::bc_p &bcyl,
-        typename parent_t::bc_p &bcyr,
-        typename parent_t::bc_p &bczl,
-        typename parent_t::bc_p &bczr,
-	const rng_t &i, 
-	const rng_t &j, 
-	const rng_t &k, 
+	typename parent_t::ctor_args_t args, 
 	const params_t &
       ) :
-	parent_t(mem, bcxl, bcxr, bcyl, bcyr, bczl, bczr, i, j, k)
+	parent_t(args)
       {}  
     }; // class donorcell_3d
   }; // namespace solvers

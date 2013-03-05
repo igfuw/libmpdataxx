@@ -82,15 +82,12 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t,
 
   // ctor
   coupled_harmosc(
-    typename parent_t::mem_t *mem, 
-    typename parent_t::bc_p &bcxl,
-    typename parent_t::bc_p &bcxr,
-    const rng_t &i, 
+    typename parent_t::ctor_args_t args,
     params_t p
   ) :
-    parent_t(mem, bcxl, bcxr, i, p),
+    parent_t(args, p),
     omega(p.omega), 
-    tmp(mem->tmp[__FILE__][0][0]) 
+    tmp(args.mem->tmp[__FILE__][0][0]) 
   {}
 
   static void alloc(
