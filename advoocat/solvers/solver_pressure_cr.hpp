@@ -98,7 +98,7 @@ namespace advoocat
 
       private:
 
-      void pressure_solver_update(real_t dt)
+      void pressure_solver_update()
       {
 	using namespace arakawa_c;
 	using formulae::nabla::grad;
@@ -153,7 +153,7 @@ std::cerr<<"-------------------------------------------------"<<std::endl;
             std::abs(this->mem->max(this->err(i,j))), 
             std::abs(this->mem->min(this->err(i,j)))
           );
-std::cerr<<error<<std::endl;
+//std::cerr<<error<<std::endl;
           this->iters++;
 	}
 

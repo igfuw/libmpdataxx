@@ -18,7 +18,7 @@ namespace advoocat
     namespace detail
     {
       template <class solver_t, int u, int w>
-      class pressure_solver_common : public solver_velocity_common<inhomo_solver<solver_t, solvers::strang>, u, w>
+      class pressure_solver_common : public solver_velocity_common<inhomo_solver<solver_t, strang>, u, w>
       {
 	protected:
 
@@ -45,14 +45,14 @@ namespace advoocat
 	void ini_pressure()
 	{ 
 	  const int halo = parent_t::halo;
-	  // dt/2 * (Prs-Prs_amb) / rho 
-	  Phi(this->i, this->j) = real_t(0);
+	  // Phi = dt/2 * (Prs-Prs_amb) / rho 
+	  Phi(this->i, this->j) = real_t(0); // ... but assuming zero perturbation at t=0
 	  this->xchng(Phi, this->i^halo, this->j^halo);
 	}
 
-	virtual void pressure_solver_update(real_t dt) = 0;
+	virtual void pressure_solver_update() = 0;
 
-	void pressure_solver_apply(real_t dt)
+	void pressure_solver_apply()
 	{
 	  const rng_t &i = this->i, &j = this->j;
 
@@ -75,14 +75,14 @@ namespace advoocat
         void hook_ante_step()
         {
           parent_t::hook_ante_step(); // velocity extrapolation + forcings
-	  pressure_solver_apply(this->dt);
+	  pressure_solver_apply(); 
         }
     
         void hook_post_step()
         {
-          parent_t::hook_post_step();
-	  pressure_solver_update(this->dt);
-	  pressure_solver_apply(this->dt);
+          parent_t::hook_post_step(); // forcings
+	  pressure_solver_update(); // intentionally after forcings
+	  pressure_solver_apply();
         }
 
         void hook_post_loop()

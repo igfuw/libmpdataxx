@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <map>
+
 namespace advoocat
 {
   namespace output

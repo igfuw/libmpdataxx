@@ -125,7 +125,7 @@ namespace advoocat
         }
       }
 
-      void pressure_solver_update(real_t dt)
+      void pressure_solver_update()
       {
 	using namespace arakawa_c;
 	using formulae::nabla::grad;
@@ -162,9 +162,8 @@ namespace advoocat
 std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
-	while (error > this->tol)
+	while (true)
 	{
-
           tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
           if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
           //else TODO!
@@ -177,7 +176,8 @@ std::cerr<<"--------------------------------------------------------------"<<std
             std::abs(this->mem->min(this->err(i, j)))
           );
 
-std::cerr<<"error "<<error<<std::endl;
+          if (error <= this->tol) break;
+//std::cerr<<"error "<<error<<std::endl;
 
           //TODO exit pseudotime loop here if <err> < error
 
