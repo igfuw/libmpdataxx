@@ -163,7 +163,7 @@ std::cerr << "aqq " << this->n << " var=" << var << std::endl;
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 5, n_out=1;
+  const int nx = 100, ny = 100, nt = 20, n_out=1;
 //  const int nx = 20, ny = 20, nt = 1, n_out=1;
 
   rng_t i(0, nx-1);
@@ -202,6 +202,7 @@ int main()
       >
     >;
     solver_t::params_t p;
+
     p.dt = dt; 
     p.dx = dx; 
     p.dz = dz; 
@@ -209,8 +210,9 @@ int main()
     p.tol = 1e-4;
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
-*/
  
+*/
+
   { // conjugate residual + preconditioner
     using solver_t = output::gnuplot<
       bombel<
@@ -228,7 +230,7 @@ int main()
     p.dz = dz; 
     p.Tht_amb = Tht_amb;
     p.tol = 1e-5;
-    p.pc_iters = 9;
+    p.pc_iters = 4;
 
     p.n_out = 5;
     p.plotfile = "figure_pc.svg";

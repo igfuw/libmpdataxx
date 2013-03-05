@@ -91,6 +91,7 @@ namespace advoocat
       using arr_2d_t = typename parent_t::arr_t;
 
       arr_2d_t p_err, q_err, lap_p_err, lap_q_err;
+      arr_2d_t pcnd_err;   //TODO is it needed?
 
       private:
 
@@ -105,14 +106,21 @@ namespace advoocat
 	rng_t &i = this->i;
 	rng_t &j = this->j;
 
-        assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
-//        for (int it=0; it<=pc_iters; it++)
-        {
-//          this->lap_q_err(i, j) = this->lap(this->q_err, i, j, this->dx, this->dz);
-          this->lap_q_err(i, j) = this->lap(this->err, i, j, this->dx, this->dz);
+        //initail q_err for preconditioner
+        q_err(i, j) = real_t(0);
+        this->xchng(q_err, i^this->halo, j^this->halo);
 
-//          q_err(i,j) += real_t(.25) * (lap_q_err(i, j) - this->err(i, j));
-          q_err(i,j) = this->err(i, j);
+       //initail preconditioner error   
+        this->pcnd_err(i, j) = this->lap(this->q_err, i, j, this->dx, this->dz) - this->err(i, j);
+          //TODO does it change with non_const density?
+        this->xchng(pcnd_err, i^halo, j^halo);
+        
+        assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
+        for (int it=0; it<=pc_iters; it++)
+        {
+          q_err(i,j)     += real_t(.25) * pcnd_err(i, j);
+          pcnd_err(i, j) += real_t(.25) * this->lap(this->pcnd_err, i, j, this->dx, this->dz);
+
           this->xchng(q_err, i^halo, j^halo);
         }
       }
@@ -145,22 +153,18 @@ namespace advoocat
           + this->lap(this->Phi, i, j, this->dx, this->dz);
           /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
-        //initail q_err for preconditioner
-        q_err(i, j) = real_t(0);
-        this->xchng(q_err, i^this->halo, j^this->halo);
-
         precond();
 
         p_err(i, j) = q_err(i, j);
         this->xchng(p_err, i^this->halo, j^this->halo);
 
         this->lap_p_err(i, j) = this->lap(this->p_err, i, j, this->dx, this->dz);
-
 std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
 	while (error > this->tol)
 	{
+
           tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
           if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
           //else TODO!
@@ -221,7 +225,8 @@ std::cerr<<"error "<<error<<std::endl;
         lap_p_err(mem->tmp[__FILE__][0][0]), // TODO: parent has unused lap_err
         lap_q_err(mem->tmp[__FILE__][0][1]),
 	p_err(mem->tmp[__FILE__][0][2]),
-	q_err(mem->tmp[__FILE__][0][3])
+	q_err(mem->tmp[__FILE__][0][3]),
+	pcnd_err(mem->tmp[__FILE__][0][4])
       {}
 
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
@@ -231,7 +236,7 @@ std::cerr<<"error "<<error<<std::endl;
 
         // temporary fields
         mem->tmp[__FILE__].push_back(new arrvec_t<arr_2d_t>());
-	for (int n=0; n < 4; ++n) 
+	for (int n=0; n < 5; ++n) 
 	  mem->tmp[__FILE__].back().push_back(new arr_2d_t(i^parent_t::halo, j^parent_t::halo)); 
       }
     }; 
