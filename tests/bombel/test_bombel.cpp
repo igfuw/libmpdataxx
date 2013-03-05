@@ -43,7 +43,7 @@ using namespace advoocat;
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 20, n_out=1;
+  const int nx = 100, ny = 100, nt = 40, n_out=1;
 //  const int nx = 20, ny = 20, nt = 1, n_out=1;
 
   rng_t i(0, nx-1);
@@ -128,7 +128,7 @@ int main()
     p.dz = dz; 
     p.Tht_amb = Tht_amb;
     p.tol = 1e-5;
-    p.pc_iters = 4;
+    p.pc_iters = 8;
 
     p.n_out = 5;
     p.plotfile = "figure_pc.svg";

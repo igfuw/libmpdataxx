@@ -26,8 +26,6 @@ namespace advoocat
 	struct info { std::string name, unit; };
 	std::map<int, info> outvars;
 
-	private: 
-
 	int n_out;
 
 	virtual void record(int var) {}

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "detail/output_common.hpp"
+#include "detail/output_timer.hpp"
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>
@@ -17,15 +17,15 @@ namespace advoocat
   namespace output
   {
     template <class solver_t>
-    class gnuplot : public detail::output_common<solver_t>
+    class gnuplot : public detail::output_timer<solver_t>
     {
-      using parent_t = detail::output_common<solver_t>;
+      using parent_t = detail::output_timer<solver_t>;
 
       std::string plotfile;
 
       void record(int var)
       {
-  std::cerr << "aqq " << this->n << " var=" << var << std::endl;
+std::cerr << "aqq " << this->n << " var=" << var << std::endl;
       }
 
       public:
