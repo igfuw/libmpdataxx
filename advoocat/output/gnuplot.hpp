@@ -30,7 +30,7 @@ namespace advoocat
       {
         binfmt = gp.binfmt(this->mem->state(0));
 
-        gp << "set term " << p.gnuplot_term << "\n"
+        gp 
 	   << "set grid\n"
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
@@ -47,10 +47,12 @@ namespace advoocat
  
       void record(int var)
       {
-	gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
-        gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n"
+        gp << "filename = '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
+        gp << "set term svg dynamic name filename\n";
+	gp << "set output filename\n";
+        gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
   //         << "set cbrange [298.5:302]\n"
-           << "splot '-' binary" << binfmt << "with image notitle\n";
+        gp << "splot '-' binary" << binfmt << "with image notitle\n";
         gp.sendBinary(this->mem->state(var).copy());
       }
 
@@ -62,7 +64,6 @@ namespace advoocat
           gnuplot_output,
           gnuplot_xlabel = "X",
           gnuplot_ylabel = "Y",
-          gnuplot_term = "svg dynamic",
           gnuplot_view = "map"; 
       };
 
