@@ -35,7 +35,7 @@ enum {u, w, tht};  //eqations
 enum {x, z};       //dimensions
 
 using real_t = double;
-const int n_iters = 2, n_eqs = 3;
+const int n_iters = 2, n_eqs = 3; // TODO: n_eqs should be in bombel!!!
 
 using namespace advoocat;
 
@@ -43,8 +43,8 @@ using namespace advoocat;
 
 int main() 
 {
-  const int nx = 500, ny = 500, nt = 5, n_out=1;
-//  const int nx = 20, ny = 20, nt = 1, n_out=1;
+  const int nx = 100, ny = 100, nt = 10;
+//  const int nx = 20, ny = 20, nt = 1;
 
   rng_t i(0, nx-1);
   rng_t j(0, ny-1);
@@ -73,7 +73,7 @@ int main()
     p.tol = 1e-5;
     p.Tht_amb = Tht_amb;
 
-    p.outfreq = 5;
+    p.outfreq = 1;
     p.outvars = {
       {u,   {.name = "u",   .unit = "m/s"}}, 
       {w,   {.name = "w",   .unit = "m/s"}}, 
@@ -155,29 +155,6 @@ int main()
       slv.state(tht) = Tht_amb 
 	+ exp( -sqr(i-nx/2.) / (2.*pow(nx/20, 2))
 	       -sqr(j-ny/4.) / (2.*pow(ny/20, 2)) )
-
-   	- exp( -sqr(i-nx/3.) / (2.*pow(nx/20, 2))
-	       -sqr(j-3*ny/4.) / (2.*pow(ny/20, 2)) )
-   	- exp( -sqr(i-2*nx/3.) / (2.*pow(nx/20, 2))
-	       -sqr(j-3*ny/4.) / (2.*pow(ny/20, 2)) )
-
-   	+ exp( -sqr(i-2*nx/3.) / (2.*pow(nx/20, 2))
-	       -sqr(j-2*ny/4.) / (2.*pow(ny/20, 2)) )
-   	+ exp( -sqr(i-2*nx/3.) / (2.*pow(nx/20, 2))
-	       -sqr(j-2*ny/4.) / (2.*pow(ny/20, 2)) )
-
-   	+ exp( -sqr(i-nx/2.) / (2.*pow(nx/20, 2))
-	       -sqr(j-ny/2.) / (2.*pow(ny/20, 2)) )
-
-   	+ exp( -sqr(i-nx/4.) / (2.*pow(nx/20, 2))
-	       -sqr(j-ny/4.) / (2.*pow(ny/20, 2)) )
-   	+ exp( -sqr(i-nx/4.) / (2.*pow(nx/20, 2))
-	       -sqr(j-3*ny/4.) / (2.*pow(ny/20, 2)) )
-
-   	- exp( -sqr(i-nx/3.) / (2.*pow(nx/20, 2))
-	       -sqr(j-ny/2.) / (2.*pow(ny/20, 2)) )
-   	- exp( -sqr(i-2*nx/3.) / (2.*pow(nx/20, 2))
-	       -sqr(j-ny/2.) / (2.*pow(ny/20, 2)) )
       ;
       slv.state(u) = real_t(0); 
       slv.state(w) = real_t(0); 

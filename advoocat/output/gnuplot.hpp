@@ -24,13 +24,14 @@ namespace advoocat
       using parent_t = detail::output_timer<solver_t>;
 
       std::string binfmt;
-      Gnuplot gp;
+      std::unique_ptr<Gnuplot> gp;
 
-      void setup()
+      void start()
       {
-        binfmt = gp.binfmt(this->mem->state(0));
+        gp.reset(new Gnuplot());
+        binfmt = gp->binfmt(this->mem->state(0));
 
-        gp 
+        *gp 
 	   << "set grid\n"
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
@@ -44,16 +45,21 @@ namespace advoocat
            << "set nosurface\n"
            << "set cntrparam levels 0\n";
       }
+
+      void stop()
+      {
+        gp.reset();
+      }
  
       void record(int var)
       {
-        gp << "filename = '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
-        gp << "set term svg dynamic name filename\n";
-	gp << "set output filename\n";
-        gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
+        *gp << "filename = '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
+        *gp << "set term svg dynamic name filename\n";
+	*gp << "set output filename\n";
+        *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
   //         << "set cbrange [298.5:302]\n"
-        gp << "splot '-' binary" << binfmt << "with image notitle\n";
-        gp.sendBinary(this->mem->state(var).copy());
+        *gp << "splot '-' binary" << binfmt << "with image notitle\n";
+        gp->sendBinary(this->mem->state(var).copy());
       }
 
       public:
@@ -62,9 +68,9 @@ namespace advoocat
       { 
 	std::string 
           gnuplot_output,
-          gnuplot_xlabel = "X",
-          gnuplot_ylabel = "Y",
-          gnuplot_view = "map"; 
+          gnuplot_xlabel = std::string("X"),
+          gnuplot_ylabel = std::string("Y"),
+          gnuplot_view = std::string("map"); 
       };
 
       const params_t p; // that's a copy - convenient but might be memory-consuming
