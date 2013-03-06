@@ -26,7 +26,7 @@ namespace advoocat
 	struct info { std::string name, unit; };
 	std::map<int, info> outvars;
 
-	int n_out;
+	int outfreq;
 
 	virtual void record(int var) {}
 	virtual void setup() {}
@@ -59,7 +59,7 @@ namespace advoocat
 	  if (this->mem->rank() == 0)
 	  {
 	    n++;
-	    if (n % n_out == 0) record_all();
+	    if (n % outfreq == 0) record_all();
 	  }
 	  this->mem->barrier();
 	}
@@ -68,7 +68,7 @@ namespace advoocat
 
 	struct params_t : parent_t::params_t 
 	{ 
-	  int n_out; 
+	  int outfreq; 
 	  std::map<int, info> outvars;
 	};
 
@@ -78,7 +78,7 @@ namespace advoocat
 	  const params_t &p
 	) :
 	parent_t(args, p),
-	  n_out(p.n_out), outvars(p.outvars)
+	  outfreq(p.outfreq), outvars(p.outvars)
 	{}
       };
     }; // namespace detail
