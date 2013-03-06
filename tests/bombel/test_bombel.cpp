@@ -73,13 +73,13 @@ int main()
     p.tol = 1e-5;
     p.Tht_amb = Tht_amb;
 
-    p.n_out = 5;
-    p.plotfile = "figure_mr.svg";
+    p.outfreq = 5;
     p.outvars = {
       {u,   {.name = "u",   .unit = "m/s"}}, 
       {w,   {.name = "w",   .unit = "m/s"}}, 
       {tht, {.name = "tht", .unit = "K"  }}
     };
+    p.gnuplot_output = "figure_mr_%s_%d.svg";
 
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
@@ -101,13 +101,13 @@ int main()
     p.Tht_amb = Tht_amb;
     p.tol = 1e-5;
 
-    p.n_out = 5;
-    p.plotfile = "figure_cr.svg";
+    p.outfreq = 5;
     p.outvars = {
       {u,   {.name = "u",   .unit = "m/s"}}, 
       {w,   {.name = "w",   .unit = "m/s"}}, 
       {tht, {.name = "tht", .unit = "K"  }}
     };
+    p.gnuplot_output = "figure_cr_%s_%d.svg";
 
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
@@ -130,13 +130,13 @@ int main()
     p.tol = 1e-5;
     p.pc_iters = 5;
 
-    p.n_out = 5;
-    p.plotfile = "figure_pc.svg";
+    p.outfreq = 5;
     p.outvars = {
       {u,   {.name = "u",   .unit = "m/s"}}, 
       {w,   {.name = "w",   .unit = "m/s"}}, 
       {tht, {.name = "tht", .unit = "K"  }}
     };
+    p.gnuplot_output = "figure_pc_%s_%d.svg";
 
     slvs.push_back(new concurr::threads<
       solver_t, 
@@ -161,6 +161,6 @@ int main()
     }
 
     // integration
-    slv.advance(nt); // 1 tymczasowo
+    slv.advance(nt); 
   }
 };
