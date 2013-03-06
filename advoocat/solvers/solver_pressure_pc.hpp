@@ -159,7 +159,7 @@ namespace advoocat
         this->xchng(p_err, i^this->halo, j^this->halo);
 
         this->lap_p_err(i, j) = this->lap(this->p_err, i, j, this->dx, this->dz);
-std::cerr<<"--------------------------------------------------------------"<<std::endl;
+//std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
 	while (true)

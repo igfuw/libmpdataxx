@@ -43,7 +43,7 @@ using namespace advoocat;
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 5, n_out=1;
+  const int nx = 500, ny = 500, nt = 5, n_out=1;
 //  const int nx = 20, ny = 20, nt = 1, n_out=1;
 
   rng_t i(0, nx-1);
@@ -111,7 +111,7 @@ int main()
 
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
- 
+
   { // conjugate residual + preconditioner
     using solver_t = output::gnuplot<
       bombel<
@@ -128,7 +128,7 @@ int main()
     p.dz = dz; 
     p.Tht_amb = Tht_amb;
     p.tol = 1e-5;
-    p.pc_iters = 5;
+    p.pc_iters = 2;
 
     p.n_out = 5;
     p.plotfile = "figure_pc.svg";
@@ -155,6 +155,29 @@ int main()
       slv.state(tht) = Tht_amb 
 	+ exp( -sqr(i-nx/2.) / (2.*pow(nx/20, 2))
 	       -sqr(j-ny/4.) / (2.*pow(ny/20, 2)) )
+
+   	- exp( -sqr(i-nx/3.) / (2.*pow(nx/20, 2))
+	       -sqr(j-3*ny/4.) / (2.*pow(ny/20, 2)) )
+   	- exp( -sqr(i-2*nx/3.) / (2.*pow(nx/20, 2))
+	       -sqr(j-3*ny/4.) / (2.*pow(ny/20, 2)) )
+
+   	+ exp( -sqr(i-2*nx/3.) / (2.*pow(nx/20, 2))
+	       -sqr(j-2*ny/4.) / (2.*pow(ny/20, 2)) )
+   	+ exp( -sqr(i-2*nx/3.) / (2.*pow(nx/20, 2))
+	       -sqr(j-2*ny/4.) / (2.*pow(ny/20, 2)) )
+
+   	+ exp( -sqr(i-nx/2.) / (2.*pow(nx/20, 2))
+	       -sqr(j-ny/2.) / (2.*pow(ny/20, 2)) )
+
+   	+ exp( -sqr(i-nx/4.) / (2.*pow(nx/20, 2))
+	       -sqr(j-ny/4.) / (2.*pow(ny/20, 2)) )
+   	+ exp( -sqr(i-nx/4.) / (2.*pow(nx/20, 2))
+	       -sqr(j-3*ny/4.) / (2.*pow(ny/20, 2)) )
+
+   	- exp( -sqr(i-nx/3.) / (2.*pow(nx/20, 2))
+	       -sqr(j-ny/2.) / (2.*pow(ny/20, 2)) )
+   	- exp( -sqr(i-2*nx/3.) / (2.*pow(nx/20, 2))
+	       -sqr(j-ny/2.) / (2.*pow(ny/20, 2)) )
       ;
       slv.state(u) = real_t(0); 
       slv.state(w) = real_t(0); 

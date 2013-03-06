@@ -117,7 +117,7 @@ namespace advoocat
           + this->lap(this->Phi, i, j, this->dx, this->dz); 
           /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
-std::cerr<<"--------------------------------------------------------------"<<std::endl;
+//std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
 	while (error > this->tol) 

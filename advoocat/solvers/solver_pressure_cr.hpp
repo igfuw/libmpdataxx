@@ -130,7 +130,7 @@ namespace advoocat
         lap_p_err(i,j) = this->lap(p_err, i, j, this->dx, this->dz);
 
 	//pseudo-time loop
-std::cerr<<"-------------------------------------------------"<<std::endl;
+//std::cerr<<"-------------------------------------------------"<<std::endl;
 	real_t error = 1.;
 	while (error > this->tol)
 	{
