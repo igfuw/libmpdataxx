@@ -53,12 +53,11 @@ namespace advoocat
  
       void record(int var)
       {
-        *gp << "filename = '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
-        *gp << "set term svg dynamic name filename\n";
-	*gp << "set output filename\n";
+	*gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
+        *gp << "set term svg dynamic\n";
         *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
   //         << "set cbrange [298.5:302]\n"
-        *gp << "splot '-' binary" << binfmt << "with image notitle\n";
+        *gp << "splot '-' binary" << binfmt << "with image failsafe notitle\n";
         gp->sendBinary(this->mem->state(var).copy());
       }
 
