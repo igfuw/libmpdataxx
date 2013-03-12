@@ -27,12 +27,13 @@ namespace advoocat
         const rng_t im, jm;
 	const real_t dx, dz;
 
-	void hook_ante_loop()
+	void hook_ante_loop(const int nt)
 	{
           rng_t &i = this->i, &j = this->j;
           // allow extrapolation at the first time-step
           this->state(u, -1)(i, j) = this->state(u)(i, j);
           this->state(w, -1)(i, j) = this->state(w)(i, j);
+          parent_t::hook_ante_loop(nt);
 	}
 
 	void extrp_velocity(int e) // extrapolate in time to t+1/2

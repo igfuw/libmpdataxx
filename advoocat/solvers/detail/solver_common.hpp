@@ -74,12 +74,12 @@ namespace advoocat
 
         virtual void hook_ante_step() {}
         virtual void hook_post_step() {}
-        virtual void hook_ante_loop() {}
+        virtual void hook_ante_loop(const int nt) {}
         virtual void hook_post_loop() {}
 
 	virtual void solve(const int nt) final
 	{   
-          hook_ante_loop();
+          hook_ante_loop(nt);
 	  for (int t = 0; t < nt; ++t) 
 	  {   
             hook_ante_step();

@@ -62,9 +62,9 @@ namespace advoocat
 
 	public:
 
-        void hook_ante_loop()
+        void hook_ante_loop(const int nt)
         {
-          parent_t::hook_ante_loop();
+          parent_t::hook_ante_loop(nt);
 	  ini_pressure();
  
           // allow pressure_solver_apply at the first time step

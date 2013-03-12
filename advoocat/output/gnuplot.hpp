@@ -23,38 +23,72 @@ namespace advoocat
     {
       using parent_t = detail::output_timer<solver_t>;
 
-      std::string binfmt;
+      static_assert(parent_t::n_dims < 3, "only 1D and 2D output supported");
+
       std::unique_ptr<Gnuplot> gp;
 
-      void start()
+      void start(const int nt)
       {
         gp.reset(new Gnuplot());
-        binfmt = gp->binfmt(this->mem->state(0));
 
         *gp 
 	   << "set grid\n"
+	   << "set border " << p.gnuplot_border << "\n"
+	   << "set palette defined ("
+	     "0 '#ffffff'," //         /\-
+	     "1 '#993399'," //        /  \-
+	     "2 '#00CCFF'," //  -----/    \---
+	     "3 '#66CC00'," // -----/      \---___
+	     "4 '#FFFF00'," //     /        \-    ---
+	     "5 '#FC8727'," //    /__________\-
+	     "6 '#FD0000'"  // 
+	   ") maxcolors " << p.gnuplot_maxcolors << "\n" 
+	   << "set view " << p.gnuplot_view << "\n"
+	   << "set zrange " << p.gnuplot_zrange << "\n"
+	   << "set xrange [0:" << this->mem->state(0).extent(0)-1 << "]\n"
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
-           << "set xrange [0:" << this->mem->state(0).extent(0)-1 << "]\n"
-           << "set yrange [0:" << this->mem->state(0).extent(1)-1 << "]\n"
-           << "set zrange " << p.gnuplot_zrange << "\n"
-           << "set cbrange " << p.gnuplot_cbrange << "\n"
-           << "set xtics out\n"
-           << "set ytics out\n"
-           << "set palette defined ("
-             "0 '#ffffff'," //         /\-
-             "1 '#993399'," //        /  \-
-             "2 '#00CCFF'," //  -----/    \---
-             "3 '#66CC00'," // -----/      \---___
-             "4 '#FFFF00'," //     /        \-    ---
-             "5 '#FC8727'," //    /__________\-
-             "6 '#FD0000'"  // 
-           ") maxcolors " << p.gnuplot_maxcolors << "\n" 
-           << "set view " << p.gnuplot_view << "\n"
-           << "set border " << p.gnuplot_border << "\n"
-           << "set key font \",5\"\n "
-           << (p.gnuplot_view != "map" ? "set pm3d at b\n" : "")
-           << "set cntrparam levels 0\n";
+	   << "set term svg dynamic\n"
+        ;
+
+        if (parent_t::n_dims == 1) // known at compile time
+        {
+          if (p.gnuplot_command == "splot") 
+          {
+            *gp << "set yrange [0:" << nt << "]\n";
+            if (p.gnuplot_ylabel == "") *gp << "set ylabel 't/dt'\n";
+          }
+          
+          *gp 
+	     << "set output '" << p.gnuplot_output << "'\n"
+             << p.gnuplot_command << " 0 notitle"
+          ;
+
+          for (int t = 0; t <= nt; t+=p.outfreq)
+          {
+	    for (const auto &v : p.outvars)
+            {
+	      *gp << ", '-' with " << p.gnuplot_with << " lt " << v.first << (
+                t == 0 
+                ? std::string(" title '") + v.second.name + "'"
+                : std::string(" notitle")
+              );
+            }
+          }
+          *gp << "\n";
+        }
+
+        if (parent_t::n_dims == 2) // known at compile time
+        {
+          *gp 
+	     << "set cbrange " << p.gnuplot_cbrange << "\n"
+	     << (p.gnuplot_view != "map" ? "set pm3d at b\n" : "")
+	     << "set yrange [0:" << this->mem->state(0).extent(1)-1 << "]\n"
+	     << "set xtics out\n"
+	     << "set ytics out\n"
+	   //  << "set key font \",5\"\n "
+	  ;
+        }
       }
 
       void stop()
@@ -62,14 +96,25 @@ namespace advoocat
         gp.reset();
       }
  
-      void record(int var)
+      // helper constructs to make it compilable for both 1D and 2D versions
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { assert(false); }
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a); }
+
+      void record(const int var)
       {
-	*gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
-        *gp << "set term svg dynamic\n";
-        *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
-  //         << "set cbrange [298.5:302]\n"
-        *gp << "splot '-' binary" << binfmt << "with " << p.gnuplot_with << " notitle\n";
-        gp->sendBinary(this->mem->state(var).copy());
+        if (parent_t::n_dims == 1) // known at compile time
+        {
+          gp->send(this->mem->state(var));
+        }
+
+        if (parent_t::n_dims == 2) // known at compile time
+        {
+	  *gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
+	  *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
+	  *gp << p.gnuplot_command << " '-' binary" << binfmt(this->mem->state(0)) 
+	      << "with " << p.gnuplot_with << " notitle\n";
+	  gp->sendBinary(this->mem->state(var).copy());
+        }
       }
 
       public:
@@ -78,15 +123,23 @@ namespace advoocat
       { 
 	std::string 
           gnuplot_output,
-          gnuplot_with = std::string("image failsafe"),
+          gnuplot_with = (
+            parent_t::n_dims == 2 
+	      ? std::string("image failsafe") // 2D
+	      : std::string("lines")          // 1D
+          ),
+          gnuplot_command = std::string("splot"),
           gnuplot_xlabel = std::string("X"),
-          gnuplot_ylabel = std::string("Y"),
+          gnuplot_ylabel = (
+            parent_t::n_dims == 2 
+              ? std::string("Y") // 2D
+              : std::string("")  // 1D
+          ),
           gnuplot_view = std::string(""), 
           gnuplot_zrange = std::string("[*:*]"),
           gnuplot_cbrange = std::string("[*:*]"),
           gnuplot_border = std::string(""); 
         int gnuplot_maxcolors = 100;
-        //bool gnuplot_surface = false;
       };
 
       const params_t p; // that's a copy - convenient but might be memory-consuming

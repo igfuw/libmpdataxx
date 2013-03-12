@@ -28,10 +28,10 @@ namespace advoocat
 
         std::unique_ptr<boost::timer::cpu_timer> tmr; 
 
-	void hook_ante_loop()
+	void hook_ante_loop(const int nt)
 	{
 	  if (this->mem->rank() == 0) tmr.reset(new boost::timer::cpu_timer());
-	  parent_t::hook_ante_loop();
+	  parent_t::hook_ante_loop(nt);
 	}
 
 	void hook_post_loop()

@@ -28,15 +28,15 @@ namespace advoocat
 
 	int outfreq;
 
-	virtual void record(int var) {}
-	virtual void start() {}
+	virtual void record(const int var) {}
+	virtual void start(const int nt) {}
 	virtual void stop() {}
 
-	void hook_ante_loop()
+	void hook_ante_loop(const int nt)
 	{
-	  if (this->mem->rank() == 0) start();
+	  if (this->mem->rank() == 0) start(nt);
 	  this->mem->barrier();
-	  parent_t::hook_ante_loop();
+	  parent_t::hook_ante_loop(nt);
 	}
 
 	void hook_post_loop()

@@ -52,6 +52,7 @@ void setopts(T &p, real_t Tht_amb, std::string name)
   };
   p.gnuplot_view = "map";
   p.gnuplot_output = "figure_" + name + "_%s_%d.svg";
+// p.gnuplot_cbrange = "[298.5:302]";
 }
 
 int main() 
