@@ -9,7 +9,6 @@
  * @section FIGURE
  *
  * \image html "../../tests/bombel/figure.svg"
- *
  */
 
 // advection (<> should be used instead of "" in normal usage) 
@@ -19,13 +18,10 @@
 #include "advoocat/solvers/solver_pressure_pc.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
 #include "advoocat/concurr/threads.hpp"
+#include "advoocat/output/gnuplot.hpp"
+
 //theta->pressure
 #include "advoocat/formulae/diagnose_formulae.hpp"
-//physical constants
-#include "advoocat/formulae/phc.hpp"
-
-// plotting
-#include "advoocat/output/gnuplot.hpp"
 
 // auto-deallocating containers
 #include <boost/ptr_container/ptr_map.hpp>
@@ -41,17 +37,26 @@ using namespace advoocat;
 
 #include "bombel.hpp"
 
+template <class T>
+void setopts(T &p, real_t Tht_amb, std::string name)
+{
+  p.dt = .1;
+  p.dx = p.dz = 1.;
+  p.Tht_amb = Tht_amb; 
+
+  p.outfreq = 1;
+  p.outvars = {
+    {u,   {.name = "u",   .unit = "m/s"}}, 
+    {w,   {.name = "w",   .unit = "m/s"}}, 
+    {tht, {.name = "tht", .unit = "K"  }}
+  };
+  p.gnuplot_view = "map";
+  p.gnuplot_output = "figure_" + name + "_%s_%d.svg";
+}
+
 int main() 
 {
   const int nx = 100, ny = 100, nt = 10;
-//  const int nx = 20, ny = 20, nt = 1;
-
-  rng_t i(0, nx-1);
-  rng_t j(0, ny-1);
-  const real_t halo = 1;  
-
-  // TODO p.Prs_amb = formulae::diagnose::p(p.Tht_amb);
-  real_t dt = .1, dx = 1., dz = 1.; // timestep
   real_t Tht_amb = 300; // ambient state (constant thoughout the domain)
 
   boost::ptr_vector<concurr::any<real_t, 2>> slvs;
@@ -66,20 +71,8 @@ int main()
       >
     >;
     solver_t::params_t p; 
-
-    p.dt = dt; 
-    p.dx = dx; 
-    p.dz = dz; 
+    setopts(p, Tht_amb, "mr");
     p.tol = 1e-5;
-    p.Tht_amb = Tht_amb;
-
-    p.outfreq = 1;
-    p.outvars = {
-      {u,   {.name = "u",   .unit = "m/s"}}, 
-      {w,   {.name = "w",   .unit = "m/s"}}, 
-      {tht, {.name = "tht", .unit = "K"  }}
-    };
-    p.gnuplot_output = "figure_mr_%s_%d.svg";
 
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
@@ -94,20 +87,8 @@ int main()
       >
     >;
     solver_t::params_t p;
-
-    p.dt = dt; 
-    p.dx = dx; 
-    p.dz = dz; 
-    p.Tht_amb = Tht_amb;
+    setopts(p, Tht_amb, "cr");
     p.tol = 1e-5;
-
-    p.outfreq = 5;
-    p.outvars = {
-      {u,   {.name = "u",   .unit = "m/s"}}, 
-      {w,   {.name = "w",   .unit = "m/s"}}, 
-      {tht, {.name = "tht", .unit = "K"  }}
-    };
-    p.gnuplot_output = "figure_cr_%s_%d.svg";
 
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
@@ -122,21 +103,9 @@ int main()
       >
     >;
     solver_t::params_t p;
-
-    p.dt = dt; 
-    p.dx = dx; 
-    p.dz = dz; 
-    p.Tht_amb = Tht_amb;
+    setopts(p, Tht_amb, "pc");
     p.tol = 1e-5;
     p.pc_iters = 2;
-
-    p.outfreq = 5;
-    p.outvars = {
-      {u,   {.name = "u",   .unit = "m/s"}}, 
-      {w,   {.name = "w",   .unit = "m/s"}}, 
-      {tht, {.name = "tht", .unit = "K"  }}
-    };
-    p.gnuplot_output = "figure_pc_%s_%d.svg";
 
     slvs.push_back(new concurr::threads<
       solver_t, 

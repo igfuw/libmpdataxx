@@ -76,7 +76,7 @@ namespace advoocat
 
 	struct params_t : parent_t::params_t 
 	{ 
-	  int outfreq; 
+	  int outfreq = 1; 
 	  std::map<int, info> outvars;
 	};
 

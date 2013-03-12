@@ -37,12 +37,23 @@ namespace advoocat
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
            << "set xrange [0:" << this->mem->state(0).extent(0)-1 << "]\n"
            << "set yrange [0:" << this->mem->state(0).extent(1)-1 << "]\n"
-          // progressive-rock connoisseur palette ;)
-           << "set palette defined (0 '#ffffff', 1 '#993399', 2 '#00CCFF', 3 '#66CC00', 4 '#FFFF00', 5 '#FC8727', 6 '#FD0000')\n"
+           << "set zrange " << p.gnuplot_zrange << "\n"
+           << "set cbrange " << p.gnuplot_cbrange << "\n"
+           << "set xtics out\n"
+           << "set ytics out\n"
+           << "set palette defined ("
+             "0 '#ffffff'," //         /\-
+             "1 '#993399'," //        /  \-
+             "2 '#00CCFF'," //  -----/    \---
+             "3 '#66CC00'," // -----/      \---___
+             "4 '#FFFF00'," //     /        \-    ---
+             "5 '#FC8727'," //    /__________\-
+             "6 '#FD0000'"  // 
+           ") maxcolors " << p.gnuplot_maxcolors << "\n" 
            << "set view " << p.gnuplot_view << "\n"
+           << "set border " << p.gnuplot_border << "\n"
            << "set key font \",5\"\n "
-           << "set contour base\n"
-           << "set nosurface\n"
+           << (p.gnuplot_view != "map" ? "set pm3d at b\n" : "")
            << "set cntrparam levels 0\n";
       }
 
@@ -57,7 +68,7 @@ namespace advoocat
         *gp << "set term svg dynamic\n";
         *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
   //         << "set cbrange [298.5:302]\n"
-        *gp << "splot '-' binary" << binfmt << "with image failsafe notitle\n";
+        *gp << "splot '-' binary" << binfmt << "with " << p.gnuplot_with << " notitle\n";
         gp->sendBinary(this->mem->state(var).copy());
       }
 
@@ -67,9 +78,15 @@ namespace advoocat
       { 
 	std::string 
           gnuplot_output,
+          gnuplot_with = std::string("image failsafe"),
           gnuplot_xlabel = std::string("X"),
           gnuplot_ylabel = std::string("Y"),
-          gnuplot_view = std::string("map"); 
+          gnuplot_view = std::string(""), 
+          gnuplot_zrange = std::string("[*:*]"),
+          gnuplot_cbrange = std::string("[*:*]"),
+          gnuplot_border = std::string(""); 
+        int gnuplot_maxcolors = 100;
+        //bool gnuplot_surface = false;
       };
 
       const params_t p; // that's a copy - convenient but might be memory-consuming

@@ -13,9 +13,8 @@
 #include "advoocat/solvers/donorcell_2d.hpp"
 #include "advoocat/bcond/cyclic_2d.hpp"
 #include "advoocat/concurr/threads.hpp"
+#include "advoocat/output/gnuplot.hpp"
 
-#define GNUPLOT_ENABLE_BLITZ
-#include <gnuplot-iostream/gnuplot-iostream.h>
 enum {x, y};
 
 template <class T>
@@ -31,77 +30,57 @@ void setup(T &solver, int n[2])
   solver.courant(y) = .25;
 }
 
+template <class T>
+void setopts(T &p, int nt, int n_iters)
+{
+  p.outfreq = nt;
+  p.gnuplot_with = "lines";
+  p.gnuplot_border = "4095";
+  p.gnuplot_maxcolors = 42;
+  p.gnuplot_zrange = "[-.666:1]";
+  p.gnuplot_cbrange = "[-.025:1.025]";
+  {
+    std::ostringstream tmp;
+    tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
+    p.gnuplot_output = tmp.str();    
+  }
+  p.outvars = {{0, {.name = "psi", .unit = "1"}}};
+}
+
 int main() 
 {
   using namespace advoocat;
 
   int n[] = {24, 24}, nt = 96;
-  Gnuplot gp;
-  gp << "set term svg size 500,1500 dynamic\n" 
-     << "set output 'figure.svg'\n"     
-     << "set multiplot layout 4,1\n" 
-     << "set border 4095\n"
-     << "set xtics out\n"
-     << "set ytics out\n"
-     << "unset ztics\n"    
-     << "set xlabel 'X'\n"
-     << "set ylabel 'Y'\n"
-     << "set xrange [0:" << n[x]-1 << "]\n"   
-     << "set yrange [0:" << n[y]-1 << "]\n"   
-     << "set zrange [-.666:1]\n"   
-     << "set cbrange [-.025:1.025]\n"     
-     << "set palette maxcolors 42\n"
-     << "set pm3d at b\n";
+
   std::string binfmt;
   {
-    concurr::threads<
-      solvers::donorcell_2d<float>,
-      bcond::cyclic, 
-      bcond::cyclic
-    > slv(n[x], n[y]);
+    using solver_t = output::gnuplot<solvers::donorcell_2d<float>>;
+    solver_t::params_t p;
+    setopts(p, nt, 1);
+    concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p);
 
     setup(slv, n);
-    binfmt = gp.binfmt(slv.state());
-    gp << "set title 't=0'\n"
-       << "splot '-' binary" << binfmt
-       << "with lines notitle\n";
-    gp.sendBinary(slv.state().copy());
     slv.advance(nt);
-    gp << "set title 'donorcell t="<<nt<<"'\n"
-       << "splot '-' binary" << binfmt
-       << "with lines notitle\n";
-    gp.sendBinary(slv.state().copy());
   } 
   {
     const int it = 2;
-    concurr::threads<
-      solvers::mpdata_2d<float, it>,
-      bcond::cyclic, 
-      bcond::cyclic
-    > slv(n[x], n[y]); 
+    using solver_t = output::gnuplot<solvers::mpdata_2d<float, it>>;
+    solver_t::params_t p;
+    setopts(p, nt, it);
+    concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
 
     setup(slv, n); 
     slv.advance(nt);
-    gp << "set title 'mpdata<" << it << "> "
-       << "t=" << nt << "'\n"
-       << "splot '-' binary" << binfmt
-       << "with lines notitle\n";
-    gp.sendBinary(slv.state().copy()); // TODO: nie lepiej bez mem?
   } 
   {
     const int it = 4;
-    concurr::threads<
-      solvers::mpdata_2d<float, it>,
-      bcond::cyclic, 
-      bcond::cyclic
-    > slv(n[x], n[y]); 
+    using solver_t = output::gnuplot<solvers::mpdata_2d<float, it>>;
+    solver_t::params_t p;
+    setopts(p, nt, it);
+    concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
 
     setup(slv, n); 
     slv.advance(nt); 
-    gp << "set title 'mpdata<" << it << "> "
-       << "t=" << nt << "'\n"
-       << "splot '-' binary" << binfmt
-       << "with lines notitle\n";
-    gp.sendBinary(slv.state().copy());
   }
 }
