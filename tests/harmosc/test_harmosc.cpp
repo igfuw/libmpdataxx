@@ -7,9 +7,10 @@
  * @brief a minimalistic model of a harmonic oscillator
  * (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
  *
- * @section FIGURE
- *
- * \image html "../../tests/harmosc/figure.svg"
+ * \image html "../../tests/harmosc/figure_euler_it=1.svg"
+ * \image html "../../tests/harmosc/figure_euler_it=1.svg"
+ * \image html "../../tests/harmosc/figure_strang_it=2.svg"
+ * \image html "../../tests/harmosc/figure_strang_it=2.svg"
  */
 
 // advection (<> should be used instead of "" in normal usage)

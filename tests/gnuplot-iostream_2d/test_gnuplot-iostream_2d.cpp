@@ -53,7 +53,6 @@ int main()
 
   int n[] = {24, 24}, nt = 96;
 
-  std::string binfmt;
   {
     using solver_t = output::gnuplot<solvers::donorcell_2d<float>>;
     solver_t::params_t p;
