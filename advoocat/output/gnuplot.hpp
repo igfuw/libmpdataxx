@@ -68,7 +68,9 @@ namespace advoocat
           {
 	    for (const auto &v : p.outvars)
             {
-	      *gp << ", '-' with " << p.gnuplot_with << " lt " << v.first << (
+	      *gp << ", '-'";
+              if (p.gnuplot_command == "splot") *gp << " using 0:(" << t << "):1";
+              *gp << " with " << p.gnuplot_with << " lt " << v.first << (
                 t == 0 
                 ? std::string(" title '") + v.second.name + "'"
                 : std::string(" notitle")
@@ -86,7 +88,6 @@ namespace advoocat
 	     << "set yrange [0:" << this->mem->state(0).extent(1)-1 << "]\n"
 	     << "set xtics out\n"
 	     << "set ytics out\n"
-	   //  << "set key font \",5\"\n "
 	  ;
         }
       }

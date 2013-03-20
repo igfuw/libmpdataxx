@@ -56,7 +56,7 @@ namespace advoocat
 	  {
 	    this->cycle(e);
             this->mem->barrier();
-	    this->bcxl->fill_halos(this->mem->psi[e][this->n[e]], this->j^halo); // TODO: two xchng calls?
+	    this->bcxl->fill_halos(this->mem->psi[e][this->n[e]], this->j^halo); // TODO: two xchng calls? (without barriers)
 	    this->bcxr->fill_halos(this->mem->psi[e][this->n[e]], this->j^halo);
 	    this->bcyl->fill_halos(this->mem->psi[e][this->n[e]], this->i^halo);
 	    this->bcyr->fill_halos(this->mem->psi[e][this->n[e]], this->i^halo);

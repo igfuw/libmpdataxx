@@ -5,7 +5,9 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
  * \include "gnuplot-iostream_1d/test_gnuplot-iostream_1d.cpp"
- * \image html "../../tests/gnuplot-iostream_1d/figure.svg"
+ * \image html "../../tests/gnuplot-iostream_1d/figure_iters=1.svg"
+ * \image html "../../tests/gnuplot-iostream_1d/figure_iters=2.svg"
+ * \image html "../../tests/gnuplot-iostream_1d/figure_iters=3.svg"
  */
 
 // (<> should be used instead of "" in normal usage)
@@ -14,9 +16,12 @@
 #include "advoocat/solvers/leapfrog_1d.hpp"
 #include "advoocat/bcond/bcond.hpp"
 #include "advoocat/concurr/threads.hpp"
+#include "advoocat/output/gnuplot.hpp"
 
-#define GNUPLOT_ENABLE_BLITZ
-#include <gnuplot-iostream/gnuplot-iostream.h>
+using namespace advoocat;
+
+using real_t = float;
+int n = 20, nt = 20;
 
 template <class T>
 void setup(T &solver, int n) 
@@ -28,54 +33,33 @@ void setup(T &solver, int n)
   solver.courant() = .5; 
 }
 
+template <class T>
+void setopts(T &p, int nt, int n_iters)
+{
+  p.outfreq = nt / 10; 
+  {
+    std::ostringstream tmp;
+    tmp << "figure_iters=" << n_iters << ".svg";
+    p.gnuplot_output = tmp.str();    
+  }
+  p.outvars = {{0, {.name = "psi", .unit = "1"}}};
+}
+
+template <int it, class slvs_t>
+void add_solver(slvs_t &slvs)
+{
+  using solver_t = output::gnuplot<solvers::mpdata_1d<real_t, it>>;
+  typename solver_t::params_t p;
+  setopts(p, nt, it);
+  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(n, p));
+  setup(slvs.back(), n);
+}
+
 int main() 
 {
-  using namespace advoocat;
-
-  Gnuplot gp;
-  gp << "set term svg size 1500,500 dynamic\n" 
-     << "set output 'figure.svg'\n"     
-     << "set multiplot layout 2,2\n" 
-     << "set noxtics\n"
-     << "set ztics .5\n"
-     << "set xlabel 'X'\n"
-     << "set ylabel 't'\n"
-     << "set zrange [-1:1]\n"   
-     << "set cbrange [-1:.5]\n"     
-     << "set xyplane at -.5\n"
-     << "set cbtics .5\n"
-     << "set noytics\n"
-     << "set palette maxcolors 18 defined (-1. \"red\", -.5 \"red\", -.5 \"blue\", -.17 \"green\", .16 \"brown\", .5 \"black\")\n";
-
-  int n = 20, nt = 20;
-
-  using real_t = float;
   boost::ptr_vector<concurr::any<real_t, 1>> slvs;
-  {
-    slvs.push_back(new concurr::threads<solvers::mpdata_1d<real_t, 1>, bcond::cyclic>(n));
-    slvs.push_back(new concurr::threads<solvers::mpdata_1d<real_t, 2>, bcond::cyclic>(n));
-    slvs.push_back(new concurr::threads<solvers::mpdata_1d<real_t, 3>, bcond::cyclic>(n));
-    slvs.push_back(new concurr::threads<solvers::leapfrog_1d<real_t>, bcond::cyclic>(n));
-  }
-
-  for (auto &slv : slvs)
-  {
-    setup(slv, n);
-
-    // instructing gnuplot what to plot
-    gp << "splot '-' using 0:(0):1 with lines notitle";
-    for (int t = 0; t < nt; ++t) 
-      gp << ", '-' using 0:(" << t+1 << "):1 with lines notitle";
-    gp << "\n";
-
-    // sending data for t=0
-    gp.send(slv.state().copy());
-
-    // timestepping and sending data for t>0
-    for (int t = 0; t < nt; ++t)
-    {
-      slv.advance(1);
-      gp.send(slv.state().copy());
-    }
-  } 
+  add_solver<1>(slvs);
+  add_solver<2>(slvs);
+  add_solver<3>(slvs);
+  for (auto &slv : slvs) slv.advance(nt);
 }
