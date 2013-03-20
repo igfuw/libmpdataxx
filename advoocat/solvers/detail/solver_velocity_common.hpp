@@ -15,7 +15,8 @@ namespace advoocat
   {
     namespace detail
     {
-      template <class inhomo_solver_t, int u, int w>
+// TODO: 2D assumed - shouldn't the name be suffixed with _2d?
+      template <class inhomo_solver_t, int u, int w> 
       class solver_velocity_common : public inhomo_solver_t
       {
 	protected:
