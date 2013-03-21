@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "detail/concurr_common.hpp"
+#include <advoocat/concurr/detail/concurr_common.hpp>
 
 #ifdef _OPENMP
 # include <omp.h>

@@ -7,11 +7,10 @@
 
 #include <boost/math/constants/constants.hpp>
 
-// advection (<> should be used instead of "" in normal usage) 
-#include "advoocat/solvers/mpdata_2d.hpp"
-#include "advoocat/bcond/cyclic_2d.hpp"
-#include "advoocat/concurr/threads.hpp"
-#include "advoocat/output/gnuplot.hpp"
+#include <advoocat/solvers/mpdata_2d.hpp>
+#include <advoocat/bcond/cyclic_2d.hpp>
+#include <advoocat/concurr/threads.hpp>
+#include <advoocat/output/gnuplot.hpp>
 using namespace advoocat; // TODO
 #include "shallow_water.hpp"
 

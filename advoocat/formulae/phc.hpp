@@ -9,10 +9,10 @@
  */
 #pragma once
 
-#include "../blitz.hpp"
-#include "../units.hpp"
+#include <advoocat/blitz.hpp>
+#include <advoocat/units.hpp>
 
-// TODO: rename (not phc)
+// TODO: rename (not phc)... or remove completely?
 
 #define phc_decltype_return(expr) -> decltype(expr) { return expr; }
 

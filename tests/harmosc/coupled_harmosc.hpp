@@ -44,8 +44,8 @@
  *
  */
 
-#include "advoocat/solvers/solver_inhomo.hpp"
-#include "advoocat/blitz.hpp"
+#include <advoocat/solvers/solver_inhomo.hpp>
+#include <advoocat/blitz.hpp>
 
 using namespace advoocat;
 

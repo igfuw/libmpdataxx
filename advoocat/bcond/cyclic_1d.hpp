@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cyclic_common.hpp"
+#include <advoocat/bcond/cyclic_common.hpp>
 
 namespace advoocat
 {

@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "../blitz.hpp"
-#include "bcond.hpp"
+#include <advoocat/blitz.hpp>
+#include <advoocat/bcond/bcond.hpp>
 
 namespace advoocat
 {

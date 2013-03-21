@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-#include "../../blitz.hpp"
+#include <advoocat/blitz.hpp>
 
 namespace advoocat
 {

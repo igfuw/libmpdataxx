@@ -7,14 +7,14 @@
 #pragma once
 
 #include <boost/ptr_container/ptr_vector.hpp>
-#include "../../blitz.hpp"
+#include <advoocat/blitz.hpp>
 
-#include "../../bcond/cyclic_1d.hpp"
-#include "../../bcond/cyclic_2d.hpp"
-#include "../../bcond/cyclic_3d.hpp"
+#include <advoocat/bcond/cyclic_1d.hpp>
+#include <advoocat/bcond/cyclic_2d.hpp>
+#include <advoocat/bcond/cyclic_3d.hpp>
 // TODO: split into 1D, 2D and 3D files?
 
-#include "sharedmem.hpp"
+#include <advoocat/concurr/detail/sharedmem.hpp>
 
 namespace advoocat
 {

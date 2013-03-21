@@ -7,9 +7,9 @@
 #pragma once
 
 #ifdef _OPENMP
-#  include "openmp.hpp"
+#  include <advoocat/concurr/openmp.hpp>
 #else
-#  include "boost_thread.hpp"
+#  include <advoocat/concurr/boost_thread.hpp>
 #endif
 
 namespace advoocat

@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "output_common.hpp"
+#include <advoocat/output/detail/output_common.hpp>
 #include <boost/timer/timer.hpp>
 
-// TEMP!
+// TEMP! TODO
 #include <sstream>
 
 namespace advoocat

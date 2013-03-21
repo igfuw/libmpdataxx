@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "../../blitz.hpp"
-#include "../../concurr/detail/sharedmem.hpp" 
+#include <advoocat/blitz.hpp>
+#include <advoocat/concurr/detail/sharedmem.hpp>
 
 namespace advoocat
 {

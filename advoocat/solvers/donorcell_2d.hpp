@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "detail/solver_2d.hpp"
-#include "../formulae/donorcell_formulae.hpp"
+#include <advoocat/solvers/detail/solver_2d.hpp>
+#include <advoocat/formulae/donorcell_formulae.hpp>
 
 namespace advoocat
 {

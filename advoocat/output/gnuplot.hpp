@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "detail/output_timer.hpp"
+#include <advoocat/output/detail/output_timer.hpp>
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h>

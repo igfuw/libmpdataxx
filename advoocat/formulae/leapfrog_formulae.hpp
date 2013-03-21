@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../idxperm.hpp"
+#include <advoocat/idxperm.hpp>
 
 namespace advoocat
 {

@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "../../blitz.hpp"
-#include "../../idxperm.hpp"
-#include "../../arakawa_c.hpp"
+#include <advoocat/blitz.hpp>
+#include <advoocat/idxperm.hpp>
+#include <advoocat/arakawa_c.hpp>
 
 namespace advoocat 
 { 

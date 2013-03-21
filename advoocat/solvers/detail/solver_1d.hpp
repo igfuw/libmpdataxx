@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "solver_common.hpp"
-#include "../../bcond/bcond.hpp"
+#include <advoocat/solvers/detail/solver_common.hpp>
+#include <advoocat/bcond/bcond.hpp>
 
 namespace advoocat
 {

@@ -73,8 +73,8 @@
   */
 
 #pragma once
-#include "detail/solver_pressure_common.hpp"
-#include "../formulae/nabla_formulae.hpp" //gradient, diveregnce
+#include <advoocat/solvers/detail/solver_pressure_common.hpp>
+#include <advoocat/formulae/nabla_formulae.hpp> //gradient, diveregnce
 
 namespace advoocat
 {

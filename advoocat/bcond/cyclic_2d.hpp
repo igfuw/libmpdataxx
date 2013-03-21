@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "cyclic_common.hpp"
-#include "../idxperm.hpp"
+#include <advoocat/bcond/cyclic_common.hpp>
+#include <advoocat/idxperm.hpp>
 
 namespace advoocat
 {

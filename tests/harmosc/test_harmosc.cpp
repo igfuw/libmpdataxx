@@ -13,12 +13,11 @@
  * \image html "../../tests/harmosc/figure_strang_it=2.svg"
  */
 
-// advection (<> should be used instead of "" in normal usage)
-#include "advoocat/solvers/mpdata_1d.hpp"
-#include "advoocat/solvers/donorcell_1d.hpp"
-#include "advoocat/bcond/cyclic_1d.hpp"
-#include "advoocat/concurr/threads.hpp"
-#include "advoocat/output/gnuplot.hpp"
+#include <advoocat/solvers/mpdata_1d.hpp>
+#include <advoocat/solvers/donorcell_1d.hpp>
+#include <advoocat/bcond/cyclic_1d.hpp>
+#include <advoocat/concurr/threads.hpp>
+#include <advoocat/output/gnuplot.hpp>
 
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;

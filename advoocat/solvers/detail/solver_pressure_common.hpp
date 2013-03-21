@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "../../formulae/nabla_formulae.hpp"
-#include "solver_velocity_common.hpp"
-#include "../solver_inhomo.hpp"
+#include <advoocat/formulae/nabla_formulae.hpp>
+#include <advoocat/solvers/detail/solver_velocity_common.hpp>
+#include <advoocat/solvers/solver_inhomo.hpp>
 
 namespace advoocat
 {

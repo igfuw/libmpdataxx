@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "../blitz.hpp"
-#include "../arakawa_c.hpp"
-#include "../formulae/phc.hpp"
+#include <advoocat/blitz.hpp>
+#include <advoocat/arakawa_c.hpp>
+#include <advoocat/formulae/phc.hpp>
 
 namespace advoocat
 {

@@ -5,11 +5,10 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 
-// (<> should be used instead of "" in normal usage)
 //#include "advoocat/mpdata_3d.hpp"
-#include "advoocat/solvers/donorcell_3d.hpp"
-#include "advoocat/bcond/cyclic_3d.hpp" // TODO: needed?
-#include "advoocat/concurr/openmp.hpp"
+#include <advoocat/solvers/donorcell_3d.hpp>
+#include <advoocat/bcond/cyclic_3d.hpp> // TODO: needed?
+#include <advoocat/concurr/openmp.hpp>
 
 enum {x, y, z};
 

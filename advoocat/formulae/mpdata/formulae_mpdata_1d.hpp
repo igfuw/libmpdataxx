@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "formulae_mpdata_common.hpp"
+#include <advoocat/formulae/mpdata/formulae_mpdata_common.hpp>
 
 namespace advoocat 
 { 

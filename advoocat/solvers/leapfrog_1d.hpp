@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "detail/solver_1d.hpp"
-#include "../formulae/leapfrog_formulae.hpp"
+#include <advoocat/solvers/detail/solver_1d.hpp>
+#include <advoocat/formulae/leapfrog_formulae.hpp>
 
 // TODO: this doesn't work yet - just a draft! needs an initial non-leapfrog step
 

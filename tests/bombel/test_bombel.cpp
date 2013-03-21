@@ -11,17 +11,16 @@
  * \image html "../../tests/bombel/figure.svg"
  */
 
-// advection (<> should be used instead of "" in normal usage) 
-#include "advoocat/solvers/mpdata_2d.hpp"
-#include "advoocat/solvers/solver_pressure_mr.hpp"
-#include "advoocat/solvers/solver_pressure_cr.hpp"
-#include "advoocat/solvers/solver_pressure_pc.hpp"
-#include "advoocat/bcond/cyclic_2d.hpp"
-#include "advoocat/concurr/threads.hpp"
-#include "advoocat/output/gnuplot.hpp"
+#include <advoocat/solvers/mpdata_2d.hpp>
+#include <advoocat/solvers/solver_pressure_mr.hpp>
+#include <advoocat/solvers/solver_pressure_cr.hpp>
+#include <advoocat/solvers/solver_pressure_pc.hpp>
+#include <advoocat/bcond/cyclic_2d.hpp>
+#include <advoocat/concurr/threads.hpp>
+#include <advoocat/output/gnuplot.hpp>
 
 //theta->pressure
-#include "advoocat/formulae/diagnose_formulae.hpp"
+#include <advoocat/formulae/diagnose_formulae.hpp>
 
 // auto-deallocating containers
 #include <boost/ptr_container/ptr_map.hpp>
