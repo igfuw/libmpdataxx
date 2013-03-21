@@ -20,13 +20,14 @@ namespace advoocat
 {
   namespace concurr
   {
-    template <typename real_t, int n_dims>
+    template <typename real_t_, int n_dims>
     class any
     {
       public:
+      typedef real_t_ real_t;
       virtual void advance(int) { assert(false); }  
-      virtual blitz::Array<real_t, n_dims> state(int e = 0) { assert(false); }
-      virtual blitz::Array<real_t, n_dims> courant(int d = 0) { assert(false); }
+      virtual blitz::Array<real_t_, n_dims> state(int e = 0) { assert(false); }
+      virtual blitz::Array<real_t_, n_dims> courant(int d = 0) { assert(false); }
     };
 
     namespace detail
