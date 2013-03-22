@@ -16,6 +16,9 @@ namespace advoocat
 {
   namespace concurr
   {
+    /// @brief shared-memory concurency logic using threads 
+    ///        (\ref advoocat::concurr::openmp if supported, 
+    ///        \ref advoocat::concurr::boost_thread otherwise)
     template <
       class solver_t,
       bcond::bcond_e bcx,

@@ -14,7 +14,7 @@
   * \f$ \partial_t \psi + \nabla \cdot (\vec{v} \psi) = R \f$
   *
   * The theory behind MPDATA solvers was developed by Piotr Smolarkiewicz et al.
-  * (see e.g. @copydetails Smolarkiewicz_2006, for a review and list of references).
+  * (see e.g. @copydetails bib::Smolarkiewicz_2006, for a review and list of references).
   * Development of libmpdata++ is carried out by Sylwester Arabas, Anna Jaruga and
   * co-workers at the [Institute of Geophysics](http://www.igf.fuw.edu.pl/),
   * [Faculty of Physics](http://www.fuw.edu.pl/),
@@ -37,75 +37,27 @@
   *
   * At present libmpdata++ handles 1D, 2D and 3D computations in cartesian coordinates on an Arakawa-C grid.
   *
-  * @section sec_solvers SUPPORTED SOLVER TYPES
-  * 
-  * @subsection sec_solvers_homo HOMOGENEOUS TRANSPORT EQUATIONS WITH PRESCRIBED VELOCITY
+  * @section sec_examples SUMMARY OF SELECTED EXAMPLES
   *
-  * \f$ \partial_t \psi + \nabla (\vec{u} \psi) = 0 \f$
+  * | test name                                               | n_dims | n_eqs | velocity       | output                                   | concurrency                               | system solved                                        | sample figure (svg)                                                             |
+  * | :-----------------------------------------------------: | :----: | :---: | :------------: | :--------------------------------------: | :---------------------------------------: | :--------------------------------------------------: | :-----------------------------------------------------------------------------: |
+  * | \ref test_gnuplot-iostream_1d.cpp "gnuplot-iostream_1d" | 1      | 1     | prescribed     | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | \f$ \partial_t \psi + \nabla (\vec{u} \psi) = 0 \f$  | \image html "../../tests/gnuplot-iostream_1d/figure_iters=2.svg"                |
+  * | \ref test_gnuplot-iostream_2d.cpp "gnuplot-iostream_2d" | 2      | 1     | prescribed     | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | \f$ \partial_t \psi + \nabla (\vec{u} \psi) = 0 \f$  | \image html "../../tests/gnuplot-iostream_2d/figure_iters=2_psi_96.svg"         |
+  * | \ref test_harmosc.cpp "harmosc"                         | 1      | 2     | prescribed     | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | pair of coupled 1D harmonic oscillators: \f$ \\ \partial_t \psi + \nabla (\vec{u} \psi) =  \omega \phi \\ \partial_t \phi + \nabla (\vec{u} \phi) = -\omega \psi \f$ | \image html "../../tests/harmosc/figure_euler_it=1.svg" |
+  * | \ref test_shallow_water.cpp "shallow_water"             | 2      | 3     | resolved       | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | 2D shallow-water system: \f$ \\ \partial_t h + \nabla_z (h \cdot u) = 0 \\ \partial_t (uh) + \nabla (\vec u \cdot uh) = -g h \partial_x h \\ \partial_t (vh) + \nabla (\vec u \cdot vh) = -g h \partial_y h \f$ | \image html "../../tests/shallow_water/figure_h_100.svg" |
+  * | \ref test_isentropic.cpp "isentropic"                   | 1      |       | resolved       | \ref advoocat::output::netcdf "netcdf"   | \ref threads.hpp "threads (openmp/boost)" | | |
+  * | \ref test_bombel.cpp "bombel"                           | 2      | 3     | resolved       | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | 2D Navier-Stokes (adiabatic, constant density): \f$ \\ \partial_t \theta + \nabla (\vec{u} \theta) = 0 \\ \partial_t u + \nabla (\vec{u} u) = -\partial_x \frac{p-p_e}{\rho} \\ \partial_t w + \nabla (\vec{u} w) = -\partial_z \frac{p-p_e}{\rho} + g \frac{\theta - \theta_e}{\theta_e} \f$ | \image html "../../tests/bombel/figure_pc_u_10.svg"|
   *
-  * See:
-  * - solver classes:
-  *   - donorcell_1d.hpp
-  *   - donorcell_2d.hpp
-  *   - donorcell_3d.hpp
-  *   - mpdata_1d.hpp
-  *   - mpdata_2d.hpp
-  * - examples:
-  *   - test_gnuplot-iostream_1d.cpp 
-  *   - test_gnuplot-iostream_2d.cpp 
-  *   - test_var_sign_2d.cpp 
   *
-  * @subsection sec_solvers_inhomo INHOMOGENEOUS TRANSPORT EQUATIONS WITH PRESCRIBED VELOCITY
   *
-  * a pair of coupled 1-dimensional harmonic oscillators:
-  *
-  * \f$ \partial_t \psi + \nabla (\vec{u} \psi) =  \omega \phi \f$
-  *
-  * \f$ \partial_t \phi + \nabla (\vec{u} \phi) = -\omega \psi \f$
-  *
-  * See:
-  * - examples:
-  *   - test_harmosc.cpp (system defined in coupled_harmosc.hpp)
-  * 
-  * @subsection sec_solvers_inhomo_vel INHOMOGENEOUS TRANSPORT EQUATIONS 
-  *
-  * 1-dimensional shallow-water equations:
-  * 
-  * \f$ \partial_t u + u \cdot \nabla_z u = - \frac{1}{\rho} \nabla_z p \f$ 
-  * 
-  * \f$ \partial_t h + \nabla_z ( \vec{u} h ) = 0 \f$
-  *
-  * @subsection sec_solvers_inhomo_dyn_pres INHOMOGENEOUS TRANSPORT EQUATIONS COUPLED WITH PRESSURE SOLVER
-  *
-  * 2-dimensional Navier-Stokes coupled assuming adiabatic transport with constant density:
-  *
-  * \f$ \partial_t \theta + \nabla (\vec{u} \theta) = 0 \f$
-  * 
-  * \f$ \partial_t u + \nabla (\vec{u} u) = -\partial_x \frac{p-p_e}{\rho} \f$
-  *
-  * \f$ \partial_t w + \nabla (\vec{u} w) = -\partial_z \frac{p-p_e}{\rho} + g \frac{\theta - \theta_e}{\theta_e} \f$
-  *
-  * See:
-  * - pressure solver classes:
+  * @section sec_install INSTALLATION AND USAGE
+  * suggested compiler options (by compiler): -march=native, -Ofast, -DNDEBUG, -lblitz (opt), -DBZDEBUG (opt), -std=c++11
+  */
+// TODO: mention:
+ /*
   *   - Richardson solver 
   *   - Minimum-Residual solver (solver_pressure_mr.hpp)
   *   - Conjugate-Residual solver (solver_pressure_cr.hpp)
   *   - Conjugate-Residual with preconditioner (solver_pressure_pc.hpp)
-  * - examples:
-  *   - test_bombel.cpp (system defined in bombel.hpp)
-  *
-  * @section sec_concurr SUPPORTES CONCURENCY SCHEMES
-  * 
-  * Shared-memory parallelisation:
-  * - OpenMP (openmp.hpp) 
-  * - Boost.Thread (boost_thread.hpp)
-  * - Threads (threads.hpp - OpenMP if supported, Boost.Thread otherwise)
-  *
-  * @section sec_output SUPPORTES OUTPUT MECHANISMS
-  * - gnuplot-iostream
-  */
-
-  /*
-  *  suggested compiler options (by compiler): -march=native, -Ofast, -DNDEBUG, -lblitz (opt), -DBZDEBUG (opt), -std=c++11
   */
 
