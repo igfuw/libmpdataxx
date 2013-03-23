@@ -7,6 +7,8 @@
 
 #pragma once
 
+// TODO: rename to output timed?
+
 #include <advoocat/output/detail/output_common.hpp>
 #include <boost/timer/timer.hpp>
 
