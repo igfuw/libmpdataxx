@@ -9,6 +9,14 @@
 namespace bib
 {
   /// @brief
+  /// A comparison of numerical solutions of the advective equation.
+  /// J. Atmos. Sci., 31, 1500-1506.
+  /// @details
+  /// [Anderson and Fattahi 1974]: http://dx.doi.org/10.1175/1520-0469(1974)031<1500:ACONSO>2.0.CO;2
+  /// [Anderson and Fattahi 1974][]
+  typedef void Anderson_and_Fattahi_1974;
+
+  /// @brief
   /// A fully multidimensional positive definite advection transport algorithm with small implicit diffusion
   /// J. Comp. Phys., 54, 352-362.
   /// @details

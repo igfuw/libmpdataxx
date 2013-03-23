@@ -13,6 +13,12 @@
   *
   * \f$ \partial_t \psi + \nabla \cdot (\vec{v} \psi) = R \f$
   *
+  * where
+  *
+  * \f$ \psi = [\psi_1, \psi_2, \ldots ] \f$ is a set of conservative dependent variables, 
+  * \f$ R = [R_1, R_2, \ldots ] \f$ are the forcing terms, 
+  * and \f$ \vec{v} = [u, v, w] \f$ is the velocity field.
+  *
   * The theory behind MPDATA solvers was developed by Piotr Smolarkiewicz et al.
   * (see e.g. @copydetails bib::Smolarkiewicz_2006, for a review and list of references).
   * Development of libmpdata++ is carried out by Sylwester Arabas, Anna Jaruga and
@@ -61,3 +67,11 @@
   *   - Conjugate-Residual with preconditioner (solver_pressure_pc.hpp)
   */
 
+/** @page HACKING HACKING file (coding conventions)
+ *  @section sec_HACKING HACKING file (coding conventions)
+ *  @verbinclude "../HACKING"
+ */
+/** @page COPYING GNU General Public License version 3
+ *  @section sec_COPYING GNU General Public License version 3
+ *  @verbinclude "../COPYING"
+ */
