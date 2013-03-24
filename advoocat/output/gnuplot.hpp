@@ -31,6 +31,7 @@ namespace advoocat
       {
         gp.reset(new Gnuplot());
 
+        // some common 1D/2D settings
         *gp 
 	   << "set grid\n"
 	   << "set border " << p.gnuplot_border << "\n"
@@ -51,6 +52,7 @@ namespace advoocat
 	   << "set term svg dynamic\n"
         ;
 
+        // 1D settings
         if (parent_t::n_dims == 1) // known at compile time
         {
           if (p.gnuplot_command == "splot") 
@@ -80,6 +82,7 @@ namespace advoocat
           *gp << "\n";
         }
 
+        // 2D settings
         if (parent_t::n_dims == 2) // known at compile time
         {
           *gp 
@@ -114,9 +117,14 @@ namespace advoocat
 	  *gp << p.gnuplot_command;
           bool imagebg = (p.gnuplot_with == "lines");
           if (imagebg)
+          {
+            float zmin, zmax;
+            int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
+            if (count != 2) zmin = 0;
             *gp << " '-' binary " << binfmt(this->mem->state(0))
-                << " origin=(.5,.5,0)" // TODO: dx/2, dy/2, base?
+                << " origin=(.5,.5," << zmin << ")" // TODO: dx/2, dy/2, 
 	        << " with image failsafe notitle,";
+          }
           *gp << " '-'" 
               << " binary" << binfmt(this->mem->state(0)) 
               << " origin=(.5,.5,0)" // TODO: dx/2, dy/2, ?
