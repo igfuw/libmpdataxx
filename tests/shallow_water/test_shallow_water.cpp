@@ -45,8 +45,8 @@ void setup(T &solver)
   blitz::secondIndex j;
 
   solver.state(h) = 1 - .1 * pow(
-    sin(i * pi<typename T::real_t>() / nx) * 
-    sin(j * pi<typename T::real_t>() / ny), 
+    sin((i+.5) * pi<typename T::real_t>() / nx) * // TODO: assumes dx=dy=1
+    sin((j+.5) * pi<typename T::real_t>() / ny), 
     32
   );
 

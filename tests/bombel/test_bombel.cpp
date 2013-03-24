@@ -122,8 +122,8 @@ int main()
       blitz::secondIndex j;
 
       slv.state(tht) = Tht_amb 
-	+ exp( -sqr(i-nx/2.) / (2.*pow(nx/20, 2))
-	       -sqr(j-ny/4.) / (2.*pow(ny/20, 2)) )
+	+ exp( -sqr(.5+i-nx/2.) / (2.*pow(nx/20, 2))   // TODO: assumed dx=dy=1?
+	       -sqr(.5+j-ny/4.) / (2.*pow(ny/20, 2)) )
       ;
       slv.state(u) = real_t(0); 
       slv.state(w) = real_t(0); 

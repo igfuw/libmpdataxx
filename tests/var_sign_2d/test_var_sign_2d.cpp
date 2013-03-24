@@ -24,8 +24,8 @@ void setup(T &solver, int n[2], typename T::real_t offset)
   blitz::firstIndex i;
   blitz::secondIndex j;
   solver.state() = offset + exp(
-    -sqr(i-n[x]/2.) / (2.*pow(n[x]/10, 2))
-    -sqr(j-n[y]/2.) / (2.*pow(n[y]/10, 2))
+    -sqr(i+.5-n[x]/2.) / (2.*pow(n[x]/10, 2)) // TODO: assumes dx=dy=1
+    -sqr(j+.5-n[y]/2.) / (2.*pow(n[y]/10, 2))
   );  
   solver.courant(x) = .5; 
   solver.courant(y) = .25;

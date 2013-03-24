@@ -80,7 +80,7 @@ int main()
     // initial condition
     {
       blitz::firstIndex i;
-      slv.state(psi) = pow(sin(i * pi<real_t>() / nx), 300);
+      slv.state(psi) = pow(sin((i+.5) * pi<real_t>() / nx), 300);
       slv.state(phi) = real_t(0);
     }
     slv.courant() = C;

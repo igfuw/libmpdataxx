@@ -27,7 +27,7 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   solver.state() = exp(
-    -sqr(i-n/2.) / (2.*pow(n/10, 2))
+    -sqr(.5+i-n/2.) / (2.*pow(n/10, 2)) // TODO: assumes dx=1
   );  
   solver.courant() = .5; 
 }

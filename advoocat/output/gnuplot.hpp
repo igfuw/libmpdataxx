@@ -45,7 +45,7 @@ namespace advoocat
 	   ") maxcolors " << p.gnuplot_maxcolors << "\n" 
 	   << "set view " << p.gnuplot_view << "\n"
 	   << "set zrange " << p.gnuplot_zrange << "\n"
-	   << "set xrange [0:" << this->mem->state(0).extent(0)-1 << "]\n"
+	   << "set xrange [0:" << this->mem->state(0).extent(0) << "]\n"
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
 	   << "set term svg dynamic\n"
@@ -84,8 +84,7 @@ namespace advoocat
         {
           *gp 
 	     << "set cbrange " << p.gnuplot_cbrange << "\n"
-	     << (p.gnuplot_view != "map" ? "set pm3d at b\n" : "")
-	     << "set yrange [0:" << this->mem->state(0).extent(1)-1 << "]\n"
+	     << "set yrange [0:" << this->mem->state(0).extent(1) << "]\n"
 	     << "set xtics out\n"
 	     << "set ytics out\n"
 	  ;
@@ -112,9 +111,18 @@ namespace advoocat
         {
 	  *gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
 	  *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
-	  *gp << p.gnuplot_command << " '-' binary" << binfmt(this->mem->state(0)) 
-	      << "with " << p.gnuplot_with << " notitle\n";
+	  *gp << p.gnuplot_command;
+          bool imagebg = (p.gnuplot_with == "lines");
+          if (imagebg)
+            *gp << " '-' binary " << binfmt(this->mem->state(0))
+                << " origin=(.5,.5,0)" // TODO: dx/2, dy/2, base?
+	        << " with image failsafe notitle,";
+          *gp << " '-'" 
+              << " binary" << binfmt(this->mem->state(0)) 
+              << " origin=(.5,.5,0)" // TODO: dx/2, dy/2, ?
+	      << " with " << p.gnuplot_with << " notitle\n";
 	  gp->sendBinary(this->mem->state(var).copy());
+          if (imagebg) gp->sendBinary(this->mem->state(var).copy());
         }
       }
 
