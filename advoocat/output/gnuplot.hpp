@@ -151,7 +151,7 @@ namespace advoocat
         int gnuplot_maxcolors = 100;
       };
 
-      const params_t p; // that's a copy - convenient but might be memory-consuming
+      const params_t p; // TODO: that's a copy - convenient but might be memory-consuming, make a struct p.gnupot that would be copied
 
       // ctor
       gnuplot(
