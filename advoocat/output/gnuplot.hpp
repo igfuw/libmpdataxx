@@ -146,10 +146,10 @@ namespace advoocat
 	      : std::string("lines")          // 1D
           ),
           gnuplot_command = std::string("splot"),
-          gnuplot_xlabel = std::string("X"),
+          gnuplot_xlabel = std::string("x/dx"),
           gnuplot_ylabel = (
             parent_t::n_dims == 2 
-              ? std::string("Y") // 2D
+              ? std::string("y/dy") // 2D
               : std::string("")  // 1D
           ),
           gnuplot_view = std::string(""), 

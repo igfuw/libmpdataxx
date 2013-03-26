@@ -47,12 +47,6 @@ namespace advoocat
 	  boost::ptr_vector<arrvec_t<arr_t>>
 	> tmp; 
 
-	// accessor method for the Courant number field
-	arr_t courant(int d = 0)  
-	{   
-	  return C[d]; // TODO: what about halo? (in y)
-	}   
-
         virtual void barrier()
         {
           assert(false && "sharedmem_common::barrier() called!");
@@ -135,12 +129,23 @@ namespace advoocat
         using parent_t = sharedmem_common<real_t, 1, n_eqs, n_tlev>;
 	public:
 
+	// accessor methods
 	blitz::Array<real_t, 1> state(int e)
 	{
 	  return this->psi[e][ this->n ](
 	    rng_t(0, this->span[0]-1)
 	  ).reindex({0});
 	}
+
+	blitz::Array<real_t, 1> courant(int d = 0)  
+	{   
+          assert(d == 0);
+          // returning the whole array but with the dimensiones
+          // reindexed to make it more intuitive when working with index placeholders
+	  return this->C[d](
+            rng_t::all()
+          ).reindex({0}); 
+	}   
 
 	// ctor
 	sharedmem(int s0, int size)
@@ -163,6 +168,19 @@ namespace advoocat
 	    rng_t(0, this->span[1]-1)
 	  })).reindex({0, 0});
 	}
+
+	blitz::Array<real_t, 2> courant(int d = 0)  
+	{   
+          assert(d == 0 || d== 1);
+          // returning the whole array but with the dimensiones
+          // reindexed to make it more intuitive when working with index placeholders
+          const rng_t all = rng_t::all();
+          switch (d)
+          {
+            case 0: return this->C[d](all, all).reindex({0,-1}); 
+            case 1: return this->C[d](all, all).reindex({-1,0}); 
+          }
+	}   
 
 	// ctor
 	sharedmem(int s0, int s1, int size)
@@ -187,6 +205,20 @@ namespace advoocat
 	    rng_t(0, this->span[2]-1)
 	  })).reindex({0, 0, 0});
 	}
+
+	blitz::Array<real_t, 3> courant(int d = 0)  
+	{   
+          assert(d == 0 || d == 1 || d == 2);
+          // returning the whole array but with the dimensiones
+          // reindexed to make it more intuitive when working with index placeholders
+          const rng_t all = rng_t::all();
+          switch (d)
+          {
+            case 0: return this->C[d](all, all, all).reindex({0,-1,-1});  // TODO: perhaps better make it the native base and chang hlf_mh to -1?
+            case 1: return this->C[d](all, all, all).reindex({-1,0,-1}); 
+            case 2: return this->C[d](all, all, all).reindex({-1,-1,0}); 
+          }
+	}   
 
 	// ctor
 	sharedmem(int s0, int s1, int s2, int size)

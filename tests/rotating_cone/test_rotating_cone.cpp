@@ -10,11 +10,16 @@
 
 #include <cmath>
 
+#include <boost/math/constants/constants.hpp>
+using boost::math::constants::pi;
+
 #include <advoocat/solvers/mpdata_2d.hpp>
 #include <advoocat/solvers/donorcell_2d.hpp>
 #include <advoocat/bcond/cyclic_2d.hpp>
 #include <advoocat/concurr/threads.hpp>
 #include <advoocat/output/gnuplot.hpp>
+
+#include <advoocat/arakawa_c.hpp> // TODO: not self-sufficient for inclusion!
 
 enum {x, y};
 using real_t = double;
@@ -24,17 +29,17 @@ template <class T>
 void setup(T &solver, int n[2]) 
 {
   real_t 
-    dt = .1,
+    dt = 10 * pi<real_t>(),
     dx = 1,
     dy = 1,
     xc = .5 * n[x] * dx,
     yc = .5 * n[y] * dy,
-    omega = .1,
-    h = 3.87,
-    r = 15,
+    omega = -.001,// / (2 * pi<real_t>()),
+    h = 1., // TODO: other name!
+    r = 4. * dx,
     h0 = 1,
-    x0 = 75 * dx,
-    y0 = 50 * dy;
+    x0 = 21. * dx,
+    y0 = 15. * dy;
 
   blitz::firstIndex i;
   blitz::secondIndex j;
@@ -51,16 +56,16 @@ void setup(T &solver, int n[2])
   solver.state() = h0 + where(tmp > 0, tmp, 0.);
 
   // constant angular velocity rotational field
-  solver.courant(x) = omega * ((i+.5) * dx - xc) * dt / dx; 
-  solver.courant(y) = -omega * ((j+.5) * dy - yc) * dt / dy;
+  solver.courant(x) = -omega * (j * dy - yc) * dt / dx;
+  solver.courant(y) = omega * (i * dx - xc) * dt / dy;
 }
 
 template <class T>
 void setopts(T &p, int nt, int n_iters)
 {
-  p.outfreq = nt/10; // TODO
+  //p.outfreq = nt/10; // TODO
   p.gnuplot_with = "lines";
-  p.gnuplot_zrange = p.gnuplot_cbrange = "[0:5]";
+  p.gnuplot_zrange = p.gnuplot_cbrange = "[.5:2.5]";
   {
     std::ostringstream tmp;
     tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
@@ -73,7 +78,7 @@ int main()
 {
   using namespace advoocat;
 
-  int n[] = {100, 100}, nt = 100; //6*628;
+  int n[] = {32, 32}, nt = 200;
 
   const int it = 2;
   using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, it>>;
