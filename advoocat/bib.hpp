@@ -17,6 +17,14 @@ namespace bib
   typedef void Anderson_and_Fattahi_1974;
 
   /// @brief
+  /// Observations and kinematic modeling of drizzling marine stratocumulus.
+  /// Atmos. Res., 102, 120-135.
+  /// @details
+  /// [Rasiński et al. 2011]: http://dx.doi.org/10.1016/j.atmosres.2011.06.020
+  /// [Rasiński et al. 2011][]
+  typedef void Rasinski_et_al_2011;
+
+  /// @brief
   /// A fully multidimensional positive definite advection transport algorithm with small implicit diffusion
   /// J. Comp. Phys., 54, 352-362.
   /// @details

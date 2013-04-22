@@ -6,6 +6,8 @@
 
 #pragma once
 
+// TODO: uses rng_t but does not include it
+
 namespace advoocat
 {
   namespace arakawa_c

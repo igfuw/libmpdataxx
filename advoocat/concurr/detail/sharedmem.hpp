@@ -179,6 +179,7 @@ namespace advoocat
           {
             case 0: return this->C[d](all, all).reindex({0,-1}); 
             case 1: return this->C[d](all, all).reindex({-1,0}); 
+            default: assert(false);
           }
 	}   
 
@@ -217,6 +218,7 @@ namespace advoocat
             case 0: return this->C[d](all, all, all).reindex({0,-1,-1});  // TODO: perhaps better make it the native base and chang hlf_mh to -1?
             case 1: return this->C[d](all, all, all).reindex({-1,0,-1}); 
             case 2: return this->C[d](all, all, all).reindex({-1,-1,0}); 
+            default: assert(false);
           }
 	}   
 

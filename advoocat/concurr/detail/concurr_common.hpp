@@ -18,6 +18,7 @@
 
 namespace advoocat
 {
+  /// @brief concurr namespace
   namespace concurr
   {
     template <typename real_t_, int n_dims>

@@ -3,6 +3,11 @@
   * @section LICENSE
   * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
   */
+
+/// @brief tha main namescape
+namespace advoocat
+{};
+
 /** @mainpage
   *
   * @section INTRODUCTION
@@ -47,7 +52,7 @@
   *
   * | test name                                               | n_dims | n_eqs | velocity       | output                                   | concurrency                               | system solved                                        | sample figure (svg)                                                             |
   * | :-----------------------------------------------------: | :----: | :---: | :------------: | :--------------------------------------: | :---------------------------------------: | :--------------------------------------------------: | :-----------------------------------------------------------------------------: |
-  * | \ref test_gnuplot-iostream_1d.cpp "gnuplot-iostream_1d" | 1      | 1     | constant       | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | \f$ \partial_t \psi + \nabla (\vec{u} \psi) = 0 \f$  | \image html "../../tests/gnuplot-iostream_1d/figure_iters=2.svg"                |
+  * | \ref test_gnuplot-iostream_1d.cpp "gnuplot-iostream_1d" | 1      | 1     | constant       | \ref advoocat::output::gnuplot "gnuplot" | \ref advoocat::concurr::threads "threads" | \f$ \partial_t \psi + \nabla (\vec{u} \psi) = 0 \f$  | \image html "../../tests/gnuplot-iostream_1d/figure_iters=2.svg"                |
   * | \ref test_gnuplot-iostream_2d.cpp "gnuplot-iostream_2d" | 2      | 1     | constant       | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | \f$ \partial_t \psi + \nabla (\vec{u} \psi) = 0 \f$  | \image html "../../tests/gnuplot-iostream_2d/figure_iters=2_psi_96.svg"         |
   * | \ref test_rotating_cone.cpp "rotating_cone"             | 2      | 1     | prescribed     | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | \f$ \partial_t \psi + \nabla (\vec{u} \psi) = 0 \f$  | \image html "../../tests/rotating_cone/figure_iters=2_psi_0.svg"                |
   * | \ref test_harmosc.cpp "harmosc"                         | 1      | 2     | constant       | \ref advoocat::output::gnuplot "gnuplot" | \ref threads.hpp "threads (openmp/boost)" | pair of coupled 1D harmonic oscillators: \f$ \\ \partial_t \psi + \nabla (\vec{u} \psi) =  \omega \phi \\ \partial_t \phi + \nabla (\vec{u} \phi) = -\omega \psi \f$ | \image html "../../tests/harmosc/figure_euler_it=1.svg" |

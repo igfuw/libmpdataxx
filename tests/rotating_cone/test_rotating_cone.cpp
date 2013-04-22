@@ -19,8 +19,6 @@ using boost::math::constants::pi;
 #include <advoocat/concurr/threads.hpp>
 #include <advoocat/output/gnuplot.hpp>
 
-#include <advoocat/arakawa_c.hpp> // TODO: not self-sufficient for inclusion!
-
 enum {x, y};
 using real_t = double;
 
