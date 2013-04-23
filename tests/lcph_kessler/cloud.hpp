@@ -1,5 +1,5 @@
 #include <advoocat/solvers/mpdata_2d.hpp>
-#include <libcloudph++/bulk_kessler.hpp>
+#include <libcloudph++/bulk/condevap.hpp>
 
 using namespace advoocat; // TODO: not here?
 
@@ -25,6 +25,19 @@ class cloud : public solvers::mpdata_2d<real_t, n_iters, n_eqs>
   {
 std::cerr << "hook_ante_loop()" << std::endl;
     // TODO
+    const rng_t &i = this->i, &j = this->j;
+    auto rhod_th   = this->state(rhod_th_ix)(i, j);
+    auto rhod_rv   = this->state(rhod_rv_ix)(i, j);
+    auto rhod_rc   = this->state(rhod_rc_ix)(i, j);
+    auto rhod_rr   = this->state(rhod_rr_ix)(i, j);
+
+
+    libcloudphxx::bulk::condevap<typename parent_t::arr_t, real_t>(
+      rhod_th,
+      rhod_rv,
+      rhod_rc,
+      rhod_rr
+    );
   }
 
   // 
