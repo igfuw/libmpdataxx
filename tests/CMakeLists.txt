@@ -8,6 +8,9 @@ else()
   set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native")
 endif()
 
+# RELEASE mode by default
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+
 # from now on the 
 find_package(OpenMP)
 

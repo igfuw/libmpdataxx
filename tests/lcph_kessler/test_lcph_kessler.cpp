@@ -1,80 +1,68 @@
-#include <advoocat/solvers/mpdata_2d.hpp>
 #include <advoocat/bcond/cyclic_2d.hpp>
 #include <advoocat/concurr/threads.hpp>
 #include <advoocat/output/gnuplot.hpp>
 
-#include <libcloudph++/bulk_kessler.hpp>
+#include "cloud.hpp"
 
-enum {rhod_th_ix, rhod_rv_ix}; // TODO: better non-global, within main()
+// for initial condition
+#include <libcloudph++/common/phc_hydrostatic.hpp>
+#include <libcloudph++/common/phc_theta.hpp>
 
 using namespace advoocat;
 
-template <typename real_t, int n_iters, int n_eqs = 2>
-class icicle : public solvers::mpdata_2d<real_t, n_iters, n_eqs>
-{
-  using parent_t = solvers::mpdata_2d<real_t, n_iters, n_eqs>;
-  real_t acth;
+enum {rhod_th_ix, rhod_rv_ix, rhod_rc_ix, rhod_rr_ix }; // variables
+enum {x, z}; // dimensions
+using real_t = double;
 
-  // deals with initials supersaturation
-  void hook_ante_loop()
-  {
-  }
-
-  // 
-  void hook_post_step()
-  {
-    parent_t::hook_post_step();
-
-    auto rhod_rv   = this->state(rhod_rv_ix);
-    auto rhod_th   = this->state(rhod_th_ix);
-
-    rng_t &i = this->i, &j = this->j;
-    
-    rhod_rv(i,j) += .1; // TODO: call something from bulk_kessler.hpp
-  }
-
-  public:
-
-  struct params_t : parent_t::params_t 
-  { 
-    real_t acth = .001; // TODO: document it! 
-  };
-
-  // ctor
-  icicle( 
-    typename parent_t::ctor_args_t args, 
-    const params_t &p
-  ) : 
-    parent_t(args, p), 
-    acth(p.acth)
-  {}  
-};
+// 8th ICMW case 1 by Wojciech Grabowski)
+#include "icmw8_case1.hpp"
 
 
+// simulation and output parameters
 template <class T>
 void setopts(T &p, int nt, int n_iters)
 {
   //p.outfreq = nt/10; // TODO
-  p.gnuplot_with = "lines";
-  p.gnuplot_zrange = p.gnuplot_cbrange = "[.5:2.5]";
+  //p.gnuplot_zrange = p.gnuplot_cbrange = "[.5:2.5]";
+  p.gnuplot_view = "map";
   {
     std::ostringstream tmp;
-    tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
+    tmp << "output/figure_iters=" << n_iters << "_%s_%d.svg";
     p.gnuplot_output = tmp.str();
   }
-  p.outvars = {{rhod_rv_ix, {.name = "\\rho_d r_v", .unit = "TODO"}}};
+  p.outvars = 
+  {
+    {rhod_rv_ix, {.name = "\\rho_v", .unit = "kg/m^{-3}"}},
+    {rhod_rc_ix, {.name = "\\rho_c", .unit = "kg/m^{-3}"}}
+  };
 }
+
 
 int main()
 {
-  int nx = 32, nz = 32, nt = 200;
-
+  int nx = 32, nz = 32, nt = 20;
   const int n_iters = 2;
-  using real_t = double;
-  using solver_t = output::gnuplot<icicle<real_t, n_iters>>;
+
+  // helper type to shorten the code below
+  using solver_t = output::gnuplot<cloud<real_t, n_iters, 
+    rhod_th_ix, 
+    rhod_rv_ix,
+    rhod_rc_ix,
+    rhod_rr_ix
+  >>;
+
+  // instantiation of structure containing simulation parameters
   solver_t::params_t p;
+
+  // output and simulation parameters
   setopts(p, nt, n_iters);
+
+  // solver instantiation
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(nx, nz, p);
-  //setup(slv);
+
+  // initial condition
+  icmw8_case1::setup(slv);
+
+  // timestepping
   slv.advance(nt);
 }
