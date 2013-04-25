@@ -1,53 +1,73 @@
 #include <advoocat/solvers/mpdata_2d.hpp>
+#include <advoocat/solvers/solver_inhomo.hpp>
+
 #include <libcloudph++/bulk/condevap.hpp>
+#include <libcloudph++/bulk/autoconv.hpp>
 
 using namespace advoocat; // TODO: not here?
 
 // @brief a minimalistic kinematic cloud model with bulk microphysics
 //        built on top of the mpdata_2d solver (by extending it with
 //        custom hook_ante_loop() and hook_post_step() methods)
-template <typename real_t, int n_iters, 
+template <
+  typename real_t, 
+  int n_iters, 
+  solvers::inhomo_e inhomo,
   int rhod_th_ix, // dry static energy density divided by c_pd (= dry air density times theta)
   int rhod_rv_ix, // water vapour density
   int rhod_rc_ix, // cloud water density
   int rhod_rr_ix, // rain water density
   int n_eqs = 4
 >
-class cloud : public solvers::mpdata_2d<real_t, n_iters, n_eqs>
+class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, n_eqs>, inhomo>
 {
-  using parent_t = solvers::mpdata_2d<real_t, n_iters, n_eqs>;
+  using parent_t = solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, n_eqs>, inhomo>;
 
   void condevap()
   {
-    const rng_t 
-      &i = this->i, 
-      &j = this->j;
-
     auto 
-      rhod_th   = this->state(rhod_th_ix)(i, j),
-      rhod_rv   = this->state(rhod_rv_ix)(i, j),
-      rhod_rc   = this->state(rhod_rc_ix)(i, j),
-      rhod_rr   = this->state(rhod_rr_ix)(i, j);
+      rhod_th = this->state(rhod_th_ix)(this->i, this->j),
+      rhod_rv = this->state(rhod_rv_ix)(this->i, this->j),
+      rhod_rc = this->state(rhod_rc_ix)(this->i, this->j),
+      rhod_rr = this->state(rhod_rr_ix)(this->i, this->j);
 
     libcloudphxx::bulk::condevap<typename parent_t::arr_t, real_t>(
       rhod, rhod_th, rhod_rv, rhod_rc, rhod_rr
     );
   }
+
+  void autoconv(real_t dt)
+  {
+    auto 
+      rhod_rc = this->state(rhod_rc_ix)(this->i, this->j),
+      rhod_rr = this->state(rhod_rr_ix)(this->i, this->j);
+
+    libcloudphxx::bulk::autoconv<typename parent_t::arr_t, real_t>(
+      dt, rhod, rhod_rc, rhod_rr
+    );
+  }
  
   protected:
 
-  // deals with initials supersaturation
+  // deals with initial supersaturation
   void hook_ante_loop(int nt)
   {
-    parent_t::hook_ante_loop(nt); // having it here causes the non-adjusted state to be output @ t=0
+    parent_t::hook_ante_loop(nt); // before condevap() so the non-adjusted state is output @ t=0
     condevap();
+  }
+
+  //
+  void forcings(real_t dt)
+  {
+    autoconv(dt);
   }
 
   // 
   void hook_post_step()
   {
-    parent_t::hook_post_step();
-    condevap();
+    condevap(); // treat saturation adjustment as post-advection, pre-rhs adjustment
+    parent_t::hook_post_step(); // includes the above forcings
+    // TODO: shouldn't condevap() be called again here to ensure adjusted field is output?
   }
 
   // with the size/range of the subdomain

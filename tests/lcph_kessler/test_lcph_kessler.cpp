@@ -22,7 +22,7 @@ using real_t = double;
 template <class T>
 void setopts(T &params, int nt, int n_iters)
 {
-  //params.outfreq = nt/10; // TODO
+  params.outfreq = nt / 10; 
   //params.gnuplot_zrange = p.gnuplot_cbrange = "[.5:2.5]";
   params.gnuplot_view = "map";
   {
@@ -33,18 +33,19 @@ void setopts(T &params, int nt, int n_iters)
   params.outvars = 
   {
     {rhod_rv_ix, {.name = "\\rho_v", .unit = "kg/m^{-3}"}},
-    {rhod_rc_ix, {.name = "\\rho_c", .unit = "kg/m^{-3}"}}
+    {rhod_rc_ix, {.name = "\\rho_c", .unit = "kg/m^{-3}"}},
+    {rhod_rr_ix, {.name = "\\rho_r", .unit = "kg/m^{-3}"}}
   };
 }
 
 
 int main()
 {
-  int nx = 32, nz = 32, nt = 20;
+  int nx = 32, nz = 32, nt = 1000;
   const int n_iters = 2;
 
   // helper type to shorten the code below
-  using solver_t = output::gnuplot<cloud<real_t, n_iters, 
+  using solver_t = output::gnuplot<cloud<real_t, n_iters, solvers::strang,
     rhod_th_ix, 
     rhod_rv_ix,
     rhod_rc_ix,
