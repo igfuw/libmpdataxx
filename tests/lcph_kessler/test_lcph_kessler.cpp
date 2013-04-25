@@ -20,17 +20,17 @@ using real_t = double;
 
 // simulation and output parameters
 template <class T>
-void setopts(T &p, int nt, int n_iters)
+void setopts(T &params, int nt, int n_iters)
 {
-  //p.outfreq = nt/10; // TODO
-  //p.gnuplot_zrange = p.gnuplot_cbrange = "[.5:2.5]";
-  p.gnuplot_view = "map";
+  //params.outfreq = nt/10; // TODO
+  //params.gnuplot_zrange = p.gnuplot_cbrange = "[.5:2.5]";
+  params.gnuplot_view = "map";
   {
     std::ostringstream tmp;
     tmp << "output/figure_iters=" << n_iters << "_%s_%d.svg";
-    p.gnuplot_output = tmp.str();
+    params.gnuplot_output = tmp.str();
   }
-  p.outvars = 
+  params.outvars = 
   {
     {rhod_rv_ix, {.name = "\\rho_v", .unit = "kg/m^{-3}"}},
     {rhod_rc_ix, {.name = "\\rho_c", .unit = "kg/m^{-3}"}}
@@ -56,12 +56,13 @@ int main()
 
   // output and simulation parameters
   setopts(p, nt, n_iters);
+  icmw8_case1::setopts(p, nz);
 
   // solver instantiation
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(nx, nz, p);
 
   // initial condition
-  icmw8_case1::setup(slv);
+  icmw8_case1::intcond(slv);
 
   // timestepping
   slv.advance(nt);

@@ -1,11 +1,18 @@
 // 8th ICMW case 1 by Wojciech Grabowski)
 namespace icmw8_case1
 {
-  const quantity<si::temperature, real_t> th_0 = 289 * si::kelvins;
-  const quantity<phc::mixing_ratio, real_t> rv_0 = 7.5e-3;
-  const quantity<si::length, real_t> z_0 = 0 * si::metres;
-  const quantity<si::pressure, real_t> p_0 = 101500 * si::pascals;
-  const quantity<si::velocity, real_t> w_max = real_t(.6) * si::metres_per_second;
+  const quantity<si::temperature, real_t> 
+    th_0 = 289 * si::kelvins;
+  const quantity<phc::mixing_ratio, real_t> 
+    rv_0 = 7.5e-3;
+  const quantity<si::pressure, real_t> 
+    p_0 = 101500 * si::pascals;
+  const quantity<si::velocity, real_t> 
+    w_max = real_t(.6) * si::metres_per_second;
+  const quantity<si::length, real_t> 
+    z_0  = 0    * si::metres,
+    nzdz = 1500 * si::metres, 
+    nxdx = 1500 * si::metres;
 
 
   // density profile as a function of altitude
@@ -35,10 +42,22 @@ namespace icmw8_case1
   }
   BZ_DECLARE_FUNCTION2_RET(psi, real_t)
 
-
-  // function accepting a libmpdata++ solver
+  // function expecting a libmpdata solver parameters struct as argument
   template <class T>
-  void setup(T &solver)
+  void setopts(T &params, int nz)
+  {
+    params.rhod.resize(nz);
+    {
+      blitz::firstIndex j;
+      real_t dz = nzdz / si::metres / nz;
+      params.rhod = rhod((j+.5) * dz);
+    }
+  }
+
+
+  // function expecting a libmpdata++ solver as argument
+  template <class T>
+  void intcond(T &solver)
   {
     // helper ondex placeholders
     blitz::firstIndex i;
@@ -50,8 +69,11 @@ namespace icmw8_case1
       nz = solver.state().extent(z);
     real_t 
       dt = 4,
-      dx = 1500 / nx, 
-      dz = 1500 / nz; 
+      dx = nxdx / si::metres / nx, 
+      dz = nzdz / si::metres / nz; 
+
+    // dry-air density field (profile)
+    // TODO
 
     // constant potential temperature & water vapour mixing ratio profiles
     solver.state(rhod_th_ix) = rhod((j+.5)*dz) * (th_0 / si::kelvins);

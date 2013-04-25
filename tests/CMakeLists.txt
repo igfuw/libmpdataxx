@@ -1,11 +1,14 @@
 set(CMAKE_CXX_FLAGS "-I../.. ${CMAKE_CXX_FLAGS}")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -Wfatal-errors")
+set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -g")
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Ofast -march=native")
-else()
-  set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native")
+# -DNDEBUG?
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -Ofast -march=native")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -O3 -mllvm -vectorize -ffast-math -march=native") 
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -fast -axAVX")
 endif()
 
 # RELEASE mode by default
