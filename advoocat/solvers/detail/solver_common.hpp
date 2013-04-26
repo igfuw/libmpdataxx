@@ -8,6 +8,7 @@
 
 #include <advoocat/blitz.hpp>
 #include <advoocat/concurr/detail/sharedmem.hpp>
+#include <advoocat/solvers/detail/monitor.hpp>
 
 namespace advoocat
 {
@@ -82,6 +83,7 @@ namespace advoocat
           hook_ante_loop(nt);
 	  for (int t = 0; t < nt; ++t) 
 	  {   
+            monitor(float(t) / nt);
             hook_ante_step();
 	    xchng_all();
 	    advop_all();
