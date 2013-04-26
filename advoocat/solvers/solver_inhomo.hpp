@@ -28,6 +28,15 @@ namespace advoocat
 
       virtual void forcings(typename parent_t::real_t dt) = 0;
 
+      void update_forcings()
+      {
+      }
+
+      void apply_forcings(typename parent_t::real_t dt)
+      {
+        forcings(dt);
+      }
+
       typename parent_t::real_t dt;
 
       public:
@@ -54,10 +63,11 @@ namespace advoocat
         switch (inhomo)
         {
           case euler: 
-//            apply_forcings(dt); 
+            update_forcings();
+            apply_forcings(dt); 
             break;
           case strang: 
-//            apply_forcings(dt / 2); 
+            apply_forcings(dt / 2); 
             break;
           default: 
             assert(false);
@@ -72,14 +82,15 @@ namespace advoocat
           case euler: 
             break;
           case strang: 
-//            update_forcings();
-//            apply_forcings(dt / 2);
+            update_forcings();
+            apply_forcings(dt / 2);
             break;
           default:
             assert(false);
         }
       } 
 
+      
       
 // TODO: member field with rhs arrays (arrvec_t)
 // TODO: ctor (a in mpdata solvers)
