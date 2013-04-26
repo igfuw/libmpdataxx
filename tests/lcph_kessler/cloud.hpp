@@ -3,6 +3,7 @@
 
 #include <libcloudph++/bulk/condevap.hpp>
 #include <libcloudph++/bulk/autoconv.hpp>
+#include <libcloudph++/bulk/collect.hpp>
 
 using namespace advoocat; // TODO: not here?
 
@@ -36,30 +37,25 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
     );
   }
 
-  void autoconv(real_t dt)
-  {
-    auto 
-      rhod_rc = this->state(rhod_rc_ix)(this->i, this->j),
-      rhod_rr = this->state(rhod_rr_ix)(this->i, this->j);
 
-    libcloudphxx::bulk::autoconv<typename parent_t::arr_t, real_t>(
-      dt, rhod, rhod_rc, rhod_rr
-    );
-  }
- 
   protected:
 
   // deals with initial supersaturation
   void hook_ante_loop(int nt)
   {
-    parent_t::hook_ante_loop(nt); // before condevap() so the non-adjusted state is output @ t=0
+    parent_t::hook_ante_loop(nt); 
     condevap();
   }
 
   //
   void forcings(real_t dt)
   {
-    autoconv(dt);
+    auto 
+      rhod_rc = this->state(rhod_rc_ix)(this->i, this->j),
+      rhod_rr = this->state(rhod_rr_ix)(this->i, this->j);
+
+    libcloudphxx::bulk::autoconv(dt, rhod, rhod_rc, rhod_rr);
+    libcloudphxx::bulk::collect(dt, rhod, rhod_rc, rhod_rr);
   }
 
   // 
