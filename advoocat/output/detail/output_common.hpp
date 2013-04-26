@@ -9,6 +9,8 @@
 
 #include <map>
 
+#include <advoocat/solvers/detail/monitor.hpp>
+
 namespace advoocat
 {
   namespace output
@@ -22,7 +24,7 @@ namespace advoocat
 
 	protected:
 
-	int n =0;
+	int n =0, nt;
 	struct info { std::string name, unit; };
 	std::map<int, info> outvars;
 
@@ -32,8 +34,9 @@ namespace advoocat
 	virtual void start(const int nt) {}
 	virtual void stop() {}
 
-	void hook_ante_loop(const int nt)
+	void hook_ante_loop(const int nt_)
 	{
+          nt = nt_;
 	  if (this->mem->rank() == 0) start(nt);
 	  this->mem->barrier();
 	  parent_t::hook_ante_loop(nt);
@@ -67,7 +70,11 @@ namespace advoocat
 	  if (this->mem->rank() == 0)
 	  {
 	    n++;
-	    if (n % outfreq == 0) record_all();
+	    if (n % outfreq == 0)
+            {
+              monitor(n / float(nt));
+              record_all();
+            }
 	  }
 	  this->mem->barrier();
 	}
