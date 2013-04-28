@@ -29,6 +29,7 @@ namespace advoocat
 	bc_p bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
 	rng_t i, j, k; // TODO: if stored as idx_t this also could be placed in solver_common
+        idx_t<n_dims> ijk;
 
 	void xchng(int e, int lev = 0) 
 	{
@@ -62,6 +63,7 @@ namespace advoocat
 	  i(args.i), 
           j(args.j), 
           k(args.k),  
+          ijk({args.i, args.j, args.k}),
 	  bcxl(std::move(args.bcxl)),
 	  bcxr(std::move(args.bcxr)),
 	  bcyl(std::move(args.bcyl)),

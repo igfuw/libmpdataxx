@@ -28,6 +28,7 @@ namespace advoocat
         bc_p bcxl, bcxr;
      
 	rng_t i; // TODO: idx_t i do common?
+        idx_t<n_dims> ijk;
 
 	void xchng(int e, int lev = 0) 
 	{
@@ -53,7 +54,8 @@ namespace advoocat
 	  parent_t(args.mem), 
           bcxl(std::move(args.bcxl)), 
           bcxr(std::move(args.bcxr)),
-          i(args.i)
+          i(args.i),
+          ijk({args.i})
 	{}
 
 	public:

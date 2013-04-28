@@ -29,6 +29,7 @@ namespace advoocat
 	bc_p bcxl, bcxr, bcyl, bcyr;
 
 	rng_t i, j;
+        idx_t<n_dims> ijk;
 
 	void xchng(int e, int lev = 0) // for previous time levels
 	{
@@ -61,6 +62,7 @@ namespace advoocat
 	  parent_t(args.mem),
 	  i(args.i), 
 	  j(args.j),  
+          ijk({args.i, args.j}),
 	  bcxl(std::move(args.bcxl)), 
 	  bcxr(std::move(args.bcxr)), 
 	  bcyl(std::move(args.bcyl)),
