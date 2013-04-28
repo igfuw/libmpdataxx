@@ -34,6 +34,7 @@ namespace advoocat
 
         typedef real_t_ real_t;
         typedef blitz::Array<real_t_, n_dims_> arr_t;
+        typedef arrvec_t<arr_t> arrvec_t;
 
 	void cycle_all()
 	{ 
@@ -66,17 +67,63 @@ namespace advoocat
 	  for (int e = 0; e < n_eqs; ++e) xchng(e);
 	}
 
-	public:
+        // hook methods to be overrided in inheriting objects
+        // the overriding methods are expected to call parent_t::hook_...()
+
+        private:
       
+        bool 
+          hook_ante_step_called = false, 
+          hook_post_step_called = false, 
+          hook_ante_loop_called = false, 
+          hook_post_loop_called = false;
+
+	public:
+
+        virtual void hook_ante_step() 
+        { 
+#if !defined(NDEBUG)
+          hook_ante_step_called = true;
+#endif
+        }
+
+        virtual void hook_post_step() 
+        {
+#if !defined(NDEBUG)
+          hook_post_step_called = true;
+#endif
+        }
+
+        virtual void hook_ante_loop(const int nt) 
+        {
+#if !defined(NDEBUG)
+          hook_ante_loop_called = true;
+#endif
+        }
+
+        virtual void hook_post_loop() 
+        {
+#if !defined(NDEBUG)
+          hook_post_loop_called = true;
+#endif
+        }
+
 	// ctor
 	solver_common(mem_t *mem) :
-	  n(n_eqs, 0), mem(mem)
+	  n(n_eqs, 0), 
+          mem(mem)
 	{ }
 
-        virtual void hook_ante_step() {}
-        virtual void hook_post_step() {}
-        virtual void hook_ante_loop(const int nt) {}
-        virtual void hook_post_loop() {}
+        // dtor
+        virtual ~solver_common()
+        {
+#if !defined(NDEBUG)
+          assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
+          assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
+          assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
+          assert(hook_post_loop_called && "any overriding hook_post_loop() must call parent_t::hook_post_loop()");
+#endif
+        }
 
 	virtual void solve(const int nt) final
 	{   

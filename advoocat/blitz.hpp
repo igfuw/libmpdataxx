@@ -30,7 +30,7 @@ namespace blitz
 
 #pragma GCC push_options
 #pragma GCC optimize ("O3") // assuming -Ofast could optimise out the algorithm
-    bool operator()(const T_sourcetype& x,const int=0) const 
+    bool operator()(const T_sourcetype& x, const int=0) const 
     { 
       T_resulttype y, t;
       y = x - c_;
