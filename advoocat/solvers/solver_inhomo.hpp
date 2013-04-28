@@ -24,20 +24,35 @@ namespace advoocat
       typedef homo_solver parent_t;
       typedef typename parent_t::mem_t mem_t;
 
+      private:
+
+      bool update_forcings_called = false;
+
       protected:
 
-      virtual void forcings(typename parent_t::real_t dt) = 0;
-
-      void update_forcings()
-      {
-      }
-
-      void apply_forcings(typename parent_t::real_t dt)
-      {
-        forcings(dt);
-      }
-
+      // member fields
       typename parent_t::real_t dt;
+
+      virtual void update_forcings(
+        typename parent_t::arrvec_t &rhs
+      ) 
+      {
+#if !defined(NDEBUG)
+        update_forcings_called = true;
+#endif
+        // zero-out all rhs arrays
+	for (int e = 0; e < parent_t::n_eqs; ++e) 
+          rhs.at(e)(this->ijk) = 0;
+      }
+
+      // this assumes explicit form - TODO: _explicit in a different file? (alloc, apply, update)
+      virtual void apply_forcings(typename parent_t::real_t dt_arg)
+      {
+        for (int e = 0; e < parent_t::n_eqs; ++e) 
+          this->state(e)(this->ijk) += dt_arg * rhs.at(e)(this->ijk);
+      }
+
+      arrvec_t<typename parent_t::arr_t> &rhs;
 
       public:
 
@@ -45,17 +60,39 @@ namespace advoocat
       { 
         typename parent_t::real_t dt; 
       };
-
-      // 1D
+      
+      // ctor
       inhomo_solver(
 	typename parent_t::ctor_args_t args, 
 	const params_t &p
       ) :
 	parent_t(args, p), 
-        dt(p.dt)
+        dt(p.dt),
+        rhs(args.mem->tmp[__FILE__][0])
       {}
 
-// TODO: hook_ante_loop() - zero rhs arrays
+      // dtor
+      ~inhomo_solver()
+      {
+#if !defined(NDEBUG)
+        assert(update_forcings_called && "any overriding update_forcings() must call parent_t::update_forcings()");
+#endif
+      }
+
+      void hook_ante_loop(int nt)
+      {
+        parent_t::hook_ante_loop(nt);
+        switch (inhomo)
+        {
+          case euler: 
+            break;
+          case strang:
+            update_forcings(rhs);
+            break;
+          default: 
+            assert(false);
+        }
+      }
 
       void hook_ante_step()
       {
@@ -63,7 +100,7 @@ namespace advoocat
         switch (inhomo)
         {
           case euler: 
-            update_forcings();
+            update_forcings(rhs);
             apply_forcings(dt); 
             break;
           case strang: 
@@ -82,7 +119,7 @@ namespace advoocat
           case euler: 
             break;
           case strang: 
-            update_forcings();
+            update_forcings(rhs);
             apply_forcings(dt / 2);
             break;
           default:
@@ -90,21 +127,22 @@ namespace advoocat
         }
       } 
 
-      
-      
-// TODO: member field with rhs arrays (arrvec_t)
-// TODO: ctor (a in mpdata solvers)
-
+      // 1D version
       static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
       {
 	parent_t::alloc(mem, nx, ny);
-
-        // (i,j)-sized temporary fields
 	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
+	for (int e = 0; e < parent_t::n_eqs; ++e)
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( nx, ny ));
+      }
 
-	const rng_t i(0, nx-1), j(0, ny-1);
-	for (int n=0; n < parent_t::n_eqs; ++n)
-	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( i, j ));
+      // 2D version
+      static void alloc(typename parent_t::mem_t *mem, const int nx)
+      {
+	parent_t::alloc(mem, nx);
+	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
+	for (int e = 0; e < parent_t::n_eqs; ++e)
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( nx ));
       }
     };
   }; // namespace solvers

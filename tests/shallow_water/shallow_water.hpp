@@ -59,24 +59,24 @@ class shallow_water : public solvers::detail::solver_velocity_common<
 
   template <int d, class arr_t>
   void forcings_helper(
-    arr_t qq,
+    arr_t dqq,
     const arr_t hh,
     const rng_t &i,
     const rng_t &j,
-    const real_t &dx,
-    const real_t &dt
+    const real_t &dx
   )
   {
     using namespace formulae::nabla;
-    qq(pi<d>(i,j)) -= dt * g * hh(pi<d>(i,j)) * grad<d>(hh, i, j, dx); 
+    dqq(pi<d>(i,j)) -= g * hh(pi<d>(i,j)) * grad<d>(hh, i, j, dx); 
   }
 
   /// @brief Shallow Water Equations: Momentum forcings for the X and Y coordinates
-  void forcings(real_t dt)  
+  void update_forcings(typename parent_t::arrvec_t &rhs)  
   {
+    parent_t::update_forcings(rhs);
     this->xchng(h);
-    forcings_helper<0>(this->state(qx), this->state(h), this->i, this->j, this->dx, dt);
-    forcings_helper<1>(this->state(qy), this->state(h), this->j, this->i, this->dz, dt); // TODO: rename dz->dy?
+    forcings_helper<0>(rhs.at(qx), this->state(h), this->i, this->j, this->dx);
+    forcings_helper<1>(rhs.at(qy), this->state(h), this->j, this->i, this->dz); // TODO: rename dz->dy?
   }
 
   public:

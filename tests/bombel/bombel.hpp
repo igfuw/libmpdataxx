@@ -13,13 +13,15 @@ class bombel : public parent_t
   real_t Tht_amb;
 
   // explicit forcings (to be applied before the eliptic solver)
-  void forcings(real_t dt)  
+  void update_forcings(typename parent_t::arrvec_t &rhs)  
   {
-    auto W   = this->state(w);
-    auto Tht = this->state(tht); // TODO: relies on global tht!!!!!
-    rng_t &i = this->i, &j = this->j;
+    parent_t::update_forcings(rhs); // incl. zeroing the rhs arrays
 
-    W(i,j) += (dt * si:: seconds) * formulae::g<real_t>() * si::seconds / si::metres * (Tht(i,j) - Tht_amb) / Tht_amb;
+    auto dW   = rhs.at(w); // TODO: relies on global w !!!
+    auto Tht = this->state(tht); // TODO: relies on global tht!!!!!
+    auto &ijk = this->ijk;
+
+    dW(ijk) += formulae::g<real_t>() * si::seconds * si::seconds / si::metres * (Tht(ijk) - Tht_amb) / Tht_amb; // TODO: get rid of units here?
   }
 
   public:

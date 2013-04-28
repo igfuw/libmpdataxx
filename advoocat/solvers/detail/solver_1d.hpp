@@ -55,7 +55,7 @@ namespace advoocat
           bcxl(std::move(args.bcxl)), 
           bcxr(std::move(args.bcxr)),
           i(args.i),
-          ijk({args.i})
+          ijk(args.i)
 	{}
 
 	public:

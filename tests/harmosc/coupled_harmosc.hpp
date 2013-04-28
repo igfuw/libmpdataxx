@@ -57,7 +57,7 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t,
   typename parent_t::real_t omega;
   typename parent_t::arr_t tmp;
 
-  void forcings(typename parent_t::real_t dt)
+  void apply_forcings(typename parent_t::real_t dt)
   {
     auto Psi = this->state(psi);
     auto Phi = this->state(phi);

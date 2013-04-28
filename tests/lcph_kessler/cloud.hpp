@@ -32,30 +32,34 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
       rhod_rc = this->state(rhod_rc_ix)(this->i, this->j),
       rhod_rr = this->state(rhod_rr_ix)(this->i, this->j);
 
-    libcloudphxx::bulk::condevap<typename parent_t::arr_t, real_t>(
+    libcloudphxx::bulk::condevap<real_t>( // TODO: dt as arg needed?
       rhod, rhod_th, rhod_rv, rhod_rc, rhod_rr
     );
   }
-
 
   protected:
 
   // deals with initial supersaturation
   void hook_ante_loop(int nt)
   {
-    parent_t::hook_ante_loop(nt); 
     condevap();
+    parent_t::hook_ante_loop(nt); // forcings after adjustments
   }
 
   //
-  void forcings(real_t dt)
+  void update_forcings(typename parent_t::arrvec_t &rhs)
   {
+    parent_t::update_forcings(rhs);
+ 
     auto 
+      drhod_rc = rhs.at(rhod_rc_ix)(this->i, this->j),
+      drhod_rr = rhs.at(rhod_rr_ix)(this->i, this->j);
+    const auto 
       rhod_rc = this->state(rhod_rc_ix)(this->i, this->j),
       rhod_rr = this->state(rhod_rr_ix)(this->i, this->j);
 
-    libcloudphxx::bulk::autoconv(dt, rhod, rhod_rc, rhod_rr);
-    libcloudphxx::bulk::collect(dt, rhod, rhod_rc, rhod_rr);
+    libcloudphxx::bulk::autoconv<real_t>(drhod_rc, drhod_rr, rhod, rhod_rc, rhod_rr);
+    libcloudphxx::bulk::collect<real_t>(drhod_rc, drhod_rr, rhod, rhod_rc, rhod_rr);
   }
 
   // 
