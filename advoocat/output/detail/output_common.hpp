@@ -34,9 +34,13 @@ namespace advoocat
 
 	void hook_ante_loop(const int nt)
 	{
-	  if (this->mem->rank() == 0) start(nt);
-	  this->mem->barrier();
 	  parent_t::hook_ante_loop(nt);
+	  if (this->mem->rank() == 0) 
+          {
+            start(nt);
+            record_all();
+          }
+	  this->mem->barrier();
 	}
 
 	void hook_post_loop()
@@ -49,17 +53,6 @@ namespace advoocat
 	void record_all()
 	{
 	  for (const auto &v : outvars) record(v.first);
-	}
-
-	void hook_ante_step()
-	{
-	  parent_t::hook_ante_step();
-
-	  if (this->mem->rank() == 0)
-	  {
-	    if (n == 0) record_all();
-	  }
-	  this->mem->barrier();
 	}
 
 	void hook_post_step()
