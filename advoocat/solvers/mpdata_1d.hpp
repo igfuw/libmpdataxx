@@ -10,7 +10,7 @@
 #include <advoocat/formulae/donorcell_formulae.hpp>
 #include <advoocat/solvers/detail/solver_1d.hpp>
 
-#include <unordered_map>
+#include <array>
 
 // TODO: an mpdata_common class?
 
@@ -39,10 +39,10 @@ namespace advoocat
         detail::max(halo, formulae::mpdata::halo)
       >;
 
-      static const int n_tmp = n_iters > 2 ? 2 : 1;
+      static const int n_tmp = n_iters > 2 ? 2 : 1; // TODO: this should be in mpdata_common
 
       // member fields
-      arrvec_t<typename parent_t::arr_t> *tmp[n_tmp];
+      std::array<arrvec_t<typename parent_t::arr_t>*, n_tmp> tmp;
       rng_t im;
 
       protected:

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <advoocat/formulae/mpdata/formulae_mpdata_2d.hpp>
 #include <advoocat/formulae/donorcell_formulae.hpp>
 #include <advoocat/solvers/detail/solver_2d.hpp>
@@ -38,7 +40,7 @@ namespace advoocat
       static const int n_tmp = n_iters > 2 ? 2 : 1;
 
       // member fields
-      arrvec_t<typename parent_t::arr_t> *tmp[n_tmp];
+      std::array<arrvec_t<typename parent_t::arr_t>*, n_tmp> tmp;
       rng_t im, jm;
 
       protected:
