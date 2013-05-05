@@ -3,7 +3,8 @@
 
 #include <libcloudph++/bulk/condevap.hpp>
 #include <libcloudph++/bulk/autoconv.hpp>
-#include <libcloudph++/bulk/collect.hpp>
+#include <libcloudph++/bulk/collectn.hpp>
+#include <libcloudph++/bulk/sediment.hpp>
 
 using namespace advoocat; // TODO: not here?
 
@@ -27,11 +28,13 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
   void condevap()
   {
     auto 
-      rhod_th = this->state(rhod_th_ix)(this->i, this->j),
-      rhod_rv = this->state(rhod_rv_ix)(this->i, this->j),
-      rhod_rc = this->state(rhod_rc_ix)(this->i, this->j),
-      rhod_rr = this->state(rhod_rr_ix)(this->i, this->j);
-
+      rhod_th = this->state(rhod_th_ix)(this->ijk),
+      rhod_rv = this->state(rhod_rv_ix)(this->ijk),
+      rhod_rc = this->state(rhod_rc_ix)(this->ijk),
+      rhod_rr = this->state(rhod_rr_ix)(this->ijk);
+    auto const
+      rhod    = this->rhod(this->ijk);
+      
     libcloudphxx::bulk::condevap<real_t>( // TODO: dt as arg needed?
       rhod, rhod_th, rhod_rv, rhod_rc, rhod_rr
     );
@@ -52,14 +55,26 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
     parent_t::update_forcings(rhs);
  
     auto 
-      drhod_rc = rhs.at(rhod_rc_ix)(this->i, this->j),
-      drhod_rr = rhs.at(rhod_rr_ix)(this->i, this->j);
+      drhod_rc = rhs.at(rhod_rc_ix),
+      drhod_rr = rhs.at(rhod_rr_ix);
     const auto 
-      rhod_rc = this->state(rhod_rc_ix)(this->i, this->j),
-      rhod_rr = this->state(rhod_rr_ix)(this->i, this->j);
+      rhod_rc  = this->state(rhod_rc_ix),
+      rhod_rr  = this->state(rhod_rr_ix),
+      rhod     = this->rhod;
 
-    libcloudphxx::bulk::autoconv<real_t>(drhod_rc, drhod_rr, rhod, rhod_rc, rhod_rr);
-    libcloudphxx::bulk::collect<real_t>(drhod_rc, drhod_rr, rhod, rhod_rc, rhod_rr);
+    // element-wise
+    {
+      const rng_t &i = this->i, &j = this->j;
+      libcloudphxx::bulk::autoconv<real_t>(drhod_rc(i,j), drhod_rr(i,j), rhod(i,j), rhod_rc(i,j), rhod_rr(i,j));
+      libcloudphxx::bulk::collectn<real_t>(drhod_rc(i,j), drhod_rr(i,j), rhod(i,j), rhod_rc(i,j), rhod_rr(i,j));
+    }
+
+    // column-wise
+    {
+      const rng_t j = this->j;
+      for (int i = this->i.first(); i <= this->i.last(); ++i)
+	libcloudphxx::bulk::sediment<real_t>(drhod_rr(i,j), rhod(i,j), rhod_rr(i,j), dz);
+    }
   }
 
   // 
@@ -72,12 +87,14 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
 
   // with the size/range of the subdomain
   typename parent_t::arr_t rhod;
+  real_t dz;
 
   public:
 
   struct params_t : parent_t::params_t 
   { 
-    typename parent_t::arr_t rhod;
+    std::vector<real_t> rhod; // profile
+    real_t dz = 0;
   };
 
   // ctor
@@ -85,18 +102,24 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
     typename parent_t::ctor_args_t args, 
     const params_t &p
   ) : 
-    parent_t(args, p)
+    parent_t(args, p),
+    dz(p.dz),
+    rhod(args.mem->tmp[__FILE__][0][0])
   {
-    // initialising rhod array with data from the p.rhod profile
-    rhod.resize(this->i, this->j);
-
-    assert(
-      p.rhod.extent(0) == rhod.extent(1) 
-      && "p.rhod profile has wrong dimension (or is not initialised)"
-    );
-
-    blitz::firstIndex i;
-    blitz::secondIndex j;
-    rhod = p.rhod(j);
+    assert(dz != 0);
+    assert(p.rhod.size() == this->j.last()+1);
+    // initialising rhod array columnwise with data from the p.rhod profile
+    for (int i = this->i.first(); i <= this->i.last(); ++i)
+      for (int j = this->j.first(); j <= this->j.last(); ++j)
+	rhod(i, j) = p.rhod[j];
   }  
+
+  static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
+  {
+    using namespace advoocat::arakawa_c;
+    parent_t::alloc(mem, nx, ny);
+    const rng_t i(0, nx-1), j(0, ny-1);
+    mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
+    mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^parent_t::halo, j^parent_t::halo)); // rhod
+  }
 };

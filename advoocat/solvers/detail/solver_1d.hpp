@@ -62,6 +62,7 @@ namespace advoocat
 
 	static void alloc(typename parent_t::mem_t *mem, const int nx)   
         {
+// TODO: N_DEBUG code to assure all parents called (same in 2D, 3D)
           const rng_t i(0, nx-1);
           
 	  for (int e = 0; e < n_eqs; ++e) // equations

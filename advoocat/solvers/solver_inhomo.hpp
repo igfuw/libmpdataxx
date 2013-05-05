@@ -58,7 +58,7 @@ namespace advoocat
 
       struct params_t : parent_t::params_t 
       { 
-        typename parent_t::real_t dt; 
+        typename parent_t::real_t dt = 0; 
       };
       
       // ctor
@@ -69,7 +69,9 @@ namespace advoocat
 	parent_t(args, p), 
         dt(p.dt),
         rhs(args.mem->tmp[__FILE__][0])
-      {}
+      {
+        assert(dt != 0);
+      }
 
       // dtor
       ~inhomo_solver()
@@ -127,22 +129,30 @@ namespace advoocat
         }
       } 
 
-      // 1D version
-      static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
-      {
-	parent_t::alloc(mem, nx, ny);
-	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
-	for (int e = 0; e < parent_t::n_eqs; ++e)
-	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( nx, ny ));
-      }
+      // TODO: merge the two allocs into one!
 
-      // 2D version
+      // 1D version
       static void alloc(typename parent_t::mem_t *mem, const int nx)
       {
 	parent_t::alloc(mem, nx);
+
+        const rng_t i(0, nx-1);
+
 	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
 	for (int e = 0; e < parent_t::n_eqs; ++e)
-	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( nx ));
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^parent_t::halo)); 
+      }
+
+      // 2D version
+      static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
+      {
+	parent_t::alloc(mem, nx, ny);
+
+        const rng_t i(0, nx-1), j(0, ny-1);
+
+	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
+	for (int e = 0; e < parent_t::n_eqs; ++e)
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^parent_t::halo, j^parent_t::halo));
       }
     };
   }; // namespace solvers

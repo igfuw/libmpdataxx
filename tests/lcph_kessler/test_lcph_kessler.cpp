@@ -22,7 +22,7 @@ using real_t = double;
 template <class T>
 void setopts(T &params, int nt, int n_iters)
 {
-  params.outfreq = nt / 10; 
+  params.outfreq = nt / 50; 
   //params.gnuplot_zrange = p.gnuplot_cbrange = "[.5:2.5]";
   params.gnuplot_view = "map";
   {
@@ -41,7 +41,7 @@ void setopts(T &params, int nt, int n_iters)
 
 int main()
 {
-  int nx = 32, nz = 32, nt = 1000;
+  int nx = 32, nz = 32, nt = 500;
   const int n_iters = 2;
 
   // helper type to shorten the code below

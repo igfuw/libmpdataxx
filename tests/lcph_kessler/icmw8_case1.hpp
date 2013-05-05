@@ -13,7 +13,8 @@ namespace icmw8_case1
     z_0  = 0    * si::metres,
     nzdz = 1500 * si::metres, 
     nxdx = 1500 * si::metres;
-
+  const quantity<si::time, real_t>
+    dt = 4 * si::seconds;
 
   // density profile as a function of altitude
   real_t rhod(real_t z)
@@ -46,12 +47,12 @@ namespace icmw8_case1
   template <class T>
   void setopts(T &params, int nz)
   {
+    params.dt = dt / si::seconds;
+    params.dz = nzdz / si::metres / nz;
+
     params.rhod.resize(nz);
-    {
-      blitz::firstIndex j;
-      real_t dz = nzdz / si::metres / nz;
-      params.rhod = rhod((j+.5) * dz);
-    }
+    for (int j = 0; j < nz; ++j)
+      params.rhod[j] = rhod((j+.5) * params.dz);
   }
 
 
@@ -68,7 +69,6 @@ namespace icmw8_case1
       nx = solver.state().extent(x),
       nz = solver.state().extent(z);
     real_t 
-      dt = 4,
       dx = nxdx / si::metres / nx, 
       dz = nzdz / si::metres / nz; 
 
@@ -92,14 +92,14 @@ namespace icmw8_case1
 	psi(i/real_t(nx), (j+.5-.5)/nz)
       ) / dz             // numerical derivative
       / rhod((j+.5)* dz) // psi defines rho_d times velocity
-      * dt / dx;         // converting to Courant number
+      * (dt / si::seconds) / dx;         // converting to Courant number
 
       solver.courant(z) = A * (
 	psi((i+.5+.5)/nx, j/real_t(nz)) -
 	psi((i+.5-.5)/nx, j/real_t(nz))
       ) / dx 
       / rhod(j * dz)
-      * dt / dz; 
+      * (dt / si::seconds) / dz; 
     }
   }
 };
