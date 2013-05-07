@@ -42,7 +42,7 @@ void setopts(T &params, int nt, int n_iters)
   params.bulk_opts.revp = true;
   params.bulk_opts.conv = true;
   params.bulk_opts.clct = true;
-  params.bulk_opts.sedi = false;
+  params.bulk_opts.sedi = true;
 }
 
 
