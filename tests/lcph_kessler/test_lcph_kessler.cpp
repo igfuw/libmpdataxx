@@ -36,6 +36,13 @@ void setopts(T &params, int nt, int n_iters)
     {rhod_rc_ix, {.name = "\\rho_c", .unit = "kg/m^{-3}"}},
     {rhod_rr_ix, {.name = "\\rho_r", .unit = "kg/m^{-3}"}}
   };
+
+  // Kessler scheme options
+  params.bulk_opts.cevp = true;
+  params.bulk_opts.revp = true;
+  params.bulk_opts.conv = true;
+  params.bulk_opts.clct = true;
+  params.bulk_opts.sedi = false;
 }
 
 
