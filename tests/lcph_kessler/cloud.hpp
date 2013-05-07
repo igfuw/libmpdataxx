@@ -1,10 +1,10 @@
 #include <advoocat/solvers/mpdata_2d.hpp>
 #include <advoocat/solvers/solver_inhomo.hpp>
 
-#include <libcloudph++/bulk/condevap.hpp>
-#include <libcloudph++/bulk/autoconv.hpp>
-#include <libcloudph++/bulk/collectn.hpp>
-#include <libcloudph++/bulk/sediment.hpp>
+#include <libcloudph++/bulk/options.hpp>
+#include <libcloudph++/bulk/adjustments.hpp>
+#include <libcloudph++/bulk/forcings_elementwise.hpp>
+#include <libcloudph++/bulk/forcings_columnwise.hpp>
 
 using namespace advoocat; // TODO: not here?
 
@@ -35,8 +35,8 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
     auto const
       rhod    = this->rhod(this->ijk);
       
-    libcloudphxx::bulk::condevap<real_t>( // TODO: dt as arg needed?
-      rhod, rhod_th, rhod_rv, rhod_rc, rhod_rr
+    libcloudphxx::bulk::adjustments<real_t>( 
+      opts, rhod, rhod_th, rhod_rv, rhod_rc, rhod_rr
     );
   }
 
@@ -65,15 +65,14 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
     // element-wise
     {
       const rng_t &i = this->i, &j = this->j;
-      libcloudphxx::bulk::autoconv<real_t>(drhod_rc(i,j), drhod_rr(i,j), rhod(i,j), rhod_rc(i,j), rhod_rr(i,j));
-      libcloudphxx::bulk::collectn<real_t>(drhod_rc(i,j), drhod_rr(i,j), rhod(i,j), rhod_rc(i,j), rhod_rr(i,j));
+      libcloudphxx::bulk::forcings_elementwise<real_t>(opts, drhod_rc(i,j), drhod_rr(i,j), rhod(i,j), rhod_rc(i,j), rhod_rr(i,j));
     }
 
     // column-wise
     {
       const rng_t j = this->j;
       for (int i = this->i.first(); i <= this->i.last(); ++i)
-	libcloudphxx::bulk::sediment<real_t>(drhod_rr(i,j), rhod(i,j), rhod_rr(i,j), dz);
+	libcloudphxx::bulk::forcings_columnwise<real_t>(opts, drhod_rr(i,j), rhod(i,j), rhod_rr(i,j), dz);
     }
   }
 
@@ -88,6 +87,7 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
   // with the size/range of the subdomain
   typename parent_t::arr_t rhod;
   real_t dz;
+  libcloudphxx::bulk::opts<real_t> opts;
 
   public:
 
@@ -95,6 +95,7 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
   { 
     std::vector<real_t> rhod; // profile
     real_t dz = 0;
+    libcloudphxx::bulk::opts<real_t> bulk_opts;
   };
 
   // ctor
@@ -104,14 +105,18 @@ class cloud : public solvers::inhomo_solver<solvers::mpdata_2d<real_t, n_iters, 
   ) : 
     parent_t(args, p),
     dz(p.dz),
+    opts(p.bulk_opts),
     rhod(args.mem->tmp[__FILE__][0][0])
   {
     assert(dz != 0);
     assert(p.rhod.size() == this->j.last()+1);
+
     // initialising rhod array columnwise with data from the p.rhod profile
     for (int i = this->i.first(); i <= this->i.last(); ++i)
       for (int j = this->j.first(); j <= this->j.last(); ++j)
 	rhod(i, j) = p.rhod[j];
+
+    opts.dt = p.dt;
   }  
 
   static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
