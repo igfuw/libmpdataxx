@@ -32,6 +32,7 @@ void setopts(T &params, int nt, int n_iters)
   }
   params.outvars = 
   {
+    {rhod_th_ix, {.name = "\\rho_d \\theta", .unit = "kg/m^{-3} K"}},
     {rhod_rv_ix, {.name = "\\rho_v", .unit = "kg/m^{-3}"}},
     {rhod_rc_ix, {.name = "\\rho_c", .unit = "kg/m^{-3}"}},
     {rhod_rr_ix, {.name = "\\rho_r", .unit = "kg/m^{-3}"}}
