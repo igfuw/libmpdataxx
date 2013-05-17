@@ -79,11 +79,8 @@ namespace icmw8_case1
       dx = nxdx / si::metres / nx, 
       dz = nzdz / si::metres / nz; 
 
-    // dry-air density field (profile)
-    // TODO
-
     // constant potential temperature & water vapour mixing ratio profiles
-    solver.state(rhod_th_ix) = rhod((j+.5)*dz) * (th_0 / si::kelvins);
+    solver.state(rhod_th_ix) = rhod((j+.5)*dz) * (th_0 / si::kelvins); // TODO: should be theta_dry and is theta
     solver.state(rhod_rv_ix) = rhod((j+.5)*dz) * real_t(rv_0);
 
     // TODO: only for bulk!
