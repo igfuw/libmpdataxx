@@ -90,6 +90,8 @@ namespace advoocat
 	     << "set yrange [0:" << this->mem->state(0).extent(1) << "]\n"
 	     << "set xtics out\n"
 	     << "set ytics out\n"
+	     << (p.gnuplot_surface ? "set" : "unset") << " surface\n"
+	     << (p.gnuplot_contour ? "set" : "unset") << " contour\n"
 	  ;
         }
       }
@@ -115,7 +117,7 @@ namespace advoocat
 	  *gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
 	  *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
 	  *gp << p.gnuplot_command;
-          bool imagebg = (p.gnuplot_with == "lines");
+          bool imagebg = (p.gnuplot_with == "lines" && !p.gnuplot_contour);
           if (imagebg)
           {
             float zmin, zmax;
@@ -157,6 +159,9 @@ namespace advoocat
           gnuplot_cbrange = std::string("[*:*]"),
           gnuplot_border = std::string(""); 
         int gnuplot_maxcolors = 100;
+        bool 
+          gnuplot_contour = false,
+          gnuplot_surface = true;
       };
 
       const params_t p; // TODO: that's a copy - convenient but might be memory-consuming, make a struct p.gnupot that would be copied
