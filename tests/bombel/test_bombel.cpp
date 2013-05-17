@@ -45,12 +45,15 @@ void setopts(T &p, real_t Tht_amb, std::string name)
 
   p.outfreq = 1;
   p.outvars = {
-    {u,   {.name = "u",   .unit = "m/s"}}, 
-    {w,   {.name = "w",   .unit = "m/s"}}, 
+//    {u,   {.name = "u",   .unit = "m/s"}}, 
+//    {w,   {.name = "w",   .unit = "m/s"}}, 
     {tht, {.name = "tht", .unit = "K"  }}
   };
   p.gnuplot_view = "map";
   p.gnuplot_output = "figure_" + name + "_%s_%d.svg";
+  p.gnuplot_with = "lines";
+  p.gnuplot_surface = false;
+  p.gnuplot_contour = true;
 // p.gnuplot_cbrange = "[298.5:302]";
 }
 
@@ -76,7 +79,7 @@ int main()
 
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
   }
-
+/*
   { // conjugate residual
     using solver_t = output::gnuplot<
       bombel<
@@ -113,7 +116,7 @@ int main()
       bcond::cyclic  // Y
     >(nx, ny, p));
   }
-
+*/
   for (auto &slv : slvs)
   {
     // initial condition
