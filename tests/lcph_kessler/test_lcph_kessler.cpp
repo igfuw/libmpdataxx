@@ -5,8 +5,8 @@
 #include "cloud.hpp"
 
 // for initial condition
-#include <libcloudph++/common/phc_hydrostatic.hpp>
-#include <libcloudph++/common/phc_theta.hpp>
+#include <libcloudph++/common/hydrostatic.hpp>
+#include <libcloudph++/common/theta.hpp>
 
 using namespace advoocat;
 

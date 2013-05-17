@@ -1,9 +1,16 @@
+#pragma once
+
+// TODO: includes!
+
 // 8th ICMW case 1 by Wojciech Grabowski)
 namespace icmw8_case1
 {
+  namespace hydrostatic = libcloudphxx::common::hydrostatic;
+  namespace theta = libcloudphxx::common::theta;
+
   const quantity<si::temperature, real_t> 
     th_0 = 289 * si::kelvins;
-  const quantity<phc::mixing_ratio, real_t> 
+  const quantity<si::dimensionless, real_t> 
     rv_0 = 7.5e-3;
   const quantity<si::pressure, real_t> 
     p_0 = 101500 * si::pascals;
@@ -19,11 +26,11 @@ namespace icmw8_case1
   // density profile as a function of altitude
   real_t rhod(real_t z)
   {
-    quantity<si::pressure, real_t> p = phc::hydrostatic::p(
+    quantity<si::pressure, real_t> p = hydrostatic::p(
       z * si::metres, th_0, rv_0, z_0, p_0
     );
     
-    quantity<si::mass_density, real_t> rhod = phc::rhod(
+    quantity<si::mass_density, real_t> rhod = theta::rhod(
       p, th_0, rv_0
     );
 
