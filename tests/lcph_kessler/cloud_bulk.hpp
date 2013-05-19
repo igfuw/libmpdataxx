@@ -1,9 +1,9 @@
-#include <cloud_common.hpp>
+#include "cloud_common.hpp"
 
-#include <libcloudph++/bulk/options.hpp>
-#include <libcloudph++/bulk/adjustments.hpp>
-#include <libcloudph++/bulk/forcings_elementwise.hpp>
-#include <libcloudph++/bulk/forcings_columnwise.hpp>
+#include <libcloudph++/blk_1m/options.hpp>
+#include <libcloudph++/blk_1m/adjustments.hpp>
+#include <libcloudph++/blk_1m/forcings_elementwise.hpp>
+#include <libcloudph++/blk_1m/forcings_columnwise.hpp>
 
 using namespace advoocat; // TODO: not here?
 
@@ -34,7 +34,7 @@ class cloud : public cloud_common<real_t, n_iters, inhomo, n_eqs>
     auto const
       rhod    = this->rhod(this->ijk);
       
-    libcloudphxx::bulk::adjustments<real_t>( 
+    libcloudphxx::blk_1m::adjustments<real_t>( 
       opts, rhod, rhod_th, rhod_rv, rhod_rc, rhod_rr
     );
   }
@@ -64,14 +64,14 @@ class cloud : public cloud_common<real_t, n_iters, inhomo, n_eqs>
     // element-wise
     {
       const rng_t &i = this->i, &j = this->j;
-      libcloudphxx::bulk::forcings_elementwise<real_t>(opts, drhod_rc(i,j), drhod_rr(i,j), rhod(i,j), rhod_rc(i,j), rhod_rr(i,j));
+      libcloudphxx::blk_1m::forcings_elementwise<real_t>(opts, drhod_rc(i,j), drhod_rr(i,j), rhod(i,j), rhod_rc(i,j), rhod_rr(i,j));
     }
 
     // column-wise
     {
       const rng_t j = this->j;
       for (int i = this->i.first(); i <= this->i.last(); ++i)
-	libcloudphxx::bulk::forcings_columnwise<real_t>(opts, drhod_rr(i,j), rhod(i,j), rhod_rr(i,j), dz);
+	libcloudphxx::blk_1m::forcings_columnwise<real_t>(opts, drhod_rr(i,j), rhod(i,j), rhod_rr(i,j), dz);
     }
   }
 
@@ -84,14 +84,14 @@ class cloud : public cloud_common<real_t, n_iters, inhomo, n_eqs>
   }
 
   real_t dz;
-  libcloudphxx::bulk::opts<real_t> opts;
+  libcloudphxx::blk_1m::opts<real_t> opts;
 
   public:
 
   struct params_t : parent_t::params_t 
   { 
     real_t dz = 0;
-    libcloudphxx::bulk::opts<real_t> bulk_opts;
+    libcloudphxx::blk_1m::opts<real_t> bulk_opts;
   };
 
   // ctor
@@ -101,10 +101,10 @@ class cloud : public cloud_common<real_t, n_iters, inhomo, n_eqs>
   ) : 
     parent_t(args, p),
     dz(p.dz),
-    opts(p.bulk_opts),
-    opts.dt(p.dt)
+    opts(p.bulk_opts)
   {
     assert(p.dz != 0);
     assert(p.dt != 0);
+    opts.dt = p.dt;
   }  
 };

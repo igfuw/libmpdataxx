@@ -2,7 +2,7 @@
 #include <advoocat/concurr/threads.hpp>
 #include <advoocat/output/gnuplot.hpp>
 
-#include "cloud.hpp"
+#include "cloud_bulk.hpp"
 
 // for initial condition
 #include <libcloudph++/common/hydrostatic.hpp>
