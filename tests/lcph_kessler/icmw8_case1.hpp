@@ -6,7 +6,7 @@
 namespace icmw8_case1
 {
   namespace hydrostatic = libcloudphxx::common::hydrostatic;
-  namespace theta = libcloudphxx::common::theta;
+  namespace theta = libcloudphxx::common::theta_std;
 
   const quantity<si::temperature, real_t> 
     th_0 = 289 * si::kelvins;

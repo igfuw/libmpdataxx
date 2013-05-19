@@ -6,7 +6,7 @@
 
 // for initial condition
 #include <libcloudph++/common/hydrostatic.hpp>
-#include <libcloudph++/common/theta.hpp>
+#include <libcloudph++/common/theta_std.hpp>
 
 using namespace advoocat;
 
