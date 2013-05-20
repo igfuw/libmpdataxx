@@ -1,3 +1,4 @@
 #define THRUST_DEVICE_SYSTEM THRUST_DEVICE_SYSTEM_CPP
-#define device_system_macro cpp
+#define libcloudphxx_particles_device cpp
+#define libcloudphxx_particles_real_t float
 #include <libcloudph++/lgrngn/particles.ipp>

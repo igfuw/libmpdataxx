@@ -2,5 +2,6 @@
 //#include <blitz/array.h>
 
 #define THRUST_DEVICE_SYSTEM THRUST_DEVICE_SYSTEM_CUDA
-#define device_system_macro cuda
+#define libcloudphxx_particles_device cuda
+#define libcloudphxx_particles_real_t float
 #include <libcloudph++/lgrngn/particles.ipp>
