@@ -1,7 +1,7 @@
 #include <iostream>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-#include "particles.hpp"
+#include <libcloudph++/lgrngn/particles.hpp>
 
 int main()
 {

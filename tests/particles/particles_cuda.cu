@@ -3,4 +3,4 @@
 
 #define THRUST_DEVICE_SYSTEM THRUST_DEVICE_SYSTEM_CUDA
 #define device_system_macro cuda
-#include "particles.cpp"
+#include <libcloudph++/lgrngn/particles.ipp>
