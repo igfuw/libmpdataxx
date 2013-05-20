@@ -1,6 +1,6 @@
 #include <cassert>
 
-enum thrust_device_systems {openmp, cuda}; 
+enum {cpp, openmp, cuda};
 
 template <typename real_t>
 class particles_proto
