@@ -1,6 +1,7 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../../../libcloudphxx") # TODO: handle it correctly!!!
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CMAKE_SOURCE_DIR}/../libcloudphxx") # TODO: handle it correctly!!!
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -I${CMAKE_SOURCE_DIR}/../libcloudphxx")
 
 find_package(CUDA QUIET)
 set(CUDA_PROPAGATE_HOST_FLAGS OFF) # -std=c++11 will not work
