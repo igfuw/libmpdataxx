@@ -10,14 +10,14 @@
  * \image html "../../tests/gnuplot-iostream_1d/figure_iters=3.svg"
  */
 
-#include <advoocat/solvers/mpdata_1d.hpp>
-#include <advoocat/solvers/donorcell_1d.hpp>
-#include <advoocat/solvers/leapfrog_1d.hpp>
-#include <advoocat/bcond/bcond.hpp>
-#include <advoocat/concurr/threads.hpp>
-#include <advoocat/output/gnuplot.hpp>
+#include <libmpdata++/solvers/mpdata_1d.hpp>
+#include <libmpdata++/solvers/donorcell_1d.hpp>
+#include <libmpdata++/solvers/leapfrog_1d.hpp>
+#include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/output/gnuplot.hpp>
 
-using namespace advoocat;
+using namespace libmpdataxx;
 
 using real_t = float;
 int n = 20, nt = 20;

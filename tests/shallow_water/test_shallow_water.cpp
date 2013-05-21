@@ -7,11 +7,11 @@
 
 #include <boost/math/constants/constants.hpp>
 
-#include <advoocat/solvers/mpdata_2d.hpp>
-#include <advoocat/bcond/cyclic_2d.hpp>
-#include <advoocat/concurr/threads.hpp>
-#include <advoocat/output/gnuplot.hpp>
-using namespace advoocat; // TODO
+#include <libmpdata++/solvers/mpdata_2d.hpp>
+#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/output/gnuplot.hpp>
+using namespace libmpdataxx; // TODO
 #include "shallow_water.hpp"
 
 enum {qx, qy, h};  // eqations

@@ -7,14 +7,14 @@
  * \include "concurrent_1d/test_concurrent_1d.cpp"
  */
 
-#include <advoocat/concurr/openmp.hpp>
-#include <advoocat/concurr/boost_thread.hpp>
-#include <advoocat/solvers/mpdata_1d.hpp>
-#include <advoocat/bcond/cyclic_1d.hpp>
+#include <libmpdata++/concurr/openmp.hpp>
+#include <libmpdata++/concurr/boost_thread.hpp>
+#include <libmpdata++/solvers/mpdata_1d.hpp>
+#include <libmpdata++/bcond/cyclic_1d.hpp>
 
 int main()
 {
-  using namespace advoocat;
+  using namespace libmpdataxx;
 
   std::cerr << "OpenMP: ";
 #if defined(_OPENMP)

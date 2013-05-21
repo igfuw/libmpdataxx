@@ -11,16 +11,16 @@
  * \image html "../../tests/bombel/figure.svg"
  */
 
-#include <advoocat/solvers/mpdata_2d.hpp>
-#include <advoocat/solvers/solver_pressure_mr.hpp>
-#include <advoocat/solvers/solver_pressure_cr.hpp>
-#include <advoocat/solvers/solver_pressure_pc.hpp>
-#include <advoocat/bcond/cyclic_2d.hpp>
-#include <advoocat/concurr/threads.hpp>
-#include <advoocat/output/gnuplot.hpp>
+#include <libmpdata++/solvers/mpdata_2d.hpp>
+#include <libmpdata++/solvers/solver_pressure_mr.hpp>
+#include <libmpdata++/solvers/solver_pressure_cr.hpp>
+#include <libmpdata++/solvers/solver_pressure_pc.hpp>
+#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/output/gnuplot.hpp>
 
 //theta->pressure
-#include <advoocat/formulae/diagnose_formulae.hpp>
+#include <libmpdata++/formulae/diagnose_formulae.hpp>
 
 // auto-deallocating containers
 #include <boost/ptr_container/ptr_map.hpp>
@@ -32,7 +32,7 @@ enum {x, z};       //dimensions
 using real_t = double;
 const int n_iters = 2, n_eqs = 3; // TODO: n_eqs should be in bombel!!!
 
-using namespace advoocat;
+using namespace libmpdataxx;
 
 #include "bombel.hpp"
 
