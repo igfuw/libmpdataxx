@@ -49,7 +49,7 @@ namespace advoocat
 	   << "set xrange [0:" << this->mem->state(0).extent(0) << "]\n"
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
-	   << "set term svg dynamic\n"
+	   << "set term " << p.gnuplot_term << "\n"
         ;
 
         // 1D settings
@@ -93,6 +93,12 @@ namespace advoocat
 	     << (p.gnuplot_surface ? "set" : "unset") << " surface\n"
 	     << (p.gnuplot_contour ? "set" : "unset") << " contour\n"
 	  ;
+          if (p.gnuplot_contour)
+          {
+            *gp 
+               << "unset clabel\n";
+             //  << "set cntrparam level incremental 299, .25, 301.5\n";
+          }
         }
       }
 
@@ -108,7 +114,7 @@ namespace advoocat
       void record(const int var)
       {
         if (parent_t::n_dims == 1) // known at compile time
-        {
+        { 
           gp->send(this->mem->state(var));
         }
 
@@ -117,7 +123,7 @@ namespace advoocat
 	  *gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
 	  *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
 	  *gp << p.gnuplot_command;
-          bool imagebg = (p.gnuplot_with == "lines" && !p.gnuplot_contour);
+          bool imagebg = (p.gnuplot_with == "lines");// && !p.gnuplot_contour);
           if (imagebg)
           {
             float zmin, zmax;
@@ -130,7 +136,7 @@ namespace advoocat
           *gp << " '-'" 
               << " binary" << binfmt(this->mem->state(0)) 
               << " origin=(.5,.5,0)" // TODO: dx/2, dy/2, ?
-	      << " with " << p.gnuplot_with << " notitle\n";
+	      << " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
 	  gp->sendBinary(this->mem->state(var).copy());
           if (imagebg) gp->sendBinary(this->mem->state(var).copy());
         }
@@ -145,7 +151,7 @@ namespace advoocat
           gnuplot_with = (
             parent_t::n_dims == 2 
 	      ? std::string("image failsafe") // 2D
-	      : std::string("lines")          // 1D
+	      : std::string("lines ")          // 1D
           ),
           gnuplot_command = std::string("splot"),
           gnuplot_xlabel = std::string("x/dx"),
@@ -157,7 +163,9 @@ namespace advoocat
           gnuplot_view = std::string(""), 
           gnuplot_zrange = std::string("[*:*]"),
           gnuplot_cbrange = std::string("[*:*]"),
-          gnuplot_border = std::string(""); 
+          gnuplot_border = std::string(""),
+          gnuplot_lt = std::string("-1"), // black
+          gnuplot_term = std::string("svg dynamic");
         int gnuplot_maxcolors = 100;
         bool 
           gnuplot_contour = false,
