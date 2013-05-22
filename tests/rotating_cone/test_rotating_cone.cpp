@@ -13,11 +13,11 @@
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-#include <advoocat/solvers/mpdata_2d.hpp>
-#include <advoocat/solvers/donorcell_2d.hpp>
-#include <advoocat/bcond/cyclic_2d.hpp>
-#include <advoocat/concurr/threads.hpp>
-#include <advoocat/output/gnuplot.hpp>
+#include <libmpdata++/solvers/mpdata_2d.hpp>
+#include <libmpdata++/solvers/donorcell_2d.hpp>
+#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/output/gnuplot.hpp>
 
 enum {x, y};
 using real_t = double;
@@ -74,7 +74,7 @@ void setopts(T &p, int nt, int n_iters)
 
 int main() 
 {
-  using namespace advoocat;
+  using namespace libmpdataxx;
 
   int n[] = {32, 32}, nt = 200;
 

@@ -10,11 +10,11 @@
  * \image html "../../tests/var_sign_2d/figure.svg"
  */
 
-#include <advoocat/solvers/donorcell_2d.hpp>
-#include <advoocat/solvers/mpdata_2d.hpp>
-#include <advoocat/bcond/cyclic_2d.hpp>
-#include <advoocat/concurr/threads.hpp>
-#include <advoocat/output/gnuplot.hpp>
+#include <libmpdata++/solvers/donorcell_2d.hpp>
+#include <libmpdata++/solvers/mpdata_2d.hpp>
+#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/output/gnuplot.hpp>
 
 enum {x, y};
 
@@ -54,7 +54,7 @@ void setopts(T &p, int nt, int n_iters, float offset)
 
 int main() 
 {
-  using namespace advoocat;
+  using namespace libmpdataxx;
 
   int n[] = {24, 24}, nt = 96;
 

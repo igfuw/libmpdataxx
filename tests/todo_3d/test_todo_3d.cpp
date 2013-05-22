@@ -5,21 +5,21 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 
-//#include "advoocat/mpdata_3d.hpp"
-#include <advoocat/solvers/donorcell_3d.hpp>
-#include <advoocat/bcond/cyclic_3d.hpp> // TODO: needed?
-#include <advoocat/concurr/openmp.hpp>
+//#include <libmpdata++/.../mpdata_3d.hpp>
+#include <libmpdata++/solvers/donorcell_3d.hpp>
+#include <libmpdata++/bcond/cyclic_3d.hpp> // TODO: needed?
+#include <libmpdata++/concurr/threads.hpp>
 
 enum {x, y, z};
 
 int main() 
 {
-  using namespace advoocat;
+  using namespace libmpdataxx;
 
   int n[] = {24, 24, 24};
   {
-    concurr::openmp<
-      advoocat::solvers::donorcell_3d<float>,
+    concurr::threads<
+      solvers::donorcell_3d<float>,
       bcond::cyclic,
       bcond::cyclic,
       bcond::cyclic

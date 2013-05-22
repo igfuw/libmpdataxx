@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.6) # for CMakePushCheckState
-project(advoocat CXX C)
+project(libmpdata++ CXX C)
 
 # library
 set(CMAKE_CXX_FLAGS "-std=c++11")
-add_subdirectory(advoocat) 
+add_subdirectory(libmpdata++) 
 #TODO: search for Blitz
 
 # docs

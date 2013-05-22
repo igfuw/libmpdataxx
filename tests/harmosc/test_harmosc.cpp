@@ -13,11 +13,11 @@
  * \image html "../../tests/harmosc/figure_strang_it=2.svg"
  */
 
-#include <advoocat/solvers/mpdata_1d.hpp>
-#include <advoocat/solvers/donorcell_1d.hpp>
-#include <advoocat/bcond/cyclic_1d.hpp>
-#include <advoocat/concurr/threads.hpp>
-#include <advoocat/output/gnuplot.hpp>
+#include <libmpdata++/solvers/mpdata_1d.hpp>
+#include <libmpdata++/solvers/donorcell_1d.hpp>
+#include <libmpdata++/bcond/cyclic_1d.hpp>
+#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/output/gnuplot.hpp>
 
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
@@ -25,7 +25,7 @@ using boost::math::constants::pi;
 #include "coupled_harmosc.hpp"
 
 using real_t = double;
-using namespace advoocat;
+using namespace libmpdataxx;
 
 enum {psi, phi};
 
