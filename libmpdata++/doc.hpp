@@ -25,7 +25,7 @@ namespace libmpdataxx
   * and \f$ \vec{v} = [u, v, w] \f$ is the velocity field.
   *
   * The theory behind MPDATA solvers was developed by Piotr Smolarkiewicz et al.
-  * (see e.g. @copydetails bib::Smolarkiewicz_2006, for a review and list of references).
+  * (see e.g. @copybrief bib::Smolarkiewicz_2006 , for a review and list of references).
   * Development of libmpdata++ is carried out by Sylwester Arabas, Anna Jaruga and
   * co-workers at the [Institute of Geophysics](http://www.igf.fuw.edu.pl/),
   * [Faculty of Physics](http://www.fuw.edu.pl/),

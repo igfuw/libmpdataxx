@@ -50,9 +50,12 @@ namespace libmpdataxx
       // method invoked by the solver
       void advop(int e)
       {
-	for (int step = 0; step < n_iters; ++step) 
+	for (int iter = 0; iter < n_iters; ++iter) 
 	{
-	  if (step == 0) 
+          // <FCT> TEMP
+          //hook_ante_iter(iter); // e.g. stor psi_min, psi_max for FCT
+          // </FCT> TEMP
+	  if (iter == 0) 
 	    formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->mem->C[0], this->i);
 	  else
 	  {
@@ -64,14 +67,14 @@ namespace libmpdataxx
 
 	    // choosing input/output for antidiff C
             const arrvec_t<typename parent_t::arr_t>
-	      &C_unco = (step == 1) 
+	      &C_unco = (iter == 1) 
 		? this->mem->C 
-		: (step % 2) 
-		  ? *tmp[1]  // odd steps
-		  : *tmp[0], // even steps
-	      &C_corr = (step  % 2) 
-		? *tmp[0]    // odd steps
-		: *tmp[1];   // even steps
+		: (iter % 2) 
+		  ? *tmp[1]  // odd iters
+		  : *tmp[0], // even iters
+	      &C_corr = (ite  % 2) 
+		? *tmp[0]    // odd iters
+		: *tmp[1];   // even iters
 
 	    // calculating the antidiffusive C 
 	    C_corr[0](im+h) = 
@@ -80,7 +83,11 @@ namespace libmpdataxx
 		im, C_unco[0]
 	      );
 
-	    // donor-cell step 
+            // <FCT>
+            //hook_
+            // </FCT>
+
+	    // donor-cell call
 	    formulae::donorcell::op_1d(this->mem->psi[e], 
 	      this->n[e], C_corr[0], this->i);
 	  }

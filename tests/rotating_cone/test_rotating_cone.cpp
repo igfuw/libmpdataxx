@@ -22,7 +22,7 @@ using boost::math::constants::pi;
 enum {x, y};
 using real_t = double;
 
-/// @brief settings from @copydetails Anderson_and_Fattahi_1974
+/// @brief settings from @copybrief Anderson_and_Fattahi_1974
 template <class T>
 void setup(T &solver, int n[2]) 
 {
