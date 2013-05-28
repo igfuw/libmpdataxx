@@ -34,7 +34,7 @@ namespace libmpdataxx
       typename parent_t::real_t dt;
 
       virtual void update_forcings(
-        typename parent_t::arrvec_t &rhs
+        arrvec_t<typename parent_t::arr_t> &rhs
       ) 
       {
 #if !defined(NDEBUG)
