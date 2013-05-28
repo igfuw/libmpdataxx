@@ -31,6 +31,7 @@ namespace libmpdataxx
     {
       static_assert(n_iters > 0, "n_iters <= 0");
 
+      private: 
       using parent_t = detail::solver_1d< 
         real_t,
         1,
@@ -39,25 +40,50 @@ namespace libmpdataxx
         detail::max(halo, formulae::mpdata::halo)
       >;
 
+      using C_t = arrvec_t<typename parent_t::arr_t>;
+
       static const int n_tmp = n_iters > 2 ? 2 : 1; // TODO: this should be in mpdata_common
 
       // member fields
-      std::array<arrvec_t<typename parent_t::arr_t>*, n_tmp> tmp;
+      std::array<C_t*, n_tmp> tmp;
       rng_t im;
 
       protected:
 
+      // for Flux-Corrected Transport (TODO: more general names?)
+      virtual void fct_init(int e) { }
+      virtual void fct_adjust_antidiff(int e) { }
+
+      C_t &C_unco(int iter)
+      {
+        return (iter == 1) 
+	  ? this->mem->C 
+	  : (iter % 2) 
+	    ? *tmp[1]  // odd iters
+	    : *tmp[0]; // even iters
+      }
+
+      C_t &C_corr(int iter) 
+      {
+        return (iter  % 2) 
+	  ? *tmp[0]    // odd iters
+	  : *tmp[1];   // even iters
+      }
+
+      virtual C_t &C(int iter)
+      {
+        if (iter == 0) return this->mem->C;
+        return C_corr(iter);
+      }
+
       // method invoked by the solver
       void advop(int e)
       {
+        fct_init(e); // e.g. store psi_min, psi_max in FCT
+
 	for (int iter = 0; iter < n_iters; ++iter) 
 	{
-          // <FCT> TEMP
-          //hook_ante_iter(iter); // e.g. stor psi_min, psi_max for FCT
-          // </FCT> TEMP
-	  if (iter == 0) 
-	    formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->mem->C[0], this->i);
-	  else
+	  if (iter != 0) 
 	  {
 	    this->cycle(e);
             this->mem->barrier();
@@ -65,32 +91,17 @@ namespace libmpdataxx
 	    this->bcxr->fill_halos(this->mem->psi[e][this->n[e]]);
             this->mem->barrier();
 
-	    // choosing input/output for antidiff C
-            const arrvec_t<typename parent_t::arr_t>
-	      &C_unco = (iter == 1) 
-		? this->mem->C 
-		: (iter % 2) 
-		  ? *tmp[1]  // odd iters
-		  : *tmp[0], // even iters
-	      &C_corr = (iter  % 2) 
-		? *tmp[0]    // odd iters
-		: *tmp[1];   // even iters
-
 	    // calculating the antidiffusive C 
-	    C_corr[0](im+h) = 
+	    C_corr(iter)[0](im+h) = 
 	      formulae::mpdata::antidiff(
 		this->mem->psi[e][this->n[e]], 
-		im, C_unco[0]
+		im, C_unco(iter)[0]
 	      );
 
-            // <FCT>
-            //hook_
-            // </FCT>
-
-	    // donor-cell call
-	    formulae::donorcell::op_1d(this->mem->psi[e], 
-	      this->n[e], C_corr[0], this->i);
-	  }
+            fct_adjust_antidiff(e); // i.e. calculate C_mono=C_mono(C_corr) in FCT
+          }
+	  // donor-cell call
+	  formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->C(iter)[0], this->i);
 	}
       }
 

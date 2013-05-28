@@ -13,7 +13,7 @@ class bombel : public parent_t
   real_t Tht_amb;
 
   // explicit forcings (to be applied before the eliptic solver)
-  void update_forcings(typename parent_t::arrvec_t &rhs)  
+  void update_forcings(arrvec_t<typename parent_t::arr_t> &rhs)  
   {
     parent_t::update_forcings(rhs); // incl. zeroing the rhs arrays
 

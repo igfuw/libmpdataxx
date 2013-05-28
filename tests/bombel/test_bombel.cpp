@@ -45,21 +45,22 @@ void setopts(T &p, real_t Tht_amb, std::string name)
 
   p.outfreq = 1;
   p.outvars = {
-//    {u,   {.name = "u",   .unit = "m/s"}}, 
-//    {w,   {.name = "w",   .unit = "m/s"}}, 
+    {u,   {.name = "u",   .unit = "m/s"}}, 
+    {w,   {.name = "w",   .unit = "m/s"}}, 
     {tht, {.name = "tht", .unit = "K"  }}
   };
   p.gnuplot_view = "map";
-  p.gnuplot_output = "figure_" + name + "_%s_%d.svg";
+  p.gnuplot_output = "figure_" + name + "_%s_%d.png";
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
+  p.gnuplot_term = "png";
 // p.gnuplot_cbrange = "[298.5:302]";
 }
 
 int main() 
 {
-  const int nx = 100, ny = 100, nt = 10;
+  const int nx = 100, ny = 100, nt = 1000;
   real_t Tht_amb = 300; // ambient state (constant thoughout the domain)
 
   boost::ptr_vector<concurr::any<real_t, 2>> slvs;

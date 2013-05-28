@@ -71,7 +71,7 @@ class shallow_water : public solvers::detail::solver_velocity_common<
   }
 
   /// @brief Shallow Water Equations: Momentum forcings for the X and Y coordinates
-  void update_forcings(typename parent_t::arrvec_t &rhs)  
+  void update_forcings(arrvec_t<typename parent_t::arr_t> &rhs)  
   {
     parent_t::update_forcings(rhs);
     this->xchng(h);
