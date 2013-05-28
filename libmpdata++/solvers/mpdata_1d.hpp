@@ -72,7 +72,7 @@ namespace libmpdataxx
 		: (iter % 2) 
 		  ? *tmp[1]  // odd iters
 		  : *tmp[0], // even iters
-	      &C_corr = (ite  % 2) 
+	      &C_corr = (iter  % 2) 
 		? *tmp[0]    // odd iters
 		: *tmp[1];   // even iters
 
@@ -117,7 +117,7 @@ namespace libmpdataxx
 	for (int n = 0; n < n_tmp; ++n)
         {
 	  mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
-	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1)^h )); 
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1)^h^(halo - 1) )); 
         }
       }
     };

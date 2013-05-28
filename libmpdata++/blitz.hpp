@@ -98,5 +98,4 @@ namespace libmpdataxx
 #endif
     }
   };
-
 }; // namespace libmpdataxx

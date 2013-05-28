@@ -5,6 +5,8 @@
   * @brief a central reference list for the documentation
   */
 
+#error "intended for use with Doxygen, not to be included during compilation"
+
 /// @brief bibliography items (trick to emulate BiBTeX-like logic in Doxygen)
 namespace bib
 {
@@ -39,4 +41,13 @@ namespace bib
   /// Multidimensional positive deÿnite advection transport algorithm: An overview
   /// Intl. J. Numer. Meth. Fluids., 50, 1123-1144.
   typedef void Smolarkiewicz_2006;
+
+  /// @brief 
+  /// [Smolarkiewicz_and_Grabowski_1990]: http://dx.doi.org/TODO
+  /// [Smolarkiewicz_and_Grabowski_1990][]
+  /// @details
+  /// The Multidimensional Positive Definite Advection Transport Algorithm: Nonoscillatory Option
+  /// J. Comp. Phys., 86, 355-375.
+  typedef void Smolarkiewicz_and_Grabowski_1990;  
+
 }; // namespace bib

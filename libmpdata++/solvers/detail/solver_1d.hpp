@@ -69,7 +69,7 @@ namespace libmpdataxx
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(new typename parent_t::arr_t(i^halo));
     
-	  mem->C.push_back(new typename parent_t::arr_t(i^h));
+	  mem->C.push_back(new typename parent_t::arr_t(i^h^(halo-1)));
         } 
       };
     }; // namespace detail

@@ -1,0 +1,1 @@
+libmpdataxx_add_test(test_mpdata_fct_1d)

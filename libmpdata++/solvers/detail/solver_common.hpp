@@ -34,7 +34,7 @@ namespace libmpdataxx
 
         typedef real_t_ real_t;
         typedef blitz::Array<real_t_, n_dims_> arr_t;
-        typedef arrvec_t<arr_t> arrvec_t;
+        //typedef arrvec_t<arr_t> arrvec_t;
 
 	void cycle_all()
 	{ 
