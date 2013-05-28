@@ -25,7 +25,8 @@ template <class T>
 void setup(T &solver, int n) 
 {
   blitz::firstIndex i;
-  solver.state() = where(i < 100-12 || i > 100+12, 2, 4); 
+  int width = 50, center = 100;
+  solver.state() = where(i <= center-width/2 || i >= center+width/2, 2, 4); 
   solver.courant() = .5; 
 }
 
