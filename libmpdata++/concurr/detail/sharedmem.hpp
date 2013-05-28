@@ -25,7 +25,7 @@ namespace libmpdataxx
       >  
       class sharedmem_common
       {
-        using arr_t = blitz::Array<real_t, n_dims>; // TODO: use it in definitions of C, psi, tmp...
+        using arr_t = blitz::Array<real_t, n_dims>; 
 
 	static_assert(n_eqs > 0, "n_eqs <= 0");
 	static_assert(n_dims > 0, "n_dims <= 0");
@@ -65,7 +65,7 @@ namespace libmpdataxx
         }
 
         // ctors
-        // TODO: fill reducetmp with NaNs
+        // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
         sharedmem_common(int s0, int size)
         {
           if (size > s0) throw std::exception(); // TODO: error_macro?

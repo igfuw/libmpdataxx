@@ -131,8 +131,8 @@ namespace libmpdataxx
         for (int n = 0; n < n_tmp; ++n)
         {
           mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
-          mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( i^h, j^halo ));
-          mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( i^halo, j^h ));
+          mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( i^h^(halo - 1), j^halo ));
+          mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( i^halo, j^h^(halo - 1) ));
         }
       }   
     };

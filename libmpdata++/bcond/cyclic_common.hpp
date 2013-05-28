@@ -13,6 +13,7 @@ namespace libmpdataxx
 {
   namespace bcond
   {
+// TODO: add detail namespace, move to detail directory?
     template <typename real_t>
     class cyclic_left_common : public bcond_t<real_t>
     {

@@ -85,9 +85,9 @@ namespace libmpdataxx
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(new typename parent_t::arr_t(i^halo, j^halo, k^halo)); 
 
-	  mem->C.push_back(new typename parent_t::arr_t(i^h, j^halo, k^halo));
-	  mem->C.push_back(new typename parent_t::arr_t(i^halo, j^h, k^halo));
-	  mem->C.push_back(new typename parent_t::arr_t(i^halo, j^halo, k^h));
+	  mem->C.push_back(new typename parent_t::arr_t(i^h^(halo-1), j^halo, k^halo));
+	  mem->C.push_back(new typename parent_t::arr_t(i^halo, j^h^(halo-1), k^halo));
+	  mem->C.push_back(new typename parent_t::arr_t(i^halo, j^halo, k^h^(halo-1)));
         }  
       };
     };
