@@ -38,10 +38,26 @@ namespace libmpdataxx
 
       typename parent_t::arr_t psi_min, psi_max;
 
-      void hook_ante_iter(int iter)
+      void fct_init(int e)
       {
-        parent_t::hook_ante_iter(iter);
-        // TODO: min/max
+// TODO: if (n_iters > 2)
+std::cerr << "fct_init()" << std::endl;
+        const rng_t i = this->i^1;
+        const typename parent_t::arr_t psi = this->state(e);
+
+        psi_min(i) = min(min(psi(i-1), psi(i)), psi(i+1));
+        psi_max(i) = max(max(psi(i-1), psi(i)), psi(i+1));
+      }
+
+      void fct_adjust_antidiff(int e)
+      {
+std::cerr << "fct_adjust_antidiff()" << std::endl;
+      }
+
+      arrvec_t<typename parent_t::arr_t> &C(int iter)
+      {
+        //if (iter > 0) return C_mono;
+        return parent_t::C(iter);
       }
 
       public:
