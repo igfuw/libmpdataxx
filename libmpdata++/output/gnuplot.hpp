@@ -3,6 +3,8 @@
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
+ * @brief a thin wrapper around the gnuplot-iostream library intended 
+ *   for debugging/demonstration purposes only (used in many tests)
  */
 
 #pragma once

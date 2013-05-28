@@ -48,9 +48,9 @@ namespace libmpdataxx
       // method invoked by the solver
       void advop(int e)
       {
-	for (int step = 0; step < n_iters; ++step) 
+	for (int iter = 0; iter < n_iters; ++iter) 
 	{
-	  if (step == 0) 
+	  if (iter == 0) 
 	    formulae::donorcell::op_2d(
 	      this->mem->psi[e], 
 	      this->n[e], this->mem->C, this->i, this->j);
@@ -66,14 +66,14 @@ namespace libmpdataxx
 
 	    // choosing input/output for antidiff C
             const arrvec_t<typename parent_t::arr_t>
-	      &C_unco = (step == 1) 
+	      &C_unco = (iter == 1) 
 		? this->mem->C 
-		: (step % 2) 
-		  ? *tmp[1]  // odd steps
-		  : *tmp[0], // even steps
-	      &C_corr = (step  % 2) 
-		? *tmp[0]    // odd steps
-		: *tmp[1];   // even steps
+		: (iter % 2) 
+		  ? *tmp[1]  // odd iters
+		  : *tmp[0], // even iters
+	      &C_corr = (iter  % 2) 
+		? *tmp[0]    // odd iters
+		: *tmp[1];   // even iters
 
 	    // calculating the antidiffusive C 
 	    C_corr[0](this->im+h, this->j) = 
@@ -95,7 +95,7 @@ namespace libmpdataxx
 	    this->bcxr->fill_halos(C_corr[1], this->j^h);
             this->mem->barrier();
 
-	    // donor-cell step 
+	    // donor-cell call 
 	    formulae::donorcell::op_2d(this->mem->psi[e], 
 	      this->n[e], C_corr, this->i, this->j);
 	  }
