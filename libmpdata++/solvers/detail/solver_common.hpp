@@ -26,7 +26,7 @@ namespace libmpdataxx
       {
 	public:
 
-        // using enums as "static const int" would need instantiation
+        // using enums as "public static const int" would need instantiation
         enum { halo = halo_ }; 
         enum { n_dims = n_dims_ };
         enum { n_eqs = n_eqs_ };
@@ -34,7 +34,6 @@ namespace libmpdataxx
 
         typedef real_t_ real_t;
         typedef blitz::Array<real_t_, n_dims_> arr_t;
-        //typedef arrvec_t<arr_t> arrvec_t;
 
 	void cycle_all()
 	{ 
@@ -72,11 +71,13 @@ namespace libmpdataxx
 
         private:
       
+#if !defined(NDEBUG)
         bool 
           hook_ante_step_called = false, 
           hook_post_step_called = false, 
           hook_ante_loop_called = false, 
           hook_post_loop_called = false;
+#endif
 
 	public:
 

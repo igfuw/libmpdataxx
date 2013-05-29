@@ -10,19 +10,28 @@
 #pragma once
 
 #include <libmpdata++/solvers/mpdata_1d.hpp>
+#include <libmpdata++/formulae/mpdata/formulae_mpdata_fct_1d.hpp>
 
 namespace libmpdataxx
 {
   namespace solvers
   {
-    namespace detail // TODO fct::formulae?
+    namespace detail 
     {
       // TODO: document why 2
-      const int fct_min_halo = 2;
+      const int fct_min_halo = 2; // TODO move to fct::formulae?
     }
 
-// TODO: could it be made once for all mpdata dimensions?
-    template <typename real_t, int n_iters, int n_eqs = 1, int halo = detail::fct_min_halo> 
+//    enum rho_enum {rho_constant, rho_profile, rho_variable};
+
+// TODO: mpdata_fct_common
+    template <
+      typename real_t, 
+      int n_iters, 
+      int n_eqs = 1, 
+//      rho_enum rho_opt = rho_constant, 
+      int halo = detail::fct_min_halo
+    > 
     class mpdata_fct_1d : public mpdata_1d<real_t, n_iters, n_eqs, detail::max(halo, detail::fct_min_halo)> 
     {
       public:
@@ -36,27 +45,52 @@ namespace libmpdataxx
 
       private:
 
-      typename parent_t::arr_t psi_min, psi_max;
+      typename parent_t::arr_t psi_min, psi_max; // TODO: movo to modata_fct_common
+      arrvec_t<typename parent_t::arr_t> C_mono; // TODO: movo to modata_fct_common
 
       void fct_init(int e)
       {
-// TODO: if (n_iters > 2)
-std::cerr << "fct_init()" << std::endl;
-        const rng_t i = this->i^1;
-        const typename parent_t::arr_t psi = this->state(e);
+        if (parent_t::n_iters > 1) // no FCT for upstream
+        {  
+          const rng_t i = this->i^1; // TODO: isn't it a race condition with more than one thread?
+          const typename parent_t::arr_t psi = this->state(e); // TODO:! powinno być psi/rho!
 
-        psi_min(i) = min(min(psi(i-1), psi(i)), psi(i+1));
-        psi_max(i) = max(max(psi(i-1), psi(i)), psi(i+1));
+          psi_min(i) = min(min(psi(i-1), psi(i)), psi(i+1));
+          psi_max(i) = max(max(psi(i-1), psi(i)), psi(i+1)); 
+        }
       }
 
-      void fct_adjust_antidiff(int e)
+      void fct_adjust_antidiff(int e, int iter)
       {
-std::cerr << "fct_adjust_antidiff()" << std::endl;
+        const int d = 0; // 1D version -> working in x dimension only
+        const auto &C_corr = parent_t::C_corr(iter);
+        const auto psi = this->state(e); 
+        const auto &im = this->im; // calculating once for i-1/2 and i+1/2
+
+        // fill halos -> mpdata works with halo=1, we need halo=2
+        this->mem->barrier();
+	this->bcxl->fill_halos_vctr(C_corr[d]); // TODO: one xchng call?
+	this->bcxr->fill_halos_vctr(C_corr[d]);
+	this->mem->barrier();
+
+        // calculating the monotonic corrective velocity
+        C_mono[d]( im+h ) = C_corr[d]( im+h ) * where(
+          C_corr[d]( im+h ) > 0,
+          min(1, min(
+            formulae::mpdata::beta_dn(psi, psi_min, C_corr[d], im),
+            formulae::mpdata::beta_up(psi, psi_max, C_corr[d], im + 1)
+          )),
+          min(1, min(
+            formulae::mpdata::beta_up(psi, psi_max, C_corr[d], im),
+            formulae::mpdata::beta_dn(psi, psi_min, C_corr[d], im + 1)
+          ))
+        );
+        // TODO: positive_definite option (z parent_t)
       }
 
-      arrvec_t<typename parent_t::arr_t> &C(int iter)
+      arrvec_t<typename parent_t::arr_t> &C(int iter) // TODO: move to mpdata_fct_common
       {
-        //if (iter > 0) return C_mono;
+        if (iter > 0) return C_mono;
         return parent_t::C(iter);
       }
 
@@ -69,7 +103,8 @@ std::cerr << "fct_adjust_antidiff()" << std::endl;
       ) : 
         parent_t(args, p),
         psi_min(args.mem->tmp[__FILE__][0][0]),
-        psi_max(args.mem->tmp[__FILE__][0][1])
+        psi_max(args.mem->tmp[__FILE__][0][1]),
+        C_mono(args.mem->tmp[__FILE__][1])
       {}   
 
       // 1D version
@@ -79,9 +114,15 @@ std::cerr << "fct_adjust_antidiff()" << std::endl;
 
         const rng_t i(0, nx-1);
 
+        // psi_min and psi_max
 	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
-	for (int e = 0; e < 2; ++e)
-	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^parent_t::halo));  // TODO: halo=1 would be enough!
+	for (int e = 0; e < 2; ++e) 
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^halo));  
+ 
+        // C_mono
+	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
+	for (int d = 0; d < parent_t::n_dims; ++d) 
+	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^h^(halo-1)));  
       }
     };
   }; // namespace solvers

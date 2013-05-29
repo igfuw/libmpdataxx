@@ -8,11 +8,14 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/arakawa_c.hpp>
 
 namespace libmpdataxx
 {
   namespace bcond
   {
+    using namespace arakawa_c;
+
 // TODO: add detail namespace, move to detail directory?
     template <typename real_t>
     class cyclic_left_common : public bcond_t<real_t>
@@ -20,14 +23,22 @@ namespace libmpdataxx
       protected:
 
       // member fields
-      rng_t left_halo, rght_edge;
+      rng_t 
+        left_halo_sclr, rght_edge_sclr,
+        left_halo_vctr, rght_edge_vctr;
+      const int halo;
 
       public:
 
       // ctor
-      cyclic_left_common(const rng_t &i, int halo) :
-	left_halo(i.first() - halo    , i.first() - 1       ),
-	rght_edge(i.last()  - halo + 1, i.last()            )
+      cyclic_left_common(const rng_t &i, const int halo) :
+        halo(halo),
+        // sclr
+	left_halo_sclr(i.first() - halo    , i.first() - 1), // TODO: less repetitions!
+	rght_edge_sclr(i.last()  - halo + 1, i.last()     ), // TODO: less repetitions!
+        // vector
+	left_halo_vctr((i-h).first() - (halo-1)    , (i-h).first() - 1), // TODO: less repetitions!
+	rght_edge_vctr((i+h).last()  - (halo-1) + 1, (i+h).last()     )  // TODO: less repetitions!
       {} 
     };
 
@@ -37,16 +48,23 @@ namespace libmpdataxx
       protected:
 
       // member fields
-      rng_t left_edge, rght_halo;
+      rng_t 
+        left_edge_sclr, rght_halo_sclr,
+        left_edge_vctr, rght_halo_vctr;
+      const int halo;
 
       public:
 
       // ctor
-      cyclic_rght_common(const rng_t &i, int halo) :
-	rght_halo(i.last()  + 1       , i.last()  + halo    ),
-	left_edge(i.first()           , i.first() + halo - 1)
+      cyclic_rght_common(const rng_t &i, const int halo) :
+        halo(halo),
+        // sclr
+	rght_halo_sclr(i.last()  + 1       , i.last()  + halo    ), // TODO: less repetitions!
+	left_edge_sclr(i.first()           , i.first() + halo - 1), // TODO: less repetitions!
+        // vctr
+	rght_halo_vctr((i+h).last()  + 1       , (i+h).last()  + (halo-1)    ), // TODO: less repetitions!
+	left_edge_vctr((i-h).first()           , (i-h).first() + (halo-1) - 1)  // TODO: less repetitions!
       {} 
     };
-
   }; // namespace bcond
 }; // namespace libmpdataxx

@@ -27,10 +27,10 @@ namespace libmpdataxx
       {} 
 
       // method invoked by the solver
-      void fill_halos(const arr_t &a, const rng_t &j)
+      void fill_halos_sclr(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
-	a(pi<d>(this->left_halo, j)) = a(pi<d>(this->rght_edge, j));     
+	a(pi<d>(this->left_halo_sclr, j)) = a(pi<d>(this->rght_edge_sclr, j));
       }
     };
 
@@ -48,10 +48,10 @@ namespace libmpdataxx
       {} 
 
       // method invoked by the solver
-      void fill_halos(const arr_t &a, const rng_t &j)
+      void fill_halos_sclr(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
-	a(pi<d>(this->rght_halo, j)) = a(pi<d>(this->left_edge, j));     
+	a(pi<d>(this->rght_halo_sclr, j)) = a(pi<d>(this->left_edge_sclr, j));
       }
     };
   }; // namespace bcond

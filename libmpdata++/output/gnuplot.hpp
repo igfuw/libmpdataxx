@@ -74,7 +74,13 @@ namespace libmpdataxx
             {
 	      *gp << ", '-'";
               if (p.gnuplot_command == "splot") *gp << " using 0:(" << t << "):1";
-              *gp << " with " << p.gnuplot_with << " lt " << v.first << (
+              *gp << " with " << p.gnuplot_with;
+ 
+              *gp << " lt ";
+              if (p.outvars.size() == 1) *gp <<  p.gnuplot_lt;
+              else *gp << v.first;
+
+              *gp << (
                 t == 0 
                 ? std::string(" title '") + v.second.name + "'"
                 : std::string(" notitle")
@@ -125,7 +131,7 @@ namespace libmpdataxx
 	  *gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
 	  *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
 	  *gp << p.gnuplot_command;
-          bool imagebg = (p.gnuplot_with == "lines");// && !p.gnuplot_contour);
+          bool imagebg = (p.gnuplot_with == "lines");
           if (imagebg)
           {
             float zmin, zmax;
@@ -153,7 +159,7 @@ namespace libmpdataxx
           gnuplot_with = (
             parent_t::n_dims == 2 
 	      ? std::string("image failsafe") // 2D
-	      : std::string("lines ")          // 1D
+	      : std::string("lines ")         // 1D // TODO: histogram steps would be better than lines
           ),
           gnuplot_command = std::string("splot"),
           gnuplot_xlabel = std::string("x/dx"),

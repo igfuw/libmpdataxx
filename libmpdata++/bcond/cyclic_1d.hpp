@@ -25,10 +25,16 @@ namespace libmpdataxx
 	parent_t(i, halo)
       { }
 
-      // method invoked by the solver
-      void fill_halos(const arr_t &a)
+      // methods invoked by the solver
+      void fill_halos_sclr(const arr_t &a)
       {
-	a(this->left_halo) = a(this->rght_edge);     
+	a(this->left_halo_sclr) = a(this->rght_edge_sclr);
+      }
+
+      void fill_halos_vctr(const arr_t &a)
+      {
+        assert(parent_t::halo > 1 && "there is no vector halo for halo=1"); 
+	a(this->left_halo_vctr) = a(this->rght_edge_vctr);
       }
     };
 
@@ -45,10 +51,16 @@ namespace libmpdataxx
 	parent_t(i, halo)
       { }
 
-      // method invoked by the solver
-      void fill_halos(const arr_t &a)
+      // methods invoked by the solver
+      void fill_halos_sclr(const arr_t &a)
       {
-	a(this->rght_halo) = a(this->left_edge);     
+	a(this->rght_halo_sclr) = a(this->left_edge_sclr);
+      }
+
+      void fill_halos_vctr(const arr_t &a)
+      {
+        assert(parent_t::halo > 1 && "there is no vector halo for halo=1"); 
+	a(this->rght_halo_vctr) = a(this->left_edge_vctr);
       }
     };
   }; // namespace bcond

@@ -23,8 +23,8 @@ namespace libmpdataxx
       ) return_macro(,
         frac(
             abs(psi(pi<d>(i+1, j))) 
-          - abs(psi(pi<d>(i,   j))),
-          // ----------------------
+          - abs(psi(pi<d>(i,   j)))
+          ,// ----------------------
             abs(psi(pi<d>(i+1, j))) 
           + abs(psi(pi<d>(i,   j)))
         ) 
@@ -40,8 +40,8 @@ namespace libmpdataxx
             abs(psi(pi<d>(i+1, j+1))) 
           + abs(psi(pi<d>(i,   j+1))) 
           - abs(psi(pi<d>(i+1, j-1))) 
-          - abs(psi(pi<d>(i,   j-1))),
-	  // ------------------------
+          - abs(psi(pi<d>(i,   j-1)))
+	  ,// ------------------------
             abs(psi(pi<d>(i+1, j+1))) 
           + abs(psi(pi<d>(i,   j+1))) 
           + abs(psi(pi<d>(i+1, j-1))) 

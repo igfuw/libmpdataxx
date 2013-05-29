@@ -58,10 +58,10 @@ namespace libmpdataxx
 	  {
 	    this->cycle(e);
             this->mem->barrier();
-	    this->bcxl->fill_halos(this->mem->psi[e][this->n[e]], this->j^halo); // TODO: two xchng calls? (without barriers)
-	    this->bcxr->fill_halos(this->mem->psi[e][this->n[e]], this->j^halo);
-	    this->bcyl->fill_halos(this->mem->psi[e][this->n[e]], this->i^halo);
-	    this->bcyr->fill_halos(this->mem->psi[e][this->n[e]], this->i^halo);
+	    this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^halo); // TODO: two xchng calls? (without barriers)
+	    this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^halo);
+	    this->bcyl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^halo);
+	    this->bcyr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^halo);
             this->mem->barrier();
 
 	    // choosing input/output for antidiff C
@@ -89,15 +89,15 @@ namespace libmpdataxx
 	    );
  
             this->mem->barrier();
-	    this->bcyl->fill_halos(C_corr[0], this->i^h); // TODO: one xchng?
-	    this->bcyr->fill_halos(C_corr[0], this->i^h);
-	    this->bcxl->fill_halos(C_corr[1], this->j^h); // TODO: one xchng?
-	    this->bcxr->fill_halos(C_corr[1], this->j^h);
+	    this->bcyl->fill_halos_sclr(C_corr[0], this->i^h); // TODO: one xchng?
+	    this->bcyr->fill_halos_sclr(C_corr[0], this->i^h);
+	    this->bcxl->fill_halos_sclr(C_corr[1], this->j^h); // TODO: one xchng?
+	    this->bcxr->fill_halos_sclr(C_corr[1], this->j^h);
             this->mem->barrier();
 
 	    // donor-cell call 
 	    formulae::donorcell::op_2d(this->mem->psi[e], 
-	      this->n[e], C_corr, this->i, this->j);
+	      this->n[e], C_corr, this->i, this->j); // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
 	  }
 	}
       }

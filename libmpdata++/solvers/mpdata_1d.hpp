@@ -20,7 +20,7 @@ namespace libmpdataxx
   {
     using namespace libmpdataxx::arakawa_c;
 
-    template<typename real_t, int n_iters, int n_eqs = 1, int halo = formulae::mpdata::halo>
+    template<typename real_t, int n_iters_, int n_eqs = 1, int halo = formulae::mpdata::halo>
     class mpdata_1d : public detail::solver_1d<
       real_t, 
       1,
@@ -29,9 +29,13 @@ namespace libmpdataxx
       detail::max(halo, formulae::mpdata::halo)
     >
     {
+      protected:
+
+      static const int n_iters = n_iters_;
       static_assert(n_iters > 0, "n_iters <= 0");
 
       private: 
+
       using parent_t = detail::solver_1d< 
         real_t,
         1,
@@ -40,19 +44,24 @@ namespace libmpdataxx
         detail::max(halo, formulae::mpdata::halo)
       >;
 
-      using C_t = arrvec_t<typename parent_t::arr_t>;
+      protected:
+
+      using C_t = arrvec_t<typename parent_t::arr_t>; // TODO: do mpdata_common
+
+      private:
 
       static const int n_tmp = n_iters > 2 ? 2 : 1; // TODO: this should be in mpdata_common
 
       // member fields
       std::array<C_t*, n_tmp> tmp;
-      rng_t im;
 
       protected:
 
+      rng_t im;
+
       // for Flux-Corrected Transport (TODO: more general names?)
       virtual void fct_init(int e) { }
-      virtual void fct_adjust_antidiff(int e) { }
+      virtual void fct_adjust_antidiff(int e, int iter) { }
 
       C_t &C_unco(int iter)
       {
@@ -87,8 +96,8 @@ namespace libmpdataxx
 	  {
 	    this->cycle(e);
             this->mem->barrier();
-	    this->bcxl->fill_halos(this->mem->psi[e][this->n[e]]); // TODO: one xchng call?
-	    this->bcxr->fill_halos(this->mem->psi[e][this->n[e]]);
+	    this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]]); // TODO: one xchng call?
+	    this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]]);
             this->mem->barrier();
 
 	    // calculating the antidiffusive C 
@@ -98,10 +107,10 @@ namespace libmpdataxx
 		im, C_unco(iter)[0]
 	      );
 
-            fct_adjust_antidiff(e); // i.e. calculate C_mono=C_mono(C_corr) in FCT
+            fct_adjust_antidiff(e, iter); // i.e. calculate C_mono=C_mono(C_corr) in FCT
           }
 	  // donor-cell call
-	  formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->C(iter)[0], this->i);
+	  formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->C(iter)[0], this->i); 
 	}
       }
 

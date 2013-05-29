@@ -43,6 +43,7 @@ void setopts(T &p, int nt, int n_iters)
     {0, {.name = "psi", .unit = "1"}}
   };
   p.gnuplot_command = "plot";
+  p.gnuplot_with = "histeps";
 }
 
 template <int it, class slvs_t>

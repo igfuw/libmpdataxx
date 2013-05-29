@@ -39,10 +39,10 @@ namespace libmpdataxx
 	void xchng(typename parent_t::arr_t psi, rng_t range_i, rng_t range_j) // for a given array
 	{
           this->mem->barrier();
-	  bcxl->fill_halos(psi, range_j);
-	  bcxr->fill_halos(psi, range_j);
-	  bcyl->fill_halos(psi, range_i);
-	  bcyr->fill_halos(psi, range_i);
+	  bcxl->fill_halos_sclr(psi, range_j);
+	  bcxr->fill_halos_sclr(psi, range_j);
+	  bcyl->fill_halos_sclr(psi, range_i);
+	  bcyr->fill_halos_sclr(psi, range_i);
           this->mem->barrier();
 	}
 

@@ -22,8 +22,8 @@ namespace libmpdataxx
       ) return_macro(,
         frac(
             abs(psi(i+1)) 
-          - abs(psi(i  )),
-          // ----------------------
+          - abs(psi(i  ))
+          ,// ----------------------
             abs(psi(i+1)) 
           + abs(psi(i  ))
         ) 
