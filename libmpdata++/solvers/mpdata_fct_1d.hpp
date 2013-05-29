@@ -38,6 +38,8 @@ namespace libmpdataxx
 
       using parent_t = mpdata_1d<real_t, n_iters, n_eqs, detail::max(halo, detail::fct_min_halo)>; 
 
+      static_assert(parent_t::n_iters > 1, "FCT is defined for MPDATA with a corrective iteration (not for donorcell)");
+
       struct params_t : parent_t::params_t
       {
         // TODO: rho!
@@ -50,14 +52,11 @@ namespace libmpdataxx
 
       void fct_init(int e)
       {
-        if (parent_t::n_iters > 1) // no FCT for upstream
-        {  
-          const rng_t i = this->i^1; // TODO: isn't it a race condition with more than one thread?
-          const typename parent_t::arr_t psi = this->state(e); // TODO:! powinno być psi/rho!
+	const rng_t i = this->i^1; // TODO: isn't it a race condition with more than one thread?
+	const typename parent_t::arr_t psi = this->state(e); // TODO:! powinno być psi/rho!
 
-          psi_min(i) = min(min(psi(i-1), psi(i)), psi(i+1));
-          psi_max(i) = max(max(psi(i-1), psi(i)), psi(i+1)); 
-        }
+	psi_min(i) = min(min(psi(i-1), psi(i)), psi(i+1));
+	psi_max(i) = max(max(psi(i-1), psi(i)), psi(i+1)); 
       }
 
       void fct_adjust_antidiff(int e, int iter)

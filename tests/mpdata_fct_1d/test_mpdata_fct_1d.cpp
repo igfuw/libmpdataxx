@@ -31,38 +31,38 @@ void setup(T &solver, int n)
 }
 
 template <class T>
-void setopts(T &p, int nt, int n_iters)
+void setopts(T &p, const int nt, const std::string &fname)
 {
   p.outfreq = nt; // siplays initial condition and the final state
-  {
-    std::ostringstream tmp;
-    tmp << "figure_iters=" << n_iters << ".svg";
-    p.gnuplot_output = tmp.str();    
-  }
+  p.gnuplot_output = fname + ".svg";    
   p.outvars = {
     {0, {.name = "psi", .unit = "1"}}
   };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
+  p.gnuplot_yrange = "[1.75:4.25]";
 }
 
-template <int it, class slvs_t>
-void add_solver(slvs_t &slvs)
+template <class solver_t, class vec_t>
+void add_solver(vec_t &slvs, const std::string &fname)
 {
-  using solver_t = output::gnuplot<
-    solvers::mpdata_fct_1d<real_t, it>
-  >;
-  typename solver_t::params_t p;
-  setopts(p, nt, it);
-  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(n, p));
+  using output_t = output::gnuplot<solver_t>;
+  typename output_t::params_t p;
+  setopts(p, nt, fname);
+  slvs.push_back(new concurr::threads<output_t, bcond::cyclic>(n, p));
   setup(slvs.back(), n);
 }
 
 int main() 
 {
   boost::ptr_vector<concurr::any<real_t, 1>> slvs;
-  add_solver<1>(slvs);
-  add_solver<2>(slvs);
-  add_solver<3>(slvs);
+
+  add_solver<solvers::mpdata_1d<real_t, 1>>(slvs, "mpdata_iters=1");
+  add_solver<solvers::mpdata_1d<real_t, 2>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_1d<real_t, 3>>(slvs, "mpdata_iters=3");
+
+  add_solver<solvers::mpdata_fct_1d<real_t, 2>>(slvs, "mpdata_fct_iters=2");
+  add_solver<solvers::mpdata_fct_1d<real_t, 3>>(slvs, "mpdata_fct_iters=3");
+
   for (auto &slv : slvs) slv.advance(nt);
 }

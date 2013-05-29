@@ -60,12 +60,19 @@ namespace libmpdataxx
           if (p.gnuplot_command == "splot") 
           {
             *gp << "set yrange [0:" << nt << "]\n";
+            assert(p.gnuplot_yrange == "[*:*]" && "gnupot_yrange was specified for a 1D splot where Y axis represents time");
+
             if (p.gnuplot_ylabel == "") *gp << "set ylabel 't/dt'\n";
           }
+          else if (p.gnuplot_command == "plot") 
+          {
+            *gp << "set yrange " << p.gnuplot_yrange << "\n";
+          } 
+          else assert(false);
           
           *gp 
 	     << "set output '" << p.gnuplot_output << "'\n"
-             << p.gnuplot_command << " 0 notitle"
+             << p.gnuplot_command << " 1/0 notitle"
           ;
 
           for (int t = 0; t <= nt; t+=p.outfreq)
@@ -101,6 +108,8 @@ namespace libmpdataxx
 	     << (p.gnuplot_surface ? "set" : "unset") << " surface\n"
 	     << (p.gnuplot_contour ? "set" : "unset") << " contour\n"
 	  ;
+          assert(p.gnuplot_yrange == "[*:*]" && "gnupot_yrange was specified for a 2D splot where Y axis represents spatial dimension");
+
           if (p.gnuplot_contour)
           {
             *gp 
@@ -170,6 +179,7 @@ namespace libmpdataxx
           ),
           gnuplot_view = std::string(""), 
           gnuplot_zrange = std::string("[*:*]"),
+          gnuplot_yrange = std::string("[*:*]"),
           gnuplot_cbrange = std::string("[*:*]"),
           gnuplot_border = std::string(""),
           gnuplot_lt = std::string("-1"), // black
