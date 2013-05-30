@@ -9,10 +9,9 @@
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_1d.hpp>
 #include <libmpdata++/formulae/donorcell_formulae.hpp>
 #include <libmpdata++/solvers/detail/solver_1d.hpp>
+#include <libmpdata++/solvers/detail/mpdata_common.hpp>
 
 #include <array>
-
-// TODO: an mpdata_common class?
 
 namespace libmpdataxx
 {
@@ -20,20 +19,15 @@ namespace libmpdataxx
   {
     using namespace libmpdataxx::arakawa_c;
 
-    template<typename real_t, int n_iters_, int n_eqs = 1, int halo = formulae::mpdata::halo>
+    template<typename real_t, int n_iters, int n_eqs = 1, int halo = formulae::mpdata::halo>
     class mpdata_1d : public detail::solver_1d<
       real_t, 
       1,
       n_eqs,
       formulae::mpdata::n_tlev,
       detail::max(halo, formulae::mpdata::halo)
-    >
+    >, protected detail::mpdata_common<real_t, n_iters> // multiple inheritance :(
     {
-      protected:
-
-      static const int n_iters = n_iters_;
-      static_assert(n_iters > 0, "n_iters <= 0");
-
       private: 
 
       using parent_t = detail::solver_1d< 
