@@ -7,6 +7,7 @@
 #pragma once
 
 #include <libmpdata++/blitz.hpp>
+#include <libmpdata++/arakawa_c.hpp>
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 #include <libmpdata++/solvers/detail/monitor.hpp>
 
@@ -16,6 +17,8 @@ namespace libmpdataxx
   {
     namespace detail
     {
+      using namespace libmpdataxx::arakawa_c;
+
       constexpr int max(const int a, const int b)
       {
         return a > b ? a : b;
@@ -146,6 +149,12 @@ namespace libmpdataxx
 	{
 	  return this->mem->psi[e][this->n[e] + add];
 	}
+
+        protected:
+
+        static rng_t rng_vctr(const int n) { return rng_t(0, n-1)^h^(halo-1); }
+        static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }
+
       };
     }; // namespace detail
   }; // namespace solvers

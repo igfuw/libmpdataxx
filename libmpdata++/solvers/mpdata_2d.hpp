@@ -126,14 +126,8 @@ namespace libmpdataxx
       )   
       {   
         parent_t::alloc(mem, nx, ny);
-        const rng_t i(0, nx-1), j(0, ny-1);
-
-        for (int n = 0; n < n_tmp; ++n)
-        {
-          mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
-          mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( i^h^(halo - 1), j^halo ));
-          mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( i^halo, j^h^(halo - 1) ));
-        }
+        for (int n = 0; n < n_tmp; ++n) 
+          parent_t::alloc_tmp_vctr(mem, nx, ny, __FILE__);
       }   
     };
   }; // namespace solvers

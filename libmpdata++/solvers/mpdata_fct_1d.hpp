@@ -33,6 +33,7 @@ namespace libmpdataxx
       int halo = detail::fct_min_halo
     > 
     class mpdata_fct_1d : public mpdata_1d<real_t, n_iters, n_eqs, detail::max(halo, detail::fct_min_halo)> 
+// TODO: inherit (multiply!) from mpdata_fct_common
     {
       public:
 
@@ -67,6 +68,7 @@ namespace libmpdataxx
         const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 
         // fill halos -> mpdata works with halo=1, we need halo=2
+// TODO: other option would be to define im as a function of halo in mpdata!
         this->mem->barrier();
 	this->bcxl->fill_halos_vctr(C_corr[d]); // TODO: one xchng call?
 	this->bcxr->fill_halos_vctr(C_corr[d]);
@@ -103,25 +105,15 @@ namespace libmpdataxx
         parent_t(args, p),
         psi_min(args.mem->tmp[__FILE__][0][0]),
         psi_max(args.mem->tmp[__FILE__][0][1]),
-        C_mono(args.mem->tmp[__FILE__][1])
+         C_mono(args.mem->tmp[__FILE__][1])
       {}   
 
       // 1D version
       static void alloc(typename parent_t::mem_t *mem, const int nx)
       {
-	parent_t::alloc(mem, nx);
-
-        const rng_t i(0, nx-1);
-
-        // psi_min and psi_max
-	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
-	for (int e = 0; e < 2; ++e) 
-	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^halo));  
- 
-        // C_mono
-	mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
-	for (int d = 0; d < parent_t::n_dims; ++d) 
-	  mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t(i^h^(halo-1)));  
+	parent_t::alloc(mem, nx); 
+        parent_t::alloc_tmp_sclr(mem, nx, __FILE__, 2); // psi_min and psi_max
+        parent_t::alloc_tmp_vctr(mem, nx, __FILE__);    // C_mono
       }
     };
   }; // namespace solvers

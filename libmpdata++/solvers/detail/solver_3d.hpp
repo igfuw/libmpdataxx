@@ -79,15 +79,23 @@ namespace libmpdataxx
           const int nx, const int ny, const int nz
         )   
         {
-          const rng_t i(0, nx-1), j(0, ny-1), k(0, nz-1);
-
 	  for (int e = 0; e < n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back(new typename parent_t::arr_t(i^halo, j^halo, k^halo)); 
+	      mem->psi[e].push_back(new typename parent_t::arr_t(
+                parent_t::rng_sclr(nx),
+                parent_t::rng_sclr(ny),
+                parent_t::rng_sclr(nz)
+              )); 
 
-	  mem->C.push_back(new typename parent_t::arr_t(i^h^(halo-1), j^halo, k^halo));
-	  mem->C.push_back(new typename parent_t::arr_t(i^halo, j^h^(halo-1), k^halo));
-	  mem->C.push_back(new typename parent_t::arr_t(i^halo, j^halo, k^h^(halo-1)));
+	  mem->C.push_back(new typename parent_t::arr_t( 
+            parent_t::rng_vctr(nx), parent_t::rng_sclr(ny), parent_t::rng_sclr(nz)
+          ));
+	  mem->C.push_back(new typename parent_t::arr_t(
+            parent_t::rng_sclr(nx), parent_t::rng_vctr(ny), parent_t::rng_sclr(nz)
+          ));
+	  mem->C.push_back(new typename parent_t::arr_t(
+            parent_t::rng_sclr(nx), parent_t::rng_sclr(ny), parent_t::rng_vctr(nz)
+          ));
         }  
       };
     };

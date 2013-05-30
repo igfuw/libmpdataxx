@@ -103,11 +103,11 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	) : 
 	  parent_t(args, p),
           tol(p.tol),
-          lap_err(args.mem->tmp[__FILE__][0][0]),
-          tmp_u(args.mem->tmp[__FILE__][0][1]),
-          tmp_w(args.mem->tmp[__FILE__][0][2]),
-          Phi(args.mem->tmp[__FILE__][0][3]),
-          err(args.mem->tmp[__FILE__][0][4]),
+           lap_err(args.mem->tmp[__FILE__][0][0]),
+             tmp_u(args.mem->tmp[__FILE__][0][1]),
+             tmp_w(args.mem->tmp[__FILE__][0][2]),
+               Phi(args.mem->tmp[__FILE__][0][3]),
+               err(args.mem->tmp[__FILE__][0][4]),
 	  lap_tmp1(args.mem->tmp[__FILE__][0][5]),
 	  lap_tmp2(args.mem->tmp[__FILE__][0][6])
 	{} 
@@ -115,14 +115,7 @@ std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
 	{
 	  parent_t::alloc(mem, nx, ny);
-
-	  const rng_t i(0, nx-1), j(0, ny-1);
-	  const int halo = parent_t::halo;
-
-          // (i^hlo,j^hlo)-sized temporary fields
-	  mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>());
-	  for (int n=0; n < 7; ++n)
-	    mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( i^halo, j^halo ));
+          parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, 7); // (i^hlo,j^hlo)-sized temporary fields
         }
       }; 
     }; // namespace detail

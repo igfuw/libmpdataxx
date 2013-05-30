@@ -69,19 +69,48 @@ namespace libmpdataxx
 	  bcyr(std::move(args.bcyr))
 	{}
 
+        // memory allocation logic using static methods
+
 	public:
 
 	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny) 
         {
-          const rng_t i(0, nx-1), j(0, ny-1);
-
+          // psi 
 	  for (int e = 0; e < n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back(new typename parent_t::arr_t(i^halo, j^halo));
+	      mem->psi[e].push_back( new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_sclr(ny)));
 
-	  mem->C.push_back(new typename parent_t::arr_t(i^h^(halo-1)   , j^halo));
-	  mem->C.push_back(new typename parent_t::arr_t(i^halo, j^h^(halo-1)   ));
+          // Courant field components (Arakawa-C grid)
+	  mem->C.push_back(new typename parent_t::arr_t( parent_t::rng_vctr(nx), parent_t::rng_sclr(ny) ));
+	  mem->C.push_back(new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_vctr(ny) ));
         }
+
+        protected:
+
+        // helper method to allocate a temporary space composed of vector-component arrays
+        static void alloc_tmp_vctr(
+          typename parent_t::mem_t *mem, const int nx, const int ny,
+          const char * __file__
+        )
+        {
+          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( parent_t::rng_vctr(nx), parent_t::rng_sclr(ny) )); 
+          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_vctr(ny) )); 
+        }
+
+        // helper method to allocate n_arr scalar temporary arrays 
+        static void alloc_tmp_sclr(
+          typename parent_t::mem_t *mem, const int nx, const int ny,
+          const char * __file__, const int n_arr
+        )   
+        {   
+          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+          for (int n = 0; n < n_arr; ++n)
+            mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( 
+              parent_t::rng_sclr(nx),
+              parent_t::rng_sclr(ny)
+            ));
+        } 
       };
     }; // namespace detail
   }; // namespace solvers
