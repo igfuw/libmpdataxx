@@ -13,8 +13,7 @@
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-#include <libmpdata++/solvers/mpdata_2d.hpp>
-#include <libmpdata++/solvers/donorcell_2d.hpp>
+#include <libmpdata++/solvers/mpdata_fct_2d.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
@@ -79,7 +78,7 @@ int main()
   int n[] = {32, 32}, nt = 200;
 
   const int it = 2;
-  using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, it>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, it>>;
   solver_t::params_t p;
   setopts(p, nt, it);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 

@@ -18,7 +18,7 @@ namespace libmpdataxx
       int n_eqs = 1,
       int halo = formulae::donorcell::halo
     >
-    class donorcell_1d : public detail::solver_1d<
+    class donorcell_1d : public detail::solver<
       real_t,
       1,
       n_eqs,
@@ -26,7 +26,7 @@ namespace libmpdataxx
       detail::max(halo, formulae::donorcell::halo)
     > 
     {
-      using parent_t = detail::solver_1d<
+      using parent_t = detail::solver<
         real_t,
         1,
         n_eqs,

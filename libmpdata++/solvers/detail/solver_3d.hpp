@@ -18,10 +18,10 @@ namespace libmpdataxx
     {
       using namespace arakawa_c;
     
-      template<typename real_t, int n_dims, int n_eqs, int n_tlev, int halo>
-      class solver_3d : public solver_common<real_t, n_dims, n_eqs, n_tlev, halo>
+      template<typename real_t, int n_eqs, int n_tlev, int halo>
+      class solver<real_t, 3, n_eqs, n_tlev, halo> : public solver_common<real_t, 3, n_eqs, n_tlev, halo>
       {
-	using parent_t = solver_common<real_t, n_dims, n_eqs, n_tlev, halo>;
+	using parent_t = solver_common<real_t, 3, n_eqs, n_tlev, halo>;
 
 	protected:
       
@@ -29,7 +29,7 @@ namespace libmpdataxx
 	bc_p bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
 	rng_t i, j, k; // TODO: if stored as idx_t this also could be placed in solver_common
-        idx_t<n_dims> ijk;
+        idx_t<parent_t::n_dims> ijk;
 
 	void xchng(int e, int lev = 0) 
 	{
@@ -58,7 +58,7 @@ namespace libmpdataxx
         protected:
 
 	// ctor
-	solver_3d(ctor_args_t args) :
+	solver(ctor_args_t args) :
 	  parent_t(args.mem),
 	  i(args.i), 
           j(args.j), 
