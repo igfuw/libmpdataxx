@@ -19,25 +19,35 @@ namespace libmpdataxx
       using namespace arakawa_c;
       using idxperm::pi;
 
-      const int halo = 1, n_tlev = 2;
-// TODO
-/*
-  struct varsgn
-  {
-    template<class T> auto aon(const T &x) -> decltype(abs(x))
-    {
-      return abs(x);
-    }
-  };
+      using opts_t = unsigned long;
 
-  struct posdef
-  {
-    template<class T> T aon(const T &x)
-    {
-      return x;
-    }
-  };
-*/
+      namespace detail
+      {
+        // http://stackoverflow.com/questions/523724/c-c-check-if-one-bit-is-set-in-i-e-int-variable
+        constexpr opts_t bit(const opts_t &x) 
+        { 
+          return opts_t(1) << x;  
+        }
+      };
+
+      enum 
+      {
+        sss = detail::bit(0), // single-sign signal
+        toa = detail::bit(1), // third-order accuracy
+        eps = detail::bit(2)  // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) // TODO! (and value of eps)
+      };
+
+      constexpr bool opt_set(const opts_t &x, const opts_t &y) 
+      { 
+	return 0 != (x & y); 
+      }
+
+      const int /*halo = 1,*/ n_tlev = 2;
+
+      constexpr const int halo(const opts_t &opts) 
+      {
+        return opt_set(opts, toa) ? 2 : 1; 
+      }
 
       template<class nom_t, class den_t>
       inline auto frac(

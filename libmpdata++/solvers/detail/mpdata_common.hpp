@@ -1,8 +1,8 @@
 /** @file
-* @copyright University of Warsaw
-* @section LICENSE
-* GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
-*/
+  * @copyright University of Warsaw
+  * @section LICENSE
+  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
+  */
 
 #pragma once
 
@@ -15,13 +15,13 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <typename real_t, int n_iters_, int n_dims, int n_eqs, int halo>
+      template <typename real_t, int n_iters_, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int halo>
       class mpdata_common : public detail::solver<
-        real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, detail::max(halo, formulae::mpdata::halo)
+        real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, detail::max(halo, formulae::mpdata::halo(opts))
       >
       {
         using parent_t = detail::solver<
-          real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, detail::max(halo, formulae::mpdata::halo)
+          real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, detail::max(halo, formulae::mpdata::halo(opts))
         >;
 
 	using C_t = arrvec_t<typename parent_t::arr_t>;
@@ -106,18 +106,18 @@ namespace libmpdataxx
       };
     }; // namespace detail
 
-    template<typename real_t, int n_iters, int n_dims, int n_eqs, int halo> // TODO: reconsider arg order...
+    template<typename real_t, int n_iters, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int halo> // TODO: reconsider arg order...
     class mpdata
     {};
 
     // alias names
-    template <typename real_t, int n_iters, int n_eqs = 1, int halo = formulae::mpdata::halo>
-    using mpdata_1d = mpdata<real_t, n_iters, 1, n_eqs, halo>;
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    using mpdata_1d = mpdata<real_t, n_iters, 1, n_eqs, opts, halo>;
 
-    template <typename real_t, int n_iters, int n_eqs = 1, int halo = formulae::mpdata::halo>
-    using mpdata_2d = mpdata<real_t, n_iters, 2, n_eqs, halo>;
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    using mpdata_2d = mpdata<real_t, n_iters, 2, n_eqs, opts, halo>;
 
-    template <typename real_t, int n_iters, int n_eqs = 1, int halo = formulae::mpdata::halo>
-    using mpdata_3d = mpdata<real_t, n_iters, 3, n_eqs, halo>;
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    using mpdata_3d = mpdata<real_t, n_iters, 3, n_eqs, opts, halo>;
   }; // namespace solvers
 }; // namescpae libmpdataxx

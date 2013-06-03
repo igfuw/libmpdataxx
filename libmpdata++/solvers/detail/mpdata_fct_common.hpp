@@ -18,14 +18,13 @@ namespace libmpdataxx
       // TODO: document why 2
       const int fct_min_halo = 2; // TODO move to fct::formulae?
 
-
-      template <typename real_t, int n_iters, int n_dims, int n_eqs, int halo>
+      template <typename real_t, int n_iters, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int halo>
       class mpdata_fct_common : public mpdata<
-        real_t, n_iters, n_dims, n_eqs, detail::max(halo, fct_min_halo)
+        real_t, n_iters, n_dims, n_eqs, opts, detail::max(halo, fct_min_halo)
       >
       {
         using parent_t = mpdata<
-          real_t, n_iters, n_dims, n_eqs, detail::max(halo, fct_min_halo)
+          real_t, n_iters, n_dims, n_eqs, opts, detail::max(halo, fct_min_halo)
         >;
 
         static_assert(parent_t::n_iters > 1, "FCT is defined for MPDATA with a corrective iteration (not for donorcell)");
@@ -80,18 +79,18 @@ namespace libmpdataxx
       };
     }; // namespace detail
 
-    template<typename real_t, int n_iters, int n_dims, int n_eqs, int halo> // TODO: reconsider arg order...
+    template<typename real_t, int n_iters, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int halo> // TODO: reconsider arg order...
     class mpdata_fct
     {};
 
     // alias names
-    template <typename real_t, int n_iters, int n_eqs = 1, int halo = detail::fct_min_halo>
-    using mpdata_fct_1d = mpdata_fct<real_t, n_iters, 1, n_eqs, halo>;
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    using mpdata_fct_1d = mpdata_fct<real_t, n_iters, 1, n_eqs, opts, halo>;
 
-    template <typename real_t, int n_iters, int n_eqs = 1, int halo = detail::fct_min_halo>
-    using mpdata_fct_2d = mpdata_fct<real_t, n_iters, 2, n_eqs, halo>;
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    using mpdata_fct_2d = mpdata_fct<real_t, n_iters, 2, n_eqs, opts, halo>;
 
-    template <typename real_t, int n_iters, int n_eqs = 1, int halo = detail::fct_min_halo>
-    using mpdata_fct_3d = mpdata_fct<real_t, n_iters, 3, n_eqs, halo>;
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    using mpdata_fct_3d = mpdata_fct<real_t, n_iters, 3, n_eqs, opts, halo>;
   }; // namespace solvers
 }; // namescpae libmpdataxx

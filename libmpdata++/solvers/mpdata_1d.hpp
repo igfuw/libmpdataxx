@@ -19,11 +19,11 @@ namespace libmpdataxx
   {
     using namespace libmpdataxx::arakawa_c;
 
-    template<typename real_t, int n_iters, int n_eqs, int halo>
-    class mpdata<real_t, n_iters, 1, n_eqs, halo> : 
-      public detail::mpdata_common<real_t, n_iters, 1, n_eqs, halo>
+    template<typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int halo>
+    class mpdata<real_t, n_iters, 1, n_eqs, opts, halo> : 
+      public detail::mpdata_common<real_t, n_iters, 1, n_eqs, opts, halo>
     {
-      using parent_t = detail::mpdata_common<real_t, n_iters, 1, n_eqs, halo >;
+      using parent_t = detail::mpdata_common<real_t, n_iters, 1, n_eqs, opts, halo>;
 
       protected:
 
@@ -46,7 +46,7 @@ namespace libmpdataxx
 
 	    // calculating the antidiffusive C 
 	    this->C_corr(iter)[0](im+h) = 
-	      formulae::mpdata::antidiff(
+	      formulae::mpdata::antidiff<opts>(
 		this->mem->psi[e][this->n[e]], 
 		im, this->C_unco(iter)[0]
 	      );

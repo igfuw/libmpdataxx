@@ -21,11 +21,12 @@ namespace libmpdataxx
       typename real_t, 
       int n_iters, 
       int n_eqs, 
+      formulae::mpdata::opts_t opts,
       int halo
     > 
-    class mpdata_fct<real_t, n_iters, 1, n_eqs, halo> : public detail::mpdata_fct_common<real_t, n_iters, 1, n_eqs, halo> 
+    class mpdata_fct<real_t, n_iters, 1, n_eqs, opts, halo> : public detail::mpdata_fct_common<real_t, n_iters, 1, n_eqs, opts, halo> 
     {
-      using parent_t = detail::mpdata_fct_common<real_t, n_iters, 1, n_eqs, halo>; 
+      using parent_t = detail::mpdata_fct_common<real_t, n_iters, 1, n_eqs, opts, halo>; 
 
       void fct_init(int e)
       {

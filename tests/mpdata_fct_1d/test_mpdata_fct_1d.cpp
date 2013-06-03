@@ -5,10 +5,12 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  * @brief MPDATA-FCT example from @copybrief Smolarkiewicz_2006 (Figs 11-12)
  *
- * \include "gnuplot-iostream_1d/test_gnuplot-iostream_1d.cpp"
- * \image html "../../tests/gnuplot-iostream_1d/figure_iters=1.svg"
- * \image html "../../tests/gnuplot-iostream_1d/figure_iters=2.svg"
- * \image html "../../tests/gnuplot-iostream_1d/figure_iters=3.svg"
+ * \include "mpdata_fct_1d/test_mpdata_fct_1d.cpp"
+ * \image html "../../tests/mpdata_fct_1d/mpdata_iters=1.svg"
+ * \image html "../../tests/mpdata_fct_1d/mpdata_iters=2.svg"
+ * \image html "../../tests/mpdata_fct_1d/mpdata_fct_iters=2.svg"
+ * \image html "../../tests/mpdata_fct_1d/mpdata_iters=3.svg"
+ * \image html "../../tests/mpdata_fct_1d/mpdata_fct_iters=3.svg"
  */
 
 #include <libmpdata++/solvers/mpdata_fct_1d.hpp>
@@ -33,7 +35,7 @@ void setup(T &solver, int n)
 template <class T>
 void setopts(T &p, const int nt, const std::string &fname)
 {
-  p.outfreq = nt; // siplays initial condition and the final state
+  p.outfreq = nt; // diplays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
   p.outvars = {
     {0, {.name = "psi", .unit = "1"}}
