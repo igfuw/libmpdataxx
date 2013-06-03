@@ -7,6 +7,7 @@
 #pragma once
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
+#include <boost/preprocessor/punctuation/comma.hpp>
 
 namespace libmpdataxx 
 { 
@@ -15,38 +16,60 @@ namespace libmpdataxx
     namespace mpdata 
     {
       // 2D
-      template<int d, class arr_2d_t>
+      template<opts_t opts, int d, class arr_2d_t>
       inline auto A(
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j
       ) return_macro(,
-        frac(
-            abs(psi(pi<d>(i+1, j))) 
-          - abs(psi(pi<d>(i,   j)))
-          ,// ----------------------
-            abs(psi(pi<d>(i+1, j))) 
-          + abs(psi(pi<d>(i,   j)))
-        ) 
+        where(opt_set(opts, sss),
+	  frac(
+	      psi(pi<d>(i+1, j)) 
+	    - psi(pi<d>(i,   j))
+	    ,// ----------------
+	      psi(pi<d>(i+1, j))
+	    + psi(pi<d>(i,   j))
+	  ), 
+	  frac(
+	      abs(psi(pi<d>(i+1, j))) 
+	    - abs(psi(pi<d>(i,   j)))
+	    ,// ---------------------
+	      abs(psi(pi<d>(i+1, j))) 
+	    + abs(psi(pi<d>(i,   j)))
+	  ) 
+        )
       ) 
 
-      template<int d, class arr_2d_t>
+      template<opts_t opts, int d, class arr_2d_t>
       inline auto B(
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j
       ) return_macro(,
-        frac( 
-            abs(psi(pi<d>(i+1, j+1))) 
-          + abs(psi(pi<d>(i,   j+1))) 
-          - abs(psi(pi<d>(i+1, j-1))) 
-          - abs(psi(pi<d>(i,   j-1)))
-	  ,// ------------------------
-            abs(psi(pi<d>(i+1, j+1))) 
-          + abs(psi(pi<d>(i,   j+1))) 
-          + abs(psi(pi<d>(i+1, j-1))) 
-          + abs(psi(pi<d>(i,   j-1)))
-        ) / 2
+        where(opt_set(opts, sss),
+	  frac( 
+	      psi(pi<d>(i+1, j+1))
+	    + psi(pi<d>(i,   j+1)) 
+	    - psi(pi<d>(i+1, j-1)) 
+	    - psi(pi<d>(i,   j-1))
+	    ,// ------------------
+	      psi(pi<d>(i+1, j+1)) 
+	    + psi(pi<d>(i,   j+1)) 
+	    + psi(pi<d>(i+1, j-1)) 
+	    + psi(pi<d>(i,   j-1))
+	  ) / 2,
+	  frac( 
+	      abs(psi(pi<d>(i+1, j+1))) 
+	    + abs(psi(pi<d>(i,   j+1))) 
+	    - abs(psi(pi<d>(i+1, j-1))) 
+	    - abs(psi(pi<d>(i,   j-1)))
+	    ,// -----------------------
+	      abs(psi(pi<d>(i+1, j+1))) 
+	    + abs(psi(pi<d>(i,   j+1))) 
+	    + abs(psi(pi<d>(i+1, j-1))) 
+	    + abs(psi(pi<d>(i,   j-1)))
+	  ) / 2
+        )
       )
 
       template<int d, class arr_2d_t>
@@ -63,7 +86,7 @@ namespace libmpdataxx
         ) / 4
       )
 
-      template <int dim, class arr_2d_t>
+      template <opts_t opts, int dim, class arr_2d_t>
       inline auto antidiff(
         const arr_2d_t &psi, 
         const rng_t &i, 
@@ -72,10 +95,10 @@ namespace libmpdataxx
       ) return_macro(,
         abs(C[dim](pi<dim>(i+h, j))) 
         * (1 - abs(C[dim](pi<dim>(i+h, j)))) 
-        * A<dim>(psi, i, j) 
+        * A<opts BOOST_PP_COMMA() dim>(psi, i, j) 
         - C[dim](pi<dim>(i+h, j)) 
         * C_bar<dim>(C[dim-1], i, j)
-        * B<dim>(psi, i, j)
+        * B<opts BOOST_PP_COMMA() dim>(psi, i, j)
       ) 
     }; // namespace mpdata
   }; // namespace formulae

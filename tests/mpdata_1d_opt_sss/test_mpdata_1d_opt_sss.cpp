@@ -43,6 +43,7 @@ void setopts(T &p, const int nt, const std::string &fname)
   };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
+  p.gnuplot_yrange = "[-2:5]";
 }
 
 template <class solver_t, class vec_t>

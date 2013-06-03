@@ -49,13 +49,13 @@ namespace libmpdataxx
 
 	    // calculating the antidiffusive C 
 	    this->C_corr(iter)[0](this->im+h, this->j) = 
-	      formulae::mpdata::antidiff<0>(
+	      formulae::mpdata::antidiff<opts, 0>(
 		this->mem->psi[e][this->n[e]], 
 		this->im, this->j, this->C_unco(iter)
 	      );
 
 	    this->C_corr(iter)[1](this->i, this->jm+h) = 
-	      formulae::mpdata::antidiff<1>(
+	      formulae::mpdata::antidiff<opts, 1>(
               this->mem->psi[e][this->n[e]], 
               this->jm, this->i, this->C_unco(iter)
 	    );
