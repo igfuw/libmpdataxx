@@ -1,0 +1,1 @@
+libmpdataxx_add_test(test_mpdata_1d_opt_toa)
