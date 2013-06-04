@@ -28,7 +28,7 @@ namespace libmpdataxx
         frac(
             max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) 
           - psi(i)
-          ,// ----------------------
+          ,// ----------------------------
             max(0, C_corr(i-h)) * psi(i-1) 
           - min(0, C_corr(i+h)) * psi(i+1)
         ) 
@@ -45,7 +45,7 @@ namespace libmpdataxx
         frac(
             psi(i)
           - min(min(min(psi_min(i), psi(i-1)), psi(i)), psi(i+1)) 
-          ,// ----------------------
+          ,// --------------------------
             max(0, C_corr(i+h)) * psi(i) 
           - min(0, C_corr(i-h)) * psi(i)
         ) 

@@ -20,7 +20,10 @@ namespace libmpdataxx
         const arr_1d_t &psi, 
         const rng_t &i 
       ) return_macro(,
-        where(opt_set(opts, sss),
+        where(
+          // if
+          opt_set(opts, sss),
+          // then
           frac( // single-sign signal version
 	      psi(i+1)
 	    - psi(i  )
@@ -28,6 +31,7 @@ namespace libmpdataxx
 	      psi(i+1)
 	    + psi(i  )
 	  ),
+          // else
 	  frac( // variable-sign signal version (likely a good default)
 	      abs(psi(i+1)) 
 	    - abs(psi(i  ))

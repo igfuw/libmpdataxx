@@ -33,8 +33,10 @@ namespace libmpdataxx
       enum 
       {
         sss = detail::bit(0), // single-sign signal
-        toa = detail::bit(1), // third-order accuracy
-        eps = detail::bit(2)  // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) // TODO! (and value of eps)
+        toa = detail::bit(1)//, // third-order accuracy // TODO (not code to handle it yet)
+// TODO        eps = detail::bit(2)  // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) // TODO! (and value of eps)
+// TODO: gauge option (adding a large constant)
+// TODO: negpart form option
       };
 
       constexpr bool opt_set(const opts_t &x, const opts_t &y) 

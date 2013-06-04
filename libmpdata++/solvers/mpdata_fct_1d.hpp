@@ -24,7 +24,8 @@ namespace libmpdataxx
       formulae::mpdata::opts_t opts,
       int halo
     > 
-    class mpdata_fct<real_t, n_iters, 1, n_eqs, opts, halo> : public detail::mpdata_fct_common<real_t, n_iters, 1, n_eqs, opts, halo> 
+    class mpdata_fct<real_t, n_iters, 1, n_eqs, opts, halo> : 
+      public detail::mpdata_fct_common<real_t, n_iters, 1, n_eqs, opts, halo> 
     {
       using parent_t = detail::mpdata_fct_common<real_t, n_iters, 1, n_eqs, opts, halo>; 
 
@@ -52,18 +53,59 @@ namespace libmpdataxx
 	this->mem->barrier();
 
         // calculating the monotonic corrective velocity
-        this->C_mono[d]( im+h ) = C_corr[d]( im+h ) * where(
-          C_corr[d]( im+h ) > 0,
-          min(1, min(
-            formulae::mpdata::beta_dn(psi, this->psi_min, C_corr[d], im),
-            formulae::mpdata::beta_up(psi, this->psi_max, C_corr[d], im + 1)
-          )),
-          min(1, min(
-            formulae::mpdata::beta_up(psi, this->psi_max, C_corr[d], im),
-            formulae::mpdata::beta_dn(psi, this->psi_min, C_corr[d], im + 1)
-          ))
-        );
-        // TODO: positive_definite option (z parent_t)
+        if (formulae::mpdata::opt_set(opts, formulae::mpdata::sss))
+        {
+          // single-sign signal version // TODO isnt't it a positive-definite version???
+	  this->C_mono[d]( im+h ) = C_corr[d]( im+h ) * where(
+	    C_corr[d]( im+h ) > 0,
+	    min(1, min(
+	      formulae::mpdata::beta_dn(psi, this->psi_min, C_corr[d], im),
+	      formulae::mpdata::beta_up(psi, this->psi_max, C_corr[d], im + 1)
+	    )),
+	    min(1, min(
+	      formulae::mpdata::beta_up(psi, this->psi_max, C_corr[d], im),
+	      formulae::mpdata::beta_dn(psi, this->psi_min, C_corr[d], im + 1)
+	    ))
+	  );
+        } 
+        else
+        {
+          // variable-sign version
+	  this->C_mono[d]( im+h ) = C_corr[d]( im+h ) * where(
+            // if
+	    C_corr[d]( im+h ) > 0,
+            // then
+            where(
+              // if
+              psi(im) > 0,
+              // then
+	      min(1, min(
+		formulae::mpdata::beta_dn(psi, this->psi_min, C_corr[d], im),
+		formulae::mpdata::beta_up(psi, this->psi_max, C_corr[d], im + 1)
+	      )),
+              // else
+	      min(1, min(
+		formulae::mpdata::beta_up(psi, this->psi_max, C_corr[d], im),
+		formulae::mpdata::beta_dn(psi, this->psi_min, C_corr[d], im + 1)
+	      ))
+            ),
+            // else
+            where(
+              // if
+              psi(im+1) > 0,
+              // then
+	      min(1, min(
+		formulae::mpdata::beta_up(psi, this->psi_max, C_corr[d], im),
+		formulae::mpdata::beta_dn(psi, this->psi_min, C_corr[d], im + 1)
+	      )),
+              // else
+	      min(1, min(
+		formulae::mpdata::beta_dn(psi, this->psi_min, C_corr[d], im),
+		formulae::mpdata::beta_up(psi, this->psi_max, C_corr[d], im + 1)
+	      ))
+            )
+	  );
+        }
       }
 
       public:

@@ -22,7 +22,10 @@ namespace libmpdataxx
         const rng_t &i, 
         const rng_t &j
       ) return_macro(,
-        where(opt_set(opts, sss),
+        where(
+          // if
+          opt_set(opts, sss),
+          // then
 	  frac(
 	      psi(pi<d>(i+1, j)) 
 	    - psi(pi<d>(i,   j))
@@ -30,6 +33,7 @@ namespace libmpdataxx
 	      psi(pi<d>(i+1, j))
 	    + psi(pi<d>(i,   j))
 	  ), 
+          // else
 	  frac(
 	      abs(psi(pi<d>(i+1, j))) 
 	    - abs(psi(pi<d>(i,   j)))
@@ -46,7 +50,10 @@ namespace libmpdataxx
         const rng_t &i, 
         const rng_t &j
       ) return_macro(,
-        where(opt_set(opts, sss),
+        where(
+          // if
+          opt_set(opts, sss),
+          // then
 	  frac( 
 	      psi(pi<d>(i+1, j+1))
 	    + psi(pi<d>(i,   j+1)) 
@@ -58,6 +65,7 @@ namespace libmpdataxx
 	    + psi(pi<d>(i+1, j-1)) 
 	    + psi(pi<d>(i,   j-1))
 	  ) / 2,
+          // else
 	  frac( 
 	      abs(psi(pi<d>(i+1, j+1))) 
 	    + abs(psi(pi<d>(i,   j+1))) 
