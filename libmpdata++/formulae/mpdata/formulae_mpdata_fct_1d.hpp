@@ -29,8 +29,14 @@ namespace libmpdataxx
             max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) 
           - psi(i)
           ,// ----------------------------
-            max(0, C_corr(i-h)) * psi(i-1) 
-          - min(0, C_corr(i+h)) * psi(i+1)
+// opts.pdf version
+//            max(0, C_corr(i-h)) * psi(i-1) 
+//          - min(0, C_corr(i+h)) * psi(i+1)
+
+            max(0, C_corr(i-h)) * max(0, psi(i-1))
+          - min(0, C_corr(i+h)) * max(0, psi(i+1))
+          - max(0, C_corr(i+h)) * min(0, psi(i))
+          + min(0, C_corr(i-h)) * min(0, psi(i))
         ) 
       ) 
 
@@ -46,8 +52,13 @@ namespace libmpdataxx
             psi(i)
           - min(min(min(psi_min(i), psi(i-1)), psi(i)), psi(i+1)) 
           ,// --------------------------
-            max(0, C_corr(i+h)) * psi(i) 
-          - min(0, C_corr(i-h)) * psi(i)
+// opts.pdf version
+//            max(0, C_corr(i+h)) * psi(i) 
+//          - min(0, C_corr(i-h)) * psi(i)
+            max(0, C_corr(i+h)) * max(0, psi(i))
+          - min(0, C_corr(i-h)) * max(0, psi(i))
+          - max(0, C_corr(i-h)) * min(0, psi(i-1))
+          + min(0, C_corr(i+h)) * min(0, psi(i+1))
         ) 
       ) 
 
