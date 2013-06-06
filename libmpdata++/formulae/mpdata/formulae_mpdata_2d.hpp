@@ -15,69 +15,78 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-      // 2D
+      // single-sign scalar version
       template<opts_t opts, int d, class arr_2d_t>
       inline auto A(
         const arr_2d_t &psi, 
         const rng_t &i, 
-        const rng_t &j
+        const rng_t &j,
+        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
       ) return_macro(,
-        where(
-          // if
-          opt_set(opts, sss),
-          // then
-	  frac(
-	      psi(pi<d>(i+1, j)) 
-	    - psi(pi<d>(i,   j))
-	    ,// ----------------
-	      psi(pi<d>(i+1, j))
-	    + psi(pi<d>(i,   j))
-	  ), 
-          // else
-	  frac(
-	      abs(psi(pi<d>(i+1, j))) 
-	    - abs(psi(pi<d>(i,   j)))
-	    ,// ---------------------
-	      abs(psi(pi<d>(i+1, j))) 
-	    + abs(psi(pi<d>(i,   j)))
-	  ) 
-        )
+	frac<opts>(
+	    psi(pi<d>(i+1, j)) 
+	  - psi(pi<d>(i,   j))
+	  ,// ----------------
+	    psi(pi<d>(i+1, j))
+	  + psi(pi<d>(i,   j))
+	)
+      )
+
+      // variable-sign scalar version
+      template<opts_t opts, int d, class arr_2d_t>
+      inline auto A(
+        const arr_2d_t &psi, 
+        const rng_t &i, 
+        const rng_t &j,
+        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss == false
+      ) return_macro(,
+	frac<opts>(
+	    abs(psi(pi<d>(i+1, j))) 
+	  - abs(psi(pi<d>(i,   j)))
+	  ,// ---------------------
+	    abs(psi(pi<d>(i+1, j))) 
+	  + abs(psi(pi<d>(i,   j)))
+	) 
       ) 
 
       template<opts_t opts, int d, class arr_2d_t>
       inline auto B(
         const arr_2d_t &psi, 
         const rng_t &i, 
-        const rng_t &j
+        const rng_t &j,
+        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
       ) return_macro(,
-        where(
-          // if
-          opt_set(opts, sss),
-          // then
-	  frac( 
-	      psi(pi<d>(i+1, j+1))
-	    + psi(pi<d>(i,   j+1)) 
-	    - psi(pi<d>(i+1, j-1)) 
-	    - psi(pi<d>(i,   j-1))
-	    ,// ------------------
-	      psi(pi<d>(i+1, j+1)) 
-	    + psi(pi<d>(i,   j+1)) 
-	    + psi(pi<d>(i+1, j-1)) 
-	    + psi(pi<d>(i,   j-1))
-	  ) / 2,
-          // else
-	  frac( 
-	      abs(psi(pi<d>(i+1, j+1))) 
-	    + abs(psi(pi<d>(i,   j+1))) 
-	    - abs(psi(pi<d>(i+1, j-1))) 
-	    - abs(psi(pi<d>(i,   j-1)))
-	    ,// -----------------------
-	      abs(psi(pi<d>(i+1, j+1))) 
-	    + abs(psi(pi<d>(i,   j+1))) 
-	    + abs(psi(pi<d>(i+1, j-1))) 
-	    + abs(psi(pi<d>(i,   j-1)))
-	  ) / 2
-        )
+	frac<opts>( 
+	    psi(pi<d>(i+1, j+1))
+	  + psi(pi<d>(i,   j+1)) 
+	  - psi(pi<d>(i+1, j-1)) 
+	  - psi(pi<d>(i,   j-1))
+	  ,// ------------------
+	    psi(pi<d>(i+1, j+1)) 
+	  + psi(pi<d>(i,   j+1)) 
+	  + psi(pi<d>(i+1, j-1)) 
+	  + psi(pi<d>(i,   j-1))
+	) / 2
+      )
+
+      template<opts_t opts, int d, class arr_2d_t>
+      inline auto B(
+        const arr_2d_t &psi, 
+        const rng_t &i, 
+        const rng_t &j,
+        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss == false
+      ) return_macro(,
+	frac<opts>( 
+	    abs(psi(pi<d>(i+1, j+1))) 
+	  + abs(psi(pi<d>(i,   j+1))) 
+	  - abs(psi(pi<d>(i+1, j-1))) 
+	  - abs(psi(pi<d>(i,   j-1)))
+	  ,// -----------------------
+	    abs(psi(pi<d>(i+1, j+1))) 
+	  + abs(psi(pi<d>(i,   j+1))) 
+	  + abs(psi(pi<d>(i+1, j-1))) 
+	  + abs(psi(pi<d>(i,   j-1)))
+	) / 2
       )
 
       template<int d, class arr_2d_t>
@@ -107,6 +116,7 @@ namespace libmpdataxx
         - C[dim](pi<dim>(i+h, j)) 
         * C_bar<dim>(C[dim-1], i, j)
         * B<opts BOOST_PP_COMMA() dim>(psi, i, j)
+        // TODO: toa
       ) 
     }; // namespace mpdata
   }; // namespace formulae

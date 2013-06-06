@@ -10,6 +10,8 @@
 #include <libmpdata++/idxperm.hpp>
 #include <libmpdata++/arakawa_c.hpp>
 
+#include <boost/preprocessor/control/if.hpp>
+
 namespace libmpdataxx
 { 
   namespace formulae 
@@ -33,8 +35,8 @@ namespace libmpdataxx
       enum 
       {
         sss = detail::bit(0), // single-sign signal
-        toa = detail::bit(1)//, // third-order accuracy // TODO (not code to handle it yet)
-// TODO        eps = detail::bit(2)  // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) // TODO! (and value of eps)
+        toa = detail::bit(1), // third-order accuracy // TODO (not code to handle it yet)
+        eps = detail::bit(2)  // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) // TODO! (and value of eps)
 // TODO: gauge option (adding a large constant)
 // TODO: negpart form option
       };
@@ -44,19 +46,30 @@ namespace libmpdataxx
 	return 0 != (x & y); 
       }
 
-      const int /*halo = 1,*/ n_tlev = 2;
+      const int n_tlev = 2;
 
       constexpr const int halo(const opts_t &opts) 
       {
         return opt_set(opts, toa) ? 2 : 1; 
       }
 
-      template<class nom_t, class den_t>
+      template<opts_t opts, class nom_t, class den_t>
       inline auto frac(
-        const nom_t &nom, const den_t &den
+        const nom_t &nom, 
+        const den_t &den,
+        typename std::enable_if<!opt_set(opts, eps)>::type* = 0 // enabled if eps == false
       ) return_macro(,
         where(den > 0, nom / den, 0)
-      ) 
+      )
+
+      template<opts_t opts, class nom_t, class den_t>
+      inline auto frac(
+        const nom_t &nom, 
+        const den_t &den,
+        typename std::enable_if<opt_set(opts, eps)>::type* = 0 // enabled if eps == true
+      ) return_macro(,
+        nom / (den + blitz::tiny(typename den_t::T_numtype(0))) // TODO: check if this tiny is not too small?
+      )
     }; // namespace mpdata
   }; // namespace formulae
 }; // namespcae libmpdataxx

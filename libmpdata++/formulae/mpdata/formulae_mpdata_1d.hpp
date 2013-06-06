@@ -14,59 +14,75 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-      // 1D
+      // single-sign signal version
       template <opts_t opts, class arr_1d_t>
       inline auto A(
         const arr_1d_t &psi, 
-        const rng_t &i 
+        const rng_t &i,
+        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
       ) return_macro(,
-        where(
-          // if
-          opt_set(opts, sss),
-          // then
-          frac( // single-sign signal version
-	      psi(i+1)
-	    - psi(i  )
-	    ,// ------
-	      psi(i+1)
-	    + psi(i  )
-	  ),
-          // else
-	  frac( // variable-sign signal version (likely a good default)
-	      abs(psi(i+1)) 
-	    - abs(psi(i  ))
-	    ,// -----------
-	      abs(psi(i+1)) 
-	    + abs(psi(i  ))
-	  ) 
-        )
-      ) 
+	frac<opts>( 
+	    psi(i+1)
+	  - psi(i  )
+	  ,// ------
+	    psi(i+1)
+	  + psi(i  )
+	)
+      )
+
+      // variable-sign signal version (likely a good default)
+      template <opts_t opts, class arr_1d_t>
+      inline auto A(
+        const arr_1d_t &psi, 
+        const rng_t &i,
+        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss = false
+      ) return_macro(,
+	frac<opts>( 
+	    abs(psi(i+1)) 
+	  - abs(psi(i  ))
+	  ,// -----------
+	    abs(psi(i+1)) 
+	  + abs(psi(i  ))
+	) 
+      )
+
+// TODO: move toa formulae to a separate file
+// TODO: rename A, B nd xx_helper to 1/psi dpsi/dt etc
+
 
       // 3rd order term (first term from eq. (36) from @copybrief Smolarkiewicz_and_Margolin_1998 (with G=1))
       template<opts_t opts, class arr_1d_t>
       inline auto f_3rd_xx(
         const arr_1d_t &psi,
         const arr_1d_t &C,
-        const rng_t &i
+        const rng_t &i,
+        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
       ) return_macro(,
 	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) 
-        / (typename arr_1d_t::T_numtype(3)) // TODO: chec if this cast is needed
-	* where(
-          // if
-          opt_set(opts, sss),
-          // then
-          frac(
-	    psi(i+2) - psi(i+1) - psi(i) + psi(i-1)
-	    ,// 
-	    psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
-	  ),
-          // else
-          frac(
-	    abs(psi(i+2)) - abs(psi(i+1)) - abs(psi(i)) + abs(psi(i-1))
-	    ,// 
-	    abs(psi(i+2)) + abs(psi(i+1)) + abs(psi(i)) + abs(psi(i-1))
-	  )
-        )
+	/ (typename arr_1d_t::T_numtype(3)) // TODO: check if this cast is needed
+        * // TODO: code duplication above :*
+        frac<opts>(
+	  psi(i+2) - psi(i+1) - psi(i) + psi(i-1)
+	  ,// 
+	  psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
+	)
+      )
+
+      template<opts_t opts, class arr_1d_t>
+      inline auto f_3rd_xx(
+        const arr_1d_t &psi,
+        const arr_1d_t &C,
+        const rng_t &i,
+        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss == false
+      ) return_macro(,
+	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) 
+	/ (typename arr_1d_t::T_numtype(3)) // TODO: check if this cast is needed
+        * // TODO: code duplication above :*
+        frac<opts>(
+	  abs(psi(i+2)) - abs(psi(i+1)) - abs(psi(i)) + abs(psi(i-1))
+	  ,// 
+	  abs(psi(i+2)) + abs(psi(i+1)) + abs(psi(i)) + abs(psi(i-1))
+	)
       )
 
       //
@@ -81,15 +97,10 @@ namespace libmpdataxx
         * (1 - abs(C(i+h))) 
         * A<opts>(psi, i) 
         // third-order terms
-        + where(
-          // if
-          opt_set(opts, toa),
-          // then 
-          f_3rd_xx<opts>(psi, C, i),
-          // else
-          0
-        )
-      ) 
+        + 
+        f_3rd_xx<opts>(psi, C, i) // TODO: rename to HOT? 
+      )
+
     }; // namespace mpdata
   }; // namespace formulae
 }; // namespcae libmpdataxx

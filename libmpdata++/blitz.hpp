@@ -6,6 +6,10 @@
 
 #pragma once
 
+#if !defined(__FAST_MATH__)
+#  warning("__FAST_MATH__ undefined - consider using the -ffast-math flag for Clang and GCC")
+#endif
+
 #if defined(_OPENMP) || defined(_REENTRANT)
 #  define BZ_THREADSAFE
 #endif
