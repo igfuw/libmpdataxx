@@ -53,61 +53,18 @@ namespace libmpdataxx
 	this->mem->barrier();
 
         // calculating the monotonic corrective velocity
-        if (formulae::mpdata::opt_set(opts, formulae::mpdata::sss))
-        {
-          // single-sign signal version 
-          // TODO: isnt't it a positive-definite version???
-          // TODO: merge it with one of the branches below
-	  this->C_mono[d]( im+h ) = C_corr[d]( im+h ) * where(
-	    C_corr[d]( im+h ) > 0,
-	    min(1, min(
-	      formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im),
-	      formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im + 1)
-	    )),
-	    min(1, min(
-	      formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im),
-	      formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im + 1)
-	    ))
-	  );
-        } 
-        else
-        {
-          // variable-sign version
-	  this->C_mono[d]( im+h ) = C_corr[d]( im+h ) * where(
-            // if
-	    C_corr[d]( im+h ) > 0,
-            // then
-            where(
-              // if
-              psi(im) > 0,
-              // then
-	      min(1, min(
-		formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im),
-		formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im + 1)
-	      )),
-              // else
-	      min(1, min(
-		formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im),
-		formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im + 1)
-	      ))
-            ),
-            // else
-            where(
-              // if
-              psi(im+1) > 0,
-              // then
-	      min(1, min(
-		formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im),
-		formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im + 1)
-	      )),
-              // else
-	      min(1, min(
-		formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im),
-		formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im + 1)
-	      ))
-            )
-	  );
-        }
+	// TODO: isnt't sss a positive-definite version only for FCT???
+	this->C_mono[d]( im+h ) = C_corr[d]( im+h ) * where(
+	  C_corr[d]( im+h ) > 0,
+	  min(1, min(
+	    formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im),
+	    formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im + 1)
+	  )),
+	  min(1, min(
+	    formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im),
+	    formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im + 1)
+	  ))
+	);
       }
 
       public:
