@@ -50,28 +50,15 @@ namespace libmpdataxx
 	// fill halos -> mpdata works with halo=1, we need halo=2
 // TODO: other option would be to define im as a function of halo in mpdata!
 	this->mem->barrier();
-	this->bcxl->fill_halos_vctr(C_corr[d]); // TODO: one xchng call?
-	this->bcxr->fill_halos_vctr(C_corr[d]);
-	this->bcyl->fill_halos_vctr(C_corr[d]); // TODO: one xchng call?
-	this->bcyr->fill_halos_vctr(C_corr[d]);
+	this->bcxl->fill_halos_vctr(C_corr[0], this->j); // TODO: one xchng call?
+	this->bcxr->fill_halos_vctr(C_corr[0], this->j);
+	this->bcyl->fill_halos_vctr(C_corr[1], this->i); // TODO: one xchng call?
+	this->bcyr->fill_halos_vctr(C_corr[1], this->i);
 	this->mem->barrier();
 
 	// calculating the monotonic corrective velocity
-	// TODO: isnt't sss a positive-definite version only for FCT???
-        {
-          const int d = 0;
-	  this->C_mono[d]( im+h, jm ) = C_corr[d]( im+h, jm ) * where( 
-	    C_corr[d]( im+h, jm ) > 0,
-	    min(1, min(
-	      formulae::mpdata::beta_dn<opts, d>(psi, this->psi_min, C_corr[d], im,     jm),
-	      formulae::mpdata::beta_up<opts, d>(psi, this->psi_max, C_corr[d], im + 1, jm)
-	    )),
-	    min(1, min(
-	      formulae::mpdata::beta_up<opts, d>(psi, this->psi_max, C_corr[d], im,     jm),
-	      formulae::mpdata::beta_dn<opts, d>(psi, this->psi_min, C_corr[d], im + 1, jm)
-	    ))
-	  );
-        }
+	this->C_mono[0]( im+h, jm ) = formulae::mpdata::C_mono<opts, 0>(psi, this->psi_min, this->psi_max, C_corr[0], im, jm);
+	this->C_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, C_corr[1], jm, im);
       }
 
       public:
