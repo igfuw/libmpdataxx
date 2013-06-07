@@ -32,6 +32,13 @@ namespace libmpdataxx
 	using namespace idxperm;
 	a(pi<d>(this->left_halo_sclr, j)) = a(pi<d>(this->rght_edge_sclr, j));
       }
+
+      void fill_halos_vctr(const arr_t &a, const rng_t &j)
+      {
+	using namespace idxperm;
+        assert(parent_t::halo > 1 && "there is no vector halo for halo=1");
+        a(pi<d>(this->left_halo_vctr, j)) = a(pi<d>(this->rght_edge_vctr, j));
+      }
     };
 
     template<int d, typename real_t>
@@ -52,6 +59,13 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
 	a(pi<d>(this->rght_halo_sclr, j)) = a(pi<d>(this->left_edge_sclr, j));
+      }
+
+      void fill_halos_vctr(const arr_t &a, const rng_t &j)
+      {
+	using namespace idxperm;
+        assert(parent_t::halo > 1 && "there is no vector halo for halo=1");
+        a(pi<d>(this->rght_halo_vctr, j)) = a(pi<d>(this->left_edge_vctr, j));
       }
     };
   }; // namespace bcond

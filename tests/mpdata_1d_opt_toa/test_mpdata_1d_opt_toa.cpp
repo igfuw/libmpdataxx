@@ -60,7 +60,7 @@ int main()
   const int n_eqs = 1;
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_iters=2_toa");
-//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_fct_iters=2_toa");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_fct_iters=2_toa"); // TODO: to nie dziala!!!
 
   for (auto &slv : slvs) slv.advance(nt);
 }

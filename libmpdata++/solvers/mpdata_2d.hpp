@@ -25,10 +25,10 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_common<real_t, n_iters, 2, n_eqs, opts, halo>;
 
+      protected:
+
       // member fields
       rng_t im, jm;
-
-      protected:
 
       // method invoked by the solver
       void advop(int e)
