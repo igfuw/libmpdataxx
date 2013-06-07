@@ -66,7 +66,7 @@ namespace libmpdataxx
 	  ,// 
 	  psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
 	)
-      )
+    )
 
       template<opts_t opts, class arr_1d_t>
       inline auto f_3rd_xx(
@@ -98,9 +98,8 @@ namespace libmpdataxx
         * A<opts>(psi, i) 
         // third-order terms
         + 
-        f_3rd_xx<opts>(psi, C, i) // TODO: rename to HOT? 
+        where(opt_set(opts, toa), f_3rd_xx<opts>(psi, C, i), 0) // TODO: rename to HOT? // TODO: where -> enable_if
       )
-
     }; // namespace mpdata
   }; // namespace formulae
 }; // namespcae libmpdataxx
