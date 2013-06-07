@@ -31,7 +31,7 @@ void setup(T &solver, int n)
   int width = 50, center = 100;
   solver.state(0) = where(i <= center-width/2 || i >= center+width/2, 2, 4); 
   solver.state(1) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
-  solver.courant() = .5; 
+  solver.courant() = -.5; 
 }
 
 template <class T>
@@ -65,15 +65,15 @@ int main()
 
   const int n_eqs = 2;
 
-  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
+//  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
+//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
+//  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
 
   add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "mpdata_fct_iters=2");
-  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "mpdata_fct_iters=3");
+//  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "mpdata_fct_iters=3");
 
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_fct_iters=2_sss");
+//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
+//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_fct_iters=2_sss");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

@@ -18,7 +18,7 @@
 using namespace libmpdataxx;
 
 using real_t = float;
-int n = 500, nt = 1600;
+int n = 500, nt = 1200;
 
 template <class T>
 void setup(T &solver, int n) 
@@ -26,7 +26,7 @@ void setup(T &solver, int n)
   blitz::firstIndex i;
   int width = 50, center = 100;
   solver.state(0) = where(i <= center-width/2 || i >= center+width/2,  2, 4); 
-  solver.courant() = .5; 
+  solver.courant() = 2/3.; 
 }
 
 template <class T>
@@ -57,10 +57,10 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  const int n_eqs = 2;
+  const int n_eqs = 1;
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_iters=2_toa");
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_fct_iters=2_toa");
+//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_fct_iters=2_toa");
 
   for (auto &slv : slvs) slv.advance(nt);
 }
