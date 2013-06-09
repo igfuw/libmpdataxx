@@ -27,7 +27,7 @@ namespace libmpdataxx
 	  (C + abs(C)) * psi_l + 
 	  (C - abs(C)) * psi_r
 	) / 2
-      )
+      ) // TODO: the npa option should go here as well!
 
       template <class arr_1d_t>
       inline auto donorcell( 

@@ -65,15 +65,18 @@ int main()
 
   const int n_eqs = 2;
 
-//  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
-//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-//  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
+  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
 
   add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "mpdata_fct_iters=2");
-//  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "mpdata_fct_iters=3");
+  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "mpdata_fct_iters=3");
 
-//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
-//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_fct_iters=2_sss");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_fct_iters=2_sss");
+
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_iters=2_npa");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_fct_iters=2_npa");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

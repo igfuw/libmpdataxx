@@ -30,6 +30,7 @@ function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   set_target_properties(${test} PROPERTIES LINK_FLAGS_DEBUG "-lblitz")
   target_link_libraries(${test} ${Boost_LIBRARIES})
+# TODO: target_compile_options() // added to CMake on Jun 3rd 2013
   add_test(${test} ${test})
 endfunction()
 
@@ -49,3 +50,4 @@ add_subdirectory(mpdata_fct_1d)
 add_subdirectory(mpdata_1d_opt_sss)
 add_subdirectory(mpdata_1d_opt_toa)
 add_subdirectory(mpdata_1d_opt_eps)
+add_subdirectory(mpdata_1d_opt_npa)

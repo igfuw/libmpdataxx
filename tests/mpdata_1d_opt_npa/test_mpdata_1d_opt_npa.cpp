@@ -25,7 +25,8 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state() = where(i <= center-width/2 || i >= center+width/2, -400, 400) * blitz::tiny(real_t(0)); 
+  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
+  solver.state(1) = where(i <= center-width/2 || i >= center+width/2,  2, 4);  // TODO: perhaps chose some values which would show the difference...
   solver.courant() = .5; 
 }
 
@@ -34,10 +35,13 @@ void setopts(T &p, const int nt, const std::string &fname)
 {
   p.outfreq = nt; // displays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
-  p.outvars = {{0, {.name = "psi", .unit = "1"}}};
+  p.outvars = {
+    {0, {.name = "variable-sign signal", .unit = "1"}},
+    {1, {.name = "single-sign signal", .unit = "1"}}
+  };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
-  //p.gnuplot_yrange = "[-2:5]";
+  p.gnuplot_yrange = "[-2:5]";
 }
 
 template <class solver_t, class vec_t>
@@ -55,11 +59,11 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  const int n_eqs = 1;
+  const int n_eqs = 2;
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::eps>>(slvs, "mpdata_iters=2_eps");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_iters=2_npa");
   add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::eps>>(slvs, "mpdata_iters=3_eps");
+  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_iters=3_npa");
 
   for (auto &slv : slvs) slv.advance(nt);
 }
