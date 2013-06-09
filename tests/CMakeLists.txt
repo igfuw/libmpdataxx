@@ -1,5 +1,5 @@
 # to make <libmpdata++/...> work
-set(CMAKE_CXX_FLAGS "-I../.. ${CMAKE_CXX_FLAGS}") 
+set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CXX_FLAGS}") 
 
 # OpenMP
 find_package(OpenMP)

@@ -1,4 +1,0 @@
-libmpdata++
-===========
-
-work in progress :)

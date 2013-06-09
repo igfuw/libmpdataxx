@@ -1,0 +1,13 @@
+libmpdata++
+===========
+
+First, that's all work in progress!
+
+
+...libmpdataxx$ mkdir build
+...libmpdataxx$ cd build
+...libmpdataxx/build$ cmake     \
+  -DCMAKE_BUILD_TYPE=Release    \
+  -DCMAKE_CXX_COMPILER=clang++  \
+  ..
+
