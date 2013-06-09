@@ -37,15 +37,15 @@ namespace libmpdataxx
 //            max(0, C_corr(i-h)) * psi(i-1) 
 //          - min(0, C_corr(i+h)) * psi(i+1)
 
-            max(0, C_corr(pi<d>(i-h, j))) * max(0, psi(pi<d>(i-1, j))) 
-          - min(0, C_corr(pi<d>(i+h, j))) * max(0, psi(pi<d>(i+1, j)))
-          - max(0, C_corr(pi<d>(i+h, j))) * min(0, psi(pi<d>(i,   j)))
-          + min(0, C_corr(pi<d>(i-h, j))) * min(0, psi(pi<d>(i,   j)))
+            pospart<opts>(C_corr(pi<d>(i-h, j))) * pospart<opts>(psi(pi<d>(i-1, j))) 
+          - negpart<opts>(C_corr(pi<d>(i+h, j))) * pospart<opts>(psi(pi<d>(i+1, j)))
+          - pospart<opts>(C_corr(pi<d>(i+h, j))) * negpart<opts>(psi(pi<d>(i,   j)))
+          + negpart<opts>(C_corr(pi<d>(i-h, j))) * negpart<opts>(psi(pi<d>(i,   j)))
 
-          + max(0, C_corr(pi<d>(i, j-h))) * max(0, psi(pi<d>(i, j-1))) // TODO: double check indices
-          - min(0, C_corr(pi<d>(i, j+h))) * max(0, psi(pi<d>(i, j+1)))
-          - max(0, C_corr(pi<d>(i, j+h))) * min(0, psi(pi<d>(i, j  )))
-          + min(0, C_corr(pi<d>(i, j-h))) * min(0, psi(pi<d>(i, j  )))
+          + pospart<opts>(C_corr(pi<d>(i, j-h))) * pospart<opts>(psi(pi<d>(i, j-1))) // TODO: double check indices
+          - negpart<opts>(C_corr(pi<d>(i, j+h))) * pospart<opts>(psi(pi<d>(i, j+1)))
+          - pospart<opts>(C_corr(pi<d>(i, j+h))) * negpart<opts>(psi(pi<d>(i, j  )))
+          + negpart<opts>(C_corr(pi<d>(i, j-h))) * negpart<opts>(psi(pi<d>(i, j  )))
         ) 
       ) 
 
@@ -69,15 +69,15 @@ namespace libmpdataxx
 // TODO: opts.pds version
 //            max(0, C_corr(i+h)) * psi(i) 
 //          - min(0, C_corr(i-h)) * psi(i)
-            max(0, C_corr(pi<d>(i+h, j))) * max(0, psi(pi<d>(i,   j)))
-          - min(0, C_corr(pi<d>(i-h, j))) * max(0, psi(pi<d>(i,   j)))
-          - max(0, C_corr(pi<d>(i-h, j))) * min(0, psi(pi<d>(i-1, j)))
-          + min(0, C_corr(pi<d>(i+h, j))) * min(0, psi(pi<d>(i+1, j)))
+            pospart<opts>(C_corr(pi<d>(i+h, j))) * pospart<opts>(psi(pi<d>(i,   j)))
+          - negpart<opts>(C_corr(pi<d>(i-h, j))) * pospart<opts>(psi(pi<d>(i,   j)))
+          - pospart<opts>(C_corr(pi<d>(i-h, j))) * negpart<opts>(psi(pi<d>(i-1, j)))
+          + negpart<opts>(C_corr(pi<d>(i+h, j))) * negpart<opts>(psi(pi<d>(i+1, j)))
 
-          + max(0, C_corr(pi<d>(i, j+h))) * max(0, psi(pi<d>(i,   j)))
-          - min(0, C_corr(pi<d>(i, j-h))) * max(0, psi(pi<d>(i,   j)))
-          - max(0, C_corr(pi<d>(i, j-h))) * min(0, psi(pi<d>(i, j-1)))
-          + min(0, C_corr(pi<d>(i, j+h))) * min(0, psi(pi<d>(i, j+1)))
+          + pospart<opts>(C_corr(pi<d>(i, j+h))) * pospart<opts>(psi(pi<d>(i,   j)))
+          - negpart<opts>(C_corr(pi<d>(i, j-h))) * pospart<opts>(psi(pi<d>(i,   j)))
+          - pospart<opts>(C_corr(pi<d>(i, j-h))) * negpart<opts>(psi(pi<d>(i, j-1)))
+          + negpart<opts>(C_corr(pi<d>(i, j+h))) * negpart<opts>(psi(pi<d>(i, j+1)))
         ) 
       ) 
 

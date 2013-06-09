@@ -16,7 +16,6 @@ namespace libmpdataxx
     {
       using namespace arakawa_c;
 
-      // 1D
 // TODO: psi -> psi/rho !!!
       template <opts_t opts, class arr_1d_t>
       inline auto beta_up(
@@ -32,11 +31,10 @@ namespace libmpdataxx
 // opts.pdf version
 //            max(0, C_corr(i-h)) * psi(i-1) 
 //          - min(0, C_corr(i+h)) * psi(i+1)
-
-            max(0, C_corr(i-h)) * max(0, psi(i-1))
-          - min(0, C_corr(i+h)) * max(0, psi(i+1))
-          - max(0, C_corr(i+h)) * min(0, psi(i))
-          + min(0, C_corr(i-h)) * min(0, psi(i))
+            pospart<opts>(C_corr(i-h)) * pospart<opts>(psi(i-1))
+          - negpart<opts>(C_corr(i+h)) * pospart<opts>(psi(i+1))
+          - pospart<opts>(C_corr(i+h)) * negpart<opts>(psi(i))
+          + negpart<opts>(C_corr(i-h)) * negpart<opts>(psi(i))
         ) 
       ) 
 
@@ -55,10 +53,10 @@ namespace libmpdataxx
 // opts.pdf version
 //            max(0, C_corr(i+h)) * psi(i) 
 //          - min(0, C_corr(i-h)) * psi(i)
-            max(0, C_corr(i+h)) * max(0, psi(i))
-          - min(0, C_corr(i-h)) * max(0, psi(i))
-          - max(0, C_corr(i-h)) * min(0, psi(i-1))
-          + min(0, C_corr(i+h)) * min(0, psi(i+1))
+            pospart<opts>(C_corr(i+h)) * pospart<opts>(psi(i  ))
+          - negpart<opts>(C_corr(i-h)) * pospart<opts>(psi(i  ))
+          - pospart<opts>(C_corr(i-h)) * negpart<opts>(psi(i-1))
+          + negpart<opts>(C_corr(i+h)) * negpart<opts>(psi(i+1))
         ) 
       ) 
 
