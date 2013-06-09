@@ -61,6 +61,7 @@ namespace libmpdataxx
 	    );
  
             // filling Y halos for C_x, and X halos for C_y
+            // TODO: document why; is it needed in the last iteration?; what about FCT?
             this->mem->barrier();
 	    this->bcyl->fill_halos_sclr(this->C_corr(iter)[0], this->i^h); // TODO: one xchng?
 	    this->bcyr->fill_halos_sclr(this->C_corr(iter)[0], this->i^h);
@@ -69,6 +70,8 @@ namespace libmpdataxx
             this->mem->barrier();
 
             this->fct_adjust_antidiff(e, iter);
+
+            // TODO: shouldn't the above halo-filling be repeated here?
 	  }
 	  // donor-cell call 
 	  formulae::donorcell::op_2d(this->mem->psi[e], 

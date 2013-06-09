@@ -50,15 +50,15 @@ namespace libmpdataxx
 	// fill halos -> mpdata works with halo=1, we need halo=2
 // TODO: other option would be to define im as a function of halo in mpdata!
 	this->mem->barrier();
-	this->bcxl->fill_halos_vctr(C_corr[0], this->j); // TODO: one xchng call?
-	this->bcxr->fill_halos_vctr(C_corr[0], this->j);
-	this->bcyl->fill_halos_vctr(C_corr[1], this->i); // TODO: one xchng call?
-	this->bcyr->fill_halos_vctr(C_corr[1], this->i);
+	this->bcxl->fill_halos_vctr(C_corr[0], this->j^1); // TODO: one xchng call?
+	this->bcxr->fill_halos_vctr(C_corr[0], this->j^1);
+	this->bcyl->fill_halos_vctr(C_corr[1], this->i^1); // TODO: one xchng call?
+	this->bcyr->fill_halos_vctr(C_corr[1], this->i^1);
 	this->mem->barrier();
 
 	// calculating the monotonic corrective velocity
-	this->C_mono[0]( im+h, jm ) = formulae::mpdata::C_mono<opts, 0>(psi, this->psi_min, this->psi_max, C_corr[0], im, jm);
-	this->C_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, C_corr[1], jm, im);
+	this->C_mono[0]( im+h, jm ) = formulae::mpdata::C_mono<opts, 0>(psi, this->psi_min, this->psi_max, C_corr, im, jm);
+	this->C_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, C_corr, jm, im);
       }
 
       public:

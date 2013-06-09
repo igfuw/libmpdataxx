@@ -21,7 +21,7 @@ namespace libmpdataxx
       inline auto beta_up(
         const arr_2d_t &psi,
         const arr_2d_t &psi_max, // from before the first iteration
-        const arr_2d_t &C_corr, 
+        const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,  
         const rng_t j
       ) return_macro(,
@@ -37,15 +37,15 @@ namespace libmpdataxx
 //            max(0, C_corr(i-h)) * psi(i-1) 
 //          - min(0, C_corr(i+h)) * psi(i+1)
 
-            pospart<opts>(C_corr(pi<d>(i-h, j))) * pospart<opts>(psi(pi<d>(i-1, j))) 
-          - negpart<opts>(C_corr(pi<d>(i+h, j))) * pospart<opts>(psi(pi<d>(i+1, j)))
-          - pospart<opts>(C_corr(pi<d>(i+h, j))) * negpart<opts>(psi(pi<d>(i,   j)))
-          + negpart<opts>(C_corr(pi<d>(i-h, j))) * negpart<opts>(psi(pi<d>(i,   j)))
+            pospart<opts>(C_corr[d-0](pi<d>(i-h, j))) * pospart<opts>(psi(pi<d>(i-1, j))) 
+          - negpart<opts>(C_corr[d-0](pi<d>(i+h, j))) * pospart<opts>(psi(pi<d>(i+1, j)))
+          - pospart<opts>(C_corr[d-0](pi<d>(i+h, j))) * negpart<opts>(psi(pi<d>(i,   j)))
+          + negpart<opts>(C_corr[d-0](pi<d>(i-h, j))) * negpart<opts>(psi(pi<d>(i,   j)))
 
-          + pospart<opts>(C_corr(pi<d>(i, j-h))) * pospart<opts>(psi(pi<d>(i, j-1))) // TODO: double check indices
-          - negpart<opts>(C_corr(pi<d>(i, j+h))) * pospart<opts>(psi(pi<d>(i, j+1)))
-          - pospart<opts>(C_corr(pi<d>(i, j+h))) * negpart<opts>(psi(pi<d>(i, j  )))
-          + negpart<opts>(C_corr(pi<d>(i, j-h))) * negpart<opts>(psi(pi<d>(i, j  )))
+          + pospart<opts>(C_corr[d-1](pi<d>(i, j-h))) * pospart<opts>(psi(pi<d>(i, j-1))) // TODO: double check indices
+          - negpart<opts>(C_corr[d-1](pi<d>(i, j+h))) * pospart<opts>(psi(pi<d>(i, j+1)))
+          - pospart<opts>(C_corr[d-1](pi<d>(i, j+h))) * negpart<opts>(psi(pi<d>(i, j  )))
+          + negpart<opts>(C_corr[d-1](pi<d>(i, j-h))) * negpart<opts>(psi(pi<d>(i, j  )))
         ) 
       ) 
 
@@ -54,12 +54,12 @@ namespace libmpdataxx
       inline auto beta_dn(
         const arr_2d_t &psi, 
         const arr_2d_t &psi_min, // from before the first iteration
-        const arr_2d_t &C_corr, 
+        const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,
         const rng_t j 
       ) return_macro(,
         frac<opts>(
-            psi(i)
+            psi(pi<d>(i, j))
           - min(min(min(min(min(psi_min(pi<d>(i,j)), 
                                    psi(pi<d>(i, j+1))),
               psi(pi<d>(i-1, j))), psi(pi<d>(i, j  ))), psi(pi<d>(i+1, j))), // TODO: this is repeated with other dimension
@@ -69,15 +69,15 @@ namespace libmpdataxx
 // TODO: opts.pds version
 //            max(0, C_corr(i+h)) * psi(i) 
 //          - min(0, C_corr(i-h)) * psi(i)
-            pospart<opts>(C_corr(pi<d>(i+h, j))) * pospart<opts>(psi(pi<d>(i,   j)))
-          - negpart<opts>(C_corr(pi<d>(i-h, j))) * pospart<opts>(psi(pi<d>(i,   j)))
-          - pospart<opts>(C_corr(pi<d>(i-h, j))) * negpart<opts>(psi(pi<d>(i-1, j)))
-          + negpart<opts>(C_corr(pi<d>(i+h, j))) * negpart<opts>(psi(pi<d>(i+1, j)))
+            pospart<opts>(C_corr[d-0](pi<d>(i+h, j))) * pospart<opts>(psi(pi<d>(i,   j)))
+          - negpart<opts>(C_corr[d-0](pi<d>(i-h, j))) * pospart<opts>(psi(pi<d>(i,   j)))
+          - pospart<opts>(C_corr[d-0](pi<d>(i-h, j))) * negpart<opts>(psi(pi<d>(i-1, j)))
+          + negpart<opts>(C_corr[d-0](pi<d>(i+h, j))) * negpart<opts>(psi(pi<d>(i+1, j)))
 
-          + pospart<opts>(C_corr(pi<d>(i, j+h))) * pospart<opts>(psi(pi<d>(i,   j)))
-          - negpart<opts>(C_corr(pi<d>(i, j-h))) * pospart<opts>(psi(pi<d>(i,   j)))
-          - pospart<opts>(C_corr(pi<d>(i, j-h))) * negpart<opts>(psi(pi<d>(i, j-1)))
-          + negpart<opts>(C_corr(pi<d>(i, j+h))) * negpart<opts>(psi(pi<d>(i, j+1)))
+          + pospart<opts>(C_corr[d-1](pi<d>(i, j+h))) * pospart<opts>(psi(pi<d>(i,   j)))
+          - negpart<opts>(C_corr[d-1](pi<d>(i, j-h))) * pospart<opts>(psi(pi<d>(i,   j)))
+          - pospart<opts>(C_corr[d-1](pi<d>(i, j-h))) * negpart<opts>(psi(pi<d>(i, j-1)))
+          + negpart<opts>(C_corr[d-1](pi<d>(i, j+h))) * negpart<opts>(psi(pi<d>(i, j+1)))
         ) 
       ) 
 
@@ -86,13 +86,13 @@ namespace libmpdataxx
         const arr_2d_t &psi,
         const arr_2d_t &psi_min, // from before the first iteration
         const arr_2d_t &psi_max, // from before the first iteration
-        const arr_2d_t &C_corr,
+        const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,
         const rng_t j
       ) return_macro(,
-        C_corr( pi<d>(i+h, j) ) * where(
+        C_corr[d]( pi<d>(i+h, j) ) * where(
           // if
-          C_corr( pi<d>(i+h, j) ) > 0,
+          C_corr[d]( pi<d>(i+h, j) ) > 0,
           // then
           min(1, min(
             beta_dn<opts, d>(psi, psi_min, C_corr, i,     j),
