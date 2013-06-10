@@ -53,18 +53,7 @@ namespace libmpdataxx
 	this->mem->barrier();
 
         // calculating the monotonic corrective velocity
-	// TODO: isnt't sss a positive-definite version only for FCT???
-	this->C_mono[d]( im+h ) = C_corr[d]( im+h ) * where(
-	  C_corr[d]( im+h ) > 0,
-	  min(1, min(
-	    formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im),
-	    formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im + 1)
-	  )),
-	  min(1, min(
-	    formulae::mpdata::beta_up<opts>(psi, this->psi_max, C_corr[d], im),
-	    formulae::mpdata::beta_dn<opts>(psi, this->psi_min, C_corr[d], im + 1)
-	  ))
-	);
+	this->C_mono[d]( im+h ) = formulae::mpdata::C_mono<opts>(psi, this->psi_min, this->psi_max, C_corr[d], im);
       }
 
       public:
