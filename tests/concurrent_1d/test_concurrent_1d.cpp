@@ -9,7 +9,7 @@
 
 #include <libmpdata++/concurr/openmp.hpp>
 #include <libmpdata++/concurr/boost_thread.hpp>
-#include <libmpdata++/solvers/mpdata_1d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
 #include <libmpdata++/bcond/cyclic_1d.hpp>
 
 int main()

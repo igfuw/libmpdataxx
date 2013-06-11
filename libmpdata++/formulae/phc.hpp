@@ -12,7 +12,7 @@
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/units.hpp>
 
-// TODO: rename (not phc)... or remove completely?
+// TODO: remove this file completely
 
 #define phc_decltype_return(expr) -> decltype(expr) { return expr; }
 

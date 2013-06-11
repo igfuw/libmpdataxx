@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/detail/solver_1d.hpp>
+#include <libmpdata++/solvers/adv/detail/solver_1d.hpp>
 #include <libmpdata++/formulae/leapfrog_formulae.hpp>
 
 // TODO: this doesn't work yet - just a draft! needs an initial non-leapfrog step

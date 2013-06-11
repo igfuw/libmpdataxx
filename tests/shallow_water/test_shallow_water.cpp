@@ -7,7 +7,7 @@
 
 #include <boost/math/constants/constants.hpp>
 
-#include <libmpdata++/solvers/mpdata_2d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>

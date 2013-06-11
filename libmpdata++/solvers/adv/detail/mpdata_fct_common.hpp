@@ -6,8 +6,6 @@
 
 #pragma once
 
-//#include <array>
-
 namespace libmpdataxx
 {
   namespace solvers

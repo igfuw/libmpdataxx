@@ -10,8 +10,8 @@
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_2d.hpp>
 #include <libmpdata++/formulae/donorcell_formulae.hpp>
-#include <libmpdata++/solvers/detail/solver_2d.hpp> // TODO: this is not used here but has to be included... tricky!
-#include <libmpdata++/solvers/detail/mpdata_common.hpp>
+#include <libmpdata++/solvers/adv/detail/solver_2d.hpp> // TODO: this is not used here but has to be included... tricky!
+#include <libmpdata++/solvers/adv/detail/mpdata_common.hpp>
 
 namespace libmpdataxx
 {

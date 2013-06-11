@@ -10,7 +10,7 @@
  * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=3.svg" TODO
  */
 
-#include <libmpdata++/solvers/mpdata_fct_1d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_fct_1d.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>

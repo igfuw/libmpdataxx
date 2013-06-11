@@ -9,7 +9,7 @@
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/arakawa_c.hpp>
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
-#include <libmpdata++/solvers/detail/monitor.hpp>
+#include <libmpdata++/solvers/adv/detail/monitor.hpp>
 
 namespace libmpdataxx
 {

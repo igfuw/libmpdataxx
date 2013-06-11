@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/mpdata_2d.hpp>
-#include <libmpdata++/solvers/detail/mpdata_fct_common.hpp>
+#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
+#include <libmpdata++/solvers/adv/detail/mpdata_fct_common.hpp>
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_fct_2d.hpp>
 
 namespace libmpdataxx

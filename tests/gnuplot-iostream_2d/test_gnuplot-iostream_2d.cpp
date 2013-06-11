@@ -8,8 +8,8 @@
  * \image html "../../tests/gnuplot-iostream_2d/figure.svg"
  */
 
-#include <libmpdata++/solvers/mpdata_2d.hpp>
-#include <libmpdata++/solvers/donorcell_2d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
+#include <libmpdata++/solvers/adv/donorcell_2d.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
