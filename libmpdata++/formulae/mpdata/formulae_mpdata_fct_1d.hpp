@@ -68,6 +68,7 @@ namespace libmpdataxx
         const arr_1d_t &C_corr,
         const rng_t i
       ) return_macro(,
+/* pds version TODO!!!
         C_corr( i+h ) * where(
           // if
           C_corr( i+h ) > 0,
@@ -82,6 +83,41 @@ namespace libmpdataxx
             beta_dn<opts>(psi, psi_min, C_corr, i + 1)
           ))  
         )  
+*/
+       C_corr(i+h) * where(
+          // if
+          C_corr(i+h) > 0,
+          // then
+          where(
+            // if
+            psi(i) > 0,
+            // then
+            min(1, min(
+              beta_dn<opts>(psi, psi_min, C_corr, i    ), 
+              beta_up<opts>(psi, psi_max, C_corr, i + 1)
+            )), 
+            // else
+            min(1, min(
+              beta_up<opts>(psi, psi_max, C_corr, i    ), 
+              beta_dn<opts>(psi, psi_min, C_corr, i + 1)
+            ))  
+          ),  
+          // else
+          where(
+            // if
+            psi(i+1) > 0, // TODO: what if crossing zero?
+            // then
+            min(1, min(
+              beta_up<opts>(psi, psi_max, C_corr, i    ), 
+              beta_dn<opts>(psi, psi_min, C_corr, i + 1)
+            )), 
+            // else
+            min(1, min(
+              beta_dn<opts>(psi, psi_min, C_corr, i   ), 
+              beta_up<opts>(psi, psi_max, C_corr, i + 1)
+            ))  
+          )   
+        )   
       )
     }; // namespace mpdata_fct
   }; // namespace formulae

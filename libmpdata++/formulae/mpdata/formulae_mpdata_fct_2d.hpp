@@ -66,7 +66,7 @@ namespace libmpdataxx
                                    psi(pi<d>(i, j-1))
           )
           ,// --------------------------
-// TODO: opts.pds version
+// TODO: opts.pds version (maybe by introducing pospart_psi, negpart_psi???)
 //            max(0, C_corr(i+h)) * psi(i) 
 //          - min(0, C_corr(i-h)) * psi(i)
             pospart<opts>(C_corr[d-0](pi<d>(i+h, j))) * pospart<opts>(psi(pi<d>(i,   j)))
@@ -90,6 +90,7 @@ namespace libmpdataxx
         const rng_t i,
         const rng_t j
       ) return_macro(,
+/* // pds version TODO!
         C_corr[d]( pi<d>(i+h, j) ) * where(
           // if
           C_corr[d]( pi<d>(i+h, j) ) > 0,
@@ -103,6 +104,41 @@ namespace libmpdataxx
             beta_up<opts, d>(psi, psi_max, C_corr, i,     j),
             beta_dn<opts, d>(psi, psi_min, C_corr, i + 1, j)
           ))
+        )
+*/
+        C_corr[d]( pi<d>(i+h, j) ) * where(
+          // if
+          C_corr[d]( pi<d>(i+h, j) ) > 0,
+          // then
+          where(
+            // if
+            psi(pi<d>(i, j)) > 0,
+            // then
+	    min(1, min(
+	      beta_dn<opts, d>(psi, psi_min, C_corr, i,     j),
+	      beta_up<opts, d>(psi, psi_max, C_corr, i + 1, j)
+	    )),
+            // else
+	    min(1, min(
+	      beta_up<opts, d>(psi, psi_max, C_corr, i,     j),
+	      beta_dn<opts, d>(psi, psi_min, C_corr, i + 1, j)
+	    ))
+          ),
+          // else
+          where(
+            // if
+            psi(pi<d>(i+1, j)) > 0, // TODO: what if crossing zero?
+            // then
+	    min(1, min(
+	      beta_up<opts, d>(psi, psi_max, C_corr, i,     j),
+	      beta_dn<opts, d>(psi, psi_min, C_corr, i + 1, j)
+	    )),
+            // else
+	    min(1, min(
+	      beta_dn<opts, d>(psi, psi_min, C_corr, i,     j),
+	      beta_up<opts, d>(psi, psi_max, C_corr, i + 1, j)
+	    ))
+          )
         )
       ) 
 
