@@ -29,8 +29,8 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, 2, 4); 
-  solver.state(1) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
+  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, 4, 2); 
+  solver.state(1) = where(i <= center-width/2 || i >= center+width/2, -1, -3); 
   solver.courant() = -.5; 
 }
 
@@ -45,7 +45,7 @@ void setopts(T &p, const int nt, const std::string &fname)
   };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
-  p.gnuplot_yrange = "[-1.25:4.25]";
+  p.gnuplot_yrange = "[-3.25:4.25]";
 }
 
 template <class solver_t, class vec_t>
@@ -65,18 +65,18 @@ int main()
 
   const int n_eqs = 2;
 
-  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
+//  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
+//  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
 
   add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "mpdata_fct_iters=2");
-  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "mpdata_fct_iters=3");
+//  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "mpdata_fct_iters=3");
 
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_fct_iters=2_sss");
+//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
+//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_fct_iters=2_sss");
 
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_iters=2_npa");
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_fct_iters=2_npa");
+//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_iters=2_npa");
+//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_fct_iters=2_npa");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

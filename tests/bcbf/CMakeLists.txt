@@ -1,0 +1,2 @@
+libmpdataxx_add_test(test_smooth_bombel)
+libmpdataxx_add_test(test_step_bombel)

@@ -24,6 +24,29 @@ class bombel : public parent_t
     dW(ijk) += formulae::g<real_t>() * si::seconds * si::seconds / si::metres * (Tht(ijk) - Tht_amb) / Tht_amb; // TODO: get rid of units here?
   }
 
+// <TEMP!!!>
+  void hook_ante_step()
+  {
+    using arakawa_c::h;
+
+    parent_t::hook_ante_step();
+
+    real_t 
+      C_x_min = this->mem->min(this->mem->C[0](this->i^h, this->j)),
+      C_x_max = this->mem->max(this->mem->C[0](this->i^h, this->j)),
+      C_y_min = this->mem->min(this->mem->C[1](this->i, this->j^h)),
+      C_y_max = this->mem->max(this->mem->C[1](this->i, this->j^h));
+
+    if (this->mem->rank() == 0)
+    {
+      std::cerr << "min(C_x)) = " << C_x_min << std::endl;
+      std::cerr << "max(C_x)) = " << C_x_max << std::endl;
+      std::cerr << "min(C_y)) = " << C_y_min << std::endl;
+      std::cerr << "max(C_y)) = " << C_y_max << std::endl;
+    }
+  }
+// </TEMP!!!>
+
   public:
 
   struct params_t : parent_t::params_t { real_t Tht_amb; };
