@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/detail/solver_common.hpp>
+#include <libmpdata++/solvers/adv/detail/solver_common.hpp>
 #include <libmpdata++/arakawa_c.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
 

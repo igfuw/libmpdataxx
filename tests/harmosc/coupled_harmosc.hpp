@@ -44,7 +44,7 @@
  *
  */
 
-#include <libmpdata++/solvers/solver_inhomo.hpp>
+#include <libmpdata++/solvers/adv+rhs/solver_inhomo.hpp>
 #include <libmpdata++/blitz.hpp>
 
 using namespace libmpdataxx;

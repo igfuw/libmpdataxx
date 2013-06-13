@@ -10,9 +10,9 @@
  * \image html "../../tests/gnuplot-iostream_1d/figure_iters=3.svg"
  */
 
-#include <libmpdata++/solvers/mpdata_1d.hpp>
-#include <libmpdata++/solvers/donorcell_1d.hpp>
-#include <libmpdata++/solvers/leapfrog_1d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
+#include <libmpdata++/solvers/adv/donorcell_1d.hpp>
+#include <libmpdata++/solvers/adv/leapfrog_1d.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>

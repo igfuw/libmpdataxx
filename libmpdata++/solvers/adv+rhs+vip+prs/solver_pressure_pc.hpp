@@ -73,7 +73,7 @@
   */
 
 #pragma once
-#include <libmpdata++/solvers/detail/solver_pressure_common.hpp>
+#include <libmpdata++/solvers/adv+rhs+vip+prs/detail/solver_pressure_common.hpp>
 #include <libmpdata++/formulae/nabla_formulae.hpp> //gradient, diveregnce
 
 namespace libmpdataxx

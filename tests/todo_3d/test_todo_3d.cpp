@@ -6,7 +6,7 @@
  */
 
 //#include <libmpdata++/.../mpdata_3d.hpp>
-#include <libmpdata++/solvers/donorcell_3d.hpp>
+#include <libmpdata++/solvers/adv/donorcell_3d.hpp>
 #include <libmpdata++/bcond/cyclic_3d.hpp> // TODO: needed?
 #include <libmpdata++/concurr/threads.hpp>
 

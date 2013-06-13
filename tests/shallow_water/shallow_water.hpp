@@ -5,8 +5,8 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 
-#include <libmpdata++/solvers/detail/solver_velocity_common.hpp> // TODO: bez detail!
-#include <libmpdata++/solvers/solver_inhomo.hpp> 
+#include <libmpdata++/solvers/adv+rhs+vip/solver_velocity_common.hpp> // TODO: common => detail??
+#include <libmpdata++/solvers/adv+rhs/solver_inhomo.hpp> 
 #include <libmpdata++/formulae/nabla_formulae.hpp>
 #include <libmpdata++/formulae/phc.hpp>
 

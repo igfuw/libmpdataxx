@@ -13,8 +13,8 @@
  * \image html "../../tests/harmosc/figure_strang_it=2.svg"
  */
 
-#include <libmpdata++/solvers/mpdata_1d.hpp>
-#include <libmpdata++/solvers/donorcell_1d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
+#include <libmpdata++/solvers/adv/donorcell_1d.hpp>
 #include <libmpdata++/bcond/cyclic_1d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>

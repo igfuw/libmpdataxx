@@ -5,7 +5,7 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
  * @brief improved Euler inhomogeneous solver  
- *        (cf. eq. 32 in Smolarkiewicz 1998)
+ *        (cf. eq. 32 in Smolarkiewicz 1998) // TODO cite
  */
 
 #pragma once
@@ -15,6 +15,9 @@ namespace libmpdataxx
   namespace solvers
   {
     enum inhomo_e { euler, strang };
+
+// TODO: explicit/implicit in the name; a common file; temporary space only for explicit/strang?
+// TODO: e.g. harmosc nie jest explicit
 
     template <class homo_solver, inhomo_e inhomo>
     class inhomo_solver : public homo_solver

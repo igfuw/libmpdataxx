@@ -13,7 +13,7 @@
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-#include <libmpdata++/solvers/mpdata_fct_2d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_fct_2d.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>

@@ -11,10 +11,10 @@
  * \image html "../../tests/bombel/figure.svg"
  */
 
-#include <libmpdata++/solvers/mpdata_2d.hpp>
-#include <libmpdata++/solvers/solver_pressure_mr.hpp>
-#include <libmpdata++/solvers/solver_pressure_cr.hpp>
-#include <libmpdata++/solvers/solver_pressure_pc.hpp>
+#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
+#include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_mr.hpp>
+#include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_cr.hpp>
+#include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_pc.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>

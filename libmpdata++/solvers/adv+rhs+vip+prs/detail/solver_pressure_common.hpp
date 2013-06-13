@@ -8,8 +8,8 @@
 #pragma once
 
 #include <libmpdata++/formulae/nabla_formulae.hpp>
-#include <libmpdata++/solvers/detail/solver_velocity_common.hpp>
-#include <libmpdata++/solvers/solver_inhomo.hpp>
+#include <libmpdata++/solvers/adv+rhs/solver_inhomo.hpp>
+#include <libmpdata++/solvers/adv+rhs+vip/solver_velocity_common.hpp> // TODO: if common, should be in detail
 
 namespace libmpdataxx
 {

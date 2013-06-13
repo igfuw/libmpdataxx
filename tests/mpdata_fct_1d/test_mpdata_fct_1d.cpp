@@ -14,7 +14,7 @@
  */
 // TODO: add sss runs to the list above
 
-#include <libmpdata++/solvers/mpdata_fct_1d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_fct_1d.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>

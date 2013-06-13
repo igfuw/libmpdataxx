@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/detail/solver_2d.hpp>
+#include <libmpdata++/solvers/adv/detail/solver_2d.hpp>
 #include <libmpdata++/formulae/donorcell_formulae.hpp>
 
 namespace libmpdataxx
