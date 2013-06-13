@@ -29,8 +29,8 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, 4, 2); 
-  solver.state(1) = where(i <= center-width/2 || i >= center+width/2, -1, -3); 
+  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, 2, 4); 
+  solver.state(1) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
   solver.courant() = -.5; 
 }
 
@@ -45,7 +45,7 @@ void setopts(T &p, const int nt, const std::string &fname)
   };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
-  p.gnuplot_yrange = "[-3.25:4.25]";
+  p.gnuplot_yrange = "[-1.25:4.25]";
 }
 
 template <class solver_t, class vec_t>
