@@ -62,6 +62,7 @@ namespace libmpdataxx
 	  if (this->mem->rank() == 0)
 	  {
 	    n++;
+// TODO: output of solver statistics every timesteps could probably go here
 	    if (n % outfreq == 0) record_all();
 	  }
 	  this->mem->barrier();
