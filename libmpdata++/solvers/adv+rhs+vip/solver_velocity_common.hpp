@@ -14,8 +14,7 @@ namespace libmpdataxx
     namespace detail
     {
 // TODO: 2D assumed - shouldn't the name be suffixed with _2d?
-// TODO: document divideby 
-      template <class inhomo_solver_t, int u, int w, int divideby = -1> // TODO: -1 => some enum or smthng
+      template <class inhomo_solver_t, int u, int w, int density = -1> // TODO: -1 => some enum or smthng
       class solver_velocity_common : public inhomo_solver_t
       {
 	protected:
@@ -30,25 +29,33 @@ namespace libmpdataxx
 
 	void hook_ante_loop(const int nt)
 	{
-          rng_t &i = this->i, &j = this->j;
-          // allow extrapolation at the first time-step
-          this->state(u, -1)(i, j) = this->state(u)(i, j); // TODO: loop over {u,w,divideby}
-          this->state(w, -1)(i, j) = this->state(w)(i, j);
-          if (divideby != -1) this->state(divideby, -1)(i, j) = this->state(divideby)(i, j);
           parent_t::hook_ante_loop(nt);
+          // write to stash current state 
+          // to artificially allow extrapolation at the first time-step
+          if (density == -1) 
+          {
+	    stash[0](this->ijk) = this->state(u)(this->ijk);
+	    stash[1](this->ijk) = this->state(w)(this->ijk);
+          }
+          else
+          {
+	    stash[0](this->ijk) = this->state(u)(this->ijk) / this->state(density)(this->ijk); // TODO: what if density == 0?
+	    stash[1](this->ijk) = this->state(w)(this->ijk) / this->state(density)(this->ijk); // TODO: what if density == 0?
+          } 
 	}
 
-// TODO: tmp_idx = -1 do jakiegos enuma czy consta 
+        template <int d>
+	void extrp(int e) // extrapolate velocity field in time to t+1/2
+	{                 // (write the result to stash since we don't need previous state any more)
+	  stash[d](this->ijk) /= -2.;
 
-	void extrp(int e) // extrapolate in time to t+1/2
-	{            // psi[n-1] will not be used anymore, and it will be intentionally overwritten!
-          rng_t &i = this->i, &j = this->j;
-	  auto tmp = this->state(e, -1);
+          if (density == -1) 
+            stash[d](this->ijk) += 3./2 * this->state(e)(this->ijk);
+          else
+            stash[d](this->ijk) += 3./2 * (this->state(e)(this->ijk) / this->state(density)(this->ijk)); // TODO: what if density == 0?
 
-	  tmp(i,j) /= -2;
-	  tmp(i,j) += 3./2 * this->state(e)(i,j);
-
-	  this->xchng(e, -1);      // filling halos 
+          rng_t &i = this->i, &j = this->j; // TODO: get rid of it
+	  this->xchng(stash[d], this->i^this->halo, this->j^this->halo);      // filling halos 
 	}
 
 	template<int d, class arr_t> 
@@ -61,7 +68,6 @@ namespace libmpdataxx
 	{   
 	  using idxperm::pi;
 	  using namespace arakawa_c;
-   
 	  this->mem->C[d](pi<d>(i+h,j)) = this->dt / dx * .5 * (
             psi(pi<d>(i,    j)) + 
             psi(pi<d>(i + 1,j))
@@ -69,26 +75,35 @@ namespace libmpdataxx
 	}  
 
 	void hook_ante_step()
-	{
-	  extrp(u);      // extrapolate velocity field in time (t+1/2)
-	  extrp(w);
+	{ //extrapolate velocity field in time (t+1/2)
+	  extrp<0>(u);     
+	  extrp<1>(w);
+          //interpolate from velocity field to courant field (mpdata needs courant numbers from t+1/2)
+	  intrp<0>(stash[0], im, this->j^this->halo, dx);
+	  intrp<1>(stash[1], jm, this->i^this->halo, dz);
 
-          if (divideby != -1) // known at compile-time
+          this->mem->barrier();
+
+          // filling the stash with data from current velocity field 
+          // (so that in the next time step they can be used for extrapolation in time)
+          if (density == -1)
           {
-	    extrp(divideby);           
-            // TODO: what if divideby == 0?
-	    intrp<0>(this->state(u, -1) / this->state(divideby, -1), im, this->j^this->halo, dx);
-	    intrp<1>(this->state(w, -1) / this->state(divideby, -1), jm, this->i^this->halo, dz);
+	    stash[0](this->ijk) = this->state(u)(this->ijk);
+	    stash[1](this->ijk) = this->state(w)(this->ijk);
           }
           else
           {
-	    intrp<0>(this->state(u, -1), im, this->j^this->halo, dx);
-	    intrp<1>(this->state(w, -1), jm, this->i^this->halo, dz);
+	    stash[0](this->ijk) = this->state(u)(this->ijk) / this->state(density)(this->ijk);
+	    stash[1](this->ijk) = this->state(w)(this->ijk) / this->state(density)(this->ijk);
           }
 
-          // TODO: document why we compute courants before forcings
-          parent_t::hook_ante_step(); // forcings
+          // intentionally after stash !!!
+          // (we have to stash data from the current time step before applying any forcings to it)
+          parent_t::hook_ante_step(); // applying forcings
 	}
+
+        // member fields
+        arrvec_t<typename parent_t::arr_t> &stash;
 
 	public:
 
@@ -105,10 +120,29 @@ namespace libmpdataxx
 	  parent_t(args, p),
           im(args.i.first() - 1, args.i.last()),
           jm(args.j.first() - 1, args.j.last()),
-          dx(p.dx), dz(p.dz)
+          dx(p.dx), dz(p.dz),
+          stash(args.mem->tmp[__FILE__][0])
 	{
 // TODO: assert dx / dz were set!
         } 
+
+	// TODO: merge the two allocs into one!
+
+	// 1D version
+	static void alloc(typename parent_t::mem_t *mem, const int nx)
+	{
+	  parent_t::alloc(mem, nx);
+	  parent_t::alloc_tmp_sclr(mem, nx, __FILE__, parent_t::n_dims); // psi[n-1] secret stash for velocity extrapolation in time
+	}
+
+	// 2D version
+	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
+	{
+	  parent_t::alloc(mem, nx, ny);
+	  parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, parent_t::n_dims); // psi[n-1] secret stash for velocity extrpolation in time
+	}
+
+	// TODO: 3D version
       }; 
     }; // namespace detail
   }; // namespace solvers

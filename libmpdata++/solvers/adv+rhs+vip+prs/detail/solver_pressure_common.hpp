@@ -81,14 +81,13 @@ namespace libmpdataxx
         void hook_post_step()
         {
           parent_t::hook_post_step(); // forcings
-	  pressure_solver_update(); // intentionally after forcings
+	  pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
 	  pressure_solver_apply();
         }
 
         void hook_post_loop()
         {
           parent_t::hook_post_loop();
-std::cerr<<"number of pseudo time iterations "<<iters<<std::endl;
 	}
 
 	struct params_t : parent_t::params_t 
