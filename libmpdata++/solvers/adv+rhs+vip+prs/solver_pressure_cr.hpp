@@ -130,7 +130,7 @@ namespace libmpdataxx
         lap_p_err(i,j) = this->lap(p_err, i, j, this->dx, this->dz);
 
 	//pseudo-time loop
-//std::cerr<<"-------------------------------------------------"<<std::endl;
+        this->iters = 0;
 	real_t error = 1.;
 	while (error > this->tol)
 	{
@@ -153,18 +153,18 @@ namespace libmpdataxx
             std::abs(this->mem->max(this->err(i,j))), 
             std::abs(this->mem->min(this->err(i,j)))
           );
-//std::cerr<<error<<std::endl;
           this->iters++;
 	}
-
 	//end of pseudo_time loop
+
+// TODO: record it
+//std::cerr<<"      number of iterations untill convergence: "<<this->iters<<std::endl;
+//std::cerr<<"      error: "<<error<<std::endl;
+
 	this->xchng(this->Phi, i^halo, j^halo);
 
-	this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, this->dx);
-	this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, this->dz);
-
-	this->tmp_u(i, j) -= this->state(u)(i, j);
-	this->tmp_w(i, j) -= this->state(w)(i, j);
+	this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->dx);
+	this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dz);
       }
 
       public:

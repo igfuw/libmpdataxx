@@ -37,7 +37,7 @@ namespace libmpdataxx
         *gp 
 	   << "set grid\n"
 	   << "set border " << p.gnuplot_border << "\n"
-	   << "set palette defined ("
+	   << "set palette " /*defined (" // makes gnuplot discard maxcolors :(
 	     "0 '#ffffff'," //         /\-
 	     "1 '#993399'," //        /  \-
 	     "2 '#00CCFF'," //  -----/    \---
@@ -45,7 +45,7 @@ namespace libmpdataxx
 	     "4 '#FFFF00'," //     /        \-    ---
 	     "5 '#FC8727'," //    /__________\-
 	     "6 '#FD0000'"  // 
-	   ") maxcolors " << p.gnuplot_maxcolors << "\n" 
+	   ")*/ << " maxcolors " << p.gnuplot_maxcolors << "\n" 
 	   << "set view " << p.gnuplot_view << "\n"
 	   << "set zrange " << p.gnuplot_zrange << "\n"
 	   << "set xrange [0:" << this->mem->state(0).extent(0) << "]\n"
@@ -105,6 +105,7 @@ namespace libmpdataxx
 	     << "set yrange [0:" << this->mem->state(0).extent(1) << "]\n"
 	     << "set xtics out\n"
 	     << "set ytics out\n"
+	     << "set size square\n"
 	     << (p.gnuplot_surface ? "set" : "unset") << " surface\n"
 	     << (p.gnuplot_contour ? "set" : "unset") << " contour\n"
 	  ;
@@ -113,8 +114,8 @@ namespace libmpdataxx
           if (p.gnuplot_contour)
           {
             *gp 
-               << "unset clabel\n";
-             //  << "set cntrparam level incremental 299, .25, 301.5\n";
+               << "unset clabel\n"
+               << "set cntrparam " << p.gnuplot_cntrparam << "\n";
           }
         }
       }
@@ -183,8 +184,9 @@ namespace libmpdataxx
           gnuplot_cbrange = std::string("[*:*]"),
           gnuplot_border = std::string(""),
           gnuplot_lt = std::string("-1"), // black
+          gnuplot_cntrparam = std::string(""),
           gnuplot_term = std::string("svg dynamic");
-        int gnuplot_maxcolors = 100;
+        int gnuplot_maxcolors = 100; 
         bool 
           gnuplot_contour = false,
           gnuplot_surface = true;
