@@ -1,8 +1,56 @@
-0.1:
+0.09 (pre-submission, things that need to be explicitely mentioned in the text):
 - MPDATA-gauge
+- rainbow plots (mpdata-toa 1D, fct, ...) - needs new output facility (output_text, output_sqlite?)
+- test showing difference between real_t=float and real_t=double (and real_t=long double, ...)
+- doc: dependencies section (C++11, Blitz, Boost, OpenMP)
+- doc: README and HACKING files
+- doc: mention the difference between the order of accuracy of integration vs. order of accuracy of an approximation
 
-0.2:
+
+0.1 (pre-submission / during reviews, should-be-easy enhancements or code cleanups before first release):
+- pressure solvers: introduce inheritance (richardson->mr->cr->pc); what if no preconditioner in pc?; reuse richardson in pc; common loop over pseudo-time
+- concurr_serial 
+- check if all adv/*.hpp are testes (donorcell_1d seems not)
+- use this->ijk istead of this->i, this->j where it could reduce the number of methods (method_1d = method_2d)
+- handle bogus subdomain counts (e.g. 0)
+- 2D & 3D third-order accuracy terms
+- unify error handling (is there anything needed besides asserts?)
+- check if velocity plots with arrows are feasible with output_gnuplot - if not forget about it
 - mechanism for recording stats, and:
   - record C_min, C_max
   - record div(Cx, Cy)
   - record n_iters, error in pressure solvers
+- barriers() within nabla operators?
+- check if some enums could not be converted into c++11 enum classes
+- test showing real_t=quantity<> or real_t=mpfr [real_t=int??? :)]
+- move leapfrog from adv to tests and finish it
+- change cyclic_1d, cyclic_2d... suffixed classes into templates (as it was done with solvers)
+- multi-arguent (variadic) xchng to reduce number of barrier() calls
+- setup(solver, ...) methods in tests do not need to take nx, ny as arguments - these are available via solver.state().extent()
+- @cite instead of @copybrief hack for references? (@cite will work within biref descriptions since the upcoming doxygen release)
+
+
+
+0.2: (near future enhancements, things important for the initial stages of the HARMONIA project)
+- support for specifying mpdata options per equation, and not globally for the whole system (e.g. positive definiteness)
+- HARMONIA-relevant boundary conditions (rigid?, zero-gradient?, open/radiation?)
+- mpdata_3d + tests (what to use for plotting? Paraview? ParaviewWeb)
+
+
+
+0.3: (not-so-near future enhancements, applicable to HARMONIA)
+- MPI parallelisation (incl. remote boundary cond?)
+- MPI-shared_mem setups
+- fork distmem parallelisation for testing sharedmem without MPI
+- concurr_opencl? http://www.multicoreinfo.com/2009/08/parprog-part-9/
+
+
+0.4: (far future, not relevant to HARMONIA)
+- support for non-carthesian geometries
+- other advection algorithms?:
+  - UNO: http://journals.ametsoc.org/doi/pdf/10.1175/2008MWR2451.1
+  - Lax Wendroff http://www.stanford.edu/class/cs205b/lectures/lecture9.pdf
+- reimplement the isentropic model from icicle
+- option to parallelise the computations by equations (and not by domain decomposition)
+- automated -fprofile-use and -fprofile-generate with CMake? (here's an example: http://trac.research.cc.gatech.edu/fastlab/browser/trunk/fastlib/CMakeLists.txt?rev=9455)
+- option to communicate while calculating the domain interior
