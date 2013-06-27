@@ -7,7 +7,7 @@
 
 #include <boost/math/constants/constants.hpp>
 
-#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_fct_2d.hpp> // TODO: not here!
 #include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
@@ -32,7 +32,7 @@ void setopts(T &p)
     {h,   {.name = "h",   .unit = "m"}}, 
   };
   p.gnuplot_with = "lines";
-  p.gnuplot_output = "figure_%s_%d.svg";
+  p.gnuplot_output = "figure_%s_%04d.svg";
   p.gnuplot_zrange = p.gnuplot_cbrange = "[.85:1.1]";
 }
 

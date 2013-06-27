@@ -110,7 +110,7 @@ namespace libmpdataxx
         q_err(i, j) = real_t(0);
         this->xchng(q_err, i^this->halo, j^this->halo);
 
-       //initail preconditioner error   
+        //initail preconditioner error   
         this->pcnd_err(i, j) = this->lap(this->q_err, i, j, this->dx, this->dz) - this->err(i, j);
           //TODO does it change with non_const density?
         this->xchng(pcnd_err, i^halo, j^halo);
@@ -159,7 +159,7 @@ namespace libmpdataxx
         this->xchng(p_err, i^this->halo, j^this->halo);
 
         this->lap_p_err(i, j) = this->lap(this->p_err, i, j, this->dx, this->dz);
-//std::cerr<<"--------------------------------------------------------------"<<std::endl;
+
 	//pseudo-time loop
 	real_t error = 1.;
 	while (true)
@@ -177,7 +177,6 @@ namespace libmpdataxx
           );
 
           if (error <= this->tol) break;
-//std::cerr<<"error "<<error<<std::endl;
 
           //TODO exit pseudotime loop here if <err> < error
 

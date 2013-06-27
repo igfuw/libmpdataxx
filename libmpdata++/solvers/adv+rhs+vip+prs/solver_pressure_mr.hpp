@@ -117,7 +117,6 @@ namespace libmpdataxx
           + this->lap(this->Phi, i, j, this->dx, this->dz); 
           /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
-//std::cerr<<"--------------------------------------------------------------"<<std::endl;
 	//pseudo-time loop
 	real_t error = 1.;
 	while (error > this->tol) 
@@ -136,12 +135,8 @@ namespace libmpdataxx
 	    std::abs(this->mem->min(this->err(i,j)))
 	  );
           this->iters++;
-//std::cerr<<error<<std::endl;
 	}
 	//end of pseudo_time loop
-//std::ostringstream s;
-//s << " error " << error << std::endl;
-//std::cerr << s.str();
 
 	this->xchng(this->Phi, i^halo, j^halo);
 	this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->dx);

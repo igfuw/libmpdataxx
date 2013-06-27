@@ -1,0 +1,8 @@
+0.1:
+- MPDATA-gauge
+
+0.2:
+- mechanism for recording stats, and:
+  - record C_min, C_max
+  - record div(Cx, Cy)
+  - record n_iters, error in pressure solvers

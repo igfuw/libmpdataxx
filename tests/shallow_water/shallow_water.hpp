@@ -41,14 +41,14 @@
 template <typename real_t, int n_iters, int qx, int qy, int h>
 class shallow_water : public solvers::detail::solver_velocity_common<
   solvers::inhomo_solver<
-    solvers::mpdata_2d<real_t, n_iters, 3>, 
+    solvers::mpdata_fct_2d<real_t, n_iters, 3>, 
     solvers::strang
   >, qx, qy, h
 >
 {
   using parent_t = solvers::detail::solver_velocity_common<
     solvers::inhomo_solver<
-      solvers::mpdata_2d<real_t, n_iters, 3>, 
+      solvers::mpdata_fct_2d<real_t, n_iters, 3>, 
       solvers::strang
     >, qx, qy, h
   >;
@@ -59,7 +59,7 @@ class shallow_water : public solvers::detail::solver_velocity_common<
 
   template <int d, class arr_t>
   void forcings_helper(
-    arr_t dqq,
+    arr_t rhs,
     const arr_t hh,
     const rng_t &i,
     const rng_t &j,
@@ -67,7 +67,7 @@ class shallow_water : public solvers::detail::solver_velocity_common<
   )
   {
     using namespace formulae::nabla;
-    dqq(pi<d>(i,j)) -= g * hh(pi<d>(i,j)) * grad<d>(hh, i, j, dx); 
+    rhs(pi<d>(i,j)) -= g * hh(pi<d>(i,j)) * grad<d>(hh, i, j, dx); 
   }
 
   /// @brief Shallow Water Equations: Momentum forcings for the X and Y coordinates

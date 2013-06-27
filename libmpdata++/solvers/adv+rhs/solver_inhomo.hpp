@@ -87,6 +87,7 @@ namespace libmpdataxx
       void hook_ante_loop(int nt)
       {
         parent_t::hook_ante_loop(nt);
+
         switch (inhomo)
         {
           case euler: 
@@ -102,6 +103,7 @@ namespace libmpdataxx
       void hook_ante_step()
       {
         parent_t::hook_ante_step();
+
         switch (inhomo)
         {
           case euler: 
