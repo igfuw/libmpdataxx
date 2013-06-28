@@ -78,7 +78,7 @@ namespace libmpdataxx
           }
 	}
 
-        protected:
+        public:
 
 	static void alloc(typename parent_t::mem_t *mem, const int nx)   
         {
@@ -88,6 +88,8 @@ namespace libmpdataxx
     
 	  mem->C.push_back(new typename parent_t::arr_t(parent_t::rng_vctr(nx))); 
         } 
+
+        protected:
 
         // helper method to allocate a vector-component temporary array
         static void alloc_tmp_vctr(

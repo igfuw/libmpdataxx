@@ -39,10 +39,14 @@ namespace libmpdataxx
 	  return parent_t::C(iter);
 	}
 
+        public:
+
 	struct params_t : parent_t::params_t
 	{
 	  // TODO: rho!
 	};
+
+        protected:
 
         // ctor
 	mpdata_fct_common(
