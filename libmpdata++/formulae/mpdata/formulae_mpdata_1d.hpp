@@ -56,6 +56,18 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
+        typename std::enable_if<!opt_set(opts, toa)>::type* = 0 // enabled if toa == false
+      ) -> decltype(0)
+      { 
+        return 0; 
+      }
+
+      template<opts_t opts, class arr_1d_t>
+      inline auto f_3rd_xx(
+        const arr_1d_t &psi,
+        const arr_1d_t &C,
+        const rng_t &i,
+        typename std::enable_if<opt_set(opts, toa)>::type* = 0, // enabled if toa == true
         typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
       ) return_macro(,
 	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) 
@@ -66,13 +78,14 @@ namespace libmpdataxx
 	  ,// 
 	  psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
 	)
-    )
+      )
 
       template<opts_t opts, class arr_1d_t>
       inline auto f_3rd_xx(
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
+        typename std::enable_if<opt_set(opts, toa)>::type* = 0, // enabled if toa == true
         typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss == false
       ) return_macro(,
 	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) 
@@ -98,7 +111,7 @@ namespace libmpdataxx
         * A<opts>(psi, i) 
         // third-order terms
         + 
-        where(opt_set(opts, toa), f_3rd_xx<opts>(psi, C, i), 0) // TODO: rename to HOT? // TODO: where -> enable_if
+        f_3rd_xx<opts>(psi, C, i) // TODO: rename to HOT?
       )
     }; // namespace mpdata
   }; // namespace formulae
