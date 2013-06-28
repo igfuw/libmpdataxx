@@ -10,6 +10,8 @@
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/arakawa_c.hpp>
 
+// TODO: move to detail
+
 namespace libmpdataxx
 {
   namespace bcond
@@ -37,8 +39,16 @@ namespace libmpdataxx
 	left_halo_sclr(i.first() - halo    , i.first() - 1), // TODO: less repetitions!
 	rght_edge_sclr(i.last()  - halo + 1, i.last()     ), // TODO: less repetitions!
         // vector
-	left_halo_vctr((i-h).first() - (halo-1)    , (i-h).first() - 1), // TODO: less repetitions!
-	rght_edge_vctr((i+h).last()  - (halo-1) + 1, (i+h).last()     )  // TODO: less repetitions!
+        left_halo_vctr(
+          halo == 1
+            ? rng_t::all() // there's no vector halo for halo=1
+            : rng_t((i-h).first() - (halo-1)    , (i-h).first() - 1)
+        ), // TODO: less repetitions!
+        rght_edge_vctr(
+          halo == 1
+            ? rng_t::all() // there's no vector halo for halo=1
+            : rng_t((i+h).last()  - (halo-1) + 1, (i+h).last()     )  // TODO: less repetitions!
+        )
       {} 
     };
 
@@ -62,8 +72,16 @@ namespace libmpdataxx
 	rght_halo_sclr(i.last()  + 1       , i.last()  + halo    ), // TODO: less repetitions!
 	left_edge_sclr(i.first()           , i.first() + halo - 1), // TODO: less repetitions!
         // vctr
-	rght_halo_vctr((i+h).last()  + 1       , (i+h).last()  + (halo-1)    ), // TODO: less repetitions!
-	left_edge_vctr((i-h).first()           , (i-h).first() + (halo-1) - 1)  // TODO: less repetitions!
+	rght_halo_vctr(
+          halo == 1
+            ? rng_t::all() // there's no vector halo for halo=1
+            : rng_t((i+h).last()  + 1       , (i+h).last()  + (halo-1)    )
+        ), // TODO: less repetitions!
+	left_edge_vctr(
+          halo == 1
+            ? rng_t::all() // there's no vector halo for halo=1
+            : rng_t((i-h).first()           , (i-h).first() + (halo-1) - 1)  // TODO: less repetitions!
+        )
       {} 
     };
   }; // namespace bcond
