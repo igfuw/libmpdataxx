@@ -37,7 +37,7 @@ namespace libmpdataxx
         *gp 
 	   << "set grid\n"
 	   << "set border " << p.gnuplot_border << "\n"
-	   << "set palette " /*defined (" // makes gnuplot discard maxcolors :(
+	   << "set palette rgbformulae 23,28,3 negative" /*defined (" // makes gnuplot discard maxcolors :(
 	     "0 '#ffffff'," //         /\-
 	     "1 '#993399'," //        /  \-
 	     "2 '#00CCFF'," //  -----/    \---
