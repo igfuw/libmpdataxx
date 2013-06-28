@@ -42,21 +42,21 @@ void setopts(T &p, real_t Tht_amb, std::string name)
   p.dx = p.dz = 10.; 
   p.Tht_amb = Tht_amb; 
 
-  p.outfreq = 10;
+  p.outfreq = 12;
   p.outvars = {
 //    {u,   {.name = "u",   .unit = "m/s"}}, 
 //    {w,   {.name = "w",   .unit = "m/s"}}, 
     {tht, {.name = "tht", .unit = "K"  }}
   };
   p.gnuplot_view = "map";
-  p.gnuplot_output = "figure_" + name + "_%s_%04d.png";
+  p.gnuplot_output = "figure_" + name + "_%s_%04d.svg";
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
-  p.gnuplot_cbrange = "[299.8:300.6]";
+  p.gnuplot_cbrange = "[299.85:300.65]";
   p.gnuplot_maxcolors = 8;
-  p.gnuplot_cntrparam = "levels incremental 299.8, 0.1, 300.6";
-  p.gnuplot_term = "png";
+  p.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
+  p.gnuplot_term = "svg";
 }
 
 int main() 
@@ -89,7 +89,14 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    slv.state(tht) = Tht_amb + where(pow(i * p.dx - 4 * r0 , 2) + pow(j * p.dz - 1.04 * r0 , 2) <= pow(r0, 2) , .5, 0);
+    slv.state(tht) = Tht_amb + where(
+      // if
+      pow((i+.5) * p.dx - 4 * r0 , 2) + pow((j+.5) * p.dz - 1.04 * r0 , 2) <= pow(r0, 2), 
+      // then
+      .5, 
+      // else
+      0
+    );
     slv.state(u) = real_t(0); 
     slv.state(w) = real_t(0); 
 
