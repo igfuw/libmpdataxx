@@ -33,8 +33,7 @@ for i in range(theta.shape[0]) :
   y[i]=r[i]*math.sin(theta[i])
 
 ngrid = 800*2
-#levels=[-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7] // TODO: this is how it was in icicle!!!
-levels=[-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2]
+levels=[-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7] 
 
 xi = np.linspace(0, 8, ngrid)
 yi = np.linspace(0, 8, ngrid)

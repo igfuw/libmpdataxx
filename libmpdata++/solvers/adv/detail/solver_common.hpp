@@ -46,7 +46,7 @@ namespace libmpdataxx
 
 	protected: 
 
-        std::vector<int> n;
+        std::vector<int> n; // TODO: why not std::array?
 
         typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs, n_tlev> mem_t;
 	mem_t *mem;
@@ -134,7 +134,7 @@ namespace libmpdataxx
           hook_ante_loop(nt);
 	  for (int t = 0; t < nt; ++t) 
 	  {   
-            monitor(float(t) / nt);
+            monitor(float(t) / nt); // TODO: should it really be here? not in some hook somewhere?
             hook_ante_step();
 	    xchng_all();
 	    advop_all();

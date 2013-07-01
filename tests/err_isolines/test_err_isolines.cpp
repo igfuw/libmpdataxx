@@ -103,9 +103,9 @@ int main()
       const real_t dt = cour * dx / velocity;
       const int 
         n_dims = 1,
-        n_eqs = 1,
-        nx = int(round(x_max/dx)),
-        nt = int(round(t_max/dt));
+        n_eqs  = 1,
+        nx = x_max/dx,
+        nt = t_max/dt;
 
       boost::ptr_map<std::string, concurr::any<real_t, n_dims>> slvs;
 
@@ -114,7 +114,6 @@ int main()
 
       // MPDATA
       add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "iters=2", nx);
-/*
       add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
       add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "iters=3", nx);
       add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::toa>>(slvs, "iters=3_toa", nx);
@@ -124,11 +123,10 @@ int main()
       add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_fct_toa", nx);
       add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "iters=3_fct", nx);
       add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs, formulae::mpdata::toa>>(slvs, "iters=3_fct_toa", nx);
-*/
 
       // calculating the analytical solution
       typename solvers::donorcell_1d<real_t, n_eqs>::arr_t exact(nx);
-      exact = gauss(i+.5 - velocity * dt * nt);
+      exact = gauss((i+.5)*dx - velocity * dt * nt);
 
       // looping over solvers
       for (auto keyval : slvs) 
@@ -140,19 +138,13 @@ int main()
 
         // setting the solver up
 	slv.courant() = cour; 
-        slv.state() = gauss(i+.5);
+        slv.state() = gauss((i+.5)*dx);
    
         // running the solver
 	slv.advance(nt);
 
         // calculating the deviation from analytical solution
         real_t err = sqrt(sum(pow(slv.state() - exact, 2)) / nx) / (nt * dt);
-if (!finite(err)) 
-{
-  std::cerr << "state: " << slv.state() << std::endl;
-  std::cerr << "exact: " << exact << std::endl;
-//  throw; TODO!!!
-}
 
         outfiles[key] << dx << "\t" << cour << "\t" << err << std::endl;
       }
