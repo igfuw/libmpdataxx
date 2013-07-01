@@ -67,8 +67,9 @@ namespace libmpdataxx
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
         sharedmem_common(int s0, int size)
+          : n(0)
         {
-          if (size > s0) throw std::exception(); // TODO: error_macro?
+          if (size > s0) throw std::exception(); // TODO: error_macro? / assert()?
           //sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));  // TODO: write a different sum that would't use sumtmp
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
