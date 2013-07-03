@@ -1,5 +1,9 @@
 /** @file
   * @copyright University of Warsaw
+  * @author Anna Jaruga <ajaruga@igf.fuw.edu.pl>
+  * @author Sylwester Arabas <slayoo@igf.fuw.edu.pl>
+  * @brief Flux Corrected Transport formulae for MPDATA 
+  *        (aka non-oscillatory, monotonic, sign-preserving option)
   * @section LICENSE
   * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
   */
@@ -17,6 +21,10 @@ namespace libmpdataxx
       using namespace arakawa_c;
 
 // TODO: psi -> psi/rho !!!
+      /// \f$ \beta^{\uparrow}_{i} = \frac { \psi^{max}_{i}- \psi^{*}_{i} }
+      /// { \sum\limits_{I} \frac{\Delta t}{\Delta x^{I}} \left( [u^{I}_{i-1/2}]^{+} \psi^{*}_{i-1} - 
+      /// [u^{I}_{i+1/2}]^{-} \psi^{*}_{i+1} \right)  } \f$ \n
+      /// eq.(19a) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
       template <opts_t opts, class arr_1d_t>
       inline auto beta_up(
         const arr_1d_t &psi,
@@ -39,6 +47,10 @@ namespace libmpdataxx
       ) 
 
 // TODO: psi -> psi/rho !!!
+      /// \f$ \beta^{\downarrow}_{i} = \frac { \psi^{*}_{i}- \psi^{min}_{i} }
+      /// { \sum\limits_{I} \frac{\Delta t}{\Delta x^{I}} \left( [u^{I}_{i+1/2}]^{+} \psi^{*}_{i} - 
+      /// [u^{I}_{i-1/2}]^{-} \psi^{*}_{i} \right)  } \f$ \n
+      /// eq.(19b) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
       template <opts_t opts, class arr_1d_t>
       inline auto beta_dn(
         const arr_1d_t &psi, 
@@ -60,6 +72,11 @@ namespace libmpdataxx
         ) 
       ) 
 
+      /// nonoscillatory antidiffusive velocity: \n
+      /// \f$ U^{MON}_{i+1/2}=min(1,\beta ^{\downarrow}_i,\beta ^{\uparrow} _{i+1})[U_{i+1/2}]^{+} 
+      /// + min(1,\beta^{\uparrow}_{i},\beta^{\downarrow}_{i+1/2})[u_{i+1/2}]^{-} \f$ \n
+      /// where \f$ [\cdot]^{+}=max(\cdot,0) \f$ and \f$ [\cdot]^{-}=min(\cdot,0) \f$ \n
+      /// eq.(18) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
       template <opts_t opts, class arr_1d_t>
       inline auto C_mono(
         const arr_1d_t &psi,

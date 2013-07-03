@@ -34,6 +34,9 @@ namespace libmpdataxx
 	const rng_t i = this->i^1; // TODO: isn't it a race condition with more than one thread?
 	const typename parent_t::arr_t psi = this->state(e); // TODO:! powinno być psi/rho!
 
+        /// \f$ \psi^{max}_{i}=max_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n  
+        /// \f$ \psi^{min}_{i}=min_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n    
+        /// eq.(20a, 20b) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
 	this->psi_min(i) = min(min(psi(i-1), psi(i)), psi(i+1));
 	this->psi_max(i) = max(max(psi(i-1), psi(i)), psi(i+1)); 
       }

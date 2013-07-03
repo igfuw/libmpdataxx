@@ -21,50 +21,13 @@
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 
+
 // making things simpler (yet less elegant)
 using namespace libmpdataxx;
 using boost::math::constants::pi;
 blitz::firstIndex i;
 boost::ptr_map<std::string, std::ofstream> outfiles;
-
-
-
-// simulation parameters
-using real_t = float;
-
-const real_t 
-  t_max    = 1., // "arbitrarily"
-  dx_max   = 1.,
-  x_max    = 20. * dx_max,
-  sgma     = 1.5 * dx_max,
-  velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
-  x0       = .5 * x_max,
-  A0       = -.5,
-  A        = 1. / sgma / sqrt(2 * pi<real_t>());
-
-const std::list<real_t> 
-  courants({ .05, .1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95}),
-  dxs({dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32, dx_max/64, dx_max/128});
-
-
-
-// gauss shape functor definition and instantiation
-struct gauss_t
-{
-  // member fields
-  real_t A0, A, sgma, x0;
-
-  // call operator
-  real_t operator()(real_t x) const 
-  { 
-    return A0 + A * exp( real_t(-.5) * pow(x - x0, 2) / pow(sgma, 2));
-  }
-  
-  // Blitz magick
-  BZ_DECLARE_FUNCTOR(gauss_t)
-};
-gauss_t gauss({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0});
-
+using real_t = long double; // this is a good test to show differences betwee float and double!!!
 
 
 // helper function template to ease adding the solvers to the pointer map
@@ -82,14 +45,51 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx)
 
   boost::assign::ptr_map_insert(outfiles)(key);
   if (!outfiles[key].is_open())
-    outfiles[key].open("err_mpdata_" + key + ".txt", std::ios::trunc); 
+  {
+    char bits[3];
+    sprintf(bits, "%03lu", 8 * sizeof(real_t));
+    outfiles[key].open("err_mpdata_" + key + "_" + bits + "_bits.txt", std::ios::trunc); 
+  }
 }
-
 
 
 // all the test logic
 int main() 
 {
+  // gauss shape functor definition 
+  struct gauss_t
+  {
+    // member fields
+    real_t A0, A, sgma, x0;
+
+    // call operator
+    real_t operator()(real_t x) const 
+    { 
+      return A0 + A * exp( real_t(-.5) * pow(x - x0, 2) / pow(sgma, 2));
+    }
+    
+    // Blitz magick
+    BZ_DECLARE_FUNCTOR(gauss_t)
+  };
+
+  // simulation parameters
+  const real_t 
+    t_max    = 1., // "arbitrarily"
+    dx_max   = 1.,
+    x_max    = 44. * dx_max, // see not about compact support in asserts below
+    sgma     = 1.5 * dx_max, 
+    velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
+    x0       = .5 * x_max, 
+    A0       = -.5,
+    A        = 1. / sgma / sqrt(2 * pi<real_t>());
+
+  const std::list<real_t> 
+    courants({ .05, .1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95}),
+    dxs({dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32, dx_max/64, dx_max/128 });
+
+  // gauss shape functor instantiation
+  gauss_t gauss({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0});
+
   // looping over different grid increments
   for (auto &dx : dxs) 
   {
@@ -104,25 +104,27 @@ int main()
       const int 
         n_dims = 1,
         n_eqs  = 1,
-        nx = x_max/dx,
-        nt = t_max/dt;
+        nx = round(x_max/dx),
+        nt = round(t_max/dt);
 
       boost::ptr_map<std::string, concurr::any<real_t, n_dims>> slvs;
+
+      // silly loop order, but it helped to catch a major bug!
 
       // donor-cell
       add_solver<solvers::donorcell_1d<real_t, n_eqs>>(slvs, "iters=1", nx);
 
       // MPDATA
       add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "iters=2", nx);
-      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
+//      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
       add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "iters=3", nx);
       add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::toa>>(slvs, "iters=3_toa", nx);
 
       // MPDATA-FCT
-      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "iters=2_fct", nx);
-      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_fct_toa", nx);
-      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "iters=3_fct", nx);
-      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs, formulae::mpdata::toa>>(slvs, "iters=3_fct_toa", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "iters=2_fct", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_fct_toa", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "iters=3_fct", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs, formulae::mpdata::toa>>(slvs, "iters=3_fct_toa", nx);
 
       // calculating the analytical solution
       typename solvers::donorcell_1d<real_t, n_eqs>::arr_t exact(nx);
@@ -142,6 +144,11 @@ int main()
    
         // running the solver
 	slv.advance(nt);
+
+        // asserting that periodic boundries did not affect the result
+        // and that the chosen domain length is enough to have compact support up to machine precision
+        assert(exact(0) == slv.state()(0));
+        assert(exact(nx-1) == slv.state()(nx-1));
 
         // calculating the deviation from analytical solution
         real_t err = sqrt(sum(pow(slv.state() - exact, 2)) / nx) / (nt * dt);

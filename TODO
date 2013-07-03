@@ -4,6 +4,7 @@
 - doc: dependencies section (C++11, Blitz, Boost, OpenMP)
 - doc: README and HACKING files
 - doc: mention the difference between the order of accuracy of integration vs. order of accuracy of an approximation
+- spreading drop test from Schar & Smolarkiewicz?
 
 
 0.1 (pre-submission / during reviews, should-be-easy enhancements or code cleanups before first release):
