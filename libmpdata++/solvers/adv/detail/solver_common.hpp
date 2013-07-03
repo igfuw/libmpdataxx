@@ -41,7 +41,6 @@ namespace libmpdataxx
 	void cycle_all()
 	{ 
 	  for (int e = 0; e < n_eqs; ++e) cycle(e);
-          this->mem->cycle();
 	}
 
 	protected: 
@@ -61,6 +60,7 @@ namespace libmpdataxx
 	void cycle(int e) 
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
+          if (e == n_eqs - 1) this->mem->cycle(); 
 	}
 
 	virtual void xchng(int e, int l = 0) = 0; // TODO: make l -> -l
