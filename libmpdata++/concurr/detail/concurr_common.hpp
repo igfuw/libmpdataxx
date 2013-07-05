@@ -34,13 +34,19 @@ namespace libmpdataxx
     namespace detail
     {
       template <
-        class solver_t, 
+        class solver_t_, 
         bcond::bcond_e bcx,
         bcond::bcond_e bcy,
         bcond::bcond_e bcz
       >
-      class concurr_common : public any<typename solver_t::real_t, solver_t::n_dims>
+      class concurr_common : public any<typename solver_t_::real_t, solver_t_::n_dims>
       {
+        public:
+
+        typedef solver_t_ solver_t;
+
+        private:
+
         // helper method to define subdomain ranges
 	int min(int span, int rank, int size) 
 	{ 
