@@ -37,7 +37,7 @@ namespace libmpdataxx
         *gp 
 	   << "set grid\n"
 	   << "set border " << p.gnuplot_border << "\n"
-	   << "set palette rgbformulae 23,28,3 negative" /*defined (" // makes gnuplot discard maxcolors :(
+	   << "set palette rgbformulae -28,-23,-3 " /*defined (" // makes gnuplot discard maxcolors :(
 	     "0 '#ffffff'," //         /\-
 	     "1 '#993399'," //        /  \-
 	     "2 '#00CCFF'," //  -----/    \---
@@ -138,8 +138,16 @@ namespace libmpdataxx
 
         if (parent_t::n_dims == 2) // known at compile time
         {
-	  *gp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
-	  *gp << "set title '"<< this->outvars[var].name << " @ t/dt=" << std::setprecision(3) << this->n << "'\n";
+          {
+            std::ostringstream tmp;
+	    tmp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
+	    tmp << "set title '"<< this->outvars[var].name << "  ("
+              /* // TODO: not every solver has dt defined!
+              << "t = " << std::dec << std::fixed << std::setprecision(0) << this->n * this->dt << " [s],"
+              */
+              << " t/dt=" << std::setprecision(3) << this->n << ")'\n";
+            *gp << tmp.str();
+          }
 	  *gp << p.gnuplot_command;
           bool imagebg = (p.gnuplot_with == "lines");
           if (imagebg)
