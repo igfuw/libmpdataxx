@@ -26,9 +26,9 @@ namespace libmpdataxx
     {
       public:
       typedef real_t_ real_t;
-      virtual void advance(int) { assert(false); }  
-      virtual blitz::Array<real_t_, n_dims> state(int e = 0) { assert(false); }
-      virtual blitz::Array<real_t_, n_dims> courant(int d = 0) { assert(false); }
+      virtual void advance(int) { assert(false); throw; }  
+      virtual blitz::Array<real_t_, n_dims> state(int e = 0) { assert(false); throw; }
+      virtual blitz::Array<real_t_, n_dims> courant(int d = 0) { assert(false); throw; }
     };
 
     namespace detail
