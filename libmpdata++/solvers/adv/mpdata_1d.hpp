@@ -53,8 +53,20 @@ namespace libmpdataxx
 
             this->fct_adjust_antidiff(e, iter); // i.e. calculate C_mono=C_mono(C_corr) in FCT
           }
+
 	  // donor-cell call
-	  formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->C(iter)[0], this->i); 
+          if (!opt_set(opts, formulae::mpdata::iga) || iter == 0)
+	    formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->C(iter)[0], this->i); 
+          else
+          {
+            assert(iter == 1); // infinite gauge option uses just one corrective step
+            // TODO: move to a formulae file? 
+            auto &psi = this->mem->psi[e];
+            const auto &n = this->n[e];
+            const auto &i = this->i;
+            const auto &C = this->C(iter)[0];
+            psi[n+1](i) = psi[n](i) - (C(i+h) - C(i-h)); // referred to as F(1,1,U) in the papers
+          }
 	}
       }
 

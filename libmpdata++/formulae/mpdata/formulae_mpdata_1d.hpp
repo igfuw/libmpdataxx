@@ -14,11 +14,28 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
+      // infinite gauge version (for both signed and variable-sign fields)
+      template <opts_t opts, class arr_1d_t>
+      inline auto A(
+        const arr_1d_t &psi, 
+        const rng_t &i,
+        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
+      ) return_macro(,
+	frac<opts>( // TODO: frac not needed!
+	    psi(i+1)
+	  - psi(i  )
+	  ,// ------
+	    1
+	  + 1
+	)
+      )
+
       // single-sign signal version
       template <opts_t opts, class arr_1d_t>
       inline auto A(
         const arr_1d_t &psi, 
         const rng_t &i,
+        typename std::enable_if<!opt_set(opts, iga)>::type* = 0, // enabled if iga == false
         typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
       ) return_macro(,
 	frac<opts>( 
@@ -35,6 +52,7 @@ namespace libmpdataxx
       inline auto A(
         const arr_1d_t &psi, 
         const rng_t &i,
+        typename std::enable_if<!opt_set(opts, iga)>::type* = 0, // enabled if iga == false
         typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss = false
       ) return_macro(,
 	frac<opts>( 
@@ -45,6 +63,9 @@ namespace libmpdataxx
 	  + abs(psi(i  ))
 	) 
       )
+
+
+// TODO: 2D-iga, iga-fct, iga-toa, assert(iga vs. n_iters)
 
 // TODO: move toa formulae to a separate file
 // TODO: rename A, B nd xx_helper to 1/psi dpsi/dt etc

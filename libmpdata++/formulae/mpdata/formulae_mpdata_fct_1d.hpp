@@ -30,7 +30,8 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr, 
-        const rng_t i  
+        const rng_t i,
+        typename std::enable_if<!opt_set(opts, iga)>::type* = 0 // enabled if iga == false
       ) return_macro(,
         frac<opts>(
             max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) 
@@ -45,6 +46,24 @@ namespace libmpdataxx
           + negpart<opts>(C_corr(i-h)) * negpart<opts>(psi(i))
         ) 
       ) 
+      template <opts_t opts, class arr_1d_t>
+      inline auto beta_up(
+        const arr_1d_t &psi,
+        const arr_1d_t &psi_max, // from before the first iteration
+        const arr_1d_t &C_corr, 
+        const rng_t i,
+        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
+      ) return_macro(,
+        frac<opts>(
+            max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) 
+          - psi(i)
+          ,// ----------------------------
+            pospart<opts>(C_corr(i-h)) * 1
+          - negpart<opts>(C_corr(i+h)) * 1
+          - pospart<opts>(C_corr(i+h)) * -1
+          + negpart<opts>(C_corr(i-h)) * -1
+        ) 
+      ) 
 
 // TODO: psi -> psi/rho !!!
       /// \f$ \beta^{\downarrow}_{i} = \frac { \psi^{*}_{i}- \psi^{min}_{i} }
@@ -56,7 +75,8 @@ namespace libmpdataxx
         const arr_1d_t &psi, 
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &C_corr, 
-        const rng_t i 
+        const rng_t i, 
+        typename std::enable_if<!opt_set(opts, iga)>::type* = 0 // enabled if iga == false
       ) return_macro(,
         frac<opts>(
             psi(i)
@@ -69,6 +89,24 @@ namespace libmpdataxx
           - negpart<opts>(C_corr(i-h)) * pospart<opts>(psi(i  ))
           - pospart<opts>(C_corr(i-h)) * negpart<opts>(psi(i-1))
           + negpart<opts>(C_corr(i+h)) * negpart<opts>(psi(i+1))
+        ) 
+      ) 
+      template <opts_t opts, class arr_1d_t>
+      inline auto beta_dn(
+        const arr_1d_t &psi, 
+        const arr_1d_t &psi_min, // from before the first iteration
+        const arr_1d_t &C_corr, 
+        const rng_t i,
+        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
+      ) return_macro(,
+        frac<opts>(
+            psi(i)
+          - min(min(min(psi_min(i), psi(i-1)), psi(i)), psi(i+1))  // TODO: nominator is repeated a few times -> make common
+          ,// --------------------------
+            pospart<opts>(C_corr(i+h)) * 1
+          - negpart<opts>(C_corr(i-h)) * 1
+          - pospart<opts>(C_corr(i-h)) * -1
+          + negpart<opts>(C_corr(i+h)) * -1
         ) 
       ) 
 

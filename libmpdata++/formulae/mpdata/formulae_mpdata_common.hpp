@@ -37,8 +37,8 @@ namespace libmpdataxx
         sss = detail::bit(0), // single-sign signal
         toa = detail::bit(1), // third-order accuracy // TODO (no correct code to handle it yet)
         eps = detail::bit(2), // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) 
-        npa = detail::bit(3)  // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
-// TODO: gauge option (adding a large constant)
+        npa = detail::bit(3), // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
+        iga = detail::bit(4)
 // TODO: pds option (positive-definite signal)
       };
 
