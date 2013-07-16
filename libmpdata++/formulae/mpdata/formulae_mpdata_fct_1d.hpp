@@ -25,21 +25,25 @@ namespace libmpdataxx
       /// { \sum\limits_{I} \frac{\Delta t}{\Delta x^{I}} \left( [u^{I}_{i-1/2}]^{+} \psi^{*}_{i-1} - 
       /// [u^{I}_{i+1/2}]^{-} \psi^{*}_{i+1} \right)  } \f$ \n
       /// eq.(19a) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
+      template <class arr_1d_t>
+      inline auto beta_up_nominator(
+        const arr_1d_t &psi,
+        const arr_1d_t &psi_max, 
+        const rng_t i
+      ) return_macro(,
+        max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) - psi(i)
+      )
       template <opts_t opts, class arr_1d_t>
       inline auto beta_up(
         const arr_1d_t &psi,
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i,
-        typename std::enable_if<!opt_set(opts, iga)>::type* = 0 // enabled if iga == false
+        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
-            max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) 
-          - psi(i)
+          beta_up_nominator(psi, psi_max, i)
           ,// ----------------------------
-// opts.pdf version
-//            max(0, C_corr(i-h)) * psi(i-1) 
-//          - min(0, C_corr(i+h)) * psi(i+1)
             pospart<opts>(C_corr(i-h)) * pospart<opts>(psi(i-1))
           - negpart<opts>(C_corr(i+h)) * pospart<opts>(psi(i+1))
           - pospart<opts>(C_corr(i+h)) * negpart<opts>(psi(i))
@@ -52,16 +56,28 @@ namespace libmpdataxx
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
+        typename std::enable_if<opt_set(opts, pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
-            max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) 
-          - psi(i)
+          beta_up_nominator(psi, psi_max, i)
+          ,// ----------------------------
+            pospart<opts>(C_corr(i-h)) * psi(i-1) 
+          - negpart<opts>(C_corr(i+h)) * psi(i+1)
+        ) 
+      ) 
+      template <opts_t opts, class arr_1d_t>
+      inline auto beta_up(
+        const arr_1d_t &psi,
+        const arr_1d_t &psi_max, // from before the first iteration
+        const arr_1d_t &C_corr, 
+        const rng_t i,
+        typename std::enable_if<opt_set(opts, iga)>::type* = 0 
+      ) return_macro(,
+        frac<opts>(
+          beta_up_nominator(psi, psi_max, i)
           ,// ----------------------------
             pospart<opts>(C_corr(i-h)) * 1
           - negpart<opts>(C_corr(i+h)) * 1
-          - pospart<opts>(C_corr(i+h)) * -1
-          + negpart<opts>(C_corr(i-h)) * -1
         ) 
       ) 
 
@@ -70,21 +86,25 @@ namespace libmpdataxx
       /// { \sum\limits_{I} \frac{\Delta t}{\Delta x^{I}} \left( [u^{I}_{i+1/2}]^{+} \psi^{*}_{i} - 
       /// [u^{I}_{i-1/2}]^{-} \psi^{*}_{i} \right)  } \f$ \n
       /// eq.(19b) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
+      template <class arr_1d_t>
+      inline auto beta_dn_nominator(
+        const arr_1d_t &psi,
+        const arr_1d_t &psi_min, 
+        const rng_t i
+      ) return_macro(,
+        psi(i) - min(min(min(psi_min(i), psi(i-1)), psi(i)), psi(i+1)) 
+      )
       template <opts_t opts, class arr_1d_t>
       inline auto beta_dn(
         const arr_1d_t &psi, 
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i, 
-        typename std::enable_if<!opt_set(opts, iga)>::type* = 0 // enabled if iga == false
+        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
-            psi(i)
-          - min(min(min(psi_min(i), psi(i-1)), psi(i)), psi(i+1)) 
+          beta_dn_nominator(psi, psi_min, i)
           ,// --------------------------
-// opts.pdf version
-//            max(0, C_corr(i+h)) * psi(i) 
-//          - min(0, C_corr(i-h)) * psi(i)
             pospart<opts>(C_corr(i+h)) * pospart<opts>(psi(i  ))
           - negpart<opts>(C_corr(i-h)) * pospart<opts>(psi(i  ))
           - pospart<opts>(C_corr(i-h)) * negpart<opts>(psi(i-1))
@@ -96,17 +116,29 @@ namespace libmpdataxx
         const arr_1d_t &psi, 
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &C_corr, 
+        const rng_t i, 
+        typename std::enable_if<opt_set(opts, pds)>::type* = 0 
+      ) return_macro(,
+        frac<opts>(
+          beta_dn_nominator(psi, psi_min, i)
+          ,// --------------------------
+            pospart<opts>(C_corr(i+h)) * psi(i) 
+          - negpart<opts>(C_corr(i-h)) * psi(i)
+        ) 
+      ) 
+      template <opts_t opts, class arr_1d_t>
+      inline auto beta_dn(
+        const arr_1d_t &psi, 
+        const arr_1d_t &psi_min, // from before the first iteration
+        const arr_1d_t &C_corr, 
         const rng_t i,
         typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
       ) return_macro(,
         frac<opts>(
-            psi(i)
-          - min(min(min(psi_min(i), psi(i-1)), psi(i)), psi(i+1))  // TODO: nominator is repeated a few times -> make common
+          beta_dn_nominator(psi, psi_min, i)
           ,// --------------------------
             pospart<opts>(C_corr(i+h)) * 1
           - negpart<opts>(C_corr(i-h)) * 1
-          - pospart<opts>(C_corr(i-h)) * -1
-          + negpart<opts>(C_corr(i+h)) * -1
         ) 
       ) 
 
@@ -121,24 +153,9 @@ namespace libmpdataxx
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr,
-        const rng_t i
+        const rng_t i,
+        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 // enabled if iga == false
       ) return_macro(,
-/* pds version TODO!!!
-        C_corr( i+h ) * where(
-          // if
-          C_corr( i+h ) > 0,
-          // then
-          min(1, min(
-            beta_dn<opts>(psi, psi_min, C_corr, i),
-            beta_up<opts>(psi, psi_max, C_corr, i + 1)
-          )), 
-          // else
-          min(1, min(
-            beta_up<opts>(psi, psi_max, C_corr, i),
-            beta_dn<opts>(psi, psi_min, C_corr, i + 1)
-          ))  
-        )  
-*/
        C_corr(i+h) * where(
           // if
           C_corr(i+h) > 0,
@@ -174,6 +191,33 @@ namespace libmpdataxx
           )   
         )   
       )
+
+
+      template <opts_t opts, class arr_1d_t>
+      inline auto C_mono(
+        const arr_1d_t &psi,
+        const arr_1d_t &psi_min, // from before the first iteration
+        const arr_1d_t &psi_max, // from before the first iteration
+        const arr_1d_t &C_corr,
+        const rng_t i,
+        typename std::enable_if<opt_set(opts, iga) || opt_set(opts, pds)>::type* = 0 // enabled if iga == true
+      ) return_macro(,
+        C_corr( i+h ) * where(
+          // if
+          C_corr( i+h ) > 0,
+          // then
+          min(1, min(
+            beta_dn<opts>(psi, psi_min, C_corr, i),
+            beta_up<opts>(psi, psi_max, C_corr, i + 1)
+          )), 
+          // else
+          min(1, min(
+            beta_up<opts>(psi, psi_max, C_corr, i),
+            beta_dn<opts>(psi, psi_min, C_corr, i + 1)
+          ))  
+        )
+      )  
+
     }; // namespace mpdata_fct
   }; // namespace formulae
 }; // namespcae libmpdataxx

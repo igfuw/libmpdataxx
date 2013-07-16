@@ -4,8 +4,8 @@
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
- * \include "mpdata_1d_opt_sss/test_mpdata_1d_opt_eps.cpp"
- * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=3.svg" TODO
+ * \include "mpdata_1d_opt_eps/test_mpdata_1d_opt_eps.cpp"
+ * \image html "../../tests/mpdata_1d_opt_eps/figure_iters=3.svg" TODO
  */
 
 #include <libmpdata++/solvers/adv/mpdata_1d.hpp>

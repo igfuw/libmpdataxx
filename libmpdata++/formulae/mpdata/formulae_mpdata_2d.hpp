@@ -9,6 +9,8 @@
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 #include <boost/preprocessor/punctuation/comma.hpp>
 
+// TODO: iga
+
 namespace libmpdataxx 
 { 
   namespace formulae 
@@ -21,7 +23,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
+        typename std::enable_if<opt_set(opts, pds)>::type* = 0 // enabled if pds == true
       ) return_macro(,
 	frac<opts>(
 	    psi(pi<d>(i+1, j)) 
@@ -38,7 +40,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss == false
+        typename std::enable_if<!opt_set(opts, pds)>::type* = 0 // enabled if pds == false
       ) return_macro(,
 	frac<opts>(
 	    abs(psi(pi<d>(i+1, j))) 
@@ -54,7 +56,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
+        typename std::enable_if<opt_set(opts, pds)>::type* = 0 // enabled if pds == true
       ) return_macro(,
 	frac<opts>( 
 	    psi(pi<d>(i+1, j+1))
@@ -74,7 +76,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss == false
+        typename std::enable_if<!opt_set(opts, pds)>::type* = 0 // enabled if pds == false
       ) return_macro(,
 	frac<opts>( 
 	    abs(psi(pi<d>(i+1, j+1))) 

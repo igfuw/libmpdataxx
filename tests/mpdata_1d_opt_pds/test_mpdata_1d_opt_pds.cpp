@@ -3,13 +3,13 @@
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- * @brief example showing how to use the sss option of mpdata intended for
- *   optimising calculations on fields of known (and invariable) sign
+ * @brief example showing how to use the pds option of mpdata intended for
+ *   optimising calculations on fields of positive sign
  *
- * \include "mpdata_1d_opt_sss/test_mpdata_1d_opt_sss.cpp"
- * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=1.svg" TODO
- * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=2.svg" TODO
- * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=3.svg" TODO
+ * \include "mpdata_1d_opt_pds/test_mpdata_1d_opt_pds.cpp"
+ * \image html "../../tests/mpdata_1d_opt_pds/figure_iters=1.svg" TODO
+ * \image html "../../tests/mpdata_1d_opt_pds/figure_iters=2.svg" TODO
+ * \image html "../../tests/mpdata_1d_opt_pds/figure_iters=3.svg" TODO
  */
 
 #include <libmpdata++/solvers/adv/mpdata_1d.hpp>
@@ -63,9 +63,9 @@ int main()
 
   const int n_eqs = 2;
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::pds>>(slvs, "mpdata_iters=2_pds");
 
-  // TODO: test if sss gives any speed-up with single-sign field
+  // TODO: test if pds gives any speed-up with single-sign field
 
   for (auto &slv : slvs) slv.advance(nt);
 }
