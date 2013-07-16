@@ -21,10 +21,10 @@ namespace libmpdataxx
         const rng_t &i,
         typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
       ) return_macro(,
-	frac<opts>( // TODO: frac not needed!
+	( 
 	    psi(i+1)
 	  - psi(i  )
-	  ,// ------
+	) / (// ------
 	    1
 	  + 1
 	)
@@ -35,8 +35,7 @@ namespace libmpdataxx
       inline auto A(
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, iga)>::type* = 0, // enabled if iga == false
-        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
+        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
 	    psi(i+1)
@@ -52,8 +51,7 @@ namespace libmpdataxx
       inline auto A(
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, iga)>::type* = 0, // enabled if iga == false
-        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss = false
+        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
 	    abs(psi(i+1)) 
@@ -65,36 +63,35 @@ namespace libmpdataxx
       )
 
 
-// TODO: 2D-iga, iga-fct, iga-toa, assert(iga vs. n_iters)
-
-// TODO: move toa formulae to a separate file
-// TODO: rename A, B nd xx_helper to 1/psi dpsi/dt etc
-
-
       // 3rd order term (first term from eq. (36) from @copybrief Smolarkiewicz_and_Margolin_1998 (with G=1))
       template<opts_t opts, class arr_1d_t>
-      inline auto f_3rd_xx(
+      inline auto HOT(
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, toa)>::type* = 0 // enabled if toa == false
+        typename std::enable_if<!opt_set(opts, toa)>::type* = 0 
       ) -> decltype(0)
       { 
         return 0; 
       }
 
+      template<class arr_1d_t>
+      inline auto HOT_helper(
+        const arr_1d_t &C,
+        const rng_t &i
+      ) return_macro(,
+	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) / 3
+      )
+
       template<opts_t opts, class arr_1d_t>
-      inline auto f_3rd_xx(
+      inline auto HOT(
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa)>::type* = 0, // enabled if toa == true
-        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
+        typename std::enable_if<opt_set(opts, toa) && opt_set(opts, pds) && !opt_set(opts, iga)>::type* = 0 
       ) return_macro(,
-	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) 
-	/ (typename arr_1d_t::T_numtype(3)) // TODO: check if this cast is needed
-        * // TODO: code duplication above :*
-        frac<opts>(
+        HOT_helper(C, i) 
+        * frac<opts>(
 	  psi(i+2) - psi(i+1) - psi(i) + psi(i-1)
 	  ,// 
 	  psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
@@ -102,20 +99,32 @@ namespace libmpdataxx
       )
 
       template<opts_t opts, class arr_1d_t>
-      inline auto f_3rd_xx(
+      inline auto HOT(
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa)>::type* = 0, // enabled if toa == true
-        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss == false
+        typename std::enable_if<opt_set(opts, toa) && !opt_set(opts, pds) && !opt_set(opts, iga)>::type* = 0
       ) return_macro(,
-	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) 
-	/ (typename arr_1d_t::T_numtype(3)) // TODO: check if this cast is needed
-        * // TODO: code duplication above :*
-        frac<opts>(
+        HOT_helper(C, i)
+        * frac<opts>(
 	  abs(psi(i+2)) - abs(psi(i+1)) - abs(psi(i)) + abs(psi(i-1))
 	  ,// 
 	  abs(psi(i+2)) + abs(psi(i+1)) + abs(psi(i)) + abs(psi(i-1))
+	)
+      )
+
+      template<opts_t opts, class arr_1d_t>
+      inline auto HOT(
+        const arr_1d_t &psi,
+        const arr_1d_t &C,
+        const rng_t &i,
+        typename std::enable_if<opt_set(opts, toa) && !opt_set(opts, pds) && opt_set(opts, iga)>::type* = 0 
+      ) return_macro(,
+        HOT_helper(C, i) 
+        * (
+	  psi(i+2) - psi(i+1) - psi(i) + psi(i-1)
+	) / (
+	  1 + 1 + 1 + 1
 	)
       )
 
@@ -132,7 +141,7 @@ namespace libmpdataxx
         * A<opts>(psi, i) 
         // third-order terms
         + 
-        f_3rd_xx<opts>(psi, C, i) // TODO: rename to HOT?
+        HOT<opts>(psi, C, i) 
       )
     }; // namespace mpdata
   }; // namespace formulae

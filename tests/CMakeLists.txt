@@ -47,7 +47,7 @@ add_subdirectory(shallow_water)
 add_subdirectory(rotating_cone)
 add_subdirectory(bcbf)
 add_subdirectory(mpdata_fct_1d)
-add_subdirectory(mpdata_1d_opt_sss) # TODO -> pdf
+add_subdirectory(mpdata_1d_opt_pds)
 add_subdirectory(mpdata_1d_opt_toa)
 add_subdirectory(mpdata_1d_opt_eps)
 add_subdirectory(mpdata_1d_opt_npa)

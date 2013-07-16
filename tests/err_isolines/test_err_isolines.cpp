@@ -118,7 +118,7 @@ int main()
       add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "iters=2", nx);
 //      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
       add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "iters=3", nx);
-      add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::toa>>(slvs, "iters=3_toa", nx);
+      add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::toa | formulae::mpdata::iga>>(slvs, "iters=3_toa", nx);
 
       // MPDATA-FCT
 //      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "iters=2_fct", nx);

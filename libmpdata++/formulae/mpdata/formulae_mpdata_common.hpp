@@ -34,12 +34,11 @@ namespace libmpdataxx
 
       enum 
       {
-        sss = detail::bit(0), // single-sign signal
-        toa = detail::bit(1), // third-order accuracy // TODO (no correct code to handle it yet)
+        pds = detail::bit(0), // positive-definite signal (turns optimisations on)
+        toa = detail::bit(1), // third-order accuracy terms
         eps = detail::bit(2), // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) 
         npa = detail::bit(3), // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
-        iga = detail::bit(4)
-// TODO: pds option (positive-definite signal)
+        iga = detail::bit(4)  // infinite-gauge option
       };
 
       constexpr bool opt_set(const opts_t &x, const opts_t &y) 
@@ -71,7 +70,7 @@ namespace libmpdataxx
         const den_t &den,
         typename std::enable_if<opt_set(opts, eps)>::type* = 0 // enabled if eps == true
       ) return_macro(,
-        nom / (den + blitz::tiny(typename den_t::T_numtype(0))) 
+        nom / (den + blitz::tiny(typename den_t::T_numtype(0))) // note: for negative signal eps -> -eps
       )
 
       // nprt: implemented using min
