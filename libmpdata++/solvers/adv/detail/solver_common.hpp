@@ -122,6 +122,7 @@ namespace libmpdataxx
         virtual ~solver_common()
         {
 #if !defined(NDEBUG)
+// TODO: what if nt=0!
           assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
           assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
           assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
