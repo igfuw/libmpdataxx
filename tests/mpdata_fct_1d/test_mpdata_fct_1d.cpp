@@ -12,7 +12,6 @@
  * \image html "../../tests/mpdata_fct_1d/mpdata_iters=3.svg"
  * \image html "../../tests/mpdata_fct_1d/mpdata_fct_iters=3.svg"
  */
-// TODO: add sss runs to the list above
 
 #include <libmpdata++/solvers/adv/mpdata_fct_1d.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
@@ -71,12 +70,6 @@ int main()
 
   add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "mpdata_fct_iters=2");
 //  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "mpdata_fct_iters=3");
-
-//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
-//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_fct_iters=2_sss");
-
-//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_iters=2_npa");
-//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::npa>>(slvs, "mpdata_fct_iters=2_npa");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

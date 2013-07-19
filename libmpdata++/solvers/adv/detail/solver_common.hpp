@@ -24,13 +24,13 @@ namespace libmpdataxx
         return a > b ? a : b;
       }
 
-      template <typename real_t_, int n_dims_, int n_eqs_, int n_tlev_, int halo_>
+      template <typename real_t_, int n_dims_, int n_eqs_, int n_tlev_, int minhalo>
       class solver_common
       {
 	public:
 
         // using enums as "public static const int" would need instantiation
-        enum { halo = halo_ }; 
+        enum { halo = minhalo }; 
         enum { n_dims = n_dims_ };
         enum { n_eqs = n_eqs_ };
         enum { n_tlev = n_tlev_ };
@@ -157,7 +157,7 @@ namespace libmpdataxx
         static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }
       };
 
-      template<typename real_t, int n_dims, int n_eqs, int n_tlev, int halo>
+      template<typename real_t, int n_dims, int n_eqs, int n_tlev, int minhalo>
       class solver
       {}; 
     }; // namespace detail

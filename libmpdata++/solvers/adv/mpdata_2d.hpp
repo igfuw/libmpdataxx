@@ -19,11 +19,11 @@ namespace libmpdataxx
   {
     using namespace arakawa_c;
 
-    template<typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int halo>
-    class mpdata<real_t, n_iters, 2, n_eqs, opts, halo> : 
-      public detail::mpdata_common<real_t, n_iters, 2, n_eqs, opts, halo>
+    template<typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int minhalo>
+    class mpdata<real_t, n_iters, 2, n_eqs, opts, minhalo> : 
+      public detail::mpdata_common<real_t, n_iters, 2, n_eqs, opts, minhalo>
     {
-      using parent_t = detail::mpdata_common<real_t, n_iters, 2, n_eqs, opts, halo>;
+      using parent_t = detail::mpdata_common<real_t, n_iters, 2, n_eqs, opts, minhalo>;
 
       protected:
 
@@ -41,10 +41,10 @@ namespace libmpdataxx
 	  {
 	    this->cycle(e);
             this->mem->barrier();
-	    this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^halo); // TODO: two xchng calls? (without barriers)
-	    this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^halo);
-	    this->bcyl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^halo);
-	    this->bcyr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^halo);
+	    this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^this->halo); // TODO: two xchng calls? (without barriers)
+	    this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^this->halo);
+	    this->bcyl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^this->halo);
+	    this->bcyr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^this->halo);
             this->mem->barrier();
 
 	    // calculating the antidiffusive C 
@@ -74,8 +74,22 @@ namespace libmpdataxx
             // TODO: shouldn't the above halo-filling be repeated here?
 	  }
 	  // donor-cell call 
-	  formulae::donorcell::op_2d(this->mem->psi[e], 
-	    this->n[e], this->C(iter), this->i, this->j); // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
+          if (!opt_set(opts, formulae::mpdata::iga) || iter ==0)
+	    formulae::donorcell::op_2d(this->mem->psi[e], this->n[e], this->C(iter), this->i, this->j); 
+            // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
+          else
+          {
+            assert(iter == 1); // infinite gauge option uses just one corrective step
+            // TODO: move to a formulae file? 
+            auto &psi = this->mem->psi[e];
+            const auto &n = this->n[e];
+            const auto &i = this->i;
+            const auto &j = this->j;
+            const auto &C = this->C(iter);
+            psi[n+1](i, j) = psi[n](i, j) 
+              - (C[0](i+h, j) - C[0](i-h, j)) 
+              - (C[1](i, j+h) - C[1](i, j-h)); // referred to as F(1,1,U) in the papers
+          }
 	}
       }
 

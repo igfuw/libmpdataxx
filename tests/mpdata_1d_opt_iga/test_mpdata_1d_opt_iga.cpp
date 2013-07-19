@@ -3,13 +3,12 @@
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- * @brief example showing how to use the sss option of mpdata intended for
- *   optimising calculations on fields of known (and invariable) sign
+ * @brief example showing how to use the iga option of mpdata 
  *
- * \include "mpdata_1d_opt_sss/test_mpdata_1d_opt_sss.cpp"
- * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=1.svg" TODO
- * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=2.svg" TODO
- * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=3.svg" TODO
+ * \include "mpdata_1d_opt_iga/test_mpdata_1d_opt_iga.cpp"
+ * \image html "../../tests/mpdata_1d_opt_iga/figure_iters=1.svg" TODO
+ * \image html "../../tests/mpdata_1d_opt_iga/figure_iters=2.svg" TODO
+ * \image html "../../tests/mpdata_1d_opt_iga/figure_iters=3.svg" TODO
  */
 
 #include <libmpdata++/solvers/adv/mpdata_1d.hpp>
@@ -28,7 +27,7 @@ void setup(T &solver, int n)
   blitz::firstIndex i;
   int width = 50, center = 100;
   solver.state(0) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
-  solver.state(1) = where(i <= center-width/2 || i >= center+width/2,  2, 4); 
+  solver.state(1) = where(i <= center-width/2 || i >= center+width/2,  0, 2); 
   solver.courant() = .5; 
 }
 
@@ -43,7 +42,7 @@ void setopts(T &p, const int nt, const std::string &fname)
   };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
-  p.gnuplot_yrange = "[-2:5]";
+  p.gnuplot_yrange = "[-2:3]";
 }
 
 template <class solver_t, class vec_t>
@@ -62,10 +61,8 @@ int main()
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
   const int n_eqs = 2;
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::sss>>(slvs, "mpdata_iters=2_sss");
-
-  // TODO: test if sss gives any speed-up with single-sign field
+//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::iga>>(slvs, "mpdata_iters=2_iga");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

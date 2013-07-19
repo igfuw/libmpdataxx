@@ -13,10 +13,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -g")
 
 # -DNDEBUG?
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -Ofast -march=native")
+  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -Ofast -march=native")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -O3 -march=native -ffast-math") 
-# -mllvm -vectorize")
+  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -O3 -march=native -ffast-math") 
 endif()
 
 # gnuplot-iostream
@@ -47,8 +46,9 @@ add_subdirectory(shallow_water)
 add_subdirectory(rotating_cone)
 add_subdirectory(bcbf)
 add_subdirectory(mpdata_fct_1d)
-add_subdirectory(mpdata_1d_opt_sss)
+add_subdirectory(mpdata_1d_opt_pds)
 add_subdirectory(mpdata_1d_opt_toa)
 add_subdirectory(mpdata_1d_opt_eps)
 add_subdirectory(mpdata_1d_opt_npa)
+add_subdirectory(mpdata_1d_opt_iga)
 add_subdirectory(err_isolines)

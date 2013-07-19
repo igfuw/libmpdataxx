@@ -3,17 +3,19 @@
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
+ * @brief example showing how to use the pds option of mpdata intended for
+ *   optimising calculations on fields of positive sign
  *
- * \include "mpdata_1d_opt_eps/test_mpdata_1d_opt_eps.cpp"
- * \image html "../../tests/mpdata_1d_opt_eps/figure_iters=3.svg" TODO
+ * \include "mpdata_1d_opt_pds/test_mpdata_1d_opt_pds.cpp"
+ * \image html "../../tests/mpdata_1d_opt_pds/figure_iters=1.svg" TODO
+ * \image html "../../tests/mpdata_1d_opt_pds/figure_iters=2.svg" TODO
+ * \image html "../../tests/mpdata_1d_opt_pds/figure_iters=3.svg" TODO
  */
 
 #include <libmpdata++/solvers/adv/mpdata_1d.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
-
-// TODO: make a common file with the setopts and setup from below?
 
 using namespace libmpdataxx;
 
@@ -25,7 +27,8 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state() = where(i <= center-width/2 || i >= center+width/2, -400, 400) * blitz::tiny(real_t(0)); 
+  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
+  solver.state(1) = where(i <= center-width/2 || i >= center+width/2,  2, 4); 
   solver.courant() = .5; 
 }
 
@@ -34,10 +37,13 @@ void setopts(T &p, const int nt, const std::string &fname)
 {
   p.outfreq = nt; // displays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
-  p.outvars = {{0, {.name = "psi", .unit = "1"}}};
+  p.outvars = {
+    {0, {.name = "variable-sign signal", .unit = "1"}},
+    {1, {.name = "single-sign signal", .unit = "1"}}
+  };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
-  //p.gnuplot_yrange = "[-2:5]";
+  p.gnuplot_yrange = "[-2:5]";
 }
 
 template <class solver_t, class vec_t>
@@ -55,11 +61,11 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  const int n_eqs = 1;
+  const int n_eqs = 2;
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::eps>>(slvs, "mpdata_iters=2_eps");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::eps>>(slvs, "mpdata_iters=3_eps");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::pds>>(slvs, "mpdata_iters=2_pds");
+
+  // TODO: test if pds gives any speed-up with single-sign field
 
   for (auto &slv : slvs) slv.advance(nt);
 }

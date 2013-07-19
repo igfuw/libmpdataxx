@@ -6,8 +6,8 @@
  * @brief example showing how to use the toa option of mpdata 
  *   (third-rder accuracy)
  *
- * \include "mpdata_1d_opt_sss/test_mpdata_1d_opt_toa.cpp"
- * \image html "../../tests/mpdata_1d_opt_sss/figure_iters=3.svg" TODO
+ * \include "mpdata_1d_opt_toa/test_mpdata_1d_opt_toa.cpp"
+ * \image html "../../tests/mpdata_1d_opt_toa/figure_iters=3.svg" TODO
  */
 
 #include <libmpdata++/solvers/adv/mpdata_fct_1d.hpp>
@@ -25,7 +25,7 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state(0) = where(i <= center-width/2 || i >= center+width/2,  2, 4); 
+  solver.state(0) = where(i <= center-width/2 || i >= center+width/2,  -2, 2); 
   solver.courant() = 2/3.; 
 }
 
@@ -39,7 +39,7 @@ void setopts(T &p, const int nt, const std::string &fname)
   };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
-  p.gnuplot_yrange = "[1.75:4.25]";
+  p.gnuplot_yrange = "[-2.25:2.25]";
 }
 
 template <class solver_t, class vec_t>
@@ -60,7 +60,9 @@ int main()
   const int n_eqs = 1;
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_iters=2_toa");
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_fct_iters=2_toa"); // TODO: to nie dziala!!!
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa | formulae::mpdata::iga>>(slvs, "mpdata_iters=2_toa_iga");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "mpdata_fct_iters=2_toa"); 
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa | formulae::mpdata::iga>>(slvs, "mpdata_fct_iters=2_toa_iga"); 
 
   for (auto &slv : slvs) slv.advance(nt);
 }

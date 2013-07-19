@@ -17,11 +17,11 @@ namespace libmpdataxx
 {
   namespace solvers
   {
-    template <typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int halo> 
-    class mpdata_fct<real_t, n_iters, 2, n_eqs, opts, halo> : 
-      public detail::mpdata_fct_common<real_t, n_iters, 2, n_eqs, opts, halo> 
+    template <typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int minhalo> 
+    class mpdata_fct<real_t, n_iters, 2, n_eqs, opts, minhalo> : 
+      public detail::mpdata_fct_common<real_t, n_iters, 2, n_eqs, opts, minhalo> 
     {
-      using parent_t = detail::mpdata_fct_common<real_t, n_iters, 2, n_eqs, opts, halo>; 
+      using parent_t = detail::mpdata_fct_common<real_t, n_iters, 2, n_eqs, opts, minhalo>; 
 
       void fct_init(int e)
       {

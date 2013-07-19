@@ -14,93 +14,109 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-      // single-sign signal version
+
       template <opts_t opts, class arr_1d_t>
-      inline auto A(
+      inline auto A(  // positive-sign signal version (no need for abs())
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
+        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
-	    psi(i+1)
-	  - psi(i  )
-	  ,// ------
-	    psi(i+1)
-	  + psi(i  )
+   	  psi(i+1) - psi(i)
+	  ,// -------------
+          psi(i+1) + psi(i)
 	)
       )
 
-      // variable-sign signal version (likely a good default)
       template <opts_t opts, class arr_1d_t>
-      inline auto A(
+      inline auto A(   // variable-sign signal version (hence the need for abs())
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss = false
+        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
-	    abs(psi(i+1)) 
-	  - abs(psi(i  ))
-	  ,// -----------
-	    abs(psi(i+1)) 
-	  + abs(psi(i  ))
+          abs(psi(i+1)) - abs(psi(i))
+	  ,// -----------------------
+	  abs(psi(i+1)) + abs(psi(i))
 	) 
       )
 
-// TODO: move toa formulae to a separate file
-// TODO: rename A, B nd xx_helper to 1/psi dpsi/dt etc
-
+      template <opts_t opts, class arr_1d_t>
+      inline auto A( // infinite gauge version (for both signed and variable-sign fields), (sum of psi -> sum of 1)
+        const arr_1d_t &psi, 
+        const rng_t &i,
+        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
+      ) return_macro(,
+	(psi(i+1) - psi(i)) 
+        / //---------------
+        (1 + 1)
+      )
 
       // 3rd order term (first term from eq. (36) from @copybrief Smolarkiewicz_and_Margolin_1998 (with G=1))
       template<opts_t opts, class arr_1d_t>
-      inline auto f_3rd_xx(
+      inline auto HOT(
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, toa)>::type* = 0 // enabled if toa == false
+        typename std::enable_if<!opt_set(opts, toa)>::type* = 0 
       ) -> decltype(0)
       { 
-        return 0; 
+        return 0; //no Higher Order Terms for second accuracy 
       }
 
+      template<class arr_1d_t>
+      inline auto HOT_helper(
+        const arr_1d_t &C,
+        const rng_t &i
+      ) return_macro(,
+	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) / 3
+      )
+
       template<opts_t opts, class arr_1d_t>
-      inline auto f_3rd_xx(
+      inline auto HOT( // for positive sign signal (so no need for abs())
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa)>::type* = 0, // enabled if toa == true
-        typename std::enable_if<opt_set(opts, sss)>::type* = 0 // enabled if sss == true
+        typename std::enable_if<opt_set(opts, toa) && opt_set(opts, pds) && !opt_set(opts, iga)>::type* = 0 
       ) return_macro(,
-	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) 
-	/ (typename arr_1d_t::T_numtype(3)) // TODO: check if this cast is needed
-        * // TODO: code duplication above :*
-        frac<opts>(
-	  psi(i+2) - psi(i+1) - psi(i) + psi(i-1)
-	  ,// 
-	  psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
+        HOT_helper(C, i) 
+        * frac<opts>(
+	    psi(i+2) - psi(i+1) - psi(i) + psi(i-1)
+	    ,//-----------------------------------
+	    psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
 	)
       )
 
       template<opts_t opts, class arr_1d_t>
-      inline auto f_3rd_xx(
+      inline auto HOT( // for variable sign signal (hence the need for abs())
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa)>::type* = 0, // enabled if toa == true
-        typename std::enable_if<!opt_set(opts, sss)>::type* = 0 // enabled if sss == false
+        typename std::enable_if<opt_set(opts, toa) && !opt_set(opts, pds) && !opt_set(opts, iga)>::type* = 0
       ) return_macro(,
-	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) 
-	/ (typename arr_1d_t::T_numtype(3)) // TODO: check if this cast is needed
-        * // TODO: code duplication above :*
-        frac<opts>(
-	  abs(psi(i+2)) - abs(psi(i+1)) - abs(psi(i)) + abs(psi(i-1))
-	  ,// 
-	  abs(psi(i+2)) + abs(psi(i+1)) + abs(psi(i)) + abs(psi(i-1))
+        HOT_helper(C, i)
+        * frac<opts>(
+	    abs(psi(i+2)) - abs(psi(i+1)) - abs(psi(i)) + abs(psi(i-1))
+	    ,//------------------------------------------------------- 
+	    abs(psi(i+2)) + abs(psi(i+1)) + abs(psi(i)) + abs(psi(i-1))
 	)
       )
 
-      //
       template<opts_t opts, class arr_1d_t>
-      inline auto antidiff(
+      inline auto HOT( // for infinite gauge option (sum of psi -> sum of 1) 
+        const arr_1d_t &psi,
+        const arr_1d_t &C,
+        const rng_t &i,
+        typename std::enable_if<opt_set(opts, toa) && !opt_set(opts, pds) && opt_set(opts, iga)>::type* = 0 
+      ) return_macro(,
+        HOT_helper(C, i) 
+        * (psi(i+2) - psi(i+1) - psi(i) + psi(i-1)) 
+        / //--------------------------------------- 
+        (1 + 1 + 1 + 1)
+      )
+
+      template<opts_t opts, class arr_1d_t>
+      inline auto antidiff( // antidiffusive velocity
         const arr_1d_t &psi, 
         const rng_t &i, 
         const arr_1d_t &C
@@ -110,8 +126,7 @@ namespace libmpdataxx
         * (1 - abs(C(i+h))) 
         * A<opts>(psi, i) 
         // third-order terms
-        + 
-        f_3rd_xx<opts>(psi, C, i) // TODO: rename to HOT?
+        + HOT<opts>(psi, C, i) 
       )
     }; // namespace mpdata
   }; // namespace formulae

@@ -18,10 +18,10 @@ namespace libmpdataxx
     {
       using namespace arakawa_c;
     
-      template<typename real_t, int n_eqs, int n_tlev, int halo>
-      class solver<real_t, 3, n_eqs, n_tlev, halo> : public solver_common<real_t, 3, n_eqs, n_tlev, halo>
+      template<typename real_t, int n_eqs, int n_tlev, int minhalo>
+      class solver<real_t, 3, n_eqs, n_tlev, minhalo> : public solver_common<real_t, 3, n_eqs, n_tlev, minhalo>
       {
-	using parent_t = solver_common<real_t, 3, n_eqs, n_tlev, halo>;
+	using parent_t = solver_common<real_t, 3, n_eqs, n_tlev, minhalo>;
 
 	protected:
       
@@ -34,12 +34,12 @@ namespace libmpdataxx
 	void xchng(int e, int lev = 0) 
 	{
           this->mem->barrier();
-	  bcxl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^halo, k^halo);
-	  bcxr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^halo, k^halo);
-	  bcyl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], k^halo, i^halo);
-	  bcyr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], k^halo, i^halo);
-	  bczl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], i^halo, j^halo);
-	  bczr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], i^halo, j^halo);
+	  bcxl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^this->halo, k^this->halo);
+	  bcxr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^this->halo, k^this->halo);
+	  bcyl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], k^this->halo, i^this->halo);
+	  bcyr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], k^this->halo, i^this->halo);
+	  bczl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], i^this->halo, j^this->halo);
+	  bczr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], i^this->halo, j^this->halo);
           this->mem->barrier();
 	}
 

@@ -74,9 +74,9 @@ int main()
     } 
     {
       const int n_eqs = 1;
-      using solver_t = output::gnuplot<solvers::mpdata_2d<float, 2, n_eqs, formulae::mpdata::sss>>;
+      using solver_t = output::gnuplot<solvers::mpdata_2d<float, 2, n_eqs, formulae::mpdata::pds>>;
       solver_t::params_t p;
-      setopts(p, nt, offset, "mpdata-sss_it=2");
+      setopts(p, nt, offset, "mpdata-pds_it=2");
       concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
       setup(slv, n, offset); 
       slv.advance(nt); 
