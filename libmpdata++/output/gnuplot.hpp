@@ -12,7 +12,7 @@
 #include <libmpdata++/output/detail/output_timer.hpp>
 
 #define GNUPLOT_ENABLE_BLITZ
-#include <gnuplot-iostream/gnuplot-iostream.h>
+#include <gnuplot-iostream/gnuplot-iostream.h> // TODO: Debian does not use a subdirectory
 
 #include <boost/format.hpp>
 

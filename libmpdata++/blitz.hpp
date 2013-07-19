@@ -11,6 +11,7 @@
 #  warning("  -ffast-math (Clang and GCC) and -DNDEBUG are recomended for release-mode builds")
 #  warning("  -DBZ_DEBUG is recommended for debug-mode builds")
 #endif
+// TODO: no ("") required?
 
 #if defined(_OPENMP) || defined(_REENTRANT)
 #  define BZ_THREADSAFE
