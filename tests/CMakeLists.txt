@@ -15,7 +15,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -g")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -Ofast -march=native")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -O3 -march=native -ffast-math") 
+  #set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -O3 -march=native" -ffast-math") 
 # -mllvm -vectorize")
 endif()
 

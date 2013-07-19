@@ -111,13 +111,13 @@ namespace libmpdataxx
     {};
 
     // alias names
-    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = -1>
     using mpdata_1d = mpdata<real_t, n_iters, 1, n_eqs, opts, halo>;
 
-    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = -1>
     using mpdata_2d = mpdata<real_t, n_iters, 2, n_eqs, opts, halo>;
 
-    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = 0>
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int halo = -1>
     using mpdata_3d = mpdata<real_t, n_iters, 3, n_eqs, opts, halo>;
   }; // namespace solvers
 }; // namescpae libmpdataxx
