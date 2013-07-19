@@ -6,8 +6,10 @@
 
 #pragma once
 
-#if !defined(__FAST_MATH__)
-#  warning("__FAST_MATH__ undefined - consider using the -ffast-math flag for Clang and GCC")
+#if (!defined(__FAST_MATH__) || !defined(NDEBUG)) && !defined(BZ_DEBUG)
+#  warning("neither __FAST_MATH__ && NDEBUG nor BZ_DEBUG defined")
+#  warning("  -ffast-math (Clang and GCC) and -DNDEBUG are recomended for release-mode builds")
+#  warning("  -DBZ_DEBUG is recommended for debug-mode builds")
 #endif
 
 #if defined(_OPENMP) || defined(_REENTRANT)

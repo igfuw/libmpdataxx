@@ -126,7 +126,7 @@ namespace libmpdataxx
       }
  
       // helper constructs to make it compilable for both 1D and 2D versions
-      std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { assert(false); }
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { assert(false); throw; }
       std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a); }
 
       void record(const int var)

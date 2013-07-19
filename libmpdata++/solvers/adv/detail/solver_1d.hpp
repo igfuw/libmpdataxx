@@ -15,10 +15,10 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template<typename real_t, int n_eqs, int n_tlev, int halo>
-      class solver<real_t, 1, n_eqs, n_tlev, halo> : public solver_common<real_t, 1, n_eqs, n_tlev, halo>
+      template<typename real_t, int n_eqs, int n_tlev, int minhalo>
+      class solver<real_t, 1, n_eqs, n_tlev, minhalo> : public solver_common<real_t, 1, n_eqs, n_tlev, minhalo>
       {
-	using parent_t = solver_common<real_t, 1, n_eqs, n_tlev, halo>;
+	using parent_t = solver_common<real_t, 1, n_eqs, n_tlev, minhalo>;
 
 	protected:
 

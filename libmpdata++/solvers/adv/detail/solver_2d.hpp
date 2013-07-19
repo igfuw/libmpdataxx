@@ -18,10 +18,10 @@ namespace libmpdataxx
     {
       using namespace libmpdataxx::arakawa_c;
 
-      template<typename real_t, int n_eqs, int n_tlev, int halo>
-      class solver<real_t, 2, n_eqs, n_tlev, halo> : public solver_common<real_t, 2, n_eqs, n_tlev, halo>
+      template<typename real_t, int n_eqs, int n_tlev, int minhalo>
+      class solver<real_t, 2, n_eqs, n_tlev, minhalo> : public solver_common<real_t, 2, n_eqs, n_tlev, minhalo>
       {
-	using parent_t = solver_common<real_t, 2, n_eqs, n_tlev, halo>;
+	using parent_t = solver_common<real_t, 2, n_eqs, n_tlev, minhalo>;
 
 	protected:
       
@@ -33,7 +33,7 @@ namespace libmpdataxx
 
 	void xchng(int e, int lev = 0) // for previous time levels
 	{
-          this->xchng(this->mem->psi[e][ this->n[e] - lev], i^halo, j^halo);
+          this->xchng(this->mem->psi[e][ this->n[e] - lev], i^this->halo, j^this->halo);
 	}
 
 	void xchng(typename parent_t::arr_t psi, rng_t range_i, rng_t range_j) // for a given array

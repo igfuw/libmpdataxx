@@ -13,10 +13,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -g")
 
 # -DNDEBUG?
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -Ofast -march=native")
+  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -Ofast -march=native")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  #set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -O3 -march=native" -ffast-math") 
-# -mllvm -vectorize")
+  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -O3 -march=native -ffast-math") 
 endif()
 
 # gnuplot-iostream

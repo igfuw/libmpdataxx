@@ -19,11 +19,11 @@ namespace libmpdataxx
   {
     using namespace libmpdataxx::arakawa_c;
 
-    template<typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int halo_>
-    class mpdata<real_t, n_iters, 1, n_eqs, opts, halo_> : 
-      public detail::mpdata_common<real_t, n_iters, 1, n_eqs, opts, halo_>
+    template<typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int minhalo>
+    class mpdata<real_t, n_iters, 1, n_eqs, opts, minhalo> : 
+      public detail::mpdata_common<real_t, n_iters, 1, n_eqs, opts, minhalo>
     {
-      using parent_t = detail::mpdata_common<real_t, n_iters, 1, n_eqs, opts, halo_>;
+      using parent_t = detail::mpdata_common<real_t, n_iters, 1, n_eqs, opts, minhalo>;
 
       protected:
 
