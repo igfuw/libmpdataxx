@@ -17,78 +17,89 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-      // single-sign scalar version
+
       template<opts_t opts, int d, class arr_2d_t>
-      inline auto A(
+      inline auto A(  // positive sign scalar version
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, pds)>::type* = 0 // enabled if pds == true
+        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0
       ) return_macro(,
 	frac<opts>(
-	    psi(pi<d>(i+1, j)) 
-	  - psi(pi<d>(i,   j))
-	  ,// ----------------
-	    psi(pi<d>(i+1, j))
-	  + psi(pi<d>(i,   j))
+	  psi(pi<d>(i+1, j)) - psi(pi<d>(i, j))
+	  ,// --------------------------------
+	  psi(pi<d>(i+1, j)) + psi(pi<d>(i, j))
 	)
       )
 
-      // variable-sign scalar version
       template<opts_t opts, int d, class arr_2d_t>
-      inline auto A(
+      inline auto A(  // variable-sign scalar version
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, pds)>::type* = 0 // enabled if pds == false
+        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
       ) return_macro(,
 	frac<opts>(
-	    abs(psi(pi<d>(i+1, j))) 
-	  - abs(psi(pi<d>(i,   j)))
-	  ,// ---------------------
-	    abs(psi(pi<d>(i+1, j))) 
-	  + abs(psi(pi<d>(i,   j)))
+	  abs(psi(pi<d>(i+1, j))) - abs(psi(pi<d>(i, j)))
+	  ,// -------------------------------------------
+	  abs(psi(pi<d>(i+1, j))) + abs(psi(pi<d>(i, j)))
 	) 
       ) 
 
       template<opts_t opts, int d, class arr_2d_t>
-      inline auto B(
+      inline auto A(  // inf gauge option
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, pds)>::type* = 0 // enabled if pds == true
+        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
+      ) return_macro(,
+        (
+	  psi(pi<d>(i+1, j)) - psi(pi<d>(i, j))
+        ) / ( //---------------------
+	  1 + 1
+        )
+      )
+
+      template<opts_t opts, int d, class arr_2d_t>
+      inline auto B( // positive sign signal
+        const arr_2d_t &psi, 
+        const rng_t &i, 
+        const rng_t &j,
+        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0
       ) return_macro(,
 	frac<opts>( 
-	    psi(pi<d>(i+1, j+1))
-	  + psi(pi<d>(i,   j+1)) 
-	  - psi(pi<d>(i+1, j-1)) 
-	  - psi(pi<d>(i,   j-1))
-	  ,// ------------------
-	    psi(pi<d>(i+1, j+1)) 
-	  + psi(pi<d>(i,   j+1)) 
-	  + psi(pi<d>(i+1, j-1)) 
-	  + psi(pi<d>(i,   j-1))
+	  psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) - psi(pi<d>(i+1, j-1)) - psi(pi<d>(i, j-1))
+	  ,// --------------------------------------------------------------------------------
+	  psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) + psi(pi<d>(i+1, j-1)) + psi(pi<d>(i, j-1))
 	) / 2
       )
 
       template<opts_t opts, int d, class arr_2d_t>
-      inline auto B(
+      inline auto B( // variable-sign signal
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, pds)>::type* = 0 // enabled if pds == false
+        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
       ) return_macro(,
 	frac<opts>( 
-	    abs(psi(pi<d>(i+1, j+1))) 
-	  + abs(psi(pi<d>(i,   j+1))) 
-	  - abs(psi(pi<d>(i+1, j-1))) 
-	  - abs(psi(pi<d>(i,   j-1)))
-	  ,// -----------------------
-	    abs(psi(pi<d>(i+1, j+1))) 
-	  + abs(psi(pi<d>(i,   j+1))) 
-	  + abs(psi(pi<d>(i+1, j-1))) 
-	  + abs(psi(pi<d>(i,   j-1)))
+	  abs(psi(pi<d>(i+1, j+1))) + abs(psi(pi<d>(i, j+1))) - abs(psi(pi<d>(i+1, j-1))) - abs(psi(pi<d>(i, j-1)))
+	  ,// ----------------------------------------------------------------------------------------------------
+	  abs(psi(pi<d>(i+1, j+1))) + abs(psi(pi<d>(i, j+1))) + abs(psi(pi<d>(i+1, j-1))) + abs(psi(pi<d>(i, j-1)))
 	) / 2
+      )
+
+      template<opts_t opts, int d, class arr_2d_t>
+      inline auto B( // inf. gauge
+        const arr_2d_t &psi, 
+        const rng_t &i, 
+        const rng_t &j,
+        typename std::enable_if<opt_set(opts, iga)>::type* = 0
+      ) return_macro(,
+        (
+	  psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) - psi(pi<d>(i+1, j-1)) - psi(pi<d>(i, j-1))
+	) / (  // --------------------------------------------------------------------------------
+	  1 + 1 + 1 +1
+        ) / 2
       )
 
       template<int d, class arr_2d_t>
