@@ -11,7 +11,11 @@
 #include <libmpdata++/output/detail/output_timer.hpp>
 #include <libmpdata++/detail/error.hpp>
 
+// the C++ HDF5 API
 #include <H5Cpp.h>
+
+// the C HDF5 API (for dimension scales)
+#include "hdf5_hl.h"
 
 namespace libmpdataxx
 {
@@ -27,6 +31,7 @@ namespace libmpdataxx
       const std::string outfile;
       std::unique_ptr<H5::H5File> hdfp;
       std::map<int, H5::DataSet> vars;
+      std::map<int, H5::DataSet> dims;
       std::vector<hsize_t> t;
 
       // HDF types of host data
@@ -69,24 +74,26 @@ namespace libmpdataxx
 	    H5::DataSpace scalar(1, &one); // netcdf fails to read HDF5 scalars :(
 
             // creating the time variable
-/* // TODO: gives a segfault :(
             {
-	      H5::DSetCreatPropList params;
-	      params.setChunk(1, chunk);
+              H5::DSetCreatPropList params;
+              params.setChunk(1, chunk);
 
               H5::DataSpace space(1, shape, limit);
-              (*hdfp)
-                .createDataSet("time", flttype_output, space, params)
-                .createAttribute("unit", strtype, scalar)
-                .write(strtype, " since "); // that's enough to force Paraview to treat it as time... 
+              dims[0] = (*hdfp).createDataSet("time", flttype_output, space, params);
+
+herr_t status;
+status = H5DSset_scale(dims[0].getId(), "time");
+std::cerr << "status = " << status << std::endl;
+
+              // it is meant to help Paraview guess which variable is time
+              dims[0].createAttribute("unit", strtype, scalar).write(strtype, std::string("TODO since 0"));
             }
-*/
 
 	    // creating the user-requested variables
             {
 	      H5::DSetCreatPropList params;
 	      params.setChunk(n_dims, chunk);
-              params.setDeflate(5); // TODO: a better choice of algorithm or the parameter?
+              params.setDeflate(5); // TODO: a better choice of algorithm or the parameter? // TODO: move such constant to the header
 
               H5::DataSpace space(n_dims, shape, limit);
 	      for (const auto &v : outvars)
@@ -130,6 +137,7 @@ namespace libmpdataxx
                 start[3] = { t[var]-1, 0, 0  };
 
               vars[var].extend(shape);
+              dims[0].extend(shape); // TODO: unnecesarily repeated for each var
 
               const H5::DataSpace column(3, count);
 	      H5::DataSpace space = vars[var].getSpace();
