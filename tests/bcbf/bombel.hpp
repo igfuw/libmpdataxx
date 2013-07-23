@@ -21,7 +21,7 @@ class bombel : public parent_t
     auto Tht = this->state(tht); // TODO: relies on global tht!!!!!
     auto &ijk = this->ijk;
 
-    dW(ijk) += formulae::g<real_t>() * si::seconds * si::seconds / si::metres * (Tht(ijk) - Tht_amb) / Tht_amb; // TODO: get rid of units here?
+    dW(ijk) += (formulae::g<real_t>() * si::seconds * si::seconds / si::metres) /*/ 300*/ * (Tht(ijk) - Tht_amb) / Tht_amb; // TODO: get rid of units here?
   }
 
   public:
