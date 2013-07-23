@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: namespace detail
+
 #if defined(__linux__)
 #  include <sys/prctl.h>
 

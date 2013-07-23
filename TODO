@@ -1,4 +1,5 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- FCT-ver-rho
 - mpdata n_iters as a param
 - nx,ny,nz as params?
 - n_eqs as params...

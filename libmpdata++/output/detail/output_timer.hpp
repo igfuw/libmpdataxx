@@ -7,7 +7,7 @@
 
 #pragma once
 
-// TODO: rename to output timed?
+// TODO: move to solver::detail?
 
 #include <libmpdata++/output/detail/output_common.hpp>
 #include <boost/timer/timer.hpp>
@@ -30,12 +30,14 @@ namespace libmpdataxx
 
         std::unique_ptr<boost::timer::cpu_timer> tmr; 
 
+        // TODO: move to ctor?
 	void hook_ante_loop(const int nt)
 	{
 	  if (this->mem->rank() == 0) tmr.reset(new boost::timer::cpu_timer());
 	  parent_t::hook_ante_loop(nt);
 	}
 
+        // TODO: move to dtor?
 	void hook_post_loop()
 	{
 	  parent_t::hook_post_loop();

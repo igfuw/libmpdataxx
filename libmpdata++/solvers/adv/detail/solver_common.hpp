@@ -46,6 +46,7 @@ namespace libmpdataxx
 	protected: 
 
         std::vector<int> n; // TODO: why not std::array?
+        long long int t = 0;
 
         typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs, n_tlev> mem_t;
 	mem_t *mem;
@@ -122,18 +123,20 @@ namespace libmpdataxx
         virtual ~solver_common()
         {
 #if !defined(NDEBUG)
-// TODO: what if nt=0!
-          assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
-          assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
-          assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
-          assert(hook_post_loop_called && "any overriding hook_post_loop() must call parent_t::hook_post_loop()");
+          if (t > 0)
+          {
+	    assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
+	    assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
+	    assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
+	    assert(hook_post_loop_called && "any overriding hook_post_loop() must call parent_t::hook_post_loop()");
+          }
 #endif
         }
 
 	virtual void solve(const int nt) final
 	{   
           hook_ante_loop(nt);
-	  for (int t = 0; t < nt; ++t) 
+	  for (t = 0; t < nt; ++t) 
 	  {   
             monitor(float(t) / nt); // TODO: should it really be here? not in some hook somewhere?
             hook_ante_step();

@@ -80,7 +80,8 @@ namespace libmpdataxx
       ~inhomo_solver()
       {
 #if !defined(NDEBUG)
-        assert(update_forcings_called && "any overriding update_forcings() must call parent_t::update_forcings()");
+       if (this->t > 0) 
+         assert(update_forcings_called && "any overriding update_forcings() must call parent_t::update_forcings()");
 #endif
       }
 
