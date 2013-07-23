@@ -34,15 +34,14 @@ namespace libmpdataxx
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; // TODO: T_sumtype
         std::unique_ptr<blitz::Array<real_t, 2>> sumtmp; // TODO: T_sumtype
 
-        protected:
-
-	int n, span[n_dims];
-
 	public:
 
+	int n, span[n_dims]; // TODO: std::array?
+
+        // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> C, psi[n_eqs];
 
-	std::unordered_map< // TODO:! can string be used here (thread-safety!!!)
+	std::unordered_map< 
 	  const char*, // intended for addressing with __FILE__
 	  boost::ptr_vector<arrvec_t<arr_t>>
 	> tmp; 
@@ -132,7 +131,7 @@ namespace libmpdataxx
 	public:
 
 	// accessor methods
-	blitz::Array<real_t, 1> state(int e)
+	blitz::Array<real_t, 1> state(int e = 0)
 	{
 	  return this->psi[e][ this->n ](
 	    rng_t(0, this->span[0]-1)
@@ -163,7 +162,7 @@ namespace libmpdataxx
         using parent_t = sharedmem_common<real_t, 2, n_eqs, n_tlev>;
 	public:
 
-	blitz::Array<real_t, 2> state(int e)
+	blitz::Array<real_t, 2> state(int e = 0)
 	{
 	  return this->psi[e][ this->n ](idx_t<2>({
 	    rng_t(0, this->span[0]-1),
@@ -200,7 +199,7 @@ namespace libmpdataxx
         using parent_t = sharedmem_common<real_t, 3, n_eqs, n_tlev>;
 	public:
 
-	blitz::Array<real_t, 3> state(int e)
+	blitz::Array<real_t, 3> state(int e = 0)
 	{
 	  return this->psi[e][ this->n ](idx_t<3>({
 	    rng_t(0, this->span[0]-1),

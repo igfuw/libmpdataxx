@@ -133,6 +133,7 @@ namespace libmpdataxx
 #endif
         }
 
+// TODO: trap signals to correctly interrupt simulation closing the output file
 	virtual void solve(const int nt) final
 	{   
           hook_ante_loop(nt);
@@ -149,7 +150,7 @@ namespace libmpdataxx
         }
 
 	// psi getter
-	arr_t state(int e, int add = 0)
+	arr_t state(int e, int add = 0) // TODO: rename it to something like psi() or subdomain_with_halos()!
 	{
 	  return this->mem->psi[e][this->n[e] + add];
 	}
