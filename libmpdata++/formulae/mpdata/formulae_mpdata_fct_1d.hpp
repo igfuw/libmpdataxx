@@ -71,7 +71,7 @@ namespace libmpdataxx
       ) 
 
       template <opts_t opts, class arr_1d_t>
-      inline auto beta_up( //infinity gauge option (* psi -> * 1)
+      inline auto beta_up( //infinite gauge option (* psi -> * 1)
         const arr_1d_t &psi,
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr, 
@@ -135,7 +135,7 @@ namespace libmpdataxx
       ) 
 
       template <opts_t opts, class arr_1d_t>
-      inline auto beta_dn( // infinity gauge option
+      inline auto beta_dn( // infinite gauge option
         const arr_1d_t &psi, 
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &C_corr, 

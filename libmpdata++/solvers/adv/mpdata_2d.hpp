@@ -8,6 +8,8 @@
 
 #include <array>
 
+#include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>  //TODO tmp
+
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_2d.hpp>
 #include <libmpdata++/formulae/donorcell_formulae.hpp>
 #include <libmpdata++/solvers/adv/detail/solver_2d.hpp> // TODO: this is not used here but has to be included... tricky!
