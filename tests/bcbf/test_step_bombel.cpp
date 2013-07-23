@@ -38,11 +38,11 @@ using namespace libmpdataxx;
 template <class T>
 void setopts(T &p, real_t Tht_amb, std::string name)
 {
-  p.dt = .5;
+  p.dt = .75;
   p.dx = p.dz = 10.; 
   p.Tht_amb = Tht_amb; 
 
-  p.outfreq = 12;
+  p.outfreq = 100; //12;
   p.outvars = {
 //    {u,   {.name = "u",   .unit = "m/s"}}, 
 //    {w,   {.name = "w",   .unit = "m/s"}}, 
@@ -53,17 +53,19 @@ void setopts(T &p, real_t Tht_amb, std::string name)
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
-  p.gnuplot_cbrange = "[299.85:300.65]";
+  p.gnuplot_cbrange = "[299.85 : 300.65]";
+//  p.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
   p.gnuplot_maxcolors = 8;
   p.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
+//  p.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
   p.gnuplot_term = "svg";
 }
 
 int main() 
 {
   const int r0 = 250; 
-  const int nx = 200, ny = 200, nt = 1212;
-  real_t Tht_amb = 300; // ambient state (constant thoughout the domain)
+  const int nx = 200, ny = 200, nt = 800;
+  real_t Tht_amb = 300; //1; //300; // ambient state (constant thoughout the domain)
 
   boost::ptr_vector<libmpdataxx::concurr::any<real_t, 2>> slvs;
 
@@ -71,7 +73,7 @@ int main()
   using solver_t = output::gnuplot<
     bombel<
       solvers::pressure_cr<
-        solvers::mpdata_fct_2d<real_t, n_iters, n_eqs>, 
+        solvers::mpdata_fct_2d<real_t, n_iters, n_eqs, formulae::mpdata::iga>, 
         //solvers::donorcell_2d<real_t, n_eqs>, 
 	u, w
       >
@@ -79,7 +81,7 @@ int main()
   >;
   solver_t::params_t p;
   setopts(p, Tht_amb, "cr");
-  p.tol = 1e-5;
+  p.tol = 1e-6;
 
   slvs.push_back(new libmpdataxx::concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
 

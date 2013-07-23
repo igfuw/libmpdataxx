@@ -177,7 +177,7 @@ namespace libmpdataxx
       ) 
 
       template <opts_t opts, int d, class arr_2d_t>
-      inline auto C_mono( //for variable-sign signal and no infinity gauge option
+      inline auto C_mono( //for variable-sign signal and no infinite gauge option
         const arr_2d_t &psi,
         const arr_2d_t &psi_min, // from before the first iteration
         const arr_2d_t &psi_max, // from before the first iteration
@@ -223,7 +223,7 @@ namespace libmpdataxx
       ) 
 
       template <opts_t opts, int d, class arr_2d_t>
-      inline auto C_mono( //for infinity gauge option or positive-sign signal
+      inline auto C_mono( //for infinite gauge option or positive-sign signal
         const arr_2d_t &psi,
         const arr_2d_t &psi_min, // from before the first iteration
         const arr_2d_t &psi_max, // from before the first iteration

@@ -35,7 +35,7 @@ void setup(T &solver, int n[2])
     omega = -.001,// / (2 * pi<real_t>()),
     h = 1., // TODO: other name!
     r = 4. * dx,
-    h0 = 0., //-.5,
+    h0 = -.5,
     x0 = 21. * dx,
     y0 = 15. * dy;
 
@@ -63,7 +63,7 @@ void setopts(T &p, int nt, int n_iters)
 {
   p.outfreq = nt; //nt;///10; // TODO
   p.gnuplot_with = "lines";
-  p.gnuplot_zrange = p.gnuplot_cbrange = "[-.1:1.6]"; //"[-1:1]";
+  p.gnuplot_zrange = p.gnuplot_cbrange = "[-1:1]";
   {
     std::ostringstream tmp;
     tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
@@ -79,8 +79,8 @@ int main()
   int n[] = {32, 32}, nt = 200;
 
   const int n_iters = 2;
-  using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1, formulae::mpdata::iga>>;
-  //using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::iga>>;
+  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::mpdata::toa*/>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::iga /*| formulae::mpdata::toa*/>>;
   solver_t::params_t p;
   setopts(p, nt, n_iters);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
