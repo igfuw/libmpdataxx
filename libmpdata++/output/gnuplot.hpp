@@ -48,11 +48,14 @@ namespace libmpdataxx
 	   ")*/ << " maxcolors " << p.gnuplot_maxcolors << "\n" 
 	   << "set view " << p.gnuplot_view << "\n"
 	   << "set zrange " << p.gnuplot_zrange << "\n"
-	   << "set xrange [0:" << this->mem->state(0).extent(0) << "]\n"
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
 	   << "set term " << p.gnuplot_term << "\n"
         ;
+	if (p.gnuplot_xrange == "[*:*]") 
+	   *gp << "set xrange [0:" << this->mem->state(0).extent(0) << "]\n";
+	else 
+	   *gp << "set xrange " << p.gnuplot_xrange << "\n";
 
         // 1D settings
         if (parent_t::n_dims == 1) // known at compile time
@@ -100,16 +103,19 @@ namespace libmpdataxx
         // 2D settings
         if (parent_t::n_dims == 2) // known at compile time
         {
+          if (p.gnuplot_yrange == "[*:*]") 
+             *gp << "set yrange [0:" << this->mem->state(0).extent(1) << "]\n";
+          else 
+             *gp << "set yrange " << p.gnuplot_yrange << "\n";
+
           *gp 
 	     << "set cbrange " << p.gnuplot_cbrange << "\n"
-	     << "set yrange [0:" << this->mem->state(0).extent(1) << "]\n"
 	     << "set xtics out\n"
 	     << "set ytics out\n"
 	     << "set size square\n"
 	     << (p.gnuplot_surface ? "set" : "unset") << " surface\n"
 	     << (p.gnuplot_contour ? "set" : "unset") << " contour\n"
 	  ;
-          assert(p.gnuplot_yrange == "[*:*]" && "gnupot_yrange was specified for a 2D splot where Y axis represents spatial dimension");
 
           if (p.gnuplot_contour)
           {
@@ -189,6 +195,7 @@ namespace libmpdataxx
           gnuplot_view = std::string(""), 
           gnuplot_zrange = std::string("[*:*]"),
           gnuplot_yrange = std::string("[*:*]"),
+          gnuplot_xrange = std::string("[*:*]"),
           gnuplot_cbrange = std::string("[*:*]"),
           gnuplot_border = std::string(""),
           gnuplot_lt = std::string("-1"), // black

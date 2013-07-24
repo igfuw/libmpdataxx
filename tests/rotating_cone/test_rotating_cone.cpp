@@ -39,7 +39,7 @@ void setup(T &solver, int n[2])
 //    r = 4. * dx,
     r = 15. * dx,
 //    h0 = -.5,
-    h0 = 0.,
+    h0 = 1.,
 //    x0 = 21. * dx,
 //    y0 = 15. * dy;
     x0 = 75 * dx,
@@ -61,7 +61,7 @@ void setup(T &solver, int n[2])
 template <class T>
 void setopts(T &p, int nt, int n_iters)
 {
-  p.outfreq = nt; //nt;///10; // TODO
+  p.outfreq = 1; //nt;///10; // TODO
   p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;
@@ -72,9 +72,11 @@ void setopts(T &p, int nt, int n_iters)
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
-  p.gnuplot_cbrange = "[-.25 : 4]";
-  p.gnuplot_maxcolors = 8;
-  p.gnuplot_cntrparam = "levels incremental -.125, .25, 4.125";
+  p.gnuplot_cbrange = "[.5 : 5.5]";
+//  p.gnuplot_xrange = "[60 : 90]";
+//  p.gnuplot_yrange = "[35 : 65]";
+  p.gnuplot_maxcolors = 10;
+  p.gnuplot_cntrparam = "levels incremental .75, .25, 5.25";
   p.gnuplot_term = "svg";
 
 /*
@@ -94,11 +96,11 @@ int main()
   using namespace libmpdataxx;
 
 //  int n[] = {32, 32}, nt = 200;
-  int n[] = {101, 101}, nt = 628 * 6;
+  int n[] = {101, 101}, nt = 628; //* 6;
 
   const int n_iters = 2;
   //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::mpdata::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::iga | formulae::mpdata::toa>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1/*, formulae::mpdata::eps | formulae::mpdata::toa*/>>;
   solver_t::params_t p;
   setopts(p, nt, n_iters);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 

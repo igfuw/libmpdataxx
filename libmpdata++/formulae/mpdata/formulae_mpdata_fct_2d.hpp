@@ -186,13 +186,13 @@ namespace libmpdataxx
         const rng_t j,
         typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
       ) return_macro(,
-        C_corr[d]( pi<d>(i+h, j) ) * where(
+        C_corr[d]( pi<d>(i+h, j) ) * where( // TODO: is it possible to implement it without where()?
           // if
-          C_corr[d]( pi<d>(i+h, j) ) > 0,
+          C_corr[d]( pi<d>(i+h, j) ) > 0, // >= ?
           // then
           where(
             // if
-            psi(pi<d>(i, j)) > 0,
+            psi(pi<d>(i, j)) > 0, // TODO: wouldn't it be better with >= ?
             // then
 	    min(1, min(
 	      beta_dn<opts, d>(psi, psi_min, C_corr, i,     j),

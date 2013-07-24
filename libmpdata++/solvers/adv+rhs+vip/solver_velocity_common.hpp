@@ -54,7 +54,6 @@ namespace libmpdataxx
           else
             stash[d](this->ijk) += 3./2 * (this->state(e)(this->ijk) / this->state(density)(this->ijk)); // TODO: what if density == 0?
 
-          rng_t &i = this->i, &j = this->j; // TODO: get rid of it
 	  this->xchng(stash[d], this->i^this->halo, this->j^this->halo);      // filling halos 
 	}
 
