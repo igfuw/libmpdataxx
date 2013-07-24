@@ -27,31 +27,31 @@ template <class T>
 void setup(T &solver, int n[2]) 
 {
   real_t 
-    dt = 10 * pi<real_t>(),
+//    dt = 10 * pi<real_t>(),
+    dt = .1,
     dx = 1,
     dy = 1,
     xc = .5 * n[x] * dx,
     yc = .5 * n[y] * dy,
-    omega = -.001,// / (2 * pi<real_t>()),
-    h = 1., // TODO: other name!
-    r = 4. * dx,
-    h0 = -.5,
-    x0 = 21. * dx,
-    y0 = 15. * dy;
+//    omega = -.001,// / (2 * pi<real_t>()),
+    omega = -.1,
+    h = 4., // TODO: other name!
+//    r = 4. * dx,
+    r = 15. * dx,
+//    h0 = -.5,
+    h0 = 0.,
+//    x0 = 21. * dx,
+//    y0 = 15. * dy;
+    x0 = 75 * dx,
+    y0 = 50 * dy;
 
   blitz::firstIndex i;
   blitz::secondIndex j;
 
   // cone shape
   decltype(solver.state()) tmp(solver.state().extent());
-  tmp = h - blitz::sqr(
-    (
-      blitz::pow((i+.5) * dx - x0, 2) +  
-      blitz::pow((j+.5) * dy - y0, 2) 
-    ) /
-    std::pow(r / h, 2)
-  );
-  solver.state() = h0 + where(tmp > 0, tmp, 0.);
+  tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
+  solver.state() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
 
   // constant angular velocity rotational field
   solver.courant(x) = -omega * (j * dy - yc) * dt / dx;
@@ -62,25 +62,43 @@ template <class T>
 void setopts(T &p, int nt, int n_iters)
 {
   p.outfreq = nt; //nt;///10; // TODO
-  p.gnuplot_with = "lines";
-  p.gnuplot_zrange = p.gnuplot_cbrange = "[-1:1]";
+  p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;
     tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
     p.gnuplot_output = tmp.str();    
   }
+  p.gnuplot_view = "map";
+  p.gnuplot_with = "lines";
+  p.gnuplot_surface = false;
+  p.gnuplot_contour = true;
+  p.gnuplot_cbrange = "[-.25 : 4]";
+  p.gnuplot_maxcolors = 8;
+  p.gnuplot_cntrparam = "levels incremental -.125, .25, 4.125";
+  p.gnuplot_term = "svg";
+
+/*
+  p.outfreq = nt;
+  p.gnuplot_with = "lines";
+  {
+    std::ostringstream tmp;
+    tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
+    p.gnuplot_output = tmp.str();
+  }
   p.outvars[0].name = "psi";
+*/
 }
 
 int main() 
 {
   using namespace libmpdataxx;
 
-  int n[] = {32, 32}, nt = 200;
+//  int n[] = {32, 32}, nt = 200;
+  int n[] = {101, 101}, nt = 628 * 6;
 
   const int n_iters = 2;
   //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::mpdata::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::iga /*| formulae::mpdata::toa*/>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::iga | formulae::mpdata::toa>>;
   solver_t::params_t p;
   setopts(p, nt, n_iters);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
