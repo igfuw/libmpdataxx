@@ -128,10 +128,6 @@ namespace libmpdataxx
         }
       }
 
-      void stop()
-      {
-      }
- 
       void record_all()
       {
 	// dimensions, offsets, etc
