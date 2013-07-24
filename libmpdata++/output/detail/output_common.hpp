@@ -50,7 +50,7 @@ namespace libmpdataxx
 	  parent_t::hook_post_loop();
 	}
 
-	void record_all()
+	virtual void record_all()
 	{
 	  for (const auto &v : outvars) record(v.first);
 	}
