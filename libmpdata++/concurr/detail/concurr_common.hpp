@@ -79,7 +79,7 @@ namespace libmpdataxx
 	// 1D ctor
 	concurr_common(
 	  const int s0, 
-	  typename solver_t::params_t &params,
+	  const typename solver_t::params_t &params,
           mem_t *mem_p,
 	  const int n0
 	)
@@ -118,7 +118,7 @@ namespace libmpdataxx
 	// 2D ctor
 	concurr_common(
 	  const int s0, const int s1, 
-	  typename solver_t::params_t &params,
+	  const typename solver_t::params_t &params,
           mem_t *mem_p,
 	  const int n0, const int n1
 	)
@@ -174,7 +174,7 @@ namespace libmpdataxx
 	// 3D ctor
 	concurr_common(
 	  const int s0, const int s1, const int s2, 
-	  typename solver_t::params_t &params,
+	  const typename solver_t::params_t &params,
           mem_t *mem_p,
 	  const int n0, const int n1, const int n2
 	)

@@ -77,7 +77,7 @@ namespace libmpdataxx
       // 1D ctor
       openmp(
 	const int s0,
-	typename solver_t::params_t &params = typename solver_t::params_t()
+	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
         parent_t(s0, params, new mem_t(s0), mem_t::size())
       {}
@@ -86,7 +86,7 @@ namespace libmpdataxx
       openmp(
 	const int s0,
 	const int s1,
-	typename solver_t::params_t &params = typename solver_t::params_t()
+	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
 	parent_t(s0, s1, params, new mem_t(s0, s1), mem_t::size(), 1)
       {}
@@ -96,7 +96,7 @@ namespace libmpdataxx
 	const int s0,
 	const int s1,
 	const int s2,
-	typename solver_t::params_t &params = typename solver_t::params_t()
+	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) :
 	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2), mem_t::size(), 1, 1)
       {}
