@@ -195,8 +195,8 @@ namespace libmpdataxx
             psi(pi<d>(i, j)) > 0, // TODO: wouldn't it be better with >= ?
             // then
 	    min(1, min(
-	      beta_dn<opts, d>(psi, psi_min, C_corr, i,     j),
-	      beta_up<opts, d>(psi, psi_max, C_corr, i + 1, j)
+              beta_dn<opts, d>(psi, psi_min, C_corr, i,     j),
+              beta_up<opts, d>(psi, psi_max, C_corr, i + 1, j) 
 	    )),
             // else
 	    min(1, min(
@@ -234,7 +234,7 @@ namespace libmpdataxx
       ) return_macro(,
         C_corr[d]( pi<d>(i+h, j) ) * where(
           // if
-          C_corr[d]( pi<d>(i+h, j) ) > 0,
+          C_corr[d]( pi<d>(i+h, j) ) >= 0, // TODO: what about where(C!=0, where()...) - could be faster for fields with a lot of zeros? (as an option?)
           // then
 	  min(1, min(
 	    beta_dn<opts, d>(psi, psi_min, C_corr, i,     j),

@@ -50,6 +50,7 @@
 
 
 0.2: (near future enhancements, things important for the initial stages of the HARMONIA project)
+- FCT vs. machine precision! (why psi=1 is bad)
 - document (and check?) stability conditions for RHS terms
 - support for specifying mpdata options per equation, and not globally for the whole system (e.g. positive definiteness)
 - HARMONIA-relevant boundary conditions (rigid?, zero-gradient?, open/radiation?)

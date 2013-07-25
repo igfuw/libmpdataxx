@@ -20,30 +20,34 @@ using boost::math::constants::pi;
 #include <libmpdata++/output/gnuplot.hpp>
 
 enum {x, y};
-using real_t = double;
+using real_t = float;
+
+real_t 
+  dt = .1,
+  dx = 1,
+  dy = 1,
+  omega = -.1,
+  h = 4., // TODO: other name!
+  h0 = 1.;
+
+// Anderson-Fattachi?
+//    dt = 10 * pi<real_t>(),
+//    omega = -.001,// / (2 * pi<real_t>()),
+//    r = 4. * dx,
+//    h0 = -.5,
+//    x0 = 21. * dx,
+//    y0 = 15. * dy;
 
 /// @brief settings from @copybrief Anderson_and_Fattahi_1974
 template <class T>
 void setup(T &solver, int n[2]) 
 {
-  real_t 
-//    dt = 10 * pi<real_t>(),
-    dt = .1,
-    dx = 1,
-    dy = 1,
-    xc = .5 * n[x] * dx,
-    yc = .5 * n[y] * dy,
-//    omega = -.001,// / (2 * pi<real_t>()),
-    omega = -.1,
-    h = 4., // TODO: other name!
-//    r = 4. * dx,
+  real_t
     r = 15. * dx,
-//    h0 = -.5,
-    h0 = 1.,
-//    x0 = 21. * dx,
-//    y0 = 15. * dy;
     x0 = 75 * dx,
-    y0 = 50 * dy;
+    y0 = 50 * dy,
+    xc = .5 * n[x] * dx,
+    yc = .5 * n[y] * dy;
 
   blitz::firstIndex i;
   blitz::secondIndex j;
@@ -55,13 +59,13 @@ void setup(T &solver, int n[2])
 
   // constant angular velocity rotational field
   solver.courant(x) = -omega * (j * dy - yc) * dt / dx;
-  solver.courant(y) = omega * (i * dx - xc) * dt / dy;
+  solver.courant(y) =  omega * (i * dx - xc) * dt / dy;
 }
 
 template <class T>
 void setopts(T &p, int nt, int n_iters)
 {
-  p.outfreq = 1; //nt;///10; // TODO
+  p.outfreq = nt; //nt;///10; // TODO
   p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;
@@ -72,11 +76,19 @@ void setopts(T &p, int nt, int n_iters)
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
-  p.gnuplot_cbrange = "[.5 : 5.5]";
+  {
+    std::ostringstream tmp;
+    tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
+    p.gnuplot_cbrange = tmp.str();
+  }
 //  p.gnuplot_xrange = "[60 : 90]";
 //  p.gnuplot_yrange = "[35 : 65]";
   p.gnuplot_maxcolors = 10;
-  p.gnuplot_cntrparam = "levels incremental .75, .25, 5.25";
+  {
+    std::ostringstream tmp;
+    tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
+    p.gnuplot_cntrparam = tmp.str();
+  }
   p.gnuplot_term = "svg";
 
 /*
@@ -100,7 +112,7 @@ int main()
 
   const int n_iters = 2;
   //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::mpdata::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1/*, formulae::mpdata::eps | formulae::mpdata::toa*/>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::pds | formulae::mpdata::eps>>;
   solver_t::params_t p;
   setopts(p, nt, n_iters);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 

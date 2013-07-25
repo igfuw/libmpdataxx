@@ -60,10 +60,11 @@ namespace libmpdataxx
         const den_t &den,
         typename std::enable_if<!opt_set(opts, eps)>::type* = 0 // enabled if eps == false
       ) return_macro(,
-        where(den > 0, nom / den, 0)
+        where(den != 0, nom / den, 0) // note: apparently >0 would suffice
       )
 
       // frac: implemented as suggested in MPDATA papers
+      //       if den == 0, then adding a smallest representable positive number
       template<opts_t opts, class nom_t, class den_t>
       inline auto frac(
         const nom_t &nom, 

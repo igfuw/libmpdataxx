@@ -143,7 +143,6 @@ namespace libmpdataxx
             hook_ante_step();
 	    xchng_all();
 	    advop_all();
-std::cerr << "min(psi) = " << blitz::min(this->mem->psi[0][this->n[0]]) - 1<< std::endl; // assumes OMP_NUM_THREADS=1
 	    cycle_all();
             hook_post_step();
 	  }   
