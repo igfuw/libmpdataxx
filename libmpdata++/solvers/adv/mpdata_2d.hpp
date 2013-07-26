@@ -88,9 +88,10 @@ namespace libmpdataxx
             const auto &i = this->i;
             const auto &j = this->j;
             const auto &C = this->C(iter);
-            psi[n+1](i, j) = psi[n](i, j) 
-              - (C[0](i+h, j) - C[0](i-h, j)) 
-              - (C[1](i, j+h) - C[1](i, j-h)); // referred to as F(1,1,U) in the papers
+            psi[n+1](i, j) = psi[n](i, j) - (
+              (C[0](i+h, j) - C[0](i-h, j)) +
+              (C[1](i, j+h) - C[1](i, j-h))
+            ); // referred to as F(1,1,U) in the papers
           }
 	}
       }
