@@ -37,7 +37,7 @@ namespace libmpdataxx
         *gp 
 	   << "set grid\n"
 	   << "set border " << p.gnuplot_border << "\n"
-	   << "set palette rgbformulae -28,-23,-3 " /*defined (" // makes gnuplot discard maxcolors :(
+	   << "set palette rgbformulae -3, -3, 19 " /*defined (" // makes gnuplot discard maxcolors :(
 	     "0 '#ffffff'," //         /\-
 	     "1 '#993399'," //        /  \-
 	     "2 '#00CCFF'," //  -----/    \---
@@ -146,7 +146,7 @@ namespace libmpdataxx
         {
           {
             std::ostringstream tmp;
-	    tmp << "set output '" << boost::format(p.gnuplot_output) % this->outvars[var].name % this->n << "'\n";
+	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->n << "'\n";
 	    tmp << "set title '"<< this->outvars[var].name << "  ("
               /* // TODO: not every solver has dt defined!
               << "t = " << std::dec << std::fixed << std::setprecision(0) << this->n * this->dt << " [s],"
