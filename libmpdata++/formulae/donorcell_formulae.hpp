@@ -103,9 +103,10 @@ namespace libmpdataxx
 	const arrvec_t<arr_2d_t> &C, 
 	const rng_t &i, const rng_t &j
       ) { 
-	psi[n+1](i,j) = psi[n](i,j)
-	  - donorcell<0>(psi[n], C[0], i, j)
-	  - donorcell<1>(psi[n], C[1], j, i); 
+	psi[n+1](i,j) = psi[n](i,j) - (      // note: this parenthesis is crucial!
+	  donorcell<0>(psi[n], C[0], i, j) + //       without it, magnitude difference
+	  donorcell<1>(psi[n], C[1], j, i)   //       between psi and the fluxes
+        );                                   //       may cause psi-0 != psi !
       }
 
       template <class arr_3d_t>
@@ -114,10 +115,11 @@ namespace libmpdataxx
 	const arrvec_t<arr_3d_t> &C, 
 	const rng_t &i, const rng_t &j, const rng_t &k
       ) { 
-	psi[n+1](i,j) = psi[n](i,j)
-	  - donorcell<0>(psi[n], C[0], i, j, k)
-	  - donorcell<1>(psi[n], C[1], j, k, i)
-	  - donorcell<2>(psi[n], C[2], k, i, j); 
+	psi[n+1](i,j) = psi[n](i,j) - (      // note: see above
+	  donorcell<0>(psi[n], C[0], i, j, k) +
+	  donorcell<1>(psi[n], C[1], j, k, i) +
+	  donorcell<2>(psi[n], C[2], k, i, j)
+        );
       }
     }; // namespace donorcell 
   }; // namespace formulae
