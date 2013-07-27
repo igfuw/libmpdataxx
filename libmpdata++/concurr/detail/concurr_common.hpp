@@ -29,6 +29,7 @@ namespace libmpdataxx
       virtual void advance(int) { assert(false); throw; }  
       virtual blitz::Array<real_t_, n_dims> state(int e = 0) { assert(false); throw; }
       virtual blitz::Array<real_t_, n_dims> courant(int d = 0) { assert(false); throw; }
+      virtual bool *panic_ptr() { assert(false && "unimplemented!"); }
     };
 
     namespace detail
@@ -249,6 +250,11 @@ namespace libmpdataxx
 	{
 	  return mem->courant(d);
 	}
+
+        bool *panic_ptr()
+        {
+          return &this->mem->panic;
+        }
       };
     }; // namespace detail
   }; // namespace concurr

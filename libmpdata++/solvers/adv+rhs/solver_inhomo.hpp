@@ -29,7 +29,9 @@ namespace libmpdataxx
 
       private:
 
-      bool update_forcings_called = false;
+#if !defined(NDEBUG)
+      bool update_forcings_called = true; // so that it nt=0 there's no complain
+#endif
 
       protected:
 
@@ -80,8 +82,7 @@ namespace libmpdataxx
       ~inhomo_solver()
       {
 #if !defined(NDEBUG)
-       if (this->t > 0) 
-         assert(update_forcings_called && "any overriding update_forcings() must call parent_t::update_forcings()");
+        assert(update_forcings_called && "any overriding update_forcings() must call parent_t::update_forcings()");
 #endif
       }
 
@@ -104,6 +105,10 @@ namespace libmpdataxx
       void hook_ante_step()
       {
         parent_t::hook_ante_step();
+
+#if !defined(NDEBUG)
+        update_forcings_called = false;
+#endif
 
         switch (inhomo)
         {

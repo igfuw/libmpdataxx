@@ -9,6 +9,7 @@
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/arakawa_c.hpp>
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
+
 #include <libmpdata++/solvers/adv/detail/monitor.hpp>
 
 namespace libmpdataxx
@@ -43,10 +44,13 @@ namespace libmpdataxx
 	  for (int e = 0; e < n_eqs; ++e) cycle(e);
 	}
 
+        private:
+
+        long long int t = -1;
+
 	protected: 
 
         std::vector<int> n; // TODO: why not std::array?
-        long long int t = 0;
 
         typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs, n_tlev> mem_t;
 	mem_t *mem;
@@ -60,7 +64,7 @@ namespace libmpdataxx
 
 	void cycle(int e) 
 	{ 
-	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // TODO: - n_tlev not needed?
+	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
           if (e == n_eqs - 1) this->mem->cycle(); 
 	}
 
@@ -70,15 +74,12 @@ namespace libmpdataxx
 	  for (int e = 0; e < n_eqs; ++e) xchng(e);
 	}
 
-        // hook methods to be overrided in inheriting objects
-        // the overriding methods are expected to call parent_t::hook_...()
-
         private:
       
 #if !defined(NDEBUG)
         bool 
-          hook_ante_step_called = false, 
-          hook_post_step_called = false, 
+          hook_ante_step_called = true, // initially true to handle nt=0 
+          hook_post_step_called = true, // 
           hook_ante_loop_called = false, 
           hook_post_loop_called = false;
 #endif
@@ -87,6 +88,7 @@ namespace libmpdataxx
 
         virtual void hook_ante_step() 
         { 
+          // sanity check if all subclasses call their parents' hooks
 #if !defined(NDEBUG)
           hook_ante_step_called = true;
 #endif
@@ -103,6 +105,11 @@ namespace libmpdataxx
         {
 #if !defined(NDEBUG)
           hook_ante_loop_called = true;
+          if (nt > 0)
+          {
+	    hook_ante_step_called = false;
+	    hook_post_step_called = false;
+          }
 #endif
         }
 
@@ -117,36 +124,45 @@ namespace libmpdataxx
 	solver_common(mem_t *mem) :
 	  n(n_eqs, 0), 
           mem(mem)
-	{ }
+	{}
 
         // dtor
         virtual ~solver_common()
         {
 #if !defined(NDEBUG)
-          if (t > 0)
-          {
-	    assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
-	    assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
-	    assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
-	    assert(hook_post_loop_called && "any overriding hook_post_loop() must call parent_t::hook_post_loop()");
-          }
+	  assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
+	  assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
+	  assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
+	  assert(hook_post_loop_called && "any overriding hook_post_loop() must call parent_t::hook_post_loop()");
 #endif
         }
 
-// TODO: trap signals to correctly interrupt simulation closing the output file
 	virtual void solve(const int nt) final
 	{   
+          // being generous about out-of-loop barriers 
+          this->mem->barrier();
           hook_ante_loop(nt);
+          this->mem->barrier();
+
 	  for (t = 0; t < nt; ++t) 
 	  {   
-            monitor(float(t) / nt); // TODO: should it really be here? not in some hook somewhere?
+	    // progress-bar info through thread name (check top -H)
+	    monitor(float(this->t) / nt); 
+
+            // multi-threaded SIGTERM handling
+            if (this->mem->panic) break;
+
+            // proper solver stuff
             hook_ante_step();
 	    xchng_all();
 	    advop_all();
 	    cycle_all();
             hook_post_step();
 	  }   
+
+          this->mem->barrier();
           hook_post_loop();
+          this->mem->barrier();
         }
 
 	// psi getter
