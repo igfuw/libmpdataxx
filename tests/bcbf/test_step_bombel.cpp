@@ -81,7 +81,7 @@ int main()
   >;
   solver_t::params_t p;
   setopts(p, Tht_amb, "cr");
-  p.tol = 1e-6;
+  p.tol = 1e-5;
 
   slvs.push_back(new libmpdataxx::concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
 

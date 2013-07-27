@@ -12,6 +12,7 @@
  */
 
 #include <libmpdata++/solvers/adv/mpdata_1d.hpp>
+#include <libmpdata++/solvers/adv/mpdata_fct_1d.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
@@ -26,8 +27,8 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
-  solver.state(1) = where(i <= center-width/2 || i >= center+width/2,  0, 2); 
+  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, 1, 3); 
+//  solver.state(1) = where(i <= center-width/2 || i >= center+width/2,  0, 2); 
   solver.courant() = .5; 
 }
 
@@ -37,8 +38,8 @@ void setopts(T &p, const int nt, const std::string &fname)
   p.outfreq = nt; // displays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
   p.outvars = {
-    {0, {.name = "variable-sign signal", .unit = "1"}},
-    {1, {.name = "single-sign signal", .unit = "1"}}
+    {0, {.name = "variable-sign signal", .unit = "1"}}//,
+//    {1, {.name = "single-sign signal", .unit = "1"}}
   };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
@@ -60,9 +61,9 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  const int n_eqs = 2;
-//  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::iga>>(slvs, "mpdata_iters=2_iga");
+  const int n_eqs = 1;
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs/*, formulae::mpdata::iga*/>>(slvs, "mpdata_iters=2");
+//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::iga>>(slvs, "mpdata_iters=2_iga");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

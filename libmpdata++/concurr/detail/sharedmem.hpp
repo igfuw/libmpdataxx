@@ -173,7 +173,7 @@ namespace libmpdataxx
 	blitz::Array<real_t, 2> courant(int d = 0)  
 	{   
           assert(d == 0 || d== 1);
-          // returning the whole array but with the dimensiones
+          // returning the whole array (i.e. incl. haloes) but with the dimensiones
           // reindexed to make it more intuitive when working with index placeholders
           const rng_t all = rng_t::all();
           switch (d)
