@@ -37,6 +37,7 @@ namespace libmpdataxx
 	public:
 
 	int n, span[n_dims]; // TODO: std::array?
+        bool panic = false; // for multi-threaded SIGTERM handling
 
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> C, psi[n_eqs];
