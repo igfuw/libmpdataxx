@@ -63,7 +63,7 @@ namespace libmpdataxx
         frac<opts>(
           beta_up_nominator(psi, psi_max, i)
           ,// ----------------------------
-            pospart<opts>(C_corr(i-h)) * pospart<opts>(psi(i-1))
+            pospart<opts>(C_corr(i-h)) * pospart<opts>(psi(i-1)) // TODO: some parenthesis?
           - negpart<opts>(C_corr(i+h)) * pospart<opts>(psi(i+1))
           - pospart<opts>(C_corr(i+h)) * negpart<opts>(psi(i))
           + negpart<opts>(C_corr(i-h)) * negpart<opts>(psi(i))
