@@ -43,36 +43,41 @@ namespace libmpdataxx
 	    : sizeof(typename solver_t::real_t) == sizeof(double) 
 	      ? H5::PredType::NATIVE_DOUBLE :
 	      H5::PredType::NATIVE_FLOAT,
-        flttype_output = H5::PredType::NATIVE_FLOAT;
+        flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      // TODO: consider saving to floats by default to conserve space?
+
+      static const int hdf_dims = 4; // HDF dimensions (spatial + time)
 
       void start(const int nt)
       {
         try 
         {
           // turn off the default output printing
-          //H5::Exception::dontPrint();
+          //H5::Exception::dontPrint(); // TODO: when done with boost exceptions set-up
 
           // creating the file
           hdfp.reset(new H5::H5File(outfile, H5F_ACC_TRUNC));
 
           // creating the dimensions
-          const int n_dims = parent_t::n_dims + 1; // +1 for time
-          hsize_t shape[n_dims], limit[n_dims], chunk[n_dims];
+          hsize_t shape[hdf_dims], limit[hdf_dims], chunk[hdf_dims];
+          // time
           shape[0] = 0; 
           limit[0] = H5S_UNLIMITED;
-          chunk[0] = 1;  // TODO: a better choice perhaps?
-          for (int i = 1; i <= parent_t::n_dims; ++i) 
-            shape[i] = limit[i] = chunk[i] = this->mem->span[i-1];
+          chunk[0] = 1; 
+          // x,y,z
+          if (parent_t::n_dims == 2)
+          {
+            shape[1] = limit[1] = chunk[1] = this->mem->span[0];
+            shape[2] = limit[2] = chunk[2] = 1;
+	    shape[3] = limit[3] = chunk[3] = this->mem->span[1];
+          }
+          else assert(false && "TODO");
 
           // creating variables
 	  // enabling chunking in order to use unlimited dimension
           {
             // some helpers
-            const H5::StrType strtype(H5::PredType::C_S1, H5T_VARIABLE);
-	    const hsize_t one = 1;
-	    H5::DataSpace scalar(1, &one); // netcdf fails to read HDF5 scalars :(
+            const H5::StrType strtype(H5::PredType::C_S1);
 
             // creating the dimension variables
             {
@@ -87,33 +92,35 @@ namespace libmpdataxx
               assert(status == 0);
 
               // it is meant to help Paraview guess which variable is time
-              dims[0].createAttribute("axis", strtype, scalar).write(strtype, std::string("T"));
-              dims[0].createAttribute("units", strtype, scalar).write(strtype, std::string("seconds"));
+              dims[0].createAttribute("axis", strtype, H5::DataSpace(H5S_SCALAR)).write(strtype, std::string("T"));
+              dims[0].createAttribute("units", strtype, H5::DataSpace(H5S_SCALAR)).write(strtype, std::string("seconds"));
 
-/* // TODO: for square NxN grids dimensions become equal! :(
+/* // TODO...
               // creating the D0 variable
               dims[1] = (*hdfp).createDataSet("D0", flttype_output, H5::DataSpace(1, shape+1));
 	      status = H5DSset_scale(dims[1].getId(), "D0");
               assert(status == 0);
-
-              // creating the D0 variable
-              dims[2] = (*hdfp).createDataSet("D1", flttype_output, H5::DataSpace(1, shape+2));
-	      status = H5DSset_scale(dims[2].getId(), "D1");
-              assert(status == 0);
+              for (hsize_t i = 0, one = 1; i < shape[1]; ++i)
+              {
+                float x = (i + .5) * this->dx;
+		H5::DataSpace space = dims[1].getSpace();
+		space.selectHyperslab(H5S_SELECT_SET, &one, &i);
+                dims[1].write(&x, flttype_output, scalar, space);
+              }
 */
             }
 
 	    // creating the user-requested variables
             {
 	      H5::DSetCreatPropList params;
-	      params.setChunk(n_dims, chunk);
-              params.setDeflate(5); // TODO: a better choice of algorithm or the parameter? // TODO: move such constant to the header
+	      params.setChunk(hdf_dims, chunk);
+              params.setDeflate(5); // TODO: move such constant to the header
 
-              H5::DataSpace space(n_dims, shape, limit);
+              H5::DataSpace space(hdf_dims, shape, limit);
 	      for (const auto &v : outvars)
 	      {
 		vars[v.first] = (*hdfp).createDataSet(v.second.name, flttype_output, space, params);
-		vars[v.first].createAttribute("units", strtype, scalar).write(strtype, v.second.unit);
+		vars[v.first].createAttribute("units", strtype, H5::DataSpace(H5S_SCALAR)).write(strtype, v.second.unit);
 	      }
             }
           }
@@ -134,13 +141,13 @@ namespace libmpdataxx
 	const hsize_t 
 	  n0 = hsize_t(this->mem->span[0]),
 	  n1 = hsize_t(this->mem->span[1]),
-	  shape[3] = { t+1, n0, n1 };
+	  shape[hdf_dims] = { t+1, n0, 1, n1 };
 	hsize_t
-	  count[3] = { 1,   1,  n1 },
-	  start[3] = { t,   0,  0  };
+	  count[hdf_dims] = { 1,   1,  1, n1 },
+	  start[hdf_dims] = { t,   0,  0, 0  };
 
-        const H5::DataSpace column(3, count);
-        const H5::DataSpace scalar(1, count);
+        const H5::DataSpace column(hdf_dims, count);
+        const H5::DataSpace scalar(1,      count);
 
         try
         {
