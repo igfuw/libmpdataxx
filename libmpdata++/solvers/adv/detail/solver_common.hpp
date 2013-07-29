@@ -33,7 +33,7 @@ namespace libmpdataxx
         // using enums as "public static const int" would need instantiation
         enum { halo = minhalo }; 
         enum { n_dims = n_dims_ };
-        enum { n_eqs = n_eqs_ };
+        enum { n_eqs = n_eqs_ }; // TODO: this does not need to be a template parameter!
         enum { n_tlev = n_tlev_ };
 
         typedef real_t_ real_t;
@@ -44,12 +44,10 @@ namespace libmpdataxx
 	  for (int e = 0; e < n_eqs; ++e) cycle(e);
 	}
 
-        private:
-
-        long long int t = -1;
 
 	protected: 
 
+        long long int timestep = -1;
         std::vector<int> n; // TODO: why not std::array?
 
         typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs, n_tlev> mem_t;
@@ -144,10 +142,10 @@ namespace libmpdataxx
           hook_ante_loop(nt);
           this->mem->barrier();
 
-	  for (t = 0; t < nt; ++t) 
+	  for (timestep = 0; timestep < nt; ++timestep) 
 	  {   
 	    // progress-bar info through thread name (check top -H)
-	    monitor(float(this->t) / nt); 
+	    monitor(float(timestep) / nt); 
 
             // multi-threaded SIGTERM handling
             if (this->mem->panic) break;

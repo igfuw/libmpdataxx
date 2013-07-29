@@ -29,7 +29,7 @@ namespace libmpdataxx
       virtual void advance(int) { assert(false); throw; }  
       virtual blitz::Array<real_t_, n_dims> state(int e = 0) { assert(false); throw; }
       virtual blitz::Array<real_t_, n_dims> courant(int d = 0) { assert(false); throw; }
-      virtual bool *panic_ptr() { assert(false && "unimplemented!"); }
+      virtual bool *panic_ptr() { assert(false && "unimplemented!"); throw; }
     };
 
     namespace detail

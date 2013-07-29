@@ -33,7 +33,6 @@ namespace libmpdataxx
       std::map<int, H5::DataSet> vars;
       std::map<int, H5::DataSet> dims;
       hsize_t t;
-      int outfreq;
 
       // HDF types of host data
       const H5::FloatType 
@@ -117,7 +116,7 @@ namespace libmpdataxx
               params.setDeflate(5); // TODO: move such constant to the header
 
               H5::DataSpace space(hdf_dims, shape, limit);
-	      for (const auto &v : outvars)
+	      for (const auto &v : this->outvars)
 	      {
 		vars[v.first] = (*hdfp).createDataSet(v.second.name, flttype_output, space, params);
 		vars[v.first].createAttribute("units", strtype, H5::DataSpace(H5S_SCALAR)).write(strtype, v.second.unit);
@@ -137,6 +136,8 @@ namespace libmpdataxx
 
       void record_all()
       {
+        assert(this->mem->rank() == 0);
+
 	// dimensions, offsets, etc
 	const hsize_t 
 	  n0 = hsize_t(this->mem->span[0]),
@@ -153,13 +154,13 @@ namespace libmpdataxx
         {
 	  dims[0].extend(shape);
 	  {
-	    float t_sec = t * outfreq * this->dt; // TODO: shouldn't it be a member of output common?
+	    float t_sec = this->timestep * this->dt; // TODO: shouldn't it be a member of output common?
 	    H5::DataSpace space = dims[0].getSpace();
 	    space.selectHyperslab(H5S_SELECT_SET, count, start);
 	    dims[0].write(&t_sec, flttype_output, scalar, space);
 	  }
 
-	  for (const auto &v : outvars) switch (solver_t::n_dims)
+	  for (const auto &v : this->outvars) switch (solver_t::n_dims)
 	  {
 	    case 2:
 	    {
@@ -190,7 +191,24 @@ namespace libmpdataxx
         t++;
       }
 
-      decltype(parent_t::params_t::outvars) outvars;
+      protected:
+
+      // auxiliary fields handling (e.g. diagnostic fields)
+      void record_aux()
+      {
+        assert(this->mem->rank() == 0);
+        try 
+        {
+        }
+        catch (const H5::Exception &e)
+        {
+          BOOST_THROW_EXCEPTION(
+            error(e.getCDetailMsg()) 
+              << boost::errinfo_api_function(e.getCFuncName())
+              << boost::errinfo_file_name(outfile.c_str())
+          );
+        } 
+      }
 
       public:
 
@@ -205,7 +223,7 @@ namespace libmpdataxx
 	typename parent_t::ctor_args_t args,
 	const params_t &p
       ) : parent_t(args, p), 
-        outfile(p.outfile), outvars(p.outvars), outfreq(p.outfreq), t(0) // TODO: all these should be members of output_common!
+        outfile(p.outfile), t(0) // TODO: all these should be members of output_common!
       { }
     }; 
   }; // namespace output
