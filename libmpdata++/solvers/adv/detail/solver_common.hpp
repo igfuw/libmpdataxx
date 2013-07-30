@@ -47,7 +47,7 @@ namespace libmpdataxx
 
 	protected: 
 
-        long long int timestep = -1;
+        long long int timestep = 0;
         std::vector<int> n; // TODO: why not std::array?
 
         typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs, n_tlev> mem_t;
@@ -142,12 +142,13 @@ namespace libmpdataxx
           hook_ante_loop(nt);
           this->mem->barrier();
 
-	  for (timestep = 0; timestep < nt; ++timestep) 
+	  while (timestep < nt)
 	  {   
 	    // progress-bar info through thread name (check top -H)
 	    monitor(float(timestep) / nt); 
 
             // multi-threaded SIGTERM handling
+            this->mem->barrier();
             if (this->mem->panic) break;
 
             // proper solver stuff
@@ -155,6 +156,7 @@ namespace libmpdataxx
 	    xchng_all();
 	    advop_all();
 	    cycle_all();
+            timestep++;
             hook_post_step();
 	  }   
 

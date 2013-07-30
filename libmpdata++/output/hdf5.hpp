@@ -6,6 +6,8 @@
  * @brief HDF5 output logic targetted at Paraview-netCDF reader
  */
 
+// TODO: rename hdf5_carthesian?
+
 #pragma once
 
 #include <libmpdata++/output/detail/output_timer.hpp>
@@ -32,7 +34,7 @@ namespace libmpdataxx
       std::unique_ptr<H5::H5File> hdfp;
       std::map<int, H5::DataSet> vars;
       std::map<int, H5::DataSet> dims;
-      hsize_t t;
+      std::map<const std::string, H5::DataSet> aux;
 
       // HDF types of host data
       const H5::FloatType 
@@ -46,6 +48,8 @@ namespace libmpdataxx
 
 
       static const int hdf_dims = 4; // HDF dimensions (spatial + time)
+      hsize_t shape[hdf_dims], limit[hdf_dims], chunk[hdf_dims], count[hdf_dims], offst[hdf_dims]; // TODO: std::arrays?
+      H5::DSetCreatPropList params;
 
       void start(const int nt)
       {
@@ -58,7 +62,6 @@ namespace libmpdataxx
           hdfp.reset(new H5::H5File(outfile, H5F_ACC_TRUNC));
 
           // creating the dimensions
-          hsize_t shape[hdf_dims], limit[hdf_dims], chunk[hdf_dims];
           // time
           shape[0] = 0; 
           limit[0] = H5S_UNLIMITED;
@@ -69,8 +72,15 @@ namespace libmpdataxx
             shape[1] = limit[1] = chunk[1] = this->mem->span[0];
             shape[2] = limit[2] = chunk[2] = 1;
 	    shape[3] = limit[3] = chunk[3] = this->mem->span[1];
+
+	    count[0] = count[1] = count[2] = 1;
+            count[3] = shape[3];
+	    offst[0] = offst[1] = offst[2] = offst[3] = 0;
           }
           else assert(false && "TODO");
+
+	  params.setChunk(hdf_dims, chunk);
+	  params.setDeflate(5); // TODO: move such constant to the header
 
           // creating variables
 	  // enabling chunking in order to use unlimited dimension
@@ -80,10 +90,10 @@ namespace libmpdataxx
 
             // creating the dimension variables
             {
-              H5::DSetCreatPropList params;
-              params.setChunk(1, chunk);
+              H5::DSetCreatPropList time_params;
+              time_params.setChunk(1, chunk);
 
-              dims[0] = (*hdfp).createDataSet("time", flttype_output, H5::DataSpace(1, shape, limit), params);
+              dims[0] = (*hdfp).createDataSet("time", flttype_output, H5::DataSpace(1, shape, limit), time_params);
 
               // phony_dim_0 -> time
 	      herr_t status;
@@ -92,46 +102,26 @@ namespace libmpdataxx
 
               // it is meant to help Paraview guess which variable is time
               dims[0].createAttribute("axis", strtype, H5::DataSpace(H5S_SCALAR)).write(strtype, std::string("T"));
-              dims[0].createAttribute("units", strtype, H5::DataSpace(H5S_SCALAR)).write(strtype, std::string("seconds"));
+              // TODO: units attribute
 
-/* // TODO...
-              // creating the D0 variable
-              dims[1] = (*hdfp).createDataSet("D0", flttype_output, H5::DataSpace(1, shape+1));
-	      status = H5DSset_scale(dims[1].getId(), "D0");
-              assert(status == 0);
-              for (hsize_t i = 0, one = 1; i < shape[1]; ++i)
-              {
-                float x = (i + .5) * this->dx;
-		H5::DataSpace space = dims[1].getSpace();
-		space.selectHyperslab(H5S_SELECT_SET, &one, &i);
-                dims[1].write(&x, flttype_output, scalar, space);
-              }
-*/
+              // TODO...
+              // creating the X,Y,Z variables
             }
 
 	    // creating the user-requested variables
-            {
-	      H5::DSetCreatPropList params;
-	      params.setChunk(hdf_dims, chunk);
-              params.setDeflate(5); // TODO: move such constant to the header
-
-              H5::DataSpace space(hdf_dims, shape, limit);
-	      for (const auto &v : this->outvars)
-	      {
-		vars[v.first] = (*hdfp).createDataSet(v.second.name, flttype_output, space, params);
-		vars[v.first].createAttribute("units", strtype, H5::DataSpace(H5S_SCALAR)).write(strtype, v.second.unit);
-	      }
-            }
+	    for (const auto &v : this->outvars)
+	    {
+	      vars[v.first] = (*hdfp).createDataSet(
+                v.second.name, 
+                flttype_output, 
+                H5::DataSpace(hdf_dims, shape, limit), 
+                params
+              );
+	      // TODO: units attribute
+	    }
           }
         }
-        catch (const H5::Exception &e)
-        {
-          BOOST_THROW_EXCEPTION(
-            error(e.getCDetailMsg()) 
-              << boost::errinfo_api_function(e.getCFuncName())
-              << boost::errinfo_file_name(outfile.c_str())
-          );
-        }
+        catch (const H5::Exception &e) { handle(e); }
       }
 
       void record_all()
@@ -139,25 +129,18 @@ namespace libmpdataxx
         assert(this->mem->rank() == 0);
 
 	// dimensions, offsets, etc
-	const hsize_t 
-	  n0 = hsize_t(this->mem->span[0]),
-	  n1 = hsize_t(this->mem->span[1]),
-	  shape[hdf_dims] = { t+1, n0, 1, n1 };
-	hsize_t
-	  count[hdf_dims] = { 1,   1,  1, n1 },
-	  start[hdf_dims] = { t,   0,  0, 0  };
-
-        const H5::DataSpace column(hdf_dims, count);
-        const H5::DataSpace scalar(1,      count);
+	shape[0] += 1;
+        offst[0] = shape[0]-1;
+        count[1] = 1;
 
         try
         {
 	  dims[0].extend(shape);
 	  {
 	    float t_sec = this->timestep * this->dt; // TODO: shouldn't it be a member of output common?
-	    H5::DataSpace space = dims[0].getSpace();
-	    space.selectHyperslab(H5S_SELECT_SET, count, start);
-	    dims[0].write(&t_sec, flttype_output, scalar, space);
+	    H5::DataSpace time_space = dims[0].getSpace();
+	    time_space.selectHyperslab(H5S_SELECT_SET, count, offst);
+	    dims[0].write(&t_sec, flttype_output, H5::DataSpace(1, count), time_space);
 	  }
 
 	  for (const auto &v : this->outvars) switch (solver_t::n_dims)
@@ -165,49 +148,66 @@ namespace libmpdataxx
 	    case 2:
 	    {
               vars[v.first].extend(shape);
-
 	      H5::DataSpace space = vars[v.first].getSpace();
 
 	      // halos present -> data not contiguous -> looping over the major rank
 	      for (int i = 0; i < this->mem->span[0]; ++i)
 	      {
-                start[1] = i;
-                space.selectHyperslab( H5S_SELECT_SET, count, start);
-		vars[v.first].write( &(this->mem->state(v.first)(i,0)), flttype_solver, column, space); 
+                offst[1] = i;
+                space.selectHyperslab(H5S_SELECT_SET, count, offst);
+		vars[v.first].write( &(this->mem->state(v.first)(i,0)), flttype_solver, H5::DataSpace(hdf_dims, count), space); 
 	      }
 	      break;
 	    }
 	    default: assert(false); // TODO: 1D and 3D versions
 	  }
         }
-        catch (const H5::Exception &e)
-        {
-          BOOST_THROW_EXCEPTION(
-            error(e.getCDetailMsg()) 
-              << boost::errinfo_api_function(e.getCFuncName())
-              << boost::errinfo_file_name(outfile.c_str())
-          );
-        }
-        t++;
+        catch (const H5::Exception &e) { handle(e); }
+      }
+
+      void handle(const H5::Exception &e) 
+      {
+	BOOST_THROW_EXCEPTION(
+	  error(e.getCDetailMsg()) 
+	    << boost::errinfo_api_function(e.getCFuncName())
+	    << boost::errinfo_file_name(outfile.c_str())
+	);
       }
 
       protected:
 
       // auxiliary fields handling (e.g. diagnostic fields)
-      void record_aux()
+      void setup_aux(const std::string &name)
       {
         assert(this->mem->rank() == 0);
         try 
         {
+	  aux[name] = (*hdfp).createDataSet(
+	    name, 
+	    flttype_output, 
+	    H5::DataSpace(hdf_dims, shape, limit), 
+	    params
+	  );
         }
-        catch (const H5::Exception &e)
+        catch (const H5::Exception &e) { handle(e); } 
+      }
+
+      // data is assumed to be contiguous and in the same layout as hdf variable
+      void record_aux(const std::string &name, typename solver_t::real_t *data)
+      {
+        assert(this->mem->rank() == 0);
+        try 
         {
-          BOOST_THROW_EXCEPTION(
-            error(e.getCDetailMsg()) 
-              << boost::errinfo_api_function(e.getCFuncName())
-              << boost::errinfo_file_name(outfile.c_str())
-          );
-        } 
+          aux[name].extend(shape);
+	  H5::DataSpace space = aux[name].getSpace();
+
+	  offst[1] = 0;
+          count[1] = shape[1];
+	  space.selectHyperslab(H5S_SELECT_SET, count, offst);
+	  aux[name].write(data, flttype_solver, H5::DataSpace(hdf_dims, count), space); 
+
+        }
+        catch (const H5::Exception &e) { handle(e); } 
       }
 
       public:
@@ -215,7 +215,7 @@ namespace libmpdataxx
       struct params_t : parent_t::params_t 
       { 
 	std::string outfile;
-// TODO: pass adiitional info? (e.g. Thrust version for icicle)
+// TODO: pass adiitional info? (command_line, library versions, ...) (-> output_common?)
       };
 
       // ctor
@@ -223,7 +223,7 @@ namespace libmpdataxx
 	typename parent_t::ctor_args_t args,
 	const params_t &p
       ) : parent_t(args, p), 
-        outfile(p.outfile), t(0) // TODO: all these should be members of output_common!
+        outfile(p.outfile)  
       { }
     }; 
   }; // namespace output
