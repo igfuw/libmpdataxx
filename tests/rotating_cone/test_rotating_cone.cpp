@@ -60,6 +60,8 @@ void setup(T &solver, int n[2])
   // constant angular velocity rotational field
   solver.courant(x) = -omega * (j * dy - yc) * dt / dx;
   solver.courant(y) =  omega * (i * dx - xc) * dt / dy;
+  // TODO: an assert confirming that the above did what it should have done
+  //       (in context of the courant()'s use of blitz::Array::reindex())
 }
 
 template <class T>
