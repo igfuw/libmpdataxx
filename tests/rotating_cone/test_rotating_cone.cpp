@@ -28,7 +28,7 @@ real_t
   dy = 1,
   omega = -.1,
   h = 4., // TODO: other name!
-  h0 = 1.;
+  h0 = 100.; // change it to 1 to see scary things!
 
 // Anderson-Fattachi?
 //    dt = 10 * pi<real_t>(),
@@ -83,8 +83,8 @@ void setopts(T &p, int nt, int n_iters)
     tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
     p.gnuplot_cbrange = tmp.str();
   }
-//  p.gnuplot_xrange = "[60 : 90]";
-//  p.gnuplot_yrange = "[35 : 65]";
+  p.gnuplot_xrange = "[60 : 90]";
+  p.gnuplot_yrange = "[35 : 65]";
   p.gnuplot_maxcolors = 10;
   {
     std::ostringstream tmp;
@@ -110,11 +110,11 @@ int main()
   using namespace libmpdataxx;
 
 //  int n[] = {32, 32}, nt = 200;
-  int n[] = {101, 101}, nt = 628; //* 6;
+  int n[] = {101, 101}, nt = 628 * 6;
 
   const int n_iters = 2;
   //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::mpdata::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::pds | formulae::mpdata::eps>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::iga | formulae::mpdata::toa>>;
   solver_t::params_t p;
   setopts(p, nt, n_iters);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
