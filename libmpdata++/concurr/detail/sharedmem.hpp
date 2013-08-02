@@ -146,7 +146,7 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
 	  return this->C[d](
             rng_t::all()
-          ).reindex({0}); 
+          ).reindex({this->C[d].base(0)+1});
 	}   
 
 	// ctor
@@ -178,9 +178,9 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           const rng_t all = rng_t::all();
           switch (d)
-          {
-            case 0: return this->C[d](all, all).reindex({0,-1}); 
-            case 1: return this->C[d](all, all).reindex({-1,0}); 
+          { 
+            case 0: return this->C[d](all, all).reindex({this->C[d].base(0)+1,this->C[d].base(1)  }); 
+            case 1: return this->C[d](all, all).reindex({this->C[d].base(0),  this->C[d].base(1)+1}); 
             default: assert(false); throw;
           }
 	}   
@@ -216,10 +216,10 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           const rng_t all = rng_t::all();
           switch (d)
-          {
-            case 0: return this->C[d](all, all, all).reindex({0,-1,-1});  // TODO: perhaps better make it the native base and chang hlf_mh to -1?
-            case 1: return this->C[d](all, all, all).reindex({-1,0,-1}); 
-            case 2: return this->C[d](all, all, all).reindex({-1,-1,0}); 
+          { 
+            case 0: return this->C[d](all, all, all).reindex({this->C[d].base(0)+1,this->C[d].base(1),  this->C[d].base(2)  });  
+            case 1: return this->C[d](all, all, all).reindex({this->C[d].base(0),  this->C[d].base(1)+1,this->C[d].base(2)  }); 
+            case 2: return this->C[d](all, all, all).reindex({this->C[d].base(0),  this->C[d].base(1),  this->C[d].base(2)+1}); 
             default: assert(false); throw;
           }
 	}   

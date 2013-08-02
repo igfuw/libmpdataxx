@@ -22,7 +22,6 @@ namespace libmpdataxx
 
 	protected:
 
-	int n =0;
 	struct info { std::string name, unit; };
 	std::map<int, info> outvars;
 
@@ -61,9 +60,8 @@ namespace libmpdataxx
 
 	  if (this->mem->rank() == 0)
 	  {
-	    n++;
 // TODO: output of solver statistics every timesteps could probably go here
-	    if (n % outfreq == 0) record_all();
+	    if (this->timestep % outfreq == 0) record_all();
 	  }
 	  this->mem->barrier();
 	}
