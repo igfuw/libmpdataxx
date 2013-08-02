@@ -146,12 +146,12 @@ namespace libmpdataxx
         {
           {
             std::ostringstream tmp;
-	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->n << "'\n";
+	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep << "'\n";
 	    tmp << "set title '"<< this->outvars[var].name << "  ("
               /* // TODO: not every solver has dt defined!
-              << "t = " << std::dec << std::fixed << std::setprecision(0) << this->n * this->dt << " [s],"
+              << "t = " << std::dec << std::fixed << std::setprecision(0) << this->timestep * this->dt << " [s],"
               */
-              << " t/dt=" << std::setprecision(3) << this->n << ")'\n";
+              << " t/dt=" << std::setprecision(3) << this->timestep << ")'\n";
             *gp << tmp.str();
           }
 	  *gp << p.gnuplot_command;
