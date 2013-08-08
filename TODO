@@ -6,17 +6,21 @@
 - CMake install() rules (as in libcloudphxx)
 - strang/midpoint/euler... into separate files, check nomenclature, reference to discussion in Smolarkiewicz 2006 (eqs. 28, 29, ...), Piotr mentioned relation with RK, improved Euler (eq. 32) / modified Euler (eq. 33)
 - at least a "zero" bcond for icicle
-- MPDATA-gauge
 - test showing difference between real_t=float and real_t=double (and real_t=long double, ...)
 - doc: dependencies section (C++11, Blitz, Boost, OpenMP)
 - doc: README and HACKING files
 - doc: mention the difference between the order of accuracy of integration vs. order of accuracy of an approximation
 - spreading drop test from Schar & Smolarkiewicz?
-- out-of-source build tests, hints and encouragement :)
 - doc: references for shallow-water docs incl. Vallis, http://www.netlib.org/chammp/shallow.bib
+- asserts for incompatible opiotns (e.g. eps vs. -eps, ... gag -> n_iters)
+- concurr -> rename concurr_ddecomp
+- npa option w donorcell
+- bcd_common -> rename dirichlet?
 
 
 0.1 (pre-submission / during reviews, should-be-easy enhancements or code cleanups before first release):
+- svg output -> git repo?
+- rename/introduce output_serial common file
 - some assert-like logic checking if the velocity field is consistent with the boudary condition?
 - diagnostic stats map and output (conservativeness indicator, how to define multi-dimensional Courant number: was defined? (cf. Szmelter 2005, JCP, appendix))
 - Molenkamp test?
@@ -28,9 +32,9 @@
 - use this->ijk istead of this->i, this->j where it could reduce the number of methods (method_1d = method_2d)
 - check at configure time what's fastest on the current machine: float vs. double, eps vs. where(), .5*(x+|x|) vs. max(x,0) and use these settings!
 - handle bogus subdomain counts (e.g. 0)
-- 2D & 3D third-order accuracy terms
 - unify error handling (is there anything needed besides asserts... or boost.asserts?)
 - check if velocity plots with arrows are feasible with output_gnuplot - if not forget about it
+- split output_gnuplot into separate files
 - check if unique_ptrs used and if so if not to change to const unique_ptr"- we do not need transferability
 - mechanism for recording stats, and:
   - record C_min, C_max
@@ -50,11 +54,10 @@
 
 
 0.2: (near future enhancements, things important for the initial stages of the HARMONIA project)
-- FCT vs. machine precision! (why psi=1 is bad)
 - document (and check?) stability conditions for RHS terms
 - support for specifying mpdata options per equation, and not globally for the whole system (e.g. positive definiteness)
 - HARMONIA-relevant boundary conditions (rigid?, zero-gradient?, open/radiation?)
-- mpdata_3d + tests (what to use for plotting? Paraview? ParaviewWeb)
+- mpdata_3d 
 
 
 
