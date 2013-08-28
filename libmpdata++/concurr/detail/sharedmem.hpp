@@ -61,7 +61,7 @@ namespace libmpdataxx
         void cycle()
         {
           barrier();
-          if (rank() == 0) n = (n + 1) % n_tlev - n_tlev; // TODO: czy potrzebne - n_tlev?
+          if (rank() == 0) n = (n + 1) % n_tlev - n_tlev; // - n_tlev assures Python-type end-of-array cyclic behaviour works
           barrier();
         }
 
@@ -75,12 +75,14 @@ namespace libmpdataxx
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
         sharedmem_common(int s0, int s1, int size)
+          : n(0)
         {
           if (size > s0) throw std::exception(); // TODO: error_macro?
           sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
         sharedmem_common(int s0, int s1, int s2, int size)
+          : n(0)
         {
           if (size > s0) throw std::exception(); // TODO: error_macro?
           sumtmp.reset(new blitz::Array<real_t, 2>(s0, s1));
@@ -134,6 +136,9 @@ namespace libmpdataxx
 	// accessor methods
 	blitz::Array<real_t, 1> state(int e = 0)
 	{
+          assert(e < n_eqs);
+          assert(this->n < n_tlev);
+
 	  return this->psi[e][ this->n ](
 	    rng_t(0, this->span[0]-1)
 	  ).reindex({0});
@@ -165,6 +170,9 @@ namespace libmpdataxx
 
 	blitz::Array<real_t, 2> state(int e = 0)
 	{
+          assert(e < n_eqs);
+          assert(this->n < n_tlev);
+
 	  return this->psi[e][ this->n ](idx_t<2>({
 	    rng_t(0, this->span[0]-1),
 	    rng_t(0, this->span[1]-1)
@@ -202,6 +210,9 @@ namespace libmpdataxx
 
 	blitz::Array<real_t, 3> state(int e = 0)
 	{
+          assert(e < n_eqs);
+          assert(this->n < n_tlev);
+
 	  return this->psi[e][ this->n ](idx_t<3>({
 	    rng_t(0, this->span[0]-1),
 	    rng_t(0, this->span[1]-1),
