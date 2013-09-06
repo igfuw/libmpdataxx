@@ -8,10 +8,6 @@
 
 #include <libmpdata++/concurr/detail/concurr_common.hpp>
 
-#ifdef _OPENMP
-# include <omp.h>
-#endif
-
 namespace libmpdataxx
 {
   namespace concurr
@@ -22,35 +18,18 @@ namespace libmpdataxx
       bcond::bcond_e bcy = bcond::null,
       bcond::bcond_e bcz = bcond::null
     >
-    class openmp : public detail::concurr_common<solver_t, bcx, bcy, bcz>
+    class serial : public detail::concurr_common<solver_t, bcx, bcy, bcz>
     {
       using parent_t = detail::concurr_common<solver_t, bcx, bcy, bcz>;
  
 
       struct mem_t : parent_t::mem_t
       {
-        int rank()
-        {
-#if defined(_OPENMP)
-          return omp_get_thread_num();
-#else
-          return 0;
-#endif
-        }
+        int rank() { return 0; }
 
-	static int size() 
-	{
-#if defined(_OPENMP)
-	  return omp_get_max_threads();
-#else
-	  return 1;
-#endif
-	}
+	static int size() { return 1; }
 
-        void barrier()
-        {
-#pragma omp barrier
-        }
+        void barrier() { }
 
         // ctors
         mem_t(int s0) : parent_t::mem_t(s0, size()) {};
@@ -60,22 +39,14 @@ namespace libmpdataxx
 
       void solve(int nt)
       {
-        int i = 0;
-#pragma omp parallel private(i)
-        {
-#if defined(_OPENMP)
-          i = omp_get_thread_num();
-#endif
-          this->algos[i].solve(nt);
-        } 
+        this->algos[0].solve(nt);
       }
 
       public:
 
-// TODO: coud it be just one ctor with int[solver_t::n_dims]?
-// TODO: document that currently paralllisation only in one dimension
+// TODO: this is an exact duplicate from openmp :(
       // 1D ctor
-      openmp(
+      serial(
 	const int s0,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
       ) : 
@@ -83,7 +54,7 @@ namespace libmpdataxx
       {}
 
       // 2D ctor
-      openmp(
+      serial(
 	const int s0,
 	const int s1,
 	const typename solver_t::params_t &params = typename solver_t::params_t()
@@ -92,7 +63,7 @@ namespace libmpdataxx
       {}
 
       // 3D ctor
-      openmp(
+      serial(
 	const int s0,
 	const int s1,
 	const int s2,
