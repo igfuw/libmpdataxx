@@ -27,7 +27,7 @@ using namespace libmpdataxx;
 using boost::math::constants::pi;
 blitz::firstIndex i;
 boost::ptr_map<std::string, std::ofstream> outfiles;
-using real_t = long double; // this is a good test to show differences betwee float and double!!!
+using real_t = long double; // this is a good test to show differences between float and double!!!
 
 
 // helper function template to ease adding the solvers to the pointer map
@@ -76,7 +76,7 @@ int main()
   const real_t 
     t_max    = 1., // "arbitrarily"
     dx_max   = 1.,
-    x_max    = 44. * dx_max, // see not about compact support in asserts below
+    x_max    = 44. * dx_max, // see note about compact support in asserts below
     sgma     = 1.5 * dx_max, 
     velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
     x0       = .5 * x_max, 
@@ -118,7 +118,7 @@ int main()
       add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "iters=2", nx);
 //      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
       add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "iters=3", nx);
-      add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::toa | formulae::mpdata::iga>>(slvs, "iters=3_toa", nx);
+      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa | formulae::mpdata::iga>>(slvs, "iters=2_toa_iga", nx);
 
       // MPDATA-FCT
 //      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "iters=2_fct", nx);
