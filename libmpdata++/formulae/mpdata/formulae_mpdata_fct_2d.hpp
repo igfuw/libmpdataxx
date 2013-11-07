@@ -40,7 +40,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,  
         const rng_t j,
-        typename std::enable_if<opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
         frac<opts>(
           beta_up_nominator<d>(psi, psi_max, i, j)
@@ -60,7 +60,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,  
         const rng_t j,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
         frac<opts>(
           beta_up_nominator<d>(psi, psi_max, i, j)
@@ -84,7 +84,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,  
         const rng_t j,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       ) return_macro(,
         frac<opts>(
           beta_up_nominator<d>(psi, psi_max, i, j)
@@ -119,7 +119,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_dn_nominator<d>(psi, psi_min, i, j)
@@ -139,7 +139,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_dn_nominator<d>(psi, psi_min, i, j)
@@ -163,7 +163,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_dn_nominator<d>(psi, psi_min, i, j)
@@ -184,7 +184,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
         C_corr[d]( pi<d>(i+h, j) ) * where( // TODO: is it possible to implement it without where()?
           // if
@@ -230,7 +230,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C_corr,
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<opt_set(opts, iga) || opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga) || opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
         C_corr[d]( pi<d>(i+h, j) ) * where(
           // if

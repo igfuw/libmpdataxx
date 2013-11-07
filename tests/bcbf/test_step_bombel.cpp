@@ -73,7 +73,7 @@ int main()
   using solver_t = output::gnuplot<
     bombel<
       solvers::pressure_cr<
-        solvers::mpdata_fct_2d<real_t, n_iters, n_eqs, formulae::mpdata::iga>, 
+        solvers::mpdata_fct_2d<real_t, n_iters, n_eqs, formulae::opts::iga>, 
         //solvers::donorcell_2d<real_t, n_eqs>, 
 	u, w
       >
@@ -91,7 +91,7 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    slv.state(tht) = Tht_amb + where(
+    slv.advectee(tht) = Tht_amb + where(
       // if
       pow((i+.5) * p.dx - 4 * r0 , 2) + pow((j+.5) * p.dz - 1.04 * r0 , 2) <= pow(r0, 2), 
       // then
@@ -99,8 +99,8 @@ int main()
       // else
       0
     );
-    slv.state(u) = real_t(0); 
-    slv.state(w) = real_t(0); 
+    slv.advectee(u) = real_t(0); 
+    slv.advectee(w) = real_t(0); 
 
     // integration
     slv.advance(nt); 

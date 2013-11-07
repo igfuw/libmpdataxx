@@ -19,7 +19,7 @@ namespace libmpdataxx
       inline auto A(  // positive-sign signal version (no need for abs())
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::pds)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
    	  psi(i+1) - psi(i)
@@ -32,7 +32,7 @@ namespace libmpdataxx
       inline auto A(   // variable-sign signal version (hence the need for abs())
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
           abs(psi(i+1)) - abs(psi(i))
@@ -45,7 +45,7 @@ namespace libmpdataxx
       inline auto A( // infinite gauge version (for both signed and variable-sign fields), (sum of psi -> sum of 1)
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 // enabled if iga == true
       ) return_macro(,
 	(psi(i+1) - psi(i)) 
         / //---------------
@@ -58,7 +58,7 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, toa)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::toa)>::type* = 0 
       ) -> decltype(0)
       { 
         return 0; //no Higher Order Terms for second accuracy 
@@ -77,7 +77,7 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa) && opt_set(opts, pds) && !opt_set(opts, iga)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::toa) && opts::isset(opts, opts::pds) && !opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
         HOT_helper(C, i) 
         * frac<opts>(
@@ -92,7 +92,7 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa) && !opt_set(opts, pds) && !opt_set(opts, iga)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::toa) && !opts::isset(opts, opts::pds) && !opts::isset(opts, opts::iga)>::type* = 0
       ) return_macro(,
         HOT_helper(C, i)
         * frac<opts>(
@@ -107,7 +107,7 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const arr_1d_t &C,
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa) && !opt_set(opts, pds) && opt_set(opts, iga)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::toa) && !opts::isset(opts, opts::pds) && opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
         HOT_helper(C, i) 
         * (psi(i+2) - psi(i+1) - psi(i) + psi(i-1)) 

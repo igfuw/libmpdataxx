@@ -53,13 +53,13 @@ void setup(T &solver, int n[2])
   blitz::secondIndex j;
 
   // cone shape
-  decltype(solver.state()) tmp(solver.state().extent());
+  decltype(solver.advectee()) tmp(solver.advectee().extent());
   tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
-  solver.state() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
+  solver.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
 
   // constant angular velocity rotational field
-  solver.courant(x) = -omega * (j * dy - yc) * dt / dx;
-  solver.courant(y) =  omega * (i * dx - xc) * dt / dy;
+  solver.advector(x) = -omega * (j * dy - yc) * dt / dx;
+  solver.advector(y) =  omega * (i * dx - xc) * dt / dy;
   // TODO: an assert confirming that the above did what it should have done
   //       (in context of the courant()'s use of blitz::Array::reindex())
 }
@@ -113,8 +113,8 @@ int main()
   int n[] = {101, 101}, nt = 628 * 6;
 
   const int n_iters = 2;
-  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::mpdata::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::iga | formulae::mpdata::toa>>;
+  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::opts::toa*/>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::opts::iga | formulae::opts::toa>>;
   solver_t::params_t p;
   setopts(p, nt, n_iters);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 

@@ -27,9 +27,9 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
-  solver.state(1) = where(i <= center-width/2 || i >= center+width/2,  2, 4); 
-  solver.courant() = .5; 
+  solver.advectee(0) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
+  solver.advectee(1) = where(i <= center-width/2 || i >= center+width/2,  2, 4); 
+  solver.advector() = .5; 
 }
 
 template <class T>
@@ -63,7 +63,7 @@ int main()
 
   const int n_eqs = 2;
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::pds>>(slvs, "mpdata_iters=2_pds");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::pds>>(slvs, "mpdata_iters=2_pds");
 
   // TODO: test if pds gives any speed-up with single-sign field
 

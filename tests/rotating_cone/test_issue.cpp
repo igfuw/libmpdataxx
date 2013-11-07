@@ -40,13 +40,13 @@ void setup(T &solver, int n[2])
   blitz::secondIndex j;
 
   // cone shape
-  decltype(solver.state()) tmp(solver.state().extent());
+  decltype(solver.advectee()) tmp(solver.advectee().extent());
   tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
-  solver.state() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
+  solver.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
 
   // constant angular velocity rotational field
-  solver.courant(x) = .3; 
-  solver.courant(y) = .3; 
+  solver.advector(x) = .3; 
+  solver.advector(y) = .3; 
 }
 
 template <class T>
@@ -56,7 +56,7 @@ void setopts(T &p, int nt, int n_iters)
   p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;
-    tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
+    tmp << "bug_iters=" << n_iters << "_%s_%d.svg";
     p.gnuplot_output = tmp.str();    
   }
   p.gnuplot_view = "map";
@@ -85,12 +85,12 @@ int main()
   int n[] = {15, 14}, nt = 2; 
 
   const int n_iters = 2;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::pds>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::opts::pds>>;
   solver_t::params_t p;
   setopts(p, nt, n_iters);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
 
   setup(slv, n); 
   slv.advance(nt);
-  if (blitz::min(slv.state()) - 1 != 0) throw;
+  if (blitz::min(slv.advectee()) - 1 != 0) throw;
 }

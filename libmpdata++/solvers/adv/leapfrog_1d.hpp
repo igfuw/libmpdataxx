@@ -39,7 +39,7 @@ namespace libmpdataxx
       void advop(int e)
       {
         formulae::leapfrog::op_1d(
-          this->mem->psi[e], this->n[e], this->mem->C[0], this->i
+          this->mem->psi[e], this->n[e], this->mem->GC[0], this->i
         );
       }
 

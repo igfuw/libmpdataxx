@@ -24,7 +24,7 @@ namespace libmpdataxx
           real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, detail::max(minhalo, formulae::mpdata::halo(opts))
         >;
 
-	using C_t = arrvec_t<typename parent_t::arr_t>;
+	using GC_t = arrvec_t<typename parent_t::arr_t>;
  
 	protected:
 
@@ -35,29 +35,29 @@ namespace libmpdataxx
         static const int n_tmp = n_iters > 2 ? 2 : 1; 
 
 	// member fields
-	std::array<C_t*, n_tmp> tmp;
+	std::array<GC_t*, n_tmp> tmp;
 
         // methods
-	C_t &C_unco(int iter)
+	GC_t &GC_unco(int iter)
 	{   
 	  return (iter == 1)  
-	    ? this->mem->C 
+	    ? this->mem->GC 
 	    : (iter % 2)  
 	      ? *tmp[1]  // odd iters
 	      : *tmp[0]; // even iters
 	}   
 
-	C_t &C_corr(int iter)
+        GC_t &GC_corr(int iter)
 	{
 	  return (iter  % 2)
 	    ? *tmp[0]    // odd iters
 	    : *tmp[1];   // even iters
 	}
 
-	virtual C_t &C(int iter)
+        virtual GC_t &GC(int iter)
 	{
-	  if (iter == 0) return this->mem->C;
-	  return C_corr(iter);
+	  if (iter == 0) return this->mem->GC;
+	  return GC_corr(iter);
 	}
 
 	// for Flux-Corrected Transport (TODO: more general names?) // TODO: move to mpdata_common

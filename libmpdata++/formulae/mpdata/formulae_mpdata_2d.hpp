@@ -21,7 +21,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
 	frac<opts>(
 	  psi(pi<d>(i+1, j)) - psi(pi<d>(i, j))
@@ -35,7 +35,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
 	frac<opts>(
 	  abs(psi(pi<d>(i+1, j))) - abs(psi(pi<d>(i, j)))
@@ -49,7 +49,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       ) return_macro(,
         (
 	  psi(pi<d>(i+1, j)) - psi(pi<d>(i, j))
@@ -63,7 +63,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
 	frac<opts>( 
 	  psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) - psi(pi<d>(i+1, j-1)) - psi(pi<d>(i, j-1))
@@ -77,7 +77,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
 	frac<opts>( 
 	  abs(psi(pi<d>(i+1, j+1))) + abs(psi(pi<d>(i, j+1))) - abs(psi(pi<d>(i+1, j-1))) - abs(psi(pi<d>(i, j-1)))
@@ -91,7 +91,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       ) return_macro(,
         (
 	  psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) - psi(pi<d>(i+1, j-1)) - psi(pi<d>(i, j-1))
@@ -137,7 +137,7 @@ namespace libmpdataxx
         const arr_2d_t &psi,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
           frac<opts>(
             psi(pi<dim>(i+2, j)) - psi(pi<dim>(i+1, j)) - psi(pi<dim>(i, j)) + psi(pi<dim>(i-1, j))
@@ -151,7 +151,7 @@ namespace libmpdataxx
         const arr_2d_t &psi,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
           frac<opts>(
             abs(psi(pi<dim>(i+2, j))) - abs(psi(pi<dim>(i+1, j))) - abs(psi(pi<dim>(i, j))) + abs(psi(pi<dim>(i-1, j)))
@@ -165,7 +165,7 @@ namespace libmpdataxx
         const arr_2d_t &psi,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       ) return_macro(,
           ( psi(pi<dim>(i+2, j)) - psi(pi<dim>(i+1, j)) - psi(pi<dim>(i, j)) + psi(pi<dim>(i-1, j)) )
           / //--------------------------------------------------------------------------------------
@@ -177,7 +177,7 @@ namespace libmpdataxx
         const arr_2d_t &psi,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
           frac<opts>(
             psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) - psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1))            
@@ -191,7 +191,7 @@ namespace libmpdataxx
         const arr_2d_t &psi,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
           frac<opts>(
             abs(psi(pi<dim>(i+1, j+1))) - abs(psi(pi<dim>(i, j+1))) - abs(psi(pi<dim>(i+1, j-1))) + abs(psi(pi<dim>(i, j-1)))            
@@ -205,7 +205,7 @@ namespace libmpdataxx
         const arr_2d_t &psi,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       ) return_macro(,
           (psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) - psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1)))            
           / //-------------------------------------------------------------------------------------------
@@ -219,7 +219,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<!opt_set(opts, toa)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::toa)>::type* = 0
       ) -> decltype(0)
       {
         return 0; //no Higher Order Terms for second accuracy 
@@ -231,7 +231,7 @@ namespace libmpdataxx
         const arrvec_t<arr_2d_t> &C,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<opt_set(opts, toa)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::toa)>::type* = 0
       ) return_macro(,
          HOT_1<opts BOOST_PP_COMMA() dim>(psi, i, j) * HOT_1_helper<dim>(C[dim], i, j) 
          + 

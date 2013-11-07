@@ -19,7 +19,7 @@ namespace libmpdataxx
   {
     using namespace libmpdataxx::arakawa_c;
 
-    template<typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int minhalo>
+    template<typename real_t, int n_iters, int n_eqs, formulae::opts::opts_t opts, int minhalo>
     class mpdata<real_t, n_iters, 1, n_eqs, opts, minhalo> : 
       public detail::mpdata_common<real_t, n_iters, 1, n_eqs, opts, minhalo>
     {
@@ -45,27 +45,36 @@ namespace libmpdataxx
             this->mem->barrier();
 
 	    // calculating the antidiffusive C 
-	    this->C_corr(iter)[0](im+h) = 
+	    this->GC_corr(iter)[0](im+h) = 
 	      formulae::mpdata::antidiff<opts>(
 		this->mem->psi[e][this->n[e]], 
-		im, this->C_unco(iter)[0]
+		im, this->GC_unco(iter)[0]
 	      );
 
             this->fct_adjust_antidiff(e, iter); // i.e. calculate C_mono=C_mono(C_corr) in FCT
           }
 
 	  // donor-cell call
-          if (!opt_set(opts, formulae::mpdata::iga) || iter == 0)
-	    formulae::donorcell::op_1d(this->mem->psi[e], this->n[e], this->C(iter)[0], this->i); 
+          if (!formulae::opts::isset(opts, formulae::opts::iga) || iter == 0)
+          {
+	    formulae::donorcell::op_1d<opts>(
+              this->mem->psi[e], 
+	      this->GC(iter)[0], 
+	      this->mem->G, 
+	      this->n[e], 
+	      this->i
+            ); 
+          }
           else
           {
             assert(iter == 1); // infinite gauge option uses just one corrective step
-            // TODO: move to a formulae file? 
-            auto &psi = this->mem->psi[e];
-            const auto &n = this->n[e];
-            const auto &i = this->i;
-            const auto &C = this->C(iter)[0];
-            psi[n+1](i) = psi[n](i) - (C(i+h) - C(i-h)); // referred to as F(1,1,U) in the papers
+	    formulae::donorcell::op_1d_iga<opts>(
+              this->mem->psi[e], 
+	      this->GC(iter)[0], 
+	      this->mem->G, 
+	      this->n[e], 
+	      this->i
+            ); 
           }
 	}
       }
