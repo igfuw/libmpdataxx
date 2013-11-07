@@ -155,7 +155,7 @@ namespace libmpdataxx
 	      {
                 offst[1] = i;
                 space.selectHyperslab(H5S_SELECT_SET, count, offst);
-		vars[v.first].write( &(this->mem->state(v.first)(i,0)), flttype_solver, H5::DataSpace(hdf_dims, count), space); 
+		vars[v.first].write( &(this->mem->advectee(v.first)(i,0)), flttype_solver, H5::DataSpace(hdf_dims, count), space); 
 	      }
 	      break;
 	    }

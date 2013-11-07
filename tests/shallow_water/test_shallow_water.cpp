@@ -44,14 +44,14 @@ void setup(T &solver)
   blitz::firstIndex i;
   blitz::secondIndex j;
 
-  solver.state(h) = 1 - .1 * pow(
+  solver.advectee(h) = 1 - .1 * pow(
     sin((i+.5) * pi<typename T::real_t>() / nx) * // TODO: assumes dx=dy=1
     sin((j+.5) * pi<typename T::real_t>() / ny), 
     32
   );
 
-  solver.state(qx) = 0;
-  solver.state(qy) = 0;
+  solver.advectee(qx) = 0;
+  solver.advectee(qy) = 0;
 }
 
 int main() 

@@ -26,10 +26,10 @@ template <class T>
 void setup(T &solver, int n) 
 {
   blitz::firstIndex i;
-  solver.state() = exp(
+  solver.advectee() = exp(
     -sqr(.5+i-n/2.) / (2.*pow(n/10, 2)) // TODO: assumes dx=1
   );  
-  solver.courant() = .5; 
+  solver.advector() = .5; 
 }
 
 template <class T>

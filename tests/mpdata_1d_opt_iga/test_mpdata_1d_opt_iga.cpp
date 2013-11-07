@@ -27,9 +27,9 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, 1, 3); 
-//  solver.state(1) = where(i <= center-width/2 || i >= center+width/2,  0, 2); 
-  solver.courant() = .5; 
+  solver.advectee(0) = where(i <= center-width/2 || i >= center+width/2, 1, 3); 
+//  solver.advectee(1) = where(i <= center-width/2 || i >= center+width/2,  0, 2); 
+  solver.advector() = .5; 
 }
 
 template <class T>
@@ -62,8 +62,8 @@ int main()
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
   const int n_eqs = 1;
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs/*, formulae::mpdata::iga*/>>(slvs, "mpdata_iters=2");
-//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::iga>>(slvs, "mpdata_iters=2_iga");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs/*, formulae::opts::iga*/>>(slvs, "mpdata_iters=2");
+//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::iga>>(slvs, "mpdata_iters=2_iga");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

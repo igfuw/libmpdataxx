@@ -90,12 +90,12 @@ int main()
       blitz::firstIndex i;
       blitz::secondIndex j;
 
-      slv.state(tht) = Tht_amb 
+      slv.advectee(tht) = Tht_amb 
 	+ .5 * exp( -sqr(.5+i-nx/2.) / (2.*pow(nx/20, 2))   // TODO: assumed dx=dy=1?
 	       	    -sqr(.5+j-ny/4.) / (2.*pow(ny/20, 2)) )
       ;
-      slv.state(u) = real_t(0); 
-      slv.state(w) = real_t(0); 
+      slv.advectee(u) = real_t(0); 
+      slv.advectee(w) = real_t(0); 
     }
 
     // integration

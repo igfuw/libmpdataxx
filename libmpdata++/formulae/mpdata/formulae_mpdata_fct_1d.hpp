@@ -20,8 +20,6 @@ namespace libmpdataxx
     {
       using namespace arakawa_c;
 
-// TODO: psi -> psi/rho !!!
-
       /// \f$ \beta^{\uparrow}_{i} = \frac { \psi^{max}_{i}- \psi^{*}_{i} }
       /// { \sum\limits_{I} \frac{\Delta t}{\Delta x^{I}} \left( [u^{I}_{i-1/2}]^{+} \psi^{*}_{i-1} - 
       /// [u^{I}_{i+1/2}]^{-} \psi^{*}_{i+1} \right)  } \f$ \n
@@ -42,7 +40,7 @@ namespace libmpdataxx
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i,
-        typename std::enable_if<opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_up_nominator(psi, psi_max, i)
@@ -58,7 +56,7 @@ namespace libmpdataxx
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_up_nominator(psi, psi_max, i)
@@ -76,7 +74,7 @@ namespace libmpdataxx
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_up_nominator(psi, psi_max, i)
@@ -106,7 +104,7 @@ namespace libmpdataxx
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i, 
-        typename std::enable_if<opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_dn_nominator(psi, psi_min, i)
@@ -122,7 +120,7 @@ namespace libmpdataxx
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i, 
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_dn_nominator(psi, psi_min, i)
@@ -140,7 +138,7 @@ namespace libmpdataxx
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &C_corr, 
         const rng_t i,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 // enabled if iga == true
       ) return_macro(,
         frac<opts>(
           beta_dn_nominator(psi, psi_min, i)
@@ -162,7 +160,7 @@ namespace libmpdataxx
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr,
         const rng_t i,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 // enabled if iga == false
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0 // enabled if iga == false
       ) return_macro(,
        C_corr(i+h) * where(
           // if
@@ -207,7 +205,7 @@ namespace libmpdataxx
         const arr_1d_t &psi_max, // from before the first iteration
         const arr_1d_t &C_corr,
         const rng_t i,
-        typename std::enable_if<opt_set(opts, iga) || opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga) || opts::isset(opts, opts::pds)>::type* = 0
       ) return_macro(,
         C_corr( i+h ) * where(
           // if

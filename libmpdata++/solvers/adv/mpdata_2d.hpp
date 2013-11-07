@@ -21,7 +21,7 @@ namespace libmpdataxx
   {
     using namespace arakawa_c;
 
-    template<typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int minhalo>
+    template<typename real_t, int n_iters, int n_eqs, formulae::opts::opts_t opts, int minhalo>
     class mpdata<real_t, n_iters, 2, n_eqs, opts, minhalo> : 
       public detail::mpdata_common<real_t, n_iters, 2, n_eqs, opts, minhalo>
     {
@@ -50,25 +50,25 @@ namespace libmpdataxx
             this->mem->barrier();
 
 	    // calculating the antidiffusive C 
-	    this->C_corr(iter)[0](this->im+h, this->j) = 
+	    this->GC_corr(iter)[0](this->im+h, this->j) = 
 	      formulae::mpdata::antidiff<opts, 0>(
 		this->mem->psi[e][this->n[e]], 
-		this->im, this->j, this->C_unco(iter)
+		this->im, this->j, this->GC_unco(iter)
 	      );
 
-	    this->C_corr(iter)[1](this->i, this->jm+h) = 
+	    this->GC_corr(iter)[1](this->i, this->jm+h) = 
 	      formulae::mpdata::antidiff<opts, 1>(
               this->mem->psi[e][this->n[e]], 
-              this->jm, this->i, this->C_unco(iter)
+              this->jm, this->i, this->GC_unco(iter)
 	    );
  
-            // filling Y halos for C_x, and X halos for C_y
+            // filling Y halos for GC_x, and X halos for GC_y
             // TODO: document why; is it needed in the last iteration?; what about FCT?
             this->mem->barrier();
-	    this->bcyl->fill_halos_sclr(this->C_corr(iter)[0], this->i^h); // TODO: one xchng?
-	    this->bcyr->fill_halos_sclr(this->C_corr(iter)[0], this->i^h);
-	    this->bcxl->fill_halos_sclr(this->C_corr(iter)[1], this->j^h); // TODO: one xchng?
-	    this->bcxr->fill_halos_sclr(this->C_corr(iter)[1], this->j^h);
+	    this->bcyl->fill_halos_sclr(this->GC_corr(iter)[0], this->i^h); // TODO: one xchng?
+	    this->bcyr->fill_halos_sclr(this->GC_corr(iter)[0], this->i^h);
+	    this->bcxl->fill_halos_sclr(this->GC_corr(iter)[1], this->j^h); // TODO: one xchng?
+	    this->bcxr->fill_halos_sclr(this->GC_corr(iter)[1], this->j^h);
             this->mem->barrier();
 
             this->fct_adjust_antidiff(e, iter);
@@ -76,22 +76,27 @@ namespace libmpdataxx
             // TODO: shouldn't the above halo-filling be repeated here?
 	  }
 	  // donor-cell call 
-          if (!opt_set(opts, formulae::mpdata::iga) || iter ==0)
-	    formulae::donorcell::op_2d(this->mem->psi[e], this->n[e], this->C(iter), this->i, this->j); 
+          if (!formulae::opts::isset(opts, formulae::opts::iga) || iter ==0)
+	    formulae::donorcell::op_2d<opts>(
+              this->mem->psi[e], 
+	      this->GC(iter), 
+	      this->mem->G, 
+	      this->n[e], 
+	      this->i, 
+              this->j
+            ); 
             // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
           else
           {
             assert(iter == 1); // infinite gauge option uses just one corrective step
-            // TODO: move to a formulae file? 
-            auto &psi = this->mem->psi[e];
-            const auto &n = this->n[e];
-            const auto &i = this->i;
-            const auto &j = this->j;
-            const auto &C = this->C(iter);
-            psi[n+1](i, j) = psi[n](i, j) - (
-              (C[0](i+h, j) - C[0](i-h, j)) +
-              (C[1](i, j+h) - C[1](i, j-h))
-            ); // referred to as F(1,1,U) in the papers
+	    formulae::donorcell::op_2d_iga<opts>(
+              this->mem->psi[e], 
+	      this->GC(iter), 
+	      this->mem->G, 
+	      this->n[e], 
+	      this->i, 
+              this->j
+            ); 
           }
 	}
       }

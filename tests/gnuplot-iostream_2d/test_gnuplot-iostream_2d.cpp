@@ -21,12 +21,12 @@ void setup(T &solver, int n[2])
 {
   blitz::firstIndex i;
   blitz::secondIndex j;
-  solver.state() = exp(
+  solver.advectee() = exp(
     -sqr(.5+i-n[x]/2.) / (2.*pow(n[x]/10, 2)) // TODO: assumes dx=dy=1
     -sqr(.5+j-n[y]/2.) / (2.*pow(n[y]/10, 2)) 
   );  
-  solver.courant(x) = .5; 
-  solver.courant(y) = .25;
+  solver.advector(x) = .5; 
+  solver.advector(y) = .25;
 }
 
 template <class T>

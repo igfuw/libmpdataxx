@@ -42,7 +42,7 @@ namespace libmpdataxx
 
       void fct_adjust_antidiff(int e, int iter)
       {
-	const auto &C_corr = parent_t::C_corr(iter);
+	const auto &GC_corr = parent_t::GC_corr(iter);
 	const auto psi = this->state(e);
 	const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 	const auto &jm = this->jm; // calculating once for i-1/2 and i+1/2
@@ -50,15 +50,15 @@ namespace libmpdataxx
 	// fill halos -> mpdata works with halo=1, we need halo=2
 // TODO: other option would be to define im as a function of halo in mpdata!
 	this->mem->barrier();
-	this->bcxl->fill_halos_vctr(C_corr[0], this->j^1); // TODO: one xchng call?
-	this->bcxr->fill_halos_vctr(C_corr[0], this->j^1);
-	this->bcyl->fill_halos_vctr(C_corr[1], this->i^1); // TODO: one xchng call?
-	this->bcyr->fill_halos_vctr(C_corr[1], this->i^1);
+	this->bcxl->fill_halos_vctr(GC_corr[0], this->j^1); // TODO: one xchng call?
+	this->bcxr->fill_halos_vctr(GC_corr[0], this->j^1);
+	this->bcyl->fill_halos_vctr(GC_corr[1], this->i^1); // TODO: one xchng call?
+	this->bcyr->fill_halos_vctr(GC_corr[1], this->i^1);
 	this->mem->barrier();
 
 	// calculating the monotonic corrective velocity
-	this->C_mono[0]( im+h, jm ) = formulae::mpdata::C_mono<opts, 0>(psi, this->psi_min, this->psi_max, C_corr, im, jm);
-	this->C_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, C_corr, jm, im);
+	this->GC_mono[0]( im+h, jm ) = formulae::mpdata::C_mono<opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, im, jm);
+	this->GC_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, jm, im);
       }
 
       public:

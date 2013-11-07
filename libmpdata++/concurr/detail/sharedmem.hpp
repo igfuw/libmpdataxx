@@ -40,7 +40,8 @@ namespace libmpdataxx
         bool panic = false; // for multi-threaded SIGTERM handling
 
         // TODO: these are public because used from outside in alloc - could friendship help?
-	arrvec_t<arr_t> C, psi[n_eqs];
+	arrvec_t<arr_t> GC, psi[n_eqs];
+	arr_t G;
 
 	std::unordered_map< 
 	  const char*, // intended for addressing with __FILE__
@@ -134,7 +135,7 @@ namespace libmpdataxx
 	public:
 
 	// accessor methods
-	blitz::Array<real_t, 1> state(int e = 0)
+	blitz::Array<real_t, 1> advectee(int e = 0)
 	{
           assert(e < n_eqs);
           assert(this->n < n_tlev);
@@ -144,14 +145,14 @@ namespace libmpdataxx
 	  ).reindex({0});
 	}
 
-	blitz::Array<real_t, 1> courant(int d = 0)  
+	blitz::Array<real_t, 1> advector(int d = 0)  
 	{   
           assert(d == 0);
           // returning the whole array but with the dimensiones
           // reindexed to make it more intuitive when working with index placeholders
-	  return this->C[d](
+	  return this->GC[d](
             rng_t::all()
-          ).reindex({this->C[d].base(0)+1});
+          ).reindex({this->GC[d].base(0)+1});
 	}   
 
 	// ctor
@@ -168,7 +169,7 @@ namespace libmpdataxx
         using parent_t = sharedmem_common<real_t, 2, n_eqs, n_tlev>;
 	public:
 
-	blitz::Array<real_t, 2> state(int e = 0)
+	blitz::Array<real_t, 2> advectee(int e = 0)
 	{
           assert(e < n_eqs);
           assert(this->n < n_tlev);
@@ -179,7 +180,7 @@ namespace libmpdataxx
 	  })).reindex({0, 0});
 	}
 
-	blitz::Array<real_t, 2> courant(int d = 0)  
+	blitz::Array<real_t, 2> advector(int d = 0)  
 	{   
           assert(d == 0 || d== 1);
           // returning the whole array (i.e. incl. haloes) but with the dimensiones
@@ -187,8 +188,8 @@ namespace libmpdataxx
           const rng_t all = rng_t::all();
           switch (d)
           { 
-            case 0: return this->C[d](all, all).reindex({this->C[d].base(0)+1,this->C[d].base(1)  }); 
-            case 1: return this->C[d](all, all).reindex({this->C[d].base(0),  this->C[d].base(1)+1}); 
+            case 0: return this->GC[d](all, all).reindex({this->GC[d].base(0)+1,this->GC[d].base(1)  }); 
+            case 1: return this->GC[d](all, all).reindex({this->GC[d].base(0),  this->GC[d].base(1)+1}); 
             default: assert(false); throw;
           }
 	}   
@@ -208,7 +209,7 @@ namespace libmpdataxx
         using parent_t = sharedmem_common<real_t, 3, n_eqs, n_tlev>;
 	public:
 
-	blitz::Array<real_t, 3> state(int e = 0)
+	blitz::Array<real_t, 3> advectee(int e = 0)
 	{
           assert(e < n_eqs);
           assert(this->n < n_tlev);
@@ -220,7 +221,7 @@ namespace libmpdataxx
 	  })).reindex({0, 0, 0});
 	}
 
-	blitz::Array<real_t, 3> courant(int d = 0)  
+	blitz::Array<real_t, 3> advector(int d = 0)  
 	{   
           assert(d == 0 || d == 1 || d == 2);
           // returning the whole array but with the dimensiones
@@ -228,9 +229,9 @@ namespace libmpdataxx
           const rng_t all = rng_t::all();
           switch (d)
           { 
-            case 0: return this->C[d](all, all, all).reindex({this->C[d].base(0)+1,this->C[d].base(1),  this->C[d].base(2)  });  
-            case 1: return this->C[d](all, all, all).reindex({this->C[d].base(0),  this->C[d].base(1)+1,this->C[d].base(2)  }); 
-            case 2: return this->C[d](all, all, all).reindex({this->C[d].base(0),  this->C[d].base(1),  this->C[d].base(2)+1}); 
+            case 0: return this->GC[d](all, all, all).reindex({this->GC[d].base(0)+1,this->GC[d].base(1),  this->GC[d].base(2)  });  
+            case 1: return this->GC[d](all, all, all).reindex({this->GC[d].base(0),  this->GC[d].base(1)+1,this->GC[d].base(2)  }); 
+            case 2: return this->GC[d](all, all, all).reindex({this->GC[d].base(0),  this->GC[d].base(1),  this->GC[d].base(2)+1}); 
             default: assert(false); throw;
           }
 	}   
