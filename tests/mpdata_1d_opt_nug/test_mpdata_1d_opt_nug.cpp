@@ -18,8 +18,7 @@ using namespace libmpdataxx;
 using real_t = float;
 using arr_t = blitz::Array<real_t, 1>;
 
-real_t GC = 1;
-int n = 12, nt = 2; //n / C;
+int n = 12, nt = 12; //n / C;
 arr_t G(n), phi(n); 
 arr_t G_c(n+1);
 
@@ -50,6 +49,9 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
+  // Starting point: a non-divergeng G \times C
+  real_t GC = .25;
+
   G   =   1,  1,  1,  1,  .5,  .5,  .5, .5,  1,  1,  1,  1;
   G_c = 1,  1,  1,  1,  .75, .5, .5,  .5, .75, 1,  1,  1,  1;      
   phi =   1, 10, 10,  1,   1,   1,   1,  1,  1,  1,  1,  1;
@@ -62,12 +64,17 @@ int main()
   slvs.back().advector() = GC / G_c; 
 
   add_solver<solvers::mpdata_1d<real_t, 1, n_eqs, formulae::opts::nug>>(slvs, "mpdata_iters=1_nug");
-  // advecting mixing ration with C times rho
+  // advecting mixing ratio with C times rho
   slvs.back().g_factor() = G;
   slvs.back().advectee() = phi;
   slvs.back().advector() = GC; 
 
+  if (sum(G * phi) != sum(slvs.at(0).advectee())) throw;
+  if (sum(G * phi) != sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) throw;
+
   for (auto &slv : slvs) slv.advance(nt);
 
-  //if (slv.advectee(0) != slv.advectee(1)) ...
+  real_t eps = 1e-22;
+  if (abs(sum(G * phi) - sum(slvs.at(0).advectee())) > eps) throw;
+  if (abs(sum(G * phi) - sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) > eps) throw;
 }

@@ -22,7 +22,7 @@
 using namespace libmpdataxx;
 
 using real_t = float;
-int n = 500, nt = 16;//00;
+int n = 500, nt = 1600;
 
 real_t min[2] = {2, -1}, max[2] = {4, 1};
 
