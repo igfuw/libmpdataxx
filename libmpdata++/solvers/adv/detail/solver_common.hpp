@@ -166,7 +166,7 @@ namespace libmpdataxx
         }
 
 	// psi getter
-	arr_t state(int e, int add = 0) // TODO: rename it to something like psi() or subdomain_with_halos()!
+	arr_t state(int e, int add = 0) // TODO: get rid of this method
 	{
 	  return this->mem->psi[e][this->n[e] + add];
 	}

@@ -1,9 +1,9 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
-- rotating_cone/test_issue.cpp ????
 - G
-- mpdata n_iters as a param
-- nx,ny,nz as params?
-- n_eqs as params...
+- solver params (needs passing params as an argument to alloc())
+  - mpdata n_iters as a param
+  - nx,ny,nz as params?
+  - n_eqs as params...
 - CMake install() rules (as in libcloudphxx)
 - strang/midpoint/euler... into separate files, check nomenclature, reference to discussion in Smolarkiewicz 2006 (eqs. 28, 29, ...), Piotr mentioned relation with RK, improved Euler (eq. 32) / modified Euler (eq. 33)
 - at least a "zero" bcond for icicle
@@ -27,7 +27,6 @@
 - test showing usage of gss'c __float128 (rainbow?)
 - pressure solvers: introduce inheritance (richardson->mr->cr->pc); what if no preconditioner in pc?; reuse richardson in pc; common loop over pseudo-time
 - make ctors explicit? (http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Explicit_Constructors#Explicit_Constructors)
-- concurr_serial 
 - check if all adv/*.hpp are testes 
 - use this->ijk istead of this->i, this->j where it could reduce the number of methods (method_1d = method_2d)
 - check at configure time what's fastest on the current machine: float vs. double, eps vs. where(), .5*(x+|x|) vs. max(x,0) and use these settings!

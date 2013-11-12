@@ -15,6 +15,7 @@ namespace libmpdataxx
   {
     namespace detail
     {
+      // n_eqs, n_tlev are template parameters as they are needed in both static and non-static contexts
       template<typename real_t, int n_eqs, int n_tlev, int minhalo>
       class solver<real_t, 1, n_eqs, n_tlev, minhalo> : public solver_common<real_t, 1, n_eqs, n_tlev, minhalo>
       {

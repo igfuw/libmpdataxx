@@ -6,15 +6,13 @@
 
 #pragma once
 
-// TODO: template parameter:
-//    enum rho_enum {rho_constant, rho_profile, rho_variable};
-
 namespace libmpdataxx
 {
   namespace solvers
   {
     namespace detail
     {
+      // n_iters is a template parameter as it is needed both in static and non-static context
       template <typename real_t, int n_iters_, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int minhalo>
       class mpdata_common : public detail::solver<
         real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, detail::max(minhalo, formulae::mpdata::halo(opts))
@@ -63,11 +61,6 @@ namespace libmpdataxx
 	// for Flux-Corrected Transport (TODO: more general names?) // TODO: move to mpdata_common
 	virtual void fct_init(int e) { }
 	virtual void fct_adjust_antidiff(int e, int iter) { }
-
-        public:
-
-        // parameters
-        struct params_t {}; // TODO: abs, frac, toa, ...
 
         protected:
 

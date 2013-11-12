@@ -38,7 +38,7 @@ namespace libmpdataxx
 	{
 	  if (iter != 0) 
 	  {
-	    this->cycle(e);
+	    this->cycle(e); // cycles subdomain's "n", and global "n" if it's the last equation
             this->mem->barrier();
 	    this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]]); // TODO: one xchng call?
 	    this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]]);
@@ -48,10 +48,11 @@ namespace libmpdataxx
 	    this->GC_corr(iter)[0](im+h) = 
 	      formulae::mpdata::antidiff<opts>(
 		this->mem->psi[e][this->n[e]], 
-		im, this->GC_unco(iter)[0]
+		im, 
+                this->GC_unco(iter)[0]
 	      );
 
-            this->fct_adjust_antidiff(e, iter); // i.e. calculate C_mono=C_mono(C_corr) in FCT
+            this->fct_adjust_antidiff(e, iter); // i.e. calculate GC_mono=GC_mono(GC_corr) in FCT
           }
 
 	  // donor-cell call
@@ -83,8 +84,7 @@ namespace libmpdataxx
 
       // ctor
       mpdata(
-        typename parent_t::ctor_args_t args,
-        const typename parent_t::params_t &
+        typename parent_t::ctor_args_t args
       ) : 
 	parent_t(args),
 	im(args.i.first() - 1, args.i.last())

@@ -26,8 +26,6 @@ int n = 500, nt = 16;//00;
 
 real_t min[2] = {2, -1}, max[2] = {4, 1};
 
-real_t min[2] = {2, -1}, max[2] = {4, 1};
-
 template <class T>
 void setup(T &solver, int n) 
 {
@@ -69,15 +67,17 @@ int main()
 
   const int n_eqs = 2;
 
-//  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
-//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-//  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
+  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
 
   add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs_fct, "mpdata_fct_iters=2");
-//  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs_fct, "mpdata_fct_iters=3");
+  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs_fct, "mpdata_fct_iters=3");
 
-//  for (auto &slv : slvs) slv.advance(nt);
+  // non-FCT solvers
+  for (auto &slv : slvs) slv.advance(nt);
 
+  // FCT solvers
   for (auto &slv : slvs_fct) 
   {
     slv.advance(nt);
