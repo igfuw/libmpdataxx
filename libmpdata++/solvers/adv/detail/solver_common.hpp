@@ -84,6 +84,8 @@ namespace libmpdataxx
 
 	public:
 
+        struct params_t {};
+
         virtual void hook_ante_step() 
         { 
           // sanity check if all subclasses call their parents' hooks
@@ -119,7 +121,7 @@ namespace libmpdataxx
         }
 
 	// ctor
-	solver_common(mem_t *mem) :
+	solver_common(mem_t *mem, const params_t &p) :
 	  n(n_eqs, 0), 
           mem(mem)
 	{}

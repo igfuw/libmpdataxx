@@ -62,13 +62,20 @@ namespace libmpdataxx
 	virtual void fct_init(int e) { }
 	virtual void fct_adjust_antidiff(int e, int iter) { }
 
+        public:
+
+	struct params_t : parent_t::params_t
+        {
+        };
+
         protected:
 
 	// ctor
 	mpdata_common(
-	  typename parent_t::ctor_args_t args
+	  typename parent_t::ctor_args_t args,
+          const params_t &p
 	) : 
-	  parent_t(args)
+	  parent_t(args, p)
         {
 	  for (int n = 0; n < n_tmp; ++n)
 	    tmp[n] = &args.mem->tmp[__FILE__][n];

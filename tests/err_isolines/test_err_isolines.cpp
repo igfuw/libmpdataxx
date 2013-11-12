@@ -53,25 +53,26 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx)
 }
 
 
+// gauss shape functor definition 
+struct gauss_t
+{
+  // member fields
+  real_t A0, A, sgma, x0;
+
+  // call operator
+  real_t operator()(real_t x) const 
+  { 
+    return A0 + A * exp( real_t(-.5) * pow(x - x0, 2) / pow(sgma, 2));
+  }
+  
+  // Blitz magick
+  BZ_DECLARE_FUNCTOR(gauss_t)
+};
+
+
 // all the test logic
 int main() 
 {
-  // gauss shape functor definition 
-  struct gauss_t
-  {
-    // member fields
-    real_t A0, A, sgma, x0;
-
-    // call operator
-    real_t operator()(real_t x) const 
-    { 
-      return A0 + A * exp( real_t(-.5) * pow(x - x0, 2) / pow(sgma, 2));
-    }
-    
-    // Blitz magick
-    BZ_DECLARE_FUNCTOR(gauss_t)
-  };
-
   // simulation parameters
   const real_t 
     t_max    = 1., // "arbitrarily"

@@ -48,14 +48,12 @@ namespace libmpdataxx
 
       public:
 
-      struct params_t {};
-
       // ctor
       donorcell_2d(
         typename parent_t::ctor_args_t args, 
-        const params_t &
+        const typename parent_t::params_t &p
       ) :
-        parent_t(args)
+        parent_t(args, p)
       {}  
     };
   }; // namespace solvers

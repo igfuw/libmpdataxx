@@ -84,9 +84,10 @@ namespace libmpdataxx
 
       // ctor
       mpdata(
-        typename parent_t::ctor_args_t args
+        typename parent_t::ctor_args_t args,
+        const typename parent_t::params_t &p
       ) : 
-	parent_t(args),
+	parent_t(args, p),
 	im(args.i.first() - 1, args.i.last())
       {}
     };
