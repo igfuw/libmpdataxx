@@ -25,8 +25,8 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state() = where(i <= center-width/2 || i >= center+width/2, -400, 400) * blitz::tiny(real_t(0)); 
-  solver.courant() = .5; 
+  solver.advectee() = where(i <= center-width/2 || i >= center+width/2, -400, 400) * blitz::tiny(real_t(0)); 
+  solver.advector() = .5; 
 }
 
 template <class T>
@@ -57,9 +57,9 @@ int main()
 
   const int n_eqs = 1;
   add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::eps>>(slvs, "mpdata_iters=2_eps");
+  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::eps>>(slvs, "mpdata_iters=2_eps");
   add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::eps>>(slvs, "mpdata_iters=3_eps");
+  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::opts::eps>>(slvs, "mpdata_iters=3_eps");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

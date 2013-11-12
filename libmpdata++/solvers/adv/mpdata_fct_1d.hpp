@@ -44,19 +44,19 @@ namespace libmpdataxx
       void fct_adjust_antidiff(int e, int iter)
       {
         const int d = 0; // 1D version -> working in x dimension only
-        const auto &C_corr = parent_t::C_corr(iter);
+        const auto &GC_corr = parent_t::GC_corr(iter);
         const auto psi = this->state(e); 
         const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 
         // fill halos -> mpdata works with halo=1, we need halo=2
 // TODO: other option would be to define im as a function of halo in mpdata!
         this->mem->barrier();
-	this->bcxl->fill_halos_vctr(C_corr[d]); // TODO: one xchng call?
-	this->bcxr->fill_halos_vctr(C_corr[d]);
+	this->bcxl->fill_halos_vctr(GC_corr[d]); // TODO: one xchng call?
+	this->bcxr->fill_halos_vctr(GC_corr[d]);
 	this->mem->barrier();
 
         // calculating the monotonic corrective velocity
-	this->C_mono[d]( im+h ) = formulae::mpdata::C_mono<opts>(psi, this->psi_min, this->psi_max, C_corr[d], im);
+	this->GC_mono[d]( im+h ) = formulae::mpdata::C_mono<opts>(psi, this->psi_min, this->psi_max, GC_corr[d], im);
       }
 
       public:

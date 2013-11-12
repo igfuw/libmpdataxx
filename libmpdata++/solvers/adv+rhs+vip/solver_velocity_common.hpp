@@ -67,10 +67,19 @@ namespace libmpdataxx
 	{   
 	  using idxperm::pi;
 	  using namespace arakawa_c;
-	  this->mem->C[d](pi<d>(i+h,j)) = this->dt / dx * .5 * (
-            psi(pi<d>(i,    j)) + 
-            psi(pi<d>(i + 1,j))
-          );
+    
+          if (this->mem->G.numElements() == 0)
+          {
+	    this->mem->GC[d](pi<d>(i+h,j)) = this->dt / dx * .5 * (
+	      psi(pi<d>(i,    j)) + 
+	      psi(pi<d>(i + 1,j))
+	    );
+          } 
+          else
+          { 
+            // TODO
+            assert(false);
+          }
 	}  
 
 	void hook_ante_step()

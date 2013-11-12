@@ -23,12 +23,12 @@ void setup(T &solver, int n[2], typename T::real_t offset)
 {
   blitz::firstIndex i;
   blitz::secondIndex j;
-  solver.state() = offset + exp(
+  solver.advectee() = offset + exp(
     -sqr(i+.5-n[x]/2.) / (2.*pow(n[x]/10, 2)) // TODO: assumes dx=dy=1
     -sqr(j+.5-n[y]/2.) / (2.*pow(n[y]/10, 2))
   );  
-  solver.courant(x) = .5; 
-  solver.courant(y) = .25;
+  solver.advector(x) = .5; 
+  solver.advector(y) = .25;
 }
 
 template <class T>
@@ -74,7 +74,7 @@ int main()
     } 
     {
       const int n_eqs = 1;
-      using solver_t = output::gnuplot<solvers::mpdata_2d<float, 2, n_eqs, formulae::mpdata::pds>>;
+      using solver_t = output::gnuplot<solvers::mpdata_2d<float, 2, n_eqs, formulae::opts::pds>>;
       solver_t::params_t p;
       setopts(p, nt, offset, "mpdata-pds_it=2");
       concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 

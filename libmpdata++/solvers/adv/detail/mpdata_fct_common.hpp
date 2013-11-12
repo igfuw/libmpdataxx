@@ -31,32 +31,25 @@ namespace libmpdataxx
 
         // member fields
 	typename parent_t::arr_t psi_min, psi_max; 
-	arrvec_t<typename parent_t::arr_t> C_mono; 
+	arrvec_t<typename parent_t::arr_t> GC_mono; 
 
-	arrvec_t<typename parent_t::arr_t> &C(int iter) 
+	arrvec_t<typename parent_t::arr_t> &GC(int iter) 
 	{
-	  if (iter > 0) return C_mono;
-	  return parent_t::C(iter);
+	  if (iter > 0) return GC_mono;
+	  return parent_t::GC(iter);
 	}
-
-        public:
-
-	struct params_t : parent_t::params_t
-	{
-	  // TODO: rho!
-	};
 
         protected:
 
         // ctor
 	mpdata_fct_common(
 	  typename parent_t::ctor_args_t args,
-	  const params_t &p
+	  const typename parent_t::params_t &p
 	) : 
           parent_t(args, p),
 	  psi_min(args.mem->tmp[__FILE__][0][0]),
 	  psi_max(args.mem->tmp[__FILE__][0][1]),
-	   C_mono(args.mem->tmp[__FILE__][1])
+	  GC_mono(args.mem->tmp[__FILE__][1])
         {}
 
         public:
@@ -66,7 +59,7 @@ namespace libmpdataxx
 	{
 	  parent_t::alloc(mem, nx);
 	  parent_t::alloc_tmp_sclr(mem, nx, __FILE__, 2); // psi_min and psi_max
-	  parent_t::alloc_tmp_vctr(mem, nx, __FILE__);    // C_mono
+	  parent_t::alloc_tmp_vctr(mem, nx, __FILE__);    // GC_mono
 	}
 
         // 2D version 
@@ -74,7 +67,7 @@ namespace libmpdataxx
 	{
 	  parent_t::alloc(mem, nx, ny);
 	  parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, 2); // psi_min and psi_max
-	  parent_t::alloc_tmp_vctr(mem, nx, ny, __FILE__);    // C_mono
+	  parent_t::alloc_tmp_vctr(mem, nx, ny, __FILE__);    // GC_mono
 	}
 
         // 3D version - TODO

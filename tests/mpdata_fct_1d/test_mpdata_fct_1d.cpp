@@ -26,14 +26,16 @@ int n = 500, nt = 16;//00;
 
 real_t min[2] = {2, -1}, max[2] = {4, 1};
 
+real_t min[2] = {2, -1}, max[2] = {4, 1};
+
 template <class T>
 void setup(T &solver, int n) 
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, min[0], max[0]); 
-  solver.state(1) = where(i <= center-width/2 || i >= center+width/2, min[1], max[1]); 
-  solver.courant() = -.5; 
+  solver.advectee(0) = where(i <= center-width/2 || i >= center+width/2, min[0], max[0]); 
+  solver.advectee(1) = where(i <= center-width/2 || i >= center+width/2, min[1], max[1]); 
+  solver.advector() = -.5; 
 }
 
 template <class T>
@@ -82,8 +84,8 @@ int main()
     for (auto i : std::set<int>({0,1}))
     {
       real_t 
-        mn = blitz::min(slv.state(i)),
-	mx = blitz::min(slv.state(i));
+        mn = blitz::min(slv.advectee(i)),
+	mx = blitz::min(slv.advectee(i));
       if (mn < min[i]) { std::cerr << mn << " < " << min[i] << std::endl; throw; }
       if (mx > max[i]) { std::cerr << mx << " > " << max[i] << std::endl; throw; }
     }

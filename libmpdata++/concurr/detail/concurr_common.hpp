@@ -27,8 +27,8 @@ namespace libmpdataxx
       public:
       typedef real_t_ real_t;
       virtual void advance(int) { assert(false); throw; }  
-      virtual blitz::Array<real_t_, n_dims> state(int e = 0) { assert(false); throw; }
-      virtual blitz::Array<real_t_, n_dims> courant(int d = 0) { assert(false); throw; }
+      virtual blitz::Array<real_t_, n_dims> advectee(int e = 0) { assert(false); throw; }
+      virtual blitz::Array<real_t_, n_dims> advector(int d = 0) { assert(false); throw; }
       virtual bool *panic_ptr() { assert(false && "unimplemented!"); throw; }
     };
 
@@ -241,14 +241,14 @@ namespace libmpdataxx
           solve(nt);
         }  
 
-	typename solver_t::arr_t state(int e = 0)
+	typename solver_t::arr_t advectee(int e = 0)
 	{
-	  return mem->state(e);
+	  return mem->advectee(e);
 	}
 
-	typename solver_t::arr_t courant(int d = 0)
+	typename solver_t::arr_t advector(int d = 0)
 	{
-	  return mem->courant(d);
+	  return mem->advector(d);
 	}
 
         bool *panic_ptr()

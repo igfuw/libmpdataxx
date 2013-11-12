@@ -118,13 +118,13 @@ int main()
       add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "iters=2", nx);
 //      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
       add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "iters=3", nx);
-      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa | formulae::mpdata::iga>>(slvs, "iters=2_toa_iga", nx);
+      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::toa | formulae::opts::iga>>(slvs, "iters=2_toa_iga", nx);
 
       // MPDATA-FCT
 //      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "iters=2_fct", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_fct_toa", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::opts::toa>>(slvs, "iters=2_fct_toa", nx);
 //      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "iters=3_fct", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs, formulae::mpdata::toa>>(slvs, "iters=3_fct_toa", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs, formulae::opts::toa>>(slvs, "iters=3_fct_toa", nx);
 
       // calculating the analytical solution
       typename solvers::donorcell_1d<real_t, n_eqs>::arr_t exact(nx);
@@ -139,19 +139,19 @@ int main()
         std::cerr << "    solver = " << key << std::endl; 
 
         // setting the solver up
-	slv.courant() = cour; 
-        slv.state() = gauss((i+.5)*dx);
+	slv.advector() = cour; 
+        slv.advectee() = gauss((i+.5)*dx);
    
         // running the solver
 	slv.advance(nt);
 
         // asserting that periodic boundries did not affect the result
         // and that the chosen domain length is enough to have compact support up to machine precision
-        assert(exact(0) == slv.state()(0));
-        assert(exact(nx-1) == slv.state()(nx-1));
+        assert(exact(0) == slv.advectee()(0));
+        assert(exact(nx-1) == slv.advectee()(nx-1));
 
         // calculating the deviation from analytical solution
-        real_t err = sqrt(sum(pow(slv.state() - exact, 2)) / nx) / (nt * dt);
+        real_t err = sqrt(sum(pow(slv.advectee() - exact, 2)) / nx) / (nt * dt);
 
         outfiles[key] << dx << "\t" << cour << "\t" << err << std::endl;
       }

@@ -87,15 +87,17 @@ namespace libmpdataxx
                 parent_t::rng_sclr(nz)
               )); 
 
-	  mem->C.push_back(new typename parent_t::arr_t( 
+	  mem->GC.push_back(new typename parent_t::arr_t( 
             parent_t::rng_vctr(nx), parent_t::rng_sclr(ny), parent_t::rng_sclr(nz)
           ));
-	  mem->C.push_back(new typename parent_t::arr_t(
+	  mem->GC.push_back(new typename parent_t::arr_t(
             parent_t::rng_sclr(nx), parent_t::rng_vctr(ny), parent_t::rng_sclr(nz)
           ));
-	  mem->C.push_back(new typename parent_t::arr_t(
+	  mem->GC.push_back(new typename parent_t::arr_t(
             parent_t::rng_sclr(nx), parent_t::rng_sclr(ny), parent_t::rng_vctr(nz)
           ));
+
+          // TODO: allocate G
         }  
       };
     };

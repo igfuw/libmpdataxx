@@ -81,8 +81,10 @@ namespace libmpdataxx
 	      mem->psi[e].push_back( new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_sclr(ny)));
 
           // Courant field components (Arakawa-C grid)
-	  mem->C.push_back(new typename parent_t::arr_t( parent_t::rng_vctr(nx), parent_t::rng_sclr(ny) ));
-	  mem->C.push_back(new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_vctr(ny) ));
+	  mem->GC.push_back(new typename parent_t::arr_t( parent_t::rng_vctr(nx), parent_t::rng_sclr(ny) ));
+	  mem->GC.push_back(new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_vctr(ny) ));
+ 
+          // TODO: allocate G
         }
 
         protected:

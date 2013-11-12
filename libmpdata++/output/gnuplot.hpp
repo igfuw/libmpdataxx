@@ -54,7 +54,7 @@ namespace libmpdataxx
            << "set termoption solid\n"
         ;
 	if (p.gnuplot_xrange == "[*:*]") 
-	   *gp << "set xrange [0:" << this->mem->state(0).extent(0) << "]\n";
+	   *gp << "set xrange [0:" << this->mem->advectee(0).extent(0) << "]\n";
 	else 
 	   *gp << "set xrange " << p.gnuplot_xrange << "\n";
 
@@ -105,7 +105,7 @@ namespace libmpdataxx
         if (parent_t::n_dims == 2) // known at compile time
         {
           if (p.gnuplot_yrange == "[*:*]") 
-             *gp << "set yrange [0:" << this->mem->state(0).extent(1) << "]\n";
+             *gp << "set yrange [0:" << this->mem->advectee(0).extent(1) << "]\n";
           else 
              *gp << "set yrange " << p.gnuplot_yrange << "\n";
 
@@ -140,7 +140,7 @@ namespace libmpdataxx
       {
         if (parent_t::n_dims == 1) // known at compile time
         { 
-          gp->send(this->mem->state(var));
+          gp->send(this->mem->advectee(var));
         }
 
         if (parent_t::n_dims == 2) // known at compile time
@@ -162,16 +162,16 @@ namespace libmpdataxx
             float zmin, zmax;
             int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
             if (count != 2) zmin = 0;
-            *gp << " '-' binary " << binfmt(this->mem->state(0))
+            *gp << " '-' binary " << binfmt(this->mem->advectee(0))
                 << " origin=(.5,.5," << zmin << ")" // TODO: dx/2, dy/2, 
 	        << " with image failsafe notitle,";
           }
           *gp << " '-'" 
-              << " binary" << binfmt(this->mem->state(0)) 
+              << " binary" << binfmt(this->mem->advectee(0)) 
               << " origin=(.5,.5,0)" // TODO: dx/2, dy/2, ?
 	      << " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
-	  gp->sendBinary(this->mem->state(var).copy());
-          if (imagebg) gp->sendBinary(this->mem->state(var).copy());
+	  gp->sendBinary(this->mem->advectee(var).copy());
+          if (imagebg) gp->sendBinary(this->mem->advectee(var).copy());
         }
       }
 
