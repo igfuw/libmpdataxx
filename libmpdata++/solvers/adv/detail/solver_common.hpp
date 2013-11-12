@@ -84,6 +84,8 @@ namespace libmpdataxx
 
 	public:
 
+        struct params_t {};
+
         virtual void hook_ante_step() 
         { 
           // sanity check if all subclasses call their parents' hooks
@@ -119,7 +121,7 @@ namespace libmpdataxx
         }
 
 	// ctor
-	solver_common(mem_t *mem) :
+	solver_common(mem_t *mem, const params_t &p) :
 	  n(n_eqs, 0), 
           mem(mem)
 	{}
@@ -166,7 +168,7 @@ namespace libmpdataxx
         }
 
 	// psi getter
-	arr_t state(int e, int add = 0) // TODO: rename it to something like psi() or subdomain_with_halos()!
+	arr_t state(int e, int add = 0) // TODO: get rid of this method
 	{
 	  return this->mem->psi[e][this->n[e] + add];
 	}

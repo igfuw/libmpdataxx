@@ -6,9 +6,6 @@
 
 #pragma once
 
-// TODO: template parameter:
-//    enum rho_enum {rho_constant, rho_profile, rho_variable};
-
 namespace libmpdataxx
 {
   namespace solvers
@@ -66,16 +63,18 @@ namespace libmpdataxx
 
         public:
 
-        // parameters
-        struct params_t {}; // TODO: abs, frac, toa, ...
+	struct params_t : parent_t::params_t
+        {
+        };
 
         protected:
 
 	// ctor
 	mpdata_common(
-	  typename parent_t::ctor_args_t args
+	  typename parent_t::ctor_args_t args,
+          const params_t &p
 	) : 
-	  parent_t(args)
+	  parent_t(args, p)
         {
 	  for (int n = 0; n < n_tmp; ++n)
 	    tmp[n] = &args.mem->tmp[__FILE__][n];

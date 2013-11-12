@@ -25,8 +25,8 @@ namespace libmpdataxx
 
       void fct_init(int e)
       {
-	const rng_t i = this->i^1, j = this->j^1; // not optimal - with multiple threads some indices are repeated among threads
-	const typename parent_t::arr_t psi = this->state(e); // TODO:! powinno być psi/rho!
+	const auto i = this->i^1, j = this->j^1; // not optimal - with multiple threads some indices are repeated among threads
+	const auto psi = this->mem->psi[e][this->n[e]]; 
 
 	this->psi_min(i,j) = min(min(min(min(
                        psi(i,j+1),
@@ -43,7 +43,7 @@ namespace libmpdataxx
       void fct_adjust_antidiff(int e, int iter)
       {
 	const auto &GC_corr = parent_t::GC_corr(iter);
-	const auto psi = this->state(e);
+	const auto psi = this->mem->psi[e][this->n[e]];
 	const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 	const auto &jm = this->jm; // calculating once for i-1/2 and i+1/2
 
@@ -59,6 +59,9 @@ namespace libmpdataxx
 	// calculating the monotonic corrective velocity
 	this->GC_mono[0]( im+h, jm ) = formulae::mpdata::C_mono<opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, im, jm);
 	this->GC_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, jm, im);
+
+        // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
+        if (iter == n_iters - 1) this->mem->barrier();  // TODO: move to common
       }
 
       public:

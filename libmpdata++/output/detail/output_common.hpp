@@ -57,13 +57,15 @@ namespace libmpdataxx
 	void hook_post_step()
 	{
 	  parent_t::hook_post_step();
+          // TODO: here the order or hooks matter -> not good :(
 
+	  this->mem->barrier(); // waiting for all threads befor doing global output
 	  if (this->mem->rank() == 0)
 	  {
-// TODO: output of solver statistics every timesteps could probably go here
+            // TODO: output of solver statistics every timesteps could probably go here
 	    if (this->timestep % outfreq == 0) record_all();
 	  }
-	  this->mem->barrier();
+	  this->mem->barrier(); // waiting for the output to be finished
 	}
 
 	public:

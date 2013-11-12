@@ -90,6 +90,21 @@ namespace libmpdataxx
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
   
+        /// @brief concurrency-aware 2D summation of array elements
+        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j) // TODO: that's just for 2D
+        {
+	  // doing a two-step sum to reduce numerical error 
+	  // and make parallel results reproducible
+	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
+          {
+	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr(c, j));
+          }
+          barrier();
+          real_t result = blitz::kahan_sum(*sumtmp);
+          barrier();
+          return result;
+        }
+
         /// @brief concurrency-aware 2D summation of a (element-wise) product of two arrays
         real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j) // TODO: that's just for 2D
         {
@@ -97,7 +112,7 @@ namespace libmpdataxx
 	  // and make parallel results reproducible
 	  for (int c = i.first(); c <= i.last(); ++c)
           {
-	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr1(c, j) * arr2(c, j)); // DOES NOT WORK!
+	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr1(c, j) * arr2(c, j)); 
           }
           barrier();
           real_t result = blitz::kahan_sum(*sumtmp);

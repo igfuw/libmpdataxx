@@ -51,6 +51,7 @@ namespace libmpdataxx
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
 	   << "set term " << p.gnuplot_term << "\n"
+           << "set termoption solid\n"
         ;
 	if (p.gnuplot_xrange == "[*:*]") 
 	   *gp << "set xrange [0:" << this->mem->advectee(0).extent(0) << "]\n";
@@ -180,7 +181,7 @@ namespace libmpdataxx
       { 
 	std::string 
           gnuplot_output,
-          gnuplot_with = (
+          gnuplot_with = ( // TODO: place somewhere an assert for histps/fsteps - apparently steps are the only correct here
             parent_t::n_dims == 2 
 	      ? std::string("image failsafe") // 2D
 	      : std::string("lines ")         // 1D // TODO: histogram steps would be better than lines

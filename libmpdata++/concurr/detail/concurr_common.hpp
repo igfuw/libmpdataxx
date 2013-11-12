@@ -91,7 +91,7 @@ namespace libmpdataxx
 
           std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, shrdl, shrdr; // TODO: solver_t::bc_p
 
-          if (bcx == bcond::cyclic)  // TODO: make a function taht does it
+          if (bcx == bcond::cyclic)  // TODO: make a function that does it
           {
             bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, s0-1), solver_t::halo));
             bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, s0-1), solver_t::halo));

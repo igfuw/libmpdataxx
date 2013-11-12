@@ -55,11 +55,18 @@ namespace libmpdataxx
           const rng_t &i, &j; 
         };  
 
+        struct params_t : parent_t::params_t
+        {
+        };
+
         protected:
 
 	// ctor
-	solver(ctor_args_t args) :
-	  parent_t(args.mem),
+	solver(
+          ctor_args_t args,
+          const params_t &p
+        ) :
+	  parent_t(args.mem, p),
 	  i(args.i), 
 	  j(args.j),  
           ijk({args.i, args.j}),

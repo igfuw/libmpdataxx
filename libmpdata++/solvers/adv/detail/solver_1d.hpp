@@ -48,15 +48,16 @@ namespace libmpdataxx
         protected:
 
 	// ctor
-	solver(ctor_args_t args) :
-	  parent_t(args.mem), 
+	solver(
+          ctor_args_t args,
+          const typename parent_t::params_t &p
+        ) :
+	  parent_t(args.mem, p), 
           bcxl(std::move(args.bcxl)), 
           bcxr(std::move(args.bcxr)),
           i(args.i),
           ijk(args.i)
 	{}
-
-
 
         // memory allocation logic using static methods
 
