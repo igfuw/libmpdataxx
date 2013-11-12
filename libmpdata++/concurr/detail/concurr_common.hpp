@@ -29,6 +29,7 @@ namespace libmpdataxx
       virtual void advance(int) { assert(false); throw; }  
       virtual blitz::Array<real_t_, n_dims> advectee(int e = 0) { assert(false); throw; }
       virtual blitz::Array<real_t_, n_dims> advector(int d = 0) { assert(false); throw; }
+      virtual blitz::Array<real_t_, n_dims> g_factor() { assert(false); throw; }
       virtual bool *panic_ptr() { assert(false && "unimplemented!"); throw; }
     };
 
@@ -249,6 +250,11 @@ namespace libmpdataxx
 	typename solver_t::arr_t advector(int d = 0)
 	{
 	  return mem->advector(d);
+	}
+
+	typename solver_t::arr_t g_factor()
+	{
+	  return mem->g_factor();
 	}
 
         bool *panic_ptr()

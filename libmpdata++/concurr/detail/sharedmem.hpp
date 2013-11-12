@@ -140,6 +140,8 @@ namespace libmpdataxx
           assert(e < n_eqs);
           assert(this->n < n_tlev);
 
+          // returning just the domain interior, i.e. without halos
+          // reindexing so that element 0 is at 0
 	  return this->psi[e][ this->n ](
 	    rng_t(0, this->span[0]-1)
 	  ).reindex({0});
@@ -150,10 +152,19 @@ namespace libmpdataxx
           assert(d == 0);
           // returning the whole array but with the dimensiones
           // reindexed to make it more intuitive when working with index placeholders
+          // (i.e. border between cell -1 and cell 0 is indexed with 0)
 	  return this->GC[d](
             rng_t::all()
           ).reindex({this->GC[d].base(0)+1});
 	}   
+
+        blitz::Array<real_t, 1> g_factor()
+        {
+          // the same logic as in advectee() - see above
+          return this->G(
+            rng_t(0, this->span[0]-1)
+          ).reindex({0});
+        }
 
 	// ctor
 	sharedmem(int s0, int size)

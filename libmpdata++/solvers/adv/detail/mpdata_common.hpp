@@ -15,13 +15,13 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <typename real_t, int n_iters_, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int minhalo>
+      template <typename real_t, int n_iters_, int n_dims, int n_eqs, formulae::opts::opts_t opts, int minhalo>
       class mpdata_common : public detail::solver<
-        real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, detail::max(minhalo, formulae::mpdata::halo(opts))
+        real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, opts, detail::max(minhalo, formulae::mpdata::halo(opts))
       >
       {
         using parent_t = detail::solver<
-          real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, detail::max(minhalo, formulae::mpdata::halo(opts))
+          real_t, n_dims, n_eqs, formulae::mpdata::n_tlev, opts, detail::max(minhalo, formulae::mpdata::halo(opts))
         >;
 
 	using GC_t = arrvec_t<typename parent_t::arr_t>;
@@ -111,13 +111,13 @@ namespace libmpdataxx
     {};
 
     // alias names
-    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::opts::opts_t opts = 0, int minhalo = 0>
     using mpdata_1d = mpdata<real_t, n_iters, 1, n_eqs, opts, minhalo>;
 
-    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::opts::opts_t opts = 0, int minhalo = 0>
     using mpdata_2d = mpdata<real_t, n_iters, 2, n_eqs, opts, minhalo>;
 
-    template <typename real_t, int n_iters, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    template <typename real_t, int n_iters, int n_eqs = 1, formulae::opts::opts_t opts = 0, int minhalo = 0>
     using mpdata_3d = mpdata<real_t, n_iters, 3, n_eqs, opts, minhalo>;
   }; // namespace solvers
 }; // namescpae libmpdataxx

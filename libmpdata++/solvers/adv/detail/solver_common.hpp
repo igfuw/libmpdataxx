@@ -177,7 +177,7 @@ namespace libmpdataxx
         static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }
       };
 
-      template<typename real_t, int n_dims, int n_eqs, int n_tlev, int minhalo>
+      template<typename real_t, int n_dims, int n_eqs, int n_tlev, formulae::opts::opts_t opts, int minhalo>
       class solver
       {}; 
     }; // namespace detail

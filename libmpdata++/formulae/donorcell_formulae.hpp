@@ -121,7 +121,7 @@ namespace libmpdataxx
 	psi[n+1](i,j) = psi[n](i,j) - (             // note: this parenthesis is crucial!
 	  donorcell<opts, 0>(psi[n], GC[0], i, j) + //       without it, magnitude difference
 	  donorcell<opts, 1>(psi[n], GC[1], j, i)   //       between psi and the fluxes
-        ) / formulae::G<opts>(G, i, j);             //       may cause psi-0 != psi !
+        ) / formulae::G<opts, 0>(G, i, j);          //       may cause psi-0 != psi !
       }
 
       // infinite-gauge version (referred to as F(1,1,U) in the papers)
@@ -136,7 +136,7 @@ namespace libmpdataxx
 	psi[n+1](i,j) = psi[n](i,j) - (             // note: see above
 	  (GC[0](i+h, j) - GC[0](i-h, j)) +
 	  (GC[1](i, j+h) - GC[1](i, j-h))
-        ) / formulae::G<opts>(G, i, j); 
+        ) / formulae::G<opts, 0>(G, i, j); 
       }
 
       template <opts_t opts, class arr_3d_t>
@@ -151,7 +151,7 @@ namespace libmpdataxx
 	  donorcell<opts, 0>(psi[n], GC[0], i, j, k) +
 	  donorcell<opts, 1>(psi[n], GC[1], j, k, i) +
 	  donorcell<opts, 2>(psi[n], GC[2], k, i, j)
-        ) / formulae::G<opts>(G, i, j, k);
+        ) / formulae::G<opts, 0>(G, i, j, k);
       }
     }; // namespace donorcell 
   }; // namespace formulae
