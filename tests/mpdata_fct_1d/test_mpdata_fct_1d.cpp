@@ -17,19 +17,22 @@
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
+#include <set>
 
 using namespace libmpdataxx;
 
 using real_t = float;
-int n = 500, nt = 1600;
+int n = 500, nt = 16;//00;
+
+real_t min[2] = {2, -1}, max[2] = {4, 1};
 
 template <class T>
 void setup(T &solver, int n) 
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, 2, 4); 
-  solver.state(1) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
+  solver.state(0) = where(i <= center-width/2 || i >= center+width/2, min[0], max[0]); 
+  solver.state(1) = where(i <= center-width/2 || i >= center+width/2, min[1], max[1]); 
   solver.courant() = -.5; 
 }
 
@@ -60,16 +63,30 @@ void add_solver(vec_t &slvs, const std::string &fname)
 int main() 
 {
   const int n_dims = 1;
-  boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
+  boost::ptr_vector<concurr::any<real_t, n_dims>> slvs, slvs_fct;
 
   const int n_eqs = 2;
 
 //  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
+//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
 //  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
 
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "mpdata_fct_iters=2");
-//  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "mpdata_fct_iters=3");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs_fct, "mpdata_fct_iters=2");
+//  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs_fct, "mpdata_fct_iters=3");
 
-  for (auto &slv : slvs) slv.advance(nt);
+//  for (auto &slv : slvs) slv.advance(nt);
+
+  for (auto &slv : slvs_fct) 
+  {
+    slv.advance(nt);
+    for (auto i : std::set<int>({0,1}))
+    {
+      real_t 
+        mn = blitz::min(slv.state(i)),
+	mx = blitz::min(slv.state(i));
+      if (mn < min[i]) { std::cerr << mn << " < " << min[i] << std::endl; throw; }
+      if (mx > max[i]) { std::cerr << mx << " > " << max[i] << std::endl; throw; }
+    }
+  }
+
 }

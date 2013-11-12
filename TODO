@@ -12,7 +12,7 @@
 - doc: mention the difference between the order of accuracy of integration vs. order of accuracy of an approximation
 - spreading drop test from Schar & Smolarkiewicz?
 - doc: references for shallow-water docs incl. Vallis, http://www.netlib.org/chammp/shallow.bib
-- asserts for incompatible opiotns (e.g. eps vs. -eps, ... gag -> n_iters)
+- asserts for incompatible options (e.g. eps vs. -eps, ... gag -> n_iters)
 - concurr -> rename concurr_ddecomp
 - npa option w donorcell
 - bcd_common -> rename dirichlet?

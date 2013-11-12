@@ -31,8 +31,8 @@ namespace libmpdataxx
 
       void fct_init(int e)
       {
-	const rng_t i = this->i^1; // TODO: isn't it a race condition with more than one thread?
-	const typename parent_t::arr_t psi = this->state(e); // TODO:! powinno być psi/rho!
+	const auto i = this->i^1; // TODO: isn't it a race condition with more than one thread?
+	const auto psi = this->state(e);
 
         /// \f$ \psi^{max}_{i}=max_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n  
         /// \f$ \psi^{min}_{i}=min_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n    
