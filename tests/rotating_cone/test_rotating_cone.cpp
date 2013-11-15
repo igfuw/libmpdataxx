@@ -113,8 +113,8 @@ int main()
   int n[] = {101, 101}, nt = 628 * 6;
 
   const int n_iters = 2;
-  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::opts::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::opts::iga | formulae::opts::toa>>;
+  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters/*, formulae::opts::toa*/>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, formulae::opts::iga | formulae::opts::toa>>;
   solver_t::params_t p;
   setopts(p, nt, n_iters);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 

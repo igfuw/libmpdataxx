@@ -17,11 +17,14 @@ namespace libmpdataxx
 {
   namespace solvers
   {
-    template <typename real_t, int n_iters, int n_eqs, formulae::mpdata::opts_t opts, int minhalo> 
-    class mpdata_fct<real_t, n_iters, 2, n_eqs, opts, minhalo> : 
-      public detail::mpdata_fct_common<real_t, n_iters, 2, n_eqs, opts, minhalo> 
+    template <typename real_t, int n_iters, formulae::mpdata::opts_t opts, int minhalo> 
+    class mpdata_fct<real_t, n_iters, 2, opts, minhalo> : 
+      public detail::mpdata_fct_common<real_t, n_iters, 2, opts, minhalo> 
     {
-      using parent_t = detail::mpdata_fct_common<real_t, n_iters, 2, n_eqs, opts, minhalo>; 
+      using parent_t = detail::mpdata_fct_common<real_t, n_iters, 2, opts, minhalo>; 
+
+      // inheriting ctors
+      using parent_t::parent_t;
 
       void fct_init(int e)
       {
@@ -61,18 +64,8 @@ namespace libmpdataxx
 	this->GC_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, jm, im);
 
         // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-        if (iter == n_iters - 1) this->mem->barrier();  // TODO: move to common
+        if (iter == n_iters - 1 && this->mem->n_eqs > 1) this->mem->barrier();  // TODO: move to common
       }
-
-      public:
-
-      // ctor (TODO: C++11 ctor inheritance?)
-      mpdata_fct(
-        typename parent_t::ctor_args_t args, 
-        const typename parent_t::params_t &p
-      ) : 
-        parent_t(args, p)
-      {}   
     };
   }; // namespace solvers
 }; // namespace libmpdataxx

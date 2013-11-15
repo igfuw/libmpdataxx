@@ -18,10 +18,10 @@ namespace libmpdataxx
     {
       using namespace libmpdataxx::arakawa_c;
 
-      template<typename real_t, int n_eqs, int n_tlev, int minhalo>
-      class solver<real_t, 2, n_eqs, n_tlev, minhalo> : public solver_common<real_t, 2, n_eqs, n_tlev, minhalo>
+      template<typename real_t, int n_tlev, int minhalo>
+      class solver<real_t, 2, n_tlev, minhalo> : public solver_common<real_t, 2, n_tlev, minhalo>
       {
-	using parent_t = solver_common<real_t, 2, n_eqs, n_tlev, minhalo>;
+	using parent_t = solver_common<real_t, 2, n_tlev, minhalo>;
 
 	protected:
       
@@ -83,7 +83,7 @@ namespace libmpdataxx
 	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny) 
         {
           // psi 
-	  for (int e = 0; e < n_eqs; ++e) // equations
+	  for (int e = 0; e < mem->n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back( new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_sclr(ny)));
 

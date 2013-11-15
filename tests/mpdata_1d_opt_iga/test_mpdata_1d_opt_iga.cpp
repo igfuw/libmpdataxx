@@ -35,6 +35,7 @@ void setup(T &solver, int n)
 template <class T>
 void setopts(T &p, const int nt, const std::string &fname)
 {
+  p.n_eqs = 1;
   p.outfreq = nt; // displays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
   p.outvars = {
@@ -61,9 +62,8 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  const int n_eqs = 1;
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs/*, formulae::opts::iga*/>>(slvs, "mpdata_iters=2");
-//  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::iga>>(slvs, "mpdata_iters=2_iga");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2/*, formulae::opts::iga*/>>(slvs, "mpdata_iters=2");
+//  add_solver<solvers::mpdata_1d<real_t, 2, formulae::opts::iga>>(slvs, "mpdata_iters=2_iga");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

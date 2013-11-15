@@ -49,10 +49,10 @@
 
 using namespace libmpdataxx;
 
-template <typename real_t, int n_iters, solvers::inhomo_e inhomo, int psi, int phi, int n_eqs = 2>
-class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters, n_eqs>, inhomo>
+template <typename real_t, int n_iters, solvers::inhomo_e inhomo, int psi, int phi>
+class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters>, inhomo>
 {
-  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters, n_eqs>, inhomo>;
+  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters>, inhomo>;
 
   typename parent_t::real_t omega;
   typename parent_t::arr_t tmp;
@@ -78,17 +78,25 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t,
 
   public:
 
-  struct params_t : parent_t::params_t { typename parent_t::real_t omega; };
+  struct params_t : parent_t::params_t 
+  { 
+    typename parent_t::real_t omega; 
+
+    // ctor setting n_eqs
+    params_t() { this->n_eqs = 2; }
+  };
 
   // ctor
   coupled_harmosc(
     typename parent_t::ctor_args_t args,
-    params_t p
+    const params_t &p
   ) :
     parent_t(args, p),
     omega(p.omega), 
     tmp(args.mem->tmp[__FILE__][0][0]) 
-  {}
+  {
+    assert(p.n_eqs == 2);
+  }
 
   static void alloc(
     typename parent_t::mem_t *mem,

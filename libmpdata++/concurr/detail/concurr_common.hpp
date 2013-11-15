@@ -65,7 +65,6 @@ namespace libmpdataxx
         typedef sharedmem<
           typename solver_t::real_t,
           solver_t::n_dims,
-          solver_t::n_eqs,
           solver_t::n_tlev
         > mem_t;
 

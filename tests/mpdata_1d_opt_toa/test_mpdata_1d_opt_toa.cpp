@@ -57,12 +57,11 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  const int n_eqs = 1;
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::toa>>(slvs, "mpdata_iters=2_toa");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::toa | formulae::opts::iga>>(slvs, "mpdata_iters=2_toa_iga");
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::opts::toa>>(slvs, "mpdata_fct_iters=2_toa"); 
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::opts::toa | formulae::opts::iga>>(slvs, "mpdata_fct_iters=2_toa_iga"); 
+  add_solver<solvers::mpdata_1d<real_t, 2>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_1d<real_t, 2, formulae::opts::toa>>(slvs, "mpdata_iters=2_toa");
+  add_solver<solvers::mpdata_1d<real_t, 2, formulae::opts::toa | formulae::opts::iga>>(slvs, "mpdata_iters=2_toa_iga");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, formulae::opts::toa>>(slvs, "mpdata_fct_iters=2_toa"); 
+  add_solver<solvers::mpdata_fct_1d<real_t, 2, formulae::opts::toa | formulae::opts::iga>>(slvs, "mpdata_fct_iters=2_toa_iga"); 
 
   for (auto &slv : slvs) slv.advance(nt);
 }

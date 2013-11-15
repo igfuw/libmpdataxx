@@ -41,14 +41,14 @@
 template <typename real_t, int n_iters, int qx, int qy, int h>
 class shallow_water : public solvers::detail::solver_velocity_common<
   solvers::inhomo_solver<
-    solvers::mpdata_fct_2d<real_t, n_iters, 3>, 
+    solvers::mpdata_fct_2d<real_t, n_iters>, 
     solvers::strang
   >, qx, qy, h
 >
 {
   using parent_t = solvers::detail::solver_velocity_common<
     solvers::inhomo_solver<
-      solvers::mpdata_fct_2d<real_t, n_iters, 3>, 
+      solvers::mpdata_fct_2d<real_t, n_iters>, 
       solvers::strang
     >, qx, qy, h
   >;
@@ -81,12 +81,18 @@ class shallow_water : public solvers::detail::solver_velocity_common<
 
   public:
 
+  struct params_t : parent_t::params_t
+  {
+    // ctor setting n_eqs
+    params_t() { this->n_eqs = 3; }
+  };
+
   // ctor
   shallow_water( 
     typename parent_t::ctor_args_t args, 
-    const typename parent_t::params_t &p
+    const params_t &p
   ) :
     parent_t(args, p), 
-    g(formulae::g<real_t>() * si::seconds * si::seconds / si::metres)
+    g(formulae::g<real_t>() * si::seconds * si::seconds / si::metres) // TODO: get rid of units!
   {}
 };

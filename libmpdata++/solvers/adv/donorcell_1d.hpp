@@ -15,13 +15,11 @@ namespace libmpdataxx
   {
     template<
       typename real_t, 
-      int n_eqs = 1,
       int halo = formulae::donorcell::halo
     >
     class donorcell_1d : public detail::solver<
       real_t,
       1,
-      n_eqs,
       formulae::donorcell::n_tlev, 
       detail::max(halo, formulae::donorcell::halo)
     > 
@@ -29,7 +27,6 @@ namespace libmpdataxx
       using parent_t = detail::solver<
         real_t,
         1,
-        n_eqs,
         formulae::donorcell::n_tlev, 
         detail::max(halo, formulae::donorcell::halo)
       >;

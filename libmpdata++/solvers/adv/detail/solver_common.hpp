@@ -25,7 +25,7 @@ namespace libmpdataxx
         return a > b ? a : b;
       }
 
-      template <typename real_t_, int n_dims_, int n_eqs_, int n_tlev_, int minhalo>
+      template <typename real_t_, int n_dims_, int n_tlev_, int minhalo>
       class solver_common
       {
 	public:
@@ -33,7 +33,6 @@ namespace libmpdataxx
         // using enums as "public static const int" would need instantiation
         enum { halo = minhalo }; 
         enum { n_dims = n_dims_ };
-        enum { n_eqs = n_eqs_ }; // TODO: this does not need to be a template parameter!
         enum { n_tlev = n_tlev_ };
 
         typedef real_t_ real_t;
@@ -41,7 +40,7 @@ namespace libmpdataxx
 
 	void cycle_all()
 	{ 
-	  for (int e = 0; e < n_eqs; ++e) cycle(e);
+	  for (int e = 0; e < mem->n_eqs; ++e) cycle(e);
 	}
 
 
@@ -50,26 +49,26 @@ namespace libmpdataxx
         long long int timestep = 0;
         std::vector<int> n; // TODO: why not std::array?
 
-        typedef concurr::detail::sharedmem<real_t, n_dims, n_eqs, n_tlev> mem_t;
+        typedef concurr::detail::sharedmem<real_t, n_dims, n_tlev> mem_t; 
 	mem_t *mem;
 
 	// helper methods invoked by solve()
 	virtual void advop(int e) = 0;
 	void advop_all()
 	{
-	  for (int e = 0; e < n_eqs; ++e) advop(e);
+	  for (int e = 0; e < mem->n_eqs; ++e) advop(e);
 	}
 
 	void cycle(int e) 
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
-          if (e == n_eqs - 1) this->mem->cycle(); 
+          if (e == mem->n_eqs - 1) this->mem->cycle(); 
 	}
 
 	virtual void xchng(int e, int l = 0) = 0; // TODO: make l -> -l
 	void xchng_all() 
 	{   
-	  for (int e = 0; e < n_eqs; ++e) xchng(e);
+	  for (int e = 0; e < mem->n_eqs; ++e) xchng(e);
 	}
 
         private:
@@ -84,7 +83,9 @@ namespace libmpdataxx
 
 	public:
 
-        struct params_t {};
+        struct params_t {
+          int n_eqs = 1;
+        };
 
         virtual void hook_ante_step() 
         { 
@@ -122,9 +123,11 @@ namespace libmpdataxx
 
 	// ctor
 	solver_common(mem_t *mem, const params_t &p) :
-	  n(n_eqs, 0), 
+	  n(p.n_eqs, 0), 
           mem(mem)
-	{}
+	{
+	  assert(p.n_eqs > 0);
+        }
 
         // dtor
         virtual ~solver_common()
@@ -179,7 +182,7 @@ namespace libmpdataxx
         static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }
       };
 
-      template<typename real_t, int n_dims, int n_eqs, int n_tlev, int minhalo>
+      template<typename real_t, int n_dims, int n_tlev, int minhalo>
       class solver
       {}; 
     }; // namespace detail

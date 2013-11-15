@@ -39,6 +39,7 @@ void setup(T &solver, int n)
 template <class T>
 void setopts(T &p, const int nt, const std::string &fname)
 {
+  p.n_eqs = 2;
   p.outfreq = nt; // diplays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
   p.outvars = {
@@ -65,14 +66,12 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs, slvs_fct;
 
-  const int n_eqs = 2;
+  add_solver<solvers::mpdata_1d<real_t, 1>>(slvs, "mpdata_iters=1");
+  add_solver<solvers::mpdata_1d<real_t, 2>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_1d<real_t, 3>>(slvs, "mpdata_iters=3");
 
-  add_solver<solvers::mpdata_1d<real_t, 1, n_eqs>>(slvs, "mpdata_iters=1");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
-
-  add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs_fct, "mpdata_fct_iters=2");
-  add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs_fct, "mpdata_fct_iters=3");
+  add_solver<solvers::mpdata_fct_1d<real_t, 2>>(slvs_fct, "mpdata_fct_iters=2");
+  add_solver<solvers::mpdata_fct_1d<real_t, 3>>(slvs_fct, "mpdata_fct_iters=3");
 
   // non-FCT solvers
   for (auto &slv : slvs) slv.advance(nt);

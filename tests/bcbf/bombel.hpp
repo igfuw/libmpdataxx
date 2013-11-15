@@ -26,7 +26,13 @@ class bombel : public parent_t
 
   public:
 
-  struct params_t : parent_t::params_t { real_t Tht_amb; };
+  struct params_t : parent_t::params_t 
+  { 
+    real_t Tht_amb; 
+ 
+    // ctor setting n_eqs
+    params_t() { this->n_eqs = 3; }
+  };
 
   // ctor
   bombel( 

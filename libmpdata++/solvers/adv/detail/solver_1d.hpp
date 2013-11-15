@@ -15,11 +15,10 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      // n_eqs, n_tlev are template parameters as they are needed in both static and non-static contexts
-      template<typename real_t, int n_eqs, int n_tlev, int minhalo>
-      class solver<real_t, 1, n_eqs, n_tlev, minhalo> : public solver_common<real_t, 1, n_eqs, n_tlev, minhalo>
+      template<typename real_t, int n_tlev, int minhalo>
+      class solver<real_t, 1, n_tlev, minhalo> : public solver_common<real_t, 1, n_tlev, minhalo>
       {
-	using parent_t = solver_common<real_t, 1, n_eqs, n_tlev, minhalo>;
+	using parent_t = solver_common<real_t, 1, n_tlev, minhalo>;
 
 	protected:
 
@@ -46,12 +45,16 @@ namespace libmpdataxx
           const rng_t &i;
         };
 
+        struct params_t : parent_t::params_t
+        {
+        };
+
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const typename parent_t::params_t &p
+          const params_t &p
         ) :
 	  parent_t(args.mem, p), 
           bcxl(std::move(args.bcxl)), 
@@ -84,7 +87,7 @@ namespace libmpdataxx
 
 	static void alloc(typename parent_t::mem_t *mem, const int nx)   
         {
-	  for (int e = 0; e < n_eqs; ++e) // equations
+	  for (int e = 0; e < mem->n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(new typename parent_t::arr_t(parent_t::rng_sclr(nx)));
     

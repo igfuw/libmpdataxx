@@ -55,11 +55,10 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  const int n_eqs = 1;
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::eps>>(slvs, "mpdata_iters=2_eps");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "mpdata_iters=3");
-  add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::opts::eps>>(slvs, "mpdata_iters=3_eps");
+  add_solver<solvers::mpdata_1d<real_t, 2>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_1d<real_t, 2, formulae::opts::eps>>(slvs, "mpdata_iters=2_eps");
+  add_solver<solvers::mpdata_1d<real_t, 3>>(slvs, "mpdata_iters=3");
+  add_solver<solvers::mpdata_1d<real_t, 3, formulae::opts::eps>>(slvs, "mpdata_iters=3_eps");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

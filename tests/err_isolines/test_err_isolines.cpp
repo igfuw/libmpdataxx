@@ -104,7 +104,6 @@ int main()
       const real_t dt = cour * dx / velocity;
       const int 
         n_dims = 1,
-        n_eqs  = 1,
         nx = round(x_max/dx),
         nt = round(t_max/dt);
 
@@ -113,22 +112,22 @@ int main()
       // silly loop order, but it helped to catch a major bug!
 
       // donor-cell
-      add_solver<solvers::donorcell_1d<real_t, n_eqs>>(slvs, "iters=1", nx);
+      add_solver<solvers::donorcell_1d<real_t>>(slvs, "iters=1", nx);
 
       // MPDATA
-      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "iters=2", nx);
-//      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
-      add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "iters=3", nx);
-      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::opts::toa | formulae::opts::iga>>(slvs, "iters=2_toa_iga", nx);
+      add_solver<solvers::mpdata_1d<real_t, 2>>(slvs, "iters=2", nx);
+//      add_solver<solvers::mpdata_1d<real_t, 2, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
+      add_solver<solvers::mpdata_1d<real_t, 3>>(slvs, "iters=3", nx);
+      add_solver<solvers::mpdata_1d<real_t, 2, formulae::opts::toa | formulae::opts::iga>>(slvs, "iters=2_toa_iga", nx);
 
       // MPDATA-FCT
-//      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "iters=2_fct", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::opts::toa>>(slvs, "iters=2_fct_toa", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "iters=3_fct", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs, formulae::opts::toa>>(slvs, "iters=3_fct_toa", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 2>>(slvs, "iters=2_fct", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 2, formulae::opts::toa>>(slvs, "iters=2_fct_toa", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 3>>(slvs, "iters=3_fct", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t, 3, formulae::opts::toa>>(slvs, "iters=3_fct_toa", nx);
 
       // calculating the analytical solution
-      typename solvers::donorcell_1d<real_t, n_eqs>::arr_t exact(nx);
+      typename solvers::donorcell_1d<real_t>::arr_t exact(nx);
       exact = gauss((i+.5)*dx - velocity * dt * nt);
 
       // looping over solvers

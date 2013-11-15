@@ -13,16 +13,18 @@ namespace libmpdataxx
   * @section INTRODUCTION
   *
   * libmpdata++ is C++ library of parallel, object-oriented implementations
-  * of the MPDATA family solvers of generalised transport equations 
+  * of the MPDATA family solvers for systems of generalised transport equations 
   * of the form:
   *
-  * \f$ \partial_t \psi + \nabla \cdot (\vec{v} \psi) = R \f$
+  * \f$ G \partial_t \psi + \nabla \cdot (G \vec{v} \psi) = G R \f$
   *
   * where
   *
-  * \f$ \psi = [\psi_1, \psi_2, \ldots ] \f$ is a set of conservative dependent variables, 
+  * \f$ \psi = [\psi_1, \psi_2, \ldots ] \f$ is a set of dependent variables, 
   * \f$ R = [R_1, R_2, \ldots ] \f$ are the forcing terms, 
-  * and \f$ \vec{v} = [u, v, w] \f$ is the velocity field.
+  * \f$ \vec{v} = [u, v, w] \f$ is the velocity field and the
+  * \f$ G \f$ factor combines time-invariant component of the advected fields 
+  * (e.g. coordinate-transformation Jacobian and/or density profile).
   *
   * The theory behind MPDATA solvers was developed by Piotr Smolarkiewicz et al.
   * (see e.g. @copybrief bib::Smolarkiewicz_2006 , for a review and list of references).
