@@ -18,8 +18,8 @@ namespace libmpdataxx
     {
       using namespace libmpdataxx::arakawa_c;
 
-      template<typename real_t, int n_tlev, int minhalo>
-      class solver<real_t, 2, n_tlev, minhalo> : public solver_common<real_t, 2, n_tlev, minhalo>
+      template<typename real_t, int n_tlev, formulae::opts::opts_t opts, int minhalo>
+      class solver<real_t, 2, n_tlev, opts, minhalo> : public solver_common<real_t, 2, n_tlev, minhalo>
       {
 	using parent_t = solver_common<real_t, 2, n_tlev, minhalo>;
 

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <libmpdata++/idxperm.hpp>
+
 namespace libmpdataxx
 {
   namespace formulae
@@ -73,7 +75,7 @@ namespace libmpdataxx
       (x + abs(x)) / 2
     )
 
-    // G = const = 1
+    // 1D: G = const = 1
     template<opts::opts_t opts, class arr_t>
     inline typename arr_t::T_numtype G(
       const arr_t &G,
@@ -83,8 +85,8 @@ namespace libmpdataxx
       return 1; 
     }
 
-    // G = const = 1
-    template<opts::opts_t opts, class arr_t>
+    // 2D: G = const = 1
+    template<opts::opts_t opts, int d, class arr_t>
     inline typename arr_t::T_numtype G(
       const arr_t &G,
       const rng_t &, const rng_t &,
@@ -93,8 +95,8 @@ namespace libmpdataxx
       return 1; 
     }
 
-    // G = const = 1
-    template<opts::opts_t opts, class arr_t>
+    // 3D: G = const = 1
+    template<opts::opts_t opts, int d, class arr_t>
     inline typename arr_t::T_numtype G(
       const arr_t &G,
       const rng_t &, const rng_t &, const rng_t &,
@@ -103,16 +105,26 @@ namespace libmpdataxx
       return 1; 
     }
 
-    // 
-/*    template<opts::opts_t opts, class arr_t> 
+    // 1D: G != const
+    template<opts::opts_t opts, class arr_t> 
     inline auto G(
       const arr_t &G,
       const rng_t &i,
       typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
     ) return_macro(,
-      return G(i)
+      G(i) + 0 // return_macro includes a call to blitz::safeToReturn() which expects an expression as an arg
     )
-*/
+
+    // 2D: G != const
+    template<opts::opts_t opts, int d, class arr_t> 
+    inline auto G(
+      const arr_t &G,
+      const rng_t &i,
+      const rng_t &j,
+      typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
+    ) return_macro(,
+      G(idxperm::pi<d>(i, j)) + 0
+    )
 
   }; // namespace formulae
 }; // namespace libmpdataxx

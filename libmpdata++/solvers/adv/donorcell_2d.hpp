@@ -15,12 +15,14 @@ namespace libmpdataxx
   {
     template<
       typename real_t, 
+      formulae::opts::opts_t opts = 0, 
       int minhalo = formulae::donorcell::halo
     >
     class donorcell_2d : public detail::solver<
       real_t,
       2,
       formulae::donorcell::n_tlev,
+      opts,
       detail::max(minhalo, formulae::donorcell::halo)
     > 
     {
@@ -28,6 +30,7 @@ namespace libmpdataxx
         real_t,
         2,
         formulae::donorcell::n_tlev, 
+        opts,
         detail::max(minhalo, formulae::donorcell::halo)
       >;
 

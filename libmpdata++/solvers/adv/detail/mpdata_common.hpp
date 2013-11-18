@@ -14,11 +14,11 @@ namespace libmpdataxx
     {
       template <typename real_t, int n_dims, formulae::mpdata::opts_t opts, int minhalo>
       class mpdata_common : public detail::solver<
-        real_t, n_dims, formulae::mpdata::n_tlev, detail::max(minhalo, formulae::mpdata::halo(opts))
+        real_t, n_dims, formulae::mpdata::n_tlev, opts, detail::max(minhalo, formulae::mpdata::halo(opts))
       >
       {
         using parent_t = detail::solver<
-          real_t, n_dims, formulae::mpdata::n_tlev, detail::max(minhalo, formulae::mpdata::halo(opts))
+          real_t, n_dims, formulae::mpdata::n_tlev, opts, detail::max(minhalo, formulae::mpdata::halo(opts))
         >;
 
 	using GC_t = arrvec_t<typename parent_t::arr_t>;

@@ -17,12 +17,14 @@ namespace libmpdataxx
   {
     template<
       typename real_t, 
+      formulae::opts::opts_t opts,
       int halo = formulae::leapfrog::halo
     >
     class leapfrog_1d : public detail::solver<
       real_t, 
       1, 
       formulae::leapfrog::n_tlev, 
+      opts,
       detail::max(halo, formulae::leapfrog::halo)
     > 
     {
@@ -30,6 +32,7 @@ namespace libmpdataxx
         real_t, 
         1,  
         formulae::leapfrog::n_tlev, 
+        opts,
         detail::max(halo, formulae::leapfrog::halo)
       >;
 

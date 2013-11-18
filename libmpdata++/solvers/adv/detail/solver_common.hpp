@@ -12,6 +12,8 @@
 
 #include <libmpdata++/solvers/adv/detail/monitor.hpp>
 
+#include <libmpdata++/formulae/opts.hpp>
+
 namespace libmpdataxx
 {
   namespace solvers
@@ -50,7 +52,7 @@ namespace libmpdataxx
 	protected: 
 
         long long int timestep = 0;
-        std::vector<int> n; // TODO: why not std::array?
+        std::vector<int> n; 
 
         typedef concurr::detail::sharedmem<real_t, n_dims, n_tlev> mem_t; 
 	mem_t *mem;
@@ -186,7 +188,7 @@ namespace libmpdataxx
         static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }
       };
 
-      template<typename real_t, int n_dims, int n_tlev, int minhalo>
+      template<typename real_t, int n_dims, int n_tlev, formulae::opts::opts_t opts, int minhalo>
       class solver
       {}; 
     }; // namespace detail

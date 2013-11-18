@@ -35,7 +35,7 @@ namespace libmpdataxx
 
         // some common 1D/2D settings
         *gp 
-	   << "set grid\n"
+	   << (p.gnuplot_grid ? "" : "un") << "set grid\n"
 	   << "set border " << p.gnuplot_border << "\n"
 	   << "set palette rgbformulae -3, -3, 19 " /*defined (" // makes gnuplot discard maxcolors :(
 	     "0 '#ffffff'," //         /\-
@@ -205,6 +205,7 @@ namespace libmpdataxx
         int gnuplot_maxcolors = 100; 
         bool 
           gnuplot_contour = false,
+          gnuplot_grid = true,
           gnuplot_surface = true;
       };
 
