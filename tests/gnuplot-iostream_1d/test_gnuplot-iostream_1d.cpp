@@ -35,6 +35,8 @@ void setup(T &solver, int n)
 template <class T>
 void setopts(T &p, int nt, int n_iters)
 {
+  p.n_iters = n_iters;
+
   p.outfreq = nt / 10; 
   {
     std::ostringstream tmp;
@@ -44,10 +46,10 @@ void setopts(T &p, int nt, int n_iters)
   p.outvars = {{0, {.name = "psi", .unit = "1"}}};
 }
 
-template <int it, class slvs_t>
-void add_solver(slvs_t &slvs)
+template <class slvs_t>
+void add_solver(slvs_t &slvs, int it)
 {
-  using solver_t = output::gnuplot<solvers::mpdata_1d<real_t, it>>;
+  using solver_t = output::gnuplot<solvers::mpdata_1d<real_t>>;
   typename solver_t::params_t p;
   setopts(p, nt, it);
   slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(n, p));
@@ -57,8 +59,8 @@ void add_solver(slvs_t &slvs)
 int main() 
 {
   boost::ptr_vector<concurr::any<real_t, 1>> slvs;
-  add_solver<1>(slvs);
-  add_solver<2>(slvs);
-  add_solver<3>(slvs);
+  add_solver(slvs, 1);
+  add_solver(slvs, 2);
+  add_solver(slvs, 3);
   for (auto &slv : slvs) slv.advance(nt);
 }

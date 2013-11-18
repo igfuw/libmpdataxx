@@ -85,7 +85,7 @@ namespace libmpdataxx
 	)
 	{
           mem.reset(mem_p);
-	  solver_t::alloc(mem.get(), s0);
+	  solver_t::alloc(mem.get(), params, s0);
 
           std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, shrdl, shrdr; // TODO: solver_t::bc_p
 
@@ -124,7 +124,7 @@ namespace libmpdataxx
 	)
 	{
           mem.reset(mem_p);
-          solver_t::alloc(mem.get(), s0, s1);
+          solver_t::alloc(mem.get(), params, s0, s1);
 
 
 // TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
@@ -180,7 +180,7 @@ namespace libmpdataxx
 	)
 	{
           mem.reset(mem_p);
-	  solver_t::alloc(mem.get(), s0, s1, s2);
+	  solver_t::alloc(mem.get(), params, s0, s1, s2);
 
 	  std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, byl, byr, bzl, bzr;
 

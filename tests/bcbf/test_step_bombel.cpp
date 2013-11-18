@@ -29,7 +29,6 @@ enum {u, w, tht};  //eqations
 enum {x, z};       //dimensions
 
 using real_t = double;
-const int n_iters = 2, n_eqs = 3; // TODO: n_eqs should be in bombel!!!
 
 using namespace libmpdataxx;
 
@@ -38,6 +37,8 @@ using namespace libmpdataxx;
 template <class T>
 void setopts(T &p, real_t Tht_amb, std::string name)
 {
+  p.n_iters = 2;
+
   p.dt = .75;
   p.dx = p.dz = 10.; 
   p.Tht_amb = Tht_amb; 
@@ -73,8 +74,8 @@ int main()
   using solver_t = output::gnuplot<
     bombel<
       solvers::pressure_cr<
-        solvers::mpdata_fct_2d<real_t, n_iters, n_eqs, formulae::opts::iga>, 
-        //solvers::donorcell_2d<real_t, n_eqs>, 
+        solvers::mpdata_fct_2d<real_t, formulae::opts::iga>, 
+        //solvers::donorcell_2d<real_t>, 
 	u, w
       >
     >

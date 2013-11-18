@@ -67,6 +67,8 @@ void setup(T &solver, int n[2])
 template <class T>
 void setopts(T &p, int nt, int n_iters)
 {
+  p.n_iters = n_iters;
+
   p.outfreq = nt; //nt;///10; // TODO
   p.outvars[0].name = "psi";
   {
@@ -112,11 +114,10 @@ int main()
 //  int n[] = {32, 32}, nt = 200;
   int n[] = {101, 101}, nt = 628 * 6;
 
-  const int n_iters = 2;
-  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters/*, formulae::opts::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, formulae::opts::iga | formulae::opts::toa>>;
+  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t/*, formulae::opts::toa*/>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, formulae::opts::iga | formulae::opts::toa>>;
   solver_t::params_t p;
-  setopts(p, nt, n_iters);
+  setopts(p, nt, 2);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
 
   setup(slv, n); 

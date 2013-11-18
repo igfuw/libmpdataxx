@@ -3,7 +3,6 @@
 - solver params (needs passing params as an argument to alloc())
   - mpdata n_iters as a param
   - nx,ny,nz as params?
-  - n_eqs as params...
 - CMake install() rules (as in libcloudphxx)
 - strang/midpoint/euler... into separate files, check nomenclature, reference to discussion in Smolarkiewicz 2006 (eqs. 28, 29, ...), Piotr mentioned relation with RK, improved Euler (eq. 32) / modified Euler (eq. 33)
 - at least a "zero" bcond for icicle

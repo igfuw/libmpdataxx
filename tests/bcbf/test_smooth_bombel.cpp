@@ -32,7 +32,6 @@ enum {u, w, tht};  //eqations
 enum {x, z};       //dimensions
 
 using real_t = double;
-const int n_iters = 2;
 
 using namespace libmpdataxx;
 
@@ -41,6 +40,8 @@ using namespace libmpdataxx;
 template <class T>
 void setopts(T &p, real_t Tht_amb, std::string name)
 {
+  p.n_iters = 2;
+
   p.dt = .5;
   p.dx = p.dz = 10.;
   p.Tht_amb = Tht_amb; 
@@ -72,7 +73,7 @@ int main()
       bombel<
 	solvers::pressure_cr<
 //        solvers::donorcell_2d<real_t>,
-	  solvers::mpdata_fct_2d<real_t, n_iters>,
+	  solvers::mpdata_fct_2d<real_t>,
 	  u, w
         >
       >

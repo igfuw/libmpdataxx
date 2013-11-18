@@ -21,11 +21,11 @@ namespace libmpdataxx
   {
     using namespace arakawa_c;
 
-    template<typename real_t, int n_iters, formulae::opts::opts_t opts, int minhalo>
-    class mpdata<real_t, n_iters, 2, opts, minhalo> : 
-      public detail::mpdata_common<real_t, n_iters, 2, opts, minhalo>
+    template<typename real_t, formulae::opts::opts_t opts, int minhalo>
+    class mpdata<real_t, 2, opts, minhalo> : 
+      public detail::mpdata_common<real_t, 2, opts, minhalo>
     {
-      using parent_t = detail::mpdata_common<real_t, n_iters, 2, opts, minhalo>;
+      using parent_t = detail::mpdata_common<real_t, 2, opts, minhalo>;
 
       protected:
 
@@ -37,7 +37,7 @@ namespace libmpdataxx
       {
         this->fct_init(e);
 
-	for (int iter = 0; iter < n_iters; ++iter) 
+	for (int iter = 0; iter < this->n_iters; ++iter) 
 	{
           if (iter != 0)
 	  {

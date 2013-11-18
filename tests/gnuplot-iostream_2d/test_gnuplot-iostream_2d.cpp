@@ -14,6 +14,8 @@
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
+#include <set>
+
 enum {x, y};
 
 template <class T>
@@ -32,6 +34,8 @@ void setup(T &solver, int n[2])
 template <class T>
 void setopts(T &p, int nt, int n_iters)
 {
+  p.n_iters = n_iters;
+
   p.outfreq = nt;
   p.gnuplot_with = "lines";
   p.gnuplot_border = "4095";
@@ -52,33 +56,14 @@ int main()
 
   int n[] = {24, 24}, nt = 96;
 
+  for (auto &it : std::set<int>({1,2,4}))
   {
-    using solver_t = output::gnuplot<solvers::donorcell_2d<float>>;
+    using solver_t = output::gnuplot<solvers::mpdata_2d<float>>;
     solver_t::params_t p;
-    setopts(p, nt, 1);
+    setopts(p, nt, it);
     concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p);
 
     setup(slv, n);
     slv.advance(nt);
   } 
-  {
-    const int it = 2;
-    using solver_t = output::gnuplot<solvers::mpdata_2d<float, it>>;
-    solver_t::params_t p;
-    setopts(p, nt, it);
-    concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
-
-    setup(slv, n); 
-    slv.advance(nt);
-  } 
-  {
-    const int it = 4;
-    using solver_t = output::gnuplot<solvers::mpdata_2d<float, it>>;
-    solver_t::params_t p;
-    setopts(p, nt, it);
-    concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
-
-    setup(slv, n); 
-    slv.advance(nt); 
-  }
 }

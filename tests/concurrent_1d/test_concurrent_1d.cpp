@@ -25,13 +25,12 @@ int main()
 
   using real_t = long double;
   int nx = 10;
-  const int n_iters = 3;
    
   // OpenMP
   std::cerr << "OpenMP run" << std::endl;
   {
     concurr::openmp<
-      solvers::mpdata_1d<real_t, n_iters>,
+      solvers::mpdata_1d<real_t>,
       bcond::cyclic
     > slv(nx);
     slv.advance(1000);
@@ -41,7 +40,7 @@ int main()
   std::cerr << "Boost.Thread run" << std::endl;
   {
     concurr::boost_thread<
-      solvers::mpdata_1d<real_t, n_iters>,
+      solvers::mpdata_1d<real_t>,
       bcond::cyclic
     > slv(nx);
     slv.advance(1000);

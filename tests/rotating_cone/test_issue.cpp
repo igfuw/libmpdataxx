@@ -50,13 +50,15 @@ void setup(T &solver, int n[2])
 }
 
 template <class T>
-void setopts(T &p, int nt, int n_iters)
+void setopts(T &p, int nt)
 {
+  p.n_iters = 2;
+
   p.outfreq = nt;
   p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;
-    tmp << "bug_iters=" << n_iters << "_%s_%d.svg";
+    tmp << "bug_iters=" << p.n_iters << "_%s_%d.svg";
     p.gnuplot_output = tmp.str();    
   }
   p.gnuplot_view = "map";
@@ -75,7 +77,6 @@ void setopts(T &p, int nt, int n_iters)
     p.gnuplot_cntrparam = tmp.str();
   }
   p.gnuplot_term = "svg";
-
 }
 
 int main() 
@@ -84,10 +85,9 @@ int main()
 
   int n[] = {15, 14}, nt = 2; 
 
-  const int n_iters = 2;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::opts::pds>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, 1, formulae::opts::pds>>;
   solver_t::params_t p;
-  setopts(p, nt, n_iters);
+  setopts(p, nt);
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
 
   setup(slv, n); 

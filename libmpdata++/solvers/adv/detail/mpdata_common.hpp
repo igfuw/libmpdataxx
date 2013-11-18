@@ -12,8 +12,7 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      // n_iters is a template parameter as it is needed both in static and non-static context
-      template <typename real_t, int n_iters_, int n_dims, formulae::mpdata::opts_t opts, int minhalo>
+      template <typename real_t, int n_dims, formulae::mpdata::opts_t opts, int minhalo>
       class mpdata_common : public detail::solver<
         real_t, n_dims, formulae::mpdata::n_tlev, detail::max(minhalo, formulae::mpdata::halo(opts))
       >
@@ -27,13 +26,10 @@ namespace libmpdataxx
 	protected:
 
         // static constants
-	static const int n_iters = n_iters_;
-	static_assert(n_iters > 0, "n_iters <= 0");
-
-        static const int n_tmp = n_iters > 2 ? 2 : 1; 
+	const int n_iters;
 
 	// member fields
-	std::array<GC_t*, n_tmp> tmp;
+	std::vector<GC_t*> tmp;
 
         // methods
 	GC_t &GC_unco(int iter)
@@ -62,10 +58,17 @@ namespace libmpdataxx
 	virtual void fct_init(int e) { }
 	virtual void fct_adjust_antidiff(int e, int iter) { }
 
+        //  
+        static int n_tmp(const int &n_iters)
+        {
+          return n_iters > 2 ? 2 : 1; 
+        }
+
         public:
 
 	struct params_t : parent_t::params_t
         {
+          int n_iters = 2; 
         };
 
         protected:
@@ -75,30 +78,38 @@ namespace libmpdataxx
 	  typename parent_t::ctor_args_t args,
           const params_t &p
 	) : 
-	  parent_t(args, p)
+	  parent_t(args, p),
+          n_iters(p.n_iters),
+          tmp(n_tmp(n_iters))
         {
-	  for (int n = 0; n < n_tmp; ++n)
+	  for (int n = 0; n < n_tmp(n_iters); ++n)
 	    tmp[n] = &args.mem->tmp[__FILE__][n];
+
+          assert(n_iters > 0);
         }
 
         public:
 
         // 1D memory allocation
-	static void alloc(typename parent_t::mem_t *mem, const int nx) 
-	{   
-	  parent_t::alloc(mem, nx);
-	  for (int n = 0; n < n_tmp; ++n)
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const params_t &p,
+          const int nx
+        ) {   
+	  parent_t::alloc(mem, p, nx);
+	  for (int n = 0; n < n_tmp(p.n_iters); ++n)
 	    parent_t::alloc_tmp_vctr(mem, nx, __FILE__);
 	}   
 
         // 2D version
 	static void alloc(
 	  typename parent_t::mem_t *mem, 
+          const params_t &p,
 	  const int nx, const int ny
 	)   
 	{   
-	  parent_t::alloc(mem, nx, ny);
-	  for (int n = 0; n < n_tmp; ++n) 
+	  parent_t::alloc(mem, p, nx, ny);
+	  for (int n = 0; n < n_tmp(p.n_iters); ++n) 
 	    parent_t::alloc_tmp_vctr(mem, nx, ny, __FILE__);
 	} 
 
@@ -106,18 +117,18 @@ namespace libmpdataxx
       };
     }; // namespace detail
 
-    template<typename real_t, int n_iters, int n_dims, formulae::mpdata::opts_t opts, int minhalo> // TODO: reconsider arg order...
+    template<typename real_t, int n_dims, formulae::mpdata::opts_t opts, int minhalo> // TODO: reconsider arg order...
     class mpdata
     {};
 
     // alias names
-    template <typename real_t, int n_iters, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_1d = mpdata<real_t, n_iters, 1, opts, minhalo>;
+    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_1d = mpdata<real_t, 1, opts, minhalo>;
 
-    template <typename real_t, int n_iters, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_2d = mpdata<real_t, n_iters, 2, opts, minhalo>;
+    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_2d = mpdata<real_t, 2, opts, minhalo>;
 
-    template <typename real_t, int n_iters, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_3d = mpdata<real_t, n_iters, 3, opts, minhalo>;
+    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_3d = mpdata<real_t, 3, opts, minhalo>;
   }; // namespace solvers
 }; // namescpae libmpdataxx

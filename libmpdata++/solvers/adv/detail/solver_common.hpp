@@ -28,6 +28,10 @@ namespace libmpdataxx
       template <typename real_t_, int n_dims_, int n_tlev_, int minhalo>
       class solver_common
       {
+        protected:
+
+        const int n_eqs;
+
 	public:
 
         // using enums as "public static const int" would need instantiation
@@ -40,9 +44,8 @@ namespace libmpdataxx
 
 	void cycle_all()
 	{ 
-	  for (int e = 0; e < mem->n_eqs; ++e) cycle(e);
+	  for (int e = 0; e < n_eqs; ++e) cycle(e);
 	}
-
 
 	protected: 
 
@@ -56,19 +59,19 @@ namespace libmpdataxx
 	virtual void advop(int e) = 0;
 	void advop_all()
 	{
-	  for (int e = 0; e < mem->n_eqs; ++e) advop(e);
+	  for (int e = 0; e < n_eqs; ++e) advop(e);
 	}
 
 	void cycle(int e) 
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
-          if (e == mem->n_eqs - 1) this->mem->cycle(); 
+          if (e == n_eqs - 1) this->mem->cycle(); 
 	}
 
 	virtual void xchng(int e, int l = 0) = 0; // TODO: make l -> -l
 	void xchng_all() 
 	{   
-	  for (int e = 0; e < mem->n_eqs; ++e) xchng(e);
+	  for (int e = 0; e < n_eqs; ++e) xchng(e);
 	}
 
         private:
@@ -123,6 +126,7 @@ namespace libmpdataxx
 
 	// ctor
 	solver_common(mem_t *mem, const params_t &p) :
+          n_eqs(p.n_eqs),
 	  n(p.n_eqs, 0), 
           mem(mem)
 	{

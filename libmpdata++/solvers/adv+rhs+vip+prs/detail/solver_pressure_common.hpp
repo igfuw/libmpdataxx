@@ -111,9 +111,9 @@ namespace libmpdataxx
 	  lap_tmp2(args.mem->tmp[__FILE__][0][6])
 	{} 
 
-	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
+	static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx, const int ny)
 	{
-	  parent_t::alloc(mem, nx, ny);
+	  parent_t::alloc(mem, p, nx, ny);
           parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, 7); // (i^hlo,j^hlo)-sized temporary fields
         }
       }; 

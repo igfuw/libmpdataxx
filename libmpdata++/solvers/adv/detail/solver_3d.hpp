@@ -83,10 +83,11 @@ namespace libmpdataxx
 
 	static void alloc(
           typename parent_t::mem_t *mem,
+          const params_t &p,
           const int nx, const int ny, const int nz
         )   
         {
-	  for (int e = 0; e < mem->n_eqs; ++e) // equations
+	  for (int e = 0; e < p.n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(new typename parent_t::arr_t(
                 parent_t::rng_sclr(nx),

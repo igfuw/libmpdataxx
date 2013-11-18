@@ -32,15 +32,18 @@ using real_t = long double; // this is a good test to show differences between f
 
 // helper function template to ease adding the solvers to the pointer map
 template <class solver_t, class vec_t>
-void add_solver(vec_t &slvs, const std::string &key, const int nx)
+void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_iters)
 {
   using params_t = typename solver_t::params_t;
+
+  params_t p;
+  p.n_iters = n_iters;
 
   boost::assign::ptr_map_insert<
     concurr::threads<solver_t, bcond::cyclic> // map element type
   >(slvs)(
-    key, // map key
-    nx, params_t() // concurr's ctor args
+    key,  // map key
+    nx, p // concurr's ctor args
   );
 
   boost::assign::ptr_map_insert(outfiles)(key);
@@ -112,19 +115,19 @@ int main()
       // silly loop order, but it helped to catch a major bug!
 
       // donor-cell
-      add_solver<solvers::donorcell_1d<real_t>>(slvs, "iters=1", nx);
+      add_solver<solvers::mpdata_1d<real_t>>(slvs, "iters=1", nx, 1);
 
       // MPDATA
-      add_solver<solvers::mpdata_1d<real_t, 2>>(slvs, "iters=2", nx);
-//      add_solver<solvers::mpdata_1d<real_t, 2, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
-      add_solver<solvers::mpdata_1d<real_t, 3>>(slvs, "iters=3", nx);
-      add_solver<solvers::mpdata_1d<real_t, 2, formulae::opts::toa | formulae::opts::iga>>(slvs, "iters=2_toa_iga", nx);
+      add_solver<solvers::mpdata_1d<real_t>>(slvs, "iters=2", nx, 2);
+//      add_solver<solvers::mpdata_1d<real_t, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx, 2);
+      add_solver<solvers::mpdata_1d<real_t>>(slvs, "iters=3", nx, 3);
+      add_solver<solvers::mpdata_1d<real_t, formulae::opts::toa | formulae::opts::iga>>(slvs, "iters=2_toa_iga", nx, 2);
 
       // MPDATA-FCT
-//      add_solver<solvers::mpdata_fct_1d<real_t, 2>>(slvs, "iters=2_fct", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 2, formulae::opts::toa>>(slvs, "iters=2_fct_toa", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 3>>(slvs, "iters=3_fct", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 3, formulae::opts::toa>>(slvs, "iters=3_fct_toa", nx);
+//      add_solver<solvers::mpdata_fct_1d<real_t>>(slvs, "iters=2_fct", nx, 2);
+//      add_solver<solvers::mpdata_fct_1d<real_t, formulae::opts::toa>>(slvs, "iters=2_fct_toa", nx, 2);
+//      add_solver<solvers::mpdata_fct_1d<real_t>>(slvs, "iters=3_fct", nx, 3);
+//      add_solver<solvers::mpdata_fct_1d<real_t, formulae::opts::toa>>(slvs, "iters=3_fct_toa", nx, 3);
 
       // calculating the analytical solution
       typename solvers::donorcell_1d<real_t>::arr_t exact(nx);

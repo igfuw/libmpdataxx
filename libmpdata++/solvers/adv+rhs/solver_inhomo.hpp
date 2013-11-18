@@ -46,14 +46,14 @@ namespace libmpdataxx
         update_forcings_called = true;
 #endif
         // zero-out all rhs arrays
-	for (int e = 0; e < this->mem->n_eqs; ++e) 
+	for (int e = 0; e < this->n_eqs; ++e) 
           rhs.at(e)(this->ijk) = 0;
       }
 
       // this assumes explicit form - TODO: _explicit in a different file? (alloc, apply, update)
       virtual void apply_forcings(typename parent_t::real_t dt_arg)
       {
-        for (int e = 0; e < this->mem->n_eqs; ++e) 
+        for (int e = 0; e < this->n_eqs; ++e) 
           this->state(e)(this->ijk) += dt_arg * rhs.at(e)(this->ijk);
       }
 
@@ -143,17 +143,17 @@ namespace libmpdataxx
       // TODO: merge the two allocs into one!
 
       // 1D version
-      static void alloc(typename parent_t::mem_t *mem, const int nx)
+      static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx)
       {
-	parent_t::alloc(mem, nx);
-        parent_t::alloc_tmp_sclr(mem, nx, __FILE__, mem->n_eqs); // rhs array for each equation
+	parent_t::alloc(mem, p, nx);
+        parent_t::alloc_tmp_sclr(mem, nx, __FILE__, p.n_eqs); // rhs array for each equation
       }
 
       // 2D version
-      static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
+      static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx, const int ny)
       {
-	parent_t::alloc(mem, nx, ny);
-        parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, mem->n_eqs); // rhs array for each equation
+	parent_t::alloc(mem, p, nx, ny);
+        parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, p.n_eqs); // rhs array for each equation
       }
 
       // TODO: 3D version

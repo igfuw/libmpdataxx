@@ -32,9 +32,11 @@ namespace libmpdataxx
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; // TODO: T_sumtype
         std::unique_ptr<blitz::Array<real_t, 2>> sumtmp; // TODO: T_sumtype
 
+        // private n_eqs for use in asserts only
+        const int n_eqs;
+
 	public:
 
-        int n_eqs;
 	int n = 0, span[n_dims]; // TODO: std::array?
         bool panic = false; // for multi-threaded SIGTERM handling
 

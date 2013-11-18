@@ -137,16 +137,16 @@ namespace libmpdataxx
 	// TODO: merge the two allocs into one!
 
 	// 1D version
-	static void alloc(typename parent_t::mem_t *mem, const int nx)
+	static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx)
 	{
-	  parent_t::alloc(mem, nx);
+	  parent_t::alloc(mem, p, nx);
 	  parent_t::alloc_tmp_sclr(mem, nx, __FILE__, parent_t::n_dims); // psi[n-1] secret stash for velocity extrapolation in time
 	}
 
 	// 2D version
-	static void alloc(typename parent_t::mem_t *mem, const int nx, const int ny)
+	static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx, const int ny)
 	{
-	  parent_t::alloc(mem, nx, ny);
+	  parent_t::alloc(mem, p, nx, ny);
 	  parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, parent_t::n_dims); // psi[n-1] secret stash for velocity extrpolation in time
 	}
 

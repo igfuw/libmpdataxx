@@ -51,26 +51,30 @@ int main()
   boost::ptr_vector<concurr::any<real_t, 1>> slvs;
 
   { // euler / donor-cell
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, /* n_iters = */ 1, solvers::euler, psi, phi>>;
+    using solver_t = output::gnuplot<coupled_harmosc<real_t, solvers::euler, psi, phi>>;
     solver_t::params_t p; 
+    p.n_iters = 1;
     setopts(p, "euler_it=1");
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
   }
   { // euler / mpdata
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, /* n_iters = */ 2, solvers::euler, psi, phi>>;
+    using solver_t = output::gnuplot<coupled_harmosc<real_t, solvers::euler, psi, phi>>;
     solver_t::params_t p; 
+    p.n_iters = 2;
     setopts(p, "euler_it=2");
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
   }
   { // strang / donor-cell
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, /* n_iters = */ 1, solvers::strang, psi, phi>>;
+    using solver_t = output::gnuplot<coupled_harmosc<real_t, solvers::strang, psi, phi>>;
     solver_t::params_t p;
+    p.n_iters = 1;
     setopts(p, "strang_it=1");
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
   }
   { // strang / mpdata
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, /* n_iters = */ 2, solvers::strang, psi, phi>>;
+    using solver_t = output::gnuplot<coupled_harmosc<real_t, solvers::strang, psi, phi>>;
     solver_t::params_t p; 
+    p.n_iters = 2;
     setopts(p, "strang_it=2");
     slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
   }

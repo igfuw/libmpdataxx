@@ -27,20 +27,20 @@ void setup(T &solver, int n)
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.advectee(0) = where(i <= center-width/2 || i >= center+width/2, 1, 3); 
-//  solver.advectee(1) = where(i <= center-width/2 || i >= center+width/2,  0, 2); 
+  solver.advectee(0) = where(i <= center-width/2 || i >= center+width/2, -1, 1); 
+  solver.advectee(1) = where(i <= center-width/2 || i >= center+width/2,  0, 2); 
   solver.advector() = .5; 
 }
 
 template <class T>
 void setopts(T &p, const int nt, const std::string &fname)
 {
-  p.n_eqs = 1;
+  p.n_eqs = 2;
   p.outfreq = nt; // displays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
   p.outvars = {
-    {0, {.name = "variable-sign signal", .unit = "1"}}//,
-//    {1, {.name = "single-sign signal", .unit = "1"}}
+    {0, {.name = "variable-sign signal", .unit = "1"}},
+    {1, {.name = "single-sign signal", .unit = "1"}}
   };
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
@@ -62,8 +62,10 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  add_solver<solvers::mpdata_fct_1d<real_t, 2/*, formulae::opts::iga*/>>(slvs, "mpdata_iters=2");
-//  add_solver<solvers::mpdata_1d<real_t, 2, formulae::opts::iga>>(slvs, "mpdata_iters=2_iga");
+  add_solver<solvers::mpdata_fct_1d<real_t>>(slvs, "mpdata_fct_iters=2");
+  add_solver<solvers::mpdata_1d<real_t>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_fct_1d<real_t, formulae::opts::iga>>(slvs, "mpdata_fct_iters=2_iga");
+  add_solver<solvers::mpdata_1d<real_t, formulae::opts::iga>>(slvs, "mpdata_iters=2_iga");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

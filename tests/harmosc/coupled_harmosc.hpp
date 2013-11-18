@@ -49,10 +49,10 @@
 
 using namespace libmpdataxx;
 
-template <typename real_t, int n_iters, solvers::inhomo_e inhomo, int psi, int phi>
-class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters>, inhomo>
+template <typename real_t, solvers::inhomo_e inhomo, int psi, int phi>
+class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t>, inhomo>
 {
-  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters>, inhomo>;
+  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t>, inhomo>;
 
   typename parent_t::real_t omega;
   typename parent_t::arr_t tmp;
@@ -100,11 +100,12 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t,
 
   static void alloc(
     typename parent_t::mem_t *mem,
+    const params_t &p,
     const int nx
   )
   {
     // TODO: move to inhomo!
-    parent_t::alloc(mem, nx);
+    parent_t::alloc(mem, p, nx);
     mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
     mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1) )); 
   }

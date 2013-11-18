@@ -65,7 +65,7 @@ int main()
       slv.advance(nt);
     } 
     {
-      using solver_t = output::gnuplot<solvers::mpdata_2d<float, 2>>;
+      using solver_t = output::gnuplot<solvers::mpdata_2d<float>>;
       solver_t::params_t p;
       setopts(p, nt, offset, "mpdata_it=2");
       concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
@@ -73,7 +73,7 @@ int main()
       slv.advance(nt);
     } 
     {
-      using solver_t = output::gnuplot<solvers::mpdata_2d<float, 2, formulae::opts::pds>>;
+      using solver_t = output::gnuplot<solvers::mpdata_2d<float, formulae::opts::pds>>;
       solver_t::params_t p;
       setopts(p, nt, offset, "mpdata-pds_it=2");
       concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 

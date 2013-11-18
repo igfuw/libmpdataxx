@@ -17,7 +17,6 @@ using namespace libmpdataxx; // TODO
 enum {qx, qy, h};  // eqations
 enum {x, y};       // dimensions
 
-const int n_iters = 2;
 const int nx = 32, ny = 32, nt = 100;
 
 template <class T>
@@ -62,7 +61,7 @@ int main()
   { 
     using solver_t = output::gnuplot<
       shallow_water<
-	real_t, n_iters,
+	real_t,
 	qx, qy, h
       >
     >;

@@ -62,8 +62,8 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  add_solver<solvers::mpdata_1d<real_t, 2>>(slvs, "mpdata_iters=2");
-  add_solver<solvers::mpdata_1d<real_t, 2, formulae::opts::pds>>(slvs, "mpdata_iters=2_pds");
+  add_solver<solvers::mpdata_1d<real_t>>(slvs, "mpdata_iters=2");
+  add_solver<solvers::mpdata_1d<real_t, formulae::opts::pds>>(slvs, "mpdata_iters=2_pds");
 
   // TODO: test if pds gives any speed-up with single-sign field
 

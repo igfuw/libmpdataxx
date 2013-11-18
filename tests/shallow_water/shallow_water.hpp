@@ -38,17 +38,17 @@
   * h times momentum eq. plus u times mass continuity equation:
   * \f$ \partial_t (uh) + \nabla_z (u \cdot uh) = -g h \nabla_z \eta \f$
   */
-template <typename real_t, int n_iters, int qx, int qy, int h>
+template <typename real_t, int qx, int qy, int h>
 class shallow_water : public solvers::detail::solver_velocity_common<
   solvers::inhomo_solver<
-    solvers::mpdata_fct_2d<real_t, n_iters>, 
+    solvers::mpdata_fct_2d<real_t>, 
     solvers::strang
   >, qx, qy, h
 >
 {
   using parent_t = solvers::detail::solver_velocity_common<
     solvers::inhomo_solver<
-      solvers::mpdata_fct_2d<real_t, n_iters>, 
+      solvers::mpdata_fct_2d<real_t>, 
       solvers::strang
     >, qx, qy, h
   >;
