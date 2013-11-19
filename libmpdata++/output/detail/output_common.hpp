@@ -81,8 +81,9 @@ namespace libmpdataxx
 	  typename parent_t::ctor_args_t args,
 	  const params_t &p
 	) :
-	parent_t(args, p),
-	  outfreq(p.outfreq), outvars(p.outvars)
+          parent_t(args, p),
+	  outfreq(p.outfreq), 
+          outvars(p.outvars)
 	{}
       };
     }; // namespace detail

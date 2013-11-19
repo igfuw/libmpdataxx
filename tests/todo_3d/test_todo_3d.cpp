@@ -16,14 +16,16 @@ int main()
 {
   using namespace libmpdataxx;
 
-  int n[] = {24, 24, 24};
-  {
-    concurr::threads<
-      solvers::donorcell_3d<float>,
-      bcond::cyclic,
-      bcond::cyclic,
-      bcond::cyclic
-    > slv(n[x], n[y], n[z]);
-  } 
+  using solver_t = solvers::donorcell_3d<float>;
+  typename solver_t::params_t p;
+
+  p.span = {24, 24, 24};
+
+  concurr::threads<
+    solver_t,
+    bcond::cyclic,
+    bcond::cyclic,
+    bcond::cyclic
+  > slv();
   // TODO: test mpdata
 }

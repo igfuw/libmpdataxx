@@ -140,23 +140,11 @@ namespace libmpdataxx
         }
       } 
 
-      // TODO: merge the two allocs into one!
-
-      // 1D version
-      static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx)
+      static void alloc(typename parent_t::mem_t *mem, const params_t &p)
       {
-	parent_t::alloc(mem, p, nx);
-        parent_t::alloc_tmp_sclr(mem, nx, __FILE__, p.n_eqs); // rhs array for each equation
+	parent_t::alloc(mem, p);
+        parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, p.n_eqs); // rhs array for each equation
       }
-
-      // 2D version
-      static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx, const int ny)
-      {
-	parent_t::alloc(mem, p, nx, ny);
-        parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, p.n_eqs); // rhs array for each equation
-      }
-
-      // TODO: 3D version
     };
   }; // namespace solvers
 }; // namespace libmpdataxx

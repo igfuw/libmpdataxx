@@ -134,23 +134,13 @@ namespace libmpdataxx
 // TODO: assert dx / dz were set!
         } 
 
-	// TODO: merge the two allocs into one!
-
 	// 1D version
-	static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx)
+	static void alloc(typename parent_t::mem_t *mem, const params_t &p)
 	{
-	  parent_t::alloc(mem, p, nx);
-	  parent_t::alloc_tmp_sclr(mem, nx, __FILE__, parent_t::n_dims); // psi[n-1] secret stash for velocity extrapolation in time
+	  parent_t::alloc(mem, p);
+	  parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, parent_t::n_dims); // psi[n-1] secret stash for velocity extrapolation in time
 	}
 
-	// 2D version
-	static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx, const int ny)
-	{
-	  parent_t::alloc(mem, p, nx, ny);
-	  parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, parent_t::n_dims); // psi[n-1] secret stash for velocity extrpolation in time
-	}
-
-	// TODO: 3D version
       }; 
     }; // namespace detail
   }; // namespace solvers

@@ -55,16 +55,12 @@ namespace libmpdataxx
           const rng_t &i, &j; 
         };  
 
-        struct params_t : parent_t::params_t
-        {
-        };
-
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const params_t &p
+          const typename parent_t::params_t &p
         ) :
 	  parent_t(args.mem, p),
 	  i(args.i), 
@@ -80,16 +76,16 @@ namespace libmpdataxx
 
 	public:
 
-	static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx, const int ny) 
+	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::params_t &p) 
         {
           // psi 
 	  for (int e = 0; e < p.n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back( new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_sclr(ny)));
+	      mem->psi[e].push_back( new typename parent_t::arr_t( parent_t::rng_sclr(p.span[0]), parent_t::rng_sclr(p.span[1])));
 
           // Courant field components (Arakawa-C grid)
-	  mem->GC.push_back(new typename parent_t::arr_t( parent_t::rng_vctr(nx), parent_t::rng_sclr(ny) ));
-	  mem->GC.push_back(new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_vctr(ny) ));
+	  mem->GC.push_back(new typename parent_t::arr_t( parent_t::rng_vctr(p.span[0]), parent_t::rng_sclr(p.span[1]) ));
+	  mem->GC.push_back(new typename parent_t::arr_t( parent_t::rng_sclr(p.span[0]), parent_t::rng_vctr(p.span[1]) ));
  
           // TODO: allocate G
         }
@@ -98,26 +94,26 @@ namespace libmpdataxx
 
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
-          typename parent_t::mem_t *mem, const int nx, const int ny,
+          typename parent_t::mem_t *mem, const std::array<int, 2> &span,
           const char * __file__
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
-          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( parent_t::rng_vctr(nx), parent_t::rng_sclr(ny) )); 
-          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( parent_t::rng_sclr(nx), parent_t::rng_vctr(ny) )); 
+          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( parent_t::rng_vctr(span[0]), parent_t::rng_sclr(span[1]) )); 
+          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( parent_t::rng_sclr(span[0]), parent_t::rng_vctr(span[1]) )); 
         }
 
         // helper method to allocate n_arr scalar temporary arrays 
         static void alloc_tmp_sclr(
-          typename parent_t::mem_t *mem, const int nx, const int ny,
+          typename parent_t::mem_t *mem, const std::array<int, 2> &span,
           const char * __file__, const int n_arr
         )   
         {   
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( 
-              parent_t::rng_sclr(nx),
-              parent_t::rng_sclr(ny)
+              parent_t::rng_sclr(span[0]),
+              parent_t::rng_sclr(span[1])
             ));
         } 
       };

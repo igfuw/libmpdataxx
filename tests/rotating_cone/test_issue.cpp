@@ -15,6 +15,8 @@
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
+/// @brief settings from @copybrief Anderson_and_Fattahi_1974
+
 enum {x, y};
 using real_t = float;
 
@@ -25,72 +27,71 @@ real_t
   h = 4., // TODO: other name!
   h0 = 1.;
 
-/// @brief settings from @copybrief Anderson_and_Fattahi_1974
-template <class T>
-void setup(T &solver, int n[2]) 
-{
-  real_t
-    r = 12. * dx,
-    x0 = 1,//75 * dx,
-    y0 = 0, //50 * dy,
-    xc = .5 * n[x] * dx,
-    yc = .5 * n[y] * dy;
-
-  blitz::firstIndex i;
-  blitz::secondIndex j;
-
-  // cone shape
-  decltype(solver.advectee()) tmp(solver.advectee().extent());
-  tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
-  solver.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
-
-  // constant angular velocity rotational field
-  solver.advector(x) = .3; 
-  solver.advector(y) = .3; 
-}
-
-template <class T>
-void setopts(T &p, int nt)
-{
-  p.n_iters = 2;
-
-  p.outfreq = nt;
-  p.outvars[0].name = "psi";
-  {
-    std::ostringstream tmp;
-    tmp << "bug_iters=" << p.n_iters << "_%s_%d.svg";
-    p.gnuplot_output = tmp.str();    
-  }
-  p.gnuplot_view = "map";
-  p.gnuplot_with = "lines";
-  p.gnuplot_surface = false;
-  p.gnuplot_contour = true;
-  {
-    std::ostringstream tmp;
-    tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
-    p.gnuplot_cbrange = tmp.str();
-  }
-  p.gnuplot_maxcolors = 10;
-  {
-    std::ostringstream tmp;
-    tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
-    p.gnuplot_cntrparam = tmp.str();
-  }
-  p.gnuplot_term = "svg";
-}
-
 int main() 
 {
   using namespace libmpdataxx;
 
-  int n[] = {15, 14}, nt = 2; 
+  const int nt = 2; 
 
   using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, 1, formulae::opts::pds>>;
   solver_t::params_t p;
-  setopts(p, nt);
-  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
 
-  setup(slv, n); 
+  // pre instantiatio
+  {
+    p.n_iters = 2;
+    p.span = {15, 14};
+
+    p.outfreq = nt;
+    p.outvars[0].name = "psi";
+    {
+      std::ostringstream tmp;
+      tmp << "bug_iters=" << p.n_iters << "_%s_%d.svg";
+      p.gnuplot_output = tmp.str();    
+    }
+    p.gnuplot_view = "map";
+    p.gnuplot_with = "lines";
+    p.gnuplot_surface = false;
+    p.gnuplot_contour = true;
+    {
+      std::ostringstream tmp;
+      tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
+      p.gnuplot_cbrange = tmp.str();
+    }
+    p.gnuplot_maxcolors = 10;
+    {
+      std::ostringstream tmp;
+      tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
+      p.gnuplot_cntrparam = tmp.str();
+    }
+    p.gnuplot_term = "svg";
+  }
+
+  // instantiation
+  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(p); 
+
+  // post instantiation
+  {
+    real_t
+      r = 12. * dx,
+      x0 = 1,//75 * dx,
+      y0 = 0, //50 * dy,
+      xc = .5 * p.span[x] * dx,
+      yc = .5 * p.span[y] * dy;
+
+    blitz::firstIndex i;
+    blitz::secondIndex j;
+
+    // cone shape
+    decltype(slv.advectee()) tmp(slv.advectee().extent());
+    tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
+    slv.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
+
+    // constant angular velocity rotational field
+    slv.advector(x) = .3; 
+    slv.advector(y) = .3; 
+  }
+
+  // 
   slv.advance(nt);
   if (blitz::min(slv.advectee()) - 1 != 0) throw;
 }

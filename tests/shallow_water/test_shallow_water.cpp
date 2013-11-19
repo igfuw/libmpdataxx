@@ -22,6 +22,8 @@ const int nx = 32, ny = 32, nt = 100;
 template <class T>
 void setopts(T &p)
 {
+  p.span = {nx, ny};
+
   p.dt = .05;
   p.dx = 1;
   p.dz = 1;
@@ -68,7 +70,7 @@ int main()
     solver_t::params_t p; 
     setopts(p);
 
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(nx, ny, p));
+    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(p));
     setup(slvs.back());
   }
 

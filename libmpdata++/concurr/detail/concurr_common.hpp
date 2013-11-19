@@ -77,23 +77,30 @@ namespace libmpdataxx
 
         typedef typename solver_t::real_t real_t;
 
-	// 1D ctor
+	// ctor
 	concurr_common(
-	  const int s0, 
-	  const typename solver_t::params_t &params,
+	  const typename solver_t::params_t &p,
           mem_t *mem_p,
-	  const int n0
-	)
-	{
+	  const int &size
+	) {
           mem.reset(mem_p);
-	  solver_t::alloc(mem.get(), params, s0);
+	  solver_t::alloc(mem.get(), p);
+          init(p, p.span, size); 
+        }
 
+        private:
+ 
+        void init(
+          const typename solver_t::params_t &p,
+          const std::array<int, 1> &span, const int &n0
+        )
+        {
           std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, shrdl, shrdr; // TODO: solver_t::bc_p
 
           if (bcx == bcond::cyclic)  // TODO: make a function that does it
           {
-            bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, s0-1), solver_t::halo));
-            bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, s0-1), solver_t::halo));
+            bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+            bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
           }
           else assert(false);
 
@@ -101,7 +108,7 @@ namespace libmpdataxx
           {
             shrdl.reset(new bcond::shared<real_t>());
             shrdr.reset(new bcond::shared<real_t>());
-            const rng_t i(min(s0, i0, n0), max(s0, i0, n0)); 
+            const rng_t i(min(span[0], i0, n0), max(span[0], i0, n0)); 
 	    algos.push_back(
               new solver_t(
                 typename solver_t::ctor_args_t({
@@ -110,24 +117,17 @@ namespace libmpdataxx
 		  i0 == n0 - 1 ? bxr : shrdr,
 		  i
                 }), 
-                params
+                p
               )
             );
           }
 	}
 
-	// 2D ctor
-	concurr_common(
-	  const int s0, const int s1, 
-	  const typename solver_t::params_t &params,
-          mem_t *mem_p,
-	  const int n0, const int n1
-	)
-	{
-          mem.reset(mem_p);
-          solver_t::alloc(mem.get(), params, s0, s1);
-
-
+        void init(
+          const typename solver_t::params_t &p,
+	  const std::array<int, 2> &span, 
+          const int &n0, const int &n1 = 1
+        ) {
 // TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
           for (int i0 = 0; i0 < n0; ++i0) 
           {
@@ -137,15 +137,15 @@ namespace libmpdataxx
 
 	      if (bcx == bcond::cyclic)  // TODO: make a function taht does it
 	      {
-		bxl.reset(new bcond::cyclic_left_2d<0, real_t>(rng_t(0, s0-1), solver_t::halo));
-		bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(rng_t(0, s0-1), solver_t::halo));
+		bxl.reset(new bcond::cyclic_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+		bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
 	      } 
 	      else assert(false);
 
 	      if (bcy == bcond::cyclic)  // TODO: make a function taht does it
 	      {
-		byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, s1-1), solver_t::halo));
-		byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, s1-1), solver_t::halo));
+		byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+		byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
 	      }
 	      else assert(false);
 
@@ -153,8 +153,8 @@ namespace libmpdataxx
               shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
 
               const rng_t 
-                i( min(s0, i0, n0), max(s0, i0, n0) ),
-                j( min(s1, i1, n1), max(s1, i1, n1) );
+                i( min(span[0], i0, n0), max(span[0], i0, n0) ),
+                j( min(span[1], i1, n1), max(span[1], i1, n1) );
               algos.push_back(
                 new solver_t(
                   typename solver_t::ctor_args_t({
@@ -165,44 +165,38 @@ namespace libmpdataxx
 		    byr, 
 		    i, j
                   }), 
-                  params
+                  p
                 )
               );
             }
           }
 	}
 
-	// 3D ctor
-	concurr_common(
-	  const int s0, const int s1, const int s2, 
-	  const typename solver_t::params_t &params,
-          mem_t *mem_p,
-	  const int n0, const int n1, const int n2
-	)
-	{
-          mem.reset(mem_p);
-	  solver_t::alloc(mem.get(), params, s0, s1, s2);
-
+        void init(
+          const typename solver_t::params_t &p,
+	  const std::array<int, 3> &span, 
+          const int &n0, const int &n1 = 1, const int &n2 = 1
+        ) {
 	  std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, byl, byr, bzl, bzr;
 
 	  if (bcx == bcond::cyclic) // TODO: make a function that does it
 	  {
-	    bxl.reset(new bcond::cyclic_left_3d<0, real_t>(rng_t(0, s0-1), solver_t::halo));
-	    bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(rng_t(0, s0-1), solver_t::halo));
+	    bxl.reset(new bcond::cyclic_left_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+	    bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
 	  }
 	  else assert(false);
 
 	  if (bcy == bcond::cyclic) // TODO: make a function taht does it
 	  {
-	    byl.reset(new bcond::cyclic_left_3d<1, real_t>(rng_t(0, s1-1), solver_t::halo));
-	    byr.reset(new bcond::cyclic_rght_3d<1, real_t>(rng_t(0, s1-1), solver_t::halo));
+	    byl.reset(new bcond::cyclic_left_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+	    byr.reset(new bcond::cyclic_rght_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
 	  }
 	  else assert(false);
 
 	  if (bcz == bcond::cyclic)  // TODO: make a function taht does it
 	  {
-	    bzl.reset(new bcond::cyclic_left_3d<2, real_t>(rng_t(0, s2-1), solver_t::halo));
-	    bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(rng_t(0, s2-1), solver_t::halo));
+	    bzl.reset(new bcond::cyclic_left_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+	    bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
 	  }
 	  else assert(false);
 
@@ -214,9 +208,9 @@ namespace libmpdataxx
 	      for (int i2 = 0; i2 < n2; ++i2) 
               {
                 rng_t
-                  i( min(s0, i0, n0), max(s0, i0, n0) ),
-                  j( min(s1, i1, n1), max(s1, i1, n1) ),
-                  k( min(s2, i2, n2), max(s2, i2, n2) );
+                  i( min(span[0], i0, n0), max(span[0], i0, n0) ),
+                  j( min(span[1], i1, n1), max(span[1], i1, n1) ),
+                  k( min(span[2], i2, n2), max(span[2], i2, n2) );
 		algos.push_back(
                   new solver_t(
                     typename solver_t::ctor_args_t({
@@ -226,13 +220,15 @@ namespace libmpdataxx
                       bzl, bzr, 
                       i, j, k
                     }), 
-                    params
+                    p
                   )
                 );
               }
             }
           }
         }
+
+        public:
 
         virtual void solve(int nt) = 0;
     

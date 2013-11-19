@@ -11,6 +11,8 @@
 
 #include <libmpdata++/blitz.hpp>
 
+#include <array>
+
 namespace libmpdataxx
 {
   namespace concurr
@@ -32,12 +34,15 @@ namespace libmpdataxx
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; // TODO: T_sumtype
         std::unique_ptr<blitz::Array<real_t, 2>> sumtmp; // TODO: T_sumtype
 
-        // private n_eqs for use in asserts only
+        protected:
+
+        // for use in asserts only
         const int n_eqs;
 
 	public:
 
-	int n = 0, span[n_dims]; // TODO: std::array?
+	int n = 0;
+        std::array<int, n_dims> span; 
         bool panic = false; // for multi-threaded SIGTERM handling
 
         // TODO: these are public because used from outside in alloc - could friendship help?
@@ -70,27 +75,27 @@ namespace libmpdataxx
 
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
-        sharedmem_common(int n_eqs, int s0, int size)
-          : n_eqs(n_eqs), n(0), psi(n_eqs) // TODO: is n(0) needed?
+        sharedmem_common(const int &n_eqs, const std::array<int, 1> &span, const int &size)
+          : n_eqs(n_eqs), n(0), psi(n_eqs), span(span) // TODO: is n(0) needed?
         {
-          if (size > s0) throw std::exception(); // TODO: error_macro? / assert()?
+          if (size > span[0]) throw std::exception(); // TODO: error_macro? / assert()?
           //sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));  // TODO: write a different sum that would't use sumtmp
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
-        sharedmem_common(int n_eqs, int s0, int s1, int size)
-          : n_eqs(n_eqs), n(0), psi(n_eqs)
+        sharedmem_common(const int &n_eqs, const std::array<int, 2> &span, const int &size)
+          : n_eqs(n_eqs), n(0), psi(n_eqs), span(span)
         {
-          if (size > s0) throw std::exception(); // TODO: error_macro?
-          sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));
+          if (size > span[0]) throw std::exception(); // TODO: error_macro?
+          sumtmp.reset(new blitz::Array<real_t, 2>(span[0], 1));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
-        sharedmem_common(int n_eqs, int s0, int s1, int s2, int size)
-          : n_eqs(n_eqs), n(0), psi(n_eqs)
+        sharedmem_common(const int &n_eqs, const std::array<int, 3> &span, const int &size)
+          : n_eqs(n_eqs), n(0), psi(n_eqs), span(span)
         {
-          if (size > s0) throw std::exception(); // TODO: error_macro?
-          sumtmp.reset(new blitz::Array<real_t, 2>(s0, s1));
+          if (size > span[0]) throw std::exception(); // TODO: error_macro?
+          sumtmp.reset(new blitz::Array<real_t, 2>(span[0], span[1]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
   
@@ -151,6 +156,8 @@ namespace libmpdataxx
       class sharedmem<real_t, 1, n_tlev> : public sharedmem_common<real_t, 1, n_tlev>
       {
         using parent_t = sharedmem_common<real_t, 1, n_tlev>;
+        using parent_t::parent_t; // inheriting ctors
+
 	public:
 
 	// accessor methods
@@ -185,18 +192,14 @@ namespace libmpdataxx
           ).reindex({0});
         }
 
-	// ctor
-	sharedmem(const int n_eqs, const int s0, const int size)
-          : parent_t(n_eqs, s0, size)
-	{
-	  this->span[0] = s0; 
-	}
       };
 
       template<typename real_t, int n_tlev>
       class sharedmem<real_t, 2, n_tlev> : public sharedmem_common<real_t, 2, n_tlev>
       {
         using parent_t = sharedmem_common<real_t, 2, n_tlev>;
+        using parent_t::parent_t; // inheriting ctors
+
 	public:
 
 	blitz::Array<real_t, 2> advectee(int e = 0)
@@ -233,19 +236,14 @@ namespace libmpdataxx
           })).reindex({0, 0});
         }
 
-	// ctor
-	sharedmem(const int n_eqs, const int s0, const int s1, const int size)
-          : parent_t(n_eqs, s0, s1, size)
-	{
-	  this->span[0] = s0; 
-	  this->span[1] = s1; 
-	}
       };
 
       template<typename real_t, int n_tlev>
       class sharedmem<real_t, 3, n_tlev> : public sharedmem_common<real_t, 3, n_tlev>
       {
         using parent_t = sharedmem_common<real_t, 3, n_tlev>;
+        using parent_t::parent_t; // inheriting ctors
+
 	public:
 
 	blitz::Array<real_t, 3> advectee(int e = 0)
@@ -285,14 +283,6 @@ namespace libmpdataxx
           })).reindex({0, 0, 0});
         }
 
-	// ctor
-	sharedmem(const int n_eqs, const int s0, const int s1, const int s2, const int size)
-          : parent_t(s0, s1, s2, size)
-	{
-	  this->span[0] = s0; 
-	  this->span[1] = s1; 
-	  this->span[2] = s2; 
-	}
       };
     }; // namespace detail
   }; // namespace concurr

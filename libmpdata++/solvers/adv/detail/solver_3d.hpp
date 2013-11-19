@@ -55,16 +55,12 @@ namespace libmpdataxx
           const rng_t &i, &j, &k; 
         };  
 
-        struct params_t : parent_t::params_t
-        {
-        };
-
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const params_t &p
+          const typename parent_t::params_t &p
         ) :
 	  parent_t(args.mem, p),
 	  i(args.i), 
@@ -83,26 +79,25 @@ namespace libmpdataxx
 
 	static void alloc(
           typename parent_t::mem_t *mem,
-          const params_t &p,
-          const int nx, const int ny, const int nz
+          const typename parent_t::params_t &p
         )   
         {
 	  for (int e = 0; e < p.n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(new typename parent_t::arr_t(
-                parent_t::rng_sclr(nx),
-                parent_t::rng_sclr(ny),
-                parent_t::rng_sclr(nz)
+                parent_t::rng_sclr(p.span[0]),
+                parent_t::rng_sclr(p.span[1]),
+                parent_t::rng_sclr(p.span[2])
               )); 
 
 	  mem->GC.push_back(new typename parent_t::arr_t( 
-            parent_t::rng_vctr(nx), parent_t::rng_sclr(ny), parent_t::rng_sclr(nz)
+            parent_t::rng_vctr(p.span[0]), parent_t::rng_sclr(p.span[1]), parent_t::rng_sclr(p.span[2])
           ));
 	  mem->GC.push_back(new typename parent_t::arr_t(
-            parent_t::rng_sclr(nx), parent_t::rng_vctr(ny), parent_t::rng_sclr(nz)
+            parent_t::rng_sclr(p.span[0]), parent_t::rng_vctr(p.span[1]), parent_t::rng_sclr(p.span[2])
           ));
 	  mem->GC.push_back(new typename parent_t::arr_t(
-            parent_t::rng_sclr(nx), parent_t::rng_sclr(ny), parent_t::rng_vctr(nz)
+            parent_t::rng_sclr(p.span[0]), parent_t::rng_sclr(p.span[1]), parent_t::rng_vctr(p.span[2])
           ));
 
           // TODO: allocate G

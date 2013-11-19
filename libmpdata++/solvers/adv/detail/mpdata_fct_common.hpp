@@ -13,8 +13,7 @@ namespace libmpdataxx
     namespace detail
     {
 
-      // TODO: document why 2
-      const int fct_min_halo = 2; // TODO move to fct::formulae?
+      const int fct_min_halo = 2; // TODO move to fct::formulae? & document why 2
 
       template <typename real_t, int n_dims, formulae::mpdata::opts_t opts, int minhalo>
       class mpdata_fct_common : public mpdata<
@@ -54,23 +53,12 @@ namespace libmpdataxx
 
         public:
 
-	// 1D version
-	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::params_t &p, const int nx)
+	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::params_t &p)
 	{
-	  parent_t::alloc(mem, p, nx);
-	  parent_t::alloc_tmp_sclr(mem, nx, __FILE__, 2); // psi_min and psi_max
-	  parent_t::alloc_tmp_vctr(mem, nx, __FILE__);    // GC_mono
+	  parent_t::alloc(mem, p);
+	  parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, 2); // psi_min and psi_max
+	  parent_t::alloc_tmp_vctr(mem, p.span, __FILE__);    // GC_mono
 	}
-
-        // 2D version 
-	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::params_t &p, const int nx, const int ny)
-	{
-	  parent_t::alloc(mem, p, nx, ny);
-	  parent_t::alloc_tmp_sclr(mem, nx, ny, __FILE__, 2); // psi_min and psi_max
-	  parent_t::alloc_tmp_vctr(mem, nx, ny, __FILE__);    // GC_mono
-	}
-
-        // 3D version - TODO
       };
     }; // namespace detail
 

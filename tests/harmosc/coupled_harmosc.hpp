@@ -100,13 +100,12 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t>
 
   static void alloc(
     typename parent_t::mem_t *mem,
-    const params_t &p,
-    const int nx
+    const params_t &p
   )
   {
     // TODO: move to inhomo!
-    parent_t::alloc(mem, p, nx);
+    parent_t::alloc(mem, p);
     mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
-    mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1) )); 
+    mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, p.span[0]-1) )); 
   }
 };

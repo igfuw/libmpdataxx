@@ -45,16 +45,12 @@ namespace libmpdataxx
           const rng_t &i;
         };
 
-        struct params_t : parent_t::params_t
-        {
-        };
-
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const params_t &p
+          const typename parent_t::params_t &p
         ) :
 	  parent_t(args.mem, p), 
           bcxl(std::move(args.bcxl)), 
@@ -85,36 +81,36 @@ namespace libmpdataxx
 
         public:
 
-	static void alloc(typename parent_t::mem_t *mem, const params_t &p, const int nx)   
+	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::params_t &p)   
         {
 	  for (int e = 0; e < p.n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back(new typename parent_t::arr_t(parent_t::rng_sclr(nx)));
+	      mem->psi[e].push_back(new typename parent_t::arr_t(parent_t::rng_sclr(p.span[0])));
     
-	  mem->GC.push_back(new typename parent_t::arr_t(parent_t::rng_vctr(nx))); 
+	  mem->GC.push_back(new typename parent_t::arr_t(parent_t::rng_vctr(p.span[0]))); 
 
           if (formulae::opts::isset(opts, formulae::opts::nug))
-	    mem->G.resize(parent_t::rng_sclr(nx));
+	    mem->G.resize(parent_t::rng_sclr(p.span[0]));
         } 
 
         protected:
 
         // helper method to allocate a vector-component temporary array
         static void alloc_tmp_vctr(
-          typename parent_t::mem_t *mem, const int nx, 
+          typename parent_t::mem_t *mem, const std::array<int, 1> &span, 
           const char * __file__
         )
         {
-          alloc_tmp(mem, __file__, 1, parent_t::rng_vctr(nx)); // always one-component vectors
+          alloc_tmp(mem, __file__, 1, parent_t::rng_vctr(span[0])); // always one-component vectors
         }
 
         // helper method to allocate n_arr scalar temporary arrays 
         static void alloc_tmp_sclr(
-          typename parent_t::mem_t *mem, const int nx, 
+          typename parent_t::mem_t *mem, const std::array<int, 1> &span, 
           const char * __file__, const int n_arr
         )
         {
-          alloc_tmp(mem, __file__, n_arr, parent_t::rng_sclr(nx)); 
+          alloc_tmp(mem, __file__, n_arr, parent_t::rng_sclr(span[0])); 
         }
       };
     }; // namespace detail

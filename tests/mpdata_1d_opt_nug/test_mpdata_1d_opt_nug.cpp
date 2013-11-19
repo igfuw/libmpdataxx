@@ -41,7 +41,8 @@ void add_solver(vec_t &slvs, const std::string &fname)
   using output_t = output::gnuplot<solver_t>;
   typename output_t::params_t p;
   setopts(p, nt, fname);
-  slvs.push_back(new concurr::threads<output_t, bcond::cyclic>(n, p));
+  p.span = {n};
+  slvs.push_back(new concurr::threads<output_t, bcond::cyclic>(p));
 }
 
 int main() 

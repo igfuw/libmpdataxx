@@ -53,9 +53,9 @@ namespace libmpdataxx
         }
 
         // ctors
-        mem_t(const int n_eqs, const int s0) : parent_t::mem_t(n_eqs, s0, size()) {};
-        mem_t(const int n_eqs, const int s0, const int s1) : parent_t::mem_t(n_eqs, s0, s1, size()) {};
-        mem_t(const int n_eqs, const int s0, const int s1, const int s2) : parent_t::mem_t(n_eqs, s0, s1, s2, size()) {};
+        mem_t(const int &n_eqs, const std::array<int, solver_t::n_dims> &span) : parent_t::mem_t(n_eqs, span, size()) {};
+        //mem_t(const int n_eqs, const int s0, const int s1) : parent_t::mem_t(n_eqs, s0, s1, size()) {};
+        //mem_t(const int n_eqs, const int s0, const int s1, const int s2) : parent_t::mem_t(n_eqs, s0, s1, s2, size()) {};
       };
 
       void solve(int nt)
@@ -72,34 +72,11 @@ namespace libmpdataxx
 
       public:
 
-// TODO: coud it be just one ctor with int[solver_t::n_dims]?
-// TODO: document that currently paralllisation only in one dimension
-      // 1D ctor
-      openmp(
-	const int s0,
-	const typename solver_t::params_t &p = typename solver_t::params_t()
-      ) : 
-        parent_t(s0, p, new mem_t(p.n_eqs, s0), mem_t::size())
+      // ctor
+      openmp(const typename solver_t::params_t &p) : 
+        parent_t(p, new mem_t(p.n_eqs, p.span), mem_t::size())
       {}
 
-      // 2D ctor
-      openmp(
-	const int s0,
-	const int s1,
-	const typename solver_t::params_t &p = typename solver_t::params_t()
-      ) : 
-	parent_t(s0, s1, p, new mem_t(p.n_eqs, s0, s1), mem_t::size(), 1)
-      {}
-
-      // 3D ctor
-      openmp(
-	const int s0,
-	const int s1,
-	const int s2,
-	const typename solver_t::params_t &p = typename solver_t::params_t()
-      ) :
-	parent_t(s0, s1, s2, p, new mem_t(p.n_eqs, s0, s1, s2), mem_t::size(), 1, 1)
-      {}
     };
   }; // namespace concurr
 }; // namespace libmpdataxx

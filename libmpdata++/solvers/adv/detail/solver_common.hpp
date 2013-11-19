@@ -14,6 +14,8 @@
 
 #include <libmpdata++/formulae/opts.hpp>
 
+#include <array>
+
 namespace libmpdataxx
 {
   namespace solvers
@@ -36,7 +38,7 @@ namespace libmpdataxx
 
 	public:
 
-        // using enums as "public static const int" would need instantiation
+        // using enums as "public static const int" would need instantiation (TODO: is it really true???)
         enum { halo = minhalo }; 
         enum { n_dims = n_dims_ };
         enum { n_tlev = n_tlev_ };
@@ -88,8 +90,10 @@ namespace libmpdataxx
 
 	public:
 
-        struct params_t {
+        struct params_t 
+        {
           int n_eqs = 1;
+          std::array<int, n_dims> span;
         };
 
         virtual void hook_ante_step() 

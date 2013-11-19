@@ -38,12 +38,13 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
 
   params_t p;
   p.n_iters = n_iters;
+  p.span = {nx};
 
   boost::assign::ptr_map_insert<
     concurr::threads<solver_t, bcond::cyclic> // map element type
   >(slvs)(
     key,  // map key
-    nx, p // concurr's ctor args
+    p     // concurr's ctor args
   );
 
   boost::assign::ptr_map_insert(outfiles)(key);

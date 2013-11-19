@@ -22,21 +22,15 @@ using namespace libmpdataxx;
 using real_t = float;
 int n = 20, nt = 20;
 
-template <class T>
-void setup(T &solver, int n) 
+template <class slvs_t>
+void add_solver(slvs_t &slvs, int n_iters)
 {
-  blitz::firstIndex i;
-  solver.advectee() = exp(
-    -sqr(.5+i-n/2.) / (2.*pow(n/10, 2)) // TODO: assumes dx=1
-  );  
-  solver.advector() = .5; 
-}
+  using solver_t = output::gnuplot<solvers::mpdata_1d<real_t>>;
+  typename solver_t::params_t p;
 
-template <class T>
-void setopts(T &p, int nt, int n_iters)
-{
+  // pre-instantiation stuff
+  p.span[0] = n;
   p.n_iters = n_iters;
-
   p.outfreq = nt / 10; 
   {
     std::ostringstream tmp;
@@ -44,16 +38,18 @@ void setopts(T &p, int nt, int n_iters)
     p.gnuplot_output = tmp.str();    
   }
   p.outvars = {{0, {.name = "psi", .unit = "1"}}};
-}
+ 
+  // instantiation
+  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(p));
 
-template <class slvs_t>
-void add_solver(slvs_t &slvs, int it)
-{
-  using solver_t = output::gnuplot<solvers::mpdata_1d<real_t>>;
-  typename solver_t::params_t p;
-  setopts(p, nt, it);
-  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(n, p));
-  setup(slvs.back(), n);
+  // post-instantiation stuff
+  {
+    blitz::firstIndex i;
+    slvs.back().advectee() = exp(
+      -sqr(.5+i-n/2.) / (2.*pow(n/10, 2)) // TODO: assumes dx=1
+    );  
+    slvs.back().advector() = .5; 
+  }
 }
 
 int main() 

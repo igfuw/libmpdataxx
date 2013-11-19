@@ -29,9 +29,17 @@ using namespace libmpdataxx;
 
 enum {psi, phi};
 
-template <class T>
-void setopts(T &p, std::string name)
+const int nt = 750;
+const real_t C = .5;
+
+template <class solver_t, class slvs_t>
+void add_solver(slvs_t &slvs, std::string name, const int n_iters)
 {
+  typename solver_t::params_t p; 
+
+  // pre instantiation
+  p.span = {1000};
+  p.n_iters = n_iters;
   p.dt = 1;
   p.omega = 2*pi<real_t>() / p.dt / 400;
   p.gnuplot_output = "figure_" + name + ".svg";
@@ -41,55 +49,27 @@ void setopts(T &p, std::string name)
     {phi, {.name = "phi", .unit = "1"}}
   };
   p.gnuplot_command = "plot";
+
+  // instantiation
+  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(p));
+
+  // post instantiation
+  {
+    blitz::firstIndex i;
+    slvs.back().advectee(psi) = pow(sin((i+.5) * pi<real_t>() / p.span[0]), 300);
+    slvs.back().advectee(phi) = real_t(0);
+  }
+  slvs.back().advector() = C;
 }
 
 int main() 
 {
-  const int nx = 1000, nt = 750;
-  const real_t C = .5;
- 
   boost::ptr_vector<concurr::any<real_t, 1>> slvs;
 
-  { // euler / donor-cell
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, solvers::euler, psi, phi>>;
-    solver_t::params_t p; 
-    p.n_iters = 1;
-    setopts(p, "euler_it=1");
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
-  }
-  { // euler / mpdata
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, solvers::euler, psi, phi>>;
-    solver_t::params_t p; 
-    p.n_iters = 2;
-    setopts(p, "euler_it=2");
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
-  }
-  { // strang / donor-cell
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, solvers::strang, psi, phi>>;
-    solver_t::params_t p;
-    p.n_iters = 1;
-    setopts(p, "strang_it=1");
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
-  }
-  { // strang / mpdata
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, solvers::strang, psi, phi>>;
-    solver_t::params_t p; 
-    p.n_iters = 2;
-    setopts(p, "strang_it=2");
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
-  }
+  add_solver<output::gnuplot<coupled_harmosc<real_t, solvers::euler,  psi, phi>>>(slvs, "euler_it=1",  1);
+  add_solver<output::gnuplot<coupled_harmosc<real_t, solvers::euler,  psi, phi>>>(slvs, "euler_it=2",  2);
+  add_solver<output::gnuplot<coupled_harmosc<real_t, solvers::strang, psi, phi>>>(slvs, "strang_it=1", 1);
+  add_solver<output::gnuplot<coupled_harmosc<real_t, solvers::strang, psi, phi>>>(slvs, "strang_it=2", 2);
 
-  for (auto &slv : slvs)
-  {
-    // initial condition
-    {
-      blitz::firstIndex i;
-      slv.advectee(psi) = pow(sin((i+.5) * pi<real_t>() / nx), 300);
-      slv.advectee(phi) = real_t(0);
-    }
-    slv.advector() = C;
-
-    // integration
-    slv.advance(nt);
-  }
+  for (auto &slv : slvs) slv.advance(nt);
 }
