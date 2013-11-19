@@ -36,7 +36,7 @@ namespace libmpdataxx
    
       void advop(int e)
       {
-        formulae::donorcell::op_1d<0>( // TODO: 0 means default options, handle it!
+        formulae::donorcell::op_1d<opts>(
           this->mem->psi[e], 
 	  this->mem->GC[0], 
 	  this->mem->G, 

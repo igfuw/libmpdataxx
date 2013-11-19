@@ -74,7 +74,8 @@ int main()
 
   for (auto &slv : slvs) slv.advance(nt);
 
-  real_t eps = 1e-22;
-  if (abs(sum(G * phi) - sum(slvs.at(0).advectee())) > eps) throw;
-  if (abs(sum(G * phi) - sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) > eps) throw;
+  real_t eps = 1e-6;
+  // have to use std::abs(), as abs() alone returns an integer!
+  if (std::abs(sum(G * phi) - sum(slvs.at(0).advectee())) > eps) throw;
+  if (std::abs(sum(G * phi) - sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) > eps) throw;
 }
