@@ -23,7 +23,7 @@
 - test showing usage of gcc's __float128 (rainbow?)
 - pressure solvers: introduce inheritance (richardson->mr->cr->pc); what if no preconditioner in pc?; reuse richardson in pc; common loop over pseudo-time
 - make ctors explicit? (http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Explicit_Constructors#Explicit_Constructors)
-- check if all adv/*.hpp are testes 
+- check if all adv/*.hpp are tested
 - use this->ijk istead of this->i, this->j where it could reduce the number of methods (method_1d = method_2d)
 - check at configure time what's fastest on the current machine: float vs. double, eps vs. where(), .5*(x+|x|) vs. max(x,0) and use these settings!
 - handle bogus subdomain counts (e.g. 0)
@@ -60,7 +60,6 @@
 - MPI parallelisation (incl. remote boundary cond?)
 - MPI-shared_mem setups
 - fork distmem parallelisation for testing sharedmem without MPI
-- concurr_opencl? http://www.multicoreinfo.com/2009/08/parprog-part-9/
 
 
 0.4: (far future, not relevant to HARMONIA)
