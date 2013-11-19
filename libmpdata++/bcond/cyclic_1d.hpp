@@ -17,13 +17,9 @@ namespace libmpdataxx
     {
       using parent_t = cyclic_left_common<real_t>;
       using arr_t = blitz::Array<real_t, 1>;
+      using parent_t::parent_t; // inheriting ctor
 
       public:
-
-      // ctor
-      cyclic_left_1d(const rng_t &i, int halo) : // TODO: inherit ctor
-	parent_t(i, halo)
-      { }
 
       // methods invoked by the solver
       void fill_halos_sclr(const arr_t &a)
@@ -43,13 +39,9 @@ namespace libmpdataxx
     {
       using parent_t = cyclic_rght_common<real_t>;
       using arr_t = blitz::Array<real_t, 1>;
+      using parent_t::parent_t; // inheriting ctor
 
       public:
-
-      // ctor
-      cyclic_rght_1d(const rng_t &i, int halo) : // TODO: inherit ctor
-	parent_t(i, halo)
-      { }
 
       // methods invoked by the solver
       void fill_halos_sclr(const arr_t &a)

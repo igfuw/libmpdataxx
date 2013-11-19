@@ -27,8 +27,7 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_fct_common<real_t, 1, opts, minhalo>; 
 
-      // inheriting constructors
-      using parent_t::parent_t;
+      using parent_t::parent_t; // inheriting constructors
 
       void fct_init(int e)
       {
