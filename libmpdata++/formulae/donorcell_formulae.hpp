@@ -147,7 +147,7 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j, const rng_t &k
       ) { 
-	psi[n+1](i,j) = psi[n](i,j) - (             // note: see above
+	psi[n+1](i,j,k) = psi[n](i,j,k) - (             // note: see above
 	  donorcell<opts, 0>(psi[n], GC[0], i, j, k) +
 	  donorcell<opts, 1>(psi[n], GC[1], j, k, i) +
 	  donorcell<opts, 2>(psi[n], GC[2], k, i, j)
