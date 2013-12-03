@@ -153,6 +153,23 @@ namespace libmpdataxx
 	  donorcell<opts, 2>(psi[n], GC[2], k, i, j)
         ) / formulae::G<opts, 0>(G, i, j, k);
       }
+      
+      // infinite-gauge version (referred to as F(1,1,U) in the papers)
+      template <opts_t opts, class arr_3d_t>
+      void op_3d_iga(
+	const arrvec_t<arr_3d_t> &psi,
+	const arrvec_t<arr_3d_t> &GC, 
+	const arr_3d_t &G, 
+        const int n,
+	const rng_t &i, const rng_t &j, const rng_t &k
+      ) { 
+	psi[n+1](i,j,k) = psi[n](i,j,k) - (             // note: see above
+	  (GC[0](i+h, j, k) - GC[0](i-h, j, k)) +
+	  (GC[1](i, j+h, k) - GC[1](i, j-h, k)) +
+	  (GC[2](i, j, k+h) - GC[2](i, j, k-h))
+        ) / formulae::G<opts, 0>(G, i, j, k); 
+      }
+
     }; // namespace donorcell 
   }; // namespace formulae
 }; // namespace libmpdataxx
