@@ -9,6 +9,7 @@
  */
 
 #include <libmpdata++/solvers/adv/donorcell_1d.hpp> // TODO: this test is aimed at testing MPDATA
+#include <libmpdata++/solvers/adv/mpdata_1d.hpp> // TODO: this test is aimed at testing MPDATA
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
@@ -25,6 +26,8 @@ arr_t G_c(n+1);
 template <class T>
 void setopts(T &p, const int nt, const std::string &fname)
 {
+  p.n_iters = 2; //number of iterations
+
   p.outfreq = nt; // displays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
   p.outvars = {{0, {.name = "psi", .unit = "1"}}};
@@ -57,13 +60,13 @@ int main()
   G_c = 1,  1,  1,  1,  .75, .5, .5,  .5, .75, 1,  1,  1,  1;      
   phi =   1, 10, 10,  1,   1,   1,   1,  1,  1,  1,  1,  1;
 
-  add_solver<solvers::donorcell_1d<real_t>>(slvs, "mpdata_iters=1");
+  add_solver<solvers::mpdata_1d<real_t>>(slvs, "mpdata_iters=2");
   // advecting density with Courant number
   slvs.back().g_factor() = 1;
   slvs.back().advectee() = G * phi;
   slvs.back().advector() = GC / G_c; 
 
-  add_solver<solvers::donorcell_1d<real_t, formulae::opts::nug>>(slvs, "mpdata_iters=1_nug");
+  add_solver<solvers::mpdata_1d<real_t, formulae::opts::nug>>(slvs, "mpdata_iters=2_nug");
   // advecting mixing ratio with C times rho
   slvs.back().g_factor() = G;
   slvs.back().advectee() = phi;

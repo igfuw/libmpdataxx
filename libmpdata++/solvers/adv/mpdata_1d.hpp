@@ -42,14 +42,18 @@ namespace libmpdataxx
             this->mem->barrier();
 	    this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]]); // TODO: one xchng call?
 	    this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]]);
+            //TODO instead of fill halos per each eq define G on bigger matrix just once
+	    this->bcxl->fill_halos_sclr(this->mem->G); // TODO: one xchng call?
+	    this->bcxr->fill_halos_sclr(this->mem->G);
             this->mem->barrier();
 
 	    // calculating the antidiffusive C 
 	    this->GC_corr(iter)[0](im+h) = 
 	      formulae::mpdata::antidiff<opts>(
 		this->mem->psi[e][this->n[e]], 
-		im, 
-                this->GC_unco(iter)[0]
+                this->GC_unco(iter)[0],
+                this->mem->G,
+		im
 	      );
 
             this->fct_adjust_antidiff(e, iter); // i.e. calculate GC_mono=GC_mono(GC_corr) in FCT
