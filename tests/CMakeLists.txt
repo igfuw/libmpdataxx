@@ -8,15 +8,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 #find_package(Threads REQUIRED) # does not work for clang :(
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # TODO (report to CMake?)
 
-# Blitz Debug mode
+# Debug mode
 set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -g")
 
-# -DNDEBUG?
+# Release mode
+# TODO: reconsider -DNDEBUG?
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -Ofast -march=native")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -O3 -march=native -ffast-math") 
 endif()
+
+# Profile mode
+set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE} -pg")
 
 # gnuplot-iostream
 find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnuplot-iostream.h)
