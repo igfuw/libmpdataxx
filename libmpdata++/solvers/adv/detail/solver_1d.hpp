@@ -74,7 +74,7 @@ namespace libmpdataxx
           for (int n = 0; n < n_arr; ++n)
           {
 	    mem->tmp[__file__].back().push_back(
-              new typename parent_t::arr_t( rng )
+              mem->old(new typename parent_t::arr_t( rng ))
             ); 
           }
 	}
@@ -85,12 +85,12 @@ namespace libmpdataxx
         {
 	  for (int e = 0; e < p.n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back(new typename parent_t::arr_t(parent_t::rng_sclr(p.span[0])));
+	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.span[0]))));
     
-	  mem->GC.push_back(new typename parent_t::arr_t(parent_t::rng_vctr(p.span[0]))); 
+	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(p.span[0])))); 
 
           if (formulae::opts::isset(opts, formulae::opts::nug))
-	    mem->G.resize(parent_t::rng_sclr(p.span[0]));
+	    mem->G.resize(parent_t::rng_sclr(p.span[0])); // TODO: mem->old!
         } 
 
         protected:

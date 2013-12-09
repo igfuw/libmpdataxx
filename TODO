@@ -59,6 +59,7 @@
 0.3: (not-so-near future enhancements, applicable to HARMONIA)
 - MPI parallelisation (incl. remote boundary cond?)
 - MPI-shared_mem setups
+- shared parallelisation through UPC (Unified Parallel C???) 
 - fork distmem parallelisation for testing sharedmem without MPI
 
 
