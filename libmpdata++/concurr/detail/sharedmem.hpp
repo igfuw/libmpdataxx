@@ -146,6 +146,20 @@ namespace libmpdataxx
           barrier();
           return result;
         }
+
+        // this hack is introduced to allow to use neverDeleteData
+        // and hence to not use BZ_THREADSAFE
+        private:
+        boost::ptr_vector<arr_t> tobefreed;
+      
+        public:
+        arr_t *old(arr_t *arr_p)
+        {
+          tobefreed.push_back(arr_p);
+          arr_t *ret = new arr_t(arr_p->dataFirst(), arr_p->shape(), blitz::neverDeleteData);
+          ret->reindexSelf(arr_p->base());
+          return ret;
+        }
       };
 
       template<typename real_t, int n_dims, int n_tlev>
