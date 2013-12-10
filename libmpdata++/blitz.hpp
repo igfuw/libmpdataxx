@@ -13,8 +13,8 @@
 #endif
 // TODO: no ("") required?
 
-#if defined(_OPENMP) || defined(_REENTRANT)
-#  define BZ_THREADSAFE
+#if defined(BZ_THREADSAFE)
+#  error libmpdata++ uses blitz::neverDeleteData, please unset BZ_THREADSAFE
 #endif
 #include <blitz/array.h>
 

@@ -84,21 +84,21 @@ namespace libmpdataxx
         {
 	  for (int e = 0; e < p.n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back(new typename parent_t::arr_t(
+	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(
                 parent_t::rng_sclr(p.span[0]),
                 parent_t::rng_sclr(p.span[1]),
                 parent_t::rng_sclr(p.span[2])
-              )); 
+              ))); 
 
-	  mem->GC.push_back(new typename parent_t::arr_t( 
+	  mem->GC.push_back(mem->old(new typename parent_t::arr_t( 
             parent_t::rng_vctr(p.span[0]), parent_t::rng_sclr(p.span[1]), parent_t::rng_sclr(p.span[2])
-          ));
-	  mem->GC.push_back(new typename parent_t::arr_t(
+          )));
+	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_sclr(p.span[0]), parent_t::rng_vctr(p.span[1]), parent_t::rng_sclr(p.span[2])
-          ));
-	  mem->GC.push_back(new typename parent_t::arr_t(
+          )));
+	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_sclr(p.span[0]), parent_t::rng_sclr(p.span[1]), parent_t::rng_vctr(p.span[2])
-          ));
+          )));
 
           // TODO: allocate G
         }  
