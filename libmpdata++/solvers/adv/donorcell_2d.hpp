@@ -39,7 +39,7 @@ namespace libmpdataxx
         formulae::donorcell::op_2d<opts>(
           this->mem->psi[e], 
 	  this->mem->GC, 
-	  this->mem->G,
+	  *this->mem->G,
 	  this->n[e], 
 	  this->i, 
           this->j

@@ -54,12 +54,14 @@ namespace libmpdataxx
 	      formulae::mpdata::antidiff<opts, 0>(
 		this->mem->psi[e][this->n[e]], 
 		this->im, this->j, this->GC_unco(iter)
+// TODO: G
 	      );
 
 	    this->GC_corr(iter)[1](this->i, this->jm+h) = 
 	      formulae::mpdata::antidiff<opts, 1>(
               this->mem->psi[e][this->n[e]], 
               this->jm, this->i, this->GC_unco(iter)
+// TODO: G
 	    );
  
             // filling Y halos for GC_x, and X halos for GC_y
@@ -80,7 +82,7 @@ namespace libmpdataxx
 	    formulae::donorcell::op_2d<opts>(
               this->mem->psi[e], 
 	      this->GC(iter), 
-	      this->mem->G, 
+	      *this->mem->G, 
 	      this->n[e], 
 	      this->i, 
               this->j
@@ -92,7 +94,7 @@ namespace libmpdataxx
 	    formulae::donorcell::op_2d_iga<opts>(
               this->mem->psi[e], 
 	      this->GC(iter), 
-	      this->mem->G, 
+	      *this->mem->G, 
 	      this->n[e], 
 	      this->i, 
               this->j

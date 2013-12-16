@@ -48,7 +48,7 @@ namespace libmpdataxx
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC;
         std::vector<arrvec_t<arr_t>> psi;
-	arr_t G;
+	std::unique_ptr<arr_t> G;
 
 	std::unordered_map< 
 	  const char*, // intended for addressing with __FILE__
@@ -153,11 +153,11 @@ namespace libmpdataxx
         boost::ptr_vector<arr_t> tobefreed;
       
         public:
-        arr_t *old(arr_t *arr_p)
+        arr_t *old(arr_t *arg)
         {
-          tobefreed.push_back(arr_p);
-          arr_t *ret = new arr_t(arr_p->dataFirst(), arr_p->shape(), blitz::neverDeleteData);
-          ret->reindexSelf(arr_p->base());
+          tobefreed.push_back(arg);
+          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData);
+          ret->reindexSelf(arg->base());
           return ret;
         }
       };
@@ -201,7 +201,7 @@ namespace libmpdataxx
         blitz::Array<real_t, 1> g_factor()
         {
           // the same logic as in advectee() - see above
-          return this->G(
+          return (*this->G)(
             rng_t(0, this->span[0]-1)
           ).reindex({0});
         }
@@ -244,7 +244,7 @@ namespace libmpdataxx
         blitz::Array<real_t, 2> g_factor()
         {
           // the same logic as in advectee() - see above
-          return this->G(idx_t<2>({
+          return (*this->G)(idx_t<2>({
             rng_t(0, this->span[0]-1),
             rng_t(0, this->span[1]-1),
           })).reindex({0, 0});
@@ -290,7 +290,7 @@ namespace libmpdataxx
         blitz::Array<real_t, 3> g_factor()
         {
           // the same logic as in advectee() - see above
-          return this->G(idx_t<3>({
+          return (*this->G)(idx_t<3>({
             rng_t(0, this->span[0]-1),
             rng_t(0, this->span[1]-1),
             rng_t(0, this->span[2]-1)

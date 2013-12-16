@@ -29,6 +29,17 @@ namespace libmpdataxx
 
       rng_t im;
 
+      void hook_ante_loop(const int nt)
+      {
+// TODO: same in 2D and 3D
+        parent_t::hook_ante_loop(nt);
+        if (formulae::opts::isset(opts, formulae::opts::nug))
+        {
+	  this->bcxl->fill_halos_sclr(*this->mem->G); // TODO: one xchng call?
+	  this->bcxr->fill_halos_sclr(*this->mem->G);
+        }
+      }
+
       // method invoked by the solver
       void advop(int e)
       {
@@ -42,9 +53,6 @@ namespace libmpdataxx
             this->mem->barrier();
 	    this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]]); // TODO: one xchng call?
 	    this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]]);
-            //TODO instead of fill halos per each eq define G on bigger matrix just once
-	    this->bcxl->fill_halos_sclr(this->mem->G); // TODO: one xchng call?
-	    this->bcxr->fill_halos_sclr(this->mem->G);
             this->mem->barrier();
 
 	    // calculating the antidiffusive C 
@@ -52,7 +60,7 @@ namespace libmpdataxx
 	      formulae::mpdata::antidiff<opts>(
 		this->mem->psi[e][this->n[e]], 
                 this->GC_unco(iter)[0],
-                this->mem->G,
+                *this->mem->G,
 		im
 	      );
 
@@ -65,7 +73,7 @@ namespace libmpdataxx
 	    formulae::donorcell::op_1d<opts>(
               this->mem->psi[e], 
 	      this->GC(iter)[0], 
-	      this->mem->G, 
+	      *this->mem->G, 
 	      this->n[e], 
 	      this->i
             ); 
@@ -76,7 +84,7 @@ namespace libmpdataxx
 	    formulae::donorcell::op_1d_iga<opts>(
               this->mem->psi[e], 
 	      this->GC(iter)[0], 
-	      this->mem->G, 
+	      *this->mem->G, 
 	      this->n[e], 
 	      this->i
             ); 

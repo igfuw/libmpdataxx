@@ -95,7 +95,7 @@ namespace libmpdataxx
           case euler: 
             break;
           case strang:
-            update_forcings(rhs);
+            update_forcings(rhs); 
             break;
           default: 
             assert(false);

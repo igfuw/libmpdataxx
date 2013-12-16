@@ -90,7 +90,7 @@ namespace libmpdataxx
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(p.span[0])))); 
 
           if (formulae::opts::isset(opts, formulae::opts::nug))
-	    mem->G.resize(parent_t::rng_sclr(p.span[0])); // TODO: mem->old!
+	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.span[0]))));
         } 
 
         protected:
