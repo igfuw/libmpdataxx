@@ -57,7 +57,7 @@ namespace libmpdataxx
 	this->GC_mono[d]( this->im+h ) = formulae::mpdata::C_mono<opts>(
           this->mem->psi[e][this->n[e]],
           this->psi_min, 
-          this->psi_max, 
+          this->psi_max, // TODO: G!
           GC_corr[d], 
           this->im // calculating once for i-1/2 and i+1/2
         );

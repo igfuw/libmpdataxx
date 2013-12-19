@@ -85,6 +85,7 @@ namespace libmpdataxx
 	  pressure_solver_apply();
         }
 
+        // TODO: get rid of it
         void hook_post_loop()
         {
           parent_t::hook_post_loop();

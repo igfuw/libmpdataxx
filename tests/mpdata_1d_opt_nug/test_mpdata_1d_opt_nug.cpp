@@ -9,40 +9,52 @@
  */
 
 #include <libmpdata++/solvers/adv/donorcell_1d.hpp> // TODO: this test is aimed at testing MPDATA
+#include <libmpdata++/solvers/adv/mpdata_1d.hpp> // TODO: this test is aimed at testing MPDATA
 #include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
-#include <libmpdata++/output/gnuplot.hpp>
+#define GNUPLOT_ENABLE_BLITZ
+#include <gnuplot-iostream/gnuplot-iostream.h> // TODO: Debian does not use a su
 
 using namespace libmpdataxx;
 
 using real_t = float;
 using arr_t = blitz::Array<real_t, 1>;
 
-int n = 12, nt = 12; //n / C;
+int n = 15;
 arr_t G(n), phi(n); 
 arr_t G_c(n+1);
 
 template <class T>
-void setopts(T &p, const int nt, const std::string &fname)
+void setopts(T &p, const std::string &sfx)
 {
-  p.outfreq = nt; // displays initial condition and the final state
-  p.gnuplot_output = fname + ".svg";    
-  p.outvars = {{0, {.name = "psi", .unit = "1"}}};
-  p.gnuplot_command = "plot";
-  p.gnuplot_with = "steps";
-  p.gnuplot_lt = "3";
-  p.gnuplot_grid = false;
-  //p.gnuplot_yrange = "[-2:5]";
+  p.n_iters =   2; //number of iterations
 }
 
 template <class solver_t, class vec_t>
-void add_solver(vec_t &slvs, const std::string &fname)
+void add_solver(vec_t &slvs, const std::string &sfx)
 {
-  using output_t = output::gnuplot<solver_t>;
-  typename output_t::params_t p;
-  setopts(p, nt, fname);
+  typename solver_t::params_t p;
+  setopts(p, sfx);
   p.span = {n};
-  slvs.push_back(new concurr::threads<output_t, bcond::cyclic>(p));
+  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(p));
+}
+
+template <class T0, class T1, class T2>
+void plot(T0 &gp, T1 &slvs, T2 &G)
+{
+  gp << "plot" 
+    << " '-' with steps title 'mxr = psi / G'"
+    << ",'-' with steps title 'mxr = psi'\n";
+  {
+    arr_t tmp(slvs.at(0).advectee() / G);
+    gp.send(tmp);
+  }
+  gp.send(slvs.at(1).advectee());
+  gp << "plot" 
+    << " '-' with steps title 'rho = psi'"
+  << ",'-' with steps title 'rho = psi * G'\n";
+  gp.send(slvs.at(0).advectee());
+  gp.send(arr_t(slvs.at(1).advectee() * G));
 }
 
 int main() 
@@ -53,17 +65,16 @@ int main()
   // Starting point: a non-divergeng G \times C
   real_t GC = .25;
 
-  G   =   1,  1,  1,  1,  .5,  .5,  .5, .5,  1,  1,  1,  1;
-  G_c = 1,  1,  1,  1,  .75, .5, .5,  .5, .75, 1,  1,  1,  1;      
-  phi =   1, 10, 10,  1,   1,   1,   1,  1,  1,  1,  1,  1;
+  phi =   1,  5, 10, 10,  10,  5,  1,  1,   1,   1,   1,  1,  1,  1,  1;
+  G   =   1,  1,  1,  1,   1,  1,  1,  1,  .5,  .5,  .5, .5, .5,  1,  1;
+  G_c = 1,  1,  1,  1,   1,  1,  1,  1, .75,  .5,  .5, .5, .5, .75,  1,  1;      
 
-  add_solver<solvers::donorcell_1d<real_t>>(slvs, "mpdata_iters=1");
+  add_solver<solvers::mpdata_1d<real_t>>(slvs, "");
   // advecting density with Courant number
-  slvs.back().g_factor() = 1;
   slvs.back().advectee() = G * phi;
   slvs.back().advector() = GC / G_c; 
 
-  add_solver<solvers::donorcell_1d<real_t, formulae::opts::nug>>(slvs, "mpdata_iters=1_nug");
+  add_solver<solvers::mpdata_1d<real_t, formulae::opts::nug>>(slvs, "_nug");
   // advecting mixing ratio with C times rho
   slvs.back().g_factor() = G;
   slvs.back().advectee() = phi;
@@ -72,7 +83,18 @@ int main()
   if (sum(G * phi) != sum(slvs.at(0).advectee())) throw;
   if (sum(G * phi) != sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) throw;
 
-  for (auto &slv : slvs) slv.advance(nt);
+  Gnuplot gp;
+  gp << "set term svg size 1200, 500\n";
+  gp << "set output 'output.svg'\n";
+  gp << "set yrange [0:12]\n";
+  gp << "set multiplot layout 2,3 columnsfirst\n";
+  gp << "set grid\n";
+
+  plot(gp, slvs, G);
+  for (auto &slv : slvs) slv.advance(20);
+  plot(gp, slvs, G);
+  for (auto &slv : slvs) slv.advance(30);
+  plot(gp, slvs, G);
 
   real_t eps = 1e-6;
   // have to use std::abs(), as abs() alone returns an integer!

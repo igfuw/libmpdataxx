@@ -59,6 +59,7 @@ namespace libmpdataxx
 	this->mem->barrier();
 
 	// calculating the monotonic corrective velocity
+// TODO: G
 	this->GC_mono[0]( im+h, jm ) = formulae::mpdata::C_mono<opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, im, jm);
 	this->GC_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, jm, im);
 

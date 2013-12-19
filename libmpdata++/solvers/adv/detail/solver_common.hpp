@@ -123,6 +123,7 @@ namespace libmpdataxx
 #endif
         }
 
+// TODO: this conflicts with multiple solve() calls - consider removing it
         virtual void hook_post_loop() 
         {
 #if !defined(NDEBUG)
@@ -150,12 +151,18 @@ namespace libmpdataxx
 #endif
         }
 
-	virtual void solve(const int nt) final
+	virtual void solve(int nt) final
 	{   
+          // multiple calls to sovlve() are meant to advance the solution by nt
+          nt += timestep;
+
           // being generous about out-of-loop barriers 
-          this->mem->barrier();
-          hook_ante_loop(nt);
-          this->mem->barrier();
+          if (timestep == 0)
+          {
+	    this->mem->barrier();
+	    hook_ante_loop(nt);
+	    this->mem->barrier();
+          }
 
 	  while (timestep < nt)
 	  {   
