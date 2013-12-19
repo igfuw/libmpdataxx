@@ -41,7 +41,7 @@
 template <typename real_t, int qx, int qy, int h>
 class shallow_water : public solvers::detail::solver_velocity_common<
   solvers::inhomo_solver<
-    solvers::mpdata_fct_2d<real_t>, 
+    solvers::mpdata_fct_2d<real_t>, // TODO: inherit from the solver...
     solvers::strang
   >, qx, qy, h
 >

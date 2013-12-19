@@ -1,4 +1,5 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- steps instead of histeps in output gnuplot (in tests as well?)
 - G in formulae
 - halo filling for G
 - CMake install() rules (as in libcloudphxx)
