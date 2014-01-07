@@ -17,6 +17,7 @@ namespace libmpdataxx
   {
     template<
       typename real_t, 
+      int n_eqs,
       formulae::opts::opts_t opts,
       int halo = formulae::leapfrog::halo
     >
@@ -24,6 +25,7 @@ namespace libmpdataxx
       real_t, 
       1, 
       formulae::leapfrog::n_tlev, 
+      n_eqs,
       opts,
       detail::max(halo, formulae::leapfrog::halo)
     > 
@@ -32,6 +34,7 @@ namespace libmpdataxx
         real_t, 
         1,  
         formulae::leapfrog::n_tlev, 
+        n_eqs,
         opts,
         detail::max(halo, formulae::leapfrog::halo)
       >;

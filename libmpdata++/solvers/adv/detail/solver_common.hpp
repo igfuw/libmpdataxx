@@ -29,16 +29,13 @@ namespace libmpdataxx
         return a > b ? a : b;
       }
 
-      template <typename real_t_, int n_dims_, int n_tlev_, int minhalo>
+      template <typename real_t_, int n_dims_, int n_tlev_, int n_eqs_, int minhalo>
       class solver_common
       {
-        protected:
-
-        const int n_eqs;
-
 	public:
 
         // using enums as "public static const int" would need instantiation (TODO: is it really true???)
+        enum { n_eqs = n_eqs_ };
         enum { halo = minhalo }; 
         enum { n_dims = n_dims_ };
         enum { n_tlev = n_tlev_ };
@@ -92,7 +89,6 @@ namespace libmpdataxx
 
         struct params_t 
         {
-          int n_eqs = 1;
           std::array<int, n_dims> span;
         };
 
@@ -133,11 +129,10 @@ namespace libmpdataxx
 
 	// ctor
 	solver_common(mem_t *mem, const params_t &p) :
-          n_eqs(p.n_eqs),
-	  n(p.n_eqs, 0), 
+	  n(n_eqs, 0), 
           mem(mem)
 	{
-	  assert(p.n_eqs > 0);
+	  static_assert(n_eqs > 0, "!");
         }
 
         // dtor
@@ -199,7 +194,7 @@ namespace libmpdataxx
         static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }
       };
 
-      template<typename real_t, int n_dims, int n_tlev, formulae::opts::opts_t opts, int minhalo>
+      template<typename real_t, int n_dims, int n_tlev, int n_eqs, formulae::opts::opts_t opts, int minhalo>
       class solver
       {}; 
     }; // namespace detail

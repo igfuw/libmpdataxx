@@ -19,13 +19,14 @@ namespace libmpdataxx
   {
     template <
       typename real_t, 
+      int n_eqs,
       formulae::mpdata::opts_t opts,
       int minhalo
     > 
-    class mpdata_fct<real_t, 1, opts, minhalo> : 
-      public detail::mpdata_fct_common<real_t, 1, opts, minhalo> 
+    class mpdata_fct<real_t, 1, n_eqs, opts, minhalo> : 
+      public detail::mpdata_fct_common<real_t, 1, n_eqs, opts, minhalo> 
     {
-      using parent_t = detail::mpdata_fct_common<real_t, 1, opts, minhalo>; 
+      using parent_t = detail::mpdata_fct_common<real_t, 1, n_eqs, opts, minhalo>; 
 
       using parent_t::parent_t; // inheriting constructors
 
@@ -63,7 +64,7 @@ namespace libmpdataxx
         );
 	
         // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-        if (iter == this->n_iters - 1 && this->n_eqs > 1) this->mem->barrier();  // TODO: move to common
+        if (iter == this->n_iters - 1 && n_eqs > 1) this->mem->barrier();  // TODO: move to common
       }
     };
   }; // namespace solvers

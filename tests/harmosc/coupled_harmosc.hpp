@@ -50,9 +50,9 @@
 using namespace libmpdataxx;
 
 template <typename real_t, solvers::inhomo_e inhomo, int psi, int phi>
-class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t>, inhomo>
+class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t, /* n_eqs = */ 2>, inhomo>
 {
-  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t>, inhomo>;
+  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t, /* n_eqs = */ 2>, inhomo>;
 
   typename parent_t::real_t omega;
   typename parent_t::arr_t tmp;
@@ -81,9 +81,6 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t>
   struct params_t : parent_t::params_t 
   { 
     typename parent_t::real_t omega; 
-
-    // ctor setting n_eqs
-    params_t() { this->n_eqs = 2; }
   };
 
   // ctor
@@ -94,9 +91,7 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t>
     parent_t(args, p),
     omega(p.omega), 
     tmp(args.mem->tmp[__FILE__][0][0]) 
-  {
-    assert(p.n_eqs == 2);
-  }
+  { }
 
   static void alloc(
     typename parent_t::mem_t *mem,

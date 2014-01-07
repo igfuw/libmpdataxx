@@ -55,22 +55,10 @@ namespace libmpdataxx
 	}
 
         // ctor
-        mem_t(const int &n_eqs, const std::array<int, solver_t::n_dims> &span) :
+        mem_t(const std::array<int, solver_t::n_dims> &span) :
           b(size()),
-          parent_t::mem_t(n_eqs, span, size()) 
+          parent_t::mem_t(span, size()) 
         {}; 
-
-/*
-        mem_t(const int n_eqs, const int s0, const int s1) : 
-          b(size()),
-          parent_t::mem_t(n_eqs, s0, s1, size()) 
-        {}; 
-
-        mem_t(const int n_eqs, const int s0, const int s1, const int s2) : 
-          b(size()),
-          parent_t::mem_t(n_eqs, s0, s1, s2, size()) 
-        {}; 
-*/
 
 	void barrier()
 	{
@@ -97,7 +85,7 @@ namespace libmpdataxx
 
       // ctor
       boost_thread(const typename solver_t::params_t &p) : 
-        parent_t(p, new mem_t(p.n_eqs, p.span), mem_t::size())
+        parent_t(p, new mem_t(p.span), mem_t::size())
       {}
 
     };

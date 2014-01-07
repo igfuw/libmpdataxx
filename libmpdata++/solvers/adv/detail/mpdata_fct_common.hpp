@@ -15,13 +15,13 @@ namespace libmpdataxx
 
       const int fct_min_halo = 2; // TODO move to fct::formulae? & document why 2
 
-      template <typename real_t, int n_dims, formulae::mpdata::opts_t opts, int minhalo>
+      template <typename real_t, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int minhalo>
       class mpdata_fct_common : public mpdata<
-        real_t, n_dims, opts, detail::max(minhalo, fct_min_halo)
+        real_t, n_dims, n_eqs, opts, detail::max(minhalo, fct_min_halo)
       >
       {
         using parent_t = mpdata<
-          real_t, n_dims, opts, detail::max(minhalo, fct_min_halo)
+          real_t, n_dims, n_eqs, opts, detail::max(minhalo, fct_min_halo)
         >;
 
         protected:
@@ -62,18 +62,18 @@ namespace libmpdataxx
       };
     }; // namespace detail
 
-    template<typename real_t, int n_dims, formulae::mpdata::opts_t opts, int minhalo> // TODO: reconsider arg order...
+    template<typename real_t, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int minhalo> // TODO: reconsider arg order...
     class mpdata_fct
     {};
 
     // alias names
-    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_fct_1d = mpdata_fct<real_t, 1, opts, minhalo>;
+    template <typename real_t, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_fct_1d = mpdata_fct<real_t, 1, n_eqs, opts, minhalo>;
 
-    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_fct_2d = mpdata_fct<real_t, 2, opts, minhalo>;
+    template <typename real_t, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_fct_2d = mpdata_fct<real_t, 2, n_eqs, opts, minhalo>;
 
-    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_fct_3d = mpdata_fct<real_t, 3, opts, minhalo>;
+    template <typename real_t, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_fct_3d = mpdata_fct<real_t, 3, n_eqs, opts, minhalo>;
   }; // namespace solvers
 }; // namescpae libmpdataxx

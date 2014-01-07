@@ -12,13 +12,13 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <typename real_t, int n_dims, formulae::mpdata::opts_t opts, int minhalo>
+      template <typename real_t, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int minhalo>
       class mpdata_common : public detail::solver<
-        real_t, n_dims, formulae::mpdata::n_tlev, opts, detail::max(minhalo, formulae::mpdata::halo(opts))
+        real_t, n_dims, formulae::mpdata::n_tlev, n_eqs, opts, detail::max(minhalo, formulae::mpdata::halo(opts))
       >
       {
         using parent_t = detail::solver<
-          real_t, n_dims, formulae::mpdata::n_tlev, opts, detail::max(minhalo, formulae::mpdata::halo(opts))
+          real_t, n_dims, formulae::mpdata::n_tlev, n_eqs, opts, detail::max(minhalo, formulae::mpdata::halo(opts))
         >;
 
 	using GC_t = arrvec_t<typename parent_t::arr_t>;
@@ -102,18 +102,18 @@ namespace libmpdataxx
       };
     }; // namespace detail
 
-    template<typename real_t, int n_dims, formulae::mpdata::opts_t opts, int minhalo> // TODO: reconsider arg order...
+    template<typename real_t, int n_dims, int n_eqs, formulae::mpdata::opts_t opts, int minhalo> // TODO: reconsider arg order...
     class mpdata
     {};
 
     // alias names
-    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_1d = mpdata<real_t, 1, opts, minhalo>;
+    template <typename real_t, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_1d = mpdata<real_t, 1, n_eqs, opts, minhalo>;
 
-    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_2d = mpdata<real_t, 2, opts, minhalo>;
+    template <typename real_t, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_2d = mpdata<real_t, 2, n_eqs, opts, minhalo>;
 
-    template <typename real_t, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
-    using mpdata_3d = mpdata<real_t, 3, opts, minhalo>;
+    template <typename real_t, int n_eqs = 1, formulae::mpdata::opts_t opts = 0, int minhalo = 0>
+    using mpdata_3d = mpdata<real_t, 3, n_eqs, opts, minhalo>;
   }; // namespace solvers
 }; // namescpae libmpdataxx

@@ -35,7 +35,6 @@ void setopts(T &p, const int nt, const std::string &fname, int n_iters)
 {
   p.n_iters = n_iters;
 
-  p.n_eqs = 2;
   p.outfreq = nt; // displays initial condition and the final state
   p.gnuplot_output = fname + ".svg";    
   p.outvars = {
@@ -63,10 +62,10 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  add_solver<solvers::mpdata_1d<real_t>>(slvs, "mpdata_iters=2", 2);
-  add_solver<solvers::mpdata_1d<real_t, formulae::opts::npa>>(slvs, "mpdata_iters=2_npa", 2);
-  add_solver<solvers::mpdata_1d<real_t>>(slvs, "mpdata_iters=3", 3);
-  add_solver<solvers::mpdata_1d<real_t, formulae::opts::npa>>(slvs, "mpdata_iters=3_npa", 3);
+  add_solver<solvers::mpdata_1d<real_t, /* n_eqs = */ 2>>(slvs, "mpdata_iters=2", 2);
+  add_solver<solvers::mpdata_1d<real_t, /* n_eqs = */ 2, formulae::opts::npa>>(slvs, "mpdata_iters=2_npa", 2);
+  add_solver<solvers::mpdata_1d<real_t, /* n_eqs = */ 2>>(slvs, "mpdata_iters=3", 3);
+  add_solver<solvers::mpdata_1d<real_t, /* n_eqs = */ 2, formulae::opts::npa>>(slvs, "mpdata_iters=3_npa", 3);
 
   for (auto &slv : slvs) slv.advance(nt);
 }

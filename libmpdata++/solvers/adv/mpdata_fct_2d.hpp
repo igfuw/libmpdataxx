@@ -17,11 +17,11 @@ namespace libmpdataxx
 {
   namespace solvers
   {
-    template <typename real_t, formulae::mpdata::opts_t opts, int minhalo> 
-    class mpdata_fct<real_t, 2, opts, minhalo> : 
-      public detail::mpdata_fct_common<real_t, 2, opts, minhalo> 
+    template <typename real_t, int n_eqs, formulae::mpdata::opts_t opts, int minhalo> 
+    class mpdata_fct<real_t, 2, n_eqs, opts, minhalo> : 
+      public detail::mpdata_fct_common<real_t, 2, n_eqs, opts, minhalo> 
     {
-      using parent_t = detail::mpdata_fct_common<real_t, 2, opts, minhalo>; 
+      using parent_t = detail::mpdata_fct_common<real_t, 2, n_eqs, opts, minhalo>; 
 
       using parent_t::parent_t; // inheriting ctors
 
@@ -64,7 +64,7 @@ namespace libmpdataxx
 	this->GC_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, jm, im);
 
         // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-        if (iter == this->n_iters - 1 && this->n_eqs > 1) this->mem->barrier();  // TODO: move to common
+        if (iter == this->n_iters - 1 && n_eqs > 1) this->mem->barrier();  // TODO: move to common
       }
     };
   }; // namespace solvers

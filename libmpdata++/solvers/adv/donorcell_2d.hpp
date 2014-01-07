@@ -15,6 +15,7 @@ namespace libmpdataxx
   {
     template<
       typename real_t, 
+      int n_eqs = 1,
       formulae::opts::opts_t opts = 0, 
       int minhalo = formulae::donorcell::halo
     >
@@ -22,6 +23,7 @@ namespace libmpdataxx
       real_t,
       2,
       formulae::donorcell::n_tlev,
+      n_eqs,
       opts,
       detail::max(minhalo, formulae::donorcell::halo)
     > 
@@ -30,6 +32,7 @@ namespace libmpdataxx
         real_t,
         2,
         formulae::donorcell::n_tlev, 
+        n_eqs,
         opts,
         detail::max(minhalo, formulae::donorcell::halo)
       >;

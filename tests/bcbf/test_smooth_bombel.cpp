@@ -72,8 +72,7 @@ int main()
     using solver_t = output::gnuplot<
       bombel<
 	solvers::pressure_cr<
-//        solvers::donorcell_2d<real_t>,
-	  solvers::mpdata_fct_2d<real_t>,
+	  solvers::mpdata_fct_2d<real_t, /* n_eqs = */ 3>,
 	  u, w
         >
       >

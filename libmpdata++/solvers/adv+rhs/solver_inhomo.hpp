@@ -46,14 +46,14 @@ namespace libmpdataxx
         update_forcings_called = true;
 #endif
         // zero-out all rhs arrays
-	for (int e = 0; e < this->n_eqs; ++e) 
+	for (int e = 0; e < parent_t::n_eqs; ++e) 
           rhs.at(e)(this->ijk) = 0;
       }
 
       // this assumes explicit form - TODO: _explicit in a different file? (alloc, apply, update)
       virtual void apply_forcings(typename parent_t::real_t dt_arg)
       {
-        for (int e = 0; e < this->n_eqs; ++e) 
+        for (int e = 0; e < parent_t::n_eqs; ++e) 
           this->state(e)(this->ijk) += dt_arg * rhs.at(e)(this->ijk);
       }
 
@@ -143,7 +143,7 @@ namespace libmpdataxx
       static void alloc(typename parent_t::mem_t *mem, const params_t &p)
       {
 	parent_t::alloc(mem, p);
-        parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, p.n_eqs); // rhs array for each equation
+        parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, parent_t::n_eqs); // rhs array for each equation
       }
     };
   }; // namespace solvers
