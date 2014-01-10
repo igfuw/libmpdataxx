@@ -69,6 +69,8 @@ int main()
   G   =   1,  1,  1,  1,   1,  1,  1,  1,  .5,  .5,  .5, .5, .5,  1,  1;
   G_c = 1,  1,  1,  1,   1,  1,  1,  1, .75,  .5,  .5, .5, .5, .75,  1,  1;      
 
+
+
   add_solver<solvers::mpdata_1d<real_t>>(slvs, "");
   // advecting density with Courant number
   slvs.back().advectee() = G * phi;

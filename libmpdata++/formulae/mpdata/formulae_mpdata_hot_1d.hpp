@@ -14,7 +14,7 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-      // 3rd order term (first term from eq. (36) from @copybrief Smolarkiewicz_and_Margolin_1998 (with G=1))
+      // 3rd order term (first term from eq. (36) from @copybrief Smolarkiewicz_and_Margolin_1998)
       template<opts_t opts, class arr_1d_t>
       inline auto HOT(
         const arr_1d_t &psi,

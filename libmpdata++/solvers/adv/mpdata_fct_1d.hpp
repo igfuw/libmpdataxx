@@ -44,7 +44,10 @@ namespace libmpdataxx
       void fct_adjust_antidiff(int e, int iter)
       {
         const int d = 0; // 1D version -> working in x dimension only
+        const auto psi = this->mem->psi[e][this->n[e]];
         const auto &GC_corr = parent_t::GC_corr(iter);
+        const auto &G = *this->mem->G;
+        const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 
         // fill halos -> mpdata works with halo=1, we need halo=2
 // TODO: other option would be to define im as a function of halo in mpdata!
@@ -54,13 +57,7 @@ namespace libmpdataxx
 	this->mem->barrier();
 
         // calculating the monotonic corrective velocity
-	this->GC_mono[d]( this->im+h ) = formulae::mpdata::C_mono<opts>(
-          this->mem->psi[e][this->n[e]],
-          this->psi_min, 
-          this->psi_max, // TODO: G!
-          GC_corr[d], 
-          this->im // calculating once for i-1/2 and i+1/2
-        );
+	this->GC_mono[d]( this->im+h ) = formulae::mpdata::GC_mono<opts>(psi, this->psi_min, this->psi_max, GC_corr[d], G, im);
 	
         // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
         if (iter == this->n_iters - 1 && this->n_eqs > 1) this->mem->barrier();  // TODO: move to common

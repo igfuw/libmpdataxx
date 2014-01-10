@@ -33,7 +33,7 @@ int main()
 
   const int nt = 2; 
 
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, 1, formulae::opts::pds>>;
+  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, formulae::opts::pds>>;
   solver_t::params_t p;
 
   // pre instantiatio
