@@ -8,12 +8,10 @@
  * \image html "../../tests/mpdata_1d_opt_nug/figure_iters=3.svg" TODO
  */
 
-#include <libmpdata++/solvers/adv/donorcell_1d.hpp> // TODO: this test is aimed at testing MPDATA
-#include <libmpdata++/solvers/adv/mpdata_1d.hpp> // TODO: this test is aimed at testing MPDATA
-#include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/solvers/mpdata.hpp> 
 #include <libmpdata++/concurr/threads.hpp>
 #define GNUPLOT_ENABLE_BLITZ
-#include <gnuplot-iostream/gnuplot-iostream.h> // TODO: Debian does not use a su
+#include <gnuplot-iostream/gnuplot-iostream.h> // TODO: Debian does not use a subdirectory
 
 using namespace libmpdataxx;
 
@@ -30,10 +28,18 @@ void setopts(T &p, const std::string &sfx)
   p.n_iters =   2; //number of iterations
 }
 
-template <class solver_t, class vec_t>
+template <formulae::opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &sfx)
 {
-  typename solver_t::params_t p;
+  struct ct_params_t
+  {
+    using real_t = real_t;
+    enum { n_dims = 1 };
+    enum { n_eqs = 1 };
+    enum { opts = opt };
+  };
+  using solver_t = solvers::mpdata<ct_params_t>;
+  typename solver_t::rt_params_t p;
   setopts(p, sfx);
   p.span = {n};
   slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(p));
@@ -69,12 +75,12 @@ int main()
   G   =   1,  1,  1,  1,   1,  1,  1,  1,  .5,  .5,  .5, .5, .5,  1,  1;
   G_c = 1,  1,  1,  1,   1,  1,  1,  1, .75,  .5,  .5, .5, .5, .75,  1,  1;      
 
-  add_solver<solvers::mpdata_1d<real_t>>(slvs, "");
+  add_solver<0>(slvs, "");
   // advecting density with Courant number
   slvs.back().advectee() = G * phi;
   slvs.back().advector() = GC / G_c; 
 
-  add_solver<solvers::mpdata_1d<real_t, formulae::opts::nug>>(slvs, "_nug");
+  add_solver<formulae::opts::nug>(slvs, "_nug");
   // advecting mixing ratio with C times rho
   slvs.back().g_factor() = G;
   slvs.back().advectee() = phi;

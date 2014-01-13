@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/adv/detail/solver_1d.hpp>
+#include <libmpdata++/solvers/detail/solver_1d.hpp>
 #include <libmpdata++/formulae/leapfrog_formulae.hpp>
 
 // TODO: this doesn't work yet - just a draft! needs an initial non-leapfrog step
@@ -16,26 +16,20 @@ namespace libmpdataxx
   namespace solvers
   {
     template<
-      typename real_t, 
-      int n_eqs,
-      formulae::opts::opts_t opts,
+      typename ct_params_t, 
       int halo = formulae::leapfrog::halo
     >
     class leapfrog_1d : public detail::solver<
-      real_t, 
+      ct_params_t, 
       1, 
       formulae::leapfrog::n_tlev, 
-      n_eqs,
-      opts,
       detail::max(halo, formulae::leapfrog::halo)
     > 
     {
       using parent_t = detail::solver<
-        real_t, 
+        ct_params_t, 
         1,  
         formulae::leapfrog::n_tlev, 
-        n_eqs,
-        opts,
         detail::max(halo, formulae::leapfrog::halo)
       >;
 

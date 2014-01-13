@@ -115,7 +115,7 @@ namespace libmpdataxx
 
 	public:
 
-	struct params_t : parent_t::params_t 
+	struct rt_params_t : parent_t::rt_params_t 
         { 
           real_t dx, dz;
         };
@@ -123,7 +123,7 @@ namespace libmpdataxx
 	// ctor
 	solver_velocity_common(
 	  typename parent_t::ctor_args_t args,
-	  const params_t &p
+	  const rt_params_t &p
 	) : 
 	  parent_t(args, p),
           im(args.i.first() - 1, args.i.last()),
@@ -135,7 +135,7 @@ namespace libmpdataxx
         } 
 
 	// 1D version
-	static void alloc(typename parent_t::mem_t *mem, const params_t &p)
+	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
 	{
 	  parent_t::alloc(mem, p);
 	  parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, parent_t::n_dims); // psi[n-1] secret stash for velocity extrapolation in time

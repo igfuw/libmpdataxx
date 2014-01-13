@@ -12,8 +12,7 @@
 #include <libmpdata++/concurr/serial.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 
-#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
-#include <libmpdata++/bcond/cyclic_1d.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 
 int main()
 {
@@ -26,14 +25,21 @@ int main()
   std::cerr << "off" << std::endl;
 #endif
 
-  using real_t = long double;
+  struct ct_params_t 
+  { 
+    using real_t = long double; 
+    enum { n_dims = 1 };
+    enum { n_eqs = 1 };
+    enum { opts = 0 };
+  };
+
   const int nx = 10, nt = 1000;
    
   // OpenMP
   std::cerr << "OpenMP run" << std::endl;
   {
-    using solver_t = solvers::mpdata_1d<real_t>;
-    typename solver_t::params_t p;
+    using solver_t = solvers::mpdata<ct_params_t>;
+    typename solver_t::rt_params_t p;
     p.span = {nx};
     concurr::openmp<solver_t, bcond::cyclic> slv(p);
     slv.advance(nt);
@@ -42,8 +48,8 @@ int main()
   // Boost.Thread
   std::cerr << "Boost.Thread run" << std::endl;
   {
-    using solver_t = solvers::mpdata_1d<real_t>;
-    typename solver_t::params_t p;
+    using solver_t = solvers::mpdata<ct_params_t>;
+    typename solver_t::rt_params_t p;
     p.span = {nx};
     concurr::boost_thread<solver_t, bcond::cyclic> slv(p);
     slv.advance(nt);
@@ -52,8 +58,8 @@ int main()
   // trheads (i.e. auto)
   std::cerr << "threads run" << std::endl;
   {
-    using solver_t = solvers::mpdata_1d<real_t>;
-    typename solver_t::params_t p;
+    using solver_t = solvers::mpdata<ct_params_t>;
+    typename solver_t::rt_params_t p;
     p.span = {nx};
     concurr::threads<solver_t, bcond::cyclic> slv(p);
     slv.advance(nt);
@@ -62,8 +68,8 @@ int main()
   // serial
   std::cerr << "serial run" << std::endl;
   {
-    using solver_t = solvers::mpdata_1d<real_t>;
-    typename solver_t::params_t p;
+    using solver_t = solvers::mpdata<ct_params_t>;
+    typename solver_t::rt_params_t p;
     p.span = {nx};
     concurr::serial<solver_t, bcond::cyclic> slv(p);
     slv.advance(nt);

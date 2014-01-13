@@ -64,6 +64,7 @@ namespace libmpdataxx
           if (p.gnuplot_command == "splot") 
           {
             *gp << "set yrange [0:" << nt << "]\n";
+            if (p.gnuplot_xyplane_at != "") *gp << "set xyplane at " << p.gnuplot_xyplane_at << "\n";
             assert(p.gnuplot_yrange == "[*:*]" && "gnupot_yrange was specified for a 1D splot where Y axis represents time");
 
             if (p.gnuplot_ylabel == "") *gp << "set ylabel 't/dt'\n";
@@ -81,14 +82,14 @@ namespace libmpdataxx
 
           for (int t = 0; t <= nt; t+=p.outfreq)
           {
-	    for (const auto &v : p.outvars)
+	    for (const auto &v : this->outvars)
             {
 	      *gp << ", '-'";
               if (p.gnuplot_command == "splot") *gp << " using 0:(" << t << "):1";
               *gp << " with " << p.gnuplot_with;
  
               *gp << " lt ";
-              if (p.outvars.size() == 1) *gp <<  p.gnuplot_lt;
+              if (this->outvars.size() == 1) *gp <<  p.gnuplot_lt;
               else *gp << v.first;
 
               *gp << (
@@ -177,10 +178,10 @@ namespace libmpdataxx
 
       public:
 
-      struct params_t : parent_t::params_t 
+      struct rt_params_t : parent_t::rt_params_t 
       { 
 	std::string 
-          gnuplot_output,
+          gnuplot_output = std::string("out.svg"),
           gnuplot_with = ( // TODO: place somewhere an assert for histps/fsteps - apparently steps are the only correct here
             parent_t::n_dims == 2 
 	      ? std::string("image failsafe") // 2D
@@ -197,6 +198,7 @@ namespace libmpdataxx
           gnuplot_zrange = std::string("[*:*]"),
           gnuplot_yrange = std::string("[*:*]"),
           gnuplot_xrange = std::string("[*:*]"),
+          gnuplot_xyplane_at = std::string(""),
           gnuplot_cbrange = std::string("[*:*]"),
           gnuplot_border = std::string(""),
           gnuplot_lt = std::string("-1"), // black
@@ -209,12 +211,13 @@ namespace libmpdataxx
           gnuplot_surface = true;
       };
 
-      const params_t p; // TODO: that's a copy - convenient but might be memory-consuming, make a struct p.gnupot that would be copied
+      const rt_params_t p; // TODO: that's a copy - convenient but might be memory-consuming, make a struct p.gnupot that would be copied
+      // TODO: make a gnuplot_params map and copy only this map!
 
       // ctor
       gnuplot(
 	typename parent_t::ctor_args_t args,
-	const params_t &p
+	const rt_params_t &p
       ) : parent_t(args, p), p(p)
       {}
     }; 

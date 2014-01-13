@@ -7,8 +7,8 @@
 #pragma once
 
 #include <libmpdata++/blitz.hpp>
-#include <libmpdata++/idxperm.hpp>
-#include <libmpdata++/arakawa_c.hpp>
+#include <libmpdata++/formulae/idxperm.hpp>
+#include <libmpdata++/formulae/arakawa_c.hpp>
 #include <libmpdata++/formulae/opts.hpp>
 
 //#include <boost/preprocessor/control/if.hpp>

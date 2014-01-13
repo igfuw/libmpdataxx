@@ -13,16 +13,21 @@
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_fct_2d.hpp>
-#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
+using namespace libmpdataxx;
 
 enum {x, y};
-using real_t = float;
+struct ct_params_t
+{
+  using real_t = float;
+  enum { n_dims = 2 };
+  enum { n_eqs = 1 };
+  enum { opts = formulae::opts::iga | formulae::opts::toa | formulae::opts::fct };
+};
 
-real_t 
+ct_params_t::real_t 
   dt = .1,
   dx = 1,
   dy = 1,
@@ -42,20 +47,16 @@ real_t
 
 int main() 
 {
-  using namespace libmpdataxx;
-
-  // nt = 200;
   int nt = 628 * 6;
 
-  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t/*, formulae::opts::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, formulae::opts::iga | formulae::opts::toa>>;
-  solver_t::params_t p;
+  using solver_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
+  solver_t::rt_params_t p;
 
   // pre instantiation
   p.n_iters = 2;
-  p.span = {101, 101}; // {32, 32}, 
+  p.span = {101, 101};
 
-  p.outfreq = nt; //nt;///10; // TODO
+  p.outfreq = nt; 
   p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;
@@ -81,23 +82,12 @@ int main()
   }
   p.gnuplot_term = "svg";
 
-/*
-  p.outfreq = nt;
-  p.gnuplot_with = "lines";
-  {
-    std::ostringstream tmp;
-    tmp << "figure_iters=" << p.n_iters << "_%s_%d.svg";
-    p.gnuplot_output = tmp.str();
-  }
-  p.outvars[0].name = "psi";
-*/
-
   // instantiation
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(p); 
 
   // post instantiation
   {
-    real_t
+    ct_params_t::real_t
       r = 15. * dx,
       x0 = 75 * dx,
       y0 = 50 * dy,

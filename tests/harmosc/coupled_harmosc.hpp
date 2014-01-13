@@ -43,42 +43,63 @@
  * what is represented by the forcings() method in the example below.
  *
  */
+// TODO: update docs above!
 
-#include <libmpdata++/solvers/adv+rhs/solver_inhomo.hpp>
-#include <libmpdata++/blitz.hpp>
+#include <libmpdata++/solvers/mpdata_rhs.hpp>
 
-using namespace libmpdataxx;
-
-template <typename real_t, solvers::inhomo_e inhomo, int psi, int phi>
-class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t, /* n_eqs = */ 2>, inhomo>
+template <class ct_params_t, int psi, int phi>
+class coupled_harmosc : public libmpdataxx::solvers::mpdata_rhs<ct_params_t>
 {
-  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t, /* n_eqs = */ 2>, inhomo>;
+  static_assert(ct_params_t::n_eqs == 2, "psi & phi");
+  using parent_t = libmpdataxx::solvers::mpdata_rhs<ct_params_t>;
+  enum { n = 0 }; // just to make n, n+1 look nice :)
 
+  // member fields
   typename parent_t::real_t omega;
   typename parent_t::arr_t tmp;
 
-  void apply_forcings(typename parent_t::real_t dt)
-  {
+  void update_rhs(
+    libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs, 
+    typename parent_t::real_t dt,
+    const int &at
+  ) {
+    parent_t::update_rhs(rhs, dt, at);
+
     auto Psi = this->state(psi);
     auto Phi = this->state(phi);
-    rng_t &i = this->i;
+    auto &i = this->i;
 
-    tmp(i) = Psi(i);
-    ///   (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
-    // explicit part
-    Psi(i) += dt * omega * Phi(i);
-    // implicit part
-    Psi(i) /= (1 + pow(dt * omega, 2));
+    switch (at)
+    {
+      /// explicit solution for R^{n}
+      case (n):
+      rhs.at(psi)(i) += omega * Phi(i);
+      rhs.at(phi)(i) -= omega * Psi(i);
+      break;
+   
+      case (n+1):
+      /// implicit solution for R^{n+1}
+      /// (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
+      rhs.at(psi)(i) += (
+	(Psi(i) + dt * omega * Phi(i)) / (1 + pow(dt * omega, 2))
+	- 
+	Psi(i)
+      ) / dt;
 
-    // explicit part
-    Phi(i) += - dt * omega * tmp(i);
-    // implicit part
-    Phi(i) /= (1 + pow(dt * omega, 2));
+      rhs.at(phi)(i) += (
+        (Phi(i) - dt * omega * Psi(i)) / (1 + pow(dt * omega, 2))
+        -
+        Phi(i)
+      ) / dt;
+      break;
+  
+      default: assert(false); 
+    }
   }
 
   public:
 
-  struct params_t : parent_t::params_t 
+  struct rt_params_t : parent_t::rt_params_t 
   { 
     typename parent_t::real_t omega; 
   };
@@ -86,21 +107,9 @@ class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t,
   // ctor
   coupled_harmosc(
     typename parent_t::ctor_args_t args,
-    const params_t &p
+    const rt_params_t &p
   ) :
     parent_t(args, p),
-    omega(p.omega), 
-    tmp(args.mem->tmp[__FILE__][0][0]) 
-  { }
-
-  static void alloc(
-    typename parent_t::mem_t *mem,
-    const params_t &p
-  )
-  {
-    // TODO: move to inhomo!
-    parent_t::alloc(mem, p);
-    mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
-    mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, p.span[0]-1) )); 
-  }
+    omega(p.omega)
+  {}
 };

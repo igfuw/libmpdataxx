@@ -10,14 +10,12 @@
  * \image html "../../tests/var_sign_2d/figure.svg"
  */
 
-#include <libmpdata++/solvers/adv/donorcell_2d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
-#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
 using namespace libmpdataxx;
-using real_t = float;
+using T = float;
 
 enum {x, y};
 int nt = 10;
@@ -28,7 +26,7 @@ void add_solver(
   const typename solver_t::real_t offset, 
   const std::string fname
 ) {
-  typename solver_t::params_t p;
+  typename solver_t::rt_params_t p;
 
   // pre instantiation
   p.span = {24, 24};
@@ -65,19 +63,37 @@ void add_solver(
 
 int main() 
 {
-  boost::ptr_vector<concurr::any<real_t, 2>> slvs;
+  boost::ptr_vector<concurr::any<T, 2>> slvs;
 
-  for (auto &offset : std::vector<real_t>({0,-.5}))
+  for (auto &offset : std::vector<T>({0,-.5}))
   {
-    add_solver<output::gnuplot<solvers::donorcell_2d<real_t>>>(
-      slvs, offset, "donorcell"
-    );
-    add_solver<output::gnuplot<solvers::mpdata_2d<real_t>>>(
-      slvs, offset, "mpdata_it=2"
-    );
-    add_solver<output::gnuplot<solvers::mpdata_2d<real_t, formulae::opts::pds>>>(
-      slvs, offset, "mpdata-pds_it=2"
-    );
+//    add_solver<output::gnuplot<solvers::donorcell_2d<real_t>>>(
+//      slvs, offset, "donorcell"
+//    );
+    {
+      struct ct_params_t
+      {
+        using real_t = T;
+        enum { n_dims = 2 };
+        enum { n_eqs = 2 };
+        enum { opts = 0 };
+      };
+      add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
+        slvs, offset, "mpdata_it=2"
+      );
+    }
+    {
+      struct ct_params_t
+      {
+        using real_t = T;
+        enum { n_dims = 2 };
+        enum { n_eqs = 2 };
+        enum { opts = formulae::opts::pds };
+      };
+      add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
+        slvs, offset, "mpdata-pds_it=2"
+      );
+    }
   }
 
   for (auto &slv : slvs) slv.advance(nt);

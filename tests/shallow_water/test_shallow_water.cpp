@@ -8,7 +8,6 @@
 #include <boost/math/constants/constants.hpp>
 
 #include <libmpdata++/solvers/adv/mpdata_fct_2d.hpp> // TODO: not here!
-#include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx; // TODO

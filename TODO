@@ -1,15 +1,26 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- unify error handling (std::runtime_error?) get rid of error.hpp; (is there anything needed besides asserts... or boost.asserts?)
+- should all classes be named with _t suffix?
+- static_assert for iga & abs
+- a check for positive-definiteness of the signal in debug mode
+- output out of hooks? (or separate output hooks?)
+- opts -> mpdata_opts
+- SA: finish new API transition: shallow_water and bcbf
+- SA+AJ: make pds default and abs an option
+- check compatibility with new gnuplot_iostream
+- move opts out of formulae namespace
+- finish donorcell and leapfrog tests
+- per-equation options (not all of them!)
+- DJ: spreading drop test from Schar & Smolarkiewicz?
+- AJ+MW: G in 3D
 - steps instead of histeps in output gnuplot (in tests as well?)
-- G in formulae
 - halo filling for G
 - CMake install() rules (as in libcloudphxx)
-- strang/midpoint/euler... into separate files, check nomenclature, reference to discussion in Smolarkiewicz 2006 (eqs. 28, 29, ...), Piotr mentioned relation with RK, improved Euler (eq. 32) / modified Euler (eq. 33)
 - at least a "zero" bcond for icicle
 - test showing difference between real_t=float and real_t=double (and real_t=long double, ...)
 - doc: dependencies section (C++11, Blitz, Boost, OpenMP)
 - doc: README and HACKING files
 - doc: mention the difference between the order of accuracy of integration vs. order of accuracy of an approximation
-- spreading drop test from Schar & Smolarkiewicz?
 - doc: references for shallow-water docs incl. Vallis, http://www.netlib.org/chammp/shallow.bib
 - concurr -> rename concurr_ddecomp
 - bcd_common -> rename dirichlet?
@@ -28,7 +39,6 @@
 - use this->ijk istead of this->i, this->j where it could reduce the number of methods (method_1d = method_2d)
 - check at configure time what's fastest on the current machine: float vs. double, eps vs. where(), .5*(x+|x|) vs. max(x,0) and use these settings!
 - handle bogus subdomain counts (e.g. 0)
-- unify error handling (is there anything needed besides asserts... or boost.asserts?)
 - check if velocity plots with arrows are feasible with output_gnuplot - if not forget about it
 - split output_gnuplot into separate files
 - check if unique_ptrs used and if so if not to change to const unique_ptr"- we do not need transferability
@@ -39,7 +49,6 @@
 - barriers() within nabla operators?
 - check if some enums could not be converted into c++11 enum classes
 - test showing real_t=quantity<> or real_t=mpfr [real_t=int??? :)]
-- move leapfrog from adv to tests and finish it
 - change cyclic_1d, cyclic_2d... suffixed classes into templates (as it was done with solvers)
 - multi-arguent (variadic) xchng to reduce number of barrier() calls
 - setup(solver, ...) methods in tests do not need to take nx, ny as arguments - these are available via solver.state().extent()

@@ -10,23 +10,27 @@
  * \image html "../../tests/gnuplot-iostream_1d/figure_iters=3.svg"
  */
 
-#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
-#include <libmpdata++/solvers/adv/donorcell_1d.hpp>
-#include <libmpdata++/solvers/adv/leapfrog_1d.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
 using namespace libmpdataxx;
 
-using real_t = float;
+struct ct_params_t
+{
+  using real_t = float;
+  enum { n_dims = 1 };
+  enum { n_eqs = 1 };
+  enum { opts = 0 };
+};
+
 int n = 20, nt = 20;
 
 template <class slvs_t>
 void add_solver(slvs_t &slvs, int n_iters)
 {
-  using solver_t = output::gnuplot<solvers::mpdata_1d<real_t>>;
-  typename solver_t::params_t p;
+  using solver_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
+  typename solver_t::rt_params_t p;
 
   // pre-instantiation stuff
   p.span[0] = n;
@@ -54,7 +58,7 @@ void add_solver(slvs_t &slvs, int n_iters)
 
 int main() 
 {
-  boost::ptr_vector<concurr::any<real_t, 1>> slvs;
+  boost::ptr_vector<concurr::any<ct_params_t::real_t, 1>> slvs;
   add_solver(slvs, 1);
   add_solver(slvs, 2);
   add_solver(slvs, 3);

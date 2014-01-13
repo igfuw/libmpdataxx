@@ -6,7 +6,7 @@
  */
 
 #include <libmpdata++/solvers/adv+rhs+vip/solver_velocity_common.hpp> // TODO: common => detail??
-#include <libmpdata++/solvers/adv+rhs/solver_inhomo.hpp> 
+#include <libmpdata++/solvers/mpdata_rhs.hpp> 
 #include <libmpdata++/formulae/nabla_formulae.hpp>
 #include <libmpdata++/formulae/phc.hpp>
 

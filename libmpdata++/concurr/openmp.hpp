@@ -71,7 +71,7 @@ namespace libmpdataxx
       public:
 
       // ctor
-      openmp(const typename solver_t::params_t &p) : 
+      openmp(const typename solver_t::rt_params_t &p) : 
         parent_t(p, new mem_t(p.span), mem_t::size())
       {}
 
