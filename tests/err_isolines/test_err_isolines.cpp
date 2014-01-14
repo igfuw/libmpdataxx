@@ -15,10 +15,7 @@
 #include <boost/assign/ptr_map_inserter.hpp>
 #include <boost/math/constants/constants.hpp>
 
-#include <libmpdata++/solvers/adv/donorcell_1d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_fct_1d.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 
 
@@ -27,16 +24,24 @@ using namespace libmpdataxx;
 using boost::math::constants::pi;
 blitz::firstIndex i;
 boost::ptr_map<std::string, std::ofstream> outfiles;
-using real_t = long double; // this is a good test to show differences between float and double!!!
+using real_t = double; // with long double this is a good test to show differences between float and double!!!
 
 
 // helper function template to ease adding the solvers to the pointer map
-template <class solver_t, class vec_t>
+template <formulae::opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_iters)
 {
-  using params_t = typename solver_t::params_t;
+  struct ct_params_t
+  {
+    using real_t = real_t;
+    enum { n_dims = 1 };
+    enum { n_eqs = 1 };
+    enum { opts = opt };
+  };
+  using solver_t = solvers::mpdata<ct_params_t>;
 
-  params_t p;
+  typename solver_t::rt_params_t p;
+
   p.n_iters = n_iters;
   p.span = {nx};
 
@@ -115,23 +120,21 @@ int main()
 
       // silly loop order, but it helped to catch a major bug!
 
-      // donor-cell
-      add_solver<solvers::mpdata_1d<real_t>>(slvs, "iters=1", nx, 1);
-
       // MPDATA
-      add_solver<solvers::mpdata_1d<real_t>>(slvs, "iters=2", nx, 2);
-//      add_solver<solvers::mpdata_1d<real_t, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx, 2);
-      add_solver<solvers::mpdata_1d<real_t>>(slvs, "iters=3", nx, 3);
-      add_solver<solvers::mpdata_1d<real_t, formulae::opts::toa | formulae::opts::iga>>(slvs, "iters=2_toa_iga", nx, 2);
+      add_solver<0>(slvs, "iters=1", nx, 1);
+      add_solver<0>(slvs, "iters=2", nx, 2);
+      add_solver<formulae::opts::toa>(slvs, "iters=2_toa", nx, 2);
+      add_solver<0>(slvs, "iters=3", nx, 3);
+      add_solver<formulae::opts::toa | formulae::opts::iga>(slvs, "iters=2_toa_iga", nx, 2);
 
       // MPDATA-FCT
-//      add_solver<solvers::mpdata_fct_1d<real_t>>(slvs, "iters=2_fct", nx, 2);
-//      add_solver<solvers::mpdata_fct_1d<real_t, formulae::opts::toa>>(slvs, "iters=2_fct_toa", nx, 2);
-//      add_solver<solvers::mpdata_fct_1d<real_t>>(slvs, "iters=3_fct", nx, 3);
-//      add_solver<solvers::mpdata_fct_1d<real_t, formulae::opts::toa>>(slvs, "iters=3_fct_toa", nx, 3);
+      add_solver<formulae::opts::fct>(slvs, "iters=2_fct", nx, 2);
+      add_solver<formulae::opts::fct | formulae::opts::toa>(slvs, "iters=2_fct_toa", nx, 2);
+      add_solver<formulae::opts::fct>(slvs, "iters=3_fct", nx, 3);
+      add_solver<formulae::opts::fct | formulae::opts::toa>(slvs, "iters=3_fct_toa", nx, 3);
 
       // calculating the analytical solution
-      typename solvers::donorcell_1d<real_t>::arr_t exact(nx);
+      decltype(slvs.end()->second->advectee()) exact(nx);
       exact = gauss((i+.5)*dx - velocity * dt * nt);
 
       // looping over solvers

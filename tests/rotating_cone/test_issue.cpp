@@ -10,17 +10,25 @@
 
 #include <cmath>
 
-#include <libmpdata++/solvers/adv/mpdata_fct_2d.hpp>
-#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
+#include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
 /// @brief settings from @copybrief Anderson_and_Fattahi_1974
 
-enum {x, y};
-using real_t = float;
+using namespace libmpdataxx;
 
-real_t 
+enum {x, y};
+
+struct ct_params_t {
+  using real_t = float;
+  enum { n_dims = 2 };
+  enum { n_eqs = 1 };
+  enum { opts = formulae::opts::pds | formulae::opts::fct };
+};
+
+ct_params_t::real_t
   dt = .1,
   dx = 1,
   dy = 1,
@@ -29,12 +37,10 @@ real_t
 
 int main() 
 {
-  using namespace libmpdataxx;
-
   const int nt = 2; 
 
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, 1, formulae::opts::pds>>;
-  solver_t::params_t p;
+  using solver_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
+  solver_t::rt_params_t p;
 
   // pre instantiatio
   {
@@ -71,7 +77,7 @@ int main()
 
   // post instantiation
   {
-    real_t
+    ct_params_t::real_t
       r = 12. * dx,
       x0 = 1,//75 * dx,
       y0 = 0, //50 * dy,

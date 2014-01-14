@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/adv/detail/solver_common.hpp>
+#include <libmpdata++/solvers/detail/solver_common.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
 
 namespace libmpdataxx
@@ -15,14 +15,19 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template<typename real_t, int n_tlev, formulae::opts::opts_t opts, int minhalo>
-      class solver<real_t, 1, n_tlev, opts, minhalo> : public solver_common<real_t, 1, n_tlev, minhalo>
+      template<typename ct_params_t, int n_tlev, int minhalo>
+      class solver<
+        ct_params_t, 
+        n_tlev, 
+        minhalo,
+        typename std::enable_if<ct_params_t::n_dims == 1 >::type
+      > : public solver_common<ct_params_t, n_tlev, minhalo>
       {
-	using parent_t = solver_common<real_t, 1, n_tlev, minhalo>;
+	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
 	protected:
 
-        typedef std::unique_ptr<bcond::bcond_t<real_t>> bc_p; // TODO: move to parent
+        typedef std::unique_ptr<bcond::bcond_t<typename parent_t::real_t>> bc_p; // TODO: move to parent
         bc_p bcxl, bcxr;
      
 	rng_t i; // TODO: idx_t i do common?
@@ -50,7 +55,7 @@ namespace libmpdataxx
 	// ctor
 	solver(
           ctor_args_t args,
-          const typename parent_t::params_t &p
+          const typename parent_t::rt_params_t &p
         ) :
 	  parent_t(args.mem, p), 
           bcxl(std::move(args.bcxl)), 
@@ -81,16 +86,17 @@ namespace libmpdataxx
 
         public:
 
-	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::params_t &p)   
+	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)   
         {
-	  for (int e = 0; e < p.n_eqs; ++e) // equations
+          mem->psi.resize(parent_t::n_eqs);
+	  for (int e = 0; e < parent_t::n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.span[0]))));
     
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(p.span[0])))); 
 
-          if (formulae::opts::isset(opts, formulae::opts::nug))
-	    mem->G.resize(parent_t::rng_sclr(p.span[0])); // TODO: mem->old!
+          if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.span[0]))));
         } 
 
         protected:

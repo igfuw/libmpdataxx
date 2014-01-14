@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libmpdata++/idxperm.hpp>
+#include <libmpdata++/formulae/idxperm.hpp>
 
 namespace libmpdataxx
 {
@@ -29,12 +29,14 @@ namespace libmpdataxx
 
       enum
       {
-        pds = opts::bit(0), // positive-definite signal (turns optimisations on)
-        toa = opts::bit(1), // third-order accuracy terms
-        eps = opts::bit(2), // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) 
-        npa = opts::bit(3), // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
-        iga = opts::bit(4), // infinite-gauge option
-        nug = opts::bit(5)  // non-unit G (default G = 1) - see Smolarkiewicz 2006 eq (25) and discussion below for info on G
+        fct = opts::bit(0), // flux-corrected transport
+        pds = opts::bit(1), // positive-definite signal (turns optimisations on)
+        toa = opts::bit(2), // third-order accuracy terms
+        eps = opts::bit(3), // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) 
+        npa = opts::bit(4), // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
+        iga = opts::bit(5), // infinite-gauge option
+        nug = opts::bit(6), // non-unit G (default G = 1) - see Smolarkiewicz 2006 eq (25) and discussion below for info on G
+        dfl = opts::bit(7)  // devergent flows
       };
 
     }; // namespace opts

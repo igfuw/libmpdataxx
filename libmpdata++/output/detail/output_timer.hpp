@@ -58,7 +58,7 @@ namespace libmpdataxx
 	// ctor
 	output_timer(
 	  typename parent_t::ctor_args_t args,
-	  const typename parent_t::params_t &p
+	  const typename parent_t::rt_params_t &p
 	) : parent_t(args, p)
 	{}
       };

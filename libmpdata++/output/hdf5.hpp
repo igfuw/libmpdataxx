@@ -212,7 +212,7 @@ namespace libmpdataxx
 
       public:
 
-      struct params_t : parent_t::params_t 
+      struct rt_params_t : parent_t::rt_params_t 
       { 
 	std::string outfile;
 // TODO: pass adiitional info? (command_line, library versions, ...) (-> output_common?)
@@ -221,7 +221,7 @@ namespace libmpdataxx
       // ctor
       hdf5(
 	typename parent_t::ctor_args_t args,
-	const params_t &p
+	const rt_params_t &p
       ) : parent_t(args, p), 
         outfile(p.outfile)  
       { }

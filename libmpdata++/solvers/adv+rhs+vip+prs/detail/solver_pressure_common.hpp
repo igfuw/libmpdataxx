@@ -85,12 +85,13 @@ namespace libmpdataxx
 	  pressure_solver_apply();
         }
 
+        // TODO: get rid of it
         void hook_post_loop()
         {
           parent_t::hook_post_loop();
 	}
 
-	struct params_t : parent_t::params_t 
+	struct rt_params_t : parent_t::rt_params_t 
         { 
           real_t tol;
         };
@@ -98,7 +99,7 @@ namespace libmpdataxx
 	// ctor
 	pressure_solver_common(
 	  typename parent_t::ctor_args_t args,
-	  const params_t &p
+	  const rt_params_t &p
 	) : 
 	  parent_t(args, p),
           tol(p.tol),
@@ -111,7 +112,7 @@ namespace libmpdataxx
 	  lap_tmp2(args.mem->tmp[__FILE__][0][6])
 	{} 
 
-	static void alloc(typename parent_t::mem_t *mem, const params_t &p)
+	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
 	{
 	  parent_t::alloc(mem, p);
           parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, 7); // (i^hlo,j^hlo)-sized temporary fields

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libmpdata++/idxperm.hpp>
+#include <libmpdata++/formulae/idxperm.hpp>
 #include <libmpdata++/formulae/opts.hpp>
 
 namespace libmpdataxx

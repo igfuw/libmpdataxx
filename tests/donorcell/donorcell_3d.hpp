@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/adv/detail/solver_3d.hpp>
+#include <libmpdata++/solvers/detail/solver_3d.hpp>
 #include <libmpdata++/formulae/donorcell_formulae.hpp>
 
 namespace libmpdataxx
@@ -14,32 +14,29 @@ namespace libmpdataxx
   namespace solvers
   {
     template<
-      typename real_t,
-      formulae::opts::opts_t opts = 0,
+      typename ct_params_t,
       int halo = formulae::donorcell::halo
     > 
     class donorcell_3d : public detail::solver<
-      real_t,
+      ct_params_t,
       3,
       formulae::donorcell::n_tlev, 
-      opts,
       detail::max(halo, formulae::donorcell::halo)
     >
     {
       using parent_t = detail::solver<
-        real_t,
+        ct_params_t,
         3,
         formulae::donorcell::n_tlev, 
-        opts,
         detail::max(halo, formulae::donorcell::halo)
       >;
 
       void advop(int e)
       {
-	formulae::donorcell::op_3d<opts>( 
+	formulae::donorcell::op_3d<ct_params_t::opts>( 
 	  this->mem->psi[e], 
           this->mem->GC, 
-          this->mem->G, 
+          *this->mem->G, 
           this->n[e], 
           this->i, this->j, this->k
 	);

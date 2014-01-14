@@ -11,13 +11,10 @@
  * \image html "../../tests/bombel/figure.svg"
  */
 
-#include <libmpdata++/solvers/adv/donorcell_2d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_fct_2d.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_mr.hpp>
 #include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_cr.hpp>
 #include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_pc.hpp>
-#include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
@@ -72,8 +69,7 @@ int main()
     using solver_t = output::gnuplot<
       bombel<
 	solvers::pressure_cr<
-//        solvers::donorcell_2d<real_t>,
-	  solvers::mpdata_fct_2d<real_t>,
+	  solvers::mpdata_fct_2d<real_t, /* n_eqs = */ 3>,
 	  u, w
         >
       >

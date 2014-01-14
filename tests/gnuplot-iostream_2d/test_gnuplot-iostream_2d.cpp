@@ -8,9 +8,7 @@
  * \image html "../../tests/gnuplot-iostream_2d/figure.svg"
  */
 
-#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
-#include <libmpdata++/solvers/adv/donorcell_2d.hpp>
-#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
@@ -26,10 +24,18 @@ int main()
 
   for (auto &n_iters : std::set<int>({1,2,4}))
   {
-    using solver_t = output::gnuplot<solvers::mpdata_2d<float>>;
-    solver_t::params_t p;
+    // compile-time parameters
+    struct ct_params_t 
+    { 
+      using real_t = float; 
+      enum { n_dims = 2 };
+      enum { n_eqs = 1 }; 
+      enum { opts = 0 };
+    };
+    using solver_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
 
-    // pre-instantiation
+    // run-time parameters
+    solver_t::rt_params_t p;
     p.span = {24, 24};
     p.n_iters = n_iters;
     p.outfreq = nt;

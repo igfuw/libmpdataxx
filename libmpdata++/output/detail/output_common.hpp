@@ -20,6 +20,12 @@ namespace libmpdataxx
       {
 	using parent_t = solver_t;
 
+        // TODO: not here!
+        // sanity checks for ct_params_t
+        static_assert(solver_t::n_dims > 0, "ct_params_t::n_dims missing?");
+        static_assert(sizeof(typename solver_t::real_t), "ct_params_t::real_t missing?");
+        static_assert(solver_t::n_eqs > 0, "ct_params_t::n_eqs missing?");
+
 	protected:
 
 	struct info { std::string name, unit; };
@@ -70,7 +76,7 @@ namespace libmpdataxx
 
 	public:
 
-	struct params_t : parent_t::params_t 
+	struct rt_params_t : parent_t::rt_params_t 
 	{ 
 	  int outfreq = 1; 
 	  std::map<int, info> outvars;
@@ -79,12 +85,16 @@ namespace libmpdataxx
 	// ctor
 	output_common(
 	  typename parent_t::ctor_args_t args,
-	  const params_t &p
+	  const rt_params_t &p
 	) :
           parent_t(args, p),
 	  outfreq(p.outfreq), 
           outvars(p.outvars)
-	{}
+	{
+          // default value for outvars
+          if (this->outvars.size() == 0 && parent_t::n_eqs == 1)
+            outvars = {{0, {.name = "", .unit = ""}}};
+        }
       };
     }; // namespace detail
   }; // namespace output

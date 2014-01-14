@@ -79,7 +79,7 @@ namespace libmpdataxx
 
 	// ctor
 	concurr_common(
-	  const typename solver_t::params_t &p,
+	  const typename solver_t::rt_params_t &p,
           mem_t *mem_p,
 	  const int &size
 	) {
@@ -91,7 +91,7 @@ namespace libmpdataxx
         private:
  
         void init(
-          const typename solver_t::params_t &p,
+          const typename solver_t::rt_params_t &p,
           const std::array<int, 1> &span, const int &n0
         )
         {
@@ -124,7 +124,7 @@ namespace libmpdataxx
 	}
 
         void init(
-          const typename solver_t::params_t &p,
+          const typename solver_t::rt_params_t &p,
 	  const std::array<int, 2> &span, 
           const int &n0, const int &n1 = 1
         ) {
@@ -173,7 +173,7 @@ namespace libmpdataxx
 	}
 
         void init(
-          const typename solver_t::params_t &p,
+          const typename solver_t::rt_params_t &p,
 	  const std::array<int, 3> &span, 
           const int &n0, const int &n1 = 1, const int &n2 = 1
         ) {

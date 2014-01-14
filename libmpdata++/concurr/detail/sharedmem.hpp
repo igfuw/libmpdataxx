@@ -34,11 +34,6 @@ namespace libmpdataxx
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; // TODO: T_sumtype
         std::unique_ptr<blitz::Array<real_t, 2>> sumtmp; // TODO: T_sumtype
 
-        protected:
-
-        // for use in asserts only
-        const int n_eqs;
-
 	public:
 
 	int n = 0;
@@ -48,7 +43,7 @@ namespace libmpdataxx
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC;
         std::vector<arrvec_t<arr_t>> psi;
-	arr_t G;
+	std::unique_ptr<arr_t> G;
 
 	std::unordered_map< 
 	  const char*, // intended for addressing with __FILE__
@@ -75,24 +70,24 @@ namespace libmpdataxx
 
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
-        sharedmem_common(const int &n_eqs, const std::array<int, 1> &span, const int &size)
-          : n_eqs(n_eqs), n(0), psi(n_eqs), span(span) // TODO: is n(0) needed?
+        sharedmem_common(const std::array<int, 1> &span, const int &size)
+          : n(0), span(span) // TODO: is n(0) needed?
         {
           if (size > span[0]) throw std::exception(); // TODO: error_macro? / assert()?
           //sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));  // TODO: write a different sum that would't use sumtmp
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
-        sharedmem_common(const int &n_eqs, const std::array<int, 2> &span, const int &size)
-          : n_eqs(n_eqs), n(0), psi(n_eqs), span(span)
+        sharedmem_common(const std::array<int, 2> &span, const int &size)
+          : n(0), span(span)
         {
           if (size > span[0]) throw std::exception(); // TODO: error_macro?
           sumtmp.reset(new blitz::Array<real_t, 2>(span[0], 1));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
-        sharedmem_common(const int &n_eqs, const std::array<int, 3> &span, const int &size)
-          : n_eqs(n_eqs), n(0), psi(n_eqs), span(span)
+        sharedmem_common(const std::array<int, 3> &span, const int &size)
+          : n(0), span(span)
         {
           if (size > span[0]) throw std::exception(); // TODO: error_macro?
           sumtmp.reset(new blitz::Array<real_t, 2>(span[0], span[1]));
@@ -153,11 +148,11 @@ namespace libmpdataxx
         boost::ptr_vector<arr_t> tobefreed;
       
         public:
-        arr_t *old(arr_t *arr_p)
+        arr_t *old(arr_t *arg)
         {
-          tobefreed.push_back(arr_p);
-          arr_t *ret = new arr_t(arr_p->dataFirst(), arr_p->shape(), blitz::neverDeleteData);
-          ret->reindexSelf(arr_p->base());
+          tobefreed.push_back(arg);
+          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData);
+          ret->reindexSelf(arg->base());
           return ret;
         }
       };
@@ -177,7 +172,6 @@ namespace libmpdataxx
 	// accessor methods
 	blitz::Array<real_t, 1> advectee(int e = 0)
 	{
-          assert(e < this->n_eqs);
           assert(this->n < n_tlev);
 
           // returning just the domain interior, i.e. without halos
@@ -201,7 +195,7 @@ namespace libmpdataxx
         blitz::Array<real_t, 1> g_factor()
         {
           // the same logic as in advectee() - see above
-          return this->G(
+          return (*this->G)(
             rng_t(0, this->span[0]-1)
           ).reindex({0});
         }
@@ -218,7 +212,6 @@ namespace libmpdataxx
 
 	blitz::Array<real_t, 2> advectee(int e = 0)
 	{
-          assert(e < this->n_eqs);
           assert(this->n < n_tlev);
 
 	  return this->psi[e][ this->n ](idx_t<2>({
@@ -244,7 +237,7 @@ namespace libmpdataxx
         blitz::Array<real_t, 2> g_factor()
         {
           // the same logic as in advectee() - see above
-          return this->G(idx_t<2>({
+          return (*this->G)(idx_t<2>({
             rng_t(0, this->span[0]-1),
             rng_t(0, this->span[1]-1),
           })).reindex({0, 0});
@@ -262,7 +255,6 @@ namespace libmpdataxx
 
 	blitz::Array<real_t, 3> advectee(int e = 0)
 	{
-          assert(e < this->n_eqs);
           assert(this->n < n_tlev);
 
 	  return this->psi[e][ this->n ](idx_t<3>({
@@ -290,7 +282,7 @@ namespace libmpdataxx
         blitz::Array<real_t, 3> g_factor()
         {
           // the same logic as in advectee() - see above
-          return this->G(idx_t<3>({
+          return (*this->G)(idx_t<3>({
             rng_t(0, this->span[0]-1),
             rng_t(0, this->span[1]-1),
             rng_t(0, this->span[2]-1)

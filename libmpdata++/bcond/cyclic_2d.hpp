@@ -7,7 +7,7 @@
 #pragma once
 
 #include <libmpdata++/bcond/cyclic_common.hpp>
-#include <libmpdata++/idxperm.hpp>
+#include <libmpdata++/formulae/idxperm.hpp>
 
 namespace libmpdataxx
 {

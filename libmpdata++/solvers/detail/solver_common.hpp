@@ -7,10 +7,10 @@
 #pragma once
 
 #include <libmpdata++/blitz.hpp>
-#include <libmpdata++/arakawa_c.hpp>
+#include <libmpdata++/formulae/arakawa_c.hpp>
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 
-#include <libmpdata++/solvers/adv/detail/monitor.hpp>
+#include <libmpdata++/solvers/detail/monitor.hpp>
 
 #include <libmpdata++/formulae/opts.hpp>
 
@@ -29,22 +29,18 @@ namespace libmpdataxx
         return a > b ? a : b;
       }
 
-      template <typename real_t_, int n_dims_, int n_tlev_, int minhalo>
+      template <typename ct_params_t, int n_tlev_, int minhalo>
       class solver_common
       {
-        protected:
-
-        const int n_eqs;
-
 	public:
 
-        // using enums as "public static const int" would need instantiation (TODO: is it really true???)
+        enum { n_eqs = ct_params_t::n_eqs };
         enum { halo = minhalo }; 
-        enum { n_dims = n_dims_ };
+        enum { n_dims = ct_params_t::n_dims };
         enum { n_tlev = n_tlev_ };
 
-        typedef real_t_ real_t;
-        typedef blitz::Array<real_t_, n_dims_> arr_t;
+        typedef typename ct_params_t::real_t real_t;
+        typedef blitz::Array<real_t, n_dims> arr_t;
 
 	void cycle_all()
 	{ 
@@ -90,9 +86,8 @@ namespace libmpdataxx
 
 	public:
 
-        struct params_t 
+        struct rt_params_t 
         {
-          int n_eqs = 1;
           std::array<int, n_dims> span;
         };
 
@@ -123,6 +118,7 @@ namespace libmpdataxx
 #endif
         }
 
+// TODO: this conflicts with multiple solve() calls - consider removing it
         virtual void hook_post_loop() 
         {
 #if !defined(NDEBUG)
@@ -131,12 +127,11 @@ namespace libmpdataxx
         }
 
 	// ctor
-	solver_common(mem_t *mem, const params_t &p) :
-          n_eqs(p.n_eqs),
-	  n(p.n_eqs, 0), 
+	solver_common(mem_t *mem, const rt_params_t &p) :
+	  n(n_eqs, 0), 
           mem(mem)
 	{
-	  assert(p.n_eqs > 0);
+	  static_assert(n_eqs > 0, "!");
         }
 
         // dtor
@@ -150,12 +145,18 @@ namespace libmpdataxx
 #endif
         }
 
-	virtual void solve(const int nt) final
+	virtual void solve(int nt) final
 	{   
+          // multiple calls to sovlve() are meant to advance the solution by nt
+          nt += timestep;
+
           // being generous about out-of-loop barriers 
-          this->mem->barrier();
-          hook_ante_loop(nt);
-          this->mem->barrier();
+          if (timestep == 0)
+          {
+	    this->mem->barrier();
+	    hook_ante_loop(nt);
+	    this->mem->barrier();
+          }
 
 	  while (timestep < nt)
 	  {   
@@ -192,7 +193,7 @@ namespace libmpdataxx
         static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }
       };
 
-      template<typename real_t, int n_dims, int n_tlev, formulae::opts::opts_t opts, int minhalo>
+      template<typename ct_params_t, int n_tlev, int minhalo, class enableif = void>
       class solver
       {}; 
     }; // namespace detail

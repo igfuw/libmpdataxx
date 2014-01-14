@@ -169,19 +169,19 @@ namespace libmpdataxx
 
       public:
 
-      struct params_t : parent_t::params_t { };
+      struct rt_params_t : parent_t::rt_params_t { };
 
       // ctor
       pressure_cr(
 	typename parent_t::ctor_args_t args,
-	const params_t &p
+	const rt_params_t &p
       ) :
 	parent_t(args, p),
         lap_p_err(args.mem->tmp[__FILE__][0][0]),
 	    p_err(args.mem->tmp[__FILE__][0][1])
       {}
 
-      static void alloc(typename parent_t::mem_t *mem, const params_t &p)
+      static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
       {
         parent_t::alloc(mem, p);
         parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, 2);
