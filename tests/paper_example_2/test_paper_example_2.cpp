@@ -6,6 +6,7 @@ using namespace libmpdataxx;
 
 int main()
 {
+//<listing-1>
   // compile-time parameters
   struct ct_params_t 
   {
@@ -14,6 +15,7 @@ int main()
     enum { n_eqs = 2 };
     enum { opts = formulae::opts::iga };
   };
+//</listing-1>
 
   using sim_t = output::gnuplot<
     solvers::mpdata<ct_params_t>
@@ -21,11 +23,10 @@ int main()
   typename sim_t::rt_params_t p;
 
   int nx = 500, nt = 1600;
-  ct_params_t::real_t min[2] = {2, -1}, max[2] = {4, 1};
 
+//<listing-2>
   // run-time parameters
   p.span = { nx };
-
   p.outfreq = nt; // diplays initial condition and the final state
   p.outvars = {
     {0, {.name = "single-sign signal", .unit = "1"}},
@@ -34,16 +35,26 @@ int main()
   p.gnuplot_command = "plot";
   p.gnuplot_with = "steps";
   p.gnuplot_yrange = "[-1.25:4.25]";
+//</listing-2>
 
   // instantiation
   concurr::serial<sim_t, bcond::cyclic> run(p);
 
+//<listing-3>
   // initial condition
   blitz::firstIndex i;
-  int width = 50, center = 100;
-  run.advectee(0) = where(i <= center-width/2 || i >= center+width/2, min[0], max[0]); 
-  run.advectee(1) = where(i <= center-width/2 || i >= center+width/2, min[1], max[1]); 
-  run.advector() = -.5; 
+  run.advectee(0) = where(
+    i <= 75 || i >= 125, // if
+    2,                   // then
+    4                    // else
+  ); 
+  run.advectee(1) = where(
+    i <= 75 || i >= 125, // if 
+    -1,                  // then
+    1                    // else
+  ); 
+  run.advector() = -.5;  // Courant
+//</listing-3>
 
   // integration
   run.advance(nt);
