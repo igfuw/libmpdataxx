@@ -14,6 +14,8 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
+
+      //divergent flow correction see eq. (30) from @copybrief Smolarkiewicz_and_Margolin_1998)
       template<opts_t opts, class arr_1d_t>
       inline auto DFL(
         const arr_1d_t &GC,

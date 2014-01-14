@@ -76,6 +76,7 @@ int main()
   G_c = 1,  1,  1,  1,   1,  1,  1,  1, .75,  .5,  .5, .5, .5, .75,  1,  1;      
 
   add_solver<0>(slvs, "");
+
   // advecting density with Courant number
   slvs.back().advectee() = G * phi;
   slvs.back().advector() = GC / G_c; 

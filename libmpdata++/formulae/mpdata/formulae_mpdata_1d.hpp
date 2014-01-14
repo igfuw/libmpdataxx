@@ -15,7 +15,7 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-
+      //eq. (17) from @copybrief Smolarkiewicz_and_Margolin_1998
       template <opts_t opts, class arr_1d_t>
       inline auto A(  // positive-sign signal version (no need for abs())
         const arr_1d_t &psi, 
@@ -52,7 +52,7 @@ namespace libmpdataxx
         / //---------------
         (1 + 1)
       )
-
+      // eq 29a from @copybrief Smolarkiewicz_and_Margolin_1998
       template<opts_t opts, class arr_1d_t>
       inline auto antidiff( // antidiffusive velocity
         const arr_1d_t &psi, 
@@ -65,9 +65,9 @@ namespace libmpdataxx
         * (1 - abs(GC(i+h)) / ((formulae::G<opts>(G, i) + formulae::G<opts>(G, i+1)) / 2)) 
         * A<opts>(psi, i) 
         // third-order terms
-        + HOT<opts>(psi, GC, G, i) 
+        + HOT<opts>(psi, GC, G, i) //higher order term
         // divergent flow terms
-        + DFL<opts>(GC, G, i) 
+        + DFL<opts>(GC, G, i) //divergent flow correction
       )
     }; // namespace mpdata
   }; // namespace formulae

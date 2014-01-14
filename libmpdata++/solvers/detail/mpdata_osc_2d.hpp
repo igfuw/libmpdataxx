@@ -37,6 +37,19 @@ namespace libmpdataxx
 	// member fields
 	rng_t im, jm;
 
+	void hook_ante_loop(const int nt) 
+	{   
+  // TODO: same in 1D and 3D
+	  parent_t::hook_ante_loop(nt);
+	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+	  {
+	    this->bcxl->fill_halos_sclr(*this->mem->G, this->j^this->halo); // TODO: one xchng call?
+	    this->bcxr->fill_halos_sclr(*this->mem->G, this->j^this->halo);
+	    this->bcxl->fill_halos_sclr(*this->mem->G, this->i^this->halo);
+	    this->bcxr->fill_halos_sclr(*this->mem->G, this->i^this->halo);
+	  }
+	} 
+
 	// method invoked by the solver
 	void advop(int e)
 	{
@@ -58,15 +71,19 @@ namespace libmpdataxx
 	      this->GC_corr(iter)[0](this->im+h, this->j) = 
 		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
 		  this->mem->psi[e][this->n[e]], 
-		  this->im, this->j, this->GC_unco(iter)
-  // TODO: G
+                  this->GC_unco(iter),
+                  *this->mem->G,
+		  this->im, 
+                  this->j
 		);
 
 	      this->GC_corr(iter)[1](this->i, this->jm+h) = 
 		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
 		this->mem->psi[e][this->n[e]], 
-		this->jm, this->i, this->GC_unco(iter)
-  // TODO: G
+                this->GC_unco(iter),
+                *this->mem->G,
+		this->jm, 
+                this->i
 	      );
    
 	      // filling Y halos for GC_x, and X halos for GC_y

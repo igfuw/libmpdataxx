@@ -47,8 +47,9 @@ namespace libmpdataxx
 
 	void fct_adjust_antidiff(int e, int iter)
 	{
-	  const auto &GC_corr = parent_t::GC_corr(iter);
 	  const auto psi = this->mem->psi[e][this->n[e]];
+	  const auto &GC_corr = parent_t::GC_corr(iter);
+          const auto &G = *this->mem->G;
 	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 	  const auto &jm = this->jm; // calculating once for i-1/2 and i+1/2
 
@@ -62,9 +63,8 @@ namespace libmpdataxx
 	  this->mem->barrier();
 
 	  // calculating the monotonic corrective velocity
-  // TODO: G
-	  this->GC_mono[0]( im+h, jm ) = formulae::mpdata::C_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, im, jm);
-	  this->GC_mono[1]( im, jm+h ) = formulae::mpdata::C_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, jm, im);
+	  this->GC_mono[0]( im+h, jm ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, jm);
+	  this->GC_mono[1]( im, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, im);
 
 	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
 	  if (iter == this->n_iters - 1 && parent_t::n_eqs > 1) this->mem->barrier();  // TODO: move to common
