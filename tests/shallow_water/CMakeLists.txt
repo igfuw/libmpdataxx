@@ -1,1 +1,2 @@
-libmpdataxx_add_test(test_shallow_water)
+libmpdataxx_add_test(test_shallow_water_1d)
+libmpdataxx_add_test(test_shallow_water_2d)

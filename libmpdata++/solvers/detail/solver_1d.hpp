@@ -35,11 +35,19 @@ namespace libmpdataxx
 
 	void xchng(int e, int lev = 0) 
 	{
-          this->mem->barrier();
+          this->mem->barrier(); // TODO: implement using the xchng below
 	  bcxl->fill_halos_sclr( this->mem->psi[e][ this->n[e] - lev ] );
 	  bcxr->fill_halos_sclr( this->mem->psi[e][ this->n[e] - lev ] );
           this->mem->barrier();
 	}
+
+        void xchng(typename parent_t::arr_t arr) // for a given array
+        {
+          this->mem->barrier();
+          bcxl->fill_halos_sclr(arr);
+          bcxr->fill_halos_sclr(arr);
+          this->mem->barrier();
+        }
 
         public:
  
