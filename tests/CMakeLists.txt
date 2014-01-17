@@ -27,13 +27,16 @@ find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnu
 # TODO: should't this path be added somewhere now?
 
 # Boost libraries
-find_package(Boost COMPONENTS thread date_time system iostreams timer REQUIRED QUIET)
+find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem REQUIRED QUIET)
+
+# HDF5 libraries
+find_package(HDF5 COMPONENTS CXX HL)
 
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   set_target_properties(${test} PROPERTIES LINK_FLAGS_DEBUG "-lblitz")
-  target_link_libraries(${test} ${Boost_LIBRARIES})
+  target_link_libraries(${test} ${Boost_LIBRARIES} ${HDF5_LIBRARIES})
 # TODO: target_compile_options() // added to CMake on Jun 3rd 2013
   add_test(${test} ${test})
 endfunction()
@@ -51,6 +54,7 @@ add_subdirectory(var_sign_2d)
 add_subdirectory(concurrent_1d)
 add_subdirectory(err_isolines)
 add_subdirectory(rotating_cone)
+add_subdirectory(rotating_sphere)
 add_subdirectory(mpdata_fct_1d)
 add_subdirectory(mpdata_1d_opt_pds)
 add_subdirectory(mpdata_1d_opt_toa)
