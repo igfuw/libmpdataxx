@@ -5,38 +5,58 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 
-// TODO: includes!
+#pragma once
 
-template <class parent_t>
-class bombel : public parent_t
+#include <libmpdata++/solvers/mpdata_rhs_vip_prs.hpp>
+
+template <class ct_params_t>
+class bombel : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 {
-  real_t Tht_amb;
+  using parent_t = libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>;
+  using ix = typename ct_params_t::ix;
+
+  public:
+  using real_t = typename ct_params_t::real_t;
+  private:
+
+  // member fields
+  real_t g, Tht_amb;
 
   // explicit forcings (to be applied before the eliptic solver)
-  void update_forcings(arrvec_t<typename parent_t::arr_t> &rhs)  
-  {
-    parent_t::update_forcings(rhs); // incl. zeroing the rhs arrays
+  void update_rhs(
+    libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs, 
+    const real_t &dt, 
+    const int &at 
+  ) {
+    // we only know R at n (and not at n+1)
+    enum { n };
+    assert(at == n); 
 
-    auto dW   = rhs.at(w); // TODO: relies on global w !!!
-    auto Tht = this->state(tht); // TODO: relies on global tht!!!!!
-    auto &ijk = this->ijk;
+    parent_t::update_rhs(rhs, dt, at); 
 
-    dW(ijk) += (formulae::g<real_t>() * si::seconds * si::seconds / si::metres) /*/ 300*/ * (Tht(ijk) - Tht_amb) / Tht_amb; // TODO: get rid of units here?
+    const auto Tht  = this->state(ix::tht); 
+    const auto &ijk = this->ijk;
+
+    rhs.at(ix::w)(ijk) += g /*/ 300*/ * (Tht(ijk) - Tht_amb) / Tht_amb; 
+                            // TODO!!!! 
   }
 
   public:
 
-  struct params_t : parent_t::params_t 
+  struct rt_params_t : parent_t::rt_params_t 
   { 
-    real_t Tht_amb; 
+    real_t g = 9.81, Tht_amb = 0; 
   };
 
   // ctor
   bombel( 
     typename parent_t::ctor_args_t args, 
-    const params_t &p
+    const rt_params_t &p
   ) :
     parent_t(args, p),
+    g(p.g),
     Tht_amb(p.Tht_amb)
-  {}
+  {
+    assert(Tht_amb != 0);
+  }
 };

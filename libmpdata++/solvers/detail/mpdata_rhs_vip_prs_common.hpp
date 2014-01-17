@@ -8,8 +8,7 @@
 #pragma once
 
 #include <libmpdata++/formulae/nabla_formulae.hpp>
-#include <libmpdata++/solvers/adv+rhs/solver_inhomo.hpp>
-#include <libmpdata++/solvers/adv+rhs+vip/solver_velocity_common.hpp> // TODO: if common, should be in detail
+#include <libmpdata++/solvers/mpdata_rhs_vip.hpp> 
 
 namespace libmpdataxx
 {
@@ -17,22 +16,30 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <class solver_t, int u, int w>
-      class pressure_solver_common : public solver_velocity_common<inhomo_solver<solver_t, strang>, u, w>
+      template <class ct_params_t>
+      class mpdata_rhs_vip_prs_common : public mpdata_rhs_vip<ct_params_t>
       {
+	using parent_t = mpdata_rhs_vip<ct_params_t>;
+        using ix = typename ct_params_t::ix;
+
+        public:
+        using real_t = typename ct_params_t::real_t;
+
 	protected:
 
-	using parent_t = solver_velocity_common<inhomo_solver<solver_t, solvers::strang>, u, w>;
-	typedef typename parent_t::real_t real_t;
-
 	// member fields
-	const real_t tol;
+	const typename ct_params_t::real_t tol;
         int iters = 0;
 
         typename parent_t::arr_t Phi, tmp_u, tmp_w, err, lap_err, lap_tmp1, lap_tmp2;
 
-        auto lap(typename parent_t::arr_t &arr, rng_t i, rng_t j, real_t dx, real_t dy) 
-        return_macro(
+        auto lap(
+          typename parent_t::arr_t &arr, 
+          const rng_t &i, 
+          const rng_t &j, 
+          const real_t &dx, 
+          const real_t &dy
+        ) return_macro(
           this->xchng(arr, i^this->halo, j^this->halo);
           lap_tmp1(i, j) = formulae::nabla::grad<0>(arr, i, j, dx);
           lap_tmp2(i, j) = formulae::nabla::grad<1>(arr, j, i, dy);
@@ -56,11 +63,9 @@ namespace libmpdataxx
 	{
 	  const rng_t &i = this->i, &j = this->j;
 
-	  this->state(u)(i,j) += tmp_u(i,j);
-	  this->state(w)(i,j) += tmp_w(i,j);
+	  this->state(ix::u)(i,j) += tmp_u(i,j);
+	  this->state(ix::w)(i,j) += tmp_w(i,j);
 	}
-
-	public:
 
         void hook_ante_loop(const int nt)
         {
@@ -85,11 +90,7 @@ namespace libmpdataxx
 	  pressure_solver_apply();
         }
 
-        // TODO: get rid of it
-        void hook_post_loop()
-        {
-          parent_t::hook_post_loop();
-	}
+	public:
 
 	struct rt_params_t : parent_t::rt_params_t 
         { 
@@ -97,7 +98,7 @@ namespace libmpdataxx
         };
 
 	// ctor
-	pressure_solver_common(
+	mpdata_rhs_vip_prs_common(
 	  typename parent_t::ctor_args_t args,
 	  const rt_params_t &p
 	) : 

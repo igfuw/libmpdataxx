@@ -28,8 +28,8 @@ namespace libmpdataxx
 
 	protected:
 
-	struct info { std::string name, unit; };
-	std::map<int, info> outvars;
+	struct info_t { std::string name, unit; };
+	std::map<int, info_t> outvars;
 
 	int outfreq;
 
@@ -79,7 +79,7 @@ namespace libmpdataxx
 	struct rt_params_t : parent_t::rt_params_t 
 	{ 
 	  int outfreq = 1; 
-	  std::map<int, info> outvars;
+	  std::map<int, info_t> outvars;
 	};
 
 	// ctor

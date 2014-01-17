@@ -42,7 +42,7 @@ namespace libmpdataxx
 
       virtual void update_rhs(
         arrvec_t<typename parent_t::arr_t> &rhs, 
-        typename parent_t::real_t dt,
+        const typename parent_t::real_t &dt,
         const int &at
       ) {
         assert(at == n || at == n+1);

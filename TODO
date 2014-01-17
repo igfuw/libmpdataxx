@@ -5,16 +5,15 @@
 - a check for positive-definiteness of the signal in debug mode
 - output out of hooks? (or separate output hooks?)
 - opts -> mpdata_opts
-- SA: finish new API transition: shallow_water and bcbf
+- SA: finish new API transition: icicle
 - SA+AJ: make pds default and abs an option
 - check compatibility with new gnuplot_iostream
 - move opts out of formulae namespace
 - finish donorcell and leapfrog tests
 - per-equation options (not all of them!)
 - DJ: spreading drop test from Schar & Smolarkiewicz?
-- AJ+MW: G in 3D
+- AJ+MW: G in 3D (incl. halo filling)
 - steps instead of histeps in output gnuplot (in tests as well?)
-- halo filling for G
 - CMake install() rules (as in libcloudphxx)
 - at least a "zero" bcond for icicle
 - test showing difference between real_t=float and real_t=double (and real_t=long double, ...)

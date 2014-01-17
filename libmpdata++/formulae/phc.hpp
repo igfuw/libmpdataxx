@@ -10,7 +10,7 @@
 #pragma once
 
 #include <libmpdata++/blitz.hpp>
-#include <libmpdata++/units.hpp>
+#include <libmpdata++/formulae/units.hpp>
 
 // TODO: remove this file completely
 

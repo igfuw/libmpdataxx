@@ -60,7 +60,7 @@ class coupled_harmosc : public libmpdataxx::solvers::mpdata_rhs<ct_params_t>
 
   void update_rhs(
     libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs, 
-    typename parent_t::real_t dt,
+    const typename parent_t::real_t &dt,
     const int &at
   ) {
     parent_t::update_rhs(rhs, dt, at);
