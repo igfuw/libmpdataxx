@@ -20,12 +20,6 @@ namespace libmpdataxx
       {
 	using parent_t = solver_t;
 
-        // TODO: not here!
-        // sanity checks for ct_params_t
-        static_assert(solver_t::n_dims > 0, "ct_params_t::n_dims missing?");
-        static_assert(sizeof(typename solver_t::real_t), "ct_params_t::real_t missing?");
-        static_assert(solver_t::n_eqs > 0, "ct_params_t::n_eqs missing?");
-
 	protected:
 
 	struct info_t { std::string name, unit; };

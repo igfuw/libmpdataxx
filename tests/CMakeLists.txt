@@ -59,7 +59,6 @@ add_subdirectory(mpdata_1d_opt_eps)
 add_subdirectory(mpdata_1d_opt_npa)
 add_subdirectory(mpdata_1d_opt_iga)
 add_subdirectory(mpdata_1d_opt_nug)
-add_subdirectory(todo_3d)
 # adv+rhs
 add_subdirectory(harmosc)
 # adv+rhs+vip
