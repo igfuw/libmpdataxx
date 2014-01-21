@@ -8,12 +8,10 @@ using namespace libmpdataxx;
 int main()
 {
   // compile-time parameters
-  struct ct_params_t
+  struct ct_params_t : ct_params_default_t
   {
-    using real_t = float;
     enum { n_dims = 1 };
     enum { n_eqs = 1 };
-    enum { opts = 0 };
   };
 
   // solver choice

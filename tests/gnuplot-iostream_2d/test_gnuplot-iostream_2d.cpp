@@ -25,7 +25,7 @@ int main()
   for (auto &n_iters : std::set<int>({1,2,4}))
   {
     // compile-time parameters
-    struct ct_params_t 
+    struct ct_params_t : ct_params_default_t
     { 
       using real_t = float; 
       enum { n_dims = 2 };

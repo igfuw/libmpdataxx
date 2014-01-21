@@ -44,7 +44,7 @@ void setopts(T &p, const int nt, const std::string &fname)
 template <formulae::opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &fname)
 {
-  struct ct_params_t
+  struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };
