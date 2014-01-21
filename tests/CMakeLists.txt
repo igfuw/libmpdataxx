@@ -45,6 +45,7 @@ add_subdirectory(kahan_sum)
 # adv
 add_subdirectory(paper_example_1)
 add_subdirectory(paper_example_2)
+add_subdirectory(paper_example_3)
 add_subdirectory(gnuplot-iostream_1d)
 add_subdirectory(gnuplot-iostream_2d)
 add_subdirectory(var_sign_2d)

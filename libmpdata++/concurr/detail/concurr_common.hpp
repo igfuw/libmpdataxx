@@ -25,7 +25,7 @@ namespace libmpdataxx
     class any
     {
       public:
-      typedef real_t_ real_t;
+      typedef real_t_ real_t; //TODO is it needed ?
       virtual void advance(int) { assert(false); throw; }  
       virtual blitz::Array<real_t_, n_dims> advectee(int e = 0) { assert(false); throw; }
       virtual blitz::Array<real_t_, n_dims> advector(int d = 0) { assert(false); throw; }

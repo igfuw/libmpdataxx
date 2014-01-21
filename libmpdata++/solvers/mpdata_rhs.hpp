@@ -34,6 +34,14 @@ namespace libmpdataxx
       bool update_rhs_called = true; // so that it nt=0 there's no complain
 #endif
 
+      virtual void apply_rhs(
+        typename parent_t::real_t dt
+      ) final
+      {
+        for (int e = 0; e < parent_t::n_eqs; ++e) 
+          this->state(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
+      }
+
       protected:
 
       // member fields
@@ -54,13 +62,6 @@ namespace libmpdataxx
           rhs.at(e)(this->ijk) = 0;
       }
 
-      virtual void apply_rhs(
-        typename parent_t::real_t dt
-      ) final
-      {
-        for (int e = 0; e < parent_t::n_eqs; ++e) 
-          this->state(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
-      }
 
       public:
 

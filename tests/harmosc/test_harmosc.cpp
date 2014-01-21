@@ -23,63 +23,50 @@ using boost::math::constants::pi;
 
 using real_t = double;
 
-enum {psi, phi};
+const int nt = 1500;
 
-const int nt = 750;
-const real_t C = .5;
-
-template <
-  formulae::opts::opts_t opt, 
-  solvers::rhs_scheme_t scheme, 
-  class slvs_t
-> void add_solver(slvs_t &slvs, std::string name, const int n_iters)
+int main() 
 {
   struct ct_params_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };
     enum { n_eqs = 2 };
-    enum { opts = opt };
-    enum { rhs_scheme = scheme };
+    enum { opts = 0 };
+    enum { rhs_scheme = solvers::rhs_scheme_t::strang };
+    struct ix { enum {psi, phi}; };
   };
 
-  using solver_t = output::gnuplot<coupled_harmosc<ct_params_t, psi, phi>>;
+  using solver_t = output::gnuplot<coupled_harmosc<ct_params_t>>;
   typename solver_t::rt_params_t p; 
 
   // run-time parameters
   p.span = {1000};
-  p.n_iters = n_iters;
   p.dt = 1;
   p.omega = 2*pi<real_t>() / p.dt / 400;
-
-  p.gnuplot_output = "figure_" + name + ".svg";
   p.outfreq = 10;
+
+  using ix = typename ct_params_t::ix;
   p.outvars = {
-    {psi, {.name = "psi", .unit = "1"}},
-    {phi, {.name = "phi", .unit = "1"}}
+    {ix::psi, {.name = "psi", .unit = "1"}},
+    {ix::phi, {.name = "phi", .unit = "1"}}
   };
   p.gnuplot_command = "plot";
 
   // instantiation
-  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(p));
+  concurr::threads<solver_t, bcond::cyclic> run(p);
 
-  // post instantiation
+  // initial condition
   {
     blitz::firstIndex i;
-    slvs.back().advectee(psi) = pow(sin((i+.5) * pi<real_t>() / p.span[0]), 300);
-    slvs.back().advectee(phi) = real_t(0);
+    run.advectee(ix::psi) = pow(
+      sin((i+.5) * pi<real_t>() / p.span[0] + pi<real_t>()/3), 
+      300
+    );
+    run.advectee(ix::phi) = real_t(0);
   }
-  slvs.back().advector() = C;
-}
+  run.advector() = .5;
 
-int main() 
-{
-  boost::ptr_vector<concurr::any<real_t, 1>> slvs;
-
-  add_solver<0, solvers::rhs_scheme_t::euler_b>(slvs, "euler_it=1",  1);
-  add_solver<0, solvers::rhs_scheme_t::euler_b>(slvs, "euler_it=2",  2);
-  add_solver<0, solvers::rhs_scheme_t::strang>(slvs, "strang_it=1", 1);
-  add_solver<0, solvers::rhs_scheme_t::strang>(slvs, "strang_it=2", 2);
-
-  for (auto &slv : slvs) slv.advance(nt);
+  // integration
+  run.advance(nt);
 }

@@ -22,20 +22,19 @@ int main()
   >;
   typename sim_t::rt_params_t p;
 
-  int nx = 500, nt = 1600;
-
 //<listing-2>
+  int nx = 500, nt = 1600;
   // run-time parameters
   p.span = { nx };
-  p.outfreq = nt; // diplays initial condition and the final state
+  p.outfreq = nt; 
   p.outvars = {
-    {0, {.name = "single-sign signal", .unit = "1"}},
-    {1, {.name = "variable-sign signal", .unit = "1"}}
+    {0, {.name = "single-sign", .unit = "1"}},
+    {1, {.name = "variable-sign", .unit = "1"}}
   };
+//</listing-2>
   p.gnuplot_command = "plot";
   p.gnuplot_with = "steps";
   p.gnuplot_yrange = "[-1.25:4.25]";
-//</listing-2>
 
   // instantiation
   concurr::serial<sim_t, bcond::cyclic> run(p);
