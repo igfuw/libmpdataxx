@@ -127,6 +127,13 @@ namespace libmpdataxx
     ) return_macro(,
       G(idxperm::pi<d>(i, j)) + 0
     )
-
   }; // namespace formulae
+
+  struct ct_params_default_t
+  {
+    using real_t = double;
+    enum { opts = formulae::opts::iga | formulae::opts::fct };
+    enum { hint_norhs = 0 };
+  };
+
 }; // namespace libmpdataxx

@@ -21,7 +21,8 @@ using namespace libmpdataxx;
 
 enum {x, y};
 
-struct ct_params_t {
+struct ct_params_t :ct_params_default_t
+{
   using real_t = float;
   enum { n_dims = 2 };
   enum { n_eqs = 1 };

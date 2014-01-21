@@ -34,7 +34,7 @@ template <
   class slvs_t
 > void add_solver(slvs_t &slvs, std::string name, const int n_iters)
 {
-  struct ct_params_t
+  struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };

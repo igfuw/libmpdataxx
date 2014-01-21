@@ -31,7 +31,7 @@ using real_t = double; // with long double this is a good test to show differenc
 template <formulae::opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_iters)
 {
-  struct ct_params_t
+  struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };
