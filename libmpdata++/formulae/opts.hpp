@@ -131,7 +131,6 @@ namespace libmpdataxx
 
   struct ct_params_default_t
   {
-    using real_t = double;
     enum { opts = formulae::opts::iga | formulae::opts::fct };
     enum { hint_norhs = 0 };
   };
