@@ -18,6 +18,7 @@ int main()
   // compile-time parameters
   struct ct_params_t : ct_params_default_t
   {
+    using real_t = double;
     enum { n_dims = 2 };
     enum { n_eqs = 3 };
     enum { rhs_scheme = solvers::euler_b };
