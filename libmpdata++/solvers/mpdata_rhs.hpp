@@ -55,9 +55,14 @@ namespace libmpdataxx
       }
 
       virtual void apply_rhs(
-        typename parent_t::real_t dt
+        const typename parent_t::real_t &dt
       ) final
       {
+        static_assert(
+          !formulae::opts::isset(ct_params_t::opts, formulae::opts::nug),
+          "TODO: implement multiplication of rhs by G"
+        ); 
+
         for (int e = 0; e < parent_t::n_eqs; ++e) 
           this->state(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
       }

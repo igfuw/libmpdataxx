@@ -67,8 +67,8 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  add_solver<formulae::opts::fct>(slvs, "mpdata_fct_iters=2");
-  add_solver<0>(slvs, "mpdata_iters=2");
+  add_solver<formulae::opts::abs | formulae::opts::fct>(slvs, "mpdata_fct_iters=2");
+  add_solver<formulae::opts::abs>(slvs, "mpdata_iters=2");
   add_solver<formulae::opts::fct | formulae::opts::iga>(slvs, "mpdata_fct_iters=2_iga");
   add_solver<formulae::opts::iga>(slvs, "mpdata_iters=2_iga");
 
