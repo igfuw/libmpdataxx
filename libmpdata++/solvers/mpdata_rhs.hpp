@@ -55,7 +55,7 @@ namespace libmpdataxx
       }
 
       virtual void apply_rhs(
-        typename parent_t::real_t dt
+        const typename parent_t::real_t &dt
       ) final
       {
         static_assert(

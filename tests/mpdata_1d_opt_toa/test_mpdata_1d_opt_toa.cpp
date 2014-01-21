@@ -65,9 +65,9 @@ int main()
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
   add_solver<0>(slvs, "mpdata_iters=2");
-  add_solver<formulae::opts::toa>(slvs, "mpdata_iters=2_toa");
+  add_solver<formulae::opts::abs | formulae::opts::toa>(slvs, "mpdata_iters=2_toa");
   add_solver<formulae::opts::toa | formulae::opts::iga>(slvs, "mpdata_iters=2_toa_iga");
-  add_solver<formulae::opts::fct | formulae::opts::toa>(slvs, "mpdata_fct_iters=2_toa"); 
+  add_solver<formulae::opts::abs | formulae::opts::fct | formulae::opts::toa>(slvs, "mpdata_fct_iters=2_toa"); 
   add_solver<formulae::opts::fct | formulae::opts::toa | formulae::opts::iga>(slvs, "mpdata_fct_iters=2_toa_iga"); 
 
   for (auto &slv : slvs) slv.advance(nt);

@@ -67,9 +67,18 @@ int main()
 
   for (auto &offset : std::vector<T>({0,-.5}))
   {
-//    add_solver<output::gnuplot<solvers::donorcell_2d<real_t>>>(
-//      slvs, offset, "donorcell"
-//    );
+    {
+      struct ct_params_t
+      {
+        using real_t = T;
+        enum { n_dims = 2 };
+        enum { n_eqs = 2 };
+        enum { opts = formulae::opts::abs };
+      };
+      add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
+        slvs, offset, "mpdata-abs_it=2"
+      );
+    }
     {
       struct ct_params_t
       {
@@ -80,18 +89,6 @@ int main()
       };
       add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
         slvs, offset, "mpdata_it=2"
-      );
-    }
-    {
-      struct ct_params_t
-      {
-        using real_t = T;
-        enum { n_dims = 2 };
-        enum { n_eqs = 2 };
-        enum { opts = formulae::opts::pds };
-      };
-      add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
-        slvs, offset, "mpdata-pds_it=2"
       );
     }
   }

@@ -46,7 +46,7 @@ namespace libmpdataxx
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const rng_t &i,
-        typename std::enable_if<opts::isset(opts, opts::toa) && opts::isset(opts, opts::pds) && !opts::isset(opts, opts::iga)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::toa) && !opts::isset(opts, opts::abs) && !opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
         HOT_helper<opts>(GC, G, i) 
         * frac<opts>(
@@ -62,7 +62,7 @@ namespace libmpdataxx
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const rng_t &i,
-        typename std::enable_if<opts::isset(opts, opts::toa) && !opts::isset(opts, opts::pds) && !opts::isset(opts, opts::iga)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::toa) && opts::isset(opts, opts::abs) && !opts::isset(opts, opts::iga)>::type* = 0
       ) return_macro(,
         HOT_helper<opts>(GC, G, i)
         * frac<opts>(
@@ -78,8 +78,10 @@ namespace libmpdataxx
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const rng_t &i,
-        typename std::enable_if<opts::isset(opts, opts::toa) && !opts::isset(opts, opts::pds) && opts::isset(opts, opts::iga)>::type* = 0 
-      ) return_macro(,
+        typename std::enable_if<opts::isset(opts, opts::toa) && opts::isset(opts, opts::iga)>::type* = 0 
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "iga & abs are mutually exclusive");
+        ,
         HOT_helper<opts>(GC, G, i) 
         * (psi(i+2) - psi(i+1) - psi(i) + psi(i-1)) 
         / //--------------------------------------- 

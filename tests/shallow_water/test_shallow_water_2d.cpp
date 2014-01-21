@@ -23,7 +23,7 @@ int main()
     using real_t = double;
     enum { n_dims = 2 };
     enum { n_eqs = 3 };
-    enum { opts = 0 }; // TODO
+    enum { opts = formulae::opts::abs }; // TODO
     enum { rhs_scheme = solvers::strang };
     struct ix { enum {qx, qy, h, vip_i=qx, vip_j=qy, vip_den=h}; };
   };

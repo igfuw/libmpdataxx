@@ -23,7 +23,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
 	frac<opts>(
 	  psi(pi<d>(i+1, j)) - psi(pi<d>(i, j))
@@ -37,7 +37,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
 	frac<opts>(
 	  abs(psi(pi<d>(i+1, j))) - abs(psi(pi<d>(i, j)))
@@ -52,7 +52,9 @@ namespace libmpdataxx
         const rng_t &i, 
         const rng_t &j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) return_macro(,
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "abs & iga options are mutually exclusive");
+        ,
         (
 	  psi(pi<d>(i+1, j)) - psi(pi<d>(i, j))
         ) / ( //---------------------
@@ -65,7 +67,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
 	frac<opts>( 
 	  psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) - psi(pi<d>(i+1, j-1)) - psi(pi<d>(i, j-1))
@@ -79,7 +81,7 @@ namespace libmpdataxx
         const arr_2d_t &psi, 
         const rng_t &i, 
         const rng_t &j,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
 	frac<opts>( 
 	  abs(psi(pi<d>(i+1, j+1))) + abs(psi(pi<d>(i, j+1))) - abs(psi(pi<d>(i+1, j-1))) - abs(psi(pi<d>(i, j-1)))
@@ -94,7 +96,9 @@ namespace libmpdataxx
         const rng_t &i, 
         const rng_t &j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) return_macro(,
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "abs & iga options are mutually exclusive");
+        ,
         (
 	  psi(pi<d>(i+1, j+1)) + psi(pi<d>(i, j+1)) - psi(pi<d>(i+1, j-1)) - psi(pi<d>(i, j-1))
 	) / (  // --------------------------------------------------------------------------------

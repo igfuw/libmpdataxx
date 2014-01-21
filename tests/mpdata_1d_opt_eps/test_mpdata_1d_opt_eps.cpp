@@ -64,10 +64,10 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
-  add_solver<0>(slvs, "mpdata_iters=2", 2);
-  add_solver<formulae::opts::eps>(slvs, "mpdata_iters=2_eps", 2);
-  add_solver<0>(slvs, "mpdata_iters=3", 3);
-  add_solver<formulae::opts::eps>(slvs, "mpdata_iters=3_eps", 3);
+  add_solver<formulae::opts::abs>(slvs, "mpdata_iters=2", 2);
+  add_solver<formulae::opts::abs | formulae::opts::eps>(slvs, "mpdata_iters=2_eps", 2);
+  add_solver<formulae::opts::abs>(slvs, "mpdata_iters=3", 3);
+  add_solver<formulae::opts::abs | formulae::opts::eps>(slvs, "mpdata_iters=3_eps", 3);
 
   for (auto &slv : slvs) slv.advance(nt);
 }

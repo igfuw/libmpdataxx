@@ -76,10 +76,10 @@ int main()
 {
   boost::ptr_vector<concurr::any<real_t, 1>> slvs;
 
-  add_solver<0, solvers::rhs_scheme_t::euler_b>(slvs, "euler_it=1",  1);
-  add_solver<0, solvers::rhs_scheme_t::euler_b>(slvs, "euler_it=2",  2);
-  add_solver<0, solvers::rhs_scheme_t::strang>(slvs, "strang_it=1", 1);
-  add_solver<0, solvers::rhs_scheme_t::strang>(slvs, "strang_it=2", 2);
+  add_solver<formulae::opts::abs, solvers::rhs_scheme_t::euler_b>(slvs, "euler_it=1",  1);
+  add_solver<formulae::opts::abs, solvers::rhs_scheme_t::euler_b>(slvs, "euler_it=2",  2);
+  add_solver<formulae::opts::abs, solvers::rhs_scheme_t::strang>(slvs, "strang_it=1", 1);
+  add_solver<formulae::opts::abs, solvers::rhs_scheme_t::strang>(slvs, "strang_it=2", 2);
 
   for (auto &slv : slvs) slv.advance(nt);
 }
