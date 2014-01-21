@@ -31,6 +31,7 @@ int main()
 
     // hints
     enum { hint_norhs = formulae::opts::bit(ix::h) }; 
+    // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
   };
   using ix = typename ct_params_t::ix;
 

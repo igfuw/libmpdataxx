@@ -33,9 +33,9 @@ namespace libmpdataxx
         typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
       ) return_macro(,
         (
-          formulae::G<opts>(G, pi<dim>(i+1, j)) 
+          formulae::G<opts, dim>(G, i+1, j) 
           +
-          formulae::G<opts>(G, pi<dim>(i  , j))
+          formulae::G<opts, dim>(G, i  , j)
         ) / 2
       )
 
