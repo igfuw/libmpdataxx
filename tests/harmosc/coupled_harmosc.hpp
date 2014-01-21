@@ -63,7 +63,7 @@ struct coupled_harmosc : public
   // method called by mpdata_rhs
   void update_rhs(
     libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs, 
-    typename ct_params_t::real_t dt,
+    const typename parent_t::real_t &dt,
     const int &at
   ) {
     parent_t::update_rhs(rhs, dt, at);

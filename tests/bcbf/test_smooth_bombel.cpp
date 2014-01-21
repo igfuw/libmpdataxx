@@ -11,92 +11,69 @@
  * \image html "../../tests/bombel/figure.svg"
  */
 
-#include <libmpdata++/solvers/mpdata.hpp>
-#include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_mr.hpp>
-#include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_cr.hpp>
-#include <libmpdata++/solvers/adv+rhs+vip+prs/solver_pressure_pc.hpp>
+#include "bombel.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
-
-//theta->pressure
-#include <libmpdata++/formulae/diagnose_formulae.hpp>
-
-// auto-deallocating containers
-#include <boost/ptr_container/ptr_map.hpp>
-#include <boost/assign/ptr_map_inserter.hpp>
-
-enum {u, w, tht};  //eqations
-enum {x, z};       //dimensions
-
-using real_t = double;
-
 using namespace libmpdataxx;
 
-#include "bombel.hpp"
-
-template <class T>
-void setopts(T &p, real_t Tht_amb, std::string name)
-{
-  p.n_iters = 2;
-
-  p.dt = .5;
-  p.dx = p.dz = 10.;
-  p.Tht_amb = Tht_amb; 
-
-  p.outfreq = 1;
-  p.outvars = {
-//    {u,   {.name = "u",   .unit = "m/s"}}, 
-//    {w,   {.name = "w",   .unit = "m/s"}}, 
-    {tht, {.name = "tht", .unit = "K"  }}
-  };
-  p.gnuplot_view = "map";
-  p.gnuplot_output = "figure_" + name + "_%s_%d.png";
-  p.gnuplot_with = "lines";
-  p.gnuplot_surface = false;
-  p.gnuplot_contour = true;
-//  p.gnuplot_cbrange = "[299:301.5]";
-  p.gnuplot_term = "png";
-}
+const int nx = 200, ny = 200, nt = 1212;
 
 int main() 
 {
-  const int nx = 200, ny = 200, nt = 1212;
-  real_t Tht_amb = 300; // ambient state (constant thoughout the domain)
-
-  boost::ptr_vector<concurr::any<real_t, 2>> slvs;
-
-  { // minimum residual
-    using solver_t = output::gnuplot<
-      bombel<
-	solvers::pressure_cr<
-	  solvers::mpdata_fct_2d<real_t, /* n_eqs = */ 3>,
-	  u, w
-        >
-      >
-    >;
-    solver_t::params_t p; 
-    setopts(p, Tht_amb, "cr");
-    p.tol = 1e-5;
-    p.span = {nx, ny};
-
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(p));
-  }
-  for (auto &slv : slvs)
+  // compile-time parameters
+  struct ct_params_t
   {
-    // initial condition
-    {
-      blitz::firstIndex i;
-      blitz::secondIndex j;
+    using real_t = double;
+    enum { n_dims = 2 };
+    enum { n_eqs = 3 };
+    enum { opts = formulae::opts::fct };
+    enum { rhs_scheme = solvers::euler_b };
+    enum { prs_scheme = solvers::cr };
+    struct ix { enum {u, w, tht, vip_i=u, vip_j=w, vip_den=-1}; }; 
+  };
+  using ix = typename ct_params_t::ix;  
 
-      slv.advectee(tht) = Tht_amb 
-	+ .5 * exp( -sqr(.5+i-nx/2.) / (2.*pow(nx/20, 2))   // TODO: assumed dx=dy=1?
-	       	    -sqr(.5+j-ny/4.) / (2.*pow(ny/20, 2)) )
-      ;
-      slv.advectee(u) = real_t(0); 
-      slv.advectee(w) = real_t(0); 
-    }
+  using solver_t = output::gnuplot<bombel<ct_params_t>>;
 
-    // integration
-    slv.advance(nt); 
+  // run-time parameters
+  solver_t::rt_params_t rt_params; 
+
+  rt_params.tol = 1e-5;
+  rt_params.span = {nx, ny};
+
+  rt_params.dt = .5;
+  rt_params.di = rt_params.dj = 10.;
+  rt_params.Tht_amb = 300; // [K] ambient state (constant thoughout the domain)
+
+  rt_params.outfreq = 1;
+  rt_params.outvars = {
+//    {ix::u,   {.name = "u",   .unit = "m/s"}}, 
+//    {ix::w,   {.name = "w",   .unit = "m/s"}}, 
+    {ix::tht, {.name = "tht", .unit = "K"  }}
+  };
+  rt_params.gnuplot_view = "map";
+  rt_params.gnuplot_output = "figure_%s_%d.png";
+  rt_params.gnuplot_with = "lines";
+  rt_params.gnuplot_surface = false;
+  rt_params.gnuplot_contour = true;
+//  rt_params.gnuplot_cbrange = "[299:301.5]";
+  rt_params.gnuplot_term = "png";
+
+  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> run(rt_params);
+
+  // initial condition
+  {
+    blitz::firstIndex i;
+    blitz::secondIndex j;
+
+    run.advectee(ix::tht) = rt_params.Tht_amb 
+      + .5 * exp( -sqr(.5+i-nx/2.) / (2.*pow(nx/20, 2))   // TODO: assumed dx=dy=1?
+		  -sqr(.5+j-ny/4.) / (2.*pow(ny/20, 2)) )
+    ;
+    run.advectee(ix::u) = 0;
+    run.advectee(ix::w) = 0; 
   }
+
+  // integration
+  run.advance(nt); 
 };

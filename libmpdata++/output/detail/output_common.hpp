@@ -20,16 +20,10 @@ namespace libmpdataxx
       {
 	using parent_t = solver_t;
 
-        // TODO: not here!
-        // sanity checks for ct_params_t
-        static_assert(solver_t::n_dims > 0, "ct_params_t::n_dims missing?");
-        static_assert(sizeof(typename solver_t::real_t), "ct_params_t::real_t missing?");
-        static_assert(solver_t::n_eqs > 0, "ct_params_t::n_eqs missing?");
-
 	protected:
 
-	struct info { std::string name, unit; };
-	std::map<int, info> outvars;
+	struct info_t { std::string name, unit; };
+	std::map<int, info_t> outvars;
 
 	int outfreq;
 
@@ -79,7 +73,7 @@ namespace libmpdataxx
 	struct rt_params_t : parent_t::rt_params_t 
 	{ 
 	  int outfreq = 1; 
-	  std::map<int, info> outvars;
+	  std::map<int, info_t> outvars;
 	};
 
 	// ctor

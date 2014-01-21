@@ -74,84 +74,78 @@
   */
 
 #pragma once
-#include <libmpdata++/solvers/adv+rhs+vip+prs/detail/solver_pressure_common.hpp>
+
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_common.hpp>
 #include <libmpdata++/formulae/nabla_formulae.hpp> //gradient, diveregnce
 
 namespace libmpdataxx
 {
   namespace solvers
   {
-    template <class inhomo_solver_t, int u, int w>
-    class pressure_mr : public detail::pressure_solver_common<inhomo_solver_t, u, w>
+    namespace detail
     {
-      public:
-
-      using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w>;
-      typedef typename parent_t::real_t real_t;
-
-      private:
-
-      void pressure_solver_update()
+      template <class ct_params_t>
+      class mpdata_rhs_vip_prs_mr : public mpdata_rhs_vip_prs_common<ct_params_t>
       {
-	using namespace arakawa_c;
-	using formulae::nabla::grad;
-	using formulae::nabla::div;
+	using parent_t = mpdata_rhs_vip_prs_common<ct_params_t>;
+        using real_t = typename ct_params_t::real_t;
+        using ix = typename ct_params_t::ix;
 
-	const real_t rho = 1.; // TODO    
-        //const real_t beta = .25; //TODO tylko Richardson
-
-	int halo = this->halo;
-	rng_t &i = this->i;
-	rng_t &j = this->j;
-
-	this->tmp_u(i,j) = this->state(u)(i,j);
-	this->tmp_w(i,j) = this->state(w)(i,j);
-
-        this->xchng(this->Phi,   i^halo, j^halo);
-        this->xchng(this->tmp_u, i^halo, j^halo);
-        this->xchng(this->tmp_w, i^halo, j^halo);
-
-        //initail error   
-        this->err(i, j) = 
-          - 1./ rho * div(rho * this->tmp_u, rho * this->tmp_w , i, j, this->dx, this->dz)
-          + this->lap(this->Phi, i, j, this->dx, this->dz); 
-          /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
-
-	//pseudo-time loop
-	real_t error = 1.;
-	while (error > this->tol) 
+	void pressure_solver_update()
 	{
-          this->lap_err(i,j) = this->lap(this->err, i, j, this->dx, this->dz); 
+	  using namespace arakawa_c;
+	  using formulae::nabla::grad;
+	  using formulae::nabla::div;
 
-// if (!richardson) TODO - jako opcja (template?)
-          real_t beta = - this->mem->sum(this->err, this->lap_err, i, j) / this->mem->sum(this->lap_err, this->lap_err, i, j);
-// endif
+	  const real_t rho = 1.; // TODO    
+	  //const real_t beta = .25; //TODO tylko Richardson
 
-          this->Phi(i, j) += beta * this->err(i, j);
-          this->err(i, j) += beta * this->lap_err(i, j);
+	  int halo = this->halo;
+	  rng_t &i = this->i;
+	  rng_t &j = this->j;
 
-	  error = std::max(
-	    std::abs(this->mem->max(this->err(i,j))),
-	    std::abs(this->mem->min(this->err(i,j)))
-	  );
-          this->iters++;
+	  this->tmp_u(i,j) = this->state(ix::u)(i,j);
+	  this->tmp_w(i,j) = this->state(ix::w)(i,j);
+
+	  this->xchng(this->Phi,   i^halo, j^halo);
+	  this->xchng(this->tmp_u, i^halo, j^halo);
+	  this->xchng(this->tmp_w, i^halo, j^halo);
+
+	  //initail error   
+	  this->err(i, j) = 
+	    - 1./ rho * div(rho * this->tmp_u, rho * this->tmp_w , i, j, this->di, this->dj)
+	    + this->lap(this->Phi, i, j, this->di, this->dj); 
+	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
+
+	  //pseudo-time loop
+	  real_t error = 1.;
+	  while (error > this->tol) 
+	  {
+	    this->lap_err(i,j) = this->lap(this->err, i, j, this->di, this->dj); 
+
+  // if (!richardson) TODO - jako opcja (template?)
+	    real_t beta = - this->mem->sum(this->err, this->lap_err, i, j) / this->mem->sum(this->lap_err, this->lap_err, i, j);
+  // endif
+
+	    this->Phi(i, j) += beta * this->err(i, j);
+	    this->err(i, j) += beta * this->lap_err(i, j);
+
+	    error = std::max(
+	      std::abs(this->mem->max(this->err(i,j))),
+	      std::abs(this->mem->min(this->err(i,j)))
+	    );
+	    this->iters++;
+	  }
+	  //end of pseudo_time loop
+
+	  this->xchng(this->Phi, i^halo, j^halo);
+	  this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->di);
+	  this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dj);
 	}
-	//end of pseudo_time loop
 
-	this->xchng(this->Phi, i^halo, j^halo);
-	this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->dx);
-	this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dz);
-      }
-
-      public:
-
-      // ctor
-      pressure_mr(
-	typename parent_t::ctor_args_t args,
-	const typename parent_t::rt_params_t &p
-      ) :
-	parent_t(args, p)
-      {}
-    }; 
+	// inheriting ctor
+        using parent_t::parent_t;
+      }; 
+    }; // namespace detail
   }; // namespace solvers
 }; // namespace libmpdataxx

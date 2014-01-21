@@ -115,21 +115,21 @@ namespace libmpdataxx
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
-          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t(
+          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_vctr(span[0]),
             parent_t::rng_sclr(span[1]),
             parent_t::rng_sclr(span[2])
-          )); 
-          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t(
+          ))); 
+          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_sclr(span[0]),
             parent_t::rng_vctr(span[1]),
             parent_t::rng_sclr(span[2])
-          )); 
-          mem->tmp[__file__].back().push_back(new typename parent_t::arr_t(
+          ))); 
+          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
              parent_t::rng_sclr(span[0]),
              parent_t::rng_sclr(span[1]),
              parent_t::rng_vctr(span[2])
-          )); 
+          ))); 
         }
 
         // helper method to allocate n_arr scalar temporary arrays 
@@ -140,11 +140,11 @@ namespace libmpdataxx
         {   
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
           for (int n = 0; n < n_arr; ++n)
-            mem->tmp[__file__].back().push_back(new typename parent_t::arr_t( 
+            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
               parent_t::rng_sclr(span[0]),
               parent_t::rng_sclr(span[1]),
               parent_t::rng_sclr(span[2])
-            ));
+            )));
         } 
       };
     };

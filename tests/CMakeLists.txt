@@ -12,11 +12,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # TODO (report to CMake?)
 set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -g")
 
 # Release mode
-# TODO: reconsider -DNDEBUG?
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -Ofast -march=native")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -O3 -march=native -ffast-math") 
 endif()
 
 # Profile mode
@@ -27,13 +24,16 @@ find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnu
 # TODO: should't this path be added somewhere now?
 
 # Boost libraries
-find_package(Boost COMPONENTS thread date_time system iostreams timer REQUIRED QUIET)
+find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem REQUIRED QUIET)
+
+# HDF5 libraries
+find_package(HDF5 COMPONENTS CXX HL)
 
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   set_target_properties(${test} PROPERTIES LINK_FLAGS_DEBUG "-lblitz")
-  target_link_libraries(${test} ${Boost_LIBRARIES})
+  target_link_libraries(${test} ${Boost_LIBRARIES} ${HDF5_LIBRARIES})
 # TODO: target_compile_options() // added to CMake on Jun 3rd 2013
   add_test(${test} ${test})
 endfunction()
@@ -52,6 +52,7 @@ add_subdirectory(var_sign_2d)
 add_subdirectory(concurrent_1d)
 add_subdirectory(err_isolines)
 add_subdirectory(rotating_cone)
+add_subdirectory(rotating_sphere)
 add_subdirectory(mpdata_fct_1d)
 add_subdirectory(mpdata_1d_opt_pds)
 add_subdirectory(mpdata_1d_opt_toa)
@@ -59,7 +60,6 @@ add_subdirectory(mpdata_1d_opt_eps)
 add_subdirectory(mpdata_1d_opt_npa)
 add_subdirectory(mpdata_1d_opt_iga)
 add_subdirectory(mpdata_1d_opt_nug)
-add_subdirectory(todo_3d)
 # adv+rhs
 add_subdirectory(harmosc)
 # adv+rhs+vip

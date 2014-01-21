@@ -79,113 +79,113 @@
 */
 
 #pragma once
-#include <libmpdata++/solvers/adv+rhs+vip+prs/detail/solver_pressure_common.hpp>
-#include <libmpdata++/formulae/nabla_formulae.hpp> //gradient, diveregnce
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_common.hpp>
+#include <libmpdata++/formulae/nabla_formulae.hpp> // gradient, diveregnce
 
 namespace libmpdataxx
 {
   namespace solvers
   {
-    template <class inhomo_solver_t, int u, int w>
-    class pressure_cr : public detail::pressure_solver_common<inhomo_solver_t, u, w>
+    namespace detail
     {
-      public:
-
-      using parent_t = detail::pressure_solver_common<inhomo_solver_t, u, w>;
-      using real_t = typename parent_t::real_t;
-
-      typename parent_t::arr_t p_err, lap_p_err;
-
-      private:
-
-      void pressure_solver_update()
+      template <class ct_params_t>
+      class mpdata_rhs_vip_prs_cr : public detail::mpdata_rhs_vip_prs_common<ct_params_t>
       {
-	using namespace arakawa_c;
-	using formulae::nabla::grad;
-	using formulae::nabla::div;
+	using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t>;
+	using real_t = typename ct_params_t::real_t;
+        using ix = typename ct_params_t::ix;
 
-	real_t beta = .25;   //TODO
-        real_t alpha = 1.;   //TODO
-	real_t rho = 1.;     //TODO    
-        real_t tmp_den = 1.; //TODO
+	typename parent_t::arr_t p_err, lap_p_err;
 
-	int halo = this->halo;
-	rng_t &i = this->i;
-	rng_t &j = this->j;
-
-	this->tmp_u(i, j) = this->state(u)(i, j);
-	this->tmp_w(i, j) = this->state(w)(i, j);
-
-        this->xchng(this->Phi,   i^halo, j^halo);
-        this->xchng(this->tmp_u, i^halo, j^halo);
-	this->xchng(this->tmp_w, i^halo, j^halo);
-
-        //initail error   
-        this->err(i, j) =
-          - 1./ rho * div(rho * this->tmp_u, rho * this->tmp_w , i, j, this->dx, this->dz)
-          + this->lap(this->Phi, i, j, this->dx, this->dz);
-          /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
-
-        p_err(i ,j) = this->err(i, j);
-        lap_p_err(i,j) = this->lap(p_err, i, j, this->dx, this->dz);
-
-	//pseudo-time loop
-        this->iters = 0;
-	real_t error = 1.;
-	while (error > this->tol)
+	void pressure_solver_update()
 	{
-          tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
-          if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
-          this->Phi(i, j) += beta * p_err(i, j);
-          this->err(i, j) += beta * lap_p_err(i, j);
+	  using namespace arakawa_c;
+	  using formulae::nabla::grad;
+	  using formulae::nabla::div;
 
-          this->lap_err(i, j) = this->lap(this->err, i, j, this->dx, this->dz);         
+	  real_t beta = .25;   //TODO
+	  real_t alpha = 1.;   //TODO
+	  real_t rho = 1.;     //TODO    
+	  real_t tmp_den = 1.; //TODO
 
-          if (tmp_den != 0) alpha = - this->mem->sum(this->lap_err, lap_p_err, i, j) / tmp_den;          
+	  int halo = this->halo;
+	  rng_t &i = this->i;
+	  rng_t &j = this->j;
 
-          p_err(i, j) *= alpha;
-          p_err(i, j) += this->err(i, j);  
- 
-          lap_p_err(i,j) *= alpha;
-          lap_p_err(i,j) += this->lap_err(i,j);
- 
-          error = std::max(
-            std::abs(this->mem->max(this->err(i,j))), 
-            std::abs(this->mem->min(this->err(i,j)))
-          );
-          this->iters++;
+	  this->tmp_u(i, j) = this->state(ix::u)(i, j);
+	  this->tmp_w(i, j) = this->state(ix::w)(i, j);
+
+	  this->xchng(this->Phi,   i^halo, j^halo);
+	  this->xchng(this->tmp_u, i^halo, j^halo);
+	  this->xchng(this->tmp_w, i^halo, j^halo);
+
+	  //initail error   
+	  this->err(i, j) =
+	    - 1./ rho * div(rho * this->tmp_u, rho * this->tmp_w , i, j, this->di, this->dj)
+	    + this->lap(this->Phi, i, j, this->di, this->dj);
+	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
+
+	  p_err(i ,j) = this->err(i, j);
+	  lap_p_err(i,j) = this->lap(p_err, i, j, this->di, this->dj);
+
+	  //pseudo-time loop
+	  this->iters = 0;
+	  real_t error = 1.;
+	  while (error > this->tol)
+	  {
+	    tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
+	    if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
+	    this->Phi(i, j) += beta * p_err(i, j);
+	    this->err(i, j) += beta * lap_p_err(i, j);
+
+	    this->lap_err(i, j) = this->lap(this->err, i, j, this->di, this->dj);         
+
+	    if (tmp_den != 0) alpha = - this->mem->sum(this->lap_err, lap_p_err, i, j) / tmp_den;          
+
+	    p_err(i, j) *= alpha;
+	    p_err(i, j) += this->err(i, j);  
+   
+	    lap_p_err(i,j) *= alpha;
+	    lap_p_err(i,j) += this->lap_err(i,j);
+   
+	    error = std::max(
+	      std::abs(this->mem->max(this->err(i,j))), 
+	      std::abs(this->mem->min(this->err(i,j)))
+	    );
+	    this->iters++;
+	  }
+	  //end of pseudo_time loop
+
+  // TODO: record it
+  //std::cerr<<"      number of iterations untill convergence: "<<this->iters<<std::endl;
+  //std::cerr<<"      error: "<<error<<std::endl;
+
+	  this->xchng(this->Phi, i^halo, j^halo);
+
+	  this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->di);
+	  this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dj);
 	}
-	//end of pseudo_time loop
 
-// TODO: record it
-//std::cerr<<"      number of iterations untill convergence: "<<this->iters<<std::endl;
-//std::cerr<<"      error: "<<error<<std::endl;
+	public:
 
-	this->xchng(this->Phi, i^halo, j^halo);
+	struct rt_params_t : parent_t::rt_params_t { };
 
-	this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->dx);
-	this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dz);
-      }
+	// ctor
+	mpdata_rhs_vip_prs_cr(
+	  typename parent_t::ctor_args_t args,
+	  const rt_params_t &p
+	) :
+	  parent_t(args, p),
+	  lap_p_err(args.mem->tmp[__FILE__][0][0]),
+	      p_err(args.mem->tmp[__FILE__][0][1])
+	{}
 
-      public:
-
-      struct rt_params_t : parent_t::rt_params_t { };
-
-      // ctor
-      pressure_cr(
-	typename parent_t::ctor_args_t args,
-	const rt_params_t &p
-      ) :
-	parent_t(args, p),
-        lap_p_err(args.mem->tmp[__FILE__][0][0]),
-	    p_err(args.mem->tmp[__FILE__][0][1])
-      {}
-
-      static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
-      {
-        parent_t::alloc(mem, p);
-        parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, 2);
-      }
-    }; 
+	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
+	{
+	  parent_t::alloc(mem, p);
+	  parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, 2);
+	}
+      }; 
+    }; // namespace detail
   }; // namespace solvers
 }; // namespace libmpdataxx

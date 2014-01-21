@@ -53,7 +53,7 @@ class shallow_water_common : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
   // 
   void update_rhs(
     libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
-    typename parent_t::real_t dt,
+    const typename parent_t::real_t &dt,
     const int &at
   ) {
     parent_t::update_rhs(rhs, dt, at);

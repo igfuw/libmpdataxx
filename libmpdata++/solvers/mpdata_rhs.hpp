@@ -50,7 +50,7 @@ namespace libmpdataxx
 
       virtual void update_rhs(
         arrvec_t<typename parent_t::arr_t> &rhs, 
-        typename parent_t::real_t dt,
+        const typename parent_t::real_t &dt,
         const int &at
       ) {
         assert(at == n || at == n+1);
@@ -62,6 +62,18 @@ namespace libmpdataxx
           rhs.at(e)(this->ijk) = 0;
       }
 
+      virtual void apply_rhs(
+        typename parent_t::real_t dt
+      ) final
+      {
+        static_assert(
+          !formulae::opts::isset(ct_params_t::opts, formulae::opts::nug),
+          "TODO: implement multiplication of rhs by G"
+        ); 
+
+        for (int e = 0; e < parent_t::n_eqs; ++e) 
+          this->state(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
+      }
 
       public:
 

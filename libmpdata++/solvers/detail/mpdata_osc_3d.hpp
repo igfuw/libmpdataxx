@@ -105,7 +105,7 @@ namespace libmpdataxx
 	      formulae::donorcell::op_3d<ct_params_t::opts>(
 		this->mem->psi[e], 
 		this->GC(iter), 
-		this->mem->G, 
+		*this->mem->G,
 		this->n[e], 
 		this->i, 
 		this->j,
@@ -119,7 +119,7 @@ namespace libmpdataxx
 	      formulae::donorcell::op_3d_iga<ct_params_t::opts>(
 		this->mem->psi[e], 
 		this->GC(iter), 
-		this->mem->G, 
+		*this->mem->G,
 		this->n[e], 
 		this->i, 
 		this->j,
