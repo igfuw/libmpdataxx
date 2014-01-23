@@ -146,6 +146,8 @@ namespace libmpdataxx
 
         // save the xmf filename for temporal write
         timesteps.push_back(xmf_name);
+        // write temporal xmf
+        xdmfw.write_temporal(outdir + "/temp.xmf", timesteps);
 
         try
         {
@@ -194,12 +196,6 @@ namespace libmpdataxx
           }
         }
         catch (const H5::Exception &e) { handle(e); }
-      }
-
-      void stop()
-      {
-        // write temporal xmf
-        xdmfw.write_temporal(outdir + "/temp.xmf", timesteps);
       }
 
       void handle(const H5::Exception &e)
