@@ -65,8 +65,8 @@ class coupled_harmosc : public libmpdataxx::solvers::mpdata_rhs<ct_params_t>
   ) {
     parent_t::update_rhs(rhs, dt, at);
 
-    auto Psi = this->state(psi);
-    auto Phi = this->state(phi);
+    auto Psi = this->psi_n(psi);
+    auto Phi = this->psi_n(phi);
     auto &i = this->i;
 
     switch (at)

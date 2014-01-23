@@ -37,9 +37,9 @@ namespace libmpdataxx
       void fill_stash() final
       {
 	if (ix::vip_den == -1) 
-	  this->stash[0](this->ijk) = this->state(ix::vip_i)(this->ijk);
+	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk);
 	else
-	  this->stash[0](this->ijk) = this->state(ix::vip_i)(this->ijk) / this->state(ix::vip_den)(this->ijk); // TODO: what if density == 0?
+	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk); // TODO: what if density == 0?
       }
 
       void interpolate_in_space() final
@@ -66,9 +66,9 @@ namespace libmpdataxx
 	this->stash[0](this->ijk) /= -2.;
 
 	if (ix::vip_den == -1) 
-	  this->stash[0](this->ijk) += 3./2 * this->state(ix::vip_i)(this->ijk);
+	  this->stash[0](this->ijk) += 3./2 * this->psi_n(ix::vip_i)(this->ijk);
 	else
-	  this->stash[0](this->ijk) += 3./2 * (this->state(ix::vip_i)(this->ijk) / this->state(ix::vip_den)(this->ijk)); // TODO: what if density == 0?
+	  this->stash[0](this->ijk) += 3./2 * (this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk)); // TODO: what if density == 0?
 
 	this->xchng(this->stash[0]);      // filling halos 
       }
@@ -113,13 +113,13 @@ namespace libmpdataxx
       {
 	if (ix::vip_den == -1) 
 	{
-	  this->stash[0](this->ijk) = this->state(ix::vip_i)(this->ijk);
-	  this->stash[1](this->ijk) = this->state(ix::vip_j)(this->ijk);
+	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk);
+	  this->stash[1](this->ijk) = this->psi_n(ix::vip_j)(this->ijk);
 	}
 	else
 	{
-	  this->stash[0](this->ijk) = this->state(ix::vip_i)(this->ijk) / this->state(ix::vip_den)(this->ijk); // TODO: what if density == 0?
-	  this->stash[1](this->ijk) = this->state(ix::vip_j)(this->ijk) / this->state(ix::vip_den)(this->ijk); // TODO: what if density == 0?
+	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk); // TODO: what if density == 0?
+	  this->stash[1](this->ijk) = this->psi_n(ix::vip_j)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk); // TODO: what if density == 0?
 	} 
       }
 
@@ -131,9 +131,9 @@ namespace libmpdataxx
 	this->stash[d](this->ijk) /= -2.;
 
 	if (ix::vip_den == -1) 
-	  this->stash[d](this->ijk) += 3./2 * this->state(e)(this->ijk);
+	  this->stash[d](this->ijk) += 3./2 * this->psi_n(e)(this->ijk);
 	else
-	  this->stash[d](this->ijk) += 3./2 * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); // TODO: what if density == 0?
+	  this->stash[d](this->ijk) += 3./2 * (this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk)); // TODO: what if density == 0?
 
 	this->xchng(this->stash[d], this->i^this->halo, this->j^this->halo);      // filling halos 
       }

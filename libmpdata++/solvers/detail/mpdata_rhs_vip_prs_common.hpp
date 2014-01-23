@@ -63,8 +63,8 @@ namespace libmpdataxx
 	{
 	  const rng_t &i = this->i, &j = this->j;
 
-	  this->state(ix::u)(i,j) += tmp_u(i,j);
-	  this->state(ix::w)(i,j) += tmp_w(i,j);
+	  this->psi_n(ix::u)(i,j) += tmp_u(i,j);
+	  this->psi_n(ix::w)(i,j) += tmp_w(i,j);
 	}
 
         void hook_ante_loop(const int nt)
