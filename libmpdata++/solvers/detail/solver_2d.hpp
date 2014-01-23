@@ -101,7 +101,12 @@ namespace libmpdataxx
             parent_t::rng_vctr(p.span[1]) 
           )));
  
-          // TODO: allocate G
+          // allocate G
+          if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+	    mem->G.reset(mem->old(new typename parent_t::arr_t(
+                    parent_t::rng_sclr(p.span[0]),
+                    parent_t::rng_sclr(p.span[1])
+            )));
         }
 
         protected:

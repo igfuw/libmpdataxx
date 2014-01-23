@@ -56,8 +56,9 @@ namespace libmpdataxx
 
 	void fct_adjust_antidiff(int e, int iter)
 	{
-	  const auto &GC_corr = parent_t::GC_corr(iter);
 	  const auto psi = this->mem->psi[e][this->n[e]];
+	  const auto &GC_corr = parent_t::GC_corr(iter);
+          const auto &G = *this->mem->G;
 	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 	  const auto &jm = this->jm; // calculating once for j-1/2 and j+1/2
 	  const auto &km = this->km; // calculating once for k-1/2 and k+1/2
@@ -74,9 +75,9 @@ namespace libmpdataxx
 	  this->mem->barrier();
 
 	  // calculating the monotonic corrective velocity
-	  this->GC_mono[0]( im+h, jm, km ) = formulae::mpdata::C_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, im, jm, km);
-	  this->GC_mono[1]( im, jm+h, km ) = formulae::mpdata::C_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, jm, km, im);
-	  this->GC_mono[2]( im, jm, km+h ) = formulae::mpdata::C_mono<ct_params_t::opts, 2>(psi, this->psi_min, this->psi_max, GC_corr, km, im, jm);
+	  this->GC_mono[0]( im+h, jm, km ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, jm, km);
+	  this->GC_mono[1]( im, jm+h, km ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, km, im);
+	  this->GC_mono[2]( im, jm, km+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 2>(psi, this->psi_min, this->psi_max, GC_corr, G, km, im, jm);
 
 	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
 	  if (iter == this->n_iters - 1) this->mem->barrier();  // TODO: move to common // TODO: different condition in 1D and 2D!
