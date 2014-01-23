@@ -117,8 +117,7 @@ namespace libmpdataxx
       ) return_macro(,
         // second order terms
         abs(GC[dim](pi<dim>(i+h, j))) 
-        * (1 - abs(GC[dim](pi<dim>(i+h, j))))
-        / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j) 
+        * (1 - abs(GC[dim](pi<dim>(i+h, j))) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j))
         * A<opts BOOST_PP_COMMA() dim>(psi, i, j) 
         - 
         GC[dim](pi<dim>(i+h, j)) 

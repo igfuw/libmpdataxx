@@ -86,6 +86,7 @@ namespace libmpdataxx
           const typename parent_t::rt_params_t &p
         )   
         {
+          // psi
           mem->psi.resize(parent_t::n_eqs);
 	  for (int e = 0; e < parent_t::n_eqs; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
@@ -95,17 +96,30 @@ namespace libmpdataxx
                 parent_t::rng_sclr(p.span[2])
               ))); 
 
+          // Courant field components (Arakawa-C grid)
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_vctr(p.span[0]), parent_t::rng_sclr(p.span[1]), parent_t::rng_sclr(p.span[2])
+            parent_t::rng_vctr(p.span[0]),
+            parent_t::rng_sclr(p.span[1]),
+            parent_t::rng_sclr(p.span[2])
           )));
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(
-            parent_t::rng_sclr(p.span[0]), parent_t::rng_vctr(p.span[1]), parent_t::rng_sclr(p.span[2])
+            parent_t::rng_sclr(p.span[0]),
+            parent_t::rng_vctr(p.span[1]),
+            parent_t::rng_sclr(p.span[2])
           )));
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(
-            parent_t::rng_sclr(p.span[0]), parent_t::rng_sclr(p.span[1]), parent_t::rng_vctr(p.span[2])
+            parent_t::rng_sclr(p.span[0]),
+            parent_t::rng_sclr(p.span[1]),
+            parent_t::rng_vctr(p.span[2])
           )));
 
-          // TODO: allocate G
+         // allocate G
+           if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+	    mem->G.reset(mem->old(new typename parent_t::arr_t(
+                    parent_t::rng_sclr(p.span[0]),
+                    parent_t::rng_sclr(p.span[1]),
+                    parent_t::rng_sclr(p.span[2])
+            )));
         }  
         
         // helper method to allocate a temporary space composed of vector-component arrays

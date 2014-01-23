@@ -103,8 +103,8 @@ int main()
     slv.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
 
     // constant angular velocity rotational field
-    slv.advector(x) = -omega * (j * dy - yc) * dt / dx;
-    slv.advector(y) =  omega * (i * dx - xc) * dt / dy;
+    slv.advector(x) = -omega * ((j+.5) * dy - yc) * dt / dx;
+    slv.advector(y) =  omega * ((i+.5) * dx - xc) * dt / dy;
     // TODO: an assert confirming that the above did what it should have done
     //       (in context of the advector()'s use of blitz::Array::reindex())
   }

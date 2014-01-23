@@ -39,14 +39,14 @@ namespace libmpdataxx
 
 	void hook_ante_loop(const int nt) 
 	{   
-  // TODO: same in 1D and 3D
+  // TODO: same in 1D
 	  parent_t::hook_ante_loop(nt);
 	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
 	  {
 	    this->bcxl->fill_halos_sclr(*this->mem->G, this->j^this->halo); // TODO: one xchng call?
 	    this->bcxr->fill_halos_sclr(*this->mem->G, this->j^this->halo);
-	    this->bcxl->fill_halos_sclr(*this->mem->G, this->i^this->halo);
-	    this->bcxr->fill_halos_sclr(*this->mem->G, this->i^this->halo);
+	    this->bcyl->fill_halos_sclr(*this->mem->G, this->i^this->halo);
+	    this->bcyr->fill_halos_sclr(*this->mem->G, this->i^this->halo);
 	  }
 	} 
 
