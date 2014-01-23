@@ -16,7 +16,7 @@
 #include <boost/math/constants/constants.hpp>
 
 #include <libmpdata++/solvers/mpdata.hpp>
-#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/concurr/serial.hpp>
 
 
 // making things simpler (yet less elegant)
@@ -46,7 +46,7 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   p.span = {nx};
 
   boost::assign::ptr_map_insert<
-    concurr::threads<solver_t, bcond::cyclic> // map element type
+    concurr::serial<solver_t, bcond::cyclic> // map element type
   >(slvs)(
     key,  // map key
     p     // concurr's ctor args
@@ -90,7 +90,7 @@ int main()
     sgma     = 1.5 * dx_max, 
     velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
     x0       = .5 * x_max, 
-    A0       = -.5,
+    A0       = 0,
     A        = 1. / sgma / sqrt(2 * pi<real_t>());
 
   const std::list<real_t> 
@@ -121,19 +121,23 @@ int main()
       // silly loop order, but it helped to catch a major bug!
 
       // donor-cell
-      add_solver<formulae::opts::abs>(slvs, "iters=1", nx, 1);
+      add_solver<0>(slvs, "iters=1", nx, 1);
 
       // MPDATA
-      add_solver<formulae::opts::abs>(slvs, "iters=2", nx, 2);
-      add_solver<formulae::opts::abs | formulae::opts::tot>(slvs, "iters=2_tot", nx, 2);
-      add_solver<formulae::opts::abs>(slvs, "iters=3", nx, 3);
-      add_solver<formulae::opts::tot | formulae::opts::iga>(slvs, "iters=2_tot_iga", nx, 2);
+      add_solver<0>(slvs, "iters=2", nx, 2);
+      add_solver<formulae::opts::tot>(slvs, "iters=2_tot", nx, 2);
+      add_solver<0>(slvs, "iters=3", nx, 3);
+      add_solver<formulae::opts::tot>(slvs, "iters=3_tot", nx, 3);
+      add_solver<formulae::opts::iga>(slvs, "iters=i", nx, 2);
+      add_solver<formulae::opts::iga | formulae::opts::tot>(slvs, "iters=i_tot", nx, 2);
 
       // MPDATA-FCT
-      add_solver<formulae::opts::abs | formulae::opts::fct>(slvs, "iters=2_fct", nx, 2);
-      add_solver<formulae::opts::abs | formulae::opts::fct | formulae::opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
-      add_solver<formulae::opts::abs | formulae::opts::fct>(slvs, "iters=3_fct", nx, 3);
-      add_solver<formulae::opts::abs | formulae::opts::fct | formulae::opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
+      add_solver<formulae::opts::fct>(slvs, "iters=2_fct", nx, 2);
+      add_solver<formulae::opts::fct | formulae::opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
+      add_solver<formulae::opts::fct>(slvs, "iters=3_fct", nx, 3);
+      add_solver<formulae::opts::fct | formulae::opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
+      add_solver<formulae::opts::fct | formulae::opts::iga>(slvs, "iters=i_fct", nx, 2);
+      add_solver<formulae::opts::fct | formulae::opts::iga | formulae::opts::tot>(slvs, "iters=i_fct_tot", nx, 2);
 
       // calculating the analytical solution
       decltype(slvs.end()->second->advectee()) exact(nx);
