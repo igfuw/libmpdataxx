@@ -53,9 +53,9 @@ void setup(T &solver)
     yc = 20 * dy,
     zc = 20 * dz;
   // constant angular velocity rotational field
-  solver.advector(x) = (-omega * pow(2, -0.5) * (j * dx - yc) + omega / 2 * (k * dx - zc)) * dt / dx;
-  solver.advector(y) = (omega * pow(2, -0.5) * (i * dx - xc) - omega / 2 * (k * dx - zc)) * dt / dx;
-  solver.advector(z) = (-omega / 2 * (i * dx - xc) + omega / 2 * (j * dx - yc)) * dt / dx;
+  solver.advector(x) = (-omega * pow(2, -0.5) * ((j+.5) * dy - yc) + omega / 2 * ((k+.5) * dz - zc)) * dt / dx;
+  solver.advector(y) = (omega * pow(2, -0.5) * ((i+.5) * dx - xc) - omega / 2 * ((k+.5) * dz - zc)) * dt / dy;
+  solver.advector(z) = (-omega / 2 * ((i+.5) * dx - xc) + omega / 2 * ((j+.5) * dy - yc)) * dt / dz;
 }
 
 int main()
