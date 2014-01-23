@@ -20,7 +20,7 @@ namespace libmpdataxx
       inline auto A(  // positive-sign signal version (no need for abs())
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
    	  psi(i+1) - psi(i)
@@ -33,7 +33,7 @@ namespace libmpdataxx
       inline auto A(   // variable-sign signal version (hence the need for abs())
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
           abs(psi(i+1)) - abs(psi(i))
@@ -47,7 +47,9 @@ namespace libmpdataxx
         const arr_1d_t &psi, 
         const rng_t &i,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 // enabled if iga == true
-      ) return_macro(,
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "abs & iga options are mutually exclusive");
+        ,
 	(psi(i+1) - psi(i)) 
         / //---------------
         (1 + 1)

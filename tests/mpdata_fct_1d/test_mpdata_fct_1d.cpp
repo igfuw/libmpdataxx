@@ -54,7 +54,7 @@ void setopts(T &p, const int nt, const std::string &fname, int n_iters)
 template <formulae::opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &fname, int n_iters)
 {
-  struct ct_params_t 
+  struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };
@@ -74,12 +74,12 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs, slvs_fct;
 
-  add_solver<0>(slvs, "mpdata_iters=1", 1);
-  add_solver<0>(slvs, "mpdata_iters=2", 2);
-  add_solver<0>(slvs, "mpdata_iters=3", 3);
+  add_solver<formulae::opts::abs>(slvs, "mpdata_iters=1", 1);
+  add_solver<formulae::opts::abs>(slvs, "mpdata_iters=2", 2);
+  add_solver<formulae::opts::abs>(slvs, "mpdata_iters=3", 3);
 
-  add_solver<formulae::opts::fct>(slvs_fct, "mpdata_fct_iters=2", 2);
-  add_solver<formulae::opts::fct>(slvs_fct, "mpdata_fct_iters=3", 3);
+  add_solver<formulae::opts::abs | formulae::opts::fct>(slvs_fct, "mpdata_fct_iters=2", 2);
+  add_solver<formulae::opts::abs | formulae::opts::fct>(slvs_fct, "mpdata_fct_iters=3", 3);
 
   // non-FCT solvers
   for (auto &slv : slvs) slv.advance(nt);

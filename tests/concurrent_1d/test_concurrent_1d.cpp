@@ -25,7 +25,7 @@ int main()
   std::cerr << "off" << std::endl;
 #endif
 
-  struct ct_params_t 
+  struct ct_params_t : ct_params_default_t
   { 
     using real_t = long double; 
     enum { n_dims = 1 };

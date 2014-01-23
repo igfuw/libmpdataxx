@@ -31,7 +31,7 @@ using real_t = double; // with long double this is a good test to show differenc
 template <formulae::opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_iters)
 {
-  struct ct_params_t
+  struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };
@@ -120,18 +120,20 @@ int main()
 
       // silly loop order, but it helped to catch a major bug!
 
+      // donor-cell
+      add_solver<formulae::opts::abs>(slvs, "iters=1", nx, 1);
+
       // MPDATA
-      add_solver<0>(slvs, "iters=1", nx, 1);
-      add_solver<0>(slvs, "iters=2", nx, 2);
-      add_solver<formulae::opts::toa>(slvs, "iters=2_toa", nx, 2);
-      add_solver<0>(slvs, "iters=3", nx, 3);
+      add_solver<formulae::opts::abs>(slvs, "iters=2", nx, 2);
+      add_solver<formulae::opts::abs | formulae::opts::toa>(slvs, "iters=2_toa", nx, 2);
+      add_solver<formulae::opts::abs>(slvs, "iters=3", nx, 3);
       add_solver<formulae::opts::toa | formulae::opts::iga>(slvs, "iters=2_toa_iga", nx, 2);
 
       // MPDATA-FCT
-      add_solver<formulae::opts::fct>(slvs, "iters=2_fct", nx, 2);
-      add_solver<formulae::opts::fct | formulae::opts::toa>(slvs, "iters=2_fct_toa", nx, 2);
-      add_solver<formulae::opts::fct>(slvs, "iters=3_fct", nx, 3);
-      add_solver<formulae::opts::fct | formulae::opts::toa>(slvs, "iters=3_fct_toa", nx, 3);
+      add_solver<formulae::opts::abs | formulae::opts::fct>(slvs, "iters=2_fct", nx, 2);
+      add_solver<formulae::opts::abs | formulae::opts::fct | formulae::opts::toa>(slvs, "iters=2_fct_toa", nx, 2);
+      add_solver<formulae::opts::abs | formulae::opts::fct>(slvs, "iters=3_fct", nx, 3);
+      add_solver<formulae::opts::abs | formulae::opts::fct | formulae::opts::toa>(slvs, "iters=3_fct_toa", nx, 3);
 
       // calculating the analytical solution
       decltype(slvs.end()->second->advectee()) exact(nx);

@@ -18,14 +18,19 @@ const int nx = 32, ny = 32, nt = 100;
 int main() 
 {
   // compile-time parameters
-  struct ct_params_t
+  struct ct_params_t : ct_params_default_t
   {
-    using real_t = double;
     enum { n_dims = 2 };
     enum { n_eqs = 3 };
-    enum { opts = 0 }; // TODO
+
+    // options
     enum { rhs_scheme = solvers::strang };
+    
+    // indices
     struct ix { enum {qx, qy, h, vip_i=qx, vip_j=qy, vip_den=h}; };
+
+    // hints
+    enum { hint_norhs = formulae::opts::bit(ix::h) }; 
   };
   using ix = typename ct_params_t::ix;
 

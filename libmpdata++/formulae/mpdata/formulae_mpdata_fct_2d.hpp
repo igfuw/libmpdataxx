@@ -43,7 +43,7 @@ namespace libmpdataxx
         const arr_2d_t &G,
         const rng_t i,  
         const rng_t j,
-        typename std::enable_if<opts::isset(opts, opts::pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         frac<opts>(
           beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
@@ -64,7 +64,7 @@ namespace libmpdataxx
         const arr_2d_t &G,
         const rng_t i,  
         const rng_t j,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         frac<opts>(
           beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
@@ -90,7 +90,9 @@ namespace libmpdataxx
         const rng_t i,  
         const rng_t j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) return_macro(,
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
+        ,
         frac<opts>(
           beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
           ,// -------------------------------------------
@@ -128,7 +130,7 @@ namespace libmpdataxx
         const arr_2d_t &G, 
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<opts::isset(opts, opts::pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
@@ -149,7 +151,7 @@ namespace libmpdataxx
         const arr_2d_t &G, 
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
         frac<opts>(
           beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
@@ -175,7 +177,9 @@ namespace libmpdataxx
         const rng_t i,
         const rng_t j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 
-      ) return_macro(,
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
+        ,
         frac<opts>(
           beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
           ,// -------------------------------------------
@@ -196,7 +200,7 @@ namespace libmpdataxx
         const arr_2d_t &G,
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::pds)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         GC_corr[dim]( pi<dim>(i+h, j) ) * where( // TODO: is it possible to implement it without where()?
           // if
@@ -243,7 +247,7 @@ namespace libmpdataxx
         const arr_2d_t &G,
         const rng_t i,
         const rng_t j,
-        typename std::enable_if<opts::isset(opts, opts::iga) || opts::isset(opts, opts::pds)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga) || !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         GC_corr[dim]( pi<dim>(i+h, j) ) * where(
           // if

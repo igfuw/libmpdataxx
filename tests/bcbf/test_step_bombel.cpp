@@ -16,12 +16,10 @@ using namespace libmpdataxx;
 int main() 
 {
   // compile-time parameters
-  struct ct_params_t
+  struct ct_params_t : ct_params_default_t
   {
-    using real_t = double;
     enum { n_dims = 2 };
     enum { n_eqs = 3 };
-    enum { opts = formulae::opts::iga | formulae::opts::fct };
     enum { rhs_scheme = solvers::euler_b };
     enum { prs_scheme = solvers::pc };
     struct ix { enum {u, w, tht, vip_i=u, vip_j=w, vip_den=-1}; };

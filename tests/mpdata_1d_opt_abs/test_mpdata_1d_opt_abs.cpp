@@ -48,7 +48,7 @@ void setopts(T &p, const int nt, const std::string &fname)
 template <formulae::opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &fname)
 {
-  struct ct_params_t
+  struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };
@@ -68,8 +68,8 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
+  add_solver<formulae::opts::abs>(slvs, "mpdata_iters=2_abs");
   add_solver<0>(slvs, "mpdata_iters=2");
-  add_solver<formulae::opts::pds>(slvs, "mpdata_iters=2_pds");
 
   // TODO: test if pds gives any speed-up with single-sign field
 

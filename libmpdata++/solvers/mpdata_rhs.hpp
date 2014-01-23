@@ -51,11 +51,17 @@ namespace libmpdataxx
 #endif
         // zero-out all rhs arrays
 	for (int e = 0; e < parent_t::n_eqs; ++e) 
+        {
+          // do nothing for equations with no rhs
+          if (formulae::opts::isset(ct_params_t::hint_norhs, formulae::opts::bit(e))) continue;
+
+          // otherwise zero out the rhs
           rhs.at(e)(this->ijk) = 0;
+        }
       }
 
       virtual void apply_rhs(
-        typename parent_t::real_t dt
+        const typename parent_t::real_t &dt
       ) final
       {
         static_assert(
@@ -64,7 +70,13 @@ namespace libmpdataxx
         ); 
 
         for (int e = 0; e < parent_t::n_eqs; ++e) 
+        {
+          // do nothing for equations with no rhs
+          if (formulae::opts::isset(ct_params_t::hint_norhs, formulae::opts::bit(e))) continue;
+
+          // otherwise apply the rhs
           this->state(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
+        }
       }
 
       public:
@@ -157,6 +169,7 @@ namespace libmpdataxx
 
       static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
       {
+        // TODO: optimise to skip allocs for equations with no rhs
 	parent_t::alloc(mem, p);
         parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, parent_t::n_eqs); // rhs array for each equation
       }

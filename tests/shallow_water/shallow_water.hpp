@@ -97,7 +97,7 @@ class shallow_water<
 
   void update_rhs(
     libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
-    typename parent_t::real_t dt,
+    const typename parent_t::real_t &dt,
     const int &at
   ) {
     using namespace libmpdataxx::formulae::nabla;
@@ -137,7 +137,7 @@ class shallow_water<
   /// @brief Shallow Water Equations: Momentum forcings for the X and Y coordinates
   void update_rhs(
     libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
-    typename parent_t::real_t dt,
+    const typename parent_t::real_t &dt,
     const int &at
   ) {
     //

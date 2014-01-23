@@ -13,9 +13,11 @@
  * \image html "../../tests/harmosc/figure_strang_it=2.svg"
  */
 
+//<listing-1>
 #include "coupled_harmosc.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
+//</listing-1>
 using namespace libmpdataxx;
 
 #include <boost/math/constants/constants.hpp>
@@ -27,7 +29,8 @@ const int nt = 1500;
 
 int main() 
 {
-  struct ct_params_t
+//<listing-1>
+  struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };
@@ -36,6 +39,7 @@ int main()
     enum { rhs_scheme = solvers::rhs_scheme_t::strang };
     struct ix { enum {psi, phi}; };
   };
+//</listing-1>
 
   using solver_t = output::gnuplot<coupled_harmosc<ct_params_t>>;
   typename solver_t::rt_params_t p; 
