@@ -135,7 +135,7 @@ namespace libmpdataxx
         const arr_2d_t &G,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<!opts::isset(opts, opts::toa)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::tot)>::type* = 0
       ) -> decltype(0)
       {
         return 0; //no Higher Order Terms for second accuracy 
@@ -148,7 +148,7 @@ namespace libmpdataxx
         const arr_2d_t &G,
         const rng_t &i,
         const rng_t &j,
-        typename std::enable_if<opts::isset(opts, opts::toa)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::tot)>::type* = 0
       ) return_macro(,
          HOT_1<opts BOOST_PP_COMMA() dim>(psi, i, j) * HOT_1_helper<opts BOOST_PP_COMMA() dim>(GC[dim], G, i, j) 
          + 

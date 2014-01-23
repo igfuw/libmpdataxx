@@ -1,5 +1,8 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
-- do not allocate rhs arrays for equations with no rhs
+- rename toa -> tot :)
+- eps, npa domyślnie?
+- barrier z argumentem - do debugowania!
+- osobno lewy i prawy war. brzegowy!
 - rename solver -> algo?
 - G multiplies RHS 
 - G in velocity interpolation
@@ -9,11 +12,10 @@
 - should all classes be named with _t suffix?
 - a check for positive-definiteness of the signal in debug mode
 - output out of hooks? (or separate output hooks?)
-- opts -> mpdata_opts
+- opts -> mpdata_opts?
 - check compatibility with new gnuplot_iostream
 - move opts out of formulae namespace
 - finish donorcell and leapfrog tests
-- per-equation options (not all of them!)
 - DJ: spreading drop test from Schar & Smolarkiewicz?
 - AJ+MW: G in 3D (incl. halo filling)
 - steps instead of histeps in output gnuplot (in tests as well?)
@@ -60,10 +62,7 @@
 
 0.2: (near future enhancements, things important for the initial stages of the HARMONIA project)
 - document (and check?) stability conditions for RHS terms
-- support for specifying mpdata options per equation, and not globally for the whole system (e.g. positive definiteness)
 - HARMONIA-relevant boundary conditions (rigid?, zero-gradient?, open/radiation?)
-- mpdata_3d 
-
 
 
 0.3: (not-so-near future enhancements, applicable to HARMONIA)
@@ -88,5 +87,5 @@
   -  explain why isentropic -> hydrostatic & compressible
   -  explain z -> theta transition
   -  explain why Montgomery potential and how it relates the Bernouli function
-  -  include a scematic picture indicating what's defined per layer, and what's defined per surface
+  -  include a schematic picture indicating what's defined per layer, and what's defined per surface
   -  explain how the heights are retrieved from pressures (via constant-density layers)

@@ -45,19 +45,22 @@
  */
 // TODO: update docs above!
 
+//<listing-1>
 #include <libmpdata++/solvers/mpdata_rhs.hpp>
 
-template <class ct_params_t, int psi, int phi>
-class coupled_harmosc : public libmpdataxx::solvers::mpdata_rhs<ct_params_t>
+template <class ct_params_t>
+struct coupled_harmosc : public 
+  libmpdataxx::solvers::mpdata_rhs<ct_params_t>
 {
-  static_assert(ct_params_t::n_eqs == 2, "psi & phi");
-  using parent_t = libmpdataxx::solvers::mpdata_rhs<ct_params_t>;
-  enum { n = 0 }; // just to make n, n+1 look nice :)
+  // aliases
+  using parent_t = 
+    libmpdataxx::solvers::mpdata_rhs<ct_params_t>;
+  using ix = typename ct_params_t::ix;
 
   // member fields
-  typename parent_t::real_t omega;
-  typename parent_t::arr_t tmp;
+  typename ct_params_t::real_t omega;
 
+  // method called by mpdata_rhs
   void update_rhs(
     libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs, 
     const typename parent_t::real_t &dt,
@@ -65,51 +68,43 @@ class coupled_harmosc : public libmpdataxx::solvers::mpdata_rhs<ct_params_t>
   ) {
     parent_t::update_rhs(rhs, dt, at);
 
-    auto Psi = this->state(psi);
-    auto Phi = this->state(phi);
+    // just to shorten code
+    auto psi = this->psi_n(ix::psi);
+    auto phi = this->psi_n(ix::phi);
     auto &i = this->i;
 
-    switch (at)
-    {
-      /// explicit solution for R^{n}
-      case (n):
-      rhs.at(psi)(i) += omega * Phi(i);
-      rhs.at(phi)(i) -= omega * Psi(i);
+    switch (at) {
+      case (0): // explicit solution for R^{n}
+      rhs.at(ix::psi)(i) += omega * phi(i);
+      rhs.at(ix::phi)(i) -= omega * psi(i);
       break;
    
-      case (n+1):
-      /// implicit solution for R^{n+1}
-      /// (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
-      rhs.at(psi)(i) += (
-	(Psi(i) + dt * omega * Phi(i)) / (1 + pow(dt * omega, 2))
-	- 
-	Psi(i)
+      case (1): // implicit solution for R^{n+1}
+      rhs.at(ix::psi)(i) += (
+	(psi(i) + dt * omega * phi(i)) 
+        / (1 + pow(dt * omega, 2))
+	- psi(i)
       ) / dt;
 
-      rhs.at(phi)(i) += (
-        (Phi(i) - dt * omega * Psi(i)) / (1 + pow(dt * omega, 2))
-        -
-        Phi(i)
+      rhs.at(ix::phi)(i) += (
+        (phi(i) - dt * omega * psi(i)) 
+        / (1 + pow(dt * omega, 2))
+        - phi(i)
       ) / dt;
       break;
-  
-      default: assert(false); 
     }
   }
 
-  public:
-
-  struct rt_params_t : parent_t::rt_params_t 
-  { 
-    typename parent_t::real_t omega; 
+  // run-time parameters
+  struct rt_params_t : parent_t::rt_params_t { 
+    typename ct_params_t::real_t omega = 0; 
   };
 
   // ctor
   coupled_harmosc(
     typename parent_t::ctor_args_t args,
     const rt_params_t &p
-  ) :
-    parent_t(args, p),
-    omega(p.omega)
-  {}
+  ) : parent_t(args, p), omega(p.omega)
+  { assert(omega != 0); }
 };
+//</listing-1>

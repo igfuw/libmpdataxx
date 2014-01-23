@@ -106,7 +106,7 @@ class shallow_water<
 
     this->xchng(ix::h);
 
-    rhs.at(ix::qx)(this->i) -= this->g * this->state(ix::h)(this->i) * grad(this->state(ix::h), this->i, this->di); 
+    rhs.at(ix::qx)(this->i) -= this->g * this->psi_n(ix::h)(this->i) * grad(this->psi_n(ix::h), this->i, this->di); 
   }
 };
 
@@ -131,7 +131,7 @@ class shallow_water<
   )
   {
     using namespace libmpdataxx::formulae::nabla;
-    rhs(pi<d>(i,j)) -= this->g * this->state(ix::h)(pi<d>(i,j)) * grad<d>(this->state(ix::h), i, j, di); 
+    rhs(pi<d>(i,j)) -= this->g * this->psi_n(ix::h)(pi<d>(i,j)) * grad<d>(this->psi_n(ix::h), i, j, di); 
   }
 
   /// @brief Shallow Water Equations: Momentum forcings for the X and Y coordinates

@@ -32,11 +32,11 @@ namespace libmpdataxx
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const rng_t &i,
-        typename std::enable_if<!opts::isset(opts, opts::toa) && opts::isset(opts, opts::dfl)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::tot) && opts::isset(opts, opts::dfl)>::type* = 0 
       ) return_macro(,
         - GC(i+h) / (G(i+1) + G(i)) / 2 * (GC((i+1)+h) - GC(i-h))
       )
-      // TODO: dfl && toa version of the above?
+      // TODO: dfl && tot version of the above?
       
     }; // namespace mpdata
   }; // namespace formulae

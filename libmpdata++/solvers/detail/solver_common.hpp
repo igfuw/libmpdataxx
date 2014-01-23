@@ -42,11 +42,6 @@ namespace libmpdataxx
         typedef typename ct_params_t::real_t real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
 
-	void cycle_all()
-	{ 
-	  for (int e = 0; e < n_eqs; ++e) cycle(e);
-	}
-
 	protected: 
 
         long long int timestep = 0;
@@ -57,22 +52,14 @@ namespace libmpdataxx
 
 	// helper methods invoked by solve()
 	virtual void advop(int e) = 0;
-	void advop_all()
-	{
-	  for (int e = 0; e < n_eqs; ++e) advop(e);
-	}
 
-	void cycle(int e) 
+	virtual void cycle(int e) final
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
           if (e == n_eqs - 1) this->mem->cycle(); 
 	}
 
 	virtual void xchng(int e, int l = 0) = 0; // TODO: make l -> -l
-	void xchng_all() 
-	{   
-	  for (int e = 0; e < n_eqs; ++e) xchng(e);
-	}
 
         private:
       
@@ -84,12 +71,7 @@ namespace libmpdataxx
           hook_post_loop_called = false;
 #endif
 
-	public:
-
-        struct rt_params_t 
-        {
-          std::array<int, n_dims> span;
-        };
+        protected:
 
         virtual void hook_ante_step() 
         { 
@@ -125,6 +107,13 @@ namespace libmpdataxx
           hook_post_loop_called = true;
 #endif
         }
+
+	public:
+
+        struct rt_params_t 
+        {
+          std::array<int, n_dims> span;
+        };
 
 	// ctor
 	solver_common(mem_t *mem, const rt_params_t &p) :
@@ -163,15 +152,15 @@ namespace libmpdataxx
 	    // progress-bar info through thread name (check top -H)
 	    monitor(float(timestep) / nt); 
 
-            // multi-threaded SIGTERM handling
+            // might be used to implement multi-threaded signal handling
             this->mem->barrier();
             if (this->mem->panic) break;
 
             // proper solver stuff
             hook_ante_step();
-	    xchng_all();
-	    advop_all();
-	    cycle_all();
+	    for (int e = 0; e < n_eqs; ++e) xchng(e);
+	    for (int e = 0; e < n_eqs; ++e) advop(e);
+	    for (int e = 0; e < n_eqs; ++e) cycle(e); // note: cycle assumes ascending loop index
             timestep++;
             hook_post_step();
 	  }   
@@ -181,13 +170,13 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-	// psi getter
-	arr_t state(int e, int add = 0) // TODO: get rid of this method
-	{
-	  return this->mem->psi[e][this->n[e] + add];
-	}
-
         protected:
+
+	// psi[n] getter - just to shorten the code
+	virtual const arr_t &psi_n(int e) final
+	{
+	  return this->mem->psi[e][this->n[e]];
+	}
 
         static rng_t rng_vctr(const int n) { return rng_t(0, n-1)^h^(halo-1); }
         static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }

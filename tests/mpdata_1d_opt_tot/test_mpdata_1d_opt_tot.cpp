@@ -3,11 +3,11 @@
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- * @brief example showing how to use the toa option of mpdata 
+ * @brief example showing how to use the tot option of mpdata 
  *   (third-rder accuracy)
  *
- * \include "mpdata_1d_opt_toa/test_mpdata_1d_opt_toa.cpp"
- * \image html "../../tests/mpdata_1d_opt_toa/figure_iters=3.svg" TODO
+ * \include "mpdata_1d_opt_tot/test_mpdata_1d_opt_tot.cpp"
+ * \image html "../../tests/mpdata_1d_opt_tot/figure_iters=3.svg" TODO
  */
 
 #include <libmpdata++/solvers/mpdata.hpp>
@@ -65,10 +65,10 @@ int main()
   boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
 
   add_solver<0>(slvs, "mpdata_iters=2");
-  add_solver<formulae::opts::abs | formulae::opts::toa>(slvs, "mpdata_iters=2_toa");
-  add_solver<formulae::opts::toa | formulae::opts::iga>(slvs, "mpdata_iters=2_toa_iga");
-  add_solver<formulae::opts::abs | formulae::opts::fct | formulae::opts::toa>(slvs, "mpdata_fct_iters=2_toa"); 
-  add_solver<formulae::opts::fct | formulae::opts::toa | formulae::opts::iga>(slvs, "mpdata_fct_iters=2_toa_iga"); 
+  add_solver<formulae::opts::abs | formulae::opts::tot>(slvs, "mpdata_iters=2_tot");
+  add_solver<formulae::opts::tot | formulae::opts::iga>(slvs, "mpdata_iters=2_tot_iga");
+  add_solver<formulae::opts::abs | formulae::opts::fct | formulae::opts::tot>(slvs, "mpdata_fct_iters=2_tot"); 
+  add_solver<formulae::opts::fct | formulae::opts::tot | formulae::opts::iga>(slvs, "mpdata_fct_iters=2_tot_iga"); 
 
   for (auto &slv : slvs) slv.advance(nt);
 }
