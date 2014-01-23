@@ -31,7 +31,7 @@ namespace libmpdataxx
       {
         fct = opts::bit(0), // flux-corrected transport
         abs = opts::bit(1), // use the abs() trick to handle variable-sign signal
-        toa = opts::bit(2), // third-order accuracy terms
+        tot = opts::bit(2), // third-order accuracy terms
         eps = opts::bit(3), // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) 
         npa = opts::bit(4), // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
         iga = opts::bit(5), // infinite-gauge option
