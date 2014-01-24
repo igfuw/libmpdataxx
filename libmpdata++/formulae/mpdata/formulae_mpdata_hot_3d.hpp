@@ -114,8 +114,9 @@ namespace libmpdataxx
         const rng_t &j,
         const rng_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) return_macro(,
+      ) return_macro(
           static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
+          ,
           (
             psi(pi<dim>(i+2, j, k)) - psi(pi<dim>(i+1, j, k)) - psi(pi<dim>(i, j, k)) + psi(pi<dim>(i-1, j, k))
           )
@@ -168,8 +169,9 @@ namespace libmpdataxx
         const rng_t &j,
         const rng_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) return_macro(,
+      ) return_macro(
           static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
+          ,
           (
             psi(pi<dim>(i+1, j+1, k))
           - psi(pi<dim>(i, j+1, k))
@@ -231,8 +233,9 @@ namespace libmpdataxx
         const rng_t &j,
         const rng_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) return_macro(,
+      ) return_macro(
           static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
+          ,
           (
             psi(pi<dim>(i+1, j, k+1))
           - psi(pi<dim>(i, j, k+1))
@@ -310,8 +313,9 @@ namespace libmpdataxx
         const rng_t &j,
         const rng_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) return_macro(,
+      ) return_macro(
           static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
+          ,
           (
             psi(pi<dim>(i+1, j+1, k+1))
           + psi(pi<dim>(i, j+1, k+1))
