@@ -31,7 +31,7 @@ namespace libmpdataxx
 	virtual void start(const int nt) {}
 	virtual void stop() {}
 
-	void hook_ante_loop(const int nt)
+	void hook_ante_loop(const int nt) final
 	{
 	  parent_t::hook_ante_loop(nt);
 	  if (this->mem->rank() == 0) 
@@ -54,10 +54,9 @@ namespace libmpdataxx
 	  for (const auto &v : outvars) record(v.first);
 	}
 
-	void hook_post_step()
+	void hook_post_step() final
 	{
 	  parent_t::hook_post_step();
-          // TODO: here the order or hooks matter -> not good :(
 
 	  this->mem->barrier(); // waiting for all threads befor doing global output
 	  if (this->mem->rank() == 0)

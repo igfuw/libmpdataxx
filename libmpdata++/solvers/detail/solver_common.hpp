@@ -150,7 +150,7 @@ namespace libmpdataxx
 	  while (timestep < nt)
 	  {   
 	    // progress-bar info through thread name (check top -H)
-	    monitor(float(timestep) / nt); 
+	    monitor(float(timestep) / nt);  // TODO: does this value make sanse with repeated advence() calls?
 
             // might be used to implement multi-threaded signal handling
             this->mem->barrier();

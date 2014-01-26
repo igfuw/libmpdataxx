@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <libmpdata++/output/detail/output_timer.hpp>
+#include <libmpdata++/output/detail/output_common.hpp>
 #include <libmpdata++/detail/error.hpp>
 #include <libmpdata++/output/detail/xdmf_writer.hpp>
 
@@ -27,9 +27,9 @@ namespace libmpdataxx
   namespace output
   {
     template <class solver_t>
-    class hdf5_xdmf : public detail::output_timer<solver_t> // TODO: get rid of timer here!
+    class hdf5_xdmf : public detail::output_common<solver_t>
     {
-      using parent_t = detail::output_timer<solver_t>;
+      using parent_t = detail::output_common<solver_t>;
 
       //static_assert(parent_t::n_dims < 3, "only 1D and 2D output supported");
 
