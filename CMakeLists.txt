@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.0) # TODO: version requirement took from another context!
+cmake_minimum_required(VERSION 2.8.8) # for OpenMP test to work in C++-only project (see http://public.kitware.com/Bug/view.php?id=11910)
 project(libmpdata++ CXX)
 
 # C++11
