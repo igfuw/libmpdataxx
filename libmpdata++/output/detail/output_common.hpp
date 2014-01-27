@@ -29,7 +29,6 @@ namespace libmpdataxx
 
 	virtual void record(const int var) {}
 	virtual void start(const int nt) {}
-	virtual void stop() {}
 
 	void hook_ante_loop(const int nt) final
 	{
@@ -40,13 +39,6 @@ namespace libmpdataxx
             record_all();
           }
 	  this->mem->barrier();
-	}
-
-	void hook_post_loop()
-	{
-	  if (this->mem->rank() == 0) stop();
-	  this->mem->barrier();
-	  parent_t::hook_post_loop();
 	}
 
 	virtual void record_all()
