@@ -67,7 +67,7 @@ namespace libmpdataxx
         bool 
           hook_ante_step_called = true, // initially true to handle nt=0 
           hook_post_step_called = true, // 
-          hook_ante_loop_called = false, 
+          hook_ante_loop_called = false;
 #endif
 
         protected:

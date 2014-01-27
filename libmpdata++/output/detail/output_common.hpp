@@ -30,7 +30,7 @@ namespace libmpdataxx
 	virtual void record(const int var) {}
 	virtual void start(const int nt) {}
 
-	void hook_ante_loop(const int nt) final
+	void hook_ante_loop(const int nt) 
 	{
 	  parent_t::hook_ante_loop(nt);
 	  if (this->mem->rank() == 0) 
@@ -46,7 +46,7 @@ namespace libmpdataxx
 	  for (const auto &v : outvars) record(v.first);
 	}
 
-	void hook_post_step() final
+	void hook_post_step() 
 	{
 	  parent_t::hook_post_step();
 
