@@ -49,10 +49,10 @@ int main()
   typename solver_t::rt_params_t p; 
 
   // run-time parameters
+  p.dt = 1;
   p.omega = 2*pi<typename ct_params_t::real_t>() / p.dt / 400;
 //</listing-3>
   p.span = {1000};
-  p.dt = 1;
   p.outfreq = 10;
 
   using ix = typename ct_params_t::ix;
