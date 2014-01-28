@@ -1,4 +1,4 @@
-find_path(BLITZ_INCLUDE_DIR blitz/array.h)
+find_path(BLITZ_INCLUDE_DIR blitz/array.h) #TODO: Fedora uses different path for config.h!
 find_library(BLITZ_LIBRARY NAMES blitz)
 
 INCLUDE(FindPackageHandleStandardArgs)
@@ -14,4 +14,3 @@ check_cxx_source_compiles("#include <blitz/array.h>\nint main(){blitz::Array<flo
 if (NOT BLITZ_VER_AT_LEAST_0_10)
   message(FATAL_ERROR "Blitz++ ver >= 0.10 requirement not met - please update Blitz++.")
 endif()
-

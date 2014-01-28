@@ -7,6 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set(CMAKE_CXX_FLAGS "-std=c++11")
 include(CheckCXXSourceCompiles)
 check_cxx_source_compiles("
+  #include <type_traits>
   template <bool a, class b> using ei=std::enable_if<a,b>; 
   struct a {a(int){}};struct b:a {using a::a;};  
   int main(){b i(1);}
