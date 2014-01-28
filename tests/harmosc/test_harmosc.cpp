@@ -29,25 +29,30 @@ const int nt = 1500;
 
 int main() 
 {
-//<listing-1>
+//<listing-2>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
     enum { n_dims = 1 };
     enum { n_eqs = 2 };
     enum { opts = 0 };
-    enum { rhs_scheme = solvers::rhs_scheme_t::strang };
+    enum { rhs_scheme = 
+      solvers::rhs_scheme_t::strang };
     struct ix { enum {psi, phi}; };
   };
-//</listing-1>
+//</listing-2>
 
-  using solver_t = output::gnuplot<coupled_harmosc<ct_params_t>>;
+//<listing-3>
+  using solver_t = output::gnuplot<
+    coupled_harmosc<ct_params_t>
+  >;
   typename solver_t::rt_params_t p; 
 
   // run-time parameters
+  p.omega = 2*pi<typename ct_params_t::real_t>() / p.dt / 400;
+//</listing-3>
   p.span = {1000};
   p.dt = 1;
-  p.omega = 2*pi<real_t>() / p.dt / 400;
   p.outfreq = 10;
 
   using ix = typename ct_params_t::ix;

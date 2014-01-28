@@ -5,45 +5,10 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
  * @brief a minimalistic model of a harmonic oscillator
- * (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
- *
- * @section DERIVATION
- *
- * A system of two 1-dimensional advection equations representing 
- * coupled harmonic oscillators is considered:
- *
- * \f$ \partial_t \psi + \nabla (\vec{u} \psi) =  \omega \phi \f$
- * 
- * \f$ \partial_t \phi + \nabla (\vec{u} \phi) = -\omega \psi \f$
- *
- * Discretisation in time yields:
- *
- * \f$ \frac{\psi^{n+1} - \psi^n}{\Delta t} + A(\psi^n) = \omega \phi^{n+1} \f$
- *
- * \f$ \frac{\phi^{n+1} - \phi^n}{\Delta t} + A(\phi^n) = - \omega \psi^{n+1} \f$
- * 
- * and after some regrouping:
- *
- * \f$ \psi^{n+1} = \Delta t \cdot \omega \phi^{n+1} + \left.\psi^{n+1}\right|_{RHS=0}\f$
- *
- * \f$ \phi^{n+1} = - \Delta t \cdot \omega \psi^{n+1} + \left.\phi^{n+1}\right|_{RHS=0}\f$
- * 
- * solving for \f$ \psi^{n+1} \f$ and \f$ \phi^{n+1} \f$ yields:
- *
- * \f$ \psi^{n+1} = \Delta t \cdot \omega \left( \left.\phi^{n+1}\right|_{RHS=0} - \Delta t \cdot \omega \psi^{n+1} \right) + \left.\psi^{n+1}\right|_{RHS=0} \f$
- *
- * \f$ \phi^{n+1} = - \Delta t \cdot \omega \left( \left.\psi^{n+1}\right|_{RHS=0} + \Delta t \cdot \omega \phi^{n+1} \right) + \left.\phi^{n+1}\right|_{RHS=0}\f$
- *
- * what can be further rearranged to yield:
- *
- * \f$ \psi^{n+1} = \left[ \Delta t \cdot \omega \left.\phi^{n+1}\right|_{RHS=0} + \left.\psi^{n+1}\right|_{RHS=0} \right] / \left[ 1 + \Delta t^2 \cdot \omega^2 \right] \f$
- * 
- * \f$ \phi^{n+1} = \left[ - \Delta t \cdot \omega \left.\psi^{n+1}\right|_{RHS=0} + \left.\phi^{n+1}\right|_{RHS=0} \right] / \left[ 1 + \Delta t^2 \cdot \omega^2 \right] \f$
- *
- * what is represented by the forcings() method in the example below.
+ * (consult eq. 28-30 in Smolarkiewicz 2006, IJNMF)
  *
  */
-// TODO: update docs above!
+//
 
 //<listing-1>
 #include <libmpdata++/solvers/mpdata_rhs.hpp>
@@ -62,7 +27,9 @@ struct coupled_harmosc : public
 
   // method called by mpdata_rhs
   void update_rhs(
-    libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs, 
+    libmpdataxx::arrvec_t<
+      typename parent_t::arr_t
+    > &rhs, 
     const typename parent_t::real_t &dt,
     const int &at
   ) {
@@ -73,13 +40,17 @@ struct coupled_harmosc : public
     auto phi = this->psi_n(ix::phi);
     auto &i = this->i;
 
-    switch (at) {
-      case (0): // explicit solution for R^{n}
+    switch (at) 
+    {
+      // explicit solution for R^{n} 
+      // (note: with strang used only at t=0)
+      case (0): 
       rhs.at(ix::psi)(i) += omega * phi(i);
       rhs.at(ix::phi)(i) -= omega * psi(i);
       break;
    
-      case (1): // implicit solution for R^{n+1}
+      // implicit solution for R^{n+1}
+      case (1): 
       rhs.at(ix::psi)(i) += (
 	(psi(i) + dt * omega * phi(i)) 
         / (1 + pow(dt * omega, 2))
