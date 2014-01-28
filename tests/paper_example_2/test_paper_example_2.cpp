@@ -70,19 +70,31 @@ int main()
     test<opts>("out_abs.svg");
   }
   {
+//<listing-5>
     enum { opts = formulae::opts::iga };
+//</listing-5>
     test<opts>("out_iga.svg");
   }
   {
-    enum { opts = formulae::opts::iga | formulae::opts::tot };
+//<listing-6>
+    enum { opts = formulae::opts::iga | 
+                  formulae::opts::tot };
+//</listing-6>
     test<opts>("out_iga_tot.svg");
   }
   {
-    enum { opts = formulae::opts::iga | formulae::opts::fct };
+//<listing-7>
+    enum { opts = formulae::opts::iga | 
+                  formulae::opts::fct };
+//</listing-7>
     test<opts>("out_iga_fct.svg");
   }
   {
-    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct };
+//<listing-8>
+    enum { opts = formulae::opts::iga | 
+                  formulae::opts::tot | 
+                  formulae::opts::fct };
+//</listing-8>
     test<opts>("out_iga_tot_fct.svg");
   }
 }

@@ -40,11 +40,14 @@ namespace libmpdataxx
       typename parent_t::real_t dt;
       arrvec_t<typename parent_t::arr_t> &rhs;
 
+//<listing-1>
       virtual void update_rhs(
         arrvec_t<typename parent_t::arr_t> &rhs, 
         const typename parent_t::real_t &dt,
         const int &at
-      ) {
+      ) 
+//</listing-1>
+      {
         assert(at == n || at == n+1);
 #if !defined(NDEBUG)
         update_rhs_called = true;
