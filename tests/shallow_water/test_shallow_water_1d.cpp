@@ -13,7 +13,17 @@ using namespace libmpdataxx;
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-const int nx = 32, nt = 100;
+const int nx = 32, nt = 0;
+
+// TODO: double -> real_t...
+double intcond(const double &x)
+{
+   return 
+     abs(x) <= 1 // if
+     ? 1 - x*x   // then
+     : 1e-10;        // else TODO: should be zero!!!
+}
+BZ_DECLARE_FUNCTION(intcond);
 
 int main() 
 {
@@ -35,6 +45,7 @@ int main()
     // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
   };
   using ix = typename ct_params_t::ix;
+  using real_t = typename ct_params_t::real_t;
 
   // solver & output choice
   using solver_t = output::gnuplot<
@@ -44,11 +55,12 @@ int main()
   // run-time parameters
   solver_t::rt_params_t p; 
 
-  p.span = { nx, };
+  p.span = { nx };
 
   p.dt = .05;
   p.di = 1;
 
+  //p.g = 1;
   p.outfreq = nt / 25;
   p.outvars = {
     {ix::h, { .name = "h",   .unit = "m" }}, 
@@ -59,13 +71,11 @@ int main()
   concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> run(p);
 
   // initial condition
+  const real_t dx = .1;
   {
     blitz::firstIndex i;
 
-    run.advectee(ix::h) = 1 - .1 * pow(
-      sin((i+.5) * pi<typename ct_params_t::real_t>() / nx), // TODO: assumes dx=1
-      32
-    );
+    run.advectee(ix::h) = intcond(dx*(i+.5) - nx*dx/2);
 
     run.advectee(ix::qx) = 0;
   }
