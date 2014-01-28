@@ -27,7 +27,9 @@ struct coupled_harmosc : public
 
   // method called by mpdata_rhs
   void update_rhs(
-    libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs, 
+    libmpdataxx::arrvec_t<
+      typename parent_t::arr_t
+    > &rhs, 
     const typename parent_t::real_t &dt,
     const int &at
   ) {
@@ -38,13 +40,17 @@ struct coupled_harmosc : public
     auto phi = this->psi_n(ix::phi);
     auto &i = this->i;
 
-    switch (at) {
-      case (0): // explicit solution for R^{n}
+    switch (at) 
+    {
+      // explicit solution for R^{n} 
+      // (note: with strang used only at t=0)
+      case (0): 
       rhs.at(ix::psi)(i) += omega * phi(i);
       rhs.at(ix::phi)(i) -= omega * psi(i);
       break;
    
-      case (1): // implicit solution for R^{n+1}
+      // implicit solution for R^{n+1}
+      case (1): 
       rhs.at(ix::psi)(i) += (
 	(psi(i) + dt * omega * phi(i)) 
         / (1 + pow(dt * omega, 2))
