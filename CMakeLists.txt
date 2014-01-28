@@ -6,13 +6,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 # C++11
 set(CMAKE_CXX_FLAGS "-std=c++11")
 include(CheckCXXSourceCompiles)
-check_cxx_source_compiles("struct a {a(int){}};struct b:a {using a::a;};int main(){b i(1);}" CXX11_SUPPORTED)
+check_cxx_source_compiles("
+  template <bool a, class b> using ei=std::enable_if<a,b>; 
+  struct a {a(int){}};struct b:a {using a::a;};  
+  int main(){b i(1);}
+" CXX11_SUPPORTED)
 if (NOT CXX11_SUPPORTED)
   message(FATAL_ERROR "C++11 compatibility test failed - please update your compiler.")
 endif()
-
-# Blitz
-find_package(Blitz++ REQUIRED) #TODO: should it be here or in tests?
 
 # the library
 add_subdirectory(libmpdata++) 

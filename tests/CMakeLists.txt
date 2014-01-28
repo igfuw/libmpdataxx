@@ -26,6 +26,10 @@ find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnu
 # Boost libraries
 find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem REQUIRED QUIET)
 
+# Blitz
+find_package(Blitz++ REQUIRED) 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${BLITZ_INCLUDE_DIR}") # TODO: same for boost and others???
+
 # HDF5 libraries
 find_package(HDF5 COMPONENTS CXX HL)
 
