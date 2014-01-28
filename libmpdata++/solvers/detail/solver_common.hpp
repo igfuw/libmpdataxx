@@ -67,8 +67,7 @@ namespace libmpdataxx
         bool 
           hook_ante_step_called = true, // initially true to handle nt=0 
           hook_post_step_called = true, // 
-          hook_ante_loop_called = false, 
-          hook_post_loop_called = false;
+          hook_ante_loop_called = false;
 #endif
 
         protected:
@@ -100,14 +99,6 @@ namespace libmpdataxx
 #endif
         }
 
-// TODO: this conflicts with multiple solve() calls - consider removing it
-        virtual void hook_post_loop() 
-        {
-#if !defined(NDEBUG)
-          hook_post_loop_called = true;
-#endif
-        }
-
 	public:
 
         struct rt_params_t 
@@ -130,7 +121,6 @@ namespace libmpdataxx
 	  assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
 	  assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
 	  assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
-	  assert(hook_post_loop_called && "any overriding hook_post_loop() must call parent_t::hook_post_loop()");
 #endif
         }
 
@@ -150,7 +140,7 @@ namespace libmpdataxx
 	  while (timestep < nt)
 	  {   
 	    // progress-bar info through thread name (check top -H)
-	    monitor(float(timestep) / nt); 
+	    monitor(float(timestep) / nt);  // TODO: does this value make sanse with repeated advence() calls?
 
             // might be used to implement multi-threaded signal handling
             this->mem->barrier();
@@ -166,8 +156,7 @@ namespace libmpdataxx
 	  }   
 
           this->mem->barrier();
-          hook_post_loop();
-          this->mem->barrier();
+          // note: hook_post_loop was removed as conficling with multiple-advance()-call logic
         }
 
         protected:

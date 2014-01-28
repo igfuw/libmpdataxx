@@ -37,6 +37,21 @@ namespace libmpdataxx
 	// member fields
 	rng_t im, jm, km;
 
+	void hook_ante_loop(const int nt) 
+	{   
+  // TODO: same in 1D
+	  parent_t::hook_ante_loop(nt);
+	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+	  {
+            this->bcxl->fill_halos_sclr(*this->mem->G, this->j^this->halo, this->k^this->halo); // TODO: one xchng call?
+            this->bcxr->fill_halos_sclr(*this->mem->G, this->j^this->halo, this->k^this->halo);
+            this->bcyl->fill_halos_sclr(*this->mem->G, this->k^this->halo, this->i^this->halo);
+            this->bcyr->fill_halos_sclr(*this->mem->G, this->k^this->halo, this->i^this->halo);
+            this->bczl->fill_halos_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
+            this->bczr->fill_halos_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
+	  }
+	} 
+
 	// method invoked by the solver
 	void advop(int e)
 	{
@@ -59,21 +74,33 @@ namespace libmpdataxx
 	      // calculating the antidiffusive C 
 	      this->GC_corr(iter)[0](this->im+h, this->j, this->k) = 
 		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
-		  this->mem->psi[e][this->n[e]], 
-		  this->im, this->j, this->k, this->GC_unco(iter)
+                  this->mem->psi[e][this->n[e]], 
+                  this->GC_unco(iter),
+                  *this->mem->G,
+                  this->im,
+                  this->j,
+                  this->k
 		);
 
 	      this->GC_corr(iter)[1](this->i, this->jm+h, this->k) = 
 		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
-		this->mem->psi[e][this->n[e]], 
-		this->jm, this->k, this->i, this->GC_unco(iter)
-	      );
+                  this->mem->psi[e][this->n[e]], 
+                  this->GC_unco(iter),
+                  *this->mem->G,
+                  this->jm,
+                  this->k,
+                  this->i
+	        );
 	      
 	      this->GC_corr(iter)[2](this->i, this->j, this->km+h) = 
 		formulae::mpdata::antidiff<ct_params_t::opts, 2>(
-		this->mem->psi[e][this->n[e]], 
-		this->km, this->i, this->j, this->GC_unco(iter)
-	      );
+                  this->mem->psi[e][this->n[e]], 
+                  this->GC_unco(iter),
+                  *this->mem->G,
+                  this->km,
+                  this->i,
+                  this->j
+	        );
    
 	      // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
 	      // halos for GC_z 

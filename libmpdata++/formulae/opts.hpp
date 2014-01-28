@@ -127,6 +127,19 @@ namespace libmpdataxx
     ) return_macro(,
       G(idxperm::pi<d>(i, j)) + 0
     )
+    
+    // 3D: G != const
+    template<opts::opts_t opts, int d, class arr_t> 
+    inline auto G(
+      const arr_t &G,
+      const rng_t &i,
+      const rng_t &j,
+      const rng_t &k,
+      typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
+    ) return_macro(,
+      G(idxperm::pi<d>(i, j, k)) + 0
+    )
+
   }; // namespace formulae
 
   struct ct_params_default_t

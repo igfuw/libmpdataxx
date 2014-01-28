@@ -12,9 +12,11 @@
 #include <libmpdata++/bcond/cyclic_1d.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
 #include <libmpdata++/bcond/cyclic_3d.hpp>
-// TODO: split into 1D, 2D and 3D files?
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
+#include <libmpdata++/concurr/detail/timer.hpp>
+
+// TODO: simplify 1d/2d/3d logic below or split into separate files?
 
 namespace libmpdataxx
 {
@@ -53,6 +55,9 @@ namespace libmpdataxx
       bool *panic_ptr() 
 //</listing-5>
       { assert(false && "unimplemented!"); throw; }
+
+      // dtor
+      virtual ~any() {}
     };
 
     namespace detail
@@ -71,13 +76,13 @@ namespace libmpdataxx
 
         private:
 
-        // helper method to define subdomain ranges
-	int min(int span, int rank, int size) 
+        // helper methods to define subdomain ranges
+	int min(const int &span, const int &rank, const int &size) 
 	{ 
 	  return rank * span / size; 
 	}
 
-	int max(int span, int rank, int size) 
+	int max(const int &span, const int &rank, const int &size) 
 	{ 
           return min(span, rank + 1, size) - 1; 
 	}
@@ -94,10 +99,17 @@ namespace libmpdataxx
 	// member fields
 	boost::ptr_vector<solver_t> algos; 
         std::unique_ptr<mem_t> mem;
+        timer tmr;
 
 	public:
 
         typedef typename solver_t::real_t real_t;
+
+        // dtor
+	virtual ~concurr_common()
+        {
+          tmr.print();
+        }
 
 	// ctor
 	concurr_common(
@@ -255,31 +267,33 @@ namespace libmpdataxx
           }
         }
 
-        public:
-
         virtual void solve(int nt) = 0;
+
+        public:
     
-        void advance(int nt) 
+        void advance(int nt) final
         {   
+          tmr.resume();
           solve(nt);
+          tmr.stop();
         }  
 
-	typename solver_t::arr_t advectee(int e = 0)
+	typename solver_t::arr_t advectee(int e = 0) final
 	{
 	  return mem->advectee(e);
 	}
 
-	typename solver_t::arr_t advector(int d = 0)
+	typename solver_t::arr_t advector(int d = 0) final
 	{
 	  return mem->advector(d);
 	}
 
-	typename solver_t::arr_t g_factor()
+	typename solver_t::arr_t g_factor() final
 	{
 	  return mem->g_factor();
 	}
 
-        bool *panic_ptr()
+        bool *panic_ptr() final
         {
           return &this->mem->panic;
         }

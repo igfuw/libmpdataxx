@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <libmpdata++/output/detail/output_timer.hpp>
+#include <libmpdata++/output/detail/output_common.hpp>
 #include <libmpdata++/detail/error.hpp>
 
 // the C++ HDF5 API
@@ -24,9 +24,9 @@ namespace libmpdataxx
   namespace output
   {
     template <class solver_t>
-    class hdf5 : public detail::output_timer<solver_t> // TODO: get rid of timer here!
+    class hdf5 : public detail::output_common<solver_t> 
     {
-      using parent_t = detail::output_timer<solver_t>;
+      using parent_t = detail::output_common<solver_t>;
 
       //static_assert(parent_t::n_dims < 3, "only 1D and 2D output supported");
 

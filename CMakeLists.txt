@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 2.8.0) # TODO: version requirement took from another context!
+cmake_minimum_required(VERSION 2.8.8) # for OpenMP test to work in C++-only project (see http://public.kitware.com/Bug/view.php?id=11910)
 project(libmpdata++ CXX)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 
 # C++11
 set(CMAKE_CXX_FLAGS "-std=c++11")
@@ -10,15 +12,7 @@ if (NOT CXX11_SUPPORTED)
 endif()
 
 # Blitz
-include(CheckIncludeFileCXX)
-check_include_file_cxx("blitz/array.h" BLITZ_FOUND)
-if (NOT BLITZ_FOUND)
-  message(FATAL_ERROR "Blitz++ includes not found - please install Blitz++ or point CMake to it.")
-endif()
-check_cxx_source_compiles("#include <blitz/array.h>\nint main(){blitz::Array<float,1> a(2); a = blitz::safeToReturn(a+a);}" BLITZ_VER_AT_LEAST_0_10)
-if (NOT BLITZ_VER_AT_LEAST_0_10)
-  message(FATAL_ERROR "Blitz++ ver >= 0.10 requirement not met - please update Blitz++.")
-endif()
+find_package(Blitz++ REQUIRED) #TODO: should it be here or in tests?
 
 # the library
 add_subdirectory(libmpdata++) 

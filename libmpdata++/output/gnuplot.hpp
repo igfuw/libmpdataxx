@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <libmpdata++/output/detail/output_timer.hpp>
+#include <libmpdata++/output/detail/output_common.hpp>
 
 #define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream/gnuplot-iostream.h> // TODO: Debian does not use a subdirectory
@@ -21,9 +21,9 @@ namespace libmpdataxx
   namespace output
   {
     template <class solver_t>
-    class gnuplot : public detail::output_timer<solver_t>
+    class gnuplot : public detail::output_common<solver_t>
     {
-      using parent_t = detail::output_timer<solver_t>;
+      using parent_t = detail::output_common<solver_t>;
 
       static_assert(parent_t::n_dims < 3, "only 1D and 2D output supported");
 
