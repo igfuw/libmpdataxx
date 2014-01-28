@@ -6,24 +6,14 @@
  */
 
 #include "shallow_water.hpp"
-#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/concurr/serial.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx; 
 
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-const int nx = 32, nt = 0;
-
-// TODO: double -> real_t...
-double intcond(const double &x)
-{
-   return 
-     abs(x) <= 1 // if
-     ? 1 - x*x   // then
-     : 1e-10;        // else TODO: should be zero!!!
-}
-BZ_DECLARE_FUNCTION(intcond);
+const int nx = 40, nt = 0;
 
 int main() 
 {
@@ -61,21 +51,34 @@ int main()
   p.di = 1;
 
   //p.g = 1;
-  p.outfreq = nt / 25;
+  p.outfreq = 1; //nt / 25;
   p.outvars = {
     {ix::h, { .name = "h",   .unit = "m" }}, 
   };
-  p.gnuplot_with = "lines";
+  p.gnuplot_command = "plot";
+  p.gnuplot_with = "steps";
 
   // instantiation
-  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> run(p);
+  concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> run(p);
 
   // initial condition
   const real_t dx = .1;
   {
     blitz::firstIndex i;
 
-    run.advectee(ix::h) = intcond(dx*(i+.5) - nx*dx/2);
+    struct intcond
+    {
+      real_t operator()(const real_t &x) const
+      {
+	 return 
+	   std::abs(x) <= 1 // if
+	   ? 1 - x*x        // then
+	   : 0;             // else
+      }
+      BZ_DECLARE_FUNCTOR(intcond);
+    };
+
+    run.advectee(ix::h) = intcond()(dx*(i+.5) - nx*dx/2);
 
     run.advectee(ix::qx) = 0;
   }
