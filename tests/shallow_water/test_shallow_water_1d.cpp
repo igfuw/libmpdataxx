@@ -13,7 +13,7 @@ using namespace libmpdataxx;
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-const int nt = 30;
+const int nt = 50;
 
 // compile-time parameters
 struct ct_params_t : ct_params_default_t
@@ -23,7 +23,7 @@ struct ct_params_t : ct_params_default_t
   enum { n_eqs = 2 };
   
   // options
-  enum { opts = 0 };
+  enum { opts = formulae::opts::fct };
   enum { rhs_scheme = solvers::strang };
   
   // indices
@@ -79,7 +79,7 @@ int main()
   {
     blitz::firstIndex i;
   
-    run.advectee(ix::h) = intcond()(p.di * (i+.5) - p.span[0] * p.di / 2);
+    run.advectee(ix::h) = 1e-3 + intcond()(p.di * (i+.5) - p.span[0] * p.di / 2);
 
     run.advectee(ix::qx) = 0;
   }
