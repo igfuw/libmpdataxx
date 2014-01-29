@@ -39,7 +39,17 @@ namespace libmpdataxx
 	if (ix::vip_den == -1) 
 	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk);
 	else
-	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk); // TODO: what if density == 0?
+	{
+          // TODO: hint_nozeroh
+	  this->stash[0](this->ijk) = where(
+	    // if
+	    this->psi_n(ix::vip_den)(this->ijk) > 0,
+	    // then					    ,
+	    this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
+	    // else
+            0
+	  );
+	}
       }
 
       void interpolate_in_space() final

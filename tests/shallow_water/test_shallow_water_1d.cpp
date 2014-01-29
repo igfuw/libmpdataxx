@@ -13,29 +13,44 @@ using namespace libmpdataxx;
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-const int nx = 40, nt = 0;
+const int nt = 30;
+
+// compile-time parameters
+struct ct_params_t : ct_params_default_t
+{
+  using real_t = double;
+  enum { n_dims = 1 };
+  enum { n_eqs = 2 };
+  
+  // options
+  enum { opts = 0 };
+  enum { rhs_scheme = solvers::strang };
+  
+  // indices
+  struct ix { enum {qx, h, vip_i=qx, vip_den=h}; };
+  
+  // hints
+  enum { hint_norhs = formulae::opts::bit(ix::h) }; 
+  // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
+};
+
+using real_t = typename ct_params_t::real_t;
+
+struct intcond
+{
+  real_t operator()(const real_t &x) const
+  {
+    return 
+      std::abs(x) <= 1 // if
+      ? 1 - x*x        // then
+      : 0;             // else
+  }
+  BZ_DECLARE_FUNCTOR(intcond);
+};
 
 int main() 
 {
-  // compile-time parameters
-  struct ct_params_t : ct_params_default_t
-  {
-    using real_t = double;
-    enum { n_dims = 1 };
-    enum { n_eqs = 2 };
- 
-    // options
-    enum { rhs_scheme = solvers::strang };
-
-    // indices
-    struct ix { enum {qx, h, vip_i=qx, vip_den=h}; };
-
-    // hints
-    enum { hint_norhs = formulae::opts::bit(ix::h) }; 
-    // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
-  };
   using ix = typename ct_params_t::ix;
-  using real_t = typename ct_params_t::real_t;
 
   // solver & output choice
   using solver_t = output::gnuplot<
@@ -45,13 +60,12 @@ int main()
   // run-time parameters
   solver_t::rt_params_t p; 
 
-  p.span = { nx };
-
-  p.dt = .05;
-  p.di = 1;
+  p.dt = .01;
+  p.di = .05;
+  p.span = { int(16 / p.di) };
 
   //p.g = 1;
-  p.outfreq = 1; //nt / 25;
+  p.outfreq = nt / 3;
   p.outvars = {
     {ix::h, { .name = "h",   .unit = "m" }}, 
   };
@@ -62,23 +76,10 @@ int main()
   concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> run(p);
 
   // initial condition
-  const real_t dx = .1;
   {
     blitz::firstIndex i;
-
-    struct intcond
-    {
-      real_t operator()(const real_t &x) const
-      {
-	 return 
-	   std::abs(x) <= 1 // if
-	   ? 1 - x*x        // then
-	   : 0;             // else
-      }
-      BZ_DECLARE_FUNCTOR(intcond);
-    };
-
-    run.advectee(ix::h) = intcond()(dx*(i+.5) - nx*dx/2);
+  
+    run.advectee(ix::h) = intcond()(p.di * (i+.5) - p.span[0] * p.di / 2);
 
     run.advectee(ix::qx) = 0;
   }

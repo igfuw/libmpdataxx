@@ -42,7 +42,7 @@ namespace libmpdataxx
 	void hook_ante_loop(const int nt)
 	{
 	  parent_t::hook_ante_loop(nt);
-
+	  
 	  // to make extrapolation possible at the first time-step
 	  fill_stash();
 	}
@@ -55,6 +55,7 @@ namespace libmpdataxx
 	  //interpolate from velocity field to courant field (mpdata needs courant numbers from t+1/2)
 	  interpolate_in_space();
 
+          // TODO: why???
 	  this->mem->barrier();
 
 	  // filling the stash with data from current velocity field 
