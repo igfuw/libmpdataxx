@@ -27,8 +27,13 @@ int main()
     // options
     enum { rhs_scheme = solvers::strang };
 
+//<listing-1>
     // indices
-    struct ix { enum {qx, h, vip_i=qx, vip_den=h}; };
+    struct ix { 
+      enum {qx,h, 
+            vip_i=qx, vip_den=h}; 
+    };
+//</listing-1>
 
     // hints
     enum { hint_norhs = formulae::opts::bit(ix::h) }; 

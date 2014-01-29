@@ -16,6 +16,7 @@ using namespace libmpdataxx;
 int main() 
 {
   // compile-time parameters
+//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
@@ -25,6 +26,7 @@ int main()
     enum { prs_scheme = solvers::pc };
     struct ix { enum {u, w, tht, vip_i=u, vip_j=w, vip_den=-1}; };
   }; 
+//</listing-1>
   using ix = typename ct_params_t::ix;
 
   const int r0 = 250; 

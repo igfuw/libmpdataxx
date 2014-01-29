@@ -94,7 +94,7 @@ class shallow_water<
   using parent_t = shallow_water_common<ct_params_t>;
   using parent_t::parent_t; // inheriting ctors
   using ix = typename ct_params_t::ix;
-
+//<listing-1>
   void update_rhs(
     libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
     const typename parent_t::real_t &dt,
@@ -109,6 +109,7 @@ class shallow_water<
     rhs.at(ix::qx)(this->i) -= this->g * this->psi_n(ix::h)(this->i) * grad(this->psi_n(ix::h), this->i, this->di); 
   }
 };
+//</listing-1>
 
 // 2D version
 template <typename ct_params_t>
