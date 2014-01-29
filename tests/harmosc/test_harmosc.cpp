@@ -40,15 +40,16 @@ int main()
   };
 //</listing-1>
 
-//<listing-2>
-  using solver_t = output::gnuplot<
+  using sim_t = output::gnuplot<
     coupled_harmosc<ct_params_t>
   >;
-  typename solver_t::rt_params_t p; 
+  typename sim_t::rt_params_t p; 
 
+//<listing-2>
   // run-time parameters
   p.dt = 1;
-  p.omega = 2*pi<typename ct_params_t::real_t>() / p.dt / 400;
+  p.omega = 2 * pi<typename ct_params_t::real_t>() 
+            / p.dt / 400;
 //</listing-2>
   p.span = {1000};
   p.outfreq = 10;
@@ -61,7 +62,7 @@ int main()
   p.gnuplot_command = "plot";
 
   // instantiation
-  concurr::threads<solver_t, bcond::cyclic> run(p);
+  concurr::threads<sim_t, bcond::cyclic> run(p);
 
   // initial condition
   {

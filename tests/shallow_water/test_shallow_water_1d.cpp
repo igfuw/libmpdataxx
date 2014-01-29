@@ -18,6 +18,8 @@ const int nx = 32, nt = 100;
 int main() 
 {
   // compile-time parameters
+  // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
+//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
@@ -29,16 +31,16 @@ int main()
 
 //<listing-1>
     // indices
-    struct ix { 
-      enum {qx,h, 
-            vip_i=qx, vip_den=h}; 
-    };
-//</listing-1>
+    struct ix { enum {
+      qx, h, 
+      vip_i=qx, vip_den=h
+    }; };
 
     // hints
     enum { hint_norhs = formulae::opts::bit(ix::h) }; 
-    // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
   };
+//</listing-1>
+
   using ix = typename ct_params_t::ix;
 
   // solver & output choice
