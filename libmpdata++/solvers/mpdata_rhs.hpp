@@ -73,10 +73,7 @@ namespace libmpdataxx
           if (formulae::opts::isset(ct_params_t::hint_norhs, formulae::opts::bit(e))) continue;
 
           // otherwise apply the rhs
-          if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
-            this->psi_n(e)(this->ijk) += dt * (*this->mem->G)(this->ijk) * rhs.at(e)(this->ijk);
-          else
-            this->psi_n(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
+          this->psi_n(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
         }
       }
 
