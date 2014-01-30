@@ -13,11 +13,9 @@
  * \image html "../../tests/harmosc/figure_strang_it=2.svg"
  */
 
-//<listing-1>
 #include "coupled_harmosc.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
-//</listing-1>
 using namespace libmpdataxx;
 
 #include <boost/math/constants/constants.hpp>
@@ -29,7 +27,7 @@ const int nt = 1500;
 
 int main() 
 {
-//<listing-2>
+//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = real_t;
@@ -40,18 +38,19 @@ int main()
       solvers::rhs_scheme_t::strang };
     struct ix { enum {psi, phi}; };
   };
-//</listing-2>
+//</listing-1>
 
-//<listing-3>
-  using solver_t = output::gnuplot<
+  using sim_t = output::gnuplot<
     coupled_harmosc<ct_params_t>
   >;
-  typename solver_t::rt_params_t p; 
+  typename sim_t::rt_params_t p; 
 
+//<listing-2>
   // run-time parameters
   p.dt = 1;
-  p.omega = 2*pi<typename ct_params_t::real_t>() / p.dt / 400;
-//</listing-3>
+  p.omega = 2 * pi<typename ct_params_t::real_t>() 
+            / p.dt / 400;
+//</listing-2>
   p.span = {1000};
   p.outfreq = 10;
 
@@ -63,7 +62,7 @@ int main()
   p.gnuplot_command = "plot";
 
   // instantiation
-  concurr::threads<solver_t, bcond::cyclic> run(p);
+  concurr::threads<sim_t, bcond::cyclic> run(p);
 
   // initial condition
   {

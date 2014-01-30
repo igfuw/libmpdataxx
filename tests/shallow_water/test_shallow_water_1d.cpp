@@ -16,6 +16,8 @@ using boost::math::constants::pi;
 const int nt = 50;
 
 // compile-time parameters
+// enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
+//<listing-1>
 struct ct_params_t : ct_params_default_t
 {
   using real_t = double;
@@ -31,8 +33,8 @@ struct ct_params_t : ct_params_default_t
   
   // hints
   enum { hint_norhs = formulae::opts::bit(ix::h) }; 
-  // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
 };
+//</listing-1>
 
 using real_t = typename ct_params_t::real_t;
 
