@@ -1,4 +1,5 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- could a param copy be made a mem member?
 - rename toa -> tot :)
 - eps, npa domyślnie?
 - barrier z argumentem - do debugowania!

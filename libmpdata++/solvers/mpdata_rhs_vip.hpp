@@ -38,13 +38,14 @@ namespace libmpdataxx
       {
 	if (ix::vip_den == -1) 
 	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk);
-	else
+	else if (this->initial_h_non_zero)
+          this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk);
+        else
 	{
-          // TODO: hint_nozeroh
 	  this->stash[0](this->ijk) = where(
 	    // if
 	    this->psi_n(ix::vip_den)(this->ijk) > 0,
-	    // then					    ,
+	    // then
 	    this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
 	    // else
             0
@@ -77,8 +78,20 @@ namespace libmpdataxx
 
 	if (ix::vip_den == -1) 
 	  this->stash[0](this->ijk) += 3./2 * this->psi_n(ix::vip_i)(this->ijk);
+	else if (this->initial_h_non_zero)
+	  this->stash[0](this->ijk) += 3./2 * this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk);
 	else
-	  this->stash[0](this->ijk) += 3./2 * (this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk)); // TODO: what if density == 0?
+        {
+          // TODO: hint_nozeroh
+	  this->stash[0](this->ijk) += where(
+            // if
+            this->psi_n(ix::vip_den)(this->ijk) > 0,
+            // then
+            3./2 * this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
+            // else
+            0
+          ); 
+        }
 
 	this->xchng(this->stash[0]);      // filling halos 
       }
