@@ -68,7 +68,7 @@ void output(run_t &run, const int &t, const real_t &dx, const real_t &dt)
   } 
 
   // time
-  ot << t * dt << "\n"; 
+  ot << t * dt << "\t" << "\n"; 
   
   // layer depth
   for (auto &it : run.advectee(ix::h)) oh << it << "\t";

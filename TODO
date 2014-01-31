@@ -1,7 +1,9 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- asserts for Courant number < 1 
+- asserts in 1D and 3D for non-divergent initial Corant number field
 - could a param copy be made a mem member?
-- rename toa -> tot :)
 - eps, npa domyślnie?
+- jakiś throw jeśli niezgodne z rozwiązaniem analitycznym w test_shallow_water_1d
 - barrier z argumentem - do debugowania!
 - osobno lewy i prawy war. brzegowy!
 - rename solver -> algo?
