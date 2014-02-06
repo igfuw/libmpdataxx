@@ -29,7 +29,6 @@ int main()
     // options
     enum { rhs_scheme = solvers::strang };
 
-//<listing-1>
     // indices
     struct ix { enum {
       qx, h, 

@@ -133,10 +133,25 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j
       ) { 
+
+
 	psi[n+1](i,j) = psi[n](i,j) - (             // note: see above
 	  (GC[0](i+h, j) - GC[0](i-h, j)) +
 	  (GC[1](i, j+h) - GC[1](i, j-h))
         ) / formulae::G<opts, 0>(G, i, j); 
+
+/*
+auto ix = minIndex(psi[n+1]);
+
+std::cerr << "  ix=" << ix << std::endl;
+
+std::cerr 
+  << "  " << psi[n](ix[0], ix[1]) << std::endl
+  << "  " << GC[0](ix[0]+0, ix[1]) - GC[0](ix[0]-1, ix[1]) +  GC[1](ix[0], ix[1]+0) - GC[1](ix[0], ix[1]-1) << std::endl
+  << "  " << psi[n+1](ix[0], ix[1]) 
+  << std::endl;
+*/
+
       }
 
       template <opts_t opts, class arr_3d_t>

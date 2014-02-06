@@ -79,7 +79,7 @@ namespace libmpdataxx
 
     // 1D: G = const = 1
     template<opts::opts_t opts, class arr_t>
-    inline typename arr_t::T_numtype G(
+    inline int G(
       const arr_t &G,
       const rng_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
@@ -89,7 +89,7 @@ namespace libmpdataxx
 
     // 2D: G = const = 1
     template<opts::opts_t opts, int d, class arr_t>
-    inline typename arr_t::T_numtype G(
+    inline int G(
       const arr_t &G,
       const rng_t &, const rng_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
@@ -99,7 +99,7 @@ namespace libmpdataxx
 
     // 3D: G = const = 1
     template<opts::opts_t opts, int d, class arr_t>
-    inline typename arr_t::T_numtype G(
+    inline int G(
       const arr_t &G,
       const rng_t &, const rng_t &, const rng_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false

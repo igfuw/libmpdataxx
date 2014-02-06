@@ -96,11 +96,11 @@ namespace libmpdataxx
         frac<opts>(
           beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
           ,// -------------------------------------------
-          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * 1 
-          - negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * 1 ) // see note in positive sign beta up
+          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) /* *1 */ 
+          - negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) /* *1 */) // see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * 1
-          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * 1 )
+          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) /* *1 */
+          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) /* *1 */)
         ) 
       ) 
 
@@ -183,11 +183,11 @@ namespace libmpdataxx
         frac<opts>(
           beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
           ,// -------------------------------------------
-          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * 1
-          - negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * 1 )  //see note in positive sign beta up
+          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) /* *1 */
+          - negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) /* *1 */)  //see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * 1
-          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * 1 )
+          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) /* *1 */
+          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) /* *1 */)
         ) 
       ) 
 

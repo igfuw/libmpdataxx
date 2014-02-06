@@ -122,7 +122,18 @@ namespace libmpdataxx
 		this->j
 	      ); 
 	    }
-	  }
+/*
+if (min(this->mem->psi[e][this->n[e]]) < 0)   { std::cerr << "AQQ" << std::endl; throw; }
+if (min(this->mem->psi[e][this->n[e]+1]) < 0) 
+{ 
+  std::cerr << "BQQ" << std::endl; 
+  std::cerr << "min(psi)=" << min(this->mem->psi[e][this->n[e]+1]) << std::endl;
+  std::cerr << "max(|Cx|)=" << max(abs(this->GC(iter)[0])) << std::endl;
+  std::cerr << "max(|Cy|)=" << max(abs(this->GC(iter)[1])) << std::endl;
+  throw; 
+}
+*/
+	 }
 	}
 
 	public:
