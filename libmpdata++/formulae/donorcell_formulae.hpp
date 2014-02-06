@@ -30,16 +30,24 @@ namespace libmpdataxx
       ) 
 
       template <opts_t opts, class arr_1d_t>
-      inline auto donorcell( 
+      inline auto flux_rght( 
 	const arr_1d_t &psi, 
 	const arr_1d_t &GC, 
 	const rng_t &i
       ) return_macro(,
-	F<opts>(
+	-F<opts>(
 	  psi(i  ), 
 	  psi(i+1), 
 	   GC(i+h)
-	) -
+	) 
+      )
+
+      template <opts_t opts, class arr_1d_t>
+      inline auto flux_left( 
+	const arr_1d_t &psi, 
+	const arr_1d_t &GC, 
+	const rng_t &i
+      ) return_macro(,
 	F<opts>(
 	  psi(i-1), 
 	  psi(i  ), 
@@ -48,17 +56,26 @@ namespace libmpdataxx
       )
 
       template<opts_t opts, int d, class arr_2d_t>  
-      inline auto donorcell( 
+      inline auto flux_rght( 
 	const arr_2d_t &psi, 
 	const arr_2d_t &GC, 
 	const rng_t &i, 
 	const rng_t &j
       ) return_macro(,
-	F<opts>(
+	- F<opts>(
 	  psi(pi<d>(i,   j)), 
 	  psi(pi<d>(i+1, j)), 
 	   GC(pi<d>(i+h, j))
-	) -
+	)
+      )
+
+      template<opts_t opts, int d, class arr_2d_t>  
+      inline auto flux_left( 
+	const arr_2d_t &psi, 
+	const arr_2d_t &GC, 
+	const rng_t &i, 
+	const rng_t &j
+      ) return_macro(,
 	F<opts>(
 	  psi(pi<d>(i-1, j)), 
 	  psi(pi<d>(i,   j)), 
@@ -67,7 +84,22 @@ namespace libmpdataxx
       )
 
       template<opts_t opts, int d, class arr_3d_t>  
-      inline auto donorcell( 
+      inline auto flux_rght( 
+	const arr_3d_t &psi, 
+	const arr_3d_t &GC, 
+	const rng_t &i, 
+	const rng_t &j,
+	const rng_t &k
+      ) return_macro(,
+	- F<opts>(
+	  psi(pi<d>(i,   j, k)), 
+	  psi(pi<d>(i+1, j, k)), 
+	   GC(pi<d>(i+h, j, k))
+	) 
+      )
+
+      template<opts_t opts, int d, class arr_3d_t>  
+      inline auto flux_left( 
 	const arr_3d_t &psi, 
 	const arr_3d_t &GC, 
 	const rng_t &i, 
@@ -75,16 +107,55 @@ namespace libmpdataxx
 	const rng_t &k
       ) return_macro(,
 	F<opts>(
-	  psi(pi<d>(i,   j, k)), 
-	  psi(pi<d>(i+1, j, k)), 
-	   GC(pi<d>(i+h, j, k))
-	) -
-	F<opts>(
 	  psi(pi<d>(i-1, j, k)), 
 	  psi(pi<d>(i,   j, k)), 
 	   GC(pi<d>(i-h, j, k))
 	)
       )
+
+      template <opts_t opts, class a_t, class f1_t, class f2_t, class g_t>
+      void donorcell_sum(
+        const a_t &psi_new, // const but modified... :)
+        const a_t &psi_old,
+        const f1_t &flx_1,
+        const f2_t &flx_2,
+        const g_t &g
+      )
+      {
+        psi_new(rng_t::all()) = psi_old + (flx_1 + flx_2) / g;
+      }
+
+      template <opts_t opts, class a_t, class f1_t, class f2_t, class f3_t, class f4_t, class g_t>
+      void donorcell_sum(
+        const a_t &psi_new,
+        const a_t &psi_old,
+        const f1_t &flx_1,
+        const f2_t &flx_2,
+        const f3_t &flx_3,
+        const f4_t &flx_4,
+        const g_t &g
+      )
+      {
+        // note: the parentheses are intended to minimise chances of numerical errors
+        psi_new(rng_t::all()) = psi_old + ((flx_1 + flx_2) + (flx_3 + flx_4)) / g;
+      }
+
+      template <opts_t opts, class a_t, class f1_t, class f2_t, class f3_t, class f4_t, class f5_t, class f6_t, class g_t>
+      void donorcell_sum(
+        const a_t &psi_new,
+        const a_t &psi_old,
+        const f1_t &flx_1,
+        const f2_t &flx_2,
+        const f3_t &flx_3,
+        const f4_t &flx_4,
+        const f5_t &flx_5,
+        const f6_t &flx_6,
+        const g_t &g
+      )
+      {
+        // note: the parentheses are intended to minimise chances of numerical errors
+        psi_new(rng_t::all()) = psi_old + ((flx_1 + flx_2) + (flx_3 + flx_4) + (flx_5 + flx_6)) / g;
+      }
 
       template <opts_t opts, class arr_1d_t>
       void op_1d(
@@ -94,8 +165,13 @@ namespace libmpdataxx
 	const int n,
 	const rng_t &i
       ) { 
-	psi[n+1](i) = psi[n](i)
-	  - donorcell<opts>(psi[n], GC, i) / formulae::G<opts>(G, i);
+        donorcell_sum<opts>(
+	  psi[n+1](i), 
+          psi[n](i),
+	  flux_left<opts>(psi[n], GC, i),
+	  flux_rght<opts>(psi[n], GC, i),
+          formulae::G<opts>(G, i)
+        );
       }
 
       // infinite-gauge version (referred to as F(1,1,U) in the papers)
@@ -107,7 +183,13 @@ namespace libmpdataxx
 	const int n,
 	const rng_t &i
       ) { 
-	psi[n+1](i) = psi[n](i) - (GC(i+h) - GC(i-h)) / formulae::G<opts>(G, i);
+        donorcell_sum<opts>(
+	  psi[n+1](i),
+          psi[n](i),
+          -GC(i+h),
+           GC(i-h),
+          formulae::G<opts>(G, i)
+        );
       }
 
       template <opts_t opts, class arr_2d_t>
@@ -118,10 +200,15 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j
       ) { 
-	psi[n+1](i,j) = psi[n](i,j) - (             // note: this parenthesis is crucial!
-	  donorcell<opts, 0>(psi[n], GC[0], i, j) + //       without it, magnitude difference
-	  donorcell<opts, 1>(psi[n], GC[1], j, i)   //       between psi and the fluxes
-        ) / formulae::G<opts, 0>(G, i, j);          //       may cause psi-0 != psi !
+        donorcell_sum<opts>(
+	  psi[n+1](i,j),
+          psi[n](i,j),
+	  flux_left<opts, 0>(psi[n], GC[0], i, j), 
+	  flux_rght<opts, 0>(psi[n], GC[0], i, j),
+	  flux_left<opts, 1>(psi[n], GC[1], j, i),
+	  flux_rght<opts, 1>(psi[n], GC[1], j, i),          
+          formulae::G<opts, 0>(G, i, j)
+        );
       }
 
       // infinite-gauge version (referred to as F(1,1,U) in the papers)
@@ -133,10 +220,15 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j
       ) { 
-	psi[n+1](i,j) = psi[n](i,j) - (             // note: see above
-	  (GC[0](i+h, j) - GC[0](i-h, j)) +
-	  (GC[1](i, j+h) - GC[1](i, j-h))
-        ) / formulae::G<opts, 0>(G, i, j); 
+        donorcell_sum<opts>(
+	  psi[n+1](i,j),
+          psi[n](i,j),
+          -GC[0](i+h, j),
+           GC[0](i-h, j),
+          -GC[1](i, j+h),
+           GC[1](i, j-h),
+          formulae::G<opts, 0>(G, i, j)
+        );; 
       }
 
       template <opts_t opts, class arr_3d_t>
@@ -147,11 +239,17 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j, const rng_t &k
       ) { 
-	psi[n+1](i,j,k) = psi[n](i,j,k) - (             // note: see above
-	  donorcell<opts, 0>(psi[n], GC[0], i, j, k) +
-	  donorcell<opts, 1>(psi[n], GC[1], j, k, i) +
-	  donorcell<opts, 2>(psi[n], GC[2], k, i, j)
-        ) / formulae::G<opts, 0>(G, i, j, k);
+        donorcell_sum(
+	  psi[n+1](i,j,k),
+          psi[n](i,j,k),
+	  flux_left<opts, 0>(psi[n], GC[0], i, j, k),
+	  flux_rght<opts, 0>(psi[n], GC[0], i, j, k),
+	  flux_left<opts, 1>(psi[n], GC[1], j, k, i),
+	  flux_rght<opts, 1>(psi[n], GC[1], j, k, i),
+	  flux_left<opts, 2>(psi[n], GC[2], k, i, j),
+	  flux_rght<opts, 2>(psi[n], GC[2], k, i, j),
+          formulae::G<opts, 0>(G, i, j, k)
+        );
       }
       
       // infinite-gauge version (referred to as F(1,1,U) in the papers)
@@ -163,11 +261,17 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j, const rng_t &k
       ) { 
-	psi[n+1](i,j,k) = psi[n](i,j,k) - (             // note: see above
-	  (GC[0](i+h, j, k) - GC[0](i-h, j, k)) +
-	  (GC[1](i, j+h, k) - GC[1](i, j-h, k)) +
-	  (GC[2](i, j, k+h) - GC[2](i, j, k-h))
-        ) / formulae::G<opts, 0>(G, i, j, k); 
+        donorcell_sum<opts>(
+	  psi[n+1](i,j,k),
+          psi[n](i,j,k),
+	  -GC[0](i+h, j, k), 
+	   GC[0](i-h, j, k),
+	  -GC[1](i, j+h, k),
+	   GC[1](i, j-h, k),
+	  -GC[2](i, j, k+h),
+	   GC[2](i, j, k-h),
+          formulae::G<opts, 0>(G, i, j, k)
+        ); 
       }
 
     }; // namespace donorcell 

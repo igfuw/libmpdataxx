@@ -1,4 +1,5 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- n_bits enum!
 - asserts for Courant number < 1 
 - asserts in 1D and 3D for non-divergent initial Corant number field
 - could a param copy be made a mem member?
