@@ -1,4 +1,6 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- should unit G return an int instead of float?
+- p -> rt_params_t in examples (Dorota'a suggesting at the first meeting)
 - n_bits enum!
 - asserts for Courant number < 1 
 - asserts in 1D and 3D for non-divergent initial Corant number field
@@ -8,7 +10,6 @@
 - barrier z argumentem - do debugowania!
 - osobno lewy i prawy war. brzegowy!
 - rename solver -> algo?
-- G multiplies RHS 
 - G in velocity interpolation
 - G in pressure solver
 - sanity checks for members of the ct_params_class

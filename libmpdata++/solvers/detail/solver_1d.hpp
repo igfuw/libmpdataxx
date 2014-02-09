@@ -105,6 +105,13 @@ namespace libmpdataxx
 
           if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
 	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.span[0]))));
+
+          // allocate Kahan summation temporary vars
+          if (formulae::opts::isset(ct_params_t::opts, formulae::opts::khn))
+            for (int n = 0; n < 3; ++n) 
+              mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
+                parent_t::rng_sclr(p.span[0])
+              )));
         } 
 
         protected:

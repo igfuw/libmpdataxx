@@ -99,7 +99,9 @@ class shallow_water<
 
 //<listing-1>
   void update_rhs(
-    libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
+    libmpdataxx::arrvec_t<
+      typename parent_t::arr_t
+    > &rhs,
     const typename parent_t::real_t &dt,
     const int &at
   ) {
@@ -107,9 +109,13 @@ class shallow_water<
 
     parent_t::update_rhs(rhs, dt, at);
 
-    this->xchng(ix::h); // due to grad() below -- TODO: include it into grad
+    // due to grad() below -- TODO: include it into grad
+    this->xchng(ix::h); 
 
-    rhs.at(ix::qx)(this->i) -= this->g * this->psi_n(ix::h)(this->i) * grad(this->psi_n(ix::h), this->i, this->di); 
+    rhs.at(ix::qx)(this->i) -= 
+      this->g 
+      * this->psi_n(ix::h)(this->i) 
+      * grad(this->psi_n(ix::h), this->i, this->di); 
   }
 //</listing-1>
 };

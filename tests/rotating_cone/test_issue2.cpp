@@ -33,7 +33,11 @@ struct solver_t : solvers::mpdata<ct_params_t>
     this->mem->barrier();
     if (this->mem->rank() != 0) return;
     if (min(this->mem->advectee()) < 0) 
+    {
+      auto ix = minIndex(this->mem->advectee());
+      std::cerr << "  min(" << ix << ") = " << this->mem->advectee()(ix) << std::endl;
       throw std::runtime_error("values below zero!");
+    }
   }
 };
 
@@ -103,20 +107,30 @@ int main(int argc, char **argv)
     nx = atoi(argv[1]),
     ny = atoi(argv[2]);
 
+  std::cerr << "nx=" << nx << " ny=" << ny << std::endl;
+
+/*
   {
     enum { opts = 0 };
+    std::cerr << "starting basic run" << std::endl;
     test<opts>("basic", nx, ny);
   }
+*/
   {
     enum { opts = formulae::opts::fct };
+    std::cerr << "starting fct run" << std::endl;
     test<opts>("fct", nx, ny);
   }
+/*
   {
     enum { opts = formulae::opts::iga | formulae::opts::fct};
+    std::cerr << "starting iga_fct run" << std::endl;
     test<opts>("iga_fct", nx, ny);
   }
   {
     enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct};
+    std::cerr << "starting iga_fct_tot run" << std::endl;
     test<opts>("iga_fct_tot", nx, ny);
   }
+*/
 }

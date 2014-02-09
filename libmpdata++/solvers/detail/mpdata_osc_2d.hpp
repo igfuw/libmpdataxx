@@ -102,6 +102,7 @@ namespace libmpdataxx
 	    // donor-cell call 
 	    if (!formulae::opts::isset(ct_params_t::opts, formulae::opts::iga) || iter ==0)
 	      formulae::donorcell::op_2d<ct_params_t::opts>(
+                this->mem->khn_tmp,
 		this->mem->psi[e], 
 		this->GC(iter), 
 		*this->mem->G, 
@@ -114,6 +115,7 @@ namespace libmpdataxx
 	    {
 	      assert(iter == 1); // infinite gauge option uses just one corrective step
 	      formulae::donorcell::op_2d_iga<ct_params_t::opts>(
+                this->mem->khn_tmp,
 		this->mem->psi[e], 
 		this->GC(iter), 
 		*this->mem->G, 
@@ -122,7 +124,18 @@ namespace libmpdataxx
 		this->j
 	      ); 
 	    }
-	  }
+/*
+if (min(this->mem->psi[e][this->n[e]]) < 0)   { std::cerr << "AQQ" << std::endl; throw; }
+if (min(this->mem->psi[e][this->n[e]+1]) < 0) 
+{ 
+  std::cerr << "BQQ" << std::endl; 
+  std::cerr << "min(psi)=" << min(this->mem->psi[e][this->n[e]+1]) << std::endl;
+  std::cerr << "max(|Cx|)=" << max(abs(this->GC(iter)[0])) << std::endl;
+  std::cerr << "max(|Cy|)=" << max(abs(this->GC(iter)[1])) << std::endl;
+  throw; 
+}
+*/
+	 }
 	}
 
 	public:

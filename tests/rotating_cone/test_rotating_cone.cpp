@@ -24,11 +24,10 @@ void test(const std::string filename)
   enum {x, y};
   struct ct_params_t : ct_params_default_t
   {
-    using real_t = float;
+    using real_t = double;
     enum { n_dims = 2 };
     enum { n_eqs = 1 };
     enum { opts = opts_arg };
-    //  enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct };
   };
 
   typename ct_params_t::real_t 
@@ -54,7 +53,7 @@ void test(const std::string filename)
   typename sim_t::rt_params_t p;
 
   // pre instantiation
-  p.n_iters = 2;
+  p.n_iters = 2; 
   p.span = {101, 101};
 
   p.outfreq = nt; 
@@ -73,8 +72,8 @@ void test(const std::string filename)
     tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
     p.gnuplot_cbrange = tmp.str();
   }
-  p.gnuplot_xrange = "[60 : 90]";
-  p.gnuplot_yrange = "[35 : 65]";
+  p.gnuplot_xrange = "[25 : 75]";
+  p.gnuplot_yrange = "[50 : 100]";
   p.gnuplot_maxcolors = 10;
   {
     std::ostringstream tmp;
@@ -90,8 +89,8 @@ void test(const std::string filename)
   {
     typename ct_params_t::real_t
       r = 15. * dx,
-      x0 = 75 * dx,
-      y0 = 50 * dy,
+      x0 = 50 * dx,//75 in the article?
+      y0 = 75 * dy,//50 in the article?
       xc = .5 * p.span[x] * dx,
       yc = .5 * p.span[y] * dy;
 

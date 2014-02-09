@@ -130,6 +130,7 @@ namespace libmpdataxx
 	    if (!formulae::opts::isset(ct_params_t::opts, formulae::opts::iga) || iter == 0)
 	    {
 	      formulae::donorcell::op_3d<ct_params_t::opts>(
+		this->mem->khn_tmp,
 		this->mem->psi[e], 
 		this->GC(iter), 
 		*this->mem->G,
@@ -144,6 +145,7 @@ namespace libmpdataxx
 	    {
 	      assert(iter == 1); // infinite gauge option uses just one corrective step
 	      formulae::donorcell::op_3d_iga<ct_params_t::opts>(
+		this->mem->khn_tmp,
 		this->mem->psi[e], 
 		this->GC(iter), 
 		*this->mem->G,

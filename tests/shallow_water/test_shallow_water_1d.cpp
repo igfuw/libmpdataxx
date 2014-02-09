@@ -32,7 +32,10 @@ struct ct_params_t : ct_params_default_t
   enum { rhs_scheme = solvers::strang };
   
   // indices
-  struct ix { enum {qx, h, vip_i=qx, vip_den=h}; };
+  struct ix { enum {
+    qx, h, 
+    vip_i=qx, vip_den=h
+  }; }; 
   
   // hints
   enum { hint_norhs = formulae::opts::bit(ix::h) }; 

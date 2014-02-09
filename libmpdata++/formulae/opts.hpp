@@ -36,7 +36,8 @@ namespace libmpdataxx
         npa = opts::bit(4), // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
         iga = opts::bit(5), // infinite-gauge option
         nug = opts::bit(6), // non-unit G (default G = 1) - see Smolarkiewicz 2006 eq (25) and discussion below for info on G
-        dfl = opts::bit(7)  // devergent flows
+        dfl = opts::bit(7), // devergent flows
+        khn = opts::bit(8)  // use Kahan summation algorithm in the donor-cell formulae
       };
 
     }; // namespace opts
@@ -79,7 +80,7 @@ namespace libmpdataxx
 
     // 1D: G = const = 1
     template<opts::opts_t opts, class arr_t>
-    inline typename arr_t::T_numtype G(
+    inline int G(
       const arr_t &G,
       const rng_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
@@ -89,7 +90,7 @@ namespace libmpdataxx
 
     // 2D: G = const = 1
     template<opts::opts_t opts, int d, class arr_t>
-    inline typename arr_t::T_numtype G(
+    inline int G(
       const arr_t &G,
       const rng_t &, const rng_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
@@ -99,7 +100,7 @@ namespace libmpdataxx
 
     // 3D: G = const = 1
     template<opts::opts_t opts, int d, class arr_t>
-    inline typename arr_t::T_numtype G(
+    inline int G(
       const arr_t &G,
       const rng_t &, const rng_t &, const rng_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false

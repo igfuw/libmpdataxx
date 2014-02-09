@@ -113,13 +113,22 @@ namespace libmpdataxx
             parent_t::rng_vctr(p.span[2])
           )));
 
-         // allocate G
-           if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+          // allocate G
+          if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
 	    mem->G.reset(mem->old(new typename parent_t::arr_t(
                     parent_t::rng_sclr(p.span[0]),
                     parent_t::rng_sclr(p.span[1]),
                     parent_t::rng_sclr(p.span[2])
             )));
+
+	  // allocate Kahan summation temporary vars
+	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::khn))
+	    for (int n = 0; n < 3; ++n) 
+	      mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
+	        parent_t::rng_sclr(p.span[0]), 
+	        parent_t::rng_sclr(p.span[1]),
+	        parent_t::rng_sclr(p.span[2])
+	      )));
         }  
         
         // helper method to allocate a temporary space composed of vector-component arrays
