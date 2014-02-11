@@ -20,6 +20,7 @@ namespace libmpdataxx
       class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_t>
       {
 	using parent_t = mpdata_rhs<ct_params_t>;
+        using ix = typename ct_params_t::ix;
 
 	protected:
 
@@ -37,6 +38,48 @@ namespace libmpdataxx
 	{}
 
 	virtual void fill_stash() = 0;
+	virtual void fill_stash_helper(const int d, const int e) final
+	{
+	  if (ix::vip_den == -1)
+	    this->stash[d](this->ijk) = this->psi_n(e)(this->ijk);
+	  else if (this->initial_h_non_zero)
+	    this->stash[d](this->ijk) = this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk);
+	  else
+	  {
+	    this->stash[d](this->ijk) = where(
+	      // if
+	      this->psi_n(ix::vip_den)(this->ijk) > 0,
+	      // then
+	      this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
+	      // else
+	      0
+	    );
+	  }
+	}
+
+	void extrp(const int d, const int e) // extrapolate velocity field in time to t+1/2
+	{                 // (write the result to stash since we don't need previous state any more)
+	  using namespace arakawa_c;
+
+	  this->stash[d](this->ijk) /= -2.;
+
+	  if (ix::vip_den == -1) 
+	    this->stash[d](this->ijk) += 3./2 * this->psi_n(e)(this->ijk);
+	  else if (this->initial_h_non_zero)
+	    this->stash[d](this->ijk) += 3./2 * (this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk)); 
+	  else
+	  {
+	    this->stash[d](this->ijk) += where(
+	      // if
+	      this->psi_n(ix::vip_den)(this->ijk) > 0,
+	      // then
+	      3./2 * this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
+	      // else
+	      0   
+	    );  
+	  }
+	}   
+
 	virtual void extrapolate_in_time() = 0;
 	virtual void interpolate_in_space() = 0;
 

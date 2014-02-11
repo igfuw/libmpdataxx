@@ -28,7 +28,7 @@ struct ct_params_t : ct_params_default_t
   enum { n_eqs = 2 };
   
   // options
-  enum { opts = 0 };
+  enum { opts = formulae::opts::fct };
   enum { rhs_scheme = solvers::strang };
   
   // indices

@@ -36,21 +36,7 @@ namespace libmpdataxx
 
       void fill_stash() final
       {
-	if (ix::vip_den == -1) 
-	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk);
-	else if (this->initial_h_non_zero)
-          this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk);
-        else
-	{
-	  this->stash[0](this->ijk) = where(
-	    // if
-	    this->psi_n(ix::vip_den)(this->ijk) > 0,
-	    // then
-	    this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
-	    // else
-            0
-	  );
-	}
+        this->fill_stash_helper(0, ix::vip_i);
       }
 
       void interpolate_in_space() final
@@ -59,7 +45,7 @@ namespace libmpdataxx
 
 	if (!this->mem->G)
 	{
-	  this->mem->GC[0](im+h) = this->dt / di * .5 * (
+	  this->mem->GC[0](im + h) = this->dt / di * .5 * (
 	    this->stash[0](im    ) + 
 	    this->stash[0](im + 1)
 	  );
@@ -72,27 +58,7 @@ namespace libmpdataxx
 
       void extrapolate_in_time() final
       {
-        using namespace arakawa_c;
-
-	this->stash[0](this->ijk) /= -2.;
-
-	if (ix::vip_den == -1) 
-	  this->stash[0](this->ijk) += 3./2 * this->psi_n(ix::vip_i)(this->ijk);
-	else if (this->initial_h_non_zero)
-	  this->stash[0](this->ijk) += 3./2 * this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk);
-	else
-        {
-          // TODO: hint_nozeroh
-	  this->stash[0](this->ijk) += where(
-            // if
-            this->psi_n(ix::vip_den)(this->ijk) > 0,
-            // then
-            3./2 * this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
-            // else
-            0
-          ); 
-        }
-
+	this->extrp(0, ix::vip_i);     
 	this->xchng(this->stash[0]);      // filling halos 
       }
 
@@ -132,33 +98,10 @@ namespace libmpdataxx
       const rng_t im, jm;
       const typename ct_params_t::real_t di, dj;
 
-      void fill_stash() final
+      void fill_stash() final 
       {
-	if (ix::vip_den == -1) 
-	{
-	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk);
-	  this->stash[1](this->ijk) = this->psi_n(ix::vip_j)(this->ijk);
-	}
-	else
-	{
-	  this->stash[0](this->ijk) = this->psi_n(ix::vip_i)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk); // TODO: what if density == 0?
-	  this->stash[1](this->ijk) = this->psi_n(ix::vip_j)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk); // TODO: what if density == 0?
-	} 
-      }
-
-      template <int d>
-      void extrp(int e) // extrapolate velocity field in time to t+1/2
-      {                 // (write the result to stash since we don't need previous state any more)
-        using namespace arakawa_c;
-
-	this->stash[d](this->ijk) /= -2.;
-
-	if (ix::vip_den == -1) 
-	  this->stash[d](this->ijk) += 3./2 * this->psi_n(e)(this->ijk);
-	else
-	  this->stash[d](this->ijk) += 3./2 * (this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk)); // TODO: what if density == 0?
-
-	this->xchng(this->stash[d], this->i^this->halo, this->j^this->halo);      // filling halos 
+        this->fill_stash_helper(0, ix::vip_i);
+        this->fill_stash_helper(1, ix::vip_j);
       }
 
       template<int d, class arr_t> 
@@ -195,8 +138,12 @@ namespace libmpdataxx
 
       void extrapolate_in_time() final
       {
-	extrp<0>(ix::vip_i);     
-	extrp<1>(ix::vip_j);
+        using namespace libmpdataxx::arakawa_c; 
+
+	this->extrp(0, ix::vip_i);     
+	this->xchng(this->stash[0], this->i^this->halo, this->j^this->halo);      // filling halos 
+	this->extrp(1, ix::vip_j);
+	this->xchng(this->stash[1], this->i^this->halo, this->j^this->halo);      // filling halos 
       }
 
       public:
