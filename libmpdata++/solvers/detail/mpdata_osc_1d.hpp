@@ -36,7 +36,8 @@ namespace libmpdataxx
 
 	void hook_ante_loop(const int nt)
 	{
-  // TODO: same in 2D and 3D
+  //  note that it's not needed for upstream
+
 	  parent_t::hook_ante_loop(nt);
 	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
 	  {
