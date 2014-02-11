@@ -48,6 +48,12 @@ namespace libmpdataxx
 	    this->bcyl->fill_halos_sclr(*this->mem->G, this->i^this->halo);
 	    this->bcyr->fill_halos_sclr(*this->mem->G, this->i^this->halo);
 	  }
+          
+          // filling Y halos for GC_x, and X halos for GC_y
+          this->bcyl->fill_halos_sclr(this->mem->GC[0], this->i^h); // TODO: one xchng?
+          this->bcyr->fill_halos_sclr(this->mem->GC[0], this->i^h);
+          this->bcxl->fill_halos_sclr(this->mem->GC[1], this->j^h); // TODO: one xchng?
+          this->bcxr->fill_halos_sclr(this->mem->GC[1], this->j^h);
 	} 
 
 	// method invoked by the solver
