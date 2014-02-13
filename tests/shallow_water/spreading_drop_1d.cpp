@@ -98,7 +98,7 @@ int main()
   p.g = 1;
 
   // instantiation
-  concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> run(p);
+  concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> run(p); // TODO: change into open bc
 
   // initial condition
   {
