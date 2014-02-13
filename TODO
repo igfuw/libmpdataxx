@@ -1,6 +1,6 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
 - should unit G return an int instead of float?
-- p -> rt_params_t in examples (Dorota'a suggesting at the first meeting)
+- p -> rt_params in examples (Dorota'a suggesting at the first meeting)
 - n_bits enum!
 - asserts for Courant number < 1 
 - asserts in 1D and 3D for non-divergent initial Corant number field
@@ -21,11 +21,9 @@
 - check compatibility with new gnuplot_iostream
 - move opts out of formulae namespace
 - finish donorcell and leapfrog tests
-- DJ: spreading drop test from Schar & Smolarkiewicz?
-- AJ+MW: G in 3D (incl. halo filling)
 - steps instead of histeps in output gnuplot (in tests as well?)
 - CMake install() rules (as in libcloudphxx)
-- at least a "zero" bcond for icicle
+- open boundary in 1D and 3D
 - test showing difference between real_t=float and real_t=double (and real_t=long double, ...)
 - doc: dependencies section (C++11, Blitz, Boost, OpenMP)
 - doc: README and HACKING files
@@ -39,8 +37,6 @@
 - svg output -> git repo?
 - rename/introduce output_serial common file
 - some assert-like logic checking if the velocity field is consistent with the boudary condition?
-- diagnostic stats map and output (conservativeness indicator, how to define multi-dimensional Courant number: was defined? (cf. Szmelter 2005, JCP, appendix))
-- Molenkamp test?
 - test showing usage of gcc's __float128 (rainbow?)
 - pressure solvers: introduce inheritance (richardson->mr->cr->pc); what if no preconditioner in pc?; reuse richardson in pc; common loop over pseudo-time
 - make ctors explicit? (http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Explicit_Constructors#Explicit_Constructors)
@@ -51,6 +47,7 @@
 - check if velocity plots with arrows are feasible with output_gnuplot - if not forget about it
 - split output_gnuplot into separate files
 - check if unique_ptrs used and if so if not to change to const unique_ptr"- we do not need transferability
+- diagnostic stats map and output (conservativeness indicator, how to define multi-dimensional Courant number: was defined? (cf. Szmelter 2005, JCP, appendix))
 - mechanism for recording stats, and:
   - record C_min, C_max
   - record div(Cx, Cy)
@@ -78,11 +75,6 @@
 
 
 0.4: (far future, not relevant to HARMONIA)
-- support for non-carthesian geometries
-- other advection algorithms?:
-  - UNO: http://journals.ametsoc.org/doi/pdf/10.1175/2008MWR2451.1
-  - Lax Wendroff http://www.stanford.edu/class/cs205b/lectures/lecture9.pdf
-  - http://journals.ametsoc.org/doi/pdf/10.1175/1520-0450(1981)020%3C0146%3AAEOSSN%3E2.0.CO%3B2
 - option to parallelise the computations by equations (and not by domain decomposition)
 - automated -fprofile-use and -fprofile-generate with CMake? (here's an example: http://trac.research.cc.gatech.edu/fastlab/browser/trunk/fastlib/CMakeLists.txt?rev=9455)
 - option to communicate while calculating the domain interior
