@@ -1,4 +1,10 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- change grid to have scalars on the edges:
+  - advector shape nx + 1 -> nx - 1
+  - in cyclic bc edge -> bone
+  - bcinit (const /= 0, const = phi_0)
+  - gnuplot (xrange, yrange)
+  - what about halo = 2 for open bc (assert?)
 - should unit G return an int instead of float?
 - p -> rt_params in examples (Dorota'a suggesting at the first meeting)
 - n_bits enum!
