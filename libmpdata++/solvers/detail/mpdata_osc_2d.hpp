@@ -40,6 +40,7 @@ namespace libmpdataxx
 	void hook_ante_loop(const int nt) 
 	{   
   // TODO: same in 1D
+  //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
 	  {
@@ -50,10 +51,10 @@ namespace libmpdataxx
 	  }
           
           // filling Y halos for GC_x, and X halos for GC_y
-          this->bcyl->fill_halos_sclr(this->mem->GC[0], this->i^h); // TODO: one xchng?
-          this->bcyr->fill_halos_sclr(this->mem->GC[0], this->i^h);
-          this->bcxl->fill_halos_sclr(this->mem->GC[1], this->j^h); // TODO: one xchng?
-          this->bcxr->fill_halos_sclr(this->mem->GC[1], this->j^h);
+          this->bcyl->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h); // TODO: one xchng?
+          this->bcyr->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h);
+          this->bcxl->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h); // TODO: one xchng?
+          this->bcxr->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h);
 	} 
 
 	// method invoked by the solver
@@ -95,10 +96,10 @@ namespace libmpdataxx
 	      // filling Y halos for GC_x, and X halos for GC_y
 	      // TODO: document why; is it needed in the last iteration?; what about FCT?
 	      this->mem->barrier();
-	      this->bcyl->fill_halos_sclr(this->GC_corr(iter)[0], this->i^h); // TODO: one xchng?
-	      this->bcyr->fill_halos_sclr(this->GC_corr(iter)[0], this->i^h);
-	      this->bcxl->fill_halos_sclr(this->GC_corr(iter)[1], this->j^h); // TODO: one xchng?
-	      this->bcxr->fill_halos_sclr(this->GC_corr(iter)[1], this->j^h);
+	      this->bcyl->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h); // TODO: one xchng?
+	      this->bcyr->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h);
+	      this->bcxl->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h); // TODO: one xchng?
+	      this->bcxr->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h);
 	      this->mem->barrier();
 
 	      this->fct_adjust_antidiff(e, iter);

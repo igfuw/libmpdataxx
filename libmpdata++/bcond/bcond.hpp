@@ -11,7 +11,7 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    enum bcond_e { null, cyclic }; 
+    enum bcond_e { null, cyclic, polar, open }; 
 
     template <typename real_t>
     class bcond_t
@@ -33,9 +33,13 @@ namespace libmpdataxx
       {
         assert(false && "bcond::fill_halos_sclr() called!");
       };
-      virtual void fill_halos_vctr(const blitz::Array<real_t, 2> &, const rng_t &) 
+      virtual void fill_halos_vctr_alng(const blitz::Array<real_t, 2> &, const rng_t &) 
       {
-        assert(false && "bcond::fill_halos_vctr() called!");
+        assert(false && "bcond::fill_halos_vctr_alng() called!");
+      };
+      virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 2> &, const rng_t &) 
+      {
+        assert(false && "bcond::fill_halos_vctr_nrml() called!");
       };
 
       // 3D
