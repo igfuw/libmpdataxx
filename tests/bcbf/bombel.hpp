@@ -37,7 +37,8 @@ class bombel : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
     const auto Tht  = this->psi_n(ix::tht); 
     const auto &ijk = this->ijk;
 
-    rhs.at(ix::w)(ijk) += g /*/ 300*/ * (Tht(ijk) - Tht_amb) / Tht_amb; 
+    rhs.at(ix::w)(ijk) += g / 300 * (Tht(ijk) - Tht_amb) / Tht_amb; 
+//    rhs.at(ix::w)(ijk) += g /*/ 300*/ * (Tht(ijk) - Tht_amb) / Tht_amb; 
                             // TODO!!!! 
   }
 

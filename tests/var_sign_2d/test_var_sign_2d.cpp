@@ -80,7 +80,7 @@ int main()
       );
     }
     {
-      struct ct_params_t
+      struct ct_params_t : ct_params_default_t
       {
         using real_t = T;
         enum { n_dims = 2 };
