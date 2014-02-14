@@ -69,7 +69,7 @@ namespace libmpdataxx
         bool 
           hook_ante_step_called = true, // initially true to handle nt=0 
           hook_post_step_called = true, // 
-          hook_ante_loop_called = false;
+          hook_ante_loop_called = true;
 #endif
 
         protected:
@@ -93,11 +93,6 @@ namespace libmpdataxx
         {
 #if !defined(NDEBUG)
           hook_ante_loop_called = true;
-          if (nt > 0)
-          {
-	    hook_ante_step_called = false;
-	    hook_post_step_called = false;
-          }
 #endif
         }
 
@@ -134,6 +129,12 @@ namespace libmpdataxx
 
 	virtual void solve(int nt) final
 	{   
+#if !defined(NDEBUG)
+	  hook_ante_loop_called = false;
+	  hook_ante_step_called = false;
+	  hook_post_step_called = false;
+#endif
+
           // multiple calls to sovlve() are meant to advance the solution by nt
           nt += timestep;
 
