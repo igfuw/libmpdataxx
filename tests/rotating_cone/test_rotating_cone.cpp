@@ -72,8 +72,10 @@ void test(const std::string filename)
     tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
     p.gnuplot_cbrange = tmp.str();
   }
-  p.gnuplot_xrange = "[25 : 75]";
-  p.gnuplot_yrange = "[50 : 100]";
+//  p.gnuplot_xrange = "[25 : 75]";
+//  p.gnuplot_yrange = "[50 : 100]";
+  p.gnuplot_xrange = "[0 : 100]";
+  p.gnuplot_yrange = "[0 : 100]";
   p.gnuplot_maxcolors = 10;
   {
     std::ostringstream tmp;
