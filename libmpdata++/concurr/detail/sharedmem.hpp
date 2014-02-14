@@ -197,6 +197,10 @@ namespace libmpdataxx
 
         blitz::Array<real_t, 1> g_factor()
         {
+          // a sanity check
+          if (this->G.get() == nullptr) 
+            throw std::runtime_error("g_factor() called with nug option unset?");
+
           // the same logic as in advectee() - see above
           return (*this->G)(
             rng_t(0, this->span[0]-1)
@@ -239,6 +243,10 @@ namespace libmpdataxx
 
         blitz::Array<real_t, 2> g_factor()
         {
+          // a sanity check
+          if (this->G.get() == nullptr) 
+            throw std::runtime_error("g_factor() called with nug option unset?");
+
           // the same logic as in advectee() - see above
           return (*this->G)(idx_t<2>({
             rng_t(0, this->span[0]-1),
@@ -290,6 +298,10 @@ namespace libmpdataxx
 
         blitz::Array<real_t, 3> g_factor()
         {
+          // a sanity check
+          if (this->G.get() == nullptr) 
+            throw std::runtime_error("g_factor() called with nug option unset?");
+
           // the same logic as in advectee() - see above
           return (*this->G)(idx_t<3>({
             rng_t(0, this->span[0]-1),
