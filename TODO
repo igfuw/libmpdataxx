@@ -31,7 +31,6 @@
 - move opts out of formulae namespace
 - finish donorcell and leapfrog tests
 - steps instead of histeps in output gnuplot (in tests as well?)
-- CMake install() rules (as in libcloudphxx)
 - open boundary in 1D and 3D
 - test showing difference between real_t=float and real_t=double (and real_t=long double, ...)
 - doc: dependencies section (C++11, Blitz, Boost, OpenMP)
