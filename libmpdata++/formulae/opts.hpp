@@ -147,6 +147,7 @@ namespace libmpdataxx
   {
     enum { opts = formulae::opts::iga | formulae::opts::fct };
     enum { hint_norhs = 0 };
+    struct ix {};
   };
 
 }; // namespace libmpdataxx

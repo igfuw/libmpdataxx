@@ -23,7 +23,7 @@ int main()
     enum { n_dims = 2 };
     enum { n_eqs = 3 };
     enum { rhs_scheme = solvers::euler_b };
-    enum { prs_scheme = solvers::pc };
+    enum { prs_scheme = solvers::cr };
     struct ix { enum {u, w, tht, vip_i=u, vip_j=w, vip_den=-1}; };
   }; 
 //</listing-1>
@@ -31,7 +31,7 @@ int main()
 
   const int r0 = 250; 
   const int nx = 200, ny = 200, nt = 800;
-  typename ct_params_t::real_t Tht_amb = 300; //1; //300; // ambient state (constant thoughout the domain)
+  typename ct_params_t::real_t Tht_amb = 1; //1; //300; // ambient state (constant thoughout the domain)
 
   // conjugate residual
   using solver_t = output::gnuplot<bombel<ct_params_t>>;
@@ -54,14 +54,14 @@ int main()
   rt_params.gnuplot_with = "lines";
   rt_params.gnuplot_surface = false;
   rt_params.gnuplot_contour = true;
-  rt_params.gnuplot_cbrange = "[299.85 : 300.65]";
-//  rt_params.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
+//  rt_params.gnuplot_cbrange = "[299.85 : 300.65]";
+  rt_params.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
   rt_params.gnuplot_maxcolors = 8;
-  rt_params.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
-//  rt_params.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
+//  rt_params.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
+  rt_params.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
   rt_params.gnuplot_term = "svg";
 
-  rt_params.tol = 1e-6;
+  rt_params.tol = 1e-5;
   rt_params.span = {nx, ny};
 
   libmpdataxx::concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(rt_params);
