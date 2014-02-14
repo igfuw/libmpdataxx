@@ -30,3 +30,11 @@ endif()
 # the tests
 enable_testing()
 add_subdirectory(tests)
+
+# make-install rule #TODO: exclude CmakeLists.txt
+install(
+  DIRECTORY
+    libmpdata++
+  DESTINATION 
+    include
+)

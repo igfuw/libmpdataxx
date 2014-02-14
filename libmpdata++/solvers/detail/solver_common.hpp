@@ -42,6 +42,8 @@ namespace libmpdataxx
         typedef typename ct_params_t::real_t real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
 
+        using ix = typename ct_params_t::ix;
+
 	protected: 
 
         long long int timestep = 0;
@@ -111,7 +113,13 @@ namespace libmpdataxx
 	  n(n_eqs, 0), 
           mem(mem)
 	{
+          // compile-time sanity checks
 	  static_assert(n_eqs > 0, "!");
+
+          // run-time sanity checks
+          for (int d = 0; d < n_dims; ++d)
+            if (p.span[d] < 1) 
+              throw std::runtime_error("bogus grid size");
         }
 
         // dtor

@@ -1,2 +1,3 @@
 libmpdataxx_add_test(test_rotating_cone)
 libmpdataxx_add_test(test_issue)
+libmpdataxx_add_test(test_issue2)

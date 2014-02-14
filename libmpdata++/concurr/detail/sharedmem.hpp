@@ -10,6 +10,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include <libmpdata++/blitz.hpp>
+#include <libmpdata++/formulae/arakawa_c.hpp>
 
 #include <array>
 
@@ -42,8 +43,9 @@ namespace libmpdataxx
 
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC;
-        std::vector<arrvec_t<arr_t>> psi;
+        std::vector<arrvec_t<arr_t>> psi; // TODO: since n_eqs is known, could make it an std::array!
 	std::unique_ptr<arr_t> G;
+        arrvec_t<arr_t> khn_tmp; // Kahan sum for donor-cell
 
 	std::unordered_map< 
 	  const char*, // intended for addressing with __FILE__
@@ -183,17 +185,22 @@ namespace libmpdataxx
 
 	blitz::Array<real_t, 1> advector(int d = 0)  
 	{   
+          using namespace arakawa_c;
           assert(d == 0);
           // returning the whole array but with the dimensiones
           // reindexed to make it more intuitive when working with index placeholders
           // (i.e. border between cell -1 and cell 0 is indexed with 0)
 	  return this->GC[d](
-            rng_t::all()
-          ).reindex({this->GC[d].base(0)+1});
+            rng_t(0, this->span[0]-1)^h
+          ).reindex({0});
 	}   
 
         blitz::Array<real_t, 1> g_factor()
         {
+          // a sanity check
+          if (this->G.get() == nullptr) 
+            throw std::runtime_error("g_factor() called with nug option unset?");
+
           // the same logic as in advectee() - see above
           return (*this->G)(
             rng_t(0, this->span[0]-1)
@@ -222,20 +229,24 @@ namespace libmpdataxx
 
 	blitz::Array<real_t, 2> advector(int d = 0)  
 	{   
+          using namespace arakawa_c;
           assert(d == 0 || d== 1);
           // returning the whole array (i.e. incl. haloes) but with the dimensiones
           // reindexed to make it more intuitive when working with index placeholders
-          const rng_t all = rng_t::all();
           switch (d)
           { 
-            case 0: return this->GC[d](all, all).reindex({this->GC[d].base(0)+1,this->GC[d].base(1)  }); 
-            case 1: return this->GC[d](all, all).reindex({this->GC[d].base(0),  this->GC[d].base(1)+1}); 
+            case 0: return this->GC[d](rng_t(0, this->span[0]-1)^h, rng_t(0, this->span[1]-1)).reindex({0, 0}); 
+            case 1: return this->GC[d](rng_t(0, this->span[0]-1), rng_t(0, this->span[1]-1)^h).reindex({0, 0}); 
             default: assert(false); throw;
           }
 	}   
 
         blitz::Array<real_t, 2> g_factor()
         {
+          // a sanity check
+          if (this->G.get() == nullptr) 
+            throw std::runtime_error("g_factor() called with nug option unset?");
+
           // the same logic as in advectee() - see above
           return (*this->G)(idx_t<2>({
             rng_t(0, this->span[0]-1),
@@ -266,21 +277,31 @@ namespace libmpdataxx
 
 	blitz::Array<real_t, 3> advector(int d = 0)  
 	{   
+          using namespace arakawa_c;
           assert(d == 0 || d == 1 || d == 2);
           // returning the whole array but with the dimensiones
           // reindexed to make it more intuitive when working with index placeholders
-          const rng_t all = rng_t::all();
           switch (d)
           { 
-            case 0: return this->GC[d](all, all, all).reindex({this->GC[d].base(0)+1,this->GC[d].base(1),  this->GC[d].base(2)  });  
-            case 1: return this->GC[d](all, all, all).reindex({this->GC[d].base(0),  this->GC[d].base(1)+1,this->GC[d].base(2)  }); 
-            case 2: return this->GC[d](all, all, all).reindex({this->GC[d].base(0),  this->GC[d].base(1),  this->GC[d].base(2)+1}); 
+            case 0: return this->GC[d](rng_t(0, this->span[0]-1)^h,
+                                       rng_t(0, this->span[1]-1),
+                                       rng_t(0, this->span[2]-1)).reindex({0, 0, 0});  
+            case 1: return this->GC[d](rng_t(0, this->span[0]-1),
+                                       rng_t(0, this->span[1]-1)^h,
+                                       rng_t(0, this->span[2]-1)).reindex({0, 0, 0});  
+            case 2: return this->GC[d](rng_t(0, this->span[0]-1),
+                                       rng_t(0, this->span[1]-1),
+                                       rng_t(0, this->span[2]-1)^h).reindex({0, 0, 0});  
             default: assert(false); throw;
           }
 	}   
 
         blitz::Array<real_t, 3> g_factor()
         {
+          // a sanity check
+          if (this->G.get() == nullptr) 
+            throw std::runtime_error("g_factor() called with nug option unset?");
+
           // the same logic as in advectee() - see above
           return (*this->G)(idx_t<3>({
             rng_t(0, this->span[0]-1),

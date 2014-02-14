@@ -40,6 +40,8 @@ namespace libmpdataxx
 	void hook_ante_loop(const int nt) 
 	{   
   // TODO: same in 1D
+  //  note that it's not needed for upstream
+
 	  parent_t::hook_ante_loop(nt);
 	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
 	  {
@@ -50,6 +52,23 @@ namespace libmpdataxx
             this->bczl->fill_halos_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
             this->bczr->fill_halos_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
 	  }
+          
+          // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
+          // halos for GC_z
+          this->bcyl->fill_halos_sclr(this->mem->GC[0], this->k^h, this->i^h);
+          this->bcyr->fill_halos_sclr(this->mem->GC[0], this->k^h, this->i^h);
+          this->bczl->fill_halos_sclr(this->mem->GC[0], this->i^h, this->j^h);
+          this->bczr->fill_halos_sclr(this->mem->GC[0], this->i^h, this->j^h);
+
+          this->bcxl->fill_halos_sclr(this->mem->GC[1], this->j^h, this->k^h);
+          this->bcxr->fill_halos_sclr(this->mem->GC[1], this->j^h, this->k^h);
+          this->bczl->fill_halos_sclr(this->mem->GC[1], this->i^h, this->j^h);
+          this->bczr->fill_halos_sclr(this->mem->GC[1], this->i^h, this->j^h);
+          
+          this->bcxl->fill_halos_sclr(this->mem->GC[2], this->j^h, this->k^h);
+          this->bcxr->fill_halos_sclr(this->mem->GC[2], this->j^h, this->k^h);
+          this->bcyl->fill_halos_sclr(this->mem->GC[2], this->k^h, this->i^h);
+          this->bcyr->fill_halos_sclr(this->mem->GC[2], this->k^h, this->i^h);
 	} 
 
 	// method invoked by the solver
@@ -130,6 +149,7 @@ namespace libmpdataxx
 	    if (!formulae::opts::isset(ct_params_t::opts, formulae::opts::iga) || iter == 0)
 	    {
 	      formulae::donorcell::op_3d<ct_params_t::opts>(
+		this->mem->khn_tmp,
 		this->mem->psi[e], 
 		this->GC(iter), 
 		*this->mem->G,
@@ -144,6 +164,7 @@ namespace libmpdataxx
 	    {
 	      assert(iter == 1); // infinite gauge option uses just one corrective step
 	      formulae::donorcell::op_3d_iga<ct_params_t::opts>(
+		this->mem->khn_tmp,
 		this->mem->psi[e], 
 		this->GC(iter), 
 		*this->mem->G,

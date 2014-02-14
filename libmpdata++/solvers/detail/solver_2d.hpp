@@ -50,6 +50,24 @@ namespace libmpdataxx
           this->mem->barrier();
 	}
 
+        // TODO: ref in argument...
+        void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
+        {
+          parent_t::hook_ante_loop(nt);
+
+          // sanity check for non-divergence of the initial Courant number field
+          // TODO: same in 1D and 3D
+          if (0 != max(abs(
+	    ( 
+              this->mem->GC[0](i-h, j  ) - 
+	      this->mem->GC[0](i+h, j  )
+            ) + (
+	      this->mem->GC[1](i,   j-h) - 
+	      this->mem->GC[1](i,   j+h)
+            )
+	  ))) throw std::runtime_error("initial advector field is divergent");
+        }
+
         public:
  
         struct ctor_args_t
@@ -107,6 +125,14 @@ namespace libmpdataxx
                     parent_t::rng_sclr(p.span[0]),
                     parent_t::rng_sclr(p.span[1])
             )));
+
+          // allocate Kahan summation temporary vars
+          if (formulae::opts::isset(ct_params_t::opts, formulae::opts::khn))
+	    for (int n = 0; n < 3; ++n) 
+	      mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
+                parent_t::rng_sclr(p.span[0]), 
+                parent_t::rng_sclr(p.span[1])
+              )));
         }
 
         protected:

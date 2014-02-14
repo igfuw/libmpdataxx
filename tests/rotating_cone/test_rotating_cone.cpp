@@ -83,7 +83,7 @@ void test(const std::string filename)
   p.gnuplot_term = "svg";
 
   // instantiation
-  concurr::threads<sim_t, bcond::cyclic, bcond::cyclic> run(p); 
+  concurr::threads<sim_t, bcond::open, bcond::open> run(p); 
 
   // post instantiation
   {

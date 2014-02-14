@@ -11,6 +11,8 @@
 
 #include <libmpdata++/bcond/cyclic_1d.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
+//#include <libmpdata++/bcond/polar_2d.hpp>
+#include <libmpdata++/bcond/open_2d.hpp>
 #include <libmpdata++/bcond/cyclic_3d.hpp>
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
@@ -174,6 +176,11 @@ namespace libmpdataxx
 		bxl.reset(new bcond::cyclic_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
 		bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
 	      } 
+              else if (bcx == bcond::open)  // TODO: make a function taht does it
+              {
+	        bxl.reset(new bcond::open_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+	        bxr.reset(new bcond::open_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+              }
 	      else assert(false);
 
 	      if (bcy == bcond::cyclic)  // TODO: make a function taht does it
@@ -181,6 +188,16 @@ namespace libmpdataxx
 		byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
 		byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
 	      }
+//              else if (bcy == bcond::polar)  // TODO: make a function taht does it
+//	      {
+//	        byl.reset(new bcond::polar_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, span[0] / 2));
+//	        byr.reset(new bcond::polar_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, span[0] / 2));
+//	      }
+              else if (bcy == bcond::open)  // TODO: make a function taht does it
+              {
+	        byl.reset(new bcond::open_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+	        byr.reset(new bcond::open_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+              }
 	      else assert(false);
 
               shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1

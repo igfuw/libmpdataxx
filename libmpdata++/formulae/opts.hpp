@@ -36,7 +36,8 @@ namespace libmpdataxx
         npa = opts::bit(4), // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
         iga = opts::bit(5), // infinite-gauge option
         nug = opts::bit(6), // non-unit G (default G = 1) - see Smolarkiewicz 2006 eq (25) and discussion below for info on G
-        dfl = opts::bit(7)  // devergent flows
+        dfl = opts::bit(7), // devergent flows
+        khn = opts::bit(8)  // use Kahan summation algorithm in the donor-cell formulae
       };
 
     }; // namespace opts
