@@ -1,4 +1,4 @@
-/** 
+/* 
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -18,7 +18,7 @@ using boost::math::constants::pi;
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx;
 
-template <int opts_arg>
+template <int opts_arg, int opts_iters>
 void test(const std::string filename)
 {
   enum {x, y};
@@ -53,7 +53,7 @@ void test(const std::string filename)
   typename sim_t::rt_params_t p;
 
   // pre instantiation
-  p.n_iters = 2; 
+  p.n_iters = opts_iters; 
   p.span = {101, 101};
 
   p.outfreq = nt; 
@@ -89,8 +89,8 @@ void test(const std::string filename)
   {
     typename ct_params_t::real_t
       r = 15. * dx,
-      x0 = 50 * dx,//75 in the article?
-      y0 = 75 * dy,//50 in the article?
+      x0 = 50 * dx,
+      y0 = 75 * dy,
       xc = .5 * p.span[x] * dx,
       yc = .5 * p.span[y] * dy;
 
@@ -103,8 +103,8 @@ void test(const std::string filename)
     run.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
 
     // constant angular velocity rotational field
-    run.advector(x) = -omega * ((j+.5) * dy - yc) * dt / dx;
-    run.advector(y) =  omega * ((i+.5) * dx - xc) * dt / dy;
+    run.advector(x) = omega * ((j+.5) * dy - yc) * dt / dx;
+    run.advector(y) = -omega * ((i+.5) * dx - xc) * dt / dy;
     // TODO: an assert confirming that the above did what it should have done
     //       (in context of the advector()'s use of blitz::Array::reindex())
   }
@@ -117,22 +117,25 @@ int main()
 {
   {
     enum { opts = 0 };
-    test<opts>("basic");
+    const int opts_iters = 2;
+    test<opts, opts_iters>("basic");
   }
+//  {
+//    enum { opts = formulae::opts::fct };
+//    test<opts>("fct");
+//  }
   {
-    enum { opts = formulae::opts::fct };
-    test<opts>("fct");
+    enum { opts = formulae::opts::fct | formulae::opts::tot };
+    const int opts_iters = 3;
+    test<opts, opts_iters>("iters3_tot_fct");
   }
+//  {
+//    enum { opts = formulae::opts::iga | formulae::opts::fct};
+//    test<opts>("iga_fct");
+//  }
   {
-    enum { opts = formulae::opts::iga | formulae::opts::tot};
-    test<opts>("iga_tot");
-  }
-  {
-    enum { opts = formulae::opts::iga | formulae::opts::fct};
-    test<opts>("iga_fct");
-  }
-  {
-    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct};
-    test<opts>("iga_fct_tot");
+    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct };
+    const int opts_iters = 2;
+    test<opts, opts_iters>("iga_tot_fct");
   }
 }
