@@ -25,8 +25,10 @@ void test(const std::string filename)
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
+//<listing-1>
     enum { n_dims = 2 };
     enum { n_eqs = 1 };
+//</listing-1>
     enum { opts = opts_arg };
   };
 
@@ -34,14 +36,14 @@ void test(const std::string filename)
     dt = .1,
     dx = 1,
     dy = 1,
-    omega = .1,
+    omg = .1,
     h = 4., // TODO: other name!
     h0 = 0;
     //  h0 = 100.; // change it to 1 to see scary things!
 
 /// @brief settings from @copybrief Anderson_and_Fattahi_1974
 //    dt = 10 * pi<real_t>(),
-//    omega = -.001,// / (2 * pi<real_t>()),
+//    omg = -.001,// / (2 * pi<real_t>()),
 //    r = 4. * dx,
 //    h0 = -.5,
 //    x0 = 21. * dx,
@@ -84,11 +86,15 @@ void test(const std::string filename)
   }
   p.gnuplot_term = "svg";
 
+//<listing-2>
   // instantiation
-  concurr::threads<sim_t, bcond::open, bcond::open> run(p); 
-
-  // post instantiation
+  concurr::threads<
+    sim_t, bcond::open, bcond::open
+  > run(p); 
+//</listing-2>
   {
+//<listing-3>
+    // post instantiation
     typename ct_params_t::real_t
       r = 15. * dx,
       x0 = 50 * dx,
@@ -100,19 +106,30 @@ void test(const std::string filename)
     blitz::secondIndex j;
 
     // cone shape
-    decltype(run.advectee()) tmp(run.advectee().extent());
-    tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
-    run.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
+    decltype(run.advectee()) 
+      tmp(run.advectee().extent());
+
+    tmp = blitz::pow((i+.5) * dx - x0, 2) + 
+          blitz::pow((j+.5) * dy - y0, 2);
+
+    run.advectee() = h0 + where(
+      tmp - pow(r, 2) <= 0,                  //if
+      h * blitz::sqr(1 - tmp / pow(r, 2)),   //then
+      0.                                     //else
+    );
 
     // constant angular velocity rotational field
-    run.advector(x) = omega * ((j+.5) * dy - yc) * dt / dx;
-    run.advector(y) = -omega * ((i+.5) * dx - xc) * dt / dy;
+    run.advector(x) =  omg * ((j+.5) * dy-yc) * dt/dx;
+    run.advector(y) = -omg * ((i+.5) * dx-xc) * dt/dy;
+//</listing-3>
+  }
     // TODO: an assert confirming that the above did what it should have done
     //       (in context of the advector()'s use of blitz::Array::reindex())
-  }
 
   // time stepping
   run.advance(nt);
+  
+  std::cout<<"min(psi) = " << min(run.advectee()) << std::endl;
 }
 
 int main()
@@ -122,22 +139,24 @@ int main()
     const int opts_iters = 2;
     test<opts, opts_iters>("basic");
   }
-//  {
-//    enum { opts = formulae::opts::fct };
-//    test<opts>("fct");
-//  }
   {
-    enum { opts = formulae::opts::fct | formulae::opts::tot };
-    const int opts_iters = 3;
-    test<opts, opts_iters>("iters3_tot_fct");
+    enum { opts = formulae::opts::fct };
+    const int opts_iters = 2;
+    test<opts, opts_iters>("fct");
   }
+//  {
+//    enum { opts = formulae::opts::fct | formulae::opts::tot };
+//    const int opts_iters = 3;
+//    test<opts, opts_iters>("iters3_tot_fct");
+//  }
 //  {
 //    enum { opts = formulae::opts::iga | formulae::opts::fct};
-//    test<opts>("iga_fct");
+//    const int opts_iters = 2;
+//    test<opts, opts_iters>("iga_fct");
 //  }
-  {
-    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct };
-    const int opts_iters = 2;
-    test<opts, opts_iters>("iga_tot_fct");
-  }
+//  {
+//    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct };
+//    const int opts_iters = 2;
+//    test<opts, opts_iters>("iga_tot_fct");
+//  }
 }
