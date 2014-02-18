@@ -209,6 +209,9 @@ namespace libmpdataxx
 	const int n,
 	const rng_t &i
       ) { 
+        assert(finite(sum(psi[n](i))));
+        assert(finite(sum(GC[0](i^h))));
+
         donorcell_sum<opts>(
           khn_tmp,
           idx_t<1>(i),
@@ -218,6 +221,8 @@ namespace libmpdataxx
 	  flux_rght<opts>(psi[n], GC, i),
           formulae::G<opts>(G, i)
         );
+
+        assert(finite(sum(psi[n+1](i))));
       }
 
       // infinite-gauge version (referred to as F(1,1,U) in the papers)
@@ -230,6 +235,9 @@ namespace libmpdataxx
 	const int n,
 	const rng_t &i
       ) { 
+        assert(finite(sum(psi[n](i))));
+        assert(finite(sum(GC[0](i^h))));
+
         donorcell_sum<opts>(
           khn_tmp,
           idx_t<1>(i),
@@ -239,6 +247,8 @@ namespace libmpdataxx
            GC(i-h),
           formulae::G<opts>(G, i)
         );
+
+        assert(finite(sum(psi[n+1](i))));
       }
 
       template <opts_t opts, class arr_2d_t>
@@ -250,6 +260,10 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j
       ) { 
+        assert(finite(sum(psi[n](i,   j  ))));
+        assert(finite(sum(GC[0 ](i^h, j  ))));
+        assert(finite(sum(GC[1 ](i,   j^h))));
+
         donorcell_sum<opts>(
           khn_tmp, 
           idx_t<2>({i, j}),
@@ -261,6 +275,8 @@ namespace libmpdataxx
 	  flux_rght<opts, 1>(psi[n], GC[1], j, i),          
           formulae::G<opts, 0>(G, i, j)
         );
+
+        assert(finite(sum(psi[n+1](i,j))));
       }
 
       // infinite-gauge version (referred to as F(1,1,U) in the papers)
@@ -273,6 +289,10 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j
       ) { 
+        assert(finite(sum(psi[n](i,   j  ))));
+        assert(finite(sum(GC[0 ](i^h, j  ))));
+        assert(finite(sum(GC[1 ](i,   j^h))));
+
         donorcell_sum<opts>(
           khn_tmp,
           idx_t<2>({i, j}),
@@ -284,6 +304,8 @@ namespace libmpdataxx
            GC[1](i, j-h),
           formulae::G<opts, 0>(G, i, j)
         );
+
+        assert(finite(sum(psi[n+1](i,j))));
       }
 
       template <opts_t opts, class arr_3d_t>
@@ -295,6 +317,11 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j, const rng_t &k
       ) { 
+        assert(finite(sum(psi[n](i,   j,   k  ))));
+        assert(finite(sum(GC[0 ](i^h, j  , k  ))));
+        assert(finite(sum(GC[1 ](i,   j^h, k  ))));
+        assert(finite(sum(GC[2 ](i,   j,   k^h))));
+
         donorcell_sum<opts>(
           khn_tmp,
           idx_t<3>({i,j,k}),
@@ -308,6 +335,8 @@ namespace libmpdataxx
 	  flux_rght<opts, 2>(psi[n], GC[2], k, i, j),
           formulae::G<opts, 0>(G, i, j, k)
         );
+
+        assert(finite(sum(psi[n+1](i,j,k))));
       }
       
       // infinite-gauge version (referred to as F(1,1,U) in the papers)
@@ -320,6 +349,11 @@ namespace libmpdataxx
         const int n,
 	const rng_t &i, const rng_t &j, const rng_t &k
       ) { 
+        assert(finite(sum(psi[n](i,   j,   k  ))));
+        assert(finite(sum(GC[0 ](i^h, j  , k  ))));
+        assert(finite(sum(GC[1 ](i,   j^h, k  ))));
+        assert(finite(sum(GC[2 ](i,   j,   k^h))));
+
         donorcell_sum<opts>(
           khn_tmp,
           idx_t<3>({i,j,k}),
@@ -333,6 +367,8 @@ namespace libmpdataxx
 	   GC[2](i, j, k-h),
           formulae::G<opts, 0>(G, i, j, k)
         ); 
+
+        assert(finite(sum(psi[n+1](i,j,k))));
       }
 
     }; // namespace donorcell 
