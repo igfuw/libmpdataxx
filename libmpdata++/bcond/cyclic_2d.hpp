@@ -58,7 +58,7 @@ namespace libmpdataxx
 	a(pi<d>(this->rght_halo_sclr, j)) = a(pi<d>(this->left_edge_sclr, j));
       }
 
-      void fill_halos_vctr(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_alng(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
         assert(parent_t::halo > 1 && "there is no vector halo for halo=1");

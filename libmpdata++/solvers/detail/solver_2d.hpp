@@ -57,7 +57,7 @@ namespace libmpdataxx
 
           // sanity check for non-divergence of the initial Courant number field
           // TODO: same in 1D and 3D
-          if (0 != max(abs(
+          if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
 	    ( 
               this->mem->GC[0](i-h, j  ) - 
 	      this->mem->GC[0](i+h, j  )
@@ -92,7 +92,7 @@ namespace libmpdataxx
 	  bcxr(std::move(args.bcxr)), 
 	  bcyl(std::move(args.bcyl)),
 	  bcyr(std::move(args.bcyr))
-	{}
+	{ }
 
         // memory allocation logic using static methods
 

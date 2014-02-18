@@ -1,4 +1,5 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- isolate test that causes iga to produce negative values!
 - change grid to have scalars on the edges:
   - advector shape nx + 1 -> nx - 1
   - in cyclic bc edge -> bone
