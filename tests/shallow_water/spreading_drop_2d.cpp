@@ -98,6 +98,11 @@ int main()
   run.advectee(ix::qx) = 0;
   run.advectee(ix::qy) = 0;
 
-  run.advance(nt); 
-
+  for(int step = 1; step <=nt; step++)
+  { 
+    assert(min(run.advectee(ix::h)) >= 0 && "pre step");
+    run.advance(1);
+    std::cerr<<"min(h) = " << min(run.advectee(ix::h)) << std::endl;
+    assert(min(run.advectee(ix::h)) >= 0 && "post step");
+  }
 };
