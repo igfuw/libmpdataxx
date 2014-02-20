@@ -83,15 +83,17 @@ namespace libmpdataxx
 		  this->im, 
                   this->j
 		);
+              assert(finite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
 
 	      this->GC_corr(iter)[1](this->i, this->jm+h) = 
 		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
-		this->mem->psi[e][this->n[e]], 
-                this->GC_unco(iter),
-                *this->mem->G,
-		this->jm, 
-                this->i
-	      );
+		  this->mem->psi[e][this->n[e]], 
+		  this->GC_unco(iter),
+		  *this->mem->G,
+		  this->jm, 
+		  this->i
+		);
+              assert(finite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
    
 	      // filling Y halos for GC_x, and X halos for GC_y
 	      // TODO: document why; is it needed in the last iteration?; what about FCT?
@@ -103,6 +105,8 @@ namespace libmpdataxx
 	      this->mem->barrier();
 
 	      this->fct_adjust_antidiff(e, iter);
+              assert(finite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
+              assert(finite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
 
 	      // TODO: shouldn't the above halo-filling be repeated here?
 	    }

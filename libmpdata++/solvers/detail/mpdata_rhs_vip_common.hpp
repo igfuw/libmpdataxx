@@ -55,6 +55,8 @@ namespace libmpdataxx
 	      0
 	    );
 	  }
+
+          assert(finite(sum(this->stash[d](this->ijk))));
 	}
 
 	void extrp(const int d, const int e) // extrapolate velocity field in time to t+1/2
@@ -78,6 +80,8 @@ namespace libmpdataxx
 	      0   
 	    );  
 	  }
+
+          assert(finite(sum(this->stash[d](this->ijk))));
 	}   
 
 	virtual void extrapolate_in_time() = 0;
