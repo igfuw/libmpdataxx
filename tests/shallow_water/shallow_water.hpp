@@ -67,6 +67,18 @@ class shallow_water_common : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
        //       only in the first timestep
   }
 
+  void hook_post_step()
+  {
+    parent_t::hook_post_step();
+    assert(min(this->psi_n(ct_params_t::ix::h)(this->ijk)) >= 0);  
+  }
+
+  void hook_ante_step()
+  {
+    parent_t::hook_ante_step();
+    assert(min(this->psi_n(ct_params_t::ix::h)(this->ijk)) >= 0);  
+  }
+
   public:
 
   // run-time parameters
