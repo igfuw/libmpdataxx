@@ -85,8 +85,9 @@ namespace libmpdataxx
         frac<opts>(
           beta_up_nominator<opts>(psi, psi_max, G, i)
           ,// ----------------------------
-          pospart<opts>(GC_corr(i-h))   * 1
-          - negpart<opts>(GC_corr(i+h)) * 1
+          pospart<opts>(GC_corr(i-h))   /* * 1 */
+          - negpart<opts>(GC_corr(i+h)) /* * 1 */
+          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -155,8 +156,9 @@ namespace libmpdataxx
         frac<opts>(
           beta_dn_nominator<opts>(psi, psi_min, G, i)
           ,// --------------------------
-            pospart<opts>(GC_corr(i+h)) * 1
-          - negpart<opts>(GC_corr(i-h)) * 1
+            pospart<opts>(GC_corr(i+h)) /* * 1 */
+          - negpart<opts>(GC_corr(i-h)) /* * 1 */
+          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 

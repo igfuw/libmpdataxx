@@ -113,14 +113,16 @@ namespace libmpdataxx
         frac<opts>(
           beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
         , //--------------------------------------------------
-          ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * 1
-          - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * 1 ) // see note in positive sign beta up
+          ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) /* * 1 */
+          - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) /* * 1 */) // see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) * 1
-          - negpart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) * 1 )
+          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) /* * 1 */
+          - negpart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) /* * 1 */)
           +
-          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * 1
-          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * 1 )
+          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) /* * 1 */
+          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) /* * 1 */)
+          +
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -220,14 +222,16 @@ namespace libmpdataxx
         frac<opts>(
           beta_dn_nominator<opts, d>(psi, psi_min, G, i, j, k)
         , //--------------------------------------------------
-          ( pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * 1
-          - negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * 1 )  //see note in positive sign beta up
+          ( pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) /* * 1 */
+          - negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) /* * 1 */)  //see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) * 1
-          - negpart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) * 1 )
+          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) /* * 1 */
+          - negpart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) /* * 1 */)
           +
-          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * 1
-          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * 1 )
+          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) /* * 1 */
+          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) /* * 1 */)
+          +
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
