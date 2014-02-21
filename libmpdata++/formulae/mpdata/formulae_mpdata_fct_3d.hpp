@@ -47,13 +47,14 @@ namespace libmpdataxx
         const arr_3d_t &psi,
         const arr_3d_t &psi_max, // from before the first iteration
         const arrvec_t<arr_3d_t> &GC_corr,
+        const arr_3d_t &G,
         const rng_t i, 
         const rng_t j,
         const rng_t k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         frac<opts>(
-          beta_up_nominator<d>(psi, psi_max, i, j, k)
+          beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
         , //----------------------------------------------------------------------
           ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * psi(pi<d>(i-1, j, k))
           - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * psi(pi<d>(i+1, j, k)) )  // additional parenthesis so that we first sum
