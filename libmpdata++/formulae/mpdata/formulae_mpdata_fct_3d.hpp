@@ -54,7 +54,7 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         frac<opts>(
-          beta_up_nominator<d>(psi, psi_max, i, j, k)
+          beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
         , //----------------------------------------------------------------------
           ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * psi(pi<d>(i-1, j, k))
           - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * psi(pi<d>(i+1, j, k)) )  // additional parenthesis so that we first sum
