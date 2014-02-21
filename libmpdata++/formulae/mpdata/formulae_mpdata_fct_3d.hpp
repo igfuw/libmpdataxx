@@ -26,7 +26,7 @@ namespace libmpdataxx
         const rng_t i, 
         const rng_t j,
         const rng_t k
-      ) return_macro(,
+      ) return_macro(, 
         (
           max(max(max(max(max(max(max(
                       psi_max(pi<d>(i, j, k)),
@@ -40,13 +40,14 @@ namespace libmpdataxx
           )
         - psi(pi<d>(i, j, k))
         ) * formulae::G<opts BOOST_PP_COMMA() d>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
-      )
+      ) 
 
       template <opts_t opts, int d, class arr_3d_t>
       inline auto beta_up( //positive sign signal
         const arr_3d_t &psi,
         const arr_3d_t &psi_max, // from before the first iteration
         const arrvec_t<arr_3d_t> &GC_corr,
+        const arr_3d_t &G,
         const rng_t i, 
         const rng_t j,
         const rng_t k,
@@ -121,8 +122,8 @@ namespace libmpdataxx
           +
           ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) /* * 1 */
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) /* * 1 */)
-          +
-          blitz::epsilon(typename arr_3d_t::T_numtype(0))
+          //+
+          //blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -230,8 +231,8 @@ namespace libmpdataxx
           +
           ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) /* * 1 */
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) /* * 1 */)
-          +
-          blitz::epsilon(typename arr_3d_t::T_numtype(0))
+          //+
+          //blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
