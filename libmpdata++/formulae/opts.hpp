@@ -8,6 +8,9 @@
 
 #include <libmpdata++/formulae/idxperm.hpp>
 
+#include <cfenv> // for fesetround() 
+#pragma STDC FENV_ACCESS ON
+
 namespace libmpdataxx
 {
   namespace formulae
@@ -143,10 +146,12 @@ namespace libmpdataxx
 
   }; // namespace formulae
 
+  // TODO: move it to a separate file so it can be easily found
   struct ct_params_default_t
   {
     enum { opts = formulae::opts::iga | formulae::opts::fct };
     enum { hint_norhs = 0 };
+    enum { round_mode = FE_TOWARDZERO };
     struct ix {};
   };
 
