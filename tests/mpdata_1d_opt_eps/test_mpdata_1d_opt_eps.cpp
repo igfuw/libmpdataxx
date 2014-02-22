@@ -16,15 +16,15 @@
 
 using namespace libmpdataxx;
 
-using real_t = float;
+using T = float;
 int n = 500, nt = 1600;
 
-template <class T>
-void setup(T &solver, int n) 
+template <class slv_t>
+void setup(slv_t &solver, int n) 
 {
   blitz::firstIndex i;
   int width = 50, center = 100;
-  solver.advectee() = where(i <= center-width/2 || i >= center+width/2, -400, 400) * blitz::tiny(real_t(0)); 
+  solver.advectee() = where(i <= center-width/2 || i >= center+width/2, -400, 400) * blitz::tiny(T(0)); 
   solver.advector() = .5; 
 }
 
@@ -46,7 +46,7 @@ void add_solver(vec_t &slvs, const std::string &fname, int n_iters)
 {
   struct ct_params_t : ct_params_default_t
   {
-    using real_t = real_t;
+    using real_t = T;
     enum { n_dims = 1 };
     enum { n_eqs = 1 };
     enum { opts = opt };
@@ -62,7 +62,7 @@ void add_solver(vec_t &slvs, const std::string &fname, int n_iters)
 int main() 
 {
   const int n_dims = 1;
-  boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
+  boost::ptr_vector<concurr::any<T, n_dims>> slvs;
 
   add_solver<formulae::opts::abs>(slvs, "mpdata_iters=2", 2);
   add_solver<formulae::opts::abs | formulae::opts::eps>(slvs, "mpdata_iters=2_eps", 2);

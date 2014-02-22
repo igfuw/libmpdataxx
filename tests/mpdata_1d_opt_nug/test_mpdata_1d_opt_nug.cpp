@@ -15,8 +15,8 @@
 
 using namespace libmpdataxx;
 
-using real_t = float;
-using arr_t = blitz::Array<real_t, 1>;
+using T = float;
+using arr_t = blitz::Array<T, 1>;
 
 int n = 15;
 arr_t G(n), phi(n); 
@@ -33,7 +33,7 @@ void add_solver(vec_t &slvs, const std::string &sfx)
 {
   struct ct_params_t : ct_params_default_t
   {
-    using real_t = real_t;
+    using real_t = T;
     enum { n_dims = 1 };
     enum { n_eqs = 1 };
     enum { opts = opt };
@@ -66,10 +66,10 @@ void plot(T0 &gp, T1 &slvs, T2 &G)
 int main() 
 {
   const int n_dims = 1;
-  boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
+  boost::ptr_vector<concurr::any<T, n_dims>> slvs;
 
   // Starting point: a non-divergeng G \times C
-  real_t GC = .25;
+  T GC = .25;
 
   phi =   1,  5, 10, 10,  10,  5,  1,  1,   1,   1,   1,  1,  1,  1,  1;
   G   =   1,  1,  1,  1,   1,  1,  1,  1,  .5,  .5,  .5, .5, .5,  1,  1;
@@ -103,7 +103,7 @@ int main()
   for (auto &slv : slvs) slv.advance(30);
   plot(gp, slvs, G);
 
-  real_t eps = 1e-6;
+  T eps = 1e-6;
   // have to use std::abs(), as abs() alone returns an integer!
   if (std::abs(sum(G * phi) - sum(slvs.at(0).advectee())) > eps) throw;
   if (std::abs(sum(G * phi) - sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) > eps) throw;

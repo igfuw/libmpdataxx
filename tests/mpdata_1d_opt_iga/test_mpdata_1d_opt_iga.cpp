@@ -17,7 +17,7 @@
 
 using namespace libmpdataxx;
 
-using real_t = float;
+using T = float;
 int n = 500, nt = 1600;
 
 template <class T>
@@ -49,7 +49,7 @@ void add_solver(vec_t &slvs, const std::string &fname)
 {
   struct ct_params_t : ct_params_default_t
   {
-    using real_t = real_t;
+    using real_t = T;
     enum { n_dims = 1 };
     enum { n_eqs = 2 };
     enum { opts = opt };
@@ -65,7 +65,7 @@ void add_solver(vec_t &slvs, const std::string &fname)
 int main() 
 {
   const int n_dims = 1;
-  boost::ptr_vector<concurr::any<real_t, n_dims>> slvs;
+  boost::ptr_vector<concurr::any<T, n_dims>> slvs;
 
   add_solver<formulae::opts::abs | formulae::opts::fct>(slvs, "mpdata_fct_iters=2");
   add_solver<formulae::opts::abs>(slvs, "mpdata_iters=2");

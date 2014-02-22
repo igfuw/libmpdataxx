@@ -20,10 +20,10 @@
 
 using namespace libmpdataxx;
 
-using real_t = float;
+using T = float;
 int n = 500, nt = 1600;
 
-real_t min[2] = {2, -1}, max[2] = {4, 1};
+T min[2] = {2, -1}, max[2] = {4, 1};
 
 template <class T>
 void setup(T &solver, int n) 
@@ -56,7 +56,7 @@ void add_solver(vec_t &slvs, const std::string &fname, int n_iters)
 {
   struct ct_params_t : ct_params_default_t
   {
-    using real_t = real_t;
+    using real_t = T;
     enum { n_dims = 1 };
     enum { n_eqs = 2 };
     enum { opts = opt };
@@ -72,7 +72,7 @@ void add_solver(vec_t &slvs, const std::string &fname, int n_iters)
 int main() 
 {
   const int n_dims = 1;
-  boost::ptr_vector<concurr::any<real_t, n_dims>> slvs, slvs_fct;
+  boost::ptr_vector<concurr::any<T, n_dims>> slvs, slvs_fct;
 
   add_solver<formulae::opts::abs>(slvs, "mpdata_iters=1", 1);
   add_solver<formulae::opts::abs>(slvs, "mpdata_iters=2", 2);
@@ -90,7 +90,7 @@ int main()
     slv.advance(nt);
     for (auto i : std::set<int>({0,1}))
     {
-      real_t 
+      T 
         mn = blitz::min(slv.advectee(i)),
 	mx = blitz::min(slv.advectee(i));
       if (mn < min[i]) { std::cerr << mn << " < " << min[i] << std::endl; throw; }

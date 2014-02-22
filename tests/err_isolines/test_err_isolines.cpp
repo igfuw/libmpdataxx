@@ -24,7 +24,7 @@ using namespace libmpdataxx;
 using boost::math::constants::pi;
 blitz::firstIndex i;
 boost::ptr_map<std::string, std::ofstream> outfiles;
-using real_t = double; // with long double this is a good test to show differences between float and double!!!
+using T = double; // with long double this is a good test to show differences between float and double!!!
 
 
 // helper function template to ease adding the solvers to the pointer map
@@ -33,7 +33,7 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
 {
   struct ct_params_t : ct_params_default_t
   {
-    using real_t = real_t;
+    using real_t = T;
     enum { n_dims = 1 };
     enum { n_eqs = 1 };
     enum { opts = opt };
@@ -56,7 +56,7 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   if (!outfiles[key].is_open())
   {
     char bits[3];
-    sprintf(bits, "%03lu", 8 * sizeof(real_t));
+    sprintf(bits, "%03lu", 8 * sizeof(typename ct_params_t::real_t));
     outfiles[key].open("err_mpdata_" + key + "_" + bits + "_bits.txt", std::ios::trunc); 
   }
 }
@@ -66,12 +66,12 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
 struct gauss_t
 {
   // member fields
-  real_t A0, A, sgma, x0;
+  T A0, A, sgma, x0;
 
   // call operator
-  real_t operator()(real_t x) const 
+  T operator()(T x) const 
   { 
-    return A0 + A * exp( real_t(-.5) * pow(x - x0, 2) / pow(sgma, 2));
+    return A0 + A * exp( T(-.5) * pow(x - x0, 2) / pow(sgma, 2));
   }
   
   // Blitz magick
@@ -83,7 +83,7 @@ struct gauss_t
 int main() 
 {
   // simulation parameters
-  const real_t 
+  const T 
     t_max    = 1., // "arbitrarily"
     dx_max   = 1.,
     x_max    = 44. * dx_max, // see note about compact support in asserts below
@@ -91,9 +91,9 @@ int main()
     velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
     x0       = .5 * x_max, 
     A0       = 0,
-    A        = 1. / sgma / sqrt(2 * pi<real_t>());
+    A        = 1. / sgma / sqrt(2 * pi<T>());
 
-  const std::list<real_t> 
+  const std::list<T> 
     courants({ .05, .1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95}),
     dxs({dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32, dx_max/64, dx_max/128 });
 
@@ -110,13 +110,13 @@ int main()
     { 
       std::cerr << "  C = " << cour << std::endl;
 
-      const real_t dt = cour * dx / velocity;
+      const T dt = cour * dx / velocity;
       const int 
         n_dims = 1,
         nx = round(x_max/dx),
         nt = round(t_max/dt);
 
-      boost::ptr_map<std::string, concurr::any<real_t, n_dims>> slvs;
+      boost::ptr_map<std::string, concurr::any<T, n_dims>> slvs;
 
       // silly loop order, but it helped to catch a major bug!
 
@@ -164,7 +164,7 @@ int main()
         assert(exact(nx-1) == slv.advectee()(nx-1));
 
         // calculating the deviation from analytical solution
-        real_t err = sqrt(sum(pow(slv.advectee() - exact, 2)) / nx) / (nt * dt);
+        T err = sqrt(sum(pow(slv.advectee() - exact, 2)) / nx) / (nt * dt);
 
         outfiles[key] << dx << "\t" << cour << "\t" << err << std::endl;
       }
