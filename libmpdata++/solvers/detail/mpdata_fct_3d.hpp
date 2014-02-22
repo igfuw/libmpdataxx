@@ -75,9 +75,9 @@ namespace libmpdataxx
 	  this->mem->barrier();
 
 	  // calculating the monotonic corrective velocity
-	  this->GC_mono[0]( im+h, jm, km ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, jm, km);
-	  this->GC_mono[1]( im, jm+h, km ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, km, im);
-	  this->GC_mono[2]( im, jm, km+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 2>(psi, this->psi_min, this->psi_max, GC_corr, G, km, im, jm);
+	  this->GC_mono[0]( im+h, this->j, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, this->j, this->k);
+	  this->GC_mono[1]( this->i, jm+h, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, this->k, this->i);
+	  this->GC_mono[2]( this->i, this->j, km+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 2>(psi, this->psi_min, this->psi_max, GC_corr, G, km, this->i, this->j);
 
 	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
 	  if (iter == this->n_iters - 1) this->mem->barrier();  // TODO: move to common // TODO: different condition in 1D and 2D!

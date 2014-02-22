@@ -63,8 +63,8 @@ namespace libmpdataxx
 	  this->mem->barrier();
 
 	  // calculating the monotonic corrective velocity
-	  this->GC_mono[0]( im+h, jm ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, jm);
-	  this->GC_mono[1]( im, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, im);
+	  this->GC_mono[0]( im+h, this->j ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, this->j);
+	  this->GC_mono[1]( this->i, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, this->i);
 
 	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
 	  if (iter == this->n_iters - 1 && parent_t::n_eqs > 1) this->mem->barrier();  // TODO: move to common
