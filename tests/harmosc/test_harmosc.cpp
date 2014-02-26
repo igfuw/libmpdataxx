@@ -21,7 +21,7 @@ using namespace libmpdataxx;
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-using real_t = double;
+using T = double;
 
 const int nt = 1500;
 
@@ -30,7 +30,7 @@ int main()
 //<listing-1>
   struct ct_params_t : ct_params_default_t
   {
-    using real_t = real_t;
+    using real_t = T;
     enum { n_dims = 1 };
     enum { n_eqs = 2 };
     enum { opts = 0 };
@@ -39,7 +39,8 @@ int main()
     struct ix { enum {psi, phi}; };
   };
 //</listing-1>
-
+  using real_t = typename ct_params_t::real_t;
+  
   using sim_t = output::gnuplot<
     coupled_harmosc<ct_params_t>
   >;
