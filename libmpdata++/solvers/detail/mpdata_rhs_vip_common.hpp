@@ -56,7 +56,7 @@ namespace libmpdataxx
 	    );
 	  }
 
-          assert(std::iffinite(sum(this->stash[d](this->ijk))));
+          assert(std::isfinite(sum(this->stash[d](this->ijk))));
 	}
 
 	void extrp(const int d, const int e) // extrapolate velocity field in time to t+1/2
