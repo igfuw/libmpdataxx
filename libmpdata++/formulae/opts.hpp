@@ -151,7 +151,8 @@ namespace libmpdataxx
   {
     enum { opts = formulae::opts::iga | formulae::opts::fct };
     enum { hint_norhs = 0 };
-    enum { round_mode = FE_TOWARDZERO };
+    enum { fp_round_mode = FE_TOWARDZERO };
+    //enum { fp_bits = 64 };  // TODO
     struct ix {};
   };
 
