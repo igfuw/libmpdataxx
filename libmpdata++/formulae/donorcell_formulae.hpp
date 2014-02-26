@@ -210,7 +210,7 @@ namespace libmpdataxx
 	const rng_t &i
       ) { 
         assert(finite(sum(psi[n](i))));
-        assert(finite(sum(GC[0](i^h))));
+        assert(finite(sum(GC(i^h))));
 
         donorcell_sum<opts>(
           khn_tmp,
