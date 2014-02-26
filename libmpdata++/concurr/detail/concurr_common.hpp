@@ -119,8 +119,11 @@ namespace libmpdataxx
           mem_t *mem_p,
 	  const int &size
 	) {
+          // allocate the memory to be shared by multiple threads
           mem.reset(mem_p);
 	  solver_t::alloc(mem.get(), p);
+
+          // allocate per-thread structures
           init(p, p.span, size); 
         }
 
