@@ -27,15 +27,7 @@ namespace libmpdataxx
 	// member fields
 	arrvec_t<typename parent_t::arr_t> &stash;
         bool initial_h_non_zero = false;
-
-	// ctor
-	mpdata_rhs_vip_common(
-	  typename parent_t::ctor_args_t args,
-	  const typename parent_t::rt_params_t &p
-	) : 
-	  parent_t(args, p),
-	  stash(args.mem->tmp[__FILE__][0])
-	{}
+        typename parent_t::real_t eps;
 
 	virtual void fill_stash() = 0;
 	virtual void fill_stash_helper(const int d, const int e) final
@@ -48,7 +40,7 @@ namespace libmpdataxx
 	  {
 	    this->stash[d](this->ijk) = where(
 	      // if
-	      this->psi_n(ix::vip_den)(this->ijk) > 0,
+	      this->psi_n(ix::vip_den)(this->ijk) > eps,
 	      // then
 	      this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
 	      // else
@@ -73,7 +65,7 @@ namespace libmpdataxx
 	  {
 	    this->stash[d](this->ijk) += where(
 	      // if
-	      this->psi_n(ix::vip_den)(this->ijk) > 0,
+	      this->psi_n(ix::vip_den)(this->ijk) > eps,
 	      // then
 	      3./2 * this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
 	      // else
@@ -120,14 +112,31 @@ namespace libmpdataxx
 
 	public:
 	
+        struct rt_params_t : parent_t::rt_params_t
+        {
+          typename parent_t::real_t vip_eps = blitz::epsilon(typename parent_t::real_t(44));
+        };
+
 	static void alloc(
 	  typename parent_t::mem_t *mem, 
-	  const typename parent_t::rt_params_t &p
+	  const rt_params_t &p
 	) {
 	  // psi[n-1] secret stash for velocity extrapolation in time
 	  parent_t::alloc(mem, p);
 	  parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, parent_t::n_dims); 
 	}
+ 
+        protected:
+
+	// ctor
+	mpdata_rhs_vip_common(
+	  typename parent_t::ctor_args_t args,
+	  const rt_params_t &p
+	) : 
+	  parent_t(args, p),
+	  stash(args.mem->tmp[__FILE__][0]),
+          eps(p.vip_eps)
+	{}
       };
     }; // namespace detail
   }; // namespace solvers
