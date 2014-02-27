@@ -132,10 +132,6 @@ namespace libmpdataxx
 
 	virtual void solve(int nt) final
 	{   
-#if !defined(NDEBUG)
-	  hook_ante_loop_called = false;
-#endif
-
           // multiple calls to sovlve() are meant to advance the solution by nt
           nt += timestep;
 
@@ -143,6 +139,9 @@ namespace libmpdataxx
           if (timestep == 0)
           {
 	    this->mem->barrier();
+#if !defined(NDEBUG)
+	    hook_ante_loop_called = false;
+#endif
 	    hook_ante_loop(nt);
 	    this->mem->barrier();
           }
