@@ -96,6 +96,7 @@ int main()
   p.di = .05;
   p.span = { int(16 / p.di) };
   p.g = 1;
+  p.vip_eps = 0; // in 1D apparently it's enough!
 
   // instantiation
   concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> run(p); // TODO: change into open bc
