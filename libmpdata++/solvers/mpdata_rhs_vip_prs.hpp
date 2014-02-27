@@ -30,7 +30,7 @@ namespace libmpdataxx
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<ct_params_t::prs_scheme == mr>::type
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)mr>::type
     > : public detail::mpdata_rhs_vip_prs_mr<ct_params_t>
     {
       using parent_t = detail::mpdata_rhs_vip_prs_mr<ct_params_t>; 
@@ -41,7 +41,7 @@ namespace libmpdataxx
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<ct_params_t::prs_scheme == cr>::type
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr>::type
     > : public detail::mpdata_rhs_vip_prs_cr<ct_params_t>
     {
       using parent_t = detail::mpdata_rhs_vip_prs_cr<ct_params_t>; 
@@ -52,7 +52,7 @@ namespace libmpdataxx
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<ct_params_t::prs_scheme == pc>::type
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)pc>::type
     > : public detail::mpdata_rhs_vip_prs_pc<ct_params_t>
     {
       using parent_t = detail::mpdata_rhs_vip_prs_pc<ct_params_t>; 
