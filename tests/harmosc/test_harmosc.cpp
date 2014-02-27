@@ -63,7 +63,7 @@ int main()
   p.gnuplot_command = "plot";
 
   // instantiation
-  concurr::threads<sim_t, bcond::cyclic> run(p);
+  concurr::threads<sim_t, bcond::cyclic, bcond::cyclic> run(p);
 
   // initial condition
   {

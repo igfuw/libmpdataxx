@@ -42,7 +42,7 @@ void add_solver(vec_t &slvs, const std::string &sfx)
   typename solver_t::rt_params_t p;
   setopts(p, sfx);
   p.span = {n};
-  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(p));
+  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(p));
 }
 
 template <class T0, class T1, class T2>

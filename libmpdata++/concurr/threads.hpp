@@ -23,14 +23,17 @@ namespace libmpdataxx
     ///        \ref libmpdataxx::concurr::boost_thread otherwise)
     template <
       class solver_t,
-      bcond::bcond_e bcx,
-      bcond::bcond_e bcy = bcond::null,
-      bcond::bcond_e bcz = bcond::null
+      bcond::bcond_e bcxl,
+      bcond::bcond_e bcxr,
+      bcond::bcond_e bcyl = bcond::null,
+      bcond::bcond_e bcyr = bcond::null,
+      bcond::bcond_e bczl = bcond::null,
+      bcond::bcond_e bczr = bcond::null
     > using threads = 
 #if defined(_OPENMP)
-    openmp<solver_t, bcx, bcy, bcz>;
+    openmp<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
 #else
-    boost_thread<solver_t, bcx, bcy, bcz>;
+    boost_thread<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
 #endif
   }; // namespace concurr
 }; // namespace libmpdataxx

@@ -45,8 +45,9 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   p.n_iters = n_iters;
   p.span = {nx};
 
+  // TODO: wouldn't open bc be better?
   boost::assign::ptr_map_insert<
-    concurr::serial<solver_t, bcond::cyclic> // map element type
+    concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> // map element type
   >(slvs)(
     key,  // map key
     p     // concurr's ctor args

@@ -8,7 +8,6 @@
   - what about halo = 2 for open bc (assert?)
 - rename p.span -> p.grid?
 - rename p.di, p.dj, p.dk -> p.step?
-- specifyin left/rght bc separetely
 - should unit G return an int instead of float?
 - p -> rt_params in examples (Dorota'a suggesting at the first meeting)
 - n_bits enum!

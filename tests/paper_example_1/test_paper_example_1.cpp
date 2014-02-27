@@ -23,7 +23,7 @@ int main()
   
   // concurency choice
   using run_t = concurr::serial<
-    sim_t, bcond::cyclic
+    sim_t, bcond::cyclic, bcond::cyclic
   >;
 
   // run-time parameters
