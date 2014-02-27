@@ -14,6 +14,8 @@
 
 #include <libmpdata++/formulae/opts.hpp>
 
+#include <libmpdata++/bcond/bcond.hpp>
+
 #include <array>
 
 namespace libmpdataxx
@@ -41,6 +43,7 @@ namespace libmpdataxx
 
         typedef typename ct_params_t::real_t real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
+        using bcp_t = std::unique_ptr<bcond::bcond_t<real_t>>;
 
         using ix = typename ct_params_t::ix;
 

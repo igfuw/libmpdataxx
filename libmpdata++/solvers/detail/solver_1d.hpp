@@ -7,7 +7,6 @@
 #pragma once
 
 #include <libmpdata++/solvers/detail/solver_common.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
 
 namespace libmpdataxx
 {
@@ -27,8 +26,7 @@ namespace libmpdataxx
 
 	protected:
 
-        typedef std::unique_ptr<bcond::bcond_t<typename parent_t::real_t>> bc_p; // TODO: move to parent
-        bc_p bcxl, bcxr;
+        typename parent_t::bcp_t bcxl, bcxr;
      
 	rng_t i; // TODO: idx_t i do common?
         idx_t<parent_t::n_dims> ijk;
@@ -54,7 +52,7 @@ namespace libmpdataxx
         struct ctor_args_t
         {
           typename parent_t::mem_t *mem;
-          bc_p &bcxl, &bcxr; 
+          typename parent_t::bcp_t &bcxl, &bcxr; 
           const rng_t &i;
         };
 
