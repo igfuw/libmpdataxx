@@ -52,7 +52,11 @@ int main()
     p.outvars = {{0, {.name = "psi", .unit = "1"}}};
 
     // instantiation
-    concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
+    concurr::threads<
+      solver_t, 
+      bcond::cyclic, bcond::cyclic,
+      bcond::cyclic, bcond::cyclic
+    > slv(p);
 
     // post-instantiation
     {

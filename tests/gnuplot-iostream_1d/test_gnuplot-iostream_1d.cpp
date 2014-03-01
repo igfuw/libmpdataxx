@@ -44,7 +44,7 @@ void add_solver(slvs_t &slvs, int n_iters)
   p.outvars = {{0, {.name = "psi", .unit = "1"}}};
  
   // instantiation
-  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(p));
+  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(p));
 
   // post-instantiation stuff
   {

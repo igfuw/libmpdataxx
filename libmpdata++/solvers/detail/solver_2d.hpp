@@ -29,8 +29,7 @@ namespace libmpdataxx
 
 	protected:
       
-        typedef std::unique_ptr<bcond::bcond_t<typename parent_t::real_t>> bc_p; // TODO: move to parent
-	bc_p bcxl, bcxr, bcyl, bcyr;
+	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr;
 
 	rng_t i, j;
         idx_t<parent_t::n_dims> ijk;
@@ -73,7 +72,7 @@ namespace libmpdataxx
         struct ctor_args_t
         {   
           typename parent_t::mem_t *mem;
-          bc_p &bcxl, &bcxr, &bcyl, &bcyr; 
+          typename parent_t::bcp_t &bcxl, &bcxr, &bcyl, &bcyr; 
           const rng_t &i, &j; 
         };  
 

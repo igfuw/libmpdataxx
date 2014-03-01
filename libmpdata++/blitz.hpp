@@ -15,9 +15,11 @@
 #if defined(BZ_THREADSAFE)
 #  error libmpdata++ uses blitz::neverDeleteData, please unset BZ_THREADSAFE
 #endif
+
 // force use of #pragma ivdep even if Blitz thinks the compiler does not support it
 // (as of gcc 20140212, it gives an ICE: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=60198)
 //#define BZ_USE_ALIGNMENT_PRAGMAS  
+
 #include <blitz/tv2fastiter.h> // otherwise Clang fails in debug mode
 #include <blitz/array.h>
 

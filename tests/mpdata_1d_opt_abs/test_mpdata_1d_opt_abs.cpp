@@ -59,7 +59,7 @@ void add_solver(vec_t &slvs, const std::string &fname)
   typename output_t::rt_params_t p;
   setopts(p, nt, fname);
   p.span = {n};
-  slvs.push_back(new concurr::threads<output_t, bcond::cyclic>(p));
+  slvs.push_back(new concurr::threads<output_t, bcond::cyclic, bcond::cyclic>(p));
   setup(slvs.back(), n);
 }
 

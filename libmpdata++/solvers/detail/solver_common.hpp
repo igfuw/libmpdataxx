@@ -14,6 +14,8 @@
 
 #include <libmpdata++/formulae/opts.hpp>
 
+#include <libmpdata++/bcond/bcond.hpp>
+
 #include <array>
 
 namespace libmpdataxx
@@ -41,6 +43,7 @@ namespace libmpdataxx
 
         typedef typename ct_params_t::real_t real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
+        using bcp_t = std::unique_ptr<bcond::bcond_t<real_t>>;
 
         using ix = typename ct_params_t::ix;
 
@@ -96,7 +99,7 @@ namespace libmpdataxx
 #endif
           // set the floating point rounding mode (see rotating cone test with zero background and opts=fct+iga)
           // doing it here to ensure all threads do the same, and to be able to set it via ct_params_t
-          fesetround(ct_params_t::round_mode);
+          fesetround(ct_params_t::fp_round_mode);
         }
 
 	public:
@@ -132,12 +135,6 @@ namespace libmpdataxx
 
 	virtual void solve(int nt) final
 	{   
-#if !defined(NDEBUG)
-	  hook_ante_loop_called = false;
-	  hook_ante_step_called = false;
-	  hook_post_step_called = false;
-#endif
-
           // multiple calls to sovlve() are meant to advance the solution by nt
           nt += timestep;
 
@@ -145,9 +142,18 @@ namespace libmpdataxx
           if (timestep == 0)
           {
 	    this->mem->barrier();
+#if !defined(NDEBUG)
+	    hook_ante_loop_called = false;
+#endif
 	    hook_ante_loop(nt);
 	    this->mem->barrier();
           }
+
+          // moved here so that if an exception is thrown from hook_ante_loop these do not cause complaints
+#if !defined(NDEBUG)
+	  hook_ante_step_called = false;
+	  hook_post_step_called = false;
+#endif
 
 	  while (timestep < nt)
 	  {   

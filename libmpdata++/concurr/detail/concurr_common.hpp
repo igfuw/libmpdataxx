@@ -64,11 +64,11 @@ namespace libmpdataxx
 
     namespace detail
     {
-      template <
+      template<
         class solver_t_, 
-        bcond::bcond_e bcx,
-        bcond::bcond_e bcy,
-        bcond::bcond_e bcz
+        bcond::bcond_e bcxl, bcond::bcond_e bcxr,
+        bcond::bcond_e bcyl, bcond::bcond_e bcyr,
+        bcond::bcond_e bczl, bcond::bcond_e bczr
       >
       class concurr_common : public any<typename solver_t_::real_t, solver_t_::n_dims>
       {
@@ -119,26 +119,39 @@ namespace libmpdataxx
           mem_t *mem_p,
 	  const int &size
 	) {
+          // allocate the memory to be shared by multiple threads
           mem.reset(mem_p);
 	  solver_t::alloc(mem.get(), p);
+
+          // allocate per-thread structures
           init(p, p.span, size); 
         }
 
         private:
  
+        // 1D version
         void init(
           const typename solver_t::rt_params_t &p,
           const std::array<int, 1> &span, const int &n0
         )
         {
-          std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, shrdl, shrdr; // TODO: solver_t::bc_p
+          typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
 
-          if (bcx == bcond::cyclic)  // TODO: make a function that does it
+          switch (bcxl) // TODO: make a function that does it
           {
-            bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
-            bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+            case bcond::cyclic: 
+              bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+              break;
+            default: assert(false);
           }
-          else assert(false);
+
+          switch (bcxr) // TODO: make a function that does it
+          {
+            case bcond::cyclic:
+	      bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+              break;
+            default: assert(false);
+          }
 
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
@@ -159,6 +172,7 @@ namespace libmpdataxx
           }
 	}
 
+        // 2D version
         void init(
           const typename solver_t::rt_params_t &p,
 	  const std::array<int, 2> &span, 
@@ -169,36 +183,61 @@ namespace libmpdataxx
           {
             for (int i1 = 0; i1 < n1; ++i1) 
             {
-	      std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, byl, byr, shrdl, shrdr;
+	      typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
 
-	      if (bcx == bcond::cyclic)  // TODO: make a function taht does it
-	      {
-		bxl.reset(new bcond::cyclic_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
-		bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
-	      } 
-              else if (bcx == bcond::open)  // TODO: make a function taht does it
+              // dim 1, left
+              switch (bcxl) // TODO: make a function taht does it
               {
-	        bxl.reset(new bcond::open_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
-	        bxr.reset(new bcond::open_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+	        case bcond::cyclic:
+		  bxl.reset(new bcond::cyclic_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                  break;
+                case bcond::open:
+	          bxl.reset(new bcond::open_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                  break;
+	        default: assert(false);
               }
-	      else assert(false);
 
-	      if (bcy == bcond::cyclic)  // TODO: make a function taht does it
-	      {
-		byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
-		byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
-	      }
-//              else if (bcy == bcond::polar)  // TODO: make a function taht does it
-//	      {
-//	        byl.reset(new bcond::polar_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, span[0] / 2));
-//	        byr.reset(new bcond::polar_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, span[0] / 2));
-//	      }
-              else if (bcy == bcond::open)  // TODO: make a function taht does it
+              // dim 1, rght
+	      switch (bcxr) // TODO: make a function taht does it
               {
-	        byl.reset(new bcond::open_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
-	        byr.reset(new bcond::open_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                case bcond::cyclic:
+                  bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                  break;
+                case bcond::open:
+                  bxr.reset(new bcond::open_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                  break;
+	        defalt: assert(false);
               }
-	      else assert(false);
+
+              // dim 2, left
+	      switch (bcyl) // TODO: make a function taht does it
+              {
+                case bcond::cyclic:
+                  byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  break;
+//                case bcond::polar:
+//                  byl.reset(new bcond::polar_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, span[0] / 2));
+//                  break;
+                case bcond::open:
+                  byl.reset(new bcond::open_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  break;
+                default: assert(false);
+              }
+
+              // dim 2, rght
+	      switch (bcyr) // TODO: make a function taht does it
+              {
+                case bcond::cyclic:
+                  byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  break;
+//                case bcond::polar:
+//                  byr.reset(new bcond::polar_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, span[0] / 2));
+//                  break;
+                case bcond::open:
+                  byr.reset(new bcond::open_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  break;
+                default: assert(false);
+              }
 
               shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
               shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
@@ -212,8 +251,7 @@ namespace libmpdataxx
 		    mem.get(), 
 		    i0 == 0      ? bxl : shrdl,
 		    i0 == n0 - 1 ? bxr : shrdr,
-		    byl, 
-		    byr, 
+		    byl, byr, 
 		    i, j
                   }), 
                   p
@@ -223,12 +261,13 @@ namespace libmpdataxx
           }
 	}
 
+        // 3D version
         void init(
           const typename solver_t::rt_params_t &p,
 	  const std::array<int, 3> &span, 
           const int &n0, const int &n1 = 1, const int &n2 = 1
         ) {
-	  std::unique_ptr<bcond::bcond_t<real_t>> bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;
+          typename solver_t::bcp_t bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;
 
 // TODO: renew pointers only if invalid ?
 	  for (int i0 = 0; i0 < n0; ++i0) 
@@ -237,26 +276,59 @@ namespace libmpdataxx
             {
 	      for (int i2 = 0; i2 < n2; ++i2) 
               {
-                if (bcx == bcond::cyclic) // TODO: make a function that does it
+                // dim 1, left
+                switch (bcxl) // TODO: make a function that does it
                 {
-                  bxl.reset(new bcond::cyclic_left_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
-                  bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                  case bcond::cyclic:
+                    bxl.reset(new bcond::cyclic_left_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                    break;
+                  default: assert(false);
                 }
-                else assert(false);
 
-                if (bcy == bcond::cyclic) // TODO: make a function taht does it
+                // dim 1, rght
+                switch (bcxr) // TODO: make a function that does it
                 {
-                  byl.reset(new bcond::cyclic_left_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
-                  byr.reset(new bcond::cyclic_rght_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  case bcond::cyclic:
+                    bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                    break;
+                  default: assert(false);
                 }
-                else assert(false);
 
-                if (bcz == bcond::cyclic)  // TODO: make a function taht does it
+                // dim 2, left
+                switch (bcyl) // TODO: make a function taht does it
                 {
-                  bzl.reset(new bcond::cyclic_left_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
-                  bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+                  case bcond::cyclic:
+                    byl.reset(new bcond::cyclic_left_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                    break;
+                  default: assert(false);
                 }
-                else assert(false);
+
+                // dim 2, rght
+                switch (bcyr) // TODO: make a function taht does it
+                {
+                  case bcond::cyclic:
+		    byr.reset(new bcond::cyclic_rght_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                    break;
+                  default: assert(false);
+                }
+
+                // dim 3, left
+                switch (bczl) // TODO: make a function taht does it
+                {
+                  case bcond::cyclic:
+		    bzl.reset(new bcond::cyclic_left_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+                    break;
+                  default: assert(false);
+                }
+
+                // dim 3, rght
+                switch (bczr) // TODO: make a function taht does it
+                {
+                  case bcond::cyclic:
+		    bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+                    break;
+                  default: assert(false);
+                }
 
                 shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
                 shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1

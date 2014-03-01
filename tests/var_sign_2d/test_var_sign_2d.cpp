@@ -48,7 +48,11 @@ void add_solver(
   p.outvars = {{0, {.name = "psi", .unit = "1"}}};
 
   // instantiation
-  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(p));
+  slvs.push_back(new concurr::threads<
+    solver_t, 
+    bcond::cyclic, bcond::cyclic,
+    bcond::cyclic, bcond::cyclic
+  >(p));
 
   // post instantiation
   blitz::firstIndex i;

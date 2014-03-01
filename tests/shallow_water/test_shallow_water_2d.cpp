@@ -58,7 +58,11 @@ int main()
   p.gnuplot_zrange = p.gnuplot_cbrange = "[.85:1.1]";
 
   // instantiation
-  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> run(p);
+  concurr::threads<
+    solver_t, 
+    bcond::cyclic, bcond::cyclic,
+    bcond::cyclic, bcond::cyclic
+  > run(p);
 
   // initial condition
   {

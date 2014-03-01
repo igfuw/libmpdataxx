@@ -74,7 +74,7 @@ int main()
   }
 
   // instantiation
-  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(p); 
+  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic, bcond::cyclic, bcond::cyclic> slv(p); 
 
   // post instantiation
   {
