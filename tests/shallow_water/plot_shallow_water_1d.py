@@ -64,6 +64,8 @@ def analytic_model_fig(x_range, h_m, v_m, t_m, casename):
         h_a = height(lamb, x_range)
         v_a = velocity(lamb, x_range)
 
+
+
         figure(1, figsize = (4,3))
         ax = subplot(1,1,1)
 
@@ -100,19 +102,20 @@ def main(casename, x_shift=8, time_l=[1,2,3]):
     #model variables
     h_m_nt = reading_modeloutput("out"+casename+".h")
     p_m_nt = reading_modeloutput("out"+casename+".q")
-    v_m_nt = p_m_nt/h_m_nt
+    v_m_nt = np.where(p_m_nt != 0.,  p_m_nt/h_m_nt, 0)
     x_m = reading_modeloutput("out"+casename+".x") - x_shift
     t_m = reading_modeloutput("out"+casename+".t")
 
     #finding indices for time levels in time_l
     #TODO: informacja, ze nie ma danej chwili czasu
     ind_time = np.in1d(t_m,time_l)
+
    
     #plotting analytic solutions and model outputs for time from time_l
     analytic_model_fig(x_m[0], h_m_nt[ind_time], v_m_nt[ind_time], t_m[ind_time],
                        casename)
 
-main("_fct")
+main("_fct_abs")
     
     
     

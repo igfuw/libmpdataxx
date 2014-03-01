@@ -20,7 +20,7 @@
 // (as of gcc 20140212, it gives an ICE: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=60198)
 //#define BZ_USE_ALIGNMENT_PRAGMAS  
 
-#include <blitz/tv2fastiter.h> // needed by Clang to work in Debug mode
+#include <blitz/tv2fastiter.h> // otherwise Clang fails in debug mode
 #include <blitz/array.h>
 
   
