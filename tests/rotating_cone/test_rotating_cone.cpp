@@ -144,19 +144,19 @@ int main()
     const int opts_iters = 2;
     test<opts, opts_iters>("fct");
   }
-//  {
-//    enum { opts = formulae::opts::fct | formulae::opts::tot };
-//    const int opts_iters = 3;
-//    test<opts, opts_iters>("iters3_tot_fct");
-//  }
-//  {
-//    enum { opts = formulae::opts::iga | formulae::opts::fct};
-//    const int opts_iters = 2;
-//    test<opts, opts_iters>("iga_fct");
-//  }
-//  {
-//    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct };
-//    const int opts_iters = 2;
-//    test<opts, opts_iters>("iga_tot_fct");
-//  }
+  {
+    enum { opts = formulae::opts::fct | formulae::opts::tot };
+    const int opts_iters = 3;
+    test<opts, opts_iters>("iters3_tot_fct");
+  }
+  {
+    enum { opts = formulae::opts::iga | formulae::opts::fct};
+    const int opts_iters = 2;
+    test<opts, opts_iters>("iga_fct");
+  }
+  {
+    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct };
+    const int opts_iters = 2;
+    test<opts, opts_iters>("iga_tot_fct");
+  }
 }
