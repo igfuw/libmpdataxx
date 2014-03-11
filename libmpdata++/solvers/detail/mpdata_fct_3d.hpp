@@ -66,12 +66,12 @@ namespace libmpdataxx
 	  // fill halos -> mpdata works with halo=1, we need halo=2
   // TODO: other option would be to define im as a function of halo in mpdata!
 	  this->mem->barrier();
-	  this->bcxl->fill_halos_vctr(GC_corr[0], this->j^1, this->k^1); // TODO: one xchng call?
-	  this->bcxr->fill_halos_vctr(GC_corr[0], this->j^1, this->k^1);
-	  this->bcyl->fill_halos_vctr(GC_corr[1], this->k^1, this->i^1); // TODO: one xchng call?
-	  this->bcyr->fill_halos_vctr(GC_corr[1], this->k^1, this->i^1);
-	  this->bczl->fill_halos_vctr(GC_corr[2], this->i^1, this->j^1); // TODO: one xchng call?
-	  this->bczr->fill_halos_vctr(GC_corr[2], this->i^1, this->j^1);
+	  this->bcxl->fill_halos_vctr_alng(GC_corr[0], this->j^1, this->k^1); // TODO: one xchng call?
+	  this->bcxr->fill_halos_vctr_alng(GC_corr[0], this->j^1, this->k^1);
+	  this->bcyl->fill_halos_vctr_alng(GC_corr[1], this->k^1, this->i^1); // TODO: one xchng call?
+	  this->bcyr->fill_halos_vctr_alng(GC_corr[1], this->k^1, this->i^1);
+	  this->bczl->fill_halos_vctr_alng(GC_corr[2], this->i^1, this->j^1); // TODO: one xchng call?
+	  this->bczr->fill_halos_vctr_alng(GC_corr[2], this->i^1, this->j^1);
 	  this->mem->barrier();
 
 	  // calculating the monotonic corrective velocity
