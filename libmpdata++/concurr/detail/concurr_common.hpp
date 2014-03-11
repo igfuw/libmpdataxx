@@ -11,9 +11,11 @@
 
 #include <libmpdata++/bcond/cyclic_1d.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
-//#include <libmpdata++/bcond/polar_2d.hpp>
-#include <libmpdata++/bcond/open_2d.hpp>
 #include <libmpdata++/bcond/cyclic_3d.hpp>
+#include <libmpdata++/bcond/open_1d.hpp>
+#include <libmpdata++/bcond/open_2d.hpp>
+#include <libmpdata++/bcond/open_3d.hpp>
+//#include <libmpdata++/bcond/polar_2d.hpp>
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
@@ -142,6 +144,9 @@ namespace libmpdataxx
             case bcond::cyclic: 
               bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
               break;
+            case bcond::open: 
+              bxl.reset(new bcond::open_left_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+              break;
             default: assert(false);
           }
 
@@ -149,6 +154,9 @@ namespace libmpdataxx
           {
             case bcond::cyclic:
 	      bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+              break;
+            case bcond::open: 
+              bxr.reset(new bcond::open_rght_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
               break;
             default: assert(false);
           }
@@ -282,6 +290,9 @@ namespace libmpdataxx
                   case bcond::cyclic:
                     bxl.reset(new bcond::cyclic_left_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
                     break;
+                  case bcond::open:
+                    bxl.reset(new bcond::open_left_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                    break;
                   default: assert(false);
                 }
 
@@ -290,6 +301,9 @@ namespace libmpdataxx
                 {
                   case bcond::cyclic:
                     bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                    break;
+                  case bcond::open:
+                    bxr.reset(new bcond::open_rght_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }
@@ -300,6 +314,9 @@ namespace libmpdataxx
                   case bcond::cyclic:
                     byl.reset(new bcond::cyclic_left_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
                     break;
+                  case bcond::open:
+                    byl.reset(new bcond::open_left_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                    break;
                   default: assert(false);
                 }
 
@@ -308,6 +325,9 @@ namespace libmpdataxx
                 {
                   case bcond::cyclic:
 		    byr.reset(new bcond::cyclic_rght_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                    break;
+                  case bcond::open:
+		    byr.reset(new bcond::open_rght_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }
@@ -318,6 +338,9 @@ namespace libmpdataxx
                   case bcond::cyclic:
 		    bzl.reset(new bcond::cyclic_left_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
                     break;
+                  case bcond::open:
+		    bzl.reset(new bcond::open_left_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+                    break;
                   default: assert(false);
                 }
 
@@ -326,6 +349,9 @@ namespace libmpdataxx
                 {
                   case bcond::cyclic:
 		    bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+                    break;
+                  case bcond::open:
+		    bzr.reset(new bcond::open_rght_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }

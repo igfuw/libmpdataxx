@@ -47,6 +47,17 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
+        void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
+        {
+          parent_t::hook_ante_loop(nt);
+	  
+          // TODO: make it work with more than one equation    
+          this->bcxl->bcinit(this->mem->psi[0][0]);
+          this->bcxr->bcinit(this->mem->psi[0][0]);
+          this->bcxl->fill_halos_vctr_alng(this->mem->GC[0]); // TODO: one xchng?
+          this->bcxr->fill_halos_vctr_alng(this->mem->GC[0]);
+        }
+
         public:
  
         struct ctor_args_t

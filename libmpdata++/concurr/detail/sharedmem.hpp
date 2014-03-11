@@ -187,11 +187,11 @@ namespace libmpdataxx
 	{   
           using namespace arakawa_c;
           assert(d == 0);
-          // returning the whole array but with the dimensiones
+          // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
-          // (i.e. border between cell -1 and cell 0 is indexed with 0)
+          // (i.e. border between cell 0 and cell 1 is indexed with 0)
 	  return this->GC[d](
-            rng_t(0, this->span[0]-1)^h
+            rng_t(0, this->span[0]-1)^(-1)^h
           ).reindex({0});
 	}   
 
@@ -231,12 +231,12 @@ namespace libmpdataxx
 	{   
           using namespace arakawa_c;
           assert(d == 0 || d== 1);
-          // returning the whole array (i.e. incl. haloes) but with the dimensiones
+          // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
           switch (d)
           { 
-            case 0: return this->GC[d](rng_t(0, this->span[0]-1)^h, rng_t(0, this->span[1]-1)).reindex({0, 0}); 
-            case 1: return this->GC[d](rng_t(0, this->span[0]-1), rng_t(0, this->span[1]-1)^h).reindex({0, 0}); 
+            case 0: return this->GC[d](rng_t(0, this->span[0]-1)^(-1)^h, rng_t(0, this->span[1]-1)).reindex({0, 0}); 
+            case 1: return this->GC[d](rng_t(0, this->span[0]-1), rng_t(0, this->span[1]-1)^(-1)^h).reindex({0, 0}); 
             default: assert(false); throw;
           }
 	}   
@@ -279,19 +279,19 @@ namespace libmpdataxx
 	{   
           using namespace arakawa_c;
           assert(d == 0 || d == 1 || d == 2);
-          // returning the whole array but with the dimensiones
+          // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
           switch (d)
           { 
-            case 0: return this->GC[d](rng_t(0, this->span[0]-1)^h,
+            case 0: return this->GC[d](rng_t(0, this->span[0]-1)^(-1)^h,
                                        rng_t(0, this->span[1]-1),
                                        rng_t(0, this->span[2]-1)).reindex({0, 0, 0});  
             case 1: return this->GC[d](rng_t(0, this->span[0]-1),
-                                       rng_t(0, this->span[1]-1)^h,
+                                       rng_t(0, this->span[1]-1)^(-1)^h,
                                        rng_t(0, this->span[2]-1)).reindex({0, 0, 0});  
             case 2: return this->GC[d](rng_t(0, this->span[0]-1),
                                        rng_t(0, this->span[1]-1),
-                                       rng_t(0, this->span[2]-1)^h).reindex({0, 0, 0});  
+                                       rng_t(0, this->span[2]-1)^(-1)^h).reindex({0, 0, 0});  
             default: assert(false); throw;
           }
 	}   

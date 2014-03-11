@@ -54,8 +54,17 @@ namespace libmpdataxx
         {
           parent_t::hook_ante_loop(nt);
 
+          // TODO: make it work with more than one equation    
+          this->bcxl->bcinit(this->mem->psi[0][0], this->j);
+          this->bcxr->bcinit(this->mem->psi[0][0], this->j);
+          this->bcyl->bcinit(this->mem->psi[0][0], this->i);
+          this->bcyr->bcinit(this->mem->psi[0][0], this->i);
+          this->bcxl->fill_halos_vctr_alng(this->mem->GC[0], this->j); // TODO: one xchng?
+          this->bcxr->fill_halos_vctr_alng(this->mem->GC[0], this->j);
+          this->bcyl->fill_halos_vctr_alng(this->mem->GC[1], this->i); // TODO: one xchng?
+          this->bcyr->fill_halos_vctr_alng(this->mem->GC[1], this->i);
           // sanity check for non-divergence of the initial Courant number field
-          // TODO: same in 1D and 3D
+          // TODO: same in 1D
           if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
 	    ( 
               this->mem->GC[0](i-h, j  ) - 
