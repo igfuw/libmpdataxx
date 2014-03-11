@@ -64,7 +64,11 @@ int main()
   rt_params.tol = 1e-5;
   rt_params.span = {nx, ny};
 
-  libmpdataxx::concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(rt_params);
+  libmpdataxx::concurr::threads<
+    solver_t, 
+    bcond::cyclic, bcond::cyclic,
+    bcond::cyclic, bcond::cyclic
+  > slv(rt_params);
 
   {
     // initial condition

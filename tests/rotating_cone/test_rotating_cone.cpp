@@ -89,7 +89,9 @@ void test(const std::string filename)
 //<listing-2>
   // instantiation
   concurr::threads<
-    sim_t, bcond::open, bcond::open
+    sim_t, 
+    bcond::open, bcond::open,
+    bcond::open, bcond::open
   > run(p); 
 //</listing-2>
   {

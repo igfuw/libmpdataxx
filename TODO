@@ -1,4 +1,6 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- rename p.span -> p.grid_size?
+- rename p.di, p.dj, p.dk -> p.grid_step?
 - isolate test that causes iga to produce negative values!
 - change grid to have scalars on the edges:
   - advector shape nx + 1 -> nx - 1
@@ -6,9 +8,6 @@
   - bcinit (const /= 0, const = phi_0)
   - gnuplot (xrange, yrange)
   - what about halo = 2 for open bc (assert?)
-- rename p.span -> p.grid?
-- rename p.di, p.dj, p.dk -> p.step?
-- specifyin left/rght bc separetely
 - should unit G return an int instead of float?
 - p -> rt_params in examples (Dorota'a suggesting at the first meeting)
 - n_bits enum!
@@ -18,7 +17,6 @@
 - eps, npa domyślnie?
 - jakiś throw jeśli niezgodne z rozwiązaniem analitycznym w test_shallow_water_1d
 - barrier z argumentem - do debugowania!
-- osobno lewy i prawy war. brzegowy!
 - rename solver -> algo?
 - G in velocity interpolation
 - G in pressure solver
@@ -39,7 +37,6 @@
 - doc: mention the difference between the order of accuracy of integration vs. order of accuracy of an approximation
 - doc: references for shallow-water docs incl. Vallis, http://www.netlib.org/chammp/shallow.bib
 - concurr -> rename concurr_ddecomp
-- bcd_common -> rename dirichlet?
 
 
 0.1 (pre-submission / during reviews, should-be-easy enhancements or code cleanups before first release):

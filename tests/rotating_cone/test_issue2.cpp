@@ -71,7 +71,7 @@ void test(const std::string filename, const int &nx, const int &ny)
   p.span = {nx, ny};
 
   // instantiation
-  concurr::threads<sim_t, bcond::open, bcond::open> run(p); 
+  concurr::threads<sim_t, bcond::open, bcond::open, bcond::open, bcond::open> run(p); 
 
   // post instantiation
   {

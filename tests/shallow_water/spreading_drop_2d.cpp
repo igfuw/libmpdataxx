@@ -82,9 +82,14 @@ int main()
     {ix::qx, {.name="qx", .unit="TODO"}}, 
     {ix::qy, {.name="qy", .unit="TODO"}}
   };
+  //p.vip_eps = 1e-5;
 
   // instantiation
-  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> run(p); // TODO: change into open bc
+  concurr::threads<
+    solver_t, 
+    bcond::cyclic, bcond::cyclic,
+    bcond::cyclic, bcond::cyclic
+  > run(p); // TODO: change into open bc
 
   // initial condition
   {

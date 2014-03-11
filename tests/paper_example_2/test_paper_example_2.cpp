@@ -39,7 +39,7 @@ void test(const std::string filename)
   p.gnuplot_yrange = "[-1.25:4.25]";
 
   // instantiation
-  concurr::serial<sim_t, bcond::cyclic> run(p);
+  concurr::serial<sim_t, bcond::cyclic, bcond::cyclic> run(p);
 
 //<listing-3>
   // initial condition

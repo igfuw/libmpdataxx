@@ -58,7 +58,11 @@ int main()
 //  rt_params.gnuplot_cbrange = "[299:301.5]";
   rt_params.gnuplot_term = "png";
 
-  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> run(rt_params);
+  concurr::threads<
+    solver_t, 
+    bcond::cyclic, bcond::cyclic,
+    bcond::cyclic, bcond::cyclic
+  > run(rt_params);
 
   // initial condition
   {

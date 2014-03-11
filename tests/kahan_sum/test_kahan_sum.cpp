@@ -23,17 +23,6 @@ void main_tmpl()
     if (blitz::kahan_sum(a) - blitz::kahan_sum(a.reverse(0)) > 4e-8) 
       throw std::exception();
   }
-
-
-  ////////////////////////////////////////////////////////////////
-  // Kahan sum functions
-  {
-    blitz::Array<real_t, 1> a(10), b(10);
-    a = 2;
-    b = a; //kahan_sum_5arg(a,a,a,a,a);
-//    auto xpr = a+b;
-//    auto itr = xpr.unwrap().begin();
-  }
 }
 
 int main()

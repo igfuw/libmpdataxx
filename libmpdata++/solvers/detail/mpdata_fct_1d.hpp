@@ -51,8 +51,8 @@ namespace libmpdataxx
 	  // fill halos -> mpdata works with halo=1, we need halo=2
   // TODO: other option would be to define im as a function of halo in mpdata!
 	  this->mem->barrier();
-	  this->bcxl->fill_halos_vctr(GC_corr[d]); // TODO: one xchng call?
-	  this->bcxr->fill_halos_vctr(GC_corr[d]);
+	  this->bcxl->fill_halos_vctr_alng(GC_corr[d]); // TODO: one xchng call?
+	  this->bcxr->fill_halos_vctr_alng(GC_corr[d]);
 	  this->mem->barrier();
 
 	  // calculating the monotonic corrective velocity

@@ -41,7 +41,7 @@ int main()
     using solver_t = solvers::mpdata<ct_params_t>;
     typename solver_t::rt_params_t p;
     p.span = {nx};
-    concurr::openmp<solver_t, bcond::cyclic> slv(p);
+    concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
     slv.advance(nt);
   }
 
@@ -51,7 +51,7 @@ int main()
     using solver_t = solvers::mpdata<ct_params_t>;
     typename solver_t::rt_params_t p;
     p.span = {nx};
-    concurr::boost_thread<solver_t, bcond::cyclic> slv(p);
+    concurr::boost_thread<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
     slv.advance(nt);
   }
 
@@ -61,7 +61,7 @@ int main()
     using solver_t = solvers::mpdata<ct_params_t>;
     typename solver_t::rt_params_t p;
     p.span = {nx};
-    concurr::threads<solver_t, bcond::cyclic> slv(p);
+    concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
     slv.advance(nt);
   }
 
@@ -71,7 +71,7 @@ int main()
     using solver_t = solvers::mpdata<ct_params_t>;
     typename solver_t::rt_params_t p;
     p.span = {nx};
-    concurr::serial<solver_t, bcond::cyclic> slv(p);
+    concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
     slv.advance(nt);
   }
 }

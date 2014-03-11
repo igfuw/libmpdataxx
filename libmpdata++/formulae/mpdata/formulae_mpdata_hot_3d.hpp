@@ -288,10 +288,10 @@ namespace libmpdataxx
           frac<opts>(
             abs(psi(pi<dim>(i+1, j+1, k+1)))
           + abs(psi(pi<dim>(i, j+1, k+1)))
-          + abs(psi(pi<dim>(i+1, j+1, k-1)))
-          + abs(psi(pi<dim>(i, j+1, k-1)))          
-          - abs(psi(pi<dim>(i, j-1, k-1)))
-          - abs(psi(pi<dim>(i+1, j-1, k-1)))
+          - abs(psi(pi<dim>(i+1, j+1, k-1)))
+          - abs(psi(pi<dim>(i, j+1, k-1)))          
+          + abs(psi(pi<dim>(i, j-1, k-1)))
+          + abs(psi(pi<dim>(i+1, j-1, k-1)))
           - abs(psi(pi<dim>(i, j-1, k+1)))
           - abs(psi(pi<dim>(i+1, j-1, k+1)))           
           , //------------------------------

@@ -39,7 +39,6 @@ namespace libmpdataxx
 
 	void hook_ante_loop(const int nt) 
 	{   
-  // TODO: same in 1D
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
@@ -83,7 +82,7 @@ namespace libmpdataxx
 		  this->im, 
                   this->j
 		);
-              assert(finite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
+              assert(std::isfinite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
 
 	      this->GC_corr(iter)[1](this->i, this->jm+h) = 
 		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
@@ -93,7 +92,7 @@ namespace libmpdataxx
 		  this->jm, 
 		  this->i
 		);
-              assert(finite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
+              assert(std::isfinite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
    
 	      // filling Y halos for GC_x, and X halos for GC_y
 	      // TODO: document why; is it needed in the last iteration?; what about FCT?
@@ -105,8 +104,8 @@ namespace libmpdataxx
 	      this->mem->barrier();
 
 	      this->fct_adjust_antidiff(e, iter);
-              assert(finite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
-              assert(finite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
+              assert(std::isfinite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
+              assert(std::isfinite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
 
 	      // TODO: shouldn't the above halo-filling be repeated here?
 	    }
