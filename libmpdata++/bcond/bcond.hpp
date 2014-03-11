@@ -126,7 +126,7 @@ namespace libmpdataxx
       using parent_t::parent_t;
 
       // ctor
-      // parent constructor takes minimal parameters that construct valid memeber ranges, note that they
+      // parent constructor takes minimal parameters that construct valid member ranges, note that they
       // aren't actually used !
       shared() : parent_t(rng_t(0, 2), 1) {}
     };

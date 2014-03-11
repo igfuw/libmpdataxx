@@ -26,6 +26,9 @@ namespace libmpdataxx
       // methods invoked by the solver
       void bcinit(const arr_t &a)
       {
+        assert(min(a(this->left_edge_sclr)) == max(a(this->left_edge_sclr))
+               && "variable initial signal on open boundary");
+
 	init_sclr = min(a(this->left_edge_sclr));
       }
 
