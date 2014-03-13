@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <libmpdata++/formulae/arakawa_c.hpp>
+
 namespace libmpdataxx
 {
   namespace bcond
@@ -89,17 +91,47 @@ namespace libmpdataxx
       bcond_t(const rng_t &i, const int halo) :
         halo(halo),
         // sclr
-	left_edge_sclr(i.first(), i.first()),
-	rght_edge_sclr(i.last(), i.last()),
-	left_halo_sclr((i^halo).first(), (i^halo).first() + halo - 1),
-	rght_halo_sclr((i^halo).last() - (halo - 1), (i^halo).last()),
-	left_intr_sclr((i^(-1)).first(), (i^(-1)).first() + halo - 1),
-	rght_intr_sclr((i^(-1)).last() - (halo - 1), (i^(-1)).last()),
+	left_edge_sclr(
+          i.first(), 
+          i.first()
+        ),
+	rght_edge_sclr(
+          i.last(),
+          i.last()
+        ),
+	left_halo_sclr(
+          (i^halo).first(), 
+          (i^halo).first() + halo - 1
+        ),
+	rght_halo_sclr(
+          (i^halo).last() - (halo - 1), 
+          (i^halo).last()
+        ),
+	left_intr_sclr(
+          (i^(-1)).first(), 
+          (i^(-1)).first() + halo - 1
+        ),
+	rght_intr_sclr(
+          (i^(-1)).last() - (halo - 1), 
+          (i^(-1)).last()
+        ),
         // vctr
-        left_halo_vctr((i^h^(halo-1)).first(), (i^h^(halo-1)).first() + halo - 1),
-        rght_halo_vctr((i^h^(halo-1)).last() - (halo - 1), (i^h^(halo-1)).last()),
-        left_intr_vctr((i^h^(-1)).first(), (i^h^(-1)).first() + halo - 1),
-        rght_intr_vctr((i^h^(-1)).last() - (halo - 1), (i^h^(-1)).last())
+        left_halo_vctr(
+          (i^h^(halo-1)).first(), 
+          (i^h^(halo-1)).first() + halo - 1
+        ),
+        rght_halo_vctr(
+          (i^h^(halo-1)).last() - (halo - 1), 
+          (i^h^(halo-1)).last()
+        ),
+        left_intr_vctr(
+          (i^h^(-1)).first(),
+          (i^h^(-1)).first() + halo - 1
+        ),
+        rght_intr_vctr(
+          (i^h^(-1)).last() - (halo - 1), 
+          (i^h^(-1)).last()
+        )
       {} 
     };
 
