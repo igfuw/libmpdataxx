@@ -66,7 +66,7 @@ void output(run_t &run, const int &t, const real_t &dx, const real_t &dt)
   if (t == 0)
   {
     for (int i = 0; i < run.advectee().extent(0); ++i) 
-      ox << (i + .5) * dx << "\t";
+      ox << i * dx << "\t";
     ox << "\n";
   } 
 
@@ -107,7 +107,7 @@ int main()
   // initial condition
   {
     blitz::firstIndex i;
-    run.advectee(ix::h) = intcond()(p.di * (i+.5) - p.span[0] * p.di / 2);
+    run.advectee(ix::h) = intcond()(p.di * i - (p.span[0]-1) * p.di / 2);
   }
   run.advectee(ix::qx) = 0;
 

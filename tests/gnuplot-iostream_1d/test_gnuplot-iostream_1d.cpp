@@ -50,7 +50,7 @@ void add_solver(slvs_t &slvs, int n_iters)
   {
     blitz::firstIndex i;
     slvs.back().advectee() = exp(
-      -sqr(.5+i-n/2.) / (2.*pow(n/10, 2)) // TODO: assumes dx=1
+      -sqr(i-(n-1)/2.) / (2.*pow((n-1)/10, 2)) // TODO: assumes dx=1
     );  
     slvs.back().advector() = .5; 
   }

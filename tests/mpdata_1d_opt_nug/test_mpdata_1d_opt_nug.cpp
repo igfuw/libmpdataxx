@@ -87,8 +87,10 @@ int main()
   slvs.back().advectee() = phi;
   slvs.back().advector() = GC; 
 
-  if (sum(G * phi) != sum(slvs.at(0).advectee())) throw;
-  if (sum(G * phi) != sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) throw;
+  if (sum(G * phi) != sum(slvs.at(0).advectee())) 
+    throw std::runtime_error("t=0:  G*phi != psi");
+  if (sum(G * phi) != sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) 
+    throw std::runtime_error("t=0:  G*phi != psi*G");
 
   Gnuplot gp;
   gp << "set term svg size 1200, 500\n";
@@ -105,6 +107,8 @@ int main()
 
   T eps = 1e-6;
   // have to use std::abs(), as abs() alone returns an integer!
-  if (std::abs(sum(G * phi) - sum(slvs.at(0).advectee())) > eps) throw;
-  if (std::abs(sum(G * phi) - sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) > eps) throw;
+  if (std::abs(sum(G * phi) - sum(slvs.at(0).advectee())) > eps) 
+    throw std::runtime_error("t>0:  G*phi - psi > eps");
+  if (std::abs(sum(G * phi) - sum(slvs.at(1).advectee() * slvs.at(1).g_factor())) > eps) 
+    throw std::runtime_error("t>0:  G*phi - psi*G > eps");
 }

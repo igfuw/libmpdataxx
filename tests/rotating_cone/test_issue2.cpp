@@ -79,20 +79,20 @@ void test(const std::string filename, const int &nx, const int &ny)
       r = 15. * dx,
       x0 = 75 * dx,
       y0 = 50 * dy,
-      xc = .5 * p.span[x] * dx,
-      yc = .5 * p.span[y] * dy;
+      xc = .5 * (p.span[x]-1) * dx,
+      yc = .5 * (p.span[y]-1) * dy;
 
     blitz::firstIndex i;
     blitz::secondIndex j;
 
     // cone shape
     decltype(run.advectee()) tmp(run.advectee().extent());
-    tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
+    tmp = blitz::pow(i * dx - x0, 2) + blitz::pow(j * dy - y0, 2);
     run.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
 
     // constant angular velocity rotational field
-    run.advector(x) = -omega * ((j+.5) * dy - yc) * dt / dx;
-    run.advector(y) =  omega * ((i+.5) * dx - xc) * dt / dy;
+    run.advector(x) = -omega * (j * dy - yc) * dt / dx;
+    run.advector(y) =  omega * (i * dx - xc) * dt / dy;
     // TODO: an assert confirming that the above did what it should have done
     //       (in context of the advector()'s use of blitz::Array::reindex())
   }
@@ -103,6 +103,9 @@ void test(const std::string filename, const int &nx, const int &ny)
 
 int main(int argc, char **argv)
 {
+  if (argc != 3) 
+    throw std::runtime_error("expecting two arguments");
+
   int 
     nx = atoi(argv[1]),
     ny = atoi(argv[2]);
