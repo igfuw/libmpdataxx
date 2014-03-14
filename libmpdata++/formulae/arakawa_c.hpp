@@ -6,7 +6,7 @@
 
 #pragma once
 
-// TODO: uses rng_t but does not include it
+#include <libmpdata++/blitz.hpp>
 
 namespace libmpdataxx
 {
