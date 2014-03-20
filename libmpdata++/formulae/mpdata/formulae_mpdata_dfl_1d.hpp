@@ -34,7 +34,15 @@ namespace libmpdataxx
         const rng_t &i,
         typename std::enable_if<!opts::isset(opts, opts::tot) && opts::isset(opts, opts::dfl)>::type* = 0 
       ) return_macro(,
-        - GC(i+h) / (G(i+1) + G(i)) / 2 * (GC((i+1)+h) - GC(i-h))
+        - GC(i+h) / (
+          formulae::G<opts>(G, i+1) 
+          + 
+          formulae::G<opts>(G, i  )
+        ) / 2 * (
+          GC((i+1)+h) 
+          - 
+          GC(i-h)
+        )
       )
       // TODO: dfl && tot version of the above?
       
