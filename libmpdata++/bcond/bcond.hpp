@@ -24,29 +24,21 @@ namespace libmpdataxx
 
 
       // 1D
-      virtual void bcinit(const blitz::Array<real_t, 1> &) 
-      {
-        assert(false && "bcond::bcinit() called!");
-      };
       virtual void fill_halos_sclr(const blitz::Array<real_t, 1> &) 
-      {
-        assert(false && "bcond::fill_halos_sclr() called!");
+      { 
+        assert(false && "bcond::fill_halos_sclr() called!"); 
       };
-      virtual void fill_halos_vctr_alng(const blitz::Array<real_t, 1> &) 
-      {
-        assert(false && "bcond::fill_halos_vctr() called!");
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 1>> &) 
+      { 
+        assert(false && "bcond::fill_halos_vctr() called!"); 
       };
 
       // 2D
-      virtual void bcinit(const blitz::Array<real_t, 2> &, const rng_t &) 
-      {
-        assert(false && "bcond::bcinit() called!");
-      };
       virtual void fill_halos_sclr(const blitz::Array<real_t, 2> &, const rng_t &) 
       {
         assert(false && "bcond::fill_halos_sclr() called!");
       };
-      virtual void fill_halos_vctr_alng(const blitz::Array<real_t, 2> &, const rng_t &) 
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &) 
       {
         assert(false && "bcond::fill_halos_vctr_alng() called!");
       };
@@ -56,15 +48,11 @@ namespace libmpdataxx
       };
 
       // 3D
-      virtual void bcinit(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
-      {
-        assert(false && "bcond::bcinit() called!");
-      };
       virtual void fill_halos_sclr(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
       {
         assert(false && "bcond::fill_halos_sclr() called!");
       };
-      virtual void fill_halos_vctr_alng(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &) 
       {
         assert(false && "bcond::fill_halos_vctr() called!");
       };
@@ -139,17 +127,14 @@ namespace libmpdataxx
     class shared : public bcond_t<real_t> // TODO: move to a bcond_shared file and document!
     {
       public:
-      virtual void bcinit(const blitz::Array<real_t, 1> &) { };
-      virtual void bcinit(const blitz::Array<real_t, 2> &, const rng_t &) { };
-      virtual void bcinit(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) { };
 
       virtual void fill_halos_sclr(const blitz::Array<real_t, 1> &) { };
       virtual void fill_halos_sclr(const blitz::Array<real_t, 2> &, const rng_t &) { };
       virtual void fill_halos_sclr(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) { };
 
-      virtual void fill_halos_vctr_alng(const blitz::Array<real_t, 1> &) { };
-      virtual void fill_halos_vctr_alng(const blitz::Array<real_t, 2> &, const rng_t &) { };
-      virtual void fill_halos_vctr_alng(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) { };
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 1>> &) { };
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &) { };
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &) { }; 
 
       virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 2> &, const rng_t &) { };
       virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) { };
