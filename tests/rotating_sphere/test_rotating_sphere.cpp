@@ -76,9 +76,9 @@ int main()
   // instantation
   concurr::threads<
   solver_t,
-  bcond::cyclic, bcond::cyclic,
-  bcond::cyclic, bcond::cyclic,
-  bcond::cyclic, bcond::cyclic
+  bcond::open, bcond::open,
+  bcond::open, bcond::open,
+  bcond::open, bcond::open
   > slv(p);
 
   // post instantation
