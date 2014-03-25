@@ -52,10 +52,11 @@ namespace libmpdataxx
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec[0], this->j^1);
-          bcxr->fill_halos_vctr_alng(arrvec[0], this->j^1);
-          bcyl->fill_halos_vctr_alng(arrvec[1], this->i^1);
-          bcyr->fill_halos_vctr_alng(arrvec[1], this->i^1);
+          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/);
+          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/);
+          bcyl->fill_halos_vctr_alng(arrvec, i/*^1*/);
+          bcyr->fill_halos_vctr_alng(arrvec, i/*^1*/);
+          // TODO: open bc nust be last!!!
           this->mem->barrier();
         }
 
@@ -64,13 +65,7 @@ namespace libmpdataxx
         {
           parent_t::hook_ante_loop(nt);
 
-          // TODO: make it work with more than one equation    
-          this->bcxl->bcinit(this->mem->psi[0][0], this->j);
-          this->bcxr->bcinit(this->mem->psi[0][0], this->j);
-          this->bcyl->bcinit(this->mem->psi[0][0], this->i);
-          this->bcyr->bcinit(this->mem->psi[0][0], this->i);
-
-          this->xchng_vctr_alng(this->mem->GC);
+          xchng_vctr_alng(this->mem->GC);
 
           // sanity check for non-divergence of the initial Courant number field
           // (including compatibility with the initial condition)
@@ -85,10 +80,9 @@ namespace libmpdataxx
 		this->mem->GC[1](i,   j+h)
 	      )
 	    ));
+
 	    if (max_abs_div > blitz::epsilon(typename parent_t::real_t(44))) 
-            {
 	      throw std::runtime_error("initial advector field is divergent");
-            }
           }
         }
 
