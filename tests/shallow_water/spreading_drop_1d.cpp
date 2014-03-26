@@ -28,9 +28,11 @@ struct ct_params_t : ct_params_default_t
   enum { n_eqs = 2 };
   
   // options
-  enum { opts = formulae::opts::fct | formulae::opts::abs };
+  enum { opts = formulae::opts::fct | formulae::opts::iga };
   enum { rhs_scheme = solvers::strang };
   
+  //enum { fp_round_mode = FE_TONEAREST };
+
   // indices
   struct ix { enum {
     qx, h, 
@@ -96,7 +98,7 @@ int main()
   p.di = .05;
   p.span = { int(16 / p.di) };
   p.g = 1;
-  p.vip_eps = 0; // in 1D apparently it's enough!
+  p.vip_eps = 1.e-10; // in 1D apparently it's enough!
 
   // instantiation
   concurr::serial<
