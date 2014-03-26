@@ -49,12 +49,12 @@ namespace libmpdataxx
         void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec)
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec[0], j^1, k^1); 
-          bcxr->fill_halos_vctr_alng(arrvec[0], j^1, k^1);
-          bcyl->fill_halos_vctr_alng(arrvec[1], k^1, i^1); 
-          bcyr->fill_halos_vctr_alng(arrvec[1], k^1, i^1);
-          bczl->fill_halos_vctr_alng(arrvec[2], i^1, j^1);
-          bczr->fill_halos_vctr_alng(arrvec[2], i^1, j^1);
+          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/); 
+          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/);
+          bcyl->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/); 
+          bcyr->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/);
+          bczl->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
+          bczr->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
           this->mem->barrier();
         }
         
@@ -62,14 +62,6 @@ namespace libmpdataxx
         {
           parent_t::hook_ante_loop(nt);
 	  
-          // TODO: make it work with more than one equation    
-          bcxl->bcinit(this->mem->psi[0][0], j, k);
-          bcxr->bcinit(this->mem->psi[0][0], j, k);
-          bcyl->bcinit(this->mem->psi[0][0], k, i);
-          bcyr->bcinit(this->mem->psi[0][0], k, i);
-          bczl->bcinit(this->mem->psi[0][0], i, j);
-          bczr->bcinit(this->mem->psi[0][0], i, j);
-
           xchng_vctr_alng(this->mem->GC);
  
           // sanity check for non-divergence of the initial Courant number field

@@ -50,8 +50,8 @@ namespace libmpdataxx
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec[0]); 
-          bcxr->fill_halos_vctr_alng(arrvec[0]);
+          bcxl->fill_halos_vctr_alng(arrvec); 
+          bcxr->fill_halos_vctr_alng(arrvec);
           this->mem->barrier();
         }
 
@@ -59,10 +59,7 @@ namespace libmpdataxx
         {
           parent_t::hook_ante_loop(nt);
 	  
-          // TODO: make it work with more than one equation    
-          bcxl->bcinit(this->mem->psi[0][0]);
-          bcxr->bcinit(this->mem->psi[0][0]);
-
+          // filling halo in velocity field
           xchng_vctr_alng(this->mem->GC);
         }
 
