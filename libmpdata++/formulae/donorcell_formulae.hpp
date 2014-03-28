@@ -236,7 +236,7 @@ namespace libmpdataxx
 	const rng_t &i
       ) { 
         assert(std::isfinite(sum(psi[n](i))));
-        assert(std::isfinite(sum(GC[0](i^h))));
+        assert(std::isfinite(sum(GC(i^h))));
 
         donorcell_sum<opts>(
           khn_tmp,

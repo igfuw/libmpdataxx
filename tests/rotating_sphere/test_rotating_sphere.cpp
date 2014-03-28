@@ -44,9 +44,9 @@ void setup(T &solver)
 
   // sphere shape
   decltype(solver.advectee()) tmp(solver.advectee().extent());
-  tmp =   blitz::pow((i + 0.5) * dx - x0, 2)
-        + blitz::pow((j + 0.5) * dx - y0, 2)
-        + blitz::pow((k + 0.5) * dx - z0, 2);
+  tmp =   blitz::pow(i * dx - x0, 2)
+        + blitz::pow(j * dx - y0, 2)
+        + blitz::pow(k * dx - z0, 2);
   solver.advectee() = where(tmp - pow(r, 2) <= 0, h * (1 - blitz::sqrt(tmp) / r) , 0);
 
   const ct_params_t::real_t
@@ -55,9 +55,9 @@ void setup(T &solver)
     yc = 20 * dy,
     zc = 20 * dz;
   // constant angular velocity rotational field
-  solver.advector(x) = (-omega * pow(2, -0.5) * ((j+.5) * dy - yc) + omega / 2 * ((k+.5) * dz - zc)) * dt / dx;
-  solver.advector(y) = (omega * pow(2, -0.5) * ((i+.5) * dx - xc) - omega / 2 * ((k+.5) * dz - zc)) * dt / dy;
-  solver.advector(z) = (-omega / 2 * ((i+.5) * dx - xc) + omega / 2 * ((j+.5) * dy - yc)) * dt / dz;
+  solver.advector(x) = (-omega * pow(2, -0.5) * (j * dy - yc) + omega / 2 * (k * dz - zc)) * dt / dx;
+  solver.advector(y) = (omega * pow(2, -0.5) * (i * dx - xc) - omega / 2 * (k * dz - zc)) * dt / dy;
+  solver.advector(z) = (-omega / 2 * (i * dx - xc) + omega / 2 * (j * dy - yc)) * dt / dz;
 }
 
 int main()
@@ -81,9 +81,9 @@ int main()
   // instantation
   concurr::threads<
   solver_t,
-  bcond::cyclic, bcond::cyclic,
-  bcond::cyclic, bcond::cyclic,
-  bcond::cyclic, bcond::cyclic
+  bcond::open, bcond::open,
+  bcond::open, bcond::open,
+  bcond::open, bcond::open
   > slv(p);
 
   // post instantation

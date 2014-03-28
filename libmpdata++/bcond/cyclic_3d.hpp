@@ -31,10 +31,10 @@ namespace libmpdataxx
 	a(pi<d>(this->left_halo_sclr, j, k)) = a(pi<d>(this->rght_intr_sclr, j, k)); 
       }
 
-      void fill_halos_vctr_alng(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
 	using namespace idxperm;
-        a(pi<d>(this->left_halo_vctr, j, k)) = a(pi<d>(this->rght_intr_vctr, j, k));
+        av[d](pi<d>(this->left_halo_vctr, j, k)) = av[d](pi<d>(this->rght_intr_vctr, j, k));
       }
 
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j, const rng_t &k)
@@ -61,10 +61,10 @@ namespace libmpdataxx
 	a(pi<d>(this->rght_halo_sclr, j, k)) = a(pi<d>(this->left_intr_sclr, j, k));
       }
       
-      void fill_halos_vctr_alng(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
 	using namespace idxperm;
-        a(pi<d>(this->rght_halo_vctr, j, k)) = a(pi<d>(this->left_intr_vctr, j, k));
+        av[d](pi<d>(this->rght_halo_vctr, j, k)) = av[d](pi<d>(this->left_intr_vctr, j, k));
       }
 
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j, const rng_t &k)

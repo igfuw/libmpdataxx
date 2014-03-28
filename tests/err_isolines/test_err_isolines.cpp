@@ -142,7 +142,7 @@ int main()
 
       // calculating the analytical solution
       decltype(slvs.end()->second->advectee()) exact(nx);
-      exact = gauss((i+.5)*dx - velocity * dt * nt);
+      exact = gauss(i*dx - velocity * dt * nt);
 
       // looping over solvers
       for (auto keyval : slvs) 
@@ -154,7 +154,7 @@ int main()
 
         // setting the solver up
 	slv.advector() = cour; 
-        slv.advectee() = gauss((i+.5)*dx);
+        slv.advectee() = gauss(i*dx);
    
         // running the solver
 	slv.advance(nt);

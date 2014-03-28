@@ -96,8 +96,8 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
     run.advectee(ix::h) = intcond()(
-      p.di * (i+.5) - p.span[0] * p.di / 2, 
-      p.dj * (j+.5) - p.span[1] * p.dj / 2
+      p.di * i - (p.span[0]-1) * p.di / 2, 
+      p.dj * j - (p.span[1]-1) * p.dj / 2
     );
   }
   run.advectee(ix::qx) = 0;

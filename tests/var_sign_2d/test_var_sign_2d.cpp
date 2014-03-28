@@ -58,8 +58,8 @@ void add_solver(
   blitz::firstIndex i;
   blitz::secondIndex j;
   slvs.back().advectee() = offset + exp(
-    -sqr(i+.5-p.span[x]/2.) / (2.*pow(p.span[x]/10, 2)) // TODO: assumes dx=dy=1
-    -sqr(j+.5-p.span[y]/2.) / (2.*pow(p.span[y]/10, 2))
+    -sqr(i-(p.span[x]-1)/2.) / (2.*pow((p.span[x]-1)/10, 2)) // TODO: assumes dx=dy=1
+    -sqr(j-(p.span[y]-1)/2.) / (2.*pow((p.span[y]-1)/10, 2))
   );  
   slvs.back().advector(x) = .5; 
   slvs.back().advector(y) = .25;

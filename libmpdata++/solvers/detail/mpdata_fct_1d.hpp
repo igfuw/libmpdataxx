@@ -48,12 +48,8 @@ namespace libmpdataxx
 	  const auto &G = *this->mem->G;
 	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 
-	  // fill halos -> mpdata works with halo=1, we need halo=2
-  // TODO: other option would be to define im as a function of halo in mpdata!
-	  this->mem->barrier();
-	  this->bcxl->fill_halos_vctr_alng(GC_corr[d]); // TODO: one xchng call?
-	  this->bcxr->fill_halos_vctr_alng(GC_corr[d]);
-	  this->mem->barrier();
+	  // fill halos in GC_corr
+          this->xchng_vctr_alng(GC_corr);
 
 	  // calculating the monotonic corrective velocity
 	  this->GC_mono[d]( this->im+h ) = formulae::mpdata::GC_mono<ct_params_t::opts>(

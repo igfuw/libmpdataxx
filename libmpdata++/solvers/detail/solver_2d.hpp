@@ -34,46 +34,56 @@ namespace libmpdataxx
 	rng_t i, j;
         idx_t<parent_t::n_dims> ijk;
 
+	void xchng(typename parent_t::arr_t arr, rng_t range_i, rng_t range_j) // for a given array
+	{
+          this->mem->barrier();
+	  bcxl->fill_halos_sclr(arr, range_j);
+	  bcxr->fill_halos_sclr(arr, range_j);
+	  bcyl->fill_halos_sclr(arr, range_i);
+	  bcyr->fill_halos_sclr(arr, range_i);
+          this->mem->barrier();
+	}
+
 	void xchng(int e, int lev = 0) // for previous time levels
 	{
           this->xchng(this->mem->psi[e][ this->n[e] - lev], i^this->halo, j^this->halo);
 	}
 
-	void xchng(typename parent_t::arr_t psi, rng_t range_i, rng_t range_j) // for a given array
-	{
+        virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        {
           this->mem->barrier();
-	  bcxl->fill_halos_sclr(psi, range_j);
-	  bcxr->fill_halos_sclr(psi, range_j);
-	  bcyl->fill_halos_sclr(psi, range_i);
-	  bcyr->fill_halos_sclr(psi, range_i);
+          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/);
+          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/);
+          bcyl->fill_halos_vctr_alng(arrvec, i/*^1*/);
+          bcyr->fill_halos_vctr_alng(arrvec, i/*^1*/);
+          // TODO: open bc nust be last!!!
           this->mem->barrier();
-	}
+        }
 
         // TODO: ref in argument...
         void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
         {
           parent_t::hook_ante_loop(nt);
 
-          // TODO: make it work with more than one equation    
-          this->bcxl->bcinit(this->mem->psi[0][0], this->j);
-          this->bcxr->bcinit(this->mem->psi[0][0], this->j);
-          this->bcyl->bcinit(this->mem->psi[0][0], this->i);
-          this->bcyr->bcinit(this->mem->psi[0][0], this->i);
-          this->bcxl->fill_halos_vctr_alng(this->mem->GC[0], this->j); // TODO: one xchng?
-          this->bcxr->fill_halos_vctr_alng(this->mem->GC[0], this->j);
-          this->bcyl->fill_halos_vctr_alng(this->mem->GC[1], this->i); // TODO: one xchng?
-          this->bcyr->fill_halos_vctr_alng(this->mem->GC[1], this->i);
+          xchng_vctr_alng(this->mem->GC);
+
           // sanity check for non-divergence of the initial Courant number field
+          // (including compatibility with the initial condition)
           // TODO: same in 1D
-          if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
-	    ( 
-              this->mem->GC[0](i-h, j  ) - 
-	      this->mem->GC[0](i+h, j  )
-            ) + (
-	      this->mem->GC[1](i,   j-h) - 
-	      this->mem->GC[1](i,   j+h)
-            )
-	  ))) throw std::runtime_error("initial advector field is divergent");
+          {
+            typename ct_params_t::real_t max_abs_div = max(abs(
+	      ( 
+		this->mem->GC[0](i-h, j  ) - 
+		this->mem->GC[0](i+h, j  )
+	      ) + (
+		this->mem->GC[1](i,   j-h) - 
+		this->mem->GC[1](i,   j+h)
+	      )
+	    ));
+
+	    if (max_abs_div > blitz::epsilon(typename parent_t::real_t(44))) 
+	      throw std::runtime_error("initial advector field is divergent");
+          }
         }
 
         public:

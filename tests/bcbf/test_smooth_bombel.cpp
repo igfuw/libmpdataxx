@@ -70,8 +70,8 @@ int main()
     blitz::secondIndex j;
 
     run.advectee(ix::tht) = rt_params.Tht_amb 
-      + .5 * exp( -sqr(.5+i-nx/2.) / (2.*pow(nx/20, 2))   // TODO: assumed dx=dy=1?
-		  -sqr(.5+j-ny/4.) / (2.*pow(ny/20, 2)) )
+      + .5 * exp( -sqr(i-(nx-1)/2.) / (2.*pow((nx-1)/20, 2))   // TODO: assumed dx=dy=1?
+		  -sqr(j-(ny-1)/4.) / (2.*pow((ny-1)/20, 2)) )
     ;
     run.advectee(ix::u) = 0;
     run.advectee(ix::w) = 0; 

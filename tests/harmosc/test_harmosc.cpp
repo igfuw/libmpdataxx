@@ -64,7 +64,7 @@ int main()
   {
     blitz::firstIndex i;
     run.advectee(ix::psi) = pow(
-      sin((i+.5) * pi<real_t>() / p.span[0] + pi<real_t>()/3), 
+      sin(i * pi<real_t>() / (p.span[0]-1) + pi<real_t>()/3), 
       300
     );
     run.advectee(ix::phi) = real_t(0);

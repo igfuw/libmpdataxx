@@ -101,8 +101,8 @@ void test(const std::string filename)
       r = 15. * dx,
       x0 = 50 * dx,
       y0 = 75 * dy,
-      xc = .5 * p.span[x] * dx,
-      yc = .5 * p.span[y] * dy;
+      xc = .5 * (p.span[x]-1) * dx,
+      yc = .5 * (p.span[y]-1) * dy;
 
     blitz::firstIndex i;
     blitz::secondIndex j;
@@ -111,8 +111,8 @@ void test(const std::string filename)
     decltype(run.advectee()) 
       tmp(run.advectee().extent());
 
-    tmp = blitz::pow((i+.5) * dx - x0, 2) + 
-          blitz::pow((j+.5) * dy - y0, 2);
+    tmp = blitz::pow(i * dx - x0, 2) + 
+          blitz::pow(j * dy - y0, 2);
 
     run.advectee() = h0 + where(
       tmp - pow(r, 2) <= 0,                  //if
@@ -121,8 +121,8 @@ void test(const std::string filename)
     );
 
     // constant angular velocity rotational field
-    run.advector(x) =  omg * ((j+.5) * dy-yc) * dt/dx;
-    run.advector(y) = -omg * ((i+.5) * dx-xc) * dt/dy;
+    run.advector(x) =  omg * (j * dy - yc) * dt/dx;
+    run.advector(y) = -omg * (i * dx - xc) * dt/dy;
 //</listing-3>
   }
     // TODO: an assert confirming that the above did what it should have done

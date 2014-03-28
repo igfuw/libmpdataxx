@@ -82,15 +82,15 @@ int main()
       r = 12. * dx,
       x0 = 1,//75 * dx,
       y0 = 0, //50 * dy,
-      xc = .5 * p.span[x] * dx,
-      yc = .5 * p.span[y] * dy;
+      xc = .5 * (p.span[x]-1) * dx,
+      yc = .5 * (p.span[y]-1) * dy;
 
     blitz::firstIndex i;
     blitz::secondIndex j;
 
     // cone shape
     decltype(slv.advectee()) tmp(slv.advectee().extent());
-    tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
+    tmp = blitz::pow(i * dx - x0, 2) + blitz::pow(j * dy - y0, 2);
     slv.advectee() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
 
     // constant angular velocity rotational field
@@ -100,5 +100,6 @@ int main()
 
   // 
   slv.advance(nt);
-  if (blitz::min(slv.advectee()) - 1 != 0) throw;
+  if (blitz::min(slv.advectee()) - 1 != 0) 
+    throw std::runtime_error("values below one!");
 }

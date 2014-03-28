@@ -63,8 +63,8 @@ int main()
       blitz::firstIndex i;
       blitz::secondIndex j;
       slv.advectee() = exp(
-	-sqr(.5+i-p.span[x]/2.) / (2.*pow(p.span[x]/10, 2)) // TODO: assumes dx=dy=1
-	-sqr(.5+j-p.span[y]/2.) / (2.*pow(p.span[y]/10, 2)) 
+	-sqr(i-(p.span[x]-1)/2.) / (2.*pow((p.span[x]-1)/10, 2)) // TODO: assumes dx=dy=1
+	-sqr(j-(p.span[y]-1)/2.) / (2.*pow((p.span[y]-1)/10, 2)) 
       );  
       slv.advector(x) = .5; 
       slv.advector(y) = .25;

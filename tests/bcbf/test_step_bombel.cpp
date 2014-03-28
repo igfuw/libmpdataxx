@@ -77,8 +77,8 @@ int main()
 
     slv.advectee(ix::tht) = Tht_amb + where(
       // if
-      pow((i+.5) * rt_params.di - 4    * r0 , 2) + 
-      pow((j+.5) * rt_params.dj - 1.04 * r0 , 2) <= pow(r0, 2), 
+      pow(i * rt_params.di - 4    * r0 , 2) + 
+      pow(j * rt_params.dj - 1.04 * r0 , 2) <= pow(r0, 2), 
       // then
       .5, 
       // else

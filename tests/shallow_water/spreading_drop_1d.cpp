@@ -18,13 +18,15 @@ const int
   nt = 300,
   outfreq = 1;
 
+using real_t = double;
+
 // compile-time parameters
 // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
 //<listing-1>
 template <int opts_arg>
 struct ct_params_t : ct_params_default_t
 {
-  using real_t = double;
+  using real_t = ::real_t;
   enum { n_dims = 1 };
   enum { n_eqs = 2 };
   
@@ -32,7 +34,7 @@ struct ct_params_t : ct_params_default_t
   enum { opts = opts_arg};
   enum { rhs_scheme = solvers::trapez };
   
-  // indices
+  // indices - TODO move vip to separate enum
   struct ix { enum {
     qx, h, 
     vip_i=qx, vip_den=h
@@ -42,9 +44,6 @@ struct ct_params_t : ct_params_default_t
   enum { hint_norhs = formulae::opts::bit(ix::h) }; 
 };
 //</listing-1>
-
-using real_t = typename ct_params_t<opts_arg>::real_t;
-using ix = typename ct_params_t<opts_arg>::ix;
 
 struct intcond
 {
@@ -60,7 +59,7 @@ struct intcond
 
 std::ofstream ox("out.x"), oh("out.h"), oq("out.q"), ot("out.t");
 
-template <class run_t>
+template <class ix, class run_t>
 void output(run_t &run, const int &t, const real_t &dx, const real_t &dt)
 {
   // x coordinate (once)
@@ -83,18 +82,16 @@ void output(run_t &run, const int &t, const real_t &dx, const real_t &dt)
   oq << "\n";
 }
 
-int main() 
+template<int opts>
+void test() 
 {
-
-  enum { opts = formulae::opts::fct | formulae::opts::abs };
-
   using ix = typename ct_params_t<opts>::ix;
 
   // solver choice
   using solver_t = shallow_water<ct_params_t<opts>>;
 
   // run-time parameters
-  solver_t::rt_params_t p; 
+  typename solver_t::rt_params_t p; 
 
   p.dt = .01;
   p.di = .05;
@@ -116,10 +113,16 @@ int main()
   run.advectee(ix::qx) = 0;
 
   // integration
-  output(run, 0, p.di, p.dt);
+  output<ix>(run, 0, p.di, p.dt);
   for (int t = 0; t < nt; t += outfreq)
   {
     run.advance(outfreq); 
-    output(run, t + outfreq, p.di, p.dt);
+    output<ix>(run, t + outfreq, p.di, p.dt);
   }
-};
+}
+
+int main()
+{
+  test<formulae::opts::iga | formulae::opts::fct>();
+}
+

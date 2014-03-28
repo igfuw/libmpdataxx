@@ -84,7 +84,8 @@ namespace libmpdataxx
 	  parent_t::hook_ante_loop(nt);
 	  
           // set-up initial_h_non_zero
-          initial_h_non_zero = min(this->psi_n(ct_params_t::ix::vip_den)(this->ijk)) > 0;
+          if (ct_params_t::ix::vip_den != -1) 
+            initial_h_non_zero = min(this->psi_n(ct_params_t::ix::vip_den)(this->ijk)) > 0;
 
 	  // to make extrapolation possible at the first time-step
 	  fill_stash();

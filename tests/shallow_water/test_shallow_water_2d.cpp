@@ -70,8 +70,8 @@ int main()
     blitz::secondIndex j;
 
     run.advectee(ix::h) = 1 - .1 * pow(
-      sin((i+.5) * pi<typename ct_params_t::real_t>() / nx) * // TODO: assumes dx=dy=1
-      sin((j+.5) * pi<typename ct_params_t::real_t>() / ny), 
+      sin(i * pi<typename ct_params_t::real_t>() / (nx-1)) * // TODO: assumes dx=dy=1
+      sin(j * pi<typename ct_params_t::real_t>() / (ny-1)), 
       32
     );
 

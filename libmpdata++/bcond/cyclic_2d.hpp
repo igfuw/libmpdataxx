@@ -31,10 +31,10 @@ namespace libmpdataxx
 	a(pi<d>(this->left_halo_sclr, j)) = a(pi<d>(this->rght_intr_sclr, j));
       }
 
-      void fill_halos_vctr_alng(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
-        a(pi<d>(this->left_halo_vctr, j)) = a(pi<d>(this->rght_intr_vctr, j));
+        av[d](pi<d>(this->left_halo_vctr, j)) = av[d](pi<d>(this->rght_intr_vctr, j));
       }
 
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
@@ -60,10 +60,10 @@ namespace libmpdataxx
 	a(pi<d>(this->rght_halo_sclr, j)) = a(pi<d>(this->left_intr_sclr, j));
       }
 
-      void fill_halos_vctr_alng(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
-        a(pi<d>(this->rght_halo_vctr, j)) = a(pi<d>(this->left_intr_vctr, j));
+        av[d](pi<d>(this->rght_halo_vctr, j)) = av[d](pi<d>(this->left_intr_vctr, j));
       }
       
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)

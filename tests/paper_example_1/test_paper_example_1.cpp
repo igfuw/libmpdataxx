@@ -23,7 +23,7 @@ int main()
   
   // concurency choice
   using run_t = concurr::serial<
-    sim_t, bcond::cyclic, bcond::cyclic
+    sim_t, bcond::open, bcond::open
   >;
 
   // run-time parameters
@@ -41,9 +41,9 @@ int main()
 
   // initial condition
   blitz::firstIndex i;
-  // Witch of Agnesi with a=.5
+  // Witch of Agnesi with a=.5 (TODO!)
   run.advectee() = 1 / (
-    pow(dx*(.5+i - nx/2.), 2) + 1
+    pow(dx*(i - (nx-1)/2.), 2) + 1
   );
   // Courant number
   run.advector() = .5;
