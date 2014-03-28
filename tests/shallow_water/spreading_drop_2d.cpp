@@ -31,6 +31,8 @@ struct ct_params_t : ct_params_default_t
   // options
   enum { opts = formulae::opts::fct | formulae::opts::iga };
   enum { rhs_scheme = solvers::strang };
+
+  //enum { fp_round_mode = FE_TONEAREST };
   
   // indices
   struct ix { enum {
@@ -82,7 +84,7 @@ int main()
     {ix::qx, {.name="qx", .unit="TODO"}}, 
     {ix::qy, {.name="qy", .unit="TODO"}}
   };
-  //p.vip_eps = 1e-5;
+  p.vip_eps = 1e-8;
 
   // instantiation
   concurr::threads<

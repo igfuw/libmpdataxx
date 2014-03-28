@@ -51,10 +51,8 @@ def reading_modeloutput(filename):
     f = open(filename)
     list_nt = []
     for line in f:
-        #pdb.set_trace()
         lst = line.split('\t')
         list_nt.append(lst[:-1])
-    #pdb.set_trace()
     return np.array(list_nt, dtype=float) 
 
 #plotting together analytic solution and model output 
@@ -63,8 +61,6 @@ def analytic_model_fig(x_range, h_m, v_m, t_m, casename):
         lamb = lambda_evol(t_m[it,0])
         h_a = height(lamb, x_range)
         v_a = velocity(lamb, x_range)
-
-
 
         figure(1, figsize = (4,3))
         ax = subplot(1,1,1)
@@ -79,13 +75,10 @@ def analytic_model_fig(x_range, h_m, v_m, t_m, casename):
         ax.set_ylim(-2,2)
 
         # removing some ticks labels
-        for i, tick in enumerate(ax.xaxis.get_major_ticks()):
+        for i, tick in enumerate(ax.xaxis.get_major_ticks()+ax.yaxis.get_major_ticks()):
             if i % 2 != 0:
                 tick.label1On = False                                
-        for i, tick in enumerate(ax.yaxis.get_major_ticks()):
-            if i % 2 != 0:
-                tick.label1On = False
-
+        
         # changing size of all ticks  
         for item in xticks()[1] + yticks()[1]:
             item.set_fontsize(10)
@@ -95,16 +88,17 @@ def analytic_model_fig(x_range, h_m, v_m, t_m, casename):
     
     
 
-def main(casename, x_shift=8, time_l=[1,2,3]):
+def main(dir, casename, x_shift=8, time_l=[1,2,3]):
     #plotting anlytic solutions for height and velocity
     height_veloc_analytic_fig()
 
     #model variables
-    h_m_nt = reading_modeloutput("out"+casename+".h")
-    p_m_nt = reading_modeloutput("out"+casename+".q")
+    h_m_nt = reading_modeloutput(dir+"spreading_drop_1d"+casename+".out/out.h")
+    p_m_nt = reading_modeloutput(dir+"spreading_drop_1d"+casename+".out/out.q")
     v_m_nt = np.where(p_m_nt != 0.,  p_m_nt/h_m_nt, 0)
-    x_m = reading_modeloutput("out"+casename+".x") - x_shift
-    t_m = reading_modeloutput("out"+casename+".t")
+    print "where with p != 0 !!"
+    x_m = reading_modeloutput(dir+"spreading_drop_1d"+casename+".out/out.x") - x_shift
+    t_m = reading_modeloutput(dir+"spreading_drop_1d"+casename+".out/out.t")
 
     #finding indices for time levels in time_l
     #TODO: informacja, ze nie ma danej chwili czasu
@@ -115,7 +109,7 @@ def main(casename, x_shift=8, time_l=[1,2,3]):
     analytic_model_fig(x_m[0], h_m_nt[ind_time], v_m_nt[ind_time], t_m[ind_time],
                        casename)
 
-main("_fct_abs")
+main("../../build/tests/shallow_water/", "_fct_iga")
     
     
     
