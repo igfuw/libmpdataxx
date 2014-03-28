@@ -30,7 +30,7 @@ struct ct_params_t : ct_params_default_t
   
   // options
   enum { opts = formulae::opts::fct | formulae::opts::iga };
-  enum { rhs_scheme = solvers::strang };
+  enum { rhs_scheme = solvers::trapez };
   
   // indices
   struct ix { enum {

@@ -44,7 +44,11 @@
 - rename/introduce output_serial common file
 - some assert-like logic checking if the velocity field is consistent with the boudary condition?
 - test showing usage of gcc's __float128 (rainbow?)
-- pressure solvers: introduce inheritance (richardson->mr->cr->pc); what if no preconditioner in pc?; reuse richardson in pc; common loop over pseudo-time
+- pressure solvers: 
+  - introduce inheritance (richardson->mr->cr->pc);
+  - what if no preconditioner in pc?; 
+  - reuse richardson in pc; 
+  - common loop over pseudo-time
 - make ctors explicit? (http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Explicit_Constructors#Explicit_Constructors)
 - check if all adv/*.hpp are tested
 - use this->ijk istead of this->i, this->j where it could reduce the number of methods (method_1d = method_2d)

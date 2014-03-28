@@ -20,7 +20,7 @@ namespace libmpdataxx
     { 
       euler_a, // Euler's method, Eulerian spirit:        psi^n+1 = ADV(psi^n) + R^n
       euler_b, // Euler's method, semi-Lagrangian spirit: psi^n+1 = ADV(psi^n + R^n)
-      strang   // paraphrase of the Strang splitting:     psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1 
+      trapez   // paraphrase of trapezoidal rule:         psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1 
     };
 
     template <class ct_params_t>
@@ -113,7 +113,7 @@ namespace libmpdataxx
           case rhs_scheme_t::euler_a: 
           case rhs_scheme_t::euler_b: 
             break;
-          case rhs_scheme_t::strang:
+          case rhs_scheme_t::trapez:
             update_rhs(rhs, dt / 2, n);
             break;
           default: 
@@ -138,7 +138,7 @@ namespace libmpdataxx
             update_rhs(rhs, dt, n);
             apply_rhs(dt); 
             break;
-          case rhs_scheme_t::strang: 
+          case rhs_scheme_t::trapez: 
             apply_rhs(dt / 2); 
             break;
           default: 
@@ -156,7 +156,7 @@ namespace libmpdataxx
             break;
           case rhs_scheme_t::euler_b: 
             break;
-          case rhs_scheme_t::strang: 
+          case rhs_scheme_t::trapez: 
             update_rhs(rhs, dt / 2, n+1);
             apply_rhs(dt / 2);
             break;

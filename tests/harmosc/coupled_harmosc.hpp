@@ -16,12 +16,10 @@
 template <class ct_params_t>
 struct coupled_harmosc : public 
   libmpdataxx::solvers::mpdata_rhs<ct_params_t>
-{
-  // aliases
+{ // aliases
   using parent_t = 
     libmpdataxx::solvers::mpdata_rhs<ct_params_t>;
   using ix = typename ct_params_t::ix;
-
   // member fields
   typename ct_params_t::real_t omega;
 
@@ -41,9 +39,8 @@ struct coupled_harmosc : public
     auto &i = this->i;
 
     switch (at) 
-    {
-      // explicit solution for R^{n} 
-      // (note: with strang used only at t=0)
+    { // explicit solution for R^{n} 
+      // (note: with trapez used only at t=0)
       case (0): 
       rhs.at(ix::psi)(i) += omega * phi(i);
       rhs.at(ix::phi)(i) -= omega * psi(i);
@@ -65,12 +62,10 @@ struct coupled_harmosc : public
       break;
     }
   }
-
   // run-time parameters
   struct rt_params_t : parent_t::rt_params_t { 
     typename ct_params_t::real_t omega = 0; 
   };
-
   // ctor
   coupled_harmosc(
     typename parent_t::ctor_args_t args,

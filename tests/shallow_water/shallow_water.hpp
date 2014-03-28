@@ -121,7 +121,7 @@ class shallow_water<
 
     parent_t::update_rhs(rhs, dt, at);
 
-    // due to grad() below -- TODO: include it into grad
+    // due to grad() below, TODO: include into grad
     this->xchng(ix::h); 
 
     rhs.at(ix::qx)(this->i) -= 

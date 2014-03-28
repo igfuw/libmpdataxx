@@ -21,6 +21,7 @@ const int
 // compile-time parameters
 // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
 //<listing-1>
+template <int opts_arg>
 struct ct_params_t : ct_params_default_t
 {
   using real_t = double;
@@ -28,8 +29,8 @@ struct ct_params_t : ct_params_default_t
   enum { n_eqs = 2 };
   
   // options
-  enum { opts = formulae::opts::fct | formulae::opts::abs };
-  enum { rhs_scheme = solvers::strang };
+  enum { opts = opts_arg};
+  enum { rhs_scheme = solvers::trapez };
   
   // indices
   struct ix { enum {
@@ -42,8 +43,8 @@ struct ct_params_t : ct_params_default_t
 };
 //</listing-1>
 
-using real_t = typename ct_params_t::real_t;
-using ix = typename ct_params_t::ix;
+using real_t = typename ct_params_t<opts_arg>::real_t;
+using ix = typename ct_params_t<opts_arg>::ix;
 
 struct intcond
 {
@@ -66,7 +67,7 @@ void output(run_t &run, const int &t, const real_t &dx, const real_t &dt)
   if (t == 0)
   {
     for (int i = 0; i < run.advectee().extent(0); ++i) 
-      ox << (i + .5) * dx << "\t";
+      ox << i * dx << "\t";
     ox << "\n";
   } 
 
@@ -84,10 +85,13 @@ void output(run_t &run, const int &t, const real_t &dx, const real_t &dt)
 
 int main() 
 {
-  using ix = typename ct_params_t::ix;
+
+  enum { opts = formulae::opts::fct | formulae::opts::abs };
+
+  using ix = typename ct_params_t<opts>::ix;
 
   // solver choice
-  using solver_t = shallow_water<ct_params_t>;
+  using solver_t = shallow_water<ct_params_t<opts>>;
 
   // run-time parameters
   solver_t::rt_params_t p; 
@@ -107,7 +111,7 @@ int main()
   // initial condition
   {
     blitz::firstIndex i;
-    run.advectee(ix::h) = intcond()(p.di * (i+.5) - p.span[0] * p.di / 2);
+    run.advectee(ix::h) = intcond()(p.di * i - (p.span[0]-1) * p.di / 2);
   }
   run.advectee(ix::qx) = 0;
 
