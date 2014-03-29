@@ -48,6 +48,8 @@ void test(const std::string &outdir)
     // options
     enum { opts = opts_arg };
     enum { rhs_scheme = solvers::strang };
+
+    //enum { fp_round_mode = FE_TONEAREST };
     
     // indices
     struct ix { enum {
@@ -58,7 +60,6 @@ void test(const std::string &outdir)
     // hints
     enum { hint_norhs = formulae::opts::bit(ix::h) }; 
   };
-  //</listing-1>
 
   using ix = typename ct_params_t::ix;
 
@@ -81,7 +82,7 @@ void test(const std::string &outdir)
     {ix::qx, {.name="qx", .unit="TODO"}}, 
     {ix::qy, {.name="qy", .unit="TODO"}}
   };
-  //p.vip_eps = 1e-5;
+  p.vip_eps = 1e-8;
 
   // instantiation
   concurr::threads<

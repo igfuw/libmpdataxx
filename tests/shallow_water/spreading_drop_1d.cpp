@@ -34,6 +34,8 @@ struct ct_params_t : ct_params_default_t
   enum { opts = opts_arg };
   enum { rhs_scheme = solvers::strang };
   
+  //enum { fp_round_mode = FE_TONEAREST };
+
   // indices
   struct ix { enum {
     qx, h, 
@@ -57,33 +59,43 @@ struct intcond
   BZ_DECLARE_FUNCTOR(intcond);
 };
 
-std::ofstream ox("out.x"), oh("out.h"), oq("out.q"), ot("out.t");
+// TODO: all this plotting logic should be done with a new libmpdataxx::output
+struct out_t
+{
+  std::ofstream x, h, q, t;
+  out_t(const std::string &pfx) : 
+    x(pfx + ".x"), 
+    h(pfx + ".h"), 
+    q(pfx + ".q"), 
+    t(pfx + ".t")
+  {}
+};
 
 template <class ix, class run_t>
-void output(run_t &run, const int &t, const real_t &dx, const real_t &dt)
+void output(run_t &run, const int &t, const real_t &dx, const real_t &dt, out_t &out)
 {
   // x coordinate (once)
   if (t == 0)
   {
     for (int i = 0; i < run.advectee().extent(0); ++i) 
-      ox << i * dx << "\t";
-    ox << "\n";
+      out.x << i * dx << "\t";
+    out.x << "\n";
   } 
 
   // time
-  ot << t * dt << "\t" << "\n"; 
+  out.t << t * dt << "\t" << "\n"; 
   
   // layer depth
-  for (auto &it : run.advectee(ix::h)) oh << it << "\t";
-  oh << "\n";
+  for (auto &it : run.advectee(ix::h)) out.h << it << "\t";
+  out.h << "\n";
 
   // momentum
-  for (auto &it : run.advectee(ix::qx)) oq << it << "\t";
-  oq << "\n";
+  for (auto &it : run.advectee(ix::qx)) out.q << it << "\t";
+  out.q << "\n";
 }
 
 template<int opts>
-void test() 
+void test(const std::string &pfx) 
 {
   using ix = typename ct_params_t<opts>::ix;
 
@@ -97,7 +109,7 @@ void test()
   p.di = .05;
   p.span = { int(16 / p.di) };
   p.g = 1;
-  p.vip_eps = 0; // in 1D apparently it's enough!
+  p.vip_eps = 1.e-10; // in 1D apparently it's enough!
 
   // instantiation
   concurr::serial<
@@ -113,17 +125,19 @@ void test()
   run.advectee(ix::qx) = 0;
 
   // integration
-  output<ix>(run, 0, p.di, p.dt);
+  out_t out(pfx);
+  output<ix>(run, 0, p.di, p.dt, out);
   for (int t = 0; t < nt; t += outfreq)
   {
     run.advance(outfreq); 
-    output<ix>(run, t + outfreq, p.di, p.dt);
+    output<ix>(run, t + outfreq, p.di, p.dt, out);
   }
 }
 
 int main()
 {
-  test<formulae::opts::iga>();
-  test<formulae::opts::abs>();
+  test<formulae::opts::iga | formulae::opts::fct>("fct+iga");
+  test<formulae::opts::abs | formulae::opts::fct>("fct+abs");
+  system("python ../../../tests/shallow_water/papierplot_shallow_water_1d.py");
 }
 
