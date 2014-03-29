@@ -19,32 +19,7 @@ const int
   nt = 300,
   outfreq = 100;
 
-// compile-time parameters
-// enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
-//<listing-1>
-struct ct_params_t : ct_params_default_t
-{
-  using real_t = double;
-  enum { n_dims = 2 };
-  enum { n_eqs = 3 };
-  
-  // options
-  enum { opts = formulae::opts::fct | formulae::opts::iga };
-  enum { rhs_scheme = solvers::strang };
-  
-  // indices
-  struct ix { enum {
-      qx, qy, h, 
-      vip_i=qx, vip_j=qy, vip_den=h
-  }; }; 
-  
-  // hints
-  enum { hint_norhs = formulae::opts::bit(ix::h) }; 
-};
-//</listing-1>
-
-using real_t = typename ct_params_t::real_t;
-using ix = typename ct_params_t::ix;
+using real_t = double;
 
 struct intcond
 {
@@ -58,9 +33,33 @@ struct intcond
   BZ_DECLARE_FUNCTOR2(intcond);
 };
 
-
-int main() 
+template <int opts_arg>
+void test(const std::string &outdir) 
 {
+  // compile-time parameters
+  // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
+  //<listing-1>
+  struct ct_params_t : ct_params_default_t
+  {
+    using real_t = ::real_t;
+    enum { n_dims = 2 };
+    enum { n_eqs = 3 };
+    
+    // options
+    enum { opts = opts_arg };
+    enum { rhs_scheme = solvers::strang };
+    
+    // indices
+    struct ix { enum {
+	qx, qy, h, 
+	vip_i=qx, vip_j=qy, vip_den=h
+    }; }; 
+    
+    // hints
+    enum { hint_norhs = formulae::opts::bit(ix::h) }; 
+  };
+  //</listing-1>
+
   using ix = typename ct_params_t::ix;
 
   // solver choice
@@ -68,7 +67,7 @@ int main()
 
 
   // run-time parameters
-  solver_t::rt_params_t p; 
+  typename solver_t::rt_params_t p; 
 
   p.dt = .01;
   p.di = .05;
@@ -76,7 +75,7 @@ int main()
   p.span = { int(16 / p.di), int(16 / p.dj) };
   p.g = 1;
   p.outfreq = outfreq;
-  p.outdir = "spreading_drop_2d.out";
+  p.outdir = outdir;
   p.outvars = {
     {ix::h,  {.name="h" , .unit="TODO"}}, 
     {ix::qx, {.name="qx", .unit="TODO"}}, 
@@ -105,3 +104,11 @@ int main()
 
   run.advance(nt);
 };
+
+int main()
+{
+  test<formulae::opts::fct | formulae::opts::iga>("spreading_drop_2d_fct+iga.out");
+  //system("python");
+  test<formulae::opts::abs>("spreading_drop_2d_abs.out");
+  //system("python");
+}
