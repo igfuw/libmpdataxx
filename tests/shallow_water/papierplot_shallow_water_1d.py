@@ -4,6 +4,7 @@ from pylab import *
 from matplotlib.font_manager import FontProperties
 import matplotlib.ticker as ticker
 import numpy as np
+import sys
 
 
 #eq. 5.6 (Schar&Smolarkiewicz, 1996) 
@@ -112,7 +113,8 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], it=300):
     savefig("papier_shallowwater_1d.pdf")
     show()
 
-main("./", ["fct+abs", "fct+iga"])
+main("./", sys.argv[1:])
+
     
     
     
