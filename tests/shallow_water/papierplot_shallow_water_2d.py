@@ -1,0 +1,121 @@
+from scipy.optimize import fsolve
+import math
+from pylab import *
+from matplotlib.font_manager import FontProperties
+import matplotlib.ticker as ticker
+import numpy as np
+import h5py
+
+
+def rad2(x,y):
+    return x**2 + y**2
+ 
+def lambda_evol(time):
+    return (2*time**2 + 1)**0.5
+ 
+def height(lamb, x, y):
+    return np.where(rad2(x,y) <= lamb**2, lamb**-2 * (1. - rad2(x,y)/lamb**2), 0)
+
+def velocity(lamb, x, y):
+    lamb_t = 2**0.5 * (1 - lamb**-2)**0.5
+    return np.where(rad2(x,y) <= lamb**2, x * lamb_t / lamb, 0)
+
+#initial condition
+def initial(x,y):
+    return np.where(rad2(x,y)<=1, 1-rad2(x,y), 0)
+
+# plotting analytic solutions for height and velocity 
+def analytic_fig(ax,time_l = [0,1,2,3], x_range = np.linspace(-8,8,100),
+                              y_range = np.zeros(100)):
+    oznacz = ['c', 'm', 'k', 'y', 'b', 'g', 'r']
+    y0 = initial(x_range, y_range)
+
+    for it in time_l:
+        lamb = lambda_evol(it)
+        h = height(lamb, x_range, y_range)
+        v = velocity(lamb, x_range, y_range)
+        ax.plot(x_range, h, oznacz[it])
+        ax.plot(x_range, v, oznacz[it]+ "--")
+
+    # removing some ticks labels
+    for i, tick in enumerate(ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks()):
+        if i % 2 != 0:
+            tick.label1On = False                                
+
+    # changing size of all ticks  
+    for item in xticks()[1] + yticks()[1]:
+        item.set_fontsize(10)
+
+
+
+#reading model output from text file and converting to an array
+def reading_modeloutput(filename):
+    f = h5py.File(filename, "r")
+    h = np.array(f["h"])
+    qx = np.array(f["qx"])
+    qy = np.array(f["qy"])
+    return h, qx, qy 
+
+#plotting together analytic solution and model output 
+def analytic_model_fig(ax, h_m, v_m, time=1, x_range=np.linspace(-8,8,320),
+                       y_range=np.zeros(320)):
+    import pdb
+    #pdb.set_trace()
+    lamb = lambda_evol(time)
+    h_a = height(lamb, x_range, y_range)
+    v_a = velocity(lamb, x_range, y_range)
+
+    pdb.set_trace()
+
+    ax.plot(x_range, initial(x_range, y_range), 'k', x_range, h_a, 'b',
+            x_range, h_m, "r")
+    ax.plot(x_range, 0*x_range, "k--", x_range, v_a, 'b--',
+            x_range, v_m, "r--")
+
+    #ax.set_title("t = "+str(t_m[it,0]), fontsize=12)
+    
+    #ax.set_ylim(-2,2)
+
+    # removing some ticks labels
+    for i, tick in enumerate(ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks()):
+        if i % 2 != 0:
+            tick.label1On = False                                
+
+    # changing size of all ticks  
+    for item in xticks()[1] + yticks()[1]:
+        item.set_fontsize(10)
+
+# time_l - list of time levels for analytic solutions
+# it - model time step used for comparison with analytic solution
+# x_shift - shift between initial cond. in model and for analytic solution
+def main(dir, casename_l, x_shift=8, time_l=[1,2,3], time=3):
+
+    figure(1, figsize = (6,9))
+    ax = subplot(4,1,1)
+    #plotting analytic solution
+    analytic_fig(ax)
+    #plotting comparison between analytic solution and model results for varies options
+    for ic, casename in enumerate(casename_l):
+        #model variables TODO: time
+        h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2d_" + casename +
+                                              ".out/timestep0000000" + str(time*100)
+                                              + '.h5')
+        # calculate velocity (momentum/height) only in the droplet region.
+        #calculating velocity from momentum, only for the droplet area 
+        v_m = np.where(h_m > 0,  py_m/h_m, 0)
+        print "where with h_m = 0 !!"
+        
+        ax = subplot(4,1,ic+2)
+        analytic_model_fig(ax, h_m[159], v_m[159], time)
+        
+        ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
+                    fontsize=12, horizontalalignment='left', verticalalignment='top')
+        
+    savefig("papier_shallowwater_2d.pdf")
+    show()
+
+main("../../build/tests/shallow_water/",
+     ["fct_abs", "fct_iga_feton_veps1e-5", "fct_iga_veps1e-8"])
+    
+    
+    
