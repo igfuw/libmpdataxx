@@ -60,6 +60,7 @@ void test(const std::string &outdir)
     // hints
     enum { hint_norhs = formulae::opts::bit(ix::h) }; 
   };
+  //</listing-1>
 
   using ix = typename ct_params_t::ix;
 
