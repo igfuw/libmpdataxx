@@ -5,6 +5,7 @@ from matplotlib.font_manager import FontProperties
 import matplotlib.ticker as ticker
 import numpy as np
 import h5py
+import sys
 
 
 def rad2(x,y):
@@ -57,13 +58,9 @@ def reading_modeloutput(filename):
 
 #plotting together analytic solution and model output 
 def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
-    import pdb
-    #pdb.set_trace()
     lamb = lambda_evol(time)
     h_a = height(lamb, x_range, y_range)
     v_a = velocity(lamb, x_range, y_range)
-
-    pdb.set_trace()
 
     ax.plot(x_range, initial(x_range, y_range), 'k', x_range, h_a, 'b',
             x_range, h_m, "r")
@@ -90,8 +87,9 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
     ax = subplot(len(casename_l)+1,1,1)
     #plotting analytic solution
     analytic_fig(ax, time_l)
-    #plotting comparison between analytic solution and model results for varies options
+    #plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l):
+        print "plotting for " + casename + ", t = " + str(time)
         #model variables TODO: time
         h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2d_" + casename +
                                               ".out/timestep0000000" + str(int(time/dt))
@@ -110,14 +108,14 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
                            np.linspace(-8,8,h_m.shape[0]), np.zeros(h_m[0].shape[0]),
                            h_m[159], v_m[159], time)
         
-        ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
-                    fontsize=12, horizontalalignment='left', verticalalignment='top')
+        #ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
+        #            fontsize=12, horizontalalignment='left', verticalalignment='top')
         
     savefig("papier_shallowwater_2d.pdf")
     show()
 
-main("../../build/tests/shallow_water/",
-     ["fct_abs", "fct_iga_veps1e-8"])
+main("./", sys.argv[1:])
+
     
     
     
