@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -48,8 +48,6 @@ void test(const std::string &outdir)
     // options
     enum { opts = opts_arg };
     enum { rhs_scheme = solvers::strang };
-
-    //enum { fp_round_mode = FE_TONEAREST };
     
     // indices
     struct ix { enum {
@@ -110,7 +108,8 @@ void test(const std::string &outdir)
 int main()
 {
   test<formulae::opts::fct | formulae::opts::iga>("spreading_drop_2d_fct+iga.out");
-  //system("python");
-  test<formulae::opts::abs>("spreading_drop_2d_abs.out");
+  //test<formulae::opts::fct | formulae::opts::abs>("spreading_drop_2d_fct+abs.out");
+  system("python ../../../tests/shallow_water/papierplot_shallow_water_2d.py fct+iga");
   //system("python");
 }
+
