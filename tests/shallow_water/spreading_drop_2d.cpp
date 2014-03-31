@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -112,3 +112,4 @@ int main()
   system("python ../../../tests/shallow_water/papierplot_shallow_water_2d.py fct+iga");
   //system("python");
 }
+
