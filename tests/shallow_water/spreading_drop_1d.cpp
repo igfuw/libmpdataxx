@@ -90,6 +90,7 @@ void test()
   // solver choice
   using solver_t = shallow_water<ct_params_t<opts>>;
 
+//<listing-2>
   // run-time parameters
   typename solver_t::rt_params_t p; 
 
@@ -98,6 +99,8 @@ void test()
   p.span = { int(16 / p.di) };
   p.g = 1;
   p.vip_eps = 0; // in 1D apparently it's enough!
+//</listing-2>
+ 
 
   // instantiation
   concurr::serial<

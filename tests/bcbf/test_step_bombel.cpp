@@ -24,7 +24,10 @@ int main()
     enum { n_eqs = 3 };
     enum { rhs_scheme = solvers::euler_b };
     enum { prs_scheme = solvers::cr };
-    struct ix { enum {u, w, tht, vip_i=u, vip_j=w, vip_den=-1}; };
+    struct ix { enum {
+      u, w, tht, 
+      vip_i=u, vip_j=w, vip_den=-1
+    }; };
   }; 
 //</listing-1>
   using ix = typename ct_params_t::ix;

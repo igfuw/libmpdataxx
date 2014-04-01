@@ -17,8 +17,8 @@ class bombel : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 
   public:
   using real_t = typename ct_params_t::real_t;
-  private:
 
+  private:
   // member fields
   real_t g, Tht_amb;
 
