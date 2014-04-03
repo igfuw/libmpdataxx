@@ -38,7 +38,7 @@ void test(const std::string filename)
     dy = 1,
     omg = .1,
     h = 4., // TODO: other name!
-    h0 = 0;
+    h0 = 1;
     //  h0 = 100.; // change it to 1 to see scary things!
 
 /// @brief settings from @copybrief Anderson_and_Fattahi_1974
