@@ -138,6 +138,8 @@ int main()
 {
   test<formulae::opts::iga | formulae::opts::fct>("fct+iga");
   test<formulae::opts::abs | formulae::opts::fct>("fct+abs");
-  system("python ../../../tests/shallow_water/papierplot_shallow_water_1d.py");
+  //plotting model results and analitic solution; 
+  //python uses sys.argv[1:0] for choosing model outputs
+  system("python ../../../tests/shallow_water/papierplot_shallow_water_1d.py fct+abs fct+iga ");
 }
 
