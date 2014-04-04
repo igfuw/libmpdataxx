@@ -40,38 +40,39 @@ int main()
   using solver_t = output::gnuplot<bombel<ct_params_t>>;
 
   // run-time parameters
-  solver_t::rt_params_t rt_params;
+  solver_t::rt_params_t p;
 
-  rt_params.dt = .75;
-  rt_params.di = rt_params.dj = 10.; 
-  rt_params.Tht_amb = Tht_amb; 
+  p.dt = .75;
+  p.di = p.dj = 10.; 
+  p.Tht_amb = Tht_amb; 
 
-  rt_params.outfreq = 100; //12;
-  rt_params.outvars = {
+  p.outfreq = 100; //12;
+  p.outvars = {
 //    {ix::u,   {.name = "u",   .unit = "m/s"}}, 
 //    {ix::w,   {.name = "w",   .unit = "m/s"}}, 
     {ix::tht, {.name = "tht", .unit = "K"  }}
   };
-  rt_params.gnuplot_view = "map";
-  rt_params.gnuplot_output = "figure_%s_%04d.svg";
-  rt_params.gnuplot_with = "lines";
-  rt_params.gnuplot_surface = false;
-  rt_params.gnuplot_contour = true;
-//  rt_params.gnuplot_cbrange = "[299.85 : 300.65]";
-  rt_params.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
-  rt_params.gnuplot_maxcolors = 8;
-//  rt_params.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
-  rt_params.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
-  rt_params.gnuplot_term = "svg";
-
-  rt_params.tol = 1e-5;
-  rt_params.span = {nx, ny};
+  p.gnuplot_view = "map";
+  p.gnuplot_output = "figure_%s_%04d.svg";
+  p.gnuplot_with = "lines";
+  p.gnuplot_surface = false;
+  p.gnuplot_contour = true;
+//  p.gnuplot_cbrange = "[299.85 : 300.65]";
+  p.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
+  p.gnuplot_maxcolors = 8;
+//  p.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
+  p.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
+  p.gnuplot_term = "svg";
+//<listing-2>
+  p.tol = 1e-5;
+//</listing-2>
+  p.span = {nx, ny};
 
   libmpdataxx::concurr::threads<
     solver_t, 
     bcond::cyclic, bcond::cyclic,
     bcond::cyclic, bcond::cyclic
-  > slv(rt_params);
+  > slv(p);
 
   {
     // initial condition
@@ -80,8 +81,8 @@ int main()
 
     slv.advectee(ix::tht) = Tht_amb + where(
       // if
-      pow(i * rt_params.di - 4    * r0 , 2) + 
-      pow(j * rt_params.dj - 1.04 * r0 , 2) <= pow(r0, 2), 
+      pow(i * p.di - 4    * r0 , 2) + 
+      pow(j * p.dj - 1.04 * r0 , 2) <= pow(r0, 2), 
       // then
       .5, 
       // else

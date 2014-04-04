@@ -45,9 +45,8 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   p.n_iters = n_iters;
   p.span = {nx};
 
-  // TODO: wouldn't open bc be better?
   boost::assign::ptr_map_insert<
-    concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> // map element type
+    concurr::serial<solver_t, bcond::open, bcond::open> // map element type
   >(slvs)(
     key,  // map key
     p     // concurr's ctor args
@@ -87,7 +86,7 @@ int main()
   const T 
     t_max    = 1., // "arbitrarily"
     dx_max   = 1.,
-    x_max    = 44. * dx_max, // see note about compact support in asserts below
+    x_max    = 10 * 44. * dx_max, // see note about compact support in asserts below
     sgma     = 1.5 * dx_max, 
     velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
     x0       = .5 * x_max, 
@@ -96,7 +95,7 @@ int main()
 
   const std::list<T> 
     courants({ .05, .1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95}),
-    dxs({dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32, dx_max/64, dx_max/128 });
+    dxs({/*dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32,*/ dx_max/64, dx_max/128 });
 
   // gauss shape functor instantiation
   gauss_t gauss({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0});
@@ -159,8 +158,9 @@ int main()
         // running the solver
 	slv.advance(nt);
 
-        // asserting that periodic boundries did not affect the result
+        // asserting that boundary conditions do not affect the result
         // and that the chosen domain length is enough to have compact support up to machine precision
+        // exact(0) === 0; slv.advectee(0) === 0;
         assert(exact(0) == slv.advectee()(0));
         assert(exact(nx-1) == slv.advectee()(nx-1));
 

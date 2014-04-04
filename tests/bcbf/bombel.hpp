@@ -22,9 +22,13 @@ class bombel : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
   // member fields
   real_t g, Tht_amb;
 
-  // explicit forcings (to be applied before the eliptic solver)
+//<listing-1>
+  // explicit forcings 
+  // (to be applied before the eliptic solver)
   void update_rhs(
-    libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs, 
+    libmpdataxx::arrvec_t<
+      typename parent_t::arr_t
+    > &rhs, 
     const real_t &dt, 
     const int &at 
   ) {
@@ -37,10 +41,11 @@ class bombel : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
     const auto Tht  = this->psi_n(ix::tht); 
     const auto &ijk = this->ijk;
 
-    rhs.at(ix::w)(ijk) += g / 300 * (Tht(ijk) - Tht_amb) / Tht_amb; 
-//    rhs.at(ix::w)(ijk) += g /*/ 300*/ * (Tht(ijk) - Tht_amb) / Tht_amb; 
-                            // TODO!!!! 
+    rhs.at(ix::w)(ijk) += 
+      g / 300 * (Tht(ijk) - Tht_amb) / Tht_amb; 
   }
+//</listing-1>
+//    rhs.at(ix::w)(ijk) += g /*/ 300*/ * (Tht(ijk) - Tht_amb) / Tht_amb; 
 
   public:
 

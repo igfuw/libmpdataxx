@@ -34,8 +34,6 @@ struct ct_params_t : ct_params_default_t
   enum { opts = opts_arg};
   enum { rhs_scheme = solvers::trapez };
   
-  //enum { fp_round_mode = FE_TONEAREST };
-
   // indices - TODO move vip to separate enum
   struct ix { enum {
     qx, h, 
