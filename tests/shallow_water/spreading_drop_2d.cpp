@@ -47,7 +47,7 @@ void test(const std::string &outdir)
     
     // options
     enum { opts = opts_arg };
-    enum { rhs_scheme = solvers::strang };
+    enum { rhs_scheme = solvers::trapez };
     
     // indices
     struct ix { enum {

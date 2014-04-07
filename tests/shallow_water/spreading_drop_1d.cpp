@@ -32,7 +32,7 @@ struct ct_params_t : ct_params_default_t
   
   // options
   enum { opts = opts_arg };
-  enum { rhs_scheme = solvers::strang };
+  enum { rhs_scheme = solvers::trapez };
   
   //enum { fp_round_mode = FE_TONEAREST };
 
