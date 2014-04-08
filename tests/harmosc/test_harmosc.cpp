@@ -7,10 +7,7 @@
  * @brief a minimalistic model of a harmonic oscillator
  * (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
  *
- * \image html "../../tests/harmosc/figure_euler_it=1.svg"
- * \image html "../../tests/harmosc/figure_euler_it=1.svg"
- * \image html "../../tests/harmosc/figure_strang_it=2.svg"
- * \image html "../../tests/harmosc/figure_strang_it=2.svg"
+ * \image html "../../tests/harmosc/out.svg"
  */
 
 #include "coupled_harmosc.hpp"
@@ -35,7 +32,7 @@ int main()
     enum { n_eqs = 2 };
     enum { opts = 0 };
     enum { rhs_scheme = 
-      solvers::rhs_scheme_t::strang };
+      solvers::rhs_scheme_t::trapez };
     struct ix { enum {psi, phi}; };
   };
 //</listing-1>

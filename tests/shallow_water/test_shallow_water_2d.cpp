@@ -25,7 +25,7 @@ int main()
     enum { n_eqs = 3 };
 
     // options
-    enum { rhs_scheme = solvers::strang };
+    enum { rhs_scheme = solvers::trapez };
     
     // indices
     struct ix { enum {qx, qy, h, vip_i=qx, vip_j=qy, vip_den=h}; };

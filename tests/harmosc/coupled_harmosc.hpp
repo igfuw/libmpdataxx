@@ -43,7 +43,7 @@ struct coupled_harmosc : public
     switch (at) 
     {
       // explicit solution for R^{n} 
-      // (note: with strang used only at t=0)
+      // (note: with trapez used only at t=0)
       case (0): 
       rhs.at(ix::psi)(i) += omega * phi(i);
       rhs.at(ix::phi)(i) -= omega * psi(i);
