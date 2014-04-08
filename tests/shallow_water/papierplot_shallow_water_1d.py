@@ -29,8 +29,8 @@ def initial(x):
     return np.where(x**2<=1, 1-x**2, 0)
 
 # plotting analytic solutions for height and velocity 
-def analytic_fig(ax,time_l = [0,1,2,3]):
-    x_range = np.linspace(-8,8,100)
+def analytic_fig(ax,time_l = [0,1,2,3], nx=320):
+    x_range = np.linspace(-8,8, nx)
     oznacz = ['k', 'g', 'c', 'y', 'b', 'm', 'r']
     y0 = initial(x_range)
 
@@ -102,7 +102,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], it=300):
         x_m = reading_modeloutput(dir+casename+".x") - x_shift
         t_m = reading_modeloutput(dir+casename+".t")
         x_range  = x_m[0]
-        
+
         print "plotting " + str(casename) + ", t = " + str(t_m[it,0])        
         ax = subplot(len(casename_l)+1,1,ic+2)
         analytic_model_fig(ax, x_range, h_m, v_m, t_m, it)
