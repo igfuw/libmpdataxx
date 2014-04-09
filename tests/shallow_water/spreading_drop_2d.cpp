@@ -110,6 +110,6 @@ int main()
   test<formulae::opts::fct | formulae::opts::iga>("spreading_drop_2d_fct+iga.out");
   //test<formulae::opts::fct | formulae::opts::abs>("spreading_drop_2d_fct+abs.out");
   system("python ../../../tests/shallow_water/papierplot_shallow_water_2d.py fct+iga");
-  //system("python");
+  system("python ../../../tests/shallow_water/plot2D_shallow_water_2d.py");
 }
 
