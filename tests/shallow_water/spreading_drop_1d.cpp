@@ -31,7 +31,7 @@ struct ct_params_t : ct_params_default_t
   enum { n_eqs = 2 };
   
   // options
-  enum { opts = opts_arg};
+  enum { opts = opts_arg };
   enum { rhs_scheme = solvers::trapez };
   
   // indices - TODO move vip to separate enum

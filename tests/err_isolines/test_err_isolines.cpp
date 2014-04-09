@@ -26,7 +26,6 @@ blitz::firstIndex i;
 boost::ptr_map<std::string, std::ofstream> outfiles;
 using T = double; // with long double this is a good test to show differences between float and double!!!
 
-
 // helper function template to ease adding the solvers to the pointer map
 template <formulae::opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_iters)
@@ -95,7 +94,7 @@ int main()
 
   const std::list<T> 
     courants({ .05, .1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95}),
-    dxs({/*dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32,*/ dx_max/64, dx_max/128 });
+    dxs({dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32, dx_max/64, dx_max/128 });
 
   // gauss shape functor instantiation
   gauss_t gauss({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0});

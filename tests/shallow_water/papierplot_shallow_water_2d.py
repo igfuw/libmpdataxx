@@ -26,9 +26,9 @@ def initial(x,y):
     return np.where(rad2(x,y)<=1, 1-rad2(x,y), 0)
 
 # plotting analytic solutions for height and velocity 
-def analytic_fig(ax, time_l = [0,1,2,3], x_range = np.linspace(-8,8,100),
-                              y_range = np.zeros(100)):
-    oznacz = ['k', 'g', 'c', 'y', 'b', 'm', 'r']
+def analytic_fig(ax, time_l = [0,1,2,3], x_range = np.linspace(-8,8,320),
+                              y_range = np.zeros(320)):
+    oznacz = ['k', 'b', 'c', 'y', 'g', 'm', 'r']
     y0 = initial(x_range, y_range)
 
     for it, time in enumerate(time_l):

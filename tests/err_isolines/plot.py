@@ -48,6 +48,7 @@ fig.gca().set_ylim(mn,mx)
 fig.gca().set_title(r'log$_2$(err)')
 fig.gca().set_xlabel('r; C=0')
 fig.gca().set_ylabel('r; C=1')
+fig.set_size_inches(9.75,7.5)
 
 # colours
 mpble = fig.gca().contourf(xi,yi,zi,levels,cmap=plt.cm.jet)
