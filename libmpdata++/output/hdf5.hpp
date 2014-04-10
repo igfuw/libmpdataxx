@@ -69,9 +69,9 @@ namespace libmpdataxx
           // x,y,z
           if (parent_t::n_dims == 2)
           {
-            shape[1] = limit[1] = chunk[1] = this->mem->span[0];
+            shape[1] = limit[1] = chunk[1] = this->mem->grid_size[0];
             shape[2] = limit[2] = chunk[2] = 1;
-	    shape[3] = limit[3] = chunk[3] = this->mem->span[1];
+	    shape[3] = limit[3] = chunk[3] = this->mem->grid_size[1];
 
 	    count[0] = count[1] = count[2] = 1;
             count[3] = shape[3];
@@ -151,7 +151,7 @@ namespace libmpdataxx
 	      H5::DataSpace space = vars[v.first].getSpace();
 
 	      // halos present -> data not contiguous -> looping over the major rank
-	      for (int i = 0; i < this->mem->span[0]; ++i)
+	      for (int i = 0; i < this->mem->grid_size[0]; ++i)
 	      {
                 offst[1] = i;
                 space.selectHyperslab(H5S_SELECT_SET, count, offst);

@@ -36,7 +36,7 @@ int main()
 
     // run-time parameters
     solver_t::rt_params_t p;
-    p.span = {24, 24};
+    p.grid_size = {24, 24};
     p.n_iters = n_iters;
     p.outfreq = nt;
     p.gnuplot_with = "lines";
@@ -63,8 +63,8 @@ int main()
       blitz::firstIndex i;
       blitz::secondIndex j;
       slv.advectee() = exp(
-	-sqr(i-(p.span[x]-1)/2.) / (2.*pow((p.span[x]-1)/10, 2)) // TODO: assumes dx=dy=1
-	-sqr(j-(p.span[y]-1)/2.) / (2.*pow((p.span[y]-1)/10, 2)) 
+	-sqr(i-(p.grid_size[x]-1)/2.) / (2.*pow((p.grid_size[x]-1)/10, 2)) // TODO: assumes dx=dy=1
+	-sqr(j-(p.grid_size[y]-1)/2.) / (2.*pow((p.grid_size[y]-1)/10, 2)) 
       );  
       slv.advector(x) = .5; 
       slv.advector(y) = .25;

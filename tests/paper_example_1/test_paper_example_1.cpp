@@ -32,7 +32,7 @@ int main()
   int nx = 128, nt = 128;
   ct_params_t::real_t dx = 0.128;
 
-  p.span = { nx };
+  p.grid_size = { nx };
   p.n_iters = 2;
   p.outfreq = nt / 10; 
  
@@ -41,7 +41,7 @@ int main()
 
   // initial condition
   blitz::firstIndex i;
-  // Witch of Agnesi with a=.5 (TODO!)
+  // Witch of Agnesi with a=.5 
   run.advectee() = 1 / (
     pow(dx*(i - (nx-1)/2.), 2) + 1
   );

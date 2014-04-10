@@ -62,7 +62,7 @@ int main()
   rt_params.gnuplot_term = "svg";
 
   rt_params.tol = 1e-5;
-  rt_params.span = {nx, ny};
+  rt_params.grid_size = {nx, ny};
 
   libmpdataxx::concurr::threads<
     solver_t, 

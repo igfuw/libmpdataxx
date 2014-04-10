@@ -124,7 +124,7 @@ namespace libmpdataxx
 	) {
 	  // psi[n-1] secret stash for velocity extrapolation in time
 	  parent_t::alloc(mem, p);
-	  parent_t::alloc_tmp_sclr(mem, p.span, __FILE__, parent_t::n_dims); 
+	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, parent_t::n_dims); 
 	}
  
         protected:

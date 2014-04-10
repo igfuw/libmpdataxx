@@ -43,7 +43,7 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   typename solver_t::rt_params_t p;
 
   p.n_iters = n_iters;
-  p.span = {nx};
+  p.grid_size = {nx};
 
   // TODO: wouldn't open bc be better?
   boost::assign::ptr_map_insert<

@@ -38,7 +38,7 @@ int main()
   solver_t::rt_params_t rt_params; 
 
   rt_params.tol = 1e-5;
-  rt_params.span = {nx, ny};
+  rt_params.grid_size = {nx, ny};
 
   rt_params.dt = .5;
   rt_params.di = rt_params.dj = 10.;

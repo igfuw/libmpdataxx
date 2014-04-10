@@ -67,7 +67,7 @@ int main()
 
   // pre instantation
   p.n_iters = 4;
-  p.span = {41, 41, 41};
+  p.grid_size = {41, 41, 41};
 
   p.outfreq = nt;
   p.outvars[0].name = "psi";

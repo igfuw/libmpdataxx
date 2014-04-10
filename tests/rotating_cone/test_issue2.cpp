@@ -68,7 +68,7 @@ void test(const std::string filename, const int &nx, const int &ny)
 
   // pre instantiation
   p.n_iters = 2;
-  p.span = {nx, ny};
+  p.grid_size = {nx, ny};
 
   // instantiation
   concurr::threads<sim_t, bcond::open, bcond::open, bcond::open, bcond::open> run(p); 
@@ -79,8 +79,8 @@ void test(const std::string filename, const int &nx, const int &ny)
       r = 15. * dx,
       x0 = 75 * dx,
       y0 = 50 * dy,
-      xc = .5 * (p.span[x]-1) * dx,
-      yc = .5 * (p.span[y]-1) * dy;
+      xc = .5 * (p.grid_size[x]-1) * dx,
+      yc = .5 * (p.grid_size[y]-1) * dy;
 
     blitz::firstIndex i;
     blitz::secondIndex j;

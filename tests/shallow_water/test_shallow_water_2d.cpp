@@ -43,7 +43,7 @@ int main()
   // run-time parameters
   solver_t::rt_params_t p; 
 
-  p.span = { nx, ny };
+  p.grid_size = { nx, ny };
 
   p.dt = .05;
   p.di = 1;

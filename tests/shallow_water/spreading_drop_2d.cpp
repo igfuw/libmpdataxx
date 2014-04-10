@@ -72,7 +72,7 @@ void test(const std::string &outdir)
   p.dt = .01;
   p.di = .05;
   p.dj = .05;
-  p.span = { int(16 / p.di), int(16 / p.dj) };
+  p.grid_size = { int(16 / p.di), int(16 / p.dj) };
   p.g = 1;
   p.outfreq = outfreq;
   p.outdir = outdir;
@@ -95,8 +95,8 @@ void test(const std::string &outdir)
     blitz::firstIndex i;
     blitz::secondIndex j;
     run.advectee(ix::h) = intcond()(
-      p.di * i - (p.span[0]-1) * p.di / 2, 
-      p.dj * j - (p.span[1]-1) * p.dj / 2
+      p.di * i - (p.grid_size[0]-1) * p.di / 2, 
+      p.dj * j - (p.grid_size[1]-1) * p.dj / 2
     );
   }
   run.advectee(ix::qx) = 0;

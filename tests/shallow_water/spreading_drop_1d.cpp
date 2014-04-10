@@ -107,7 +107,7 @@ void test(const std::string &pfx)
 
   p.dt = .01;
   p.di = .05;
-  p.span = { int(16 / p.di) };
+  p.grid_size = { int(16 / p.di) };
   p.g = 1;
   p.vip_eps = 1.e-10; // in 1D apparently it's enough!
 
@@ -120,7 +120,7 @@ void test(const std::string &pfx)
   // initial condition
   {
     blitz::firstIndex i;
-    run.advectee(ix::h) = intcond()(p.di * i - (p.span[0]-1) * p.di / 2);
+    run.advectee(ix::h) = intcond()(p.di * i - (p.grid_size[0]-1) * p.di / 2);
   }
   run.advectee(ix::qx) = 0;
 

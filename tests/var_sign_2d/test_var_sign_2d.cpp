@@ -29,7 +29,7 @@ void add_solver(
   typename solver_t::rt_params_t p;
 
   // pre instantiation
-  p.span = {24, 24};
+  p.grid_size = {24, 24};
   p.outfreq = nt; 
   p.gnuplot_with = "lines";
   p.gnuplot_border = "4095";
@@ -58,8 +58,8 @@ void add_solver(
   blitz::firstIndex i;
   blitz::secondIndex j;
   slvs.back().advectee() = offset + exp(
-    -sqr(i-(p.span[x]-1)/2.) / (2.*pow((p.span[x]-1)/10, 2)) // TODO: assumes dx=dy=1
-    -sqr(j-(p.span[y]-1)/2.) / (2.*pow((p.span[y]-1)/10, 2))
+    -sqr(i-(p.grid_size[x]-1)/2.) / (2.*pow((p.grid_size[x]-1)/10, 2)) // TODO: assumes dx=dy=1
+    -sqr(j-(p.grid_size[y]-1)/2.) / (2.*pow((p.grid_size[y]-1)/10, 2))
   );  
   slvs.back().advector(x) = .5; 
   slvs.back().advector(y) = .25;

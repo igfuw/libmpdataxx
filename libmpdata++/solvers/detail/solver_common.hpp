@@ -106,7 +106,7 @@ namespace libmpdataxx
 
         struct rt_params_t 
         {
-          std::array<int, n_dims> span;
+          std::array<int, n_dims> grid_size;
         };
 
 	// ctor
@@ -119,7 +119,7 @@ namespace libmpdataxx
 
           // run-time sanity checks
           for (int d = 0; d < n_dims; ++d)
-            if (p.span[d] < 1) 
+            if (p.grid_size[d] < 1) 
               throw std::runtime_error("bogus grid size");
         }
 

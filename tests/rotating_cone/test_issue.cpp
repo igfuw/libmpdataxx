@@ -46,7 +46,7 @@ int main()
   // pre instantiatio
   {
     p.n_iters = 2;
-    p.span = {15, 14};
+    p.grid_size = {15, 14};
 
     p.outfreq = nt;
     p.outvars[0].name = "psi";
@@ -82,8 +82,8 @@ int main()
       r = 12. * dx,
       x0 = 1,//75 * dx,
       y0 = 0, //50 * dy,
-      xc = .5 * (p.span[x]-1) * dx,
-      yc = .5 * (p.span[y]-1) * dy;
+      xc = .5 * (p.grid_size[x]-1) * dx,
+      yc = .5 * (p.grid_size[y]-1) * dy;
 
     blitz::firstIndex i;
     blitz::secondIndex j;

@@ -26,7 +26,7 @@ void test(const std::string filename)
 //<listing-2>
   int nx = 600, nt = 1200;
   // run-time parameters
-  p.span = { nx };
+  p.grid_size = { nx };
   p.outfreq = nt; 
   p.outvars = {
     {0, {.name = "single-sign", .unit = "1"}},
