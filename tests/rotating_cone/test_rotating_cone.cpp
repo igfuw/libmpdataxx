@@ -27,7 +27,7 @@ void test(const std::string filename)
     using real_t = double;
 //<listing-1>
     enum { n_dims = 2 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
 //</listing-1>
     enum { opts = opts_arg };
   };
@@ -56,7 +56,7 @@ void test(const std::string filename)
 
   // pre instantiation
   p.n_iters = opts_iters; 
-  p.span = {101, 101};
+  p.grid_size = {101, 101};
 
   p.outfreq = nt; 
   p.outvars[0].name = "psi";
@@ -101,8 +101,8 @@ void test(const std::string filename)
       r = 15. * dx,
       x0 = 50 * dx,
       y0 = 75 * dy,
-      xc = .5 * (p.span[x]-1) * dx,
-      yc = .5 * (p.span[y]-1) * dy;
+      xc = .5 * (p.grid_size[x]-1) * dx,
+      yc = .5 * (p.grid_size[y]-1) * dy;
 
     blitz::firstIndex i;
     blitz::secondIndex j;

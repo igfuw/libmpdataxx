@@ -21,7 +21,7 @@ int main()
   {
     using real_t = double;
     enum { n_dims = 2 };
-    enum { n_eqs = 3 };
+    enum { n_eqns = 3 };
     enum { rhs_scheme = solvers::euler_b };
     enum { prs_scheme = solvers::cr };
     struct ix { enum {
@@ -52,21 +52,21 @@ int main()
 //    {ix::w,   {.name = "w",   .unit = "m/s"}}, 
     {ix::tht, {.name = "tht", .unit = "K"  }}
   };
-  p.gnuplot_view = "map";
-  p.gnuplot_output = "figure_%s_%04d.svg";
-  p.gnuplot_with = "lines";
-  p.gnuplot_surface = false;
-  p.gnuplot_contour = true;
-//  p.gnuplot_cbrange = "[299.85 : 300.65]";
-  p.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
-  p.gnuplot_maxcolors = 8;
-//  p.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
-  p.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
-  p.gnuplot_term = "svg";
+  rt_params.gnuplot_view = "map";
+  rt_params.gnuplot_output = "figure_%s_%04d.svg";
+  rt_params.gnuplot_with = "lines";
+  rt_params.gnuplot_surface = false;
+  rt_params.gnuplot_contour = true;
+//  rt_params.gnuplot_cbrange = "[299.85 : 300.65]";
+  rt_params.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
+  rt_params.gnuplot_maxcolors = 8;
+//  rt_params.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
+  rt_params.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
+  rt_params.gnuplot_term = "svg";
 //<listing-2>
-  p.tol = 1e-5;
+  rt_params.tol = 1e-5;
 //</listing-2>
-  p.span = {nx, ny};
+  rt_params.grid_size = {nx, ny};
 
   libmpdataxx::concurr::threads<
     solver_t, 

@@ -90,7 +90,7 @@ namespace libmpdataxx
  
               *gp << " lt ";
               if (this->outvars.size() == 1) *gp <<  p.gnuplot_lt;
-              else *gp << v.first;
+              else *gp << v.first + 1;
 
               *gp << (
                 t == 0 
@@ -150,9 +150,6 @@ namespace libmpdataxx
             std::ostringstream tmp;
 	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep << "'\n";
 	    tmp << "set title '"<< this->outvars[var].name << "  ("
-              /* // TODO: not every solver has dt defined!
-              << "t = " << std::dec << std::fixed << std::setprecision(0) << this->timestep * this->dt << " [s],"
-              */
               << " t/dt=" << std::setprecision(3) << this->timestep << ")'\n";
             *gp << tmp.str();
           }
@@ -164,12 +161,12 @@ namespace libmpdataxx
             int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
             if (count != 2) zmin = 0;
             *gp << " '-' binary " << binfmt(this->mem->advectee(0))
-                << " origin=(.5,.5," << zmin << ")" // TODO: dx/2, dy/2, 
+                << " origin=(.5,.5," << zmin << ")" 
 	        << " with image failsafe notitle,";
           }
           *gp << " '-'" 
               << " binary" << binfmt(this->mem->advectee(0)) 
-              << " origin=(.5,.5,0)" // TODO: dx/2, dy/2, ?
+              << " origin=(.5,.5,0)" 
 	      << " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
 	  gp->sendBinary(this->mem->advectee(var).copy());
           if (imagebg) gp->sendBinary(this->mem->advectee(var).copy());

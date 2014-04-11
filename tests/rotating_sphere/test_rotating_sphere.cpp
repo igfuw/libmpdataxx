@@ -19,8 +19,7 @@ struct ct_params_t : ct_params_default_t
   using real_t = double;
 //<listing-1>
   enum { n_dims = 3 };
-  enum { n_eqs = 1 };
-//</listing-1>
+  enum { n_eqns = 1 };
   enum { opts = formulae::opts::abs };
 };
 
@@ -72,7 +71,7 @@ int main()
 
   // pre instantation
   p.n_iters = 4;
-  p.span = {41, 41, 41};
+  p.grid_size = {41, 41, 41};
 
   p.outfreq = nt;
   p.outvars[0].name = "psi";

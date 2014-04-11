@@ -35,8 +35,8 @@ namespace libmpdataxx
         void barrier() { }
 
         // ctors
-        mem_t(const std::array<int, solver_t::n_dims> &span) 
-          : parent_t::mem_t(span, size()) 
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size) 
+          : parent_t::mem_t(grid_size, size()) 
         {};
       };
 
@@ -49,7 +49,7 @@ namespace libmpdataxx
 
       // ctor
       serial(const typename solver_t::rt_params_t &p) : 
-        parent_t(p, new mem_t(p.span), mem_t::size())
+        parent_t(p, new mem_t(p.grid_size), mem_t::size())
       {}
 
     };

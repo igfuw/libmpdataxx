@@ -101,7 +101,7 @@ namespace libmpdataxx
         ) {   
 	  parent_t::alloc(mem, p);
 	  for (int n = 0; n < n_tmp(p.n_iters); ++n)
-	    parent_t::alloc_tmp_vctr(mem, p.span, __FILE__);
+	    parent_t::alloc_tmp_vctr(mem, p.grid_size, __FILE__);
 	}   
       };
 

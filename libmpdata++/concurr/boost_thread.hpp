@@ -58,9 +58,9 @@ namespace libmpdataxx
 	}
 
         // ctor
-        mem_t(const std::array<int, solver_t::n_dims> &span) :
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size) :
           b(size()),
-          parent_t::mem_t(span, size()) 
+          parent_t::mem_t(grid_size, size()) 
         {}; 
 
 	void barrier()
@@ -88,7 +88,7 @@ namespace libmpdataxx
 
       // ctor
       boost_thread(const typename solver_t::rt_params_t &p) : 
-        parent_t(p, new mem_t(p.span), mem_t::size())
+        parent_t(p, new mem_t(p.grid_size), mem_t::size())
       {}
 
     };

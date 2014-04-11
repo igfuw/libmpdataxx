@@ -36,7 +36,7 @@ namespace libmpdataxx
       {
 	public:
 
-        enum { n_eqs = ct_params_t::n_eqs };
+        enum { n_eqns = ct_params_t::n_eqns };
         enum { halo = minhalo }; 
         enum { n_dims = ct_params_t::n_dims };
         enum { n_tlev = n_tlev_ };
@@ -61,7 +61,7 @@ namespace libmpdataxx
 	virtual void cycle(int e) final
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
-          if (e == n_eqs - 1) this->mem->cycle(); 
+          if (e == n_eqns - 1) this->mem->cycle(); 
 	}
 
 	virtual void xchng(int e, int l = 0) = 0; // TODO: make l -> -l
@@ -106,20 +106,20 @@ namespace libmpdataxx
 
         struct rt_params_t 
         {
-          std::array<int, n_dims> span;
+          std::array<int, n_dims> grid_size;
         };
 
 	// ctor
 	solver_common(mem_t *mem, const rt_params_t &p) :
-	  n(n_eqs, 0), 
+	  n(n_eqns, 0), 
           mem(mem)
 	{
           // compile-time sanity checks
-	  static_assert(n_eqs > 0, "!");
+	  static_assert(n_eqns > 0, "!");
 
           // run-time sanity checks
           for (int d = 0; d < n_dims; ++d)
-            if (p.span[d] < 1) 
+            if (p.grid_size[d] < 1) 
               throw std::runtime_error("bogus grid size");
         }
 
@@ -166,9 +166,9 @@ namespace libmpdataxx
 
             // proper solver stuff
             hook_ante_step();
-	    for (int e = 0; e < n_eqs; ++e) xchng(e);
-	    for (int e = 0; e < n_eqs; ++e) advop(e);
-	    for (int e = 0; e < n_eqs; ++e) cycle(e); // note: cycle assumes ascending loop index
+	    for (int e = 0; e < n_eqns; ++e) xchng(e);
+	    for (int e = 0; e < n_eqns; ++e) advop(e);
+	    for (int e = 0; e < n_eqns; ++e) cycle(e); // note: cycle assumes ascending loop index
             timestep++;
             hook_post_step();
 	  }   
