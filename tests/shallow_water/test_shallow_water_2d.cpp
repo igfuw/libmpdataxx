@@ -22,7 +22,7 @@ int main()
   {
     using real_t = double;
     enum { n_dims = 2 };
-    enum { n_eqs = 3 };
+    enum { n_eqns = 3 };
 
     // options
     enum { rhs_scheme = solvers::trapez };
@@ -43,7 +43,7 @@ int main()
   // run-time parameters
   solver_t::rt_params_t p; 
 
-  p.span = { nx, ny };
+  p.grid_size = { nx, ny };
 
   p.dt = .05;
   p.di = 1;

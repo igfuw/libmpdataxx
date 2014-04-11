@@ -77,7 +77,7 @@ namespace libmpdataxx
           outvars(p.outvars)
 	{
           // default value for outvars
-          if (this->outvars.size() == 0 && parent_t::n_eqs == 1)
+          if (this->outvars.size() == 0 && parent_t::n_eqns == 1)
             outvars = {{0, {.name = "", .unit = ""}}};
         }
       };

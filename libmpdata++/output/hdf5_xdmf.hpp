@@ -168,7 +168,7 @@ namespace libmpdataxx
               case 2:
               {
                 // halos present -> data not contiguous -> looping over the major rank
-                for (int i = 0; i < this->mem->span[0]; ++i)
+                for (int i = 0; i < this->mem->grid_size[0]; ++i)
                 {
                   offst[0] = i;
                   space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
@@ -179,9 +179,9 @@ namespace libmpdataxx
               case 3:
               {
                 // halos present -> data not contiguous -> looping over the major rank
-                for (int i = 0; i < this->mem->span[0]; ++i)
+                for (int i = 0; i < this->mem->grid_size[0]; ++i)
                 {
-                  for (int j = 0; j < this->mem->span[1]; ++j)
+                  for (int j = 0; j < this->mem->grid_size[1]; ++j)
                   {
                     offst[0] = i;
                     offst[1] = j;

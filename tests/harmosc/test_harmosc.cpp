@@ -29,7 +29,7 @@ int main()
   {
     using real_t = T;
     enum { n_dims = 1 };
-    enum { n_eqs = 2 };
+    enum { n_eqns = 2 };
     enum { opts = 0 };
     enum { rhs_scheme = 
       solvers::rhs_scheme_t::trapez };
@@ -49,7 +49,7 @@ int main()
   p.omega = 2 * pi<typename ct_params_t::real_t>() 
             / p.dt / 400;
 //</listing-2>
-  p.span = {1000};
+  p.grid_size = {1000};
   p.outfreq = 10;
 
   using ix = typename ct_params_t::ix;
@@ -66,7 +66,7 @@ int main()
   {
     blitz::firstIndex i;
     run.advectee(ix::psi) = pow(
-      sin(i * pi<real_t>() / (p.span[0]-1) + pi<real_t>()/3), 
+      sin(i * pi<real_t>() / (p.grid_size[0]-1) + pi<real_t>()/3), 
       300
     );
     run.advectee(ix::phi) = real_t(0);

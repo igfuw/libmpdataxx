@@ -29,7 +29,7 @@ int main()
   { 
     using real_t = long double; 
     enum { n_dims = 1 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
     enum { opts = 0 };
   };
 
@@ -40,7 +40,7 @@ int main()
   {
     using solver_t = solvers::mpdata<ct_params_t>;
     typename solver_t::rt_params_t p;
-    p.span = {nx};
+    p.grid_size = {nx};
     concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
     slv.advance(nt);
   }
@@ -50,7 +50,7 @@ int main()
   {
     using solver_t = solvers::mpdata<ct_params_t>;
     typename solver_t::rt_params_t p;
-    p.span = {nx};
+    p.grid_size = {nx};
     concurr::boost_thread<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
     slv.advance(nt);
   }
@@ -60,7 +60,7 @@ int main()
   {
     using solver_t = solvers::mpdata<ct_params_t>;
     typename solver_t::rt_params_t p;
-    p.span = {nx};
+    p.grid_size = {nx};
     concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
     slv.advance(nt);
   }
@@ -70,7 +70,7 @@ int main()
   {
     using solver_t = solvers::mpdata<ct_params_t>;
     typename solver_t::rt_params_t p;
-    p.span = {nx};
+    p.grid_size = {nx};
     concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
     slv.advance(nt);
   }

@@ -48,13 +48,13 @@ void add_solver(vec_t &slvs, const std::string &fname)
   {
     using real_t = T;
     enum { n_dims = 1 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
     enum { opts = opt };
   };
   using output_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
   typename output_t::rt_params_t p;
   setopts(p, nt, fname);
-  p.span = {n};
+  p.grid_size = {n};
   slvs.push_back(new concurr::threads<output_t, bcond::cyclic, bcond::cyclic>(p));
   setup(slvs.back(), n);
 }

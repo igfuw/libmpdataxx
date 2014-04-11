@@ -104,7 +104,7 @@ class shallow_water<
   typename std::enable_if<ct_params_t::n_dims == 1>::type
 > : public shallow_water_common<ct_params_t>
 {
-  static_assert(ct_params_t::n_eqs == 2, "{qx, h} in 1D");
+  static_assert(ct_params_t::n_eqns == 2, "{qx, h} in 1D");
   using parent_t = shallow_water_common<ct_params_t>;
   using parent_t::parent_t; // inheriting ctors
   using ix = typename ct_params_t::ix;
@@ -139,7 +139,7 @@ class shallow_water<
   typename std::enable_if<ct_params_t::n_dims == 2>::type
 > : public shallow_water_common<ct_params_t>
 {
-  static_assert(ct_params_t::n_eqs == 3, "{qx, qy, h} in 2D");
+  static_assert(ct_params_t::n_eqns == 3, "{qx, qy, h} in 2D");
   using parent_t = shallow_water_common<ct_params_t>;
   using parent_t::parent_t; // inheriting ctors
   using ix = typename ct_params_t::ix;

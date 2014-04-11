@@ -81,14 +81,14 @@ namespace libmpdataxx
         private:
 
         // helper methods to define subdomain ranges
-	int min(const int &span, const int &rank, const int &size) 
+	int min(const int &grid_size, const int &rank, const int &size) 
 	{ 
-	  return rank * span / size; 
+	  return rank * grid_size / size; 
 	}
 
-	int max(const int &span, const int &rank, const int &size) 
+	int max(const int &grid_size, const int &rank, const int &size) 
 	{ 
-          return min(span, rank + 1, size) - 1; 
+          return min(grid_size, rank + 1, size) - 1; 
 	}
 
 	protected:
@@ -126,7 +126,7 @@ namespace libmpdataxx
 	  solver_t::alloc(mem.get(), p);
 
           // allocate per-thread structures
-          init(p, p.span, size); 
+          init(p, p.grid_size, size); 
         }
 
         private:
@@ -134,7 +134,7 @@ namespace libmpdataxx
         // 1D version
         void init(
           const typename solver_t::rt_params_t &p,
-          const std::array<int, 1> &span, const int &n0
+          const std::array<int, 1> &grid_size, const int &n0
         )
         {
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
@@ -142,10 +142,10 @@ namespace libmpdataxx
           switch (bcxl) // TODO: make a function that does it
           {
             case bcond::cyclic: 
-              bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+              bxl.reset(new bcond::cyclic_left_1d<real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
               break;
             case bcond::open: 
-              bxl.reset(new bcond::open_left_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+              bxl.reset(new bcond::open_left_1d<real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
               break;
             default: assert(false);
           }
@@ -153,10 +153,10 @@ namespace libmpdataxx
           switch (bcxr) // TODO: make a function that does it
           {
             case bcond::cyclic:
-	      bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+	      bxr.reset(new bcond::cyclic_rght_1d<real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
               break;
             case bcond::open: 
-              bxr.reset(new bcond::open_rght_1d<real_t>(rng_t(0, span[0]-1), solver_t::halo));
+              bxr.reset(new bcond::open_rght_1d<real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
               break;
             default: assert(false);
           }
@@ -165,7 +165,7 @@ namespace libmpdataxx
           {
             shrdl.reset(new bcond::shared<real_t>());
             shrdr.reset(new bcond::shared<real_t>());
-            const rng_t i(min(span[0], i0, n0), max(span[0], i0, n0)); 
+            const rng_t i(min(grid_size[0], i0, n0), max(grid_size[0], i0, n0)); 
 	    algos.push_back(
               new solver_t(
                 typename solver_t::ctor_args_t({
@@ -183,7 +183,7 @@ namespace libmpdataxx
         // 2D version
         void init(
           const typename solver_t::rt_params_t &p,
-	  const std::array<int, 2> &span, 
+	  const std::array<int, 2> &grid_size, 
           const int &n0, const int &n1 = 1
         ) {
 // TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
@@ -197,10 +197,10 @@ namespace libmpdataxx
               switch (bcxl) // TODO: make a function taht does it
               {
 	        case bcond::cyclic:
-		  bxl.reset(new bcond::cyclic_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+		  bxl.reset(new bcond::cyclic_left_2d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                   break;
                 case bcond::open:
-	          bxl.reset(new bcond::open_left_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+	          bxl.reset(new bcond::open_left_2d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                   break;
 	        default: assert(false);
               }
@@ -209,10 +209,10 @@ namespace libmpdataxx
 	      switch (bcxr) // TODO: make a function taht does it
               {
                 case bcond::cyclic:
-                  bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                  bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                   break;
                 case bcond::open:
-                  bxr.reset(new bcond::open_rght_2d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                  bxr.reset(new bcond::open_rght_2d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                   break;
 	        defalt: assert(false);
               }
@@ -221,13 +221,13 @@ namespace libmpdataxx
 	      switch (bcyl) // TODO: make a function taht does it
               {
                 case bcond::cyclic:
-                  byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
 //                case bcond::polar:
-//                  byl.reset(new bcond::polar_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, span[0] / 2));
+//                  byl.reset(new bcond::polar_left_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo, grid_size[0] / 2));
 //                  break;
                 case bcond::open:
-                  byl.reset(new bcond::open_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  byl.reset(new bcond::open_left_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
                 default: assert(false);
               }
@@ -236,13 +236,13 @@ namespace libmpdataxx
 	      switch (bcyr) // TODO: make a function taht does it
               {
                 case bcond::cyclic:
-                  byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
 //                case bcond::polar:
-//                  byr.reset(new bcond::polar_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, span[0] / 2));
+//                  byr.reset(new bcond::polar_rght_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo, grid_size[0] / 2));
 //                  break;
                 case bcond::open:
-                  byr.reset(new bcond::open_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                  byr.reset(new bcond::open_rght_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
                 default: assert(false);
               }
@@ -251,8 +251,8 @@ namespace libmpdataxx
               shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
 
               const rng_t 
-                i( min(span[0], i0, n0), max(span[0], i0, n0) ),
-                j( min(span[1], i1, n1), max(span[1], i1, n1) );
+                i( min(grid_size[0], i0, n0), max(grid_size[0], i0, n0) ),
+                j( min(grid_size[1], i1, n1), max(grid_size[1], i1, n1) );
               algos.push_back(
                 new solver_t(
                   typename solver_t::ctor_args_t({
@@ -272,7 +272,7 @@ namespace libmpdataxx
         // 3D version
         void init(
           const typename solver_t::rt_params_t &p,
-	  const std::array<int, 3> &span, 
+	  const std::array<int, 3> &grid_size, 
           const int &n0, const int &n1 = 1, const int &n2 = 1
         ) {
           typename solver_t::bcp_t bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;
@@ -288,10 +288,10 @@ namespace libmpdataxx
                 switch (bcxl) // TODO: make a function that does it
                 {
                   case bcond::cyclic:
-                    bxl.reset(new bcond::cyclic_left_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                    bxl.reset(new bcond::cyclic_left_3d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                     break;
                   case bcond::open:
-                    bxl.reset(new bcond::open_left_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                    bxl.reset(new bcond::open_left_3d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }
@@ -300,10 +300,10 @@ namespace libmpdataxx
                 switch (bcxr) // TODO: make a function that does it
                 {
                   case bcond::cyclic:
-                    bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                    bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                     break;
                   case bcond::open:
-                    bxr.reset(new bcond::open_rght_3d<0, real_t>(rng_t(0, span[0]-1), solver_t::halo));
+                    bxr.reset(new bcond::open_rght_3d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }
@@ -312,10 +312,10 @@ namespace libmpdataxx
                 switch (bcyl) // TODO: make a function taht does it
                 {
                   case bcond::cyclic:
-                    byl.reset(new bcond::cyclic_left_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                    byl.reset(new bcond::cyclic_left_3d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                     break;
                   case bcond::open:
-                    byl.reset(new bcond::open_left_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+                    byl.reset(new bcond::open_left_3d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }
@@ -324,10 +324,10 @@ namespace libmpdataxx
                 switch (bcyr) // TODO: make a function taht does it
                 {
                   case bcond::cyclic:
-		    byr.reset(new bcond::cyclic_rght_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+		    byr.reset(new bcond::cyclic_rght_3d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                     break;
                   case bcond::open:
-		    byr.reset(new bcond::open_rght_3d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo));
+		    byr.reset(new bcond::open_rght_3d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }
@@ -336,10 +336,10 @@ namespace libmpdataxx
                 switch (bczl) // TODO: make a function taht does it
                 {
                   case bcond::cyclic:
-		    bzl.reset(new bcond::cyclic_left_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+		    bzl.reset(new bcond::cyclic_left_3d<2, real_t>(rng_t(0, grid_size[2]-1), solver_t::halo));
                     break;
                   case bcond::open:
-		    bzl.reset(new bcond::open_left_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+		    bzl.reset(new bcond::open_left_3d<2, real_t>(rng_t(0, grid_size[2]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }
@@ -348,10 +348,10 @@ namespace libmpdataxx
                 switch (bczr) // TODO: make a function taht does it
                 {
                   case bcond::cyclic:
-		    bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+		    bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(rng_t(0, grid_size[2]-1), solver_t::halo));
                     break;
                   case bcond::open:
-		    bzr.reset(new bcond::open_rght_3d<2, real_t>(rng_t(0, span[2]-1), solver_t::halo));
+		    bzr.reset(new bcond::open_rght_3d<2, real_t>(rng_t(0, grid_size[2]-1), solver_t::halo));
                     break;
                   default: assert(false);
                 }
@@ -360,9 +360,9 @@ namespace libmpdataxx
                 shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
 
                 rng_t
-                  i( min(span[0], i0, n0), max(span[0], i0, n0) ),
-                  j( min(span[1], i1, n1), max(span[1], i1, n1) ),
-                  k( min(span[2], i2, n2), max(span[2], i2, n2) );
+                  i( min(grid_size[0], i0, n0), max(grid_size[0], i0, n0) ),
+                  j( min(grid_size[1], i1, n1), max(grid_size[1], i1, n1) ),
+                  k( min(grid_size[2], i2, n2), max(grid_size[2], i2, n2) );
 
 		algos.push_back(
                   new solver_t(

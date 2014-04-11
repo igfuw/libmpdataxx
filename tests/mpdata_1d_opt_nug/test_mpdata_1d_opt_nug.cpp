@@ -35,13 +35,13 @@ void add_solver(vec_t &slvs, const std::string &sfx)
   {
     using real_t = T;
     enum { n_dims = 1 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
     enum { opts = opt };
   };
   using solver_t = solvers::mpdata<ct_params_t>;
   typename solver_t::rt_params_t p;
   setopts(p, sfx);
-  p.span = {n};
+  p.grid_size = {n};
   slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(p));
 }
 

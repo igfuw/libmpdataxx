@@ -20,7 +20,7 @@ struct ct_params_t : ct_params_default_t
 {
   using real_t = float;
   enum { n_dims = 1 };
-  enum { n_eqs = 1 };
+  enum { n_eqns = 1 };
   enum { opts = 0 };
 };
 
@@ -33,7 +33,7 @@ void add_solver(slvs_t &slvs, int n_iters)
   typename solver_t::rt_params_t p;
 
   // pre-instantiation stuff
-  p.span[0] = n;
+  p.grid_size[0] = n;
   p.n_iters = n_iters;
   p.outfreq = nt / 10; 
   {

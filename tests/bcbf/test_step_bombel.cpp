@@ -21,7 +21,7 @@ int main()
   {
     using real_t = double;
     enum { n_dims = 2 };
-    enum { n_eqs = 3 };
+    enum { n_eqns = 3 };
     enum { rhs_scheme = solvers::euler_b };
     enum { prs_scheme = solvers::cr };
     struct ix { enum {u, w, tht, vip_i=u, vip_j=w, vip_den=-1}; };
@@ -62,7 +62,7 @@ int main()
   rt_params.gnuplot_term = "svg";
 
   rt_params.tol = 1e-5;
-  rt_params.span = {nx, ny};
+  rt_params.grid_size = {nx, ny};
 
   libmpdataxx::concurr::threads<
     solver_t, 
