@@ -43,7 +43,7 @@ void test(const std::string &outdir)
   {
     using real_t = ::real_t;
     enum { n_dims = 2 };
-    enum { n_eqs = 3 };
+    enum { n_eqns = 3 };
     
     // options
     enum { opts = opts_arg };

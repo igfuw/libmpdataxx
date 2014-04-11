@@ -49,7 +49,7 @@ void test(const std::string filename, const int &nx, const int &ny)
   {
     using real_t = float;
     enum { n_dims = 2 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
     enum { opts = opts_arg };
   };
 

@@ -28,7 +28,7 @@ struct ct_params_t : ct_params_default_t
 {
   using real_t = ::real_t;
   enum { n_dims = 1 };
-  enum { n_eqs = 2 };
+  enum { n_eqns = 2 };
   
   // options
   enum { opts = opts_arg };

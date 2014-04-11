@@ -35,7 +35,7 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   {
     using real_t = T;
     enum { n_dims = 1 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
     enum { opts = opt };
   };
   using solver_t = solvers::mpdata<ct_params_t>;

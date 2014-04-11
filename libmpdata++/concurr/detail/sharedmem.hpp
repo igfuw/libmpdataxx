@@ -43,7 +43,7 @@ namespace libmpdataxx
 
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC;
-        std::vector<arrvec_t<arr_t>> psi; // TODO: since n_eqs is known, could make it an std::array!
+        std::vector<arrvec_t<arr_t>> psi; // TODO: since n_eqns is known, could make it an std::array!
 	std::unique_ptr<arr_t> G;
         arrvec_t<arr_t> khn_tmp; // Kahan sum for donor-cell
 

@@ -120,8 +120,8 @@ namespace libmpdataxx
         )   
         {
           // psi
-          mem->psi.resize(parent_t::n_eqs);
-	  for (int e = 0; e < parent_t::n_eqs; ++e) // equations
+          mem->psi.resize(parent_t::n_eqns);
+	  for (int e = 0; e < parent_t::n_eqns; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(
                 parent_t::rng_sclr(p.grid_size[0]),

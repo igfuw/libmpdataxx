@@ -57,7 +57,7 @@ namespace libmpdataxx
 	  );
 	  
 	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-	  if (iter == this->n_iters - 1 && parent_t::n_eqs > 1) this->mem->barrier();  // TODO: move to common
+	  if (iter == this->n_iters - 1 && parent_t::n_eqns > 1) this->mem->barrier();  // TODO: move to common
 	}
       };
     }; // namespace detail

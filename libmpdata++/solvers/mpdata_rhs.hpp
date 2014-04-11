@@ -53,7 +53,7 @@ namespace libmpdataxx
         update_rhs_called = true;
 #endif
         // zero-out all rhs arrays
-	for (int e = 0; e < parent_t::n_eqs; ++e) 
+	for (int e = 0; e < parent_t::n_eqns; ++e) 
         {
           // do nothing for equations with no rhs
           if (formulae::opts::isset(ct_params_t::hint_norhs, formulae::opts::bit(e))) continue;
@@ -67,7 +67,7 @@ namespace libmpdataxx
         const typename parent_t::real_t &dt
       ) final
       {
-        for (int e = 0; e < parent_t::n_eqs; ++e) 
+        for (int e = 0; e < parent_t::n_eqns; ++e) 
         {
           // do nothing for equations with no rhs
           if (formulae::opts::isset(ct_params_t::hint_norhs, formulae::opts::bit(e))) continue;
@@ -169,7 +169,7 @@ namespace libmpdataxx
       {
         // TODO: optimise to skip allocs for equations with no rhs
 	parent_t::alloc(mem, p);
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, parent_t::n_eqs); // rhs array for each equation
+        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, parent_t::n_eqns); // rhs array for each equation
       }
     };
   }; // namespace solvers

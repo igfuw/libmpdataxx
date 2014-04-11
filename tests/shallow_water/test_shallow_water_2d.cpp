@@ -22,7 +22,7 @@ int main()
   {
     using real_t = double;
     enum { n_dims = 2 };
-    enum { n_eqs = 3 };
+    enum { n_eqns = 3 };
 
     // options
     enum { rhs_scheme = solvers::trapez };

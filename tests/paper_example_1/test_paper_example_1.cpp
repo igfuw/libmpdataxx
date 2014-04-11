@@ -12,7 +12,7 @@ int main()
   {
     using real_t = double;
     enum { n_dims = 1 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
   };
 
   // solver choice

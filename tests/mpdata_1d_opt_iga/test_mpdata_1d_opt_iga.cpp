@@ -51,7 +51,7 @@ void add_solver(vec_t &slvs, const std::string &fname)
   {
     using real_t = T;
     enum { n_dims = 1 };
-    enum { n_eqs = 2 };
+    enum { n_eqns = 2 };
     enum { opts = opt };
   };
   using output_t = output::gnuplot<solvers::mpdata<ct_params_t>>;

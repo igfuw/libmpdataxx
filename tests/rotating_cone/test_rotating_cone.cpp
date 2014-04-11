@@ -27,7 +27,7 @@ void test(const std::string filename)
     using real_t = double;
 //<listing-1>
     enum { n_dims = 2 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
 //</listing-1>
     enum { opts = opts_arg };
   };

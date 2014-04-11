@@ -29,7 +29,7 @@ int main()
     { 
       using real_t = float; 
       enum { n_dims = 2 };
-      enum { n_eqs = 1 }; 
+      enum { n_eqns = 1 }; 
       enum { opts = 0 };
     };
     using solver_t = output::gnuplot<solvers::mpdata<ct_params_t>>;

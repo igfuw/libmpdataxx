@@ -25,7 +25,7 @@ struct ct_params_t :ct_params_default_t
 {
   using real_t = float;
   enum { n_dims = 2 };
-  enum { n_eqs = 1 };
+  enum { n_eqns = 1 };
   enum { opts = formulae::opts::fct };
 };
 

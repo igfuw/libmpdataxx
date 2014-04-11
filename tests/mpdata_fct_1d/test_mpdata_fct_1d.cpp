@@ -58,7 +58,7 @@ void add_solver(vec_t &slvs, const std::string &fname, int n_iters)
   {
     using real_t = T;
     enum { n_dims = 1 };
-    enum { n_eqs = 2 };
+    enum { n_eqns = 2 };
     enum { opts = opt };
     enum { fp_round_mode = FE_TONEAREST }; // note: without it, values below minimum!
   };
