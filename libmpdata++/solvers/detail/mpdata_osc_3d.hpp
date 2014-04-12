@@ -41,7 +41,7 @@ namespace libmpdataxx
 	{   
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
-	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+	  if (opts::isset(ct_params_t::opts, opts::nug))
 	  {
             this->bcxl->fill_halos_sclr(*this->mem->G, this->j^this->halo, this->k^this->halo); // TODO: one xchng call?
             this->bcxr->fill_halos_sclr(*this->mem->G, this->j^this->halo, this->k^this->halo);
@@ -144,7 +144,7 @@ namespace libmpdataxx
 	      // TODO: shouldn't the above halo-filling be repeated here?
 	    }
 	    // donor-cell call 
-	    if (!formulae::opts::isset(ct_params_t::opts, formulae::opts::iga) || iter == 0)
+	    if (!opts::isset(ct_params_t::opts, opts::iga) || iter == 0)
 	    {
 	      formulae::donorcell::op_3d<ct_params_t::opts>(
 		this->mem->khn_tmp,

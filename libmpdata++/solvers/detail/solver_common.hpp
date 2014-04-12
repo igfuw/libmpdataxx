@@ -12,8 +12,6 @@
 
 #include <libmpdata++/solvers/detail/monitor.hpp>
 
-#include <libmpdata++/formulae/opts.hpp>
-
 #include <libmpdata++/bcond/bcond.hpp>
 
 #include <array>

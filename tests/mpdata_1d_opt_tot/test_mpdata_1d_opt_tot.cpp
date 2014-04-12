@@ -41,7 +41,7 @@ void setopts(T &p, const int nt, const std::string &fname)
   p.gnuplot_yrange = "[-2.25:2.25]";
 }
 
-template <formulae::opts::opts_t opt, class vec_t>
+template <opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &fname)
 {
   struct ct_params_t : ct_params_default_t
@@ -65,10 +65,10 @@ int main()
   boost::ptr_vector<concurr::any<T, n_dims>> slvs;
 
   add_solver<0>(slvs, "mpdata_iters=2");
-  add_solver<formulae::opts::abs | formulae::opts::tot>(slvs, "mpdata_iters=2_tot");
-  add_solver<formulae::opts::tot | formulae::opts::iga>(slvs, "mpdata_iters=2_tot_iga");
-  add_solver<formulae::opts::abs | formulae::opts::fct | formulae::opts::tot>(slvs, "mpdata_fct_iters=2_tot"); 
-  add_solver<formulae::opts::fct | formulae::opts::tot | formulae::opts::iga>(slvs, "mpdata_fct_iters=2_tot_iga"); 
+  add_solver<opts::abs | opts::tot>(slvs, "mpdata_iters=2_tot");
+  add_solver<opts::tot | opts::iga>(slvs, "mpdata_iters=2_tot_iga");
+  add_solver<opts::abs | opts::fct | opts::tot>(slvs, "mpdata_fct_iters=2_tot"); 
+  add_solver<opts::fct | opts::tot | opts::iga>(slvs, "mpdata_fct_iters=2_tot_iga"); 
 
   for (auto &slv : slvs) slv.advance(nt);
 }

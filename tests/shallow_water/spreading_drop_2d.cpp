@@ -37,8 +37,8 @@ template <int opts_arg>
 void test(const std::string &outdir) 
 {
   // compile-time parameters
-  // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
-  //<listing-1>
+  // enum { hint_noneg = opts::bit(ix::h) };  // TODO: reconsider?
+//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = ::real_t;
@@ -56,9 +56,9 @@ void test(const std::string &outdir)
     }; }; 
     
     // hints
-    enum { hint_norhs = formulae::opts::bit(ix::h) }; 
+    enum { hint_norhs = opts::bit(ix::h) }; 
   };
-  //</listing-1>
+//</listing-1>
 
   using ix = typename ct_params_t::ix;
 
@@ -107,8 +107,8 @@ void test(const std::string &outdir)
 
 int main()
 {
-  test<formulae::opts::fct | formulae::opts::iga>("spreading_drop_2d_fct+iga.out");
-  //test<formulae::opts::fct | formulae::opts::abs>("spreading_drop_2d_fct+abs.out");
+  test<opts::fct | opts::iga>("spreading_drop_2d_fct+iga.out");
+  //test<opts::fct | opts::abs>("spreading_drop_2d_fct+abs.out");
   system("python ../../../tests/shallow_water/papierplot_shallow_water_2d.py fct+iga");
   //system("python");
 }

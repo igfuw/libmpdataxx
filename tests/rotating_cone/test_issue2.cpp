@@ -120,18 +120,18 @@ int main(int argc, char **argv)
   }
 */
   {
-    enum { opts = formulae::opts::fct };
+    enum { opts = opts::fct };
     std::cerr << "starting fct run" << std::endl;
     test<opts>("fct", nx, ny);
   }
 /*
   {
-    enum { opts = formulae::opts::iga | formulae::opts::fct};
+    enum { opts = opts::iga | opts::fct};
     std::cerr << "starting iga_fct run" << std::endl;
     test<opts>("iga_fct", nx, ny);
   }
   {
-    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct};
+    enum { opts = opts::iga | opts::tot | opts::fct};
     std::cerr << "starting iga_fct_tot run" << std::endl;
     test<opts>("iga_fct_tot", nx, ny);
   }
