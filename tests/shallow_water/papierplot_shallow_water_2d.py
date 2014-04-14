@@ -1,6 +1,6 @@
 from scipy.optimize import fsolve
 import math
-from pylab import *
+import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import matplotlib.ticker as ticker
 import numpy as np
@@ -44,7 +44,7 @@ def analytic_fig(ax, time_l = [0,1,2,3], x_range = np.linspace(-8,8,320),
             tick.label1On = False                                
 
     # changing ticks' size  
-    for item in xticks()[1] + yticks()[1]:
+    for item in plt.xticks()[1] + plt.yticks()[1]:
         item.set_fontsize(10)
 
 
@@ -75,7 +75,7 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
             tick.label1On = False                                
 
     # changing ticks' size  
-    for item in xticks()[1] + yticks()[1]:
+    for item in plt.xticks()[1] + plt.yticks()[1]:
         item.set_fontsize(10)
 
 # time_l - list of time levels for analytic solutions
@@ -83,8 +83,8 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
 # dt -  model time step
 # x_shift - shift between initial cond. in model and for analytic solution
 def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
-    figure(1, figsize = (6,8))
-    ax = subplot(len(casename_l)+1,1,1)
+    plt.figure(1, figsize = (6,8))
+    ax = plt.subplot(len(casename_l)+1,1,1)
     #plotting analytic solution
     analytic_fig(ax, time_l)
     #plotting comparison between analytic solution and model results for various options
@@ -99,7 +99,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
         v_m = np.where(h_m > 0,  py_m/h_m, 0)
         print "where with h_m = 0 !!"
         
-        ax = subplot(len(casename_l)+1,1,ic+2)
+        ax = plt.subplot(len(casename_l)+1,1,ic+2)
         
         # choosing a plane of a cross section TODO: should be 160?
         # TODO: x_range/y_range should be calculated from hdf file!!
@@ -111,8 +111,8 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
         #ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
         #            fontsize=12, horizontalalignment='left', verticalalignment='top')
         
-    savefig("papier_shallowwater_2d.pdf")
-    show()
+    plt.savefig("papier_shallowwater_2d.pdf")
+    plt.show()
 
 main("./", sys.argv[1:])
 
