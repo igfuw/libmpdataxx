@@ -6,6 +6,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 import h5py
 import sys
+import plot_settings as ps
 
 
 def rad2(x,y):
@@ -38,15 +39,7 @@ def analytic_fig(ax, time_l = [0,1,2,3], x_range = np.linspace(-8,8,320),
         ax.plot(x_range, h, oznacz[it])
         ax.plot(x_range, v, oznacz[it]+ "--")
 
-    # removing some ticks's labels
-    for i, tick in enumerate(ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks()):
-        if i % 2 != 0:
-            tick.label1On = False                                
-
-    # changing ticks' size  
-    for item in plt.xticks()[1] + plt.yticks()[1]:
-        item.set_fontsize(10)
-
+    ps.ticks_changes(ax)
 
 #reading model output from text file and converting to an array
 def reading_modeloutput(filename):
@@ -68,15 +61,8 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
             x_range, v_m, "r--")
 
     #ax.set_ylim(-2,2)
+    ps.ticks_changes(ax)
 
-    # removing some ticks' labels
-    for i, tick in enumerate(ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks()):
-        if i % 2 != 0:
-            tick.label1On = False                                
-
-    # changing ticks' size  
-    for item in plt.xticks()[1] + plt.yticks()[1]:
-        item.set_fontsize(10)
 
 # time_l - list of time levels for analytic solutions
 # time - model time level used for comparison with analytic solution

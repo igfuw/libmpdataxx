@@ -5,7 +5,7 @@ from matplotlib.font_manager import FontProperties
 import matplotlib.ticker as ticker
 import numpy as np
 import sys
-
+import plot_settings as ps
 
 #eq. 5.6 (Schar&Smolarkiewicz, 1996) 
 def lambda_eq(x, *time):
@@ -29,27 +29,17 @@ def initial(x):
     return np.where(x**2<=1, 1-x**2, 0)
 
 # plotting analytic solutions for height and velocity 
-def analytic_fig(ax,time_l = [0,1,2,3], nx=320):
+def analytic_fig(ax, time_l = [0,1,2,3], nx=320):
     x_range = np.linspace(-8,8, nx)
     oznacz = ['k', 'b', 'c', 'y', 'g', 'm', 'r']
     y0 = initial(x_range)
-
     for it, time in enumerate(time_l):
         lamb = lambda_evol(time)
         h = height(lamb, x_range)
         v = velocity(lamb, x_range)
         ax.plot(x_range, h, oznacz[it])
         ax.plot(x_range, v, oznacz[it]+ "--")
-
-    # removing some ticks' labels
-    for i, tick in enumerate(ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks()):
-        if i % 2 != 0:
-            tick.label1On = False                                
-
-    # changing ticks' size  
-    for item in plt.xticks()[1] + plt.yticks()[1]:
-        item.set_fontsize(10)
-
+    ps.ticks_changes(ax)
 
 
 #reading model output from text file and converting to an array
@@ -73,15 +63,7 @@ def analytic_model_fig(ax, x_range, h_m, v_m, t_m, it):
             x_range, v_m[it], "r--")
 
     ax.set_ylim(-2,2)
-
-    # removing some ticks' labels
-    for i, tick in enumerate(ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks()):
-        if i % 2 != 0:
-            tick.label1On = False                                
-
-    # changing ticks' size  
-    for item in plt.xticks()[1] + plt.yticks()[1]:
-        item.set_fontsize(10)
+    ps.ticks_changes(ax)
 
 # time_l - list of time levels for analytic solutions
 # it - model time level used for comparison with analytic solution
