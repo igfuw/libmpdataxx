@@ -7,7 +7,7 @@
 #pragma once
 
 #include <libmpdata++/formulae/idxperm.hpp>
-#include <libmpdata++/formulae/opts.hpp>
+#include <libmpdata++/formulae/common.hpp>
 #include <libmpdata++/formulae/kahan_sum.hpp>
 
 namespace libmpdataxx

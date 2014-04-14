@@ -65,35 +65,31 @@ int main()
 {
   {
 //<listing-4>
-    enum { opts = formulae::opts::abs };
+    enum { opts = opts::abs };
 //</listing-4>
     test<opts>("out_abs.svg");
   }
   {
 //<listing-5>
-    enum { opts = formulae::opts::iga };
+    enum { opts = opts::iga };
 //</listing-5>
     test<opts>("out_iga.svg");
   }
   {
 //<listing-6>
-    enum { opts = formulae::opts::iga | 
-                  formulae::opts::tot };
+    enum { opts = opts::iga | opts::tot };
 //</listing-6>
     test<opts>("out_iga_tot.svg");
   }
   {
 //<listing-7>
-    enum { opts = formulae::opts::iga | 
-                  formulae::opts::fct };
+    enum { opts = opts::iga | opts::fct };
 //</listing-7>
     test<opts>("out_iga_fct.svg");
   }
   {
 //<listing-8>
-    enum { opts = formulae::opts::iga | 
-                  formulae::opts::tot | 
-                  formulae::opts::fct };
+    enum { opts = opts::iga | opts::tot | opts::fct };
 //</listing-8>
     test<opts>("out_iga_tot_fct.svg");
   }

@@ -31,7 +31,7 @@ int main()
     struct ix { enum {qx, qy, h, vip_i=qx, vip_j=qy, vip_den=h}; };
 
     // hints
-    enum { hint_norhs = formulae::opts::bit(ix::h) }; 
+    enum { hint_norhs = opts::bit(ix::h) }; 
   };
   using ix = typename ct_params_t::ix;
 

@@ -38,7 +38,7 @@ namespace libmpdataxx
 	{
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
-	  if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+	  if (opts::isset(ct_params_t::opts, opts::nug))
 	  {
 	    this->bcxl->fill_halos_sclr(*this->mem->G); // TODO: one xchng call?
 	    this->bcxr->fill_halos_sclr(*this->mem->G);
@@ -73,7 +73,7 @@ namespace libmpdataxx
 	    }
 
 	    // donor-cell call
-	    if (!formulae::opts::isset(ct_params_t::opts, formulae::opts::iga) || iter == 0)
+	    if (!opts::isset(ct_params_t::opts, opts::iga) || iter == 0)
 	    {
 	      formulae::donorcell::op_1d<ct_params_t::opts>(
 		this->mem->khn_tmp,

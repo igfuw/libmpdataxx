@@ -19,7 +19,7 @@ struct ct_params_t : ct_params_default_t
   using real_t = double;
   enum { n_dims = 3 };
   enum { n_eqns = 1 };
-  enum { opts = formulae::opts::abs };
+  enum { opts = opts::abs };
 };
 
 template<class T>
