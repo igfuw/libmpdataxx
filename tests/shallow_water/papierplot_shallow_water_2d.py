@@ -7,35 +7,18 @@ import numpy as np
 import h5py
 import sys
 import plot_settings as ps
-
-
-def rad2(x,y):
-    return x**2 + y**2
- 
-def lambda_evol(time):
-    return (2*time**2 + 1)**0.5
- 
-def height(lamb, x, y):
-    return np.where(rad2(x,y) <= lamb**2, lamb**-2 * (1. - rad2(x,y)/lamb**2), 0)
-
-def velocity(lamb, x, y):
-    lamb_t = 2**0.5 * (1 - lamb**-2)**0.5
-    return np.where(rad2(x,y) <= lamb**2, x * lamb_t / lamb, 0)
-
-#initial condition
-def initial(x,y):
-    return np.where(rad2(x,y)<=1, 1-rad2(x,y), 0)
+import analytic_eq as eq
 
 # plotting analytic solutions for height and velocity 
 def analytic_fig(ax, time_l = [0,1,2,3], x_range = np.linspace(-8,8,320),
                               y_range = np.zeros(320)):
     oznacz = ['k', 'b', 'c', 'y', 'g', 'm', 'r']
-    y0 = initial(x_range, y_range)
+    y0 = eq.d2_initial(x_range, y_range)
 
     for it, time in enumerate(time_l):
-        lamb = lambda_evol(time)
-        h = height(lamb, x_range, y_range)
-        v = velocity(lamb, x_range, y_range)
+        lamb = eq.d2_lambda_evol(time)
+        h = eq.d2_height(lamb, x_range, y_range)
+        v = eq.d2_velocity(lamb, x_range, y_range)
         ax.plot(x_range, h, oznacz[it])
         ax.plot(x_range, v, oznacz[it]+ "--")
 
@@ -51,11 +34,11 @@ def reading_modeloutput(filename):
 
 #plotting together analytic solution and model output 
 def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
-    lamb = lambda_evol(time)
-    h_a = height(lamb, x_range, y_range)
-    v_a = velocity(lamb, x_range, y_range)
+    lamb = eq.d2_lambda_evol(time)
+    h_a = eq.d2_height(lamb, x_range, y_range)
+    v_a = eq.d2_velocity(lamb, x_range, y_range)
 
-    ax.plot(x_range, initial(x_range, y_range), 'k', x_range, h_a, 'b',
+    ax.plot(x_range, eq.d2_initial(x_range, y_range), 'k', x_range, h_a, 'b',
             x_range, h_m, "r")
     ax.plot(x_range, 0*x_range, "k--", x_range, v_a, 'b--',
             x_range, v_m, "r--")

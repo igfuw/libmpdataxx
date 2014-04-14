@@ -1,42 +1,20 @@
-from scipy.optimize import fsolve
-import math
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import matplotlib.ticker as ticker
 import numpy as np
 import sys
 import plot_settings as ps
-
-#eq. 5.6 (Schar&Smolarkiewicz, 1996) 
-def lambda_eq(x, *time):
-    return 0.5 * ((x*(x-1.))**0.5 + math.log((x-1.)**0.5 + x**0.5)) - time
-
-# finging roots of lambda_eq 
-def lambda_evol(time, x0=1):
-    return fsolve(lambda_eq, x0, args=time)
-
-#eq. 5.4 (Schar&Smolarkiewicz, 1996)
-def height(lamb, x):
-    return np.where(x**2 <= lamb**2, lamb**-1 * (1. - (x/lamb)**2), 0)
-
-#eq. 5.5 (Schar&Smolarkiewicz, 1996)
-def velocity(lamb, x):
-    lamb_t = 2 * (1 - lamb**-1)**0.5
-    return np.where(x**2 <= lamb**2, x * lamb_t / lamb, 0)
-
-#eq. 5.3 (Schar&Smolarkiewicz, 1996)
-def initial(x):
-    return np.where(x**2<=1, 1-x**2, 0)
+import analytic_eq as eq
 
 # plotting analytic solutions for height and velocity 
 def analytic_fig(ax, time_l = [0,1,2,3], nx=320):
     x_range = np.linspace(-8,8, nx)
     oznacz = ['k', 'b', 'c', 'y', 'g', 'm', 'r']
-    y0 = initial(x_range)
+    y0 = eq.d1_initial(x_range)
     for it, time in enumerate(time_l):
-        lamb = lambda_evol(time)
-        h = height(lamb, x_range)
-        v = velocity(lamb, x_range)
+        lamb = eq.d1_lambda_evol(time)
+        h = eq.d1_height(lamb, x_range)
+        v = eq.d1_velocity(lamb, x_range)
         ax.plot(x_range, h, oznacz[it])
         ax.plot(x_range, v, oznacz[it]+ "--")
     ps.ticks_changes(ax)
@@ -53,11 +31,11 @@ def reading_modeloutput(filename):
 
 #plotting together analytic solution and model output 
 def analytic_model_fig(ax, x_range, h_m, v_m, t_m, it):
-    lamb = lambda_evol(t_m[it,0])
-    h_a = height(lamb, x_range)
-    v_a = velocity(lamb, x_range)
+    lamb = eq.d1_lambda_evol(t_m[it,0])
+    h_a = eq.d1_height(lamb, x_range)
+    v_a = eq.d1_velocity(lamb, x_range)
 
-    ax.plot(x_range, initial(x_range), 'k', x_range, h_a, 'b',
+    ax.plot(x_range, eq.d1_initial(x_range), 'k', x_range, h_a, 'b',
             x_range, h_m[it], "r")
     ax.plot(x_range, 0*x_range, "k--", x_range, v_a, 'b--',
             x_range, v_m[it], "r--")
