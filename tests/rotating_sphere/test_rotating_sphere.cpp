@@ -17,7 +17,6 @@ enum {x, y, z};
 struct ct_params_t : ct_params_default_t
 {
   using real_t = double;
-//<listing-1>
   enum { n_dims = 3 };
   enum { n_eqns = 1 };
   enum { opts = opts::abs };
@@ -62,11 +61,9 @@ void setup(T &solver)
 int main()
 {
   int nt = 5 * 314;
-//<listing-2>
   using solver_t = output::hdf5_xdmf<
     solvers::mpdata<ct_params_t>
   >;
-//</listing-2>
   solver_t::rt_params_t p;
 
   // pre instantation
