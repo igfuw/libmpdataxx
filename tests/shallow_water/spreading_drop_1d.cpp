@@ -21,7 +21,7 @@ const int
 using real_t = double;
 
 // compile-time parameters
-// enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
+// enum { hint_noneg = opts::bit(ix::h) };  // TODO: reconsider?
 //<listing-1>
 template <int opts_arg>
 struct ct_params_t : ct_params_default_t
@@ -41,7 +41,7 @@ struct ct_params_t : ct_params_default_t
   }; }; 
   
   // hints
-  enum { hint_norhs = formulae::opts::bit(ix::h) }; 
+  enum { hint_norhs = opts::bit(ix::h) }; 
 };
 //</listing-1>
 
@@ -136,8 +136,8 @@ void test(const std::string &pfx)
 
 int main()
 {
-  test<formulae::opts::iga | formulae::opts::fct>("fct+iga");
-  test<formulae::opts::abs | formulae::opts::fct>("fct+abs");
+  test<opts::iga | opts::fct>("fct+iga");
+  test<opts::abs | opts::fct>("fct+abs");
   //plotting model results and analitic solution; 
   //python uses sys.argv[1:0] for choosing model outputs
   system("python ../../../tests/shallow_water/papierplot_shallow_water_1d.py fct+abs fct+iga ");

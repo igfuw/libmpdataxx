@@ -28,7 +28,7 @@ void setopts(T &p, const std::string &sfx)
   p.n_iters =   2; //number of iterations
 }
 
-template <formulae::opts::opts_t opt, class vec_t>
+template <opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &sfx)
 {
   struct ct_params_t : ct_params_default_t
@@ -81,7 +81,7 @@ int main()
   slvs.back().advectee() = G * phi;
   slvs.back().advector() = GC / G_c; 
 
-  add_solver<formulae::opts::nug>(slvs, "_nug");
+  add_solver<opts::nug>(slvs, "_nug");
   // advecting mixing ratio with C times rho
   slvs.back().g_factor() = G;
   slvs.back().advectee() = phi;

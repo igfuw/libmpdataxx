@@ -14,6 +14,8 @@
 
 #include <libmpdata++/solvers/mpdata.hpp>
 
+#include <libmpdata++/output/hdf5_xdmf.hpp>
+
 int main()
 {
   using namespace libmpdataxx;
@@ -25,24 +27,39 @@ int main()
   std::cerr << "off" << std::endl;
 #endif
 
+//<listing-1>
   struct ct_params_t : ct_params_default_t
   { 
     using real_t = long double; 
     enum { n_dims = 1 };
     enum { n_eqns = 1 };
-    enum { opts = 0 };
   };
+//</listing-1>
 
   const int nx = 10, nt = 1000;
    
   // OpenMP
   std::cerr << "OpenMP run" << std::endl;
   {
-    using solver_t = solvers::mpdata<ct_params_t>;
-    typename solver_t::rt_params_t p;
-    p.grid_size = {nx};
-    concurr::openmp<solver_t, bcond::cyclic, bcond::cyclic> slv(p);
-    slv.advance(nt);
+//<listing-2>
+    using slv_t = solvers::mpdata<ct_params_t>;
+//</listing-2>
+//<listing-3>
+    using slv_out_t = output::hdf5_xdmf<slv_t>;
+//</listing-3>
+//<listing-4>
+    using cnr_t = concurr::openmp<
+      slv_t, 
+      bcond::cyclic, 
+      bcond::cyclic
+    >;
+//</listing-4>
+//<listing-5>
+    typename slv_out_t::rt_params_t p;
+    p.grid_size = { nx };
+    cnr_t cnr(p);
+//</listing-5>
+    cnr.advance(nt);
   }
 
   // Boost.Thread

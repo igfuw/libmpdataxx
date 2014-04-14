@@ -142,22 +142,22 @@ int main()
     test<opts, opts_iters>("basic");
   }
   {
-    enum { opts = formulae::opts::fct };
+    enum { opts = opts::fct };
     const int opts_iters = 2;
     test<opts, opts_iters>("fct");
   }
   {
-    enum { opts = formulae::opts::fct | formulae::opts::tot };
+    enum { opts = opts::fct | opts::tot };
     const int opts_iters = 3;
     test<opts, opts_iters>("iters3_tot_fct");
   }
   {
-    enum { opts = formulae::opts::iga | formulae::opts::fct};
+    enum { opts = opts::iga | opts::fct};
     const int opts_iters = 2;
     test<opts, opts_iters>("iga_fct");
   }
   {
-    enum { opts = formulae::opts::iga | formulae::opts::tot | formulae::opts::fct };
+    enum { opts = opts::iga | opts::tot | opts::fct };
     const int opts_iters = 2;
     test<opts, opts_iters>("iga_tot_fct");
   }

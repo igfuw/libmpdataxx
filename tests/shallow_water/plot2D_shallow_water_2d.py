@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
 import h5py
+import plot_settings as ps
 
 def reading_modeloutput(filename):
     f = h5py.File(filename, "r")
@@ -20,10 +21,7 @@ def plotting_2D(X, Y, Z):
     ax.plot_surface(X, Y, Z, rstride=10, cstride=10, alpha=0.2)
     cset = ax.contourf(X, Y, Z, zdir='z', offset=-0.1, cmap=cm.Blues)
     fig.colorbar(cset) #, fraction=0.05)
-
-    for i, tick in enumerate(ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks()):
-        if i % 2 != 0:
-            tick.label1On = False        
+    ps.ticks_changes(ax)
 
 
     ax.set_xlabel('x')

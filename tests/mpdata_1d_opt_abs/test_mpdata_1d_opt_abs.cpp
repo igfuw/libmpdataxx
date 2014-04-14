@@ -45,7 +45,7 @@ void setopts(T &p, const int nt, const std::string &fname)
   p.gnuplot_yrange = "[-2:5]";
 }
 
-template <formulae::opts::opts_t opt, class vec_t>
+template <opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &fname)
 {
   struct ct_params_t : ct_params_default_t
@@ -68,7 +68,7 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<T, n_dims>> slvs;
 
-  add_solver<formulae::opts::abs>(slvs, "mpdata_iters=2_abs");
+  add_solver<opts::abs>(slvs, "mpdata_iters=2_abs");
   add_solver<0>(slvs, "mpdata_iters=2");
 
   // TODO: test if pds gives any speed-up with single-sign field

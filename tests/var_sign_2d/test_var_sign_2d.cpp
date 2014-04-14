@@ -77,7 +77,7 @@ int main()
         using real_t = T;
         enum { n_dims = 2 };
         enum { n_eqns = 2 };
-        enum { opts = formulae::opts::abs };
+        enum { opts = opts::abs };
       };
       add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
         slvs, offset, "mpdata-abs_it=2"

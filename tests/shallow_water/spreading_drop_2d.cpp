@@ -37,8 +37,8 @@ template <int opts_arg>
 void test(const std::string &outdir) 
 {
   // compile-time parameters
-  // enum { hint_noneg = formulae::opts::bit(ix::h) };  // TODO: reconsider?
-  //<listing-1>
+  // enum { hint_noneg = opts::bit(ix::h) };  // TODO: reconsider?
+//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = ::real_t;
@@ -60,9 +60,9 @@ void test(const std::string &outdir)
     }; }; 
     
     // hints
-    enum { hint_norhs = formulae::opts::bit(ix::h) }; 
+    enum { hint_norhs = opts::bit(ix::h) }; 
   };
-  //</listing-1>
+//</listing-1>
 
   using ix = typename ct_params_t::ix;
 

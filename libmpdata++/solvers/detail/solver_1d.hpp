@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <libmpdata++/opts.hpp>
 #include <libmpdata++/solvers/detail/solver_common.hpp>
 
 namespace libmpdataxx
@@ -117,11 +118,11 @@ namespace libmpdataxx
     
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(p.grid_size[0])))); 
 
-          if (formulae::opts::isset(ct_params_t::opts, formulae::opts::nug))
+          if (opts::isset(ct_params_t::opts, opts::nug))
 	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.grid_size[0]))));
 
           // allocate Kahan summation temporary vars
-          if (formulae::opts::isset(ct_params_t::opts, formulae::opts::khn))
+          if (opts::isset(ct_params_t::opts, opts::khn))
             for (int n = 0; n < 3; ++n) 
               mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
                 parent_t::rng_sclr(p.grid_size[0])

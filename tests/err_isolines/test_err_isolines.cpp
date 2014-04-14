@@ -27,7 +27,7 @@ boost::ptr_map<std::string, std::ofstream> outfiles;
 using T = double; // with long double this is a good test to show differences between float and double!!!
 
 // helper function template to ease adding the solvers to the pointer map
-template <formulae::opts::opts_t opt, class vec_t>
+template <opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_iters)
 {
   struct ct_params_t : ct_params_default_t
@@ -140,19 +140,19 @@ int main()
 
       // MPDATA
       add_solver<0>(slvs, "iters=2", nx, 2);
-      add_solver<formulae::opts::tot>(slvs, "iters=2_tot", nx, 2);
+      add_solver<opts::tot>(slvs, "iters=2_tot", nx, 2);
       add_solver<0>(slvs, "iters=3", nx, 3);
-      add_solver<formulae::opts::tot>(slvs, "iters=3_tot", nx, 3);
-      add_solver<formulae::opts::iga>(slvs, "iters=i", nx, 2);
-      add_solver<formulae::opts::iga | formulae::opts::tot>(slvs, "iters=i_tot", nx, 2);
+      add_solver<opts::tot>(slvs, "iters=3_tot", nx, 3);
+      add_solver<opts::iga>(slvs, "iters=i", nx, 2);
+      add_solver<opts::iga | opts::tot>(slvs, "iters=i_tot", nx, 2);
 
       // MPDATA-FCT
-      add_solver<formulae::opts::fct>(slvs, "iters=2_fct", nx, 2);
-      add_solver<formulae::opts::fct | formulae::opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
-      add_solver<formulae::opts::fct>(slvs, "iters=3_fct", nx, 3);
-      add_solver<formulae::opts::fct | formulae::opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
-      add_solver<formulae::opts::fct | formulae::opts::iga>(slvs, "iters=i_fct", nx, 2);
-      add_solver<formulae::opts::fct | formulae::opts::iga | formulae::opts::tot>(slvs, "iters=i_fct_tot", nx, 2);
+      add_solver<opts::fct>(slvs, "iters=2_fct", nx, 2);
+      add_solver<opts::fct | opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
+      add_solver<opts::fct>(slvs, "iters=3_fct", nx, 3);
+      add_solver<opts::fct | opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
+      add_solver<opts::fct | opts::iga>(slvs, "iters=i_fct", nx, 2);
+      add_solver<opts::fct | opts::iga | opts::tot>(slvs, "iters=i_fct_tot", nx, 2);
 
       // calculating the analytical solution
       decltype(slvs.end()->second->advectee()) exact(nx);

@@ -56,7 +56,7 @@ namespace libmpdataxx
 	for (int e = 0; e < parent_t::n_eqns; ++e) 
         {
           // do nothing for equations with no rhs
-          if (formulae::opts::isset(ct_params_t::hint_norhs, formulae::opts::bit(e))) continue;
+          if (opts::isset(ct_params_t::hint_norhs, opts::bit(e))) continue;
 
           // otherwise zero out the rhs
           rhs.at(e)(this->ijk) = 0;
@@ -70,7 +70,7 @@ namespace libmpdataxx
         for (int e = 0; e < parent_t::n_eqns; ++e) 
         {
           // do nothing for equations with no rhs
-          if (formulae::opts::isset(ct_params_t::hint_norhs, formulae::opts::bit(e))) continue;
+          if (opts::isset(ct_params_t::hint_norhs, opts::bit(e))) continue;
 
           // otherwise apply the rhs
           this->psi_n(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
