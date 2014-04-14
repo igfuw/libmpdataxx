@@ -17,9 +17,11 @@ enum {x, y, z};
 struct ct_params_t : ct_params_default_t
 {
   using real_t = double;
+//<listing-1>
   enum { n_dims = 3 };
-  enum { n_eqns = 1 };
-  enum { opts = opts::abs };
+//</listing-1>
+  enum { n_eqs = 1 };
+  enum { opts = formulae::opts::abs };
 };
 
 template<class T>
@@ -62,8 +64,11 @@ int main()
 {
   int nt = 5 * 314;
 
-  using solver_t = output::hdf5_xdmf<solvers::mpdata<ct_params_t>>;
-  solver_t::rt_params_t p;
+  using slv_t = solvers::mpdata<ct_params_t>;
+//<listing-2>
+  using sim_t = output::hdf5_xdmf<slv_t>;
+//</listing-2>
+  sim_t::rt_params_t p;
 
   // pre instantation
   p.n_iters = 4;
@@ -71,7 +76,9 @@ int main()
 
   p.outfreq = nt;
   p.outvars[0].name = "psi";
-  p.outdir = "test";
+//<listing-3>
+  p.outdir = "rotating_sphere_3d";
+//</listing-3>
 
   // instantation
   concurr::threads<
