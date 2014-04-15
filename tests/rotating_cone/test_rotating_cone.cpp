@@ -21,7 +21,6 @@ using namespace libmpdataxx;
 template <int opts_arg, int opts_iters>
 void test(const std::string filename)
 {
-  enum {x, y};
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
@@ -96,31 +95,36 @@ void test(const std::string filename)
 //</listing-2>
   {
 //<listing-3>
-    // post instantiation
-    typename ct_params_t::real_t
+    // constants used in the set-up definition
+    enum {x, y};
+    const typename ct_params_t::real_t
       r = 15. * dx,
       x0 = 50 * dx,
       y0 = 75 * dy,
       xc = .5 * (p.grid_size[x]-1) * dx,
       yc = .5 * (p.grid_size[y]-1) * dy;
 
+    // temporary array of the same ...
+    decltype(run.advectee())        // type 
+      tmp(run.advectee().extent()); // and size 
+    // ... as the one returned by advectee()
+
+    // helper vars for Blitz++ tensor notation
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    // cone shape
-    decltype(run.advectee()) 
-      tmp(run.advectee().extent());
-
+    // cone shape ...
     tmp = blitz::pow(i * dx - x0, 2) + 
           blitz::pow(j * dy - y0, 2);
 
+    // ... cut off at zero
     run.advectee() = h0 + where(
       tmp - pow(r, 2) <= 0,                  //if
       h * blitz::sqr(1 - tmp / pow(r, 2)),   //then
       0.                                     //else
     );
 
-    // constant angular velocity rotational field
+    // constant-angular-velocity rotational field
     run.advector(x) =  omg * (j * dy - yc) * dt/dx;
     run.advector(y) = -omg * (i * dx - xc) * dt/dy;
 //</listing-3>
