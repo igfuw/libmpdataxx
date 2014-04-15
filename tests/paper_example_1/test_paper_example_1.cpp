@@ -24,7 +24,7 @@ int main()
   // concurency choice
   using run_t = concurr::serial<
     sim_t, bcond::open, bcond::open
-  >;
+  >;     //left bcond   //right bcond
 
   // run-time parameters
   typename sim_t::rt_params_t p;
