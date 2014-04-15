@@ -63,9 +63,10 @@ namespace libmpdataxx
       
 
       protected:
-      rng_t 
         // sclr
-        left_edge_sclr, rght_edge_sclr,
+      int 
+        left_edge_sclr, rght_edge_sclr;
+      rng_t 
         left_halo_sclr, rght_halo_sclr,
         left_intr_sclr, rght_intr_sclr,
         // vctr
@@ -80,11 +81,9 @@ namespace libmpdataxx
         halo(halo),
         // sclr
 	left_edge_sclr(
-          i.first(), 
           i.first()
         ),
 	rght_edge_sclr(
-          i.last(),
           i.last()
         ),
 	left_halo_sclr(

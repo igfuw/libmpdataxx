@@ -26,23 +26,23 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
-	  a(pi<d>(rng_t(i, i), j, k)) = a(pi<d>(this->left_edge_sclr, j, k));
+	  a(pi<d>(i, j, k)) = a(pi<d>(this->left_edge_sclr, j, k));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
 	using namespace idxperm;
-	const rng_t i = this->left_edge_sclr;
+	const int i = this->left_edge_sclr;
 
         switch (d) // note: order and lack of breaks intentional!
         {
           case 0:
-          av[d+2](pi<d>(i.first(), j, (k-h).first())) = 0;
-          av[d+2](pi<d>(i.first(), j, (k+h).last() )) = 0;
+          av[d+2](pi<d>(i, j, (k-h).first())) = 0;
+          av[d+2](pi<d>(i, j, (k+h).last() )) = 0;
 
           case 1:
-          av[d+1](pi<d>(i.first(), (j-h).first(), k)) = 0;
-          av[d+1](pi<d>(i.first(), (j+h).last(),  k)) = 0;
+          av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
+          av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
         }
 
 	assert(std::isfinite(sum(av[d  ](pi<d>(i+h, j, k)))));
@@ -72,7 +72,7 @@ namespace libmpdataxx
 	using namespace idxperm;
         // note intentional sclr
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
-          a(pi<d>(rng_t(i, i), j, k)) = 0; 
+          a(pi<d>(i, j, k)) = 0; 
       }
     };
 
@@ -89,23 +89,23 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-	  a(pi<d>(rng_t(i, i), j, k)) = a(pi<d>(this->rght_edge_sclr, j, k));
+	  a(pi<d>(i, j, k)) = a(pi<d>(this->rght_edge_sclr, j, k));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
 	using namespace idxperm;
-        const rng_t i = this->rght_edge_sclr;
+        const int i = this->rght_edge_sclr;
 
         switch (d) // note: order and lack of breaks intentional!
         {
           case 0:
-	  av[d+2](pi<d>(i.last(), j, (k-h).first())) = 0;
-	  av[d+2](pi<d>(i.last(), j, (k+h).last() )) = 0;
+	  av[d+2](pi<d>(i, j, (k-h).first())) = 0;
+	  av[d+2](pi<d>(i, j, (k+h).last() )) = 0;
 
           case 1:
-	  av[d+1](pi<d>(i.last(), (j-h).first(), k)) = 0;
-	  av[d+1](pi<d>(i.last(), (j+h).last(),  k)) = 0;
+	  av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
+	  av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
         }
 
 	assert(std::isfinite(sum(av[d  ](pi<d>(i-h, j, k)))));
@@ -134,7 +134,7 @@ namespace libmpdataxx
 	using namespace idxperm;
         // note intentional sclr
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-          a(pi<d>(rng_t(i, i), j, k)) = 0; 
+          a(pi<d>(i, j, k)) = 0; 
       }
     };
   }; // namespace bcond

@@ -26,19 +26,19 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
-	  a(pi<d>(rng_t(i, i), j)) = a(pi<d>(this->left_edge_sclr, j));
+	  a(pi<d>(i, j)) = a(pi<d>(this->left_edge_sclr, j));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
-	const rng_t i = this->left_edge_sclr;
+	const int i = this->left_edge_sclr;
    
         // if executed first (d=0) this could contain NaNs
         if (d == 0) 
         {
-          av[d+1](pi<d>(i.first(), (j-h).first())) = 0;
-          av[d+1](pi<d>(i.first(), (j+h).last())) = 0;
+          av[d+1](pi<d>(i, (j-h).first())) = 0;
+          av[d+1](pi<d>(i, (j+h).last())) = 0;
         }
        
 	// zero-divergence condition
@@ -58,7 +58,7 @@ namespace libmpdataxx
 	using namespace idxperm;
         // note intentional sclr
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
-          a(pi<d>(rng_t(i, i), j)) = 0; 
+          a(pi<d>(i, j)) = 0; 
       }
     };
 
@@ -75,19 +75,19 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-	  a(pi<d>(rng_t(i, i), j)) = a(pi<d>(this->rght_edge_sclr, j));
+	  a(pi<d>(i, j)) = a(pi<d>(this->rght_edge_sclr, j));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
-	const rng_t i = this->rght_edge_sclr;
+	const int i = this->rght_edge_sclr;
 
         // if executed first (d=0) this could contain NaNs
         if (d == 0) 
         {
-          av[d+1](pi<d>(i.last(), (j-h).first())) = 0;
-          av[d+1](pi<d>(i.last(), (j+h).last())) = 0;
+          av[d+1](pi<d>(i, (j-h).first())) = 0;
+          av[d+1](pi<d>(i, (j+h).last())) = 0;
         }
        
 	// zero-divergence condition
@@ -106,7 +106,7 @@ namespace libmpdataxx
 	using namespace idxperm;
         // note intentional sclr
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-          a(pi<d>(rng_t(i, i), j)) = 0; 
+          a(pi<d>(i, j)) = 0; 
       }
     };
   }; // namespace bcond

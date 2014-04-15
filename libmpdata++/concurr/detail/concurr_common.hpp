@@ -15,7 +15,7 @@
 #include <libmpdata++/bcond/open_1d.hpp>
 #include <libmpdata++/bcond/open_2d.hpp>
 #include <libmpdata++/bcond/open_3d.hpp>
-//#include <libmpdata++/bcond/polar_2d.hpp>
+#include <libmpdata++/bcond/polar_2d.hpp>
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
@@ -223,9 +223,9 @@ namespace libmpdataxx
                 case bcond::cyclic:
                   byl.reset(new bcond::cyclic_left_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
-//                case bcond::polar:
-//                  byl.reset(new bcond::polar_left_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo, grid_size[0] / 2));
-//                  break;
+                case bcond::polar:
+                  byl.reset(new bcond::polar_left_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, (span[0] - 1) / 2));
+                  break;
                 case bcond::open:
                   byl.reset(new bcond::open_left_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
@@ -238,9 +238,9 @@ namespace libmpdataxx
                 case bcond::cyclic:
                   byr.reset(new bcond::cyclic_rght_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
-//                case bcond::polar:
-//                  byr.reset(new bcond::polar_rght_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo, grid_size[0] / 2));
-//                  break;
+                case bcond::polar:
+                  byr.reset(new bcond::polar_rght_2d<1, real_t>(rng_t(0, span[1]-1), solver_t::halo, (span[0] - 1) / 2));
+                  break;
                 case bcond::open:
                   byr.reset(new bcond::open_rght_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
