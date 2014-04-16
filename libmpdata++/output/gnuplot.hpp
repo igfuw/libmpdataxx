@@ -65,7 +65,8 @@ namespace libmpdataxx
           {
             *gp << "set yrange [0:" << nt << "]\n";
             if (p.gnuplot_xyplane_at != "") *gp << "set xyplane at " << p.gnuplot_xyplane_at << "\n";
-            assert(p.gnuplot_yrange == "[*:*]" && "gnupot_yrange was specified for a 1D splot where Y axis represents time");
+            if (p.gnuplot_yrange != "[*:*]")
+              throw std::runtime_error("gnupot_yrange was specified for a 1D splot where Y axis represents time");
 
             if (p.gnuplot_ylabel == "") *gp << "set ylabel 't/dt'\n";
           }
@@ -74,7 +75,7 @@ namespace libmpdataxx
             if (p.gnuplot_with != "histeps") throw std::runtime_error("histeps is the only meaningfull style for 1D plots");
             *gp << "set yrange " << p.gnuplot_yrange << "\n";
           } 
-          else assert(false);
+          else throw std::runtime_error("gnuplot_command must equal plot or splot");
           
           *gp 
 	     << "set output '" << p.gnuplot_output << "'\n"
@@ -135,7 +136,7 @@ namespace libmpdataxx
       }
  
       // helper constructs to make it compilable for both 1D and 2D versions
-      std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { assert(false); throw; }
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { throw std::logic_error("binfmt() only for 2D!"); }
       std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a); }
 
       void record(const int var)
