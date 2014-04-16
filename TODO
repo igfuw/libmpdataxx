@@ -2,13 +2,12 @@
 - dfl option in all shallow_water tests
 - rename p.di, p.dj, p.dk -> p.grid_step?
 - isolate test that causes iga to produce negative values!
-- change grid to have scalars on the edges:
-  - gnuplot (xrange, yrange)
 - p -> rt_params in examples (Dorota'a suggesting at the first meeting)
 - n_bits enum!
 - asserts for Courant number < 1 
 - asserts in 1D for non-divergent initial Corant number field
 - could a param copy be made a mem member?
+- multiple xdmf instances
 - eps, npa domyślnie?
 - jakiś throw jeśli niezgodne z rozwiązaniem analitycznym w test_shallow_water_1d
 - barrier z argumentem - do debugowania!
@@ -23,14 +22,13 @@
 - opts -> mpdata_opts?
 - check compatibility with new gnuplot_iostream
 - finish donorcell and leapfrog tests
-- steps instead of histeps in output gnuplot (in tests as well?)
 - test showing difference between real_t=float and real_t=double (and real_t=long double, ...)
 - doc: dependencies section (C++11, Blitz, Boost, OpenMP)
 - doc: README and HACKING files
 - doc: mention the difference between the order of accuracy of integration vs. order of accuracy of an approximation
 - doc: references for shallow-water docs incl. Vallis, http://www.netlib.org/chammp/shallow.bib
 - concurr -> rename concurr_ddecomp
-
+- kahan sums in fct
 
 0.1 (pre-submission / during reviews, should-be-easy enhancements or code cleanups before first release):
 - svg output -> git repo?
