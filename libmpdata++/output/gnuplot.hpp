@@ -87,8 +87,8 @@ namespace libmpdataxx
 	    for (const auto &v : this->outvars)
             {
 	      *gp << ", '-'";
-              if (p.gnuplot_command == "splot") *gp << " using 0:(" << t << "):1";
-              *gp << " with " << p.gnuplot_with;
+              if (p.gnuplot_command == "splot") *gp << " using (((int($0)+1)/2+(int($0)-1)/2)*.5):(" << t << "):1";
+              *gp << " with " << p.gnuplot_with; // TODO: assert histeps -> emulation
  
               *gp << " lt ";
               if (this->outvars.size() == 1) *gp <<  p.gnuplot_lt;
@@ -143,7 +143,16 @@ namespace libmpdataxx
       {
         if (parent_t::n_dims == 1) // known at compile time
         { 
-          gp->send(this->mem->advectee(var));
+          if (p.gnuplot_command == "splot") 
+          {
+            // emulating histeps
+            decltype(this->mem->advectee(var)) 
+              tmp(2 * this->mem->advectee(var).extent(0));
+            for (int i = 0; i < tmp.extent(0); ++i) 
+              tmp(i) = this->mem->advectee(var)(i/2);
+	    gp->send(tmp);
+          }
+          else gp->send(this->mem->advectee(var));
         }
 
         if (parent_t::n_dims == 2) // known at compile time
@@ -189,7 +198,7 @@ namespace libmpdataxx
           gnuplot_with = ( 
             parent_t::n_dims == 2 
 	      ? std::string("image failsafe") // 2D
-	      : std::string("lines")         // 1D // TODO: histogram steps would be better than lines
+	      : std::string("histeps")
           ),
           gnuplot_command = std::string("splot"),
           gnuplot_xlabel = std::string("x/dx"),

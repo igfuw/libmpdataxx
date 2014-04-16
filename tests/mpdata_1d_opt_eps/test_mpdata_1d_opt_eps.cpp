@@ -17,13 +17,13 @@
 using namespace libmpdataxx;
 
 using T = float;
-int n = 500, nt = 1600;
+int n = 11, nt = 10000;
 
 template <class slv_t>
 void setup(slv_t &solver, int n) 
 {
   blitz::firstIndex i;
-  int width = 50, center = 100;
+  int width = 2, center = 5;
   solver.advectee() = where(i <= center-width/2 || i >= center+width/2, -400, 400) * blitz::tiny(T(0)); 
   solver.advector() = .5; 
 }
