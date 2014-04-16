@@ -54,7 +54,7 @@ namespace libmpdataxx
            << "set termoption solid\n"
         ;
 	if (p.gnuplot_xrange == "[*:*]") 
-	   *gp << "set xrange [0:" << this->mem->advectee(0).extent(0) << "]\n";
+	   *gp << "set xrange [0:" << this->mem->advectee(0).extent(0)-1 << "]\n";
 	else 
 	   *gp << "set xrange " << p.gnuplot_xrange << "\n";
 
@@ -71,6 +71,7 @@ namespace libmpdataxx
           }
           else if (p.gnuplot_command == "plot") 
           {
+            if (p.gnuplot_with != "histeps") throw std::runtime_error("histeps is the only meaningfull style for 1D plots");
             *gp << "set yrange " << p.gnuplot_yrange << "\n";
           } 
           else assert(false);
@@ -90,7 +91,7 @@ namespace libmpdataxx
  
               *gp << " lt ";
               if (this->outvars.size() == 1) *gp <<  p.gnuplot_lt;
-              else *gp << v.first + 1;
+              else *gp << v.first + 1; // +1 so that the "0" lt is not used (gives dashed lines)
 
               *gp << (
                 t == 0 
@@ -106,7 +107,7 @@ namespace libmpdataxx
         if (parent_t::n_dims == 2) // known at compile time
         {
           if (p.gnuplot_yrange == "[*:*]") 
-             *gp << "set yrange [0:" << this->mem->advectee(0).extent(1) << "]\n";
+             *gp << "set yrange [0:" << this->mem->advectee(0).extent(1)-1 << "]\n";
           else 
              *gp << "set yrange " << p.gnuplot_yrange << "\n";
 
@@ -184,10 +185,10 @@ namespace libmpdataxx
       { 
 	std::string 
           gnuplot_output = std::string("out.svg"),
-          gnuplot_with = ( // TODO: place somewhere an assert for histps/fsteps - apparently steps are the only correct here
+          gnuplot_with = ( 
             parent_t::n_dims == 2 
 	      ? std::string("image failsafe") // 2D
-	      : std::string("lines ")         // 1D // TODO: histogram steps would be better than lines
+	      : std::string("lines")         // 1D // TODO: histogram steps would be better than lines
           ),
           gnuplot_command = std::string("splot"),
           gnuplot_xlabel = std::string("x/dx"),
