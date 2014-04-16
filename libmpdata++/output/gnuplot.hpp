@@ -154,22 +154,27 @@ namespace libmpdataxx
             *gp << tmp.str();
           }
 	  *gp << p.gnuplot_command;
-          bool imagebg = (p.gnuplot_with == "lines");
-          if (imagebg)
           {
-            float zmin, zmax;
-            int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
-            if (count != 2) zmin = 0;
-            *gp << " '-' binary " << binfmt(this->mem->advectee(0))
-                << " origin=(.5,.5," << zmin << ")" 
-	        << " with image failsafe notitle,";
+	    bool imagebg = (p.gnuplot_with == "lines");
+            typename parent_t::real_t ox, oy;
+            // ox = oy = .5; // old: x = (i+.5) * dx
+            ox = oy = 0;     // new: x =   i    * dx
+	    if (imagebg)
+	    {
+	      float zmin, zmax;
+	      int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
+	      if (count != 2) zmin = 0;
+	      *gp << " '-' binary " << binfmt(this->mem->advectee(0))
+		  << " origin=(" << ox << "," << oy << "," << zmin << ")"     
+		  << " with image failsafe notitle,";
+	    }
+	    *gp << " '-'" 
+		<< " binary" << binfmt(this->mem->advectee(0)) 
+		<< " origin=(" << ox << "," << oy << ",0)" 
+		<< " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
+	    gp->sendBinary(this->mem->advectee(var).copy());
+	    if (imagebg) gp->sendBinary(this->mem->advectee(var).copy());
           }
-          *gp << " '-'" 
-              << " binary" << binfmt(this->mem->advectee(0)) 
-              << " origin=(.5,.5,0)" 
-	      << " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
-	  gp->sendBinary(this->mem->advectee(var).copy());
-          if (imagebg) gp->sendBinary(this->mem->advectee(var).copy());
         }
       }
 
