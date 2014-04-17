@@ -54,7 +54,7 @@ namespace libmpdataxx
            << "set termoption solid\n"
         ;
 	if (p.gnuplot_xrange == "[*:*]") 
-	   *gp << "set xrange [0:" << this->mem->advectee(0).extent(0) << "]\n";
+	   *gp << "set xrange [0:" << this->mem->advectee(0).extent(0)-1 << "]\n";
 	else 
 	   *gp << "set xrange " << p.gnuplot_xrange << "\n";
 
@@ -65,15 +65,17 @@ namespace libmpdataxx
           {
             *gp << "set yrange [0:" << nt << "]\n";
             if (p.gnuplot_xyplane_at != "") *gp << "set xyplane at " << p.gnuplot_xyplane_at << "\n";
-            assert(p.gnuplot_yrange == "[*:*]" && "gnupot_yrange was specified for a 1D splot where Y axis represents time");
+            if (p.gnuplot_yrange != "[*:*]")
+              throw std::runtime_error("gnupot_yrange was specified for a 1D splot where Y axis represents time");
 
             if (p.gnuplot_ylabel == "") *gp << "set ylabel 't/dt'\n";
           }
           else if (p.gnuplot_command == "plot") 
           {
+            if (p.gnuplot_with != "histeps") throw std::runtime_error("histeps is the only meaningfull style for 1D plots");
             *gp << "set yrange " << p.gnuplot_yrange << "\n";
           } 
-          else assert(false);
+          else throw std::runtime_error("gnuplot_command must equal plot or splot");
           
           *gp 
 	     << "set output '" << p.gnuplot_output << "'\n"
@@ -85,12 +87,12 @@ namespace libmpdataxx
 	    for (const auto &v : this->outvars)
             {
 	      *gp << ", '-'";
-              if (p.gnuplot_command == "splot") *gp << " using 0:(" << t << "):1";
-              *gp << " with " << p.gnuplot_with;
+              if (p.gnuplot_command == "splot") *gp << " using (((int($0)+1)/2+(int($0)-1)/2)*.5):(" << t << "):1";
+              *gp << " with " << p.gnuplot_with; // TODO: assert histeps -> emulation
  
               *gp << " lt ";
               if (this->outvars.size() == 1) *gp <<  p.gnuplot_lt;
-              else *gp << v.first + 1;
+              else *gp << v.first + 1; // +1 so that the "0" lt is not used (gives dashed lines)
 
               *gp << (
                 t == 0 
@@ -106,7 +108,7 @@ namespace libmpdataxx
         if (parent_t::n_dims == 2) // known at compile time
         {
           if (p.gnuplot_yrange == "[*:*]") 
-             *gp << "set yrange [0:" << this->mem->advectee(0).extent(1) << "]\n";
+             *gp << "set yrange [0:" << this->mem->advectee(0).extent(1)-1 << "]\n";
           else 
              *gp << "set yrange " << p.gnuplot_yrange << "\n";
 
@@ -134,14 +136,23 @@ namespace libmpdataxx
       }
  
       // helper constructs to make it compilable for both 1D and 2D versions
-      std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { assert(false); throw; }
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { throw std::logic_error("binfmt() only for 2D!"); }
       std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a); }
 
       void record(const int var)
       {
         if (parent_t::n_dims == 1) // known at compile time
         { 
-          gp->send(this->mem->advectee(var));
+          if (p.gnuplot_command == "splot") 
+          {
+            // emulating histeps
+            decltype(this->mem->advectee(var)) 
+              tmp(2 * this->mem->advectee(var).extent(0));
+            for (int i = 0; i < tmp.extent(0); ++i) 
+              tmp(i) = this->mem->advectee(var)(i/2);
+	    gp->send(tmp);
+          }
+          else gp->send(this->mem->advectee(var));
         }
 
         if (parent_t::n_dims == 2) // known at compile time
@@ -154,22 +165,27 @@ namespace libmpdataxx
             *gp << tmp.str();
           }
 	  *gp << p.gnuplot_command;
-          bool imagebg = (p.gnuplot_with == "lines");
-          if (imagebg)
           {
-            float zmin, zmax;
-            int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
-            if (count != 2) zmin = 0;
-            *gp << " '-' binary " << binfmt(this->mem->advectee(0))
-                << " origin=(.5,.5," << zmin << ")" 
-	        << " with image failsafe notitle,";
+	    bool imagebg = (p.gnuplot_with == "lines");
+            typename parent_t::real_t ox, oy;
+            // ox = oy = .5; // old: x = (i+.5) * dx
+            ox = oy = 0;     // new: x =   i    * dx
+	    if (imagebg)
+	    {
+	      float zmin, zmax;
+	      int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
+	      if (count != 2) zmin = 0;
+	      *gp << " '-' binary " << binfmt(this->mem->advectee(0))
+		  << " origin=(" << ox << "," << oy << "," << zmin << ")"     
+		  << " with image failsafe notitle,";
+	    }
+	    *gp << " '-'" 
+		<< " binary" << binfmt(this->mem->advectee(0)) 
+		<< " origin=(" << ox << "," << oy << ",0)" 
+		<< " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
+	    gp->sendBinary(this->mem->advectee(var).copy());
+	    if (imagebg) gp->sendBinary(this->mem->advectee(var).copy());
           }
-          *gp << " '-'" 
-              << " binary" << binfmt(this->mem->advectee(0)) 
-              << " origin=(.5,.5,0)" 
-	      << " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
-	  gp->sendBinary(this->mem->advectee(var).copy());
-          if (imagebg) gp->sendBinary(this->mem->advectee(var).copy());
         }
       }
 
@@ -179,10 +195,10 @@ namespace libmpdataxx
       { 
 	std::string 
           gnuplot_output = std::string("out.svg"),
-          gnuplot_with = ( // TODO: place somewhere an assert for histps/fsteps - apparently steps are the only correct here
+          gnuplot_with = ( 
             parent_t::n_dims == 2 
 	      ? std::string("image failsafe") // 2D
-	      : std::string("lines ")         // 1D // TODO: histogram steps would be better than lines
+	      : std::string("histeps")
           ),
           gnuplot_command = std::string("splot"),
           gnuplot_xlabel = std::string("x/dx"),

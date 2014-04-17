@@ -21,7 +21,7 @@
 using namespace libmpdataxx;
 
 using T = float;
-int n = 500, nt = 1600;
+int n = 501, nt = 1600;
 
 T min[2] = {2, -1}, max[2] = {4, 1};
 

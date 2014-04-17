@@ -17,7 +17,7 @@
 using namespace libmpdataxx;
 
 using T = float;
-int n = 500, nt = 1200;
+int n = 501, nt = 1200;
 
 template <class T>
 void setup(T &solver, int n) 
