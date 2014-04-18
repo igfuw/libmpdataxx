@@ -51,6 +51,7 @@ namespace libmpdataxx
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
 	   << "set term " << p.gnuplot_term << "\n"
+	   << "set size " << p.gnuplot_size << "\n"
            << "set termoption solid\n"
         ;
 	if (p.gnuplot_xrange == "[*:*]") 
@@ -79,7 +80,8 @@ namespace libmpdataxx
           
           *gp 
 	     << "set output '" << p.gnuplot_output << "'\n"
-             << p.gnuplot_command << " 1/0 notitle"
+	     << "set title '" << p.gnuplot_title << "'\n"
+             << p.gnuplot_command << " 1/0 notitle" // for the comma below :)
           ;
 
           for (int t = 0; t <= nt; t+=p.outfreq)
@@ -116,7 +118,6 @@ namespace libmpdataxx
 	     << "set cbrange " << p.gnuplot_cbrange << "\n"
 	     << "set xtics out\n"
 	     << "set ytics out\n"
-	     << "set size square\n"
 	     << (p.gnuplot_surface ? "set" : "unset") << " surface\n"
 	     << (p.gnuplot_contour ? "set" : "unset") << " contour\n"
 	  ;
@@ -160,7 +161,7 @@ namespace libmpdataxx
           {
             std::ostringstream tmp;
 	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep << "'\n";
-	    tmp << "set title '"<< this->outvars[var].name << "  ("
+	    tmp << "set title '"<< this->outvars[var].name << "  (" // TODO: handle the option
               << " t/dt=" << std::setprecision(3) << this->timestep << ")'\n";
             *gp << tmp.str();
           }
@@ -207,7 +208,13 @@ namespace libmpdataxx
               ? std::string("y/dy") // 2D
               : std::string("")  // 1D
           ),
+          gnuplot_size = (
+            parent_t::n_dims == 2 
+              ? std::string("square") // 2D
+              : std::string("noratio")  // 1D
+          ),
           gnuplot_view = std::string(""), 
+          gnuplot_title = std::string(""), 
           gnuplot_zrange = std::string("[*:*]"),
           gnuplot_yrange = std::string("[*:*]"),
           gnuplot_xrange = std::string("[*:*]"),
