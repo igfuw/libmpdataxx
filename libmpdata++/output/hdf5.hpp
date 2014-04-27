@@ -80,7 +80,7 @@ namespace libmpdataxx
           else assert(false && "TODO");
 
 	  params.setChunk(hdf_dims, chunk);
-	  params.setDeflate(5); // TODO: move such constant to the header
+	  params.setDeflate(1); // higher values make super-droplet output slooooow  TODO: as parameter
 
           // creating variables
 	  // enabling chunking in order to use unlimited dimension
