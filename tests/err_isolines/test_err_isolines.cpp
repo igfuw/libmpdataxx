@@ -15,11 +15,8 @@
 #include <boost/assign/ptr_map_inserter.hpp>
 #include <boost/math/constants/constants.hpp>
 
-#include <libmpdata++/solvers/adv/donorcell_1d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_fct_1d.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
-#include <libmpdata++/concurr/threads.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
+#include <libmpdata++/concurr/serial.hpp>
 
 
 // making things simpler (yet less elegant)
@@ -27,63 +24,77 @@ using namespace libmpdataxx;
 using boost::math::constants::pi;
 blitz::firstIndex i;
 boost::ptr_map<std::string, std::ofstream> outfiles;
-using real_t = long double; // this is a good test to show differences betwee float and double!!!
+using T = double; // with long double this is a good test to show differences between float and double!!!
 
 
 // helper function template to ease adding the solvers to the pointer map
-template <class solver_t, class vec_t>
-void add_solver(vec_t &slvs, const std::string &key, const int nx)
+template <opts::opts_t opt, class vec_t>
+void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_iters)
 {
-  using params_t = typename solver_t::params_t;
+  struct ct_params_t : ct_params_default_t
+  {
+    using real_t = T;
+    enum { n_dims = 1 };
+    enum { n_eqns = 1 };
+    enum { opts = opt };
+  };
+  using solver_t = solvers::mpdata<ct_params_t>;
 
+  typename solver_t::rt_params_t p;
+
+  p.n_iters = n_iters;
+  p.grid_size = {nx};
+
+  // TODO: wouldn't open bc be better?
   boost::assign::ptr_map_insert<
-    concurr::threads<solver_t, bcond::cyclic> // map element type
+    concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> // map element type
   >(slvs)(
-    key, // map key
-    nx, params_t() // concurr's ctor args
+    key,  // map key
+    p     // concurr's ctor args
   );
 
   boost::assign::ptr_map_insert(outfiles)(key);
   if (!outfiles[key].is_open())
   {
     char bits[3];
-    sprintf(bits, "%03lu", 8 * sizeof(real_t));
+    sprintf(bits, "%03lu", 8 * sizeof(typename ct_params_t::real_t));
     outfiles[key].open("err_mpdata_" + key + "_" + bits + "_bits.txt", std::ios::trunc); 
   }
 }
 
 
+// gauss shape functor definition 
+struct gauss_t
+{
+  // member fields
+  T A0, A, sgma, x0;
+
+  // call operator
+  T operator()(T x) const 
+  { 
+    return A0 + A * exp( T(-.5) * pow(x - x0, 2) / pow(sgma, 2));
+  }
+  
+  // Blitz magick
+  BZ_DECLARE_FUNCTOR(gauss_t)
+};
+
+
 // all the test logic
 int main() 
 {
-  // gauss shape functor definition 
-  struct gauss_t
-  {
-    // member fields
-    real_t A0, A, sgma, x0;
-
-    // call operator
-    real_t operator()(real_t x) const 
-    { 
-      return A0 + A * exp( real_t(-.5) * pow(x - x0, 2) / pow(sgma, 2));
-    }
-    
-    // Blitz magick
-    BZ_DECLARE_FUNCTOR(gauss_t)
-  };
-
   // simulation parameters
-  const real_t 
+  const T 
     t_max    = 1., // "arbitrarily"
     dx_max   = 1.,
-    x_max    = 44. * dx_max, // see not about compact support in asserts below
+    x_max    = 44. * dx_max, // see note about compact support in asserts below
     sgma     = 1.5 * dx_max, 
     velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
     x0       = .5 * x_max, 
-    A0       = -.5,
-    A        = 1. / sgma / sqrt(2 * pi<real_t>());
+    A0       = 0,
+    A        = 1. / sgma / sqrt(2 * pi<T>());
 
-  const std::list<real_t> 
+  const std::list<T> 
     courants({ .05, .1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95}),
     dxs({dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32, dx_max/64, dx_max/128 });
 
@@ -100,35 +111,38 @@ int main()
     { 
       std::cerr << "  C = " << cour << std::endl;
 
-      const real_t dt = cour * dx / velocity;
+      const T dt = cour * dx / velocity;
       const int 
         n_dims = 1,
-        n_eqs  = 1,
         nx = round(x_max/dx),
         nt = round(t_max/dt);
 
-      boost::ptr_map<std::string, concurr::any<real_t, n_dims>> slvs;
+      boost::ptr_map<std::string, concurr::any<T, n_dims>> slvs;
 
       // silly loop order, but it helped to catch a major bug!
 
       // donor-cell
-      add_solver<solvers::donorcell_1d<real_t, n_eqs>>(slvs, "iters=1", nx);
+      add_solver<0>(slvs, "iters=1", nx, 1);
 
       // MPDATA
-      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs>>(slvs, "iters=2", nx);
-//      add_solver<solvers::mpdata_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_toa", nx);
-      add_solver<solvers::mpdata_1d<real_t, 3, n_eqs>>(slvs, "iters=3", nx);
-      add_solver<solvers::mpdata_1d<real_t, 3, n_eqs, formulae::mpdata::toa | formulae::mpdata::iga>>(slvs, "iters=3_toa", nx);
+      add_solver<0>(slvs, "iters=2", nx, 2);
+      add_solver<opts::tot>(slvs, "iters=2_tot", nx, 2);
+      add_solver<0>(slvs, "iters=3", nx, 3);
+      add_solver<opts::tot>(slvs, "iters=3_tot", nx, 3);
+      add_solver<opts::iga>(slvs, "iters=i", nx, 2);
+      add_solver<opts::iga | opts::tot>(slvs, "iters=i_tot", nx, 2);
 
       // MPDATA-FCT
-//      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs>>(slvs, "iters=2_fct", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 2, n_eqs, formulae::mpdata::toa>>(slvs, "iters=2_fct_toa", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs>>(slvs, "iters=3_fct", nx);
-//      add_solver<solvers::mpdata_fct_1d<real_t, 3, n_eqs, formulae::mpdata::toa>>(slvs, "iters=3_fct_toa", nx);
+      add_solver<opts::fct>(slvs, "iters=2_fct", nx, 2);
+      add_solver<opts::fct | opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
+      add_solver<opts::fct>(slvs, "iters=3_fct", nx, 3);
+      add_solver<opts::fct | opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
+      add_solver<opts::fct | opts::iga>(slvs, "iters=i_fct", nx, 2);
+      add_solver<opts::fct | opts::iga | opts::tot>(slvs, "iters=i_fct_tot", nx, 2);
 
       // calculating the analytical solution
-      typename solvers::donorcell_1d<real_t, n_eqs>::arr_t exact(nx);
-      exact = gauss((i+.5)*dx - velocity * dt * nt);
+      decltype(slvs.end()->second->advectee()) exact(nx);
+      exact = gauss(i*dx - velocity * dt * nt);
 
       // looping over solvers
       for (auto keyval : slvs) 
@@ -139,19 +153,19 @@ int main()
         std::cerr << "    solver = " << key << std::endl; 
 
         // setting the solver up
-	slv.courant() = cour; 
-        slv.state() = gauss((i+.5)*dx);
+	slv.advector() = cour; 
+        slv.advectee() = gauss(i*dx);
    
         // running the solver
 	slv.advance(nt);
 
         // asserting that periodic boundries did not affect the result
         // and that the chosen domain length is enough to have compact support up to machine precision
-        assert(exact(0) == slv.state()(0));
-        assert(exact(nx-1) == slv.state()(nx-1));
+        assert(exact(0) == slv.advectee()(0));
+        assert(exact(nx-1) == slv.advectee()(nx-1));
 
         // calculating the deviation from analytical solution
-        real_t err = sqrt(sum(pow(slv.state() - exact, 2)) / nx) / (nt * dt);
+        T err = sqrt(sum(pow(slv.advectee() - exact, 2)) / nx) / (nt * dt);
 
         outfiles[key] << dx << "\t" << cour << "\t" << err << std::endl;
       }

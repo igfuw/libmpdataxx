@@ -7,85 +7,72 @@
  * @brief a minimalistic model of a harmonic oscillator
  * (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
  *
- * \image html "../../tests/harmosc/figure_euler_it=1.svg"
- * \image html "../../tests/harmosc/figure_euler_it=1.svg"
- * \image html "../../tests/harmosc/figure_strang_it=2.svg"
- * \image html "../../tests/harmosc/figure_strang_it=2.svg"
+ * \image html "../../tests/harmosc/out.svg"
  */
 
-#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
-#include <libmpdata++/solvers/adv/donorcell_1d.hpp>
-#include <libmpdata++/bcond/cyclic_1d.hpp>
+#include "coupled_harmosc.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
+using namespace libmpdataxx;
 
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-#include "coupled_harmosc.hpp"
+using T = double;
 
-using real_t = double;
-using namespace libmpdataxx;
-
-enum {psi, phi};
-
-template <class T>
-void setopts(T &p, std::string name)
-{
-  p.dt = 1;
-  p.omega = 2*pi<real_t>() / p.dt / 400;
-  p.gnuplot_output = "figure_" + name + ".svg";
-  p.outfreq = 10;
-  p.outvars = {
-    {psi, {.name = "psi", .unit = "1"}},
-    {phi, {.name = "phi", .unit = "1"}}
-  };
-  p.gnuplot_command = "plot";
-}
+const int nt = 1500;
 
 int main() 
 {
-  const int nx = 1000, nt = 750;
-  const real_t C = .5;
- 
-  boost::ptr_vector<concurr::any<real_t, 1>> slvs;
-
-  { // euler / donor-cell
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, /* n_iters = */ 1, solvers::euler, psi, phi>>;
-    solver_t::params_t p; 
-    setopts(p, "euler_it=1");
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
-  }
-  { // euler / mpdata
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, /* n_iters = */ 2, solvers::euler, psi, phi>>;
-    solver_t::params_t p; 
-    setopts(p, "euler_it=2");
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
-  }
-  { // strang / donor-cell
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, /* n_iters = */ 1, solvers::strang, psi, phi>>;
-    solver_t::params_t p;
-    setopts(p, "strang_it=1");
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
-  }
-  { // strang / mpdata
-    using solver_t = output::gnuplot<coupled_harmosc<real_t, /* n_iters = */ 2, solvers::strang, psi, phi>>;
-    solver_t::params_t p; 
-    setopts(p, "strang_it=2");
-    slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(nx, p));
-  }
-
-  for (auto &slv : slvs)
+//<listing-1>
+  struct ct_params_t : ct_params_default_t
   {
-    // initial condition
-    {
-      blitz::firstIndex i;
-      slv.state(psi) = pow(sin((i+.5) * pi<real_t>() / nx), 300);
-      slv.state(phi) = real_t(0);
-    }
-    slv.courant() = C;
+    using real_t = T;
+    enum { n_dims = 1 };
+    enum { n_eqns = 2 };
+    enum { opts = 0 };
+    enum { rhs_scheme = 
+      solvers::rhs_scheme_t::trapez };
+    struct ix { enum {psi, phi}; };
+  };
+//</listing-1>
+  using real_t = typename ct_params_t::real_t;
+  
+  using sim_t = output::gnuplot<
+    coupled_harmosc<ct_params_t>
+  >;
+  typename sim_t::rt_params_t p; 
 
-    // integration
-    slv.advance(nt);
+//<listing-2>
+  // run-time parameters
+  p.dt = 1;
+  p.omega = 2 * pi<typename ct_params_t::real_t>() 
+            / p.dt / 400;
+//</listing-2>
+  p.grid_size = {1001};
+  p.outfreq = 10;
+
+  using ix = typename ct_params_t::ix;
+  p.outvars = {
+    {ix::psi, {.name = "psi", .unit = "1"}},
+    {ix::phi, {.name = "phi", .unit = "1"}}
+  };
+  p.gnuplot_command = "plot";
+
+  // instantiation
+  concurr::threads<sim_t, bcond::cyclic, bcond::cyclic> run(p);
+
+  // initial condition
+  {
+    blitz::firstIndex i;
+    run.advectee(ix::psi) = pow(
+      sin(i * pi<real_t>() / (p.grid_size[0]-1) + pi<real_t>()/3), 
+      300
+    );
+    run.advectee(ix::phi) = real_t(0);
   }
+  run.advector() = .5;
+
+  // integration
+  run.advance(nt);
 }

@@ -27,13 +27,16 @@ namespace libmpdataxx
 
     template <
       class solver_t,
-      bcond::bcond_e bcx,
-      bcond::bcond_e bcy = bcond::null,
-      bcond::bcond_e bcz = bcond::null
+      bcond::bcond_e bcxl,
+      bcond::bcond_e bcxr,
+      bcond::bcond_e bcyl = bcond::null,
+      bcond::bcond_e bcyr = bcond::null,
+      bcond::bcond_e bczl = bcond::null,
+      bcond::bcond_e bczr = bcond::null
     >
-    class boost_thread : public detail::concurr_common<solver_t, bcx, bcy, bcz>
+    class boost_thread : public detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
     {
-      using parent_t = detail::concurr_common<solver_t, bcx, bcy, bcz>;
+      using parent_t = detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
  
       class mem_t : public parent_t::mem_t 
       {
@@ -50,25 +53,14 @@ namespace libmpdataxx
 	{
 	  const char *env_var("OMP_NUM_THREADS");
 	  return (std::getenv(env_var) != NULL)
-	    ? std::atoi(std::getenv(env_var)) // TODO: check if convesion OK?
+	    ? std::atoi(std::getenv(env_var)) // TODO: check if conversion OK?
 	    : boost::thread::hardware_concurrency();
 	}
 
-
-        // TODO:  could one constructor be enough if n_dims a template param?
-        mem_t(int s0) : 
+        // ctor
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size) :
           b(size()),
-          parent_t::mem_t(s0, size()) 
-        {}; 
-
-        mem_t(int s0, int s1) : 
-          b(size()),
-          parent_t::mem_t(s0, s1, size()) 
-        {}; 
-
-        mem_t(int s0, int s1, int s2) : 
-          b(size()),
-          parent_t::mem_t(s0, s1, s2, size()) 
+          parent_t::mem_t(grid_size, size()) 
         {}; 
 
 	void barrier()
@@ -81,7 +73,7 @@ namespace libmpdataxx
 
       void solve(int nt)
       {
-        boost::thread_group threads; // TODO: member field?
+        boost::thread_group threads;
         for (int i = 0; i < this->algos.size(); ++i) 
         {  
           std::unique_ptr<boost::thread> thp;
@@ -94,33 +86,11 @@ namespace libmpdataxx
         threads.join_all();
       }
 
-// could it be just one ctor with int[solver_t::n_dims]?
-      // 1D ctor
-      boost_thread(
-	const int s0,
-	const typename solver_t::params_t &params = typename solver_t::params_t()
-      ) : 
-        parent_t(s0, params, new mem_t(s0), mem_t::size())
+      // ctor
+      boost_thread(const typename solver_t::rt_params_t &p) : 
+        parent_t(p, new mem_t(p.grid_size), mem_t::size())
       {}
 
-      // 2D ctor
-      boost_thread(
-	const int s0,
-	const int s1,
-	const typename solver_t::params_t &params = typename solver_t::params_t()
-      ) : 
-	parent_t(s0, s1, params, new mem_t(s0, s1), mem_t::size(), 1)
-      {}
-
-      // 3D ctor
-      boost_thread(
-	const int s0,
-	const int s1,
-	const int s2,
-	const typename solver_t::params_t &params = typename solver_t::params_t()
-      ) :
-	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2), mem_t::size(), 1, 1)
-      {}
     };
   }; // namespace concurr
 }; // namespace libmpdataxx

@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
+#include <libmpdata++/formulae/mpdata/formulae_mpdata_hot_1d.hpp>
+#include <libmpdata++/formulae/mpdata/formulae_mpdata_dfl_1d.hpp>
 
 namespace libmpdataxx
 { 
@@ -14,12 +15,12 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-
+      //eq. (17) from @copybrief Smolarkiewicz_and_Margolin_1998
       template <opts_t opts, class arr_1d_t>
       inline auto A(  // positive-sign signal version (no need for abs())
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, iga) && opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
    	  psi(i+1) - psi(i)
@@ -32,7 +33,7 @@ namespace libmpdataxx
       inline auto A(   // variable-sign signal version (hence the need for abs())
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
 	frac<opts>( 
           abs(psi(i+1)) - abs(psi(i))
@@ -45,88 +46,30 @@ namespace libmpdataxx
       inline auto A( // infinite gauge version (for both signed and variable-sign fields), (sum of psi -> sum of 1)
         const arr_1d_t &psi, 
         const rng_t &i,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
-      ) return_macro(,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 // enabled if iga == true
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "abs & iga options are mutually exclusive");
+        ,
 	(psi(i+1) - psi(i)) 
         / //---------------
         (1 + 1)
       )
-
-      // 3rd order term (first term from eq. (36) from @copybrief Smolarkiewicz_and_Margolin_1998 (with G=1))
-      template<opts_t opts, class arr_1d_t>
-      inline auto HOT(
-        const arr_1d_t &psi,
-        const arr_1d_t &C,
-        const rng_t &i,
-        typename std::enable_if<!opt_set(opts, toa)>::type* = 0 
-      ) -> decltype(0)
-      { 
-        return 0; //no Higher Order Terms for second accuracy 
-      }
-
-      template<class arr_1d_t>
-      inline auto HOT_helper(
-        const arr_1d_t &C,
-        const rng_t &i
-      ) return_macro(,
-	(3 * C(i+h) * abs(C(i+h)) - 2 * pow(C(i+h), 3) - C(i+h)) / 3
-      )
-
-      template<opts_t opts, class arr_1d_t>
-      inline auto HOT( // for positive sign signal (so no need for abs())
-        const arr_1d_t &psi,
-        const arr_1d_t &C,
-        const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa) && opt_set(opts, pds) && !opt_set(opts, iga)>::type* = 0 
-      ) return_macro(,
-        HOT_helper(C, i) 
-        * frac<opts>(
-	    psi(i+2) - psi(i+1) - psi(i) + psi(i-1)
-	    ,//-----------------------------------
-	    psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
-	)
-      )
-
-      template<opts_t opts, class arr_1d_t>
-      inline auto HOT( // for variable sign signal (hence the need for abs())
-        const arr_1d_t &psi,
-        const arr_1d_t &C,
-        const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa) && !opt_set(opts, pds) && !opt_set(opts, iga)>::type* = 0
-      ) return_macro(,
-        HOT_helper(C, i)
-        * frac<opts>(
-	    abs(psi(i+2)) - abs(psi(i+1)) - abs(psi(i)) + abs(psi(i-1))
-	    ,//------------------------------------------------------- 
-	    abs(psi(i+2)) + abs(psi(i+1)) + abs(psi(i)) + abs(psi(i-1))
-	)
-      )
-
-      template<opts_t opts, class arr_1d_t>
-      inline auto HOT( // for infinite gauge option (sum of psi -> sum of 1) 
-        const arr_1d_t &psi,
-        const arr_1d_t &C,
-        const rng_t &i,
-        typename std::enable_if<opt_set(opts, toa) && !opt_set(opts, pds) && opt_set(opts, iga)>::type* = 0 
-      ) return_macro(,
-        HOT_helper(C, i) 
-        * (psi(i+2) - psi(i+1) - psi(i) + psi(i-1)) 
-        / //--------------------------------------- 
-        (1 + 1 + 1 + 1)
-      )
-
+      // eq 29a from @copybrief Smolarkiewicz_and_Margolin_1998
       template<opts_t opts, class arr_1d_t>
       inline auto antidiff( // antidiffusive velocity
         const arr_1d_t &psi, 
-        const rng_t &i, 
-        const arr_1d_t &C
+        const arr_1d_t &GC,
+        const arr_1d_t &G,
+        const rng_t &i
       ) return_macro(,
         // second-order terms
-        abs(C(i+h)) 
-        * (1 - abs(C(i+h))) 
+        abs(GC(i+h)) 
+        * (1 - abs(GC(i+h)) / ((formulae::G<opts>(G, i) + formulae::G<opts>(G, i+1)) / 2)) 
         * A<opts>(psi, i) 
         // third-order terms
-        + HOT<opts>(psi, C, i) 
+        + HOT<opts>(psi, GC, G, i) //higher order term
+        // divergent flow terms
+        + DFL<opts>(GC, G, i) //divergent flow correction
       )
     }; // namespace mpdata
   }; // namespace formulae

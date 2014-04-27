@@ -10,31 +10,31 @@
  * \image html "../../tests/gnuplot-iostream_1d/figure_iters=3.svg"
  */
 
-#include <libmpdata++/solvers/adv/mpdata_1d.hpp>
-#include <libmpdata++/solvers/adv/donorcell_1d.hpp>
-#include <libmpdata++/solvers/adv/leapfrog_1d.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
 using namespace libmpdataxx;
 
-using real_t = float;
+struct ct_params_t : ct_params_default_t
+{
+  using real_t = float;
+  enum { n_dims = 1 };
+  enum { n_eqns = 1 };
+  enum { opts = 0 };
+};
+
 int n = 20, nt = 20;
 
-template <class T>
-void setup(T &solver, int n) 
+template <class slvs_t>
+void add_solver(slvs_t &slvs, int n_iters)
 {
-  blitz::firstIndex i;
-  solver.state() = exp(
-    -sqr(.5+i-n/2.) / (2.*pow(n/10, 2)) // TODO: assumes dx=1
-  );  
-  solver.courant() = .5; 
-}
+  using solver_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
+  typename solver_t::rt_params_t p;
 
-template <class T>
-void setopts(T &p, int nt, int n_iters)
-{
+  // pre-instantiation stuff
+  p.grid_size[0] = n;
+  p.n_iters = n_iters;
   p.outfreq = nt / 10; 
   {
     std::ostringstream tmp;
@@ -42,23 +42,25 @@ void setopts(T &p, int nt, int n_iters)
     p.gnuplot_output = tmp.str();    
   }
   p.outvars = {{0, {.name = "psi", .unit = "1"}}};
-}
+ 
+  // instantiation
+  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic, bcond::cyclic>(p));
 
-template <int it, class slvs_t>
-void add_solver(slvs_t &slvs)
-{
-  using solver_t = output::gnuplot<solvers::mpdata_1d<real_t, it>>;
-  typename solver_t::params_t p;
-  setopts(p, nt, it);
-  slvs.push_back(new concurr::threads<solver_t, bcond::cyclic>(n, p));
-  setup(slvs.back(), n);
+  // post-instantiation stuff
+  {
+    blitz::firstIndex i;
+    slvs.back().advectee() = exp(
+      -sqr(i-(n-1)/2.) / (2.*pow((n-1)/10, 2)) // TODO: assumes dx=1
+    );  
+    slvs.back().advector() = .5; 
+  }
 }
 
 int main() 
 {
-  boost::ptr_vector<concurr::any<real_t, 1>> slvs;
-  add_solver<1>(slvs);
-  add_solver<2>(slvs);
-  add_solver<3>(slvs);
+  boost::ptr_vector<concurr::any<ct_params_t::real_t, 1>> slvs;
+  add_solver(slvs, 1);
+  add_solver(slvs, 2);
+  add_solver(slvs, 3);
   for (auto &slv : slvs) slv.advance(nt);
 }

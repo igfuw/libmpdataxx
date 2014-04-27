@@ -1,1 +1,3 @@
-libmpdataxx_add_test(test_shallow_water)
+libmpdataxx_add_test(spreading_drop_1d)
+libmpdataxx_add_test(spreading_drop_2d)
+libmpdataxx_add_test(test_shallow_water_2d)

@@ -7,8 +7,8 @@
 #pragma once
 
 #include <libmpdata++/blitz.hpp>
-#include <libmpdata++/idxperm.hpp>
-#include <libmpdata++/arakawa_c.hpp>
+#include <libmpdata++/formulae/idxperm.hpp>
+#include <libmpdata++/formulae/arakawa_c.hpp>
 
 namespace libmpdataxx
 {
@@ -18,6 +18,19 @@ namespace libmpdataxx
     {
       using idxperm::pi;
 
+      template <class arg_t, typename real_t>
+      inline auto grad(
+	const arg_t &x,
+	const rng_t &i,
+	const real_t dx
+      ) return_macro(,
+	(
+	  x(i+1) - 
+	  x(i-1)
+	) / dx / 2.
+      )
+
+      // 2D version
       template <int d, class arg_t, typename real_t>
       inline auto grad(
 	const arg_t &x,

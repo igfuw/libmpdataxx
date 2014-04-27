@@ -8,7 +8,7 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/bcond/bcond.hpp>
-#include <libmpdata++/arakawa_c.hpp>
+#include <libmpdata++/formulae/arakawa_c.hpp>
 
 // TODO: move to detail
 

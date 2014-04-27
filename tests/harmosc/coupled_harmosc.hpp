@@ -5,99 +5,77 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
  * @brief a minimalistic model of a harmonic oscillator
- * (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
- *
- * @section DERIVATION
- *
- * A system of two 1-dimensional advection equations representing 
- * coupled harmonic oscillators is considered:
- *
- * \f$ \partial_t \psi + \nabla (\vec{u} \psi) =  \omega \phi \f$
- * 
- * \f$ \partial_t \phi + \nabla (\vec{u} \phi) = -\omega \psi \f$
- *
- * Discretisation in time yields:
- *
- * \f$ \frac{\psi^{n+1} - \psi^n}{\Delta t} + A(\psi^n) = \omega \phi^{n+1} \f$
- *
- * \f$ \frac{\phi^{n+1} - \phi^n}{\Delta t} + A(\phi^n) = - \omega \psi^{n+1} \f$
- * 
- * and after some regrouping:
- *
- * \f$ \psi^{n+1} = \Delta t \cdot \omega \phi^{n+1} + \left.\psi^{n+1}\right|_{RHS=0}\f$
- *
- * \f$ \phi^{n+1} = - \Delta t \cdot \omega \psi^{n+1} + \left.\phi^{n+1}\right|_{RHS=0}\f$
- * 
- * solving for \f$ \psi^{n+1} \f$ and \f$ \phi^{n+1} \f$ yields:
- *
- * \f$ \psi^{n+1} = \Delta t \cdot \omega \left( \left.\phi^{n+1}\right|_{RHS=0} - \Delta t \cdot \omega \psi^{n+1} \right) + \left.\psi^{n+1}\right|_{RHS=0} \f$
- *
- * \f$ \phi^{n+1} = - \Delta t \cdot \omega \left( \left.\psi^{n+1}\right|_{RHS=0} + \Delta t \cdot \omega \phi^{n+1} \right) + \left.\phi^{n+1}\right|_{RHS=0}\f$
- *
- * what can be further rearranged to yield:
- *
- * \f$ \psi^{n+1} = \left[ \Delta t \cdot \omega \left.\phi^{n+1}\right|_{RHS=0} + \left.\psi^{n+1}\right|_{RHS=0} \right] / \left[ 1 + \Delta t^2 \cdot \omega^2 \right] \f$
- * 
- * \f$ \phi^{n+1} = \left[ - \Delta t \cdot \omega \left.\psi^{n+1}\right|_{RHS=0} + \left.\phi^{n+1}\right|_{RHS=0} \right] / \left[ 1 + \Delta t^2 \cdot \omega^2 \right] \f$
- *
- * what is represented by the forcings() method in the example below.
+ * (consult eq. 28-30 in Smolarkiewicz 2006, IJNMF)
  *
  */
+//
 
-#include <libmpdata++/solvers/adv+rhs/solver_inhomo.hpp>
-#include <libmpdata++/blitz.hpp>
+//<listing-1>
+#include <libmpdata++/solvers/mpdata_rhs.hpp>
 
-using namespace libmpdataxx;
-
-template <typename real_t, int n_iters, solvers::inhomo_e inhomo, int psi, int phi, int n_eqs = 2>
-class coupled_harmosc : public solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters, n_eqs>, inhomo>
+template <class ct_params_t>
+struct coupled_harmosc : public 
+  libmpdataxx::solvers::mpdata_rhs<ct_params_t>
 {
-  using parent_t = solvers::inhomo_solver<solvers::mpdata_1d<real_t, n_iters, n_eqs>, inhomo>;
+  // aliases
+  using parent_t = 
+    libmpdataxx::solvers::mpdata_rhs<ct_params_t>;
+  using ix = typename ct_params_t::ix;
 
-  typename parent_t::real_t omega;
-  typename parent_t::arr_t tmp;
+  // member fields
+  typename ct_params_t::real_t omega;
 
-  void apply_forcings(typename parent_t::real_t dt)
-  {
-    auto Psi = this->state(psi);
-    auto Phi = this->state(phi);
-    rng_t &i = this->i;
+  // method called by mpdata_rhs
+  void update_rhs(
+    libmpdataxx::arrvec_t<
+      typename parent_t::arr_t
+    > &rhs, 
+    const typename parent_t::real_t &dt,
+    const int &at
+  ) {
+    parent_t::update_rhs(rhs, dt, at);
 
-    tmp(i) = Psi(i);
-    ///   (consult eq. 28 in Smolarkiewicz 2006, IJNMF)
-    // explicit part
-    Psi(i) += dt * omega * Phi(i);
-    // implicit part
-    Psi(i) /= (1 + pow(dt * omega, 2));
+    // just to shorten code
+    auto psi = this->psi_n(ix::psi);
+    auto phi = this->psi_n(ix::phi);
+    auto &i = this->i;
 
-    // explicit part
-    Phi(i) += - dt * omega * tmp(i);
-    // implicit part
-    Phi(i) /= (1 + pow(dt * omega, 2));
+    switch (at) 
+    {
+      // explicit solution for R^{n} 
+      // (note: with trapez used only at t=0)
+      case (0): 
+      rhs.at(ix::psi)(i) += omega * phi(i);
+      rhs.at(ix::phi)(i) -= omega * psi(i);
+      break;
+   
+      // implicit solution for R^{n+1}
+      case (1): 
+      rhs.at(ix::psi)(i) += (
+	(psi(i) + dt * omega * phi(i)) 
+        / (1 + pow(dt * omega, 2))
+	- psi(i)
+      ) / dt;
+
+      rhs.at(ix::phi)(i) += (
+        (phi(i) - dt * omega * psi(i)) 
+        / (1 + pow(dt * omega, 2))
+        - phi(i)
+      ) / dt;
+      break;
+    }
   }
 
-  public:
-
-  struct params_t : parent_t::params_t { typename parent_t::real_t omega; };
+  // run-time parameters
+  struct rt_params_t : parent_t::rt_params_t { 
+    typename ct_params_t::real_t omega = 0; 
+  };
 
   // ctor
   coupled_harmosc(
     typename parent_t::ctor_args_t args,
-    params_t p
-  ) :
-    parent_t(args, p),
-    omega(p.omega), 
-    tmp(args.mem->tmp[__FILE__][0][0]) 
-  {}
-
-  static void alloc(
-    typename parent_t::mem_t *mem,
-    const int nx
-  )
-  {
-    // TODO: move to inhomo!
-    parent_t::alloc(mem, nx);
-    mem->tmp[__FILE__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
-    mem->tmp[__FILE__].back().push_back(new typename parent_t::arr_t( rng_t(0, nx-1) )); 
-  }
+    const rt_params_t &p
+  ) : parent_t(args, p), omega(p.omega)
+  { assert(omega != 0); }
 };
+//</listing-1>

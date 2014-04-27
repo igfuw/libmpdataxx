@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <libmpdata++/output/detail/output_timer.hpp>
+#include <libmpdata++/output/detail/output_common.hpp>
 #include <libmpdata++/detail/error.hpp>
 
 // the C++ HDF5 API
@@ -24,9 +24,9 @@ namespace libmpdataxx
   namespace output
   {
     template <class solver_t>
-    class hdf5 : public detail::output_timer<solver_t> // TODO: get rid of timer here!
+    class hdf5 : public detail::output_common<solver_t> 
     {
-      using parent_t = detail::output_timer<solver_t>;
+      using parent_t = detail::output_common<solver_t>;
 
       //static_assert(parent_t::n_dims < 3, "only 1D and 2D output supported");
 
@@ -69,9 +69,9 @@ namespace libmpdataxx
           // x,y,z
           if (parent_t::n_dims == 2)
           {
-            shape[1] = limit[1] = chunk[1] = this->mem->span[0];
+            shape[1] = limit[1] = chunk[1] = this->mem->grid_size[0];
             shape[2] = limit[2] = chunk[2] = 1;
-	    shape[3] = limit[3] = chunk[3] = this->mem->span[1];
+	    shape[3] = limit[3] = chunk[3] = this->mem->grid_size[1];
 
 	    count[0] = count[1] = count[2] = 1;
             count[3] = shape[3];
@@ -151,11 +151,11 @@ namespace libmpdataxx
 	      H5::DataSpace space = vars[v.first].getSpace();
 
 	      // halos present -> data not contiguous -> looping over the major rank
-	      for (int i = 0; i < this->mem->span[0]; ++i)
+	      for (int i = 0; i < this->mem->grid_size[0]; ++i)
 	      {
                 offst[1] = i;
                 space.selectHyperslab(H5S_SELECT_SET, count, offst);
-		vars[v.first].write( &(this->mem->state(v.first)(i,0)), flttype_solver, H5::DataSpace(hdf_dims, count), space); 
+		vars[v.first].write( &(this->mem->advectee(v.first)(i,0)), flttype_solver, H5::DataSpace(hdf_dims, count), space); 
 	      }
 	      break;
 	    }
@@ -212,7 +212,7 @@ namespace libmpdataxx
 
       public:
 
-      struct params_t : parent_t::params_t 
+      struct rt_params_t : parent_t::rt_params_t 
       { 
 	std::string outfile;
 // TODO: pass adiitional info? (command_line, library versions, ...) (-> output_common?)
@@ -221,7 +221,7 @@ namespace libmpdataxx
       // ctor
       hdf5(
 	typename parent_t::ctor_args_t args,
-	const params_t &p
+	const rt_params_t &p
       ) : parent_t(args, p), 
         outfile(p.outfile)  
       { }

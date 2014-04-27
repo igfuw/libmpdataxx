@@ -11,60 +11,22 @@
 #  warning   -ffast-math (Clang and GCC) and -DNDEBUG are recomended for release-mode builds
 #  warning   -DBZ_DEBUG is recommended for debug-mode builds
 #endif
-// TODO: no ("") required?
 
-#if defined(_OPENMP) || defined(_REENTRANT)
-#  define BZ_THREADSAFE
+#if defined(BZ_THREADSAFE)
+#  error libmpdata++ uses blitz::neverDeleteData, please unset BZ_THREADSAFE
 #endif
+
+// force use of #pragma ivdep even if Blitz thinks the compiler does not support it
+// (as of gcc 20140212, it gives an ICE: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=60198) - TODO: check in CMake
+//#define BZ_USE_ALIGNMENT_PRAGMAS  
+
+#include <blitz/tv2fastiter.h> // otherwise Clang fails in debug mode
 #include <blitz/array.h>
 
-// local definition of a Kahan's sum reduction
-// (http://en.wikipedia.org/wiki/Kahan_summation_algorithm)
-namespace blitz
-{
-  template<typename P_sourcetype, typename P_resulttype = BZ_SUMTYPE(P_sourcetype)>
-  class ReduceKahanSum 
-  {
-    public:
-
-    typedef P_sourcetype T_sourcetype;
-    typedef P_resulttype T_resulttype;
-    typedef T_resulttype T_numtype;
-
-    static const bool needIndex = false, needInit = false;
-
-    ReduceKahanSum() { } 
-
-#pragma GCC push_options
-#pragma GCC optimize ("O3") // assuming -Ofast could optimise out the algorithm
-    bool operator()(const T_sourcetype& x, const int=0) const 
-    { 
-      T_resulttype y, t;
-      y = x - c_;
-      t = sum_ + y;
-      c_ = (t - sum_) - y;
-      sum_ = t;
-      return true;
-    }   
-#pragma GCC pop_options
-
-    T_resulttype result(const int) const { return sum_; }
-
-    void reset() const 
-    { 
-      sum_ = c_ = zero(T_resulttype()); 
-    }
- 
-    static const char* name() { return "sum"; }
- 
-    protected:
-
-    mutable T_resulttype sum_, c_;
-  };
-  BZ_DECL_ARRAY_PARTIAL_REDUCE(kahan_sum, ReduceKahanSum)
-  BZ_DECL_ARRAY_FULL_REDUCE(kahan_sum, ReduceKahanSum)
-}
   
+#include <libmpdata++/kahan_reduction.hpp>
+
+//////////////////////////////////////////////////////////
 #include <boost/ptr_container/ptr_vector.hpp>
 
 // C++11 auto return type macro

@@ -10,30 +10,26 @@
  * \image html "../../tests/var_sign_2d/figure.svg"
  */
 
-#include <libmpdata++/solvers/adv/donorcell_2d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
-#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 
+using namespace libmpdataxx;
+using T = float;
+
 enum {x, y};
+int nt = 10;
 
-template <class T>
-void setup(T &solver, int n[2], typename T::real_t offset) 
-{
-  blitz::firstIndex i;
-  blitz::secondIndex j;
-  solver.state() = offset + exp(
-    -sqr(i+.5-n[x]/2.) / (2.*pow(n[x]/10, 2)) // TODO: assumes dx=dy=1
-    -sqr(j+.5-n[y]/2.) / (2.*pow(n[y]/10, 2))
-  );  
-  solver.courant(x) = .5; 
-  solver.courant(y) = .25;
-}
+template <class solver_t, class slvs_t>
+void add_solver(
+  slvs_t &slvs, 
+  const typename solver_t::real_t offset, 
+  const std::string fname
+) {
+  typename solver_t::rt_params_t p;
 
-template <class T>
-void setopts(T &p, const int nt, const float offset, const std::string &fname)
-{
+  // pre instantiation
+  p.grid_size = {24, 24};
   p.outfreq = nt; 
   p.gnuplot_with = "lines";
   p.gnuplot_border = "4095";
@@ -44,42 +40,62 @@ void setopts(T &p, const int nt, const float offset, const std::string &fname)
     tmp << "[" << (offset -.025) << ":" << (offset +1.025) << "]";
     p.gnuplot_cbrange = tmp.str();
   }
-  p.gnuplot_output = fname + "_%d_%d.svg";    
+  {
+    std::ostringstream tmp;
+    tmp << fname << "_offset=" << offset << "_%d_%d.svg";    
+    p.gnuplot_output = tmp.str();
+  }
   p.outvars = {{0, {.name = "psi", .unit = "1"}}};
+
+  // instantiation
+  slvs.push_back(new concurr::threads<
+    solver_t, 
+    bcond::cyclic, bcond::cyclic,
+    bcond::cyclic, bcond::cyclic
+  >(p));
+
+  // post instantiation
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  slvs.back().advectee() = offset + exp(
+    -sqr(i-(p.grid_size[x]-1)/2.) / (2.*pow((p.grid_size[x]-1)/10, 2)) // TODO: assumes dx=dy=1
+    -sqr(j-(p.grid_size[y]-1)/2.) / (2.*pow((p.grid_size[y]-1)/10, 2))
+  );  
+  slvs.back().advector(x) = .5; 
+  slvs.back().advector(y) = .25;
 }
 
 int main() 
 {
-  using namespace libmpdataxx;
+  boost::ptr_vector<concurr::any<T, 2>> slvs;
 
-  int n[] = {24, 24}, nt = 10;
-
-  for (auto &offset : std::vector<float>({0,-.5}))
+  for (auto &offset : std::vector<T>({0,-.5}))
   {
     {
-      using solver_t = output::gnuplot<solvers::donorcell_2d<float>>;
-      solver_t::params_t p;
-      setopts(p, nt, offset, "donorcell");
-      concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p);
-      setup(slv, n, offset);
-      slv.advance(nt);
-    } 
+      struct ct_params_t : ct_params_default_t
+      {
+        using real_t = T;
+        enum { n_dims = 2 };
+        enum { n_eqns = 2 };
+        enum { opts = opts::abs };
+      };
+      add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
+        slvs, offset, "mpdata-abs_it=2"
+      );
+    }
     {
-      using solver_t = output::gnuplot<solvers::mpdata_2d<float, 2>>;
-      solver_t::params_t p;
-      setopts(p, nt, offset, "mpdata_it=2");
-      concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
-      setup(slv, n, offset); 
-      slv.advance(nt);
-    } 
-    {
-      const int n_eqs = 1;
-      using solver_t = output::gnuplot<solvers::mpdata_2d<float, 2, n_eqs, formulae::mpdata::pds>>;
-      solver_t::params_t p;
-      setopts(p, nt, offset, "mpdata-pds_it=2");
-      concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
-      setup(slv, n, offset); 
-      slv.advance(nt); 
+      struct ct_params_t : ct_params_default_t
+      {
+        using real_t = T;
+        enum { n_dims = 2 };
+        enum { n_eqns = 2 };
+        enum { opts = 0 };
+      };
+      add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
+        slvs, offset, "mpdata_it=2"
+      );
     }
   }
+
+  for (auto &slv : slvs) slv.advance(nt);
 }

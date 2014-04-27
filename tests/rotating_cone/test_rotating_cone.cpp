@@ -1,4 +1,4 @@
-/** 
+/* 
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -13,65 +13,55 @@
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
 
-#include <libmpdata++/solvers/adv/mpdata_2d.hpp>
-#include <libmpdata++/solvers/adv/mpdata_fct_2d.hpp>
-#include <libmpdata++/bcond/cyclic_2d.hpp>
+#include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
+using namespace libmpdataxx;
 
-enum {x, y};
-using real_t = float;
+template <int opts_arg, int opts_iters>
+void test(const std::string filename)
+{
+  struct ct_params_t : ct_params_default_t
+  {
+    using real_t = double;
+//<listing-1>
+    enum { n_dims = 2 };
+    enum { n_eqns = 1 };
+//</listing-1>
+    enum { opts = opts_arg };
+  };
 
-real_t 
-  dt = .1,
-  dx = 1,
-  dy = 1,
-  omega = -.1,
-  h = 4., // TODO: other name!
-  h0 = 100.; // change it to 1 to see scary things!
+  typename ct_params_t::real_t 
+    dt = .1,
+    dx = 1,
+    dy = 1,
+    omg = .1,
+    h = 4., // TODO: other name!
+    h0 = 0;
+    //  h0 = 100.; // change it to 1 to see scary things!
 
-// Anderson-Fattachi?
+/// @brief settings from @copybrief Anderson_and_Fattahi_1974
 //    dt = 10 * pi<real_t>(),
-//    omega = -.001,// / (2 * pi<real_t>()),
+//    omg = -.001,// / (2 * pi<real_t>()),
 //    r = 4. * dx,
 //    h0 = -.5,
 //    x0 = 21. * dx,
 //    y0 = 15. * dy;
 
-/// @brief settings from @copybrief Anderson_and_Fattahi_1974
-template <class T>
-void setup(T &solver, int n[2]) 
-{
-  real_t
-    r = 15. * dx,
-    x0 = 75 * dx,
-    y0 = 50 * dy,
-    xc = .5 * n[x] * dx,
-    yc = .5 * n[y] * dy;
+  int nt = 628 * 6;
 
-  blitz::firstIndex i;
-  blitz::secondIndex j;
+  using sim_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
+  typename sim_t::rt_params_t p;
 
-  // cone shape
-  decltype(solver.state()) tmp(solver.state().extent());
-  tmp = blitz::pow((i+.5) * dx - x0, 2) + blitz::pow((j+.5) * dy - y0, 2);
-  solver.state() = h0 + where(tmp - pow(r, 2) <= 0, h * blitz::sqr(1 - tmp / pow(r, 2)), 0.);
+  // pre instantiation
+  p.n_iters = opts_iters; 
+  p.grid_size = {101, 101};
 
-  // constant angular velocity rotational field
-  solver.courant(x) = -omega * (j * dy - yc) * dt / dx;
-  solver.courant(y) =  omega * (i * dx - xc) * dt / dy;
-  // TODO: an assert confirming that the above did what it should have done
-  //       (in context of the courant()'s use of blitz::Array::reindex())
-}
-
-template <class T>
-void setopts(T &p, int nt, int n_iters)
-{
-  p.outfreq = nt; //nt;///10; // TODO
+  p.outfreq = nt; 
   p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;
-    tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
+    tmp << filename << "_%s_%d.svg";
     p.gnuplot_output = tmp.str();    
   }
   p.gnuplot_view = "map";
@@ -83,8 +73,10 @@ void setopts(T &p, int nt, int n_iters)
     tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
     p.gnuplot_cbrange = tmp.str();
   }
-  p.gnuplot_xrange = "[60 : 90]";
-  p.gnuplot_yrange = "[35 : 65]";
+  p.gnuplot_xrange = "[25 : 75]";
+  p.gnuplot_yrange = "[50 : 100]";
+//  p.gnuplot_xrange = "[0 : 100]";
+//  p.gnuplot_yrange = "[0 : 100]";
   p.gnuplot_maxcolors = 10;
   {
     std::ostringstream tmp;
@@ -93,33 +85,84 @@ void setopts(T &p, int nt, int n_iters)
   }
   p.gnuplot_term = "svg";
 
-/*
-  p.outfreq = nt;
-  p.gnuplot_with = "lines";
+//<listing-2>
+  // instantiation
+  concurr::threads<
+    sim_t, 
+    bcond::open, bcond::open,
+    bcond::open, bcond::open
+  > run(p); 
+//</listing-2>
   {
-    std::ostringstream tmp;
-    tmp << "figure_iters=" << n_iters << "_%s_%d.svg";
-    p.gnuplot_output = tmp.str();
+//<listing-3>
+    // constants used in the set-up definition
+    enum {x, y};
+    const typename ct_params_t::real_t
+      r = 15. * dx,
+      x0 = 50 * dx,
+      y0 = 75 * dy,
+      xc = .5 * (p.grid_size[x]-1) * dx,
+      yc = .5 * (p.grid_size[y]-1) * dy;
+
+    // temporary array of the same ...
+    decltype(run.advectee())        // type 
+      tmp(run.advectee().extent()); // and size 
+    // ... as the one returned by advectee()
+
+    // helper vars for Blitz++ tensor notation
+    blitz::firstIndex i;
+    blitz::secondIndex j;
+
+    // cone shape ...
+    tmp = blitz::pow(i * dx - x0, 2) + 
+          blitz::pow(j * dy - y0, 2);
+
+    // ... cut off at zero
+    run.advectee() = h0 + where(
+      tmp - pow(r, 2) <= 0,                  //if
+      h * blitz::sqr(1 - tmp / pow(r, 2)),   //then
+      0.                                     //else
+    );
+
+    // constant-angular-velocity rotational field
+    run.advector(x) =  omg * (j * dy - yc) * dt/dx;
+    run.advector(y) = -omg * (i * dx - xc) * dt/dy;
+//</listing-3>
   }
-  p.outvars[0].name = "psi";
-*/
+    // TODO: an assert confirming that the above did what it should have done
+    //       (in context of the advector()'s use of blitz::Array::reindex())
+
+  // time stepping
+  run.advance(nt);
+  
+  std::cout<<"min(psi) = " << min(run.advectee()) << std::endl;
 }
 
-int main() 
+int main()
 {
-  using namespace libmpdataxx;
-
-//  int n[] = {32, 32}, nt = 200;
-  int n[] = {101, 101}, nt = 628 * 6;
-
-  const int n_iters = 2;
-  //using solver_t = output::gnuplot<solvers::mpdata_2d<real_t, n_iters, 1/*, formulae::mpdata::toa*/>>;
-  using solver_t = output::gnuplot<solvers::mpdata_fct_2d<real_t, n_iters, 1, formulae::mpdata::iga | formulae::mpdata::toa>>;
-  solver_t::params_t p;
-  setopts(p, nt, n_iters);
-  concurr::threads<solver_t, bcond::cyclic, bcond::cyclic> slv(n[x], n[y], p); 
-
-  setup(slv, n); 
-  slv.advance(nt);
+  {
+    enum { opts = 0 };
+    const int opts_iters = 2;
+    test<opts, opts_iters>("basic");
+  }
+  {
+    enum { opts = opts::fct };
+    const int opts_iters = 2;
+    test<opts, opts_iters>("fct");
+  }
+  {
+    enum { opts = opts::fct | opts::tot };
+    const int opts_iters = 3;
+    test<opts, opts_iters>("iters3_tot_fct");
+  }
+  {
+    enum { opts = opts::iga | opts::fct};
+    const int opts_iters = 2;
+    test<opts, opts_iters>("iga_fct");
+  }
+  {
+    enum { opts = opts::iga | opts::tot | opts::fct };
+    const int opts_iters = 2;
+    test<opts, opts_iters>("iga_tot_fct");
+  }
 }
-

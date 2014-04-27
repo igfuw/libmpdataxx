@@ -20,35 +20,35 @@ namespace libmpdataxx
     {
       using namespace arakawa_c;
 
-// TODO: psi -> psi/rho !!!
-
       /// \f$ \beta^{\uparrow}_{i} = \frac { \psi^{max}_{i}- \psi^{*}_{i} }
       /// { \sum\limits_{I} \frac{\Delta t}{\Delta x^{I}} \left( [u^{I}_{i-1/2}]^{+} \psi^{*}_{i-1} - 
       /// [u^{I}_{i+1/2}]^{-} \psi^{*}_{i+1} \right)  } \f$ \n
       /// eq.(19a) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
 
-      template <class arr_1d_t>
+      template<opts_t opts, class arr_1d_t>
       inline auto beta_up_nominator(
         const arr_1d_t &psi,
         const arr_1d_t &psi_max, 
+        const arr_1d_t &G,
         const rng_t i
       ) return_macro(,
-        max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) - psi(i)
-      )
-
+        (max(max(max(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) - psi(i)) * formulae::G<opts>(G, i)
+      )                                                                    //to make beta dimensionless 
+                                                                           //when transporting mixing ratios with momentum
       template <opts_t opts, class arr_1d_t>
       inline auto beta_up( // for positive sign signal
         const arr_1d_t &psi,
         const arr_1d_t &psi_max, // from before the first iteration
-        const arr_1d_t &C_corr, 
+        const arr_1d_t &GC_corr,
+        const arr_1d_t &G,
         const rng_t i,
-        typename std::enable_if<opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::abs) && !opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
         frac<opts>(
-          beta_up_nominator(psi, psi_max, i)
+          beta_up_nominator<opts>(psi, psi_max, G, i)
           ,// ----------------------------
-            pospart<opts>(C_corr(i-h)) * psi(i-1) 
-          - negpart<opts>(C_corr(i+h)) * psi(i+1)
+            pospart<opts>(GC_corr(i-h)) * psi(i-1) 
+          - negpart<opts>(GC_corr(i+h)) * psi(i+1)
         ) 
       ) 
 
@@ -56,17 +56,18 @@ namespace libmpdataxx
       inline auto beta_up( //for variable sign signal
         const arr_1d_t &psi,
         const arr_1d_t &psi_max, // from before the first iteration
-        const arr_1d_t &C_corr, 
+        const arr_1d_t &GC_corr,
+        const arr_1d_t &G,
         const rng_t i,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
         frac<opts>(
-          beta_up_nominator(psi, psi_max, i)
+          beta_up_nominator<opts>(psi, psi_max, G, i)
           ,// ----------------------------
-            pospart<opts>(C_corr(i-h)) * pospart<opts>(psi(i-1)) // TODO: some parenthesis?
-          - negpart<opts>(C_corr(i+h)) * pospart<opts>(psi(i+1))
-          - pospart<opts>(C_corr(i+h)) * negpart<opts>(psi(i))
-          + negpart<opts>(C_corr(i-h)) * negpart<opts>(psi(i))
+            pospart<opts>(GC_corr(i-h)) * pospart<opts>(psi(i-1)) // TODO: some parenthesis?
+          - negpart<opts>(GC_corr(i+h)) * pospart<opts>(psi(i+1))
+          - pospart<opts>(GC_corr(i+h)) * negpart<opts>(psi(i  ))
+          + negpart<opts>(GC_corr(i-h)) * negpart<opts>(psi(i  ))
         ) 
       ) 
 
@@ -74,15 +75,19 @@ namespace libmpdataxx
       inline auto beta_up( //infinite gauge option (* psi -> * 1)
         const arr_1d_t &psi,
         const arr_1d_t &psi_max, // from before the first iteration
-        const arr_1d_t &C_corr, 
+        const arr_1d_t &GC_corr,
+        const arr_1d_t &G,
         const rng_t i,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0 
-      ) return_macro(,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
+        ,
         frac<opts>(
-          beta_up_nominator(psi, psi_max, i)
+          beta_up_nominator<opts>(psi, psi_max, G, i)
           ,// ----------------------------
-          pospart<opts>(C_corr(i-h))   * 1
-          - negpart<opts>(C_corr(i+h)) * 1
+          pospart<opts>(GC_corr(i-h))   /* * 1 */
+          - negpart<opts>(GC_corr(i+h)) /* * 1 */
+          //+ blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -91,28 +96,30 @@ namespace libmpdataxx
       /// [u^{I}_{i-1/2}]^{-} \psi^{*}_{i} \right)  } \f$ \n
       /// eq.(19b) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
 
-      template <class arr_1d_t>
+      template<opts_t opts, class arr_1d_t>
       inline auto beta_dn_nominator(
         const arr_1d_t &psi,
         const arr_1d_t &psi_min, 
+        const arr_1d_t &G, 
         const rng_t i
       ) return_macro(,
-        psi(i) - min(min(min(psi_min(i), psi(i-1)), psi(i)), psi(i+1)) 
-      )
-
+        (psi(i) - min(min(min(psi_min(i), psi(i-1)), psi(i)), psi(i+1))) * formulae::G<opts>(G, i)
+      )                                                                    //to make beta dimensionless 
+                                                                           //when transporting mixing ratios with momentum
       template <opts_t opts, class arr_1d_t>
       inline auto beta_dn( //positive sign signal
         const arr_1d_t &psi, 
         const arr_1d_t &psi_min, // from before the first iteration
-        const arr_1d_t &C_corr, 
+        const arr_1d_t &GC_corr, 
+        const arr_1d_t &G, 
         const rng_t i, 
-        typename std::enable_if<opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
         frac<opts>(
-          beta_dn_nominator(psi, psi_min, i)
+          beta_dn_nominator<opts>(psi, psi_min, G, i)
           ,// --------------------------
-            pospart<opts>(C_corr(i+h)) * psi(i) 
-          - negpart<opts>(C_corr(i-h)) * psi(i)
+            pospart<opts>(GC_corr(i+h)) * psi(i) 
+          - negpart<opts>(GC_corr(i-h)) * psi(i)
         ) 
       ) 
 
@@ -120,17 +127,18 @@ namespace libmpdataxx
       inline auto beta_dn( // variable sign signal
         const arr_1d_t &psi, 
         const arr_1d_t &psi_min, // from before the first iteration
-        const arr_1d_t &C_corr, 
+        const arr_1d_t &GC_corr, 
+        const arr_1d_t &G, 
         const rng_t i, 
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
         frac<opts>(
-          beta_dn_nominator(psi, psi_min, i)
+          beta_dn_nominator<opts>(psi, psi_min, G, i)
           ,// --------------------------
-            pospart<opts>(C_corr(i+h)) * pospart<opts>(psi(i  ))
-          - negpart<opts>(C_corr(i-h)) * pospart<opts>(psi(i  ))
-          - pospart<opts>(C_corr(i-h)) * negpart<opts>(psi(i-1))
-          + negpart<opts>(C_corr(i+h)) * negpart<opts>(psi(i+1))
+            pospart<opts>(GC_corr(i+h)) * pospart<opts>(psi(i  ))
+          - negpart<opts>(GC_corr(i-h)) * pospart<opts>(psi(i  ))
+          - pospart<opts>(GC_corr(i-h)) * negpart<opts>(psi(i-1))
+          + negpart<opts>(GC_corr(i+h)) * negpart<opts>(psi(i+1))
         ) 
       ) 
 
@@ -138,15 +146,19 @@ namespace libmpdataxx
       inline auto beta_dn( // infinite gauge option
         const arr_1d_t &psi, 
         const arr_1d_t &psi_min, // from before the first iteration
-        const arr_1d_t &C_corr, 
+        const arr_1d_t &GC_corr,
+        const arr_1d_t &G,
         const rng_t i,
-        typename std::enable_if<opt_set(opts, iga)>::type* = 0 // enabled if iga == true
-      ) return_macro(,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0 // enabled if iga == true
+      ) return_macro(
+        static_assert(!opts::isset(opts, opts::abs), "iga & abs are mutually exclusive");
+        ,
         frac<opts>(
-          beta_dn_nominator(psi, psi_min, i)
+          beta_dn_nominator<opts>(psi, psi_min, G, i)
           ,// --------------------------
-            pospart<opts>(C_corr(i+h)) * 1
-          - negpart<opts>(C_corr(i-h)) * 1
+            pospart<opts>(GC_corr(i+h)) /* * 1 */
+          - negpart<opts>(GC_corr(i-h)) /* * 1 */
+          //+ blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -156,30 +168,31 @@ namespace libmpdataxx
       /// where \f$ [\cdot]^{+}=max(\cdot,0) \f$ and \f$ [\cdot]^{-}=min(\cdot,0) \f$ \n
       /// eq.(18) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
       template <opts_t opts, class arr_1d_t>
-      inline auto C_mono(  // for variable sign signal and no inf. gauge
+      inline auto GC_mono(  // for variable sign signal and no inf. gauge
         const arr_1d_t &psi,
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &psi_max, // from before the first iteration
-        const arr_1d_t &C_corr,
+        const arr_1d_t &GC_corr,
+        const arr_1d_t &G,
         const rng_t i,
-        typename std::enable_if<!opt_set(opts, iga) && !opt_set(opts, pds)>::type* = 0 // enabled if iga == false
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 // enabled if iga == false
       ) return_macro(,
-       C_corr(i+h) * where(
+       GC_corr(i+h) * where(
           // if
-          C_corr(i+h) > 0,
+          GC_corr(i+h) > 0,
           // then
           where(
             // if
             psi(i) > 0,
             // then
             min(1, min(
-              beta_dn<opts>(psi, psi_min, C_corr, i    ), 
-              beta_up<opts>(psi, psi_max, C_corr, i + 1)
+              beta_dn<opts>(psi, psi_min, GC_corr, G, i    ), 
+              beta_up<opts>(psi, psi_max, GC_corr, G, i + 1)
             )), 
             // else
             min(1, min(
-              beta_up<opts>(psi, psi_max, C_corr, i    ), 
-              beta_dn<opts>(psi, psi_min, C_corr, i + 1)
+              beta_up<opts>(psi, psi_max, GC_corr, G, i    ), 
+              beta_dn<opts>(psi, psi_min, GC_corr, G, i + 1)
             ))  
           ),  
           // else
@@ -188,39 +201,40 @@ namespace libmpdataxx
             psi(i+1) > 0, // TODO: what if crossing zero?
             // then
             min(1, min(
-              beta_up<opts>(psi, psi_max, C_corr, i    ), 
-              beta_dn<opts>(psi, psi_min, C_corr, i + 1)
+              beta_up<opts>(psi, psi_max, GC_corr, G, i    ), 
+              beta_dn<opts>(psi, psi_min, GC_corr, G, i + 1)
             )), 
             // else
             min(1, min(
-              beta_dn<opts>(psi, psi_min, C_corr, i   ), 
-              beta_up<opts>(psi, psi_max, C_corr, i + 1)
+              beta_dn<opts>(psi, psi_min, GC_corr, G, i   ), 
+              beta_up<opts>(psi, psi_max, GC_corr, G, i + 1)
             ))  
           )   
         )   
       )
 
       template <opts_t opts, class arr_1d_t>
-      inline auto C_mono( // for inf. gauge option or positive sign signal
+      inline auto GC_mono( // for inf. gauge option or positive sign signal
         const arr_1d_t &psi,
         const arr_1d_t &psi_min, // from before the first iteration
         const arr_1d_t &psi_max, // from before the first iteration
-        const arr_1d_t &C_corr,
+        const arr_1d_t &GC_corr,
+        const arr_1d_t &G,
         const rng_t i,
-        typename std::enable_if<opt_set(opts, iga) || opt_set(opts, pds)>::type* = 0
+        typename std::enable_if<opts::isset(opts, opts::iga) || !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        C_corr( i+h ) * where(
+        GC_corr( i+h ) * where(
           // if
-          C_corr( i+h ) > 0,
+          GC_corr( i+h ) > 0,
           // then
           min(1, min(
-            beta_dn<opts>(psi, psi_min, C_corr, i),
-            beta_up<opts>(psi, psi_max, C_corr, i + 1)
+            beta_dn<opts>(psi, psi_min, GC_corr, G, i),
+            beta_up<opts>(psi, psi_max, GC_corr, G, i + 1)
           )), 
           // else
           min(1, min(
-            beta_up<opts>(psi, psi_max, C_corr, i),
-            beta_dn<opts>(psi, psi_min, C_corr, i + 1)
+            beta_up<opts>(psi, psi_max, GC_corr, G, i),
+            beta_dn<opts>(psi, psi_min, GC_corr, G, i + 1)
           ))  
         )
       )  

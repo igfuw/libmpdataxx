@@ -18,13 +18,16 @@ namespace libmpdataxx
   {
     template <
       class solver_t,
-      bcond::bcond_e bcx,
-      bcond::bcond_e bcy = bcond::null,
-      bcond::bcond_e bcz = bcond::null
+      bcond::bcond_e bcxl,
+      bcond::bcond_e bcxr,
+      bcond::bcond_e bcyl = bcond::null,
+      bcond::bcond_e bcyr = bcond::null,
+      bcond::bcond_e bczl = bcond::null,
+      bcond::bcond_e bczr = bcond::null
     >
-    class openmp : public detail::concurr_common<solver_t, bcx, bcy, bcz>
+    class openmp : public detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
     {
-      using parent_t = detail::concurr_common<solver_t, bcx, bcy, bcz>;
+      using parent_t = detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
  
 
       struct mem_t : parent_t::mem_t
@@ -53,9 +56,7 @@ namespace libmpdataxx
         }
 
         // ctors
-        mem_t(int s0) : parent_t::mem_t(s0, size()) {};
-        mem_t(int s0, int s1) : parent_t::mem_t(s0, s1, size()) {};
-        mem_t(int s0, int s1, int s2) : parent_t::mem_t(s0, s1, s2, size()) {};
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size) : parent_t::mem_t(grid_size, size()) {};
       };
 
       void solve(int nt)
@@ -72,34 +73,11 @@ namespace libmpdataxx
 
       public:
 
-// TODO: coud it be just one ctor with int[solver_t::n_dims]?
-// TODO: document that currently paralllisation only in one dimension
-      // 1D ctor
-      openmp(
-	const int s0,
-	const typename solver_t::params_t &params = typename solver_t::params_t()
-      ) : 
-        parent_t(s0, params, new mem_t(s0), mem_t::size())
+      // ctor
+      openmp(const typename solver_t::rt_params_t &p) : 
+        parent_t(p, new mem_t(p.grid_size), mem_t::size())
       {}
 
-      // 2D ctor
-      openmp(
-	const int s0,
-	const int s1,
-	const typename solver_t::params_t &params = typename solver_t::params_t()
-      ) : 
-	parent_t(s0, s1, params, new mem_t(s0, s1), mem_t::size(), 1)
-      {}
-
-      // 3D ctor
-      openmp(
-	const int s0,
-	const int s1,
-	const int s2,
-	const typename solver_t::params_t &params = typename solver_t::params_t()
-      ) :
-	parent_t(s0, s1, s2, params, new mem_t(s0, s1, s2), mem_t::size(), 1, 1)
-      {}
     };
   }; // namespace concurr
 }; // namespace libmpdataxx

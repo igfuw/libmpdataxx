@@ -6,66 +6,69 @@
 
 #pragma once
 
-#include <libmpdata++/bcond/cyclic_common.hpp>
-#include <libmpdata++/idxperm.hpp>
+#include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/formulae/idxperm.hpp>
 
 namespace libmpdataxx
 {
   namespace bcond
   {
     template<int d, typename real_t>
-    class cyclic_left_2d : public cyclic_left_common<real_t>
+    class cyclic_left_2d : public bcond_t<real_t>
     {
-      using parent_t = cyclic_left_common<real_t>;
+      using parent_t = bcond_t<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
+      using parent_t::parent_t; // inheriting ctor
 
       public:
 
-      // ctor
-      cyclic_left_2d(const rng_t &i, int halo) : // TODO: inherit ctor
-	parent_t(i, halo)
-      {} 
-
       // method invoked by the solver
+      void bcinit(const arr_t &a, const rng_t &j) {}
+
       void fill_halos_sclr(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
-	a(pi<d>(this->left_halo_sclr, j)) = a(pi<d>(this->rght_edge_sclr, j));
+	a(pi<d>(this->left_halo_sclr, j)) = a(pi<d>(this->rght_intr_sclr, j));
       }
 
-      void fill_halos_vctr(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
-        assert(parent_t::halo > 1 && "there is no vector halo for halo=1");
-        a(pi<d>(this->left_halo_vctr, j)) = a(pi<d>(this->rght_edge_vctr, j));
+        av[d](pi<d>(this->left_halo_vctr, j)) = av[d](pi<d>(this->rght_intr_vctr, j));
+      }
+
+      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
+      {
+        fill_halos_sclr(a, j);
       }
     };
 
     template<int d, typename real_t>
-    class cyclic_rght_2d : public cyclic_rght_common<real_t>
+    class cyclic_rght_2d : public bcond_t<real_t>
     {
-      using parent_t = cyclic_rght_common<real_t>;
+      using parent_t = bcond_t<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
+      using parent_t::parent_t; // inheriting ctor
 
       public:
 
-      // ctor
-      cyclic_rght_2d(const rng_t &i, int halo) : // TODO: inherit ctor
-	parent_t(i, halo)
-      {} 
-
       // method invoked by the solver
+      void bcinit(const arr_t &a, const rng_t &j) {}
       void fill_halos_sclr(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
-	a(pi<d>(this->rght_halo_sclr, j)) = a(pi<d>(this->left_edge_sclr, j));
+	a(pi<d>(this->rght_halo_sclr, j)) = a(pi<d>(this->left_intr_sclr, j));
       }
 
-      void fill_halos_vctr(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
-        assert(parent_t::halo > 1 && "there is no vector halo for halo=1");
-        a(pi<d>(this->rght_halo_vctr, j)) = a(pi<d>(this->left_edge_vctr, j));
+        av[d](pi<d>(this->rght_halo_vctr, j)) = av[d](pi<d>(this->left_intr_vctr, j));
+      }
+      
+      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
+      {
+        fill_halos_sclr(a, j);
       }
     };
   }; // namespace bcond
