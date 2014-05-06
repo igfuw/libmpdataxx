@@ -44,7 +44,7 @@ namespace libmpdataxx
           this->mem->barrier();
 	}
 
-	void xchng(int e, int lev = 0) // for previous time levels
+	void xchng(int e) 
 	{
           this->xchng_sclr(this->mem->psi[e][ this->n[e] - lev], i^this->halo, j^this->halo);
 	}

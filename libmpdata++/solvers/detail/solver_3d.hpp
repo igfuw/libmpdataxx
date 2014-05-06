@@ -34,7 +34,7 @@ namespace libmpdataxx
 	rng_t i, j, k; // TODO: if stored as idx_t this also could be placed in solver_common
         idx_t<parent_t::n_dims> ijk;
 
-	void xchng(int e, int lev = 0) 
+	void xchng(int e) 
 	{
           this->mem->barrier();
 	  bcxl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^this->halo, k^this->halo);

@@ -32,7 +32,7 @@ namespace libmpdataxx
 	rng_t i; // TODO: idx_t i do common?
         idx_t<parent_t::n_dims> ijk;
 
-	void xchng(int e, int lev = 0) 
+	void xchng(int e) 
 	{
           this->mem->barrier(); // TODO: implement using the xchng below
 	  bcxl->fill_halos_sclr( this->mem->psi[e][ this->n[e] - lev ] );
