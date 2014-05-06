@@ -37,12 +37,12 @@ namespace libmpdataxx
 	void xchng(int e) 
 	{
           this->mem->barrier();
-	  bcxl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^this->halo, k^this->halo);
-	  bcxr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^this->halo, k^this->halo);
-	  bcyl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], k^this->halo, i^this->halo);
-	  bcyr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], k^this->halo, i^this->halo);
-	  bczl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], i^this->halo, j^this->halo);
-	  bczr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], i^this->halo, j^this->halo);
+	  bcxl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], j^this->halo, k^this->halo);
+	  bcxr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], j^this->halo, k^this->halo);
+	  bcyl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], k^this->halo, i^this->halo);
+	  bcyr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], k^this->halo, i^this->halo);
+	  bczl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
+	  bczr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
           this->mem->barrier();
 	}
 

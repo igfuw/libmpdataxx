@@ -46,7 +46,7 @@ namespace libmpdataxx
 
 	void xchng(int e) 
 	{
-          this->xchng_sclr(this->mem->psi[e][ this->n[e] - lev], i^this->halo, j^this->halo);
+          this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
 	}
 
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final

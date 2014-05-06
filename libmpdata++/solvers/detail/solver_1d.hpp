@@ -35,8 +35,8 @@ namespace libmpdataxx
 	void xchng(int e) 
 	{
           this->mem->barrier(); // TODO: implement using the xchng below
-	  bcxl->fill_halos_sclr( this->mem->psi[e][ this->n[e] - lev ] );
-	  bcxr->fill_halos_sclr( this->mem->psi[e][ this->n[e] - lev ] );
+	  bcxl->fill_halos_sclr( this->mem->psi[e][ this->n[e]] );
+	  bcxr->fill_halos_sclr( this->mem->psi[e][ this->n[e]] );
           this->mem->barrier();
 	}
 
