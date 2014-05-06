@@ -34,19 +34,19 @@ namespace libmpdataxx
 	rng_t i, j;
         idx_t<parent_t::n_dims> ijk;
 
-	void xchng(typename parent_t::arr_t arr, rng_t range_i, rng_t range_j) // for a given array
+	void xchng_sclr(typename parent_t::arr_t arr, rng_t range_i, rng_t range_j, const bool deriv = false) // for a given array
 	{
           this->mem->barrier();
-	  bcxl->fill_halos_sclr(arr, range_j);
-	  bcxr->fill_halos_sclr(arr, range_j);
-	  bcyl->fill_halos_sclr(arr, range_i);
-	  bcyr->fill_halos_sclr(arr, range_i);
+	  bcxl->fill_halos_sclr(arr, range_j, deriv);
+	  bcxr->fill_halos_sclr(arr, range_j, deriv);
+	  bcyl->fill_halos_sclr(arr, range_i, deriv);
+	  bcyr->fill_halos_sclr(arr, range_i, deriv);
           this->mem->barrier();
 	}
 
 	void xchng(int e, int lev = 0) // for previous time levels
 	{
-          this->xchng(this->mem->psi[e][ this->n[e] - lev], i^this->halo, j^this->halo);
+          this->xchng_sclr(this->mem->psi[e][ this->n[e] - lev], i^this->halo, j^this->halo);
 	}
 
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final

@@ -40,11 +40,11 @@ namespace libmpdataxx
           this->mem->barrier();
 	}
 
-        void xchng(typename parent_t::arr_t arr) // for a given array
+        virtual void xchng_sclr(typename parent_t::arr_t arr, const bool deriv = false) final // for a given array
         {
           this->mem->barrier();
-          bcxl->fill_halos_sclr(arr);
-          bcxr->fill_halos_sclr(arr);
+          bcxl->fill_halos_sclr(arr, deriv);
+          bcxr->fill_halos_sclr(arr, deriv);
           this->mem->barrier();
         }
 
