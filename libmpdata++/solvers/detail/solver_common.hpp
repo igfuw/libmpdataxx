@@ -63,6 +63,7 @@ namespace libmpdataxx
 	}
 
 	virtual void xchng(int e) = 0;
+        // TODO: implement flagging of valid/invalid halo for optimisations
 
         private:
       

@@ -61,6 +61,9 @@ namespace libmpdataxx
           // otherwise zero out the rhs
           rhs.at(e)(this->ijk) = 0;
         }
+
+        // fill halos with data (e.g. for computing gradients)
+        for (int e = 0; e < parent_t::n_eqns; ++e) this->xchng(e);
       }
 
       virtual void apply_rhs(
