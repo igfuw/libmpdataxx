@@ -110,12 +110,12 @@ namespace libmpdataxx
 
 	  //initail q_err for preconditioner
 	  q_err(i, j) = real_t(0);
-	  this->xchng(q_err, i^this->halo, j^this->halo);
+	  this->xchng_sclr(q_err, i^this->halo, j^this->halo);
 
 	  //initail preconditioner error   
 	  this->pcnd_err(i, j) = this->lap(this->q_err, i, j, this->di, this->dj) - this->err(i, j);
 	    //TODO does it change with non_const density?
-	  this->xchng(pcnd_err, i^halo, j^halo);
+	  this->xchng_sclr(pcnd_err, i^halo, j^halo);
 	  
 	  assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
 	  for (int it=0; it<=pc_iters; it++)
@@ -123,7 +123,7 @@ namespace libmpdataxx
 	    q_err(i,j)     += real_t(.25) * pcnd_err(i, j);
 	    pcnd_err(i, j) += real_t(.25) * this->lap(this->pcnd_err, i, j, this->di, this->dj);
 
-	    this->xchng(q_err, i^halo, j^halo);
+	    this->xchng_sclr(q_err, i^halo, j^halo);
 	  }
 	}
 
@@ -145,9 +145,9 @@ namespace libmpdataxx
 	  this->tmp_u(i, j) = this->psi_n(ix::u)(i, j);
 	  this->tmp_w(i, j) = this->psi_n(ix::w)(i, j);
 
-	  this->xchng(this->Phi,   i^halo, j^halo);
-	  this->xchng(this->tmp_u, i^halo, j^halo);
-	  this->xchng(this->tmp_w, i^halo, j^halo);
+	  this->xchng_sclr(this->Phi,   i^halo, j^halo);
+	  this->xchng_sclr(this->tmp_u, i^halo, j^halo);
+	  this->xchng_sclr(this->tmp_w, i^halo, j^halo);
 
 	  //initail error   
 	  this->err(i, j) =
@@ -158,7 +158,7 @@ namespace libmpdataxx
 	  precond();
 
 	  p_err(i, j) = q_err(i, j);
-	  this->xchng(p_err, i^this->halo, j^this->halo);
+	  this->xchng_sclr(p_err, i^this->halo, j^this->halo);
 
 	  this->lap_p_err(i, j) = this->lap(this->p_err, i, j, this->di, this->dj);
 
@@ -197,7 +197,7 @@ namespace libmpdataxx
 	  }
 	  //end of pseudo_time loop
 
-	  this->xchng(this->Phi, i^halo, j^halo);
+	  this->xchng_sclr(this->Phi, i^halo, j^halo);
 
 	  this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, this->di);
 	  this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, this->dj);

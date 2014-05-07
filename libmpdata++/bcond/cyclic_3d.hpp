@@ -22,10 +22,7 @@ namespace libmpdataxx
 
       public:
 
-      // method invoked by the solver
-      void bcinit(const arr_t &a, const rng_t &j, const rng_t &k) {}
-
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
 	using namespace idxperm;
 	a(pi<d>(this->left_halo_sclr, j, k)) = a(pi<d>(this->rght_intr_sclr, j, k)); 
@@ -52,10 +49,7 @@ namespace libmpdataxx
 
       public:
 
-      // method invoked by the solver
-      void bcinit(const arr_t &a, const rng_t &j, const rng_t &k) {}
-
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
 	using namespace idxperm;
 	a(pi<d>(this->rght_halo_sclr, j, k)) = a(pi<d>(this->left_intr_sclr, j, k));

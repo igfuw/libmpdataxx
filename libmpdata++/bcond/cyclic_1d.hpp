@@ -21,10 +21,7 @@ namespace libmpdataxx
 
       public:
 
-      // methods invoked by the solver
-      void bcinit(const arr_t &a) {}
-
-      void fill_halos_sclr(const arr_t &a)
+      void fill_halos_sclr(const arr_t &a, const bool deriv = false)
       {
 	a(this->left_halo_sclr) = a(this->rght_intr_sclr);
       }
@@ -44,10 +41,7 @@ namespace libmpdataxx
 
       public:
 
-      // methods invoked by the solver
-      void bcinit(const arr_t &a) {}
-
-      void fill_halos_sclr(const arr_t &a)
+      void fill_halos_sclr(const arr_t &a, const bool deriv = false)
       {
 	a(this->rght_halo_sclr) = a(this->left_intr_sclr);
       }

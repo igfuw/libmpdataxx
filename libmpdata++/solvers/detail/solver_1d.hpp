@@ -32,19 +32,19 @@ namespace libmpdataxx
 	rng_t i; // TODO: idx_t i do common?
         idx_t<parent_t::n_dims> ijk;
 
-	void xchng(int e, int lev = 0) 
+	void xchng(int e) 
 	{
           this->mem->barrier(); // TODO: implement using the xchng below
-	  bcxl->fill_halos_sclr( this->mem->psi[e][ this->n[e] - lev ] );
-	  bcxr->fill_halos_sclr( this->mem->psi[e][ this->n[e] - lev ] );
+	  bcxl->fill_halos_sclr( this->mem->psi[e][ this->n[e]] );
+	  bcxr->fill_halos_sclr( this->mem->psi[e][ this->n[e]] );
           this->mem->barrier();
 	}
 
-        void xchng(typename parent_t::arr_t arr) // for a given array
+        virtual void xchng_sclr(typename parent_t::arr_t arr, const bool deriv = false) final // for a given array
         {
           this->mem->barrier();
-          bcxl->fill_halos_sclr(arr);
-          bcxr->fill_halos_sclr(arr);
+          bcxl->fill_halos_sclr(arr, deriv);
+          bcxr->fill_halos_sclr(arr, deriv);
           this->mem->barrier();
         }
 

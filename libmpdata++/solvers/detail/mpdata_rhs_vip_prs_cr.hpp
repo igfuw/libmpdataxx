@@ -115,9 +115,9 @@ namespace libmpdataxx
 	  this->tmp_u(i, j) = this->psi_n(ix::u)(i, j);
 	  this->tmp_w(i, j) = this->psi_n(ix::w)(i, j);
 
-	  this->xchng(this->Phi,   i^halo, j^halo);
-	  this->xchng(this->tmp_u, i^halo, j^halo);
-	  this->xchng(this->tmp_w, i^halo, j^halo);
+	  this->xchng_sclr(this->Phi,   i^halo, j^halo);
+	  this->xchng_sclr(this->tmp_u, i^halo, j^halo);
+	  this->xchng_sclr(this->tmp_w, i^halo, j^halo);
 
 	  //initail error   
 	  this->err(i, j) =
@@ -160,7 +160,7 @@ namespace libmpdataxx
   //std::cerr<<"      number of iterations untill convergence: "<<this->iters<<std::endl;
   //std::cerr<<"      error: "<<error<<std::endl;
 
-	  this->xchng(this->Phi, i^halo, j^halo);
+	  this->xchng_sclr(this->Phi, i^halo, j^halo);
 
 	  this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->di);
 	  this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dj);

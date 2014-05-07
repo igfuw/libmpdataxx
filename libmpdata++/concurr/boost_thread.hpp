@@ -65,6 +65,7 @@ namespace libmpdataxx
 
 	void barrier()
 	{
+// TODO: if (size() != 1) ???
 	  b.wait();
 	}
       };

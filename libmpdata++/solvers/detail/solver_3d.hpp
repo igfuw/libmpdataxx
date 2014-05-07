@@ -34,15 +34,15 @@ namespace libmpdataxx
 	rng_t i, j, k; // TODO: if stored as idx_t this also could be placed in solver_common
         idx_t<parent_t::n_dims> ijk;
 
-	void xchng(int e, int lev = 0) 
+	void xchng(int e) 
 	{
           this->mem->barrier();
-	  bcxl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^this->halo, k^this->halo);
-	  bcxr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], j^this->halo, k^this->halo);
-	  bcyl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], k^this->halo, i^this->halo);
-	  bcyr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], k^this->halo, i^this->halo);
-	  bczl->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], i^this->halo, j^this->halo);
-	  bczr->fill_halos_sclr(this->mem->psi[e][ this->n[e] - lev ], i^this->halo, j^this->halo);
+	  bcxl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], j^this->halo, k^this->halo);
+	  bcxr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], j^this->halo, k^this->halo);
+	  bcyl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], k^this->halo, i^this->halo);
+	  bcyr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], k^this->halo, i^this->halo);
+	  bczl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
+	  bczr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
           this->mem->barrier();
 	}
 
