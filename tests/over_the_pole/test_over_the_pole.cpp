@@ -37,8 +37,8 @@ void test(const std::string filename)
     dlmb = 2 * pi / (nlon - 1),
     dphi = pi / nlat;
 
-  using sim_t = output::hdf5_xdmf<solvers::mpdata<ct_params_t>>;
-  typename sim_t::rt_params_t p;
+  using slv_out_t = output::hdf5_xdmf<solvers::mpdata<ct_params_t>>;
+  typename slv_out_t::rt_params_t p;
 
   p.n_iters = opts_iters; 
   p.span = {nlon, nlat};
@@ -49,7 +49,7 @@ void test(const std::string filename)
 
 //<listing-2>
   concurr::serial<
-    sim_t, 
+    slv_out_t, 
     bcond::cyclic, bcond::cyclic,
     bcond::polar, bcond::polar
   > run(p); 
