@@ -40,11 +40,11 @@ namespace libmpdataxx
           const real_t &dx, 
           const real_t &dy
         ) return_macro(
-          this->xchng(arr, i^this->halo, j^this->halo);
+          this->xchng_sclr(arr, i^this->halo, j^this->halo);
           lap_tmp1(i, j) = formulae::nabla::grad<0>(arr, i, j, dx);
           lap_tmp2(i, j) = formulae::nabla::grad<1>(arr, j, i, dy);
-          this->xchng(lap_tmp1, i^this->halo, j^this->halo);
-          this->xchng(lap_tmp2, i^this->halo, j^this->halo);
+          this->xchng_sclr(lap_tmp1, i^this->halo, j^this->halo, /* deriv = */ true);
+          this->xchng_sclr(lap_tmp2, i^this->halo, j^this->halo, /* deriv = */ true);
           ,
           formulae::nabla::div(lap_tmp1, lap_tmp2, i, j, dx, dy)
         );
@@ -54,7 +54,7 @@ namespace libmpdataxx
 	  const int halo = parent_t::halo;
 	  // Phi = dt/2 * (Prs-Prs_amb) / rho 
 	  Phi(this->i, this->j) = real_t(0); // ... but assuming zero perturbation at t=0
-	  this->xchng(Phi, this->i^halo, this->j^halo);
+	  this->xchng_sclr(Phi, this->i^halo, this->j^halo);
 	}
 
 	virtual void pressure_solver_update() = 0;

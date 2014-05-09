@@ -122,9 +122,6 @@ class shallow_water<
 
     parent_t::update_rhs(rhs, dt, at);
 
-    // due to grad() below, TODO: include into grad
-    this->xchng(ix::h); 
-
     rhs.at(ix::qx)(this->i) -= 
       this->g 
       * this->psi_n(ix::h)(this->i) 
@@ -165,9 +162,6 @@ class shallow_water<
   ) {
     //
     parent_t::update_rhs(rhs, dt, at);
-
-    //
-    this->xchng(ix::h);
 
     //
     forcings_helper<0>(rhs.at(ix::qx), this->i, this->j, this->di);

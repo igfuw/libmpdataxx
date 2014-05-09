@@ -19,14 +19,6 @@ endif()
 # the library
 add_subdirectory(libmpdata++) 
 
-# the docs
-find_package(Doxygen)
-if (DOXYGEN_FOUND)
-  add_subdirectory(doc)
-else()
-  message(WARNING "Doxygent not found - 'make doc' will not be available.")
-endif()
-
 # the tests
 enable_testing()
 add_subdirectory(tests)

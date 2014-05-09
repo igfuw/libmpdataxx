@@ -47,7 +47,7 @@ int main()
   p.omega = 2 * pi<typename ct_params_t::real_t>() 
             / p.dt / 400;
 //</listing-2>
-  p.grid_size = {1000};
+  p.grid_size = {1001};
   p.outfreq = 10;
 
   using ix = typename ct_params_t::ix;

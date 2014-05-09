@@ -16,7 +16,7 @@
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx;
 
-const int nx = 200, ny = 200, nt = 1212;
+const int nx = 201, ny = 201, nt = 1212;
 
 int main() 
 {
