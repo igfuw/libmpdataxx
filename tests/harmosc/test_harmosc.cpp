@@ -28,7 +28,6 @@ int main()
     using real_t = T;
     enum { n_dims = 1 };
     enum { n_eqns = 2 };
-    enum { opts = 0 };
     enum { rhs_scheme = 
       solvers::rhs_scheme_t::trapez };
     struct ix { enum {psi, phi}; };
