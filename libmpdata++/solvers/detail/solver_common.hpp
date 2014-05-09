@@ -62,7 +62,8 @@ namespace libmpdataxx
           if (e == n_eqns - 1) this->mem->cycle(); 
 	}
 
-	virtual void xchng(int e, int l = 0) = 0; // TODO: make l -> -l
+	virtual void xchng(int e) = 0;
+        // TODO: implement flagging of valid/invalid halo for optimisations
 
         private:
       

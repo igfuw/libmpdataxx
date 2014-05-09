@@ -30,7 +30,7 @@ int main()
   using ix = typename ct_params_t::ix;
 
   const int r0 = 250; 
-  const int nx = 200, ny = 200, nt = 800;
+  const int nx = 201, ny = 201, nt = 800;
   typename ct_params_t::real_t Tht_amb = 1; //1; //300; // ambient state (constant thoughout the domain)
 
   // conjugate residual

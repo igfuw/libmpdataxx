@@ -24,7 +24,7 @@ void test(const std::string filename)
   typename sim_t::rt_params_t p;
 
 //<listing-2>
-  int nx = 600, nt = 1200;
+  int nx = 601, nt = 1200;
   // run-time parameters
   p.grid_size = { nx };
   p.outfreq = nt; 
@@ -35,7 +35,7 @@ void test(const std::string filename)
 //</listing-2>
   p.gnuplot_output = filename; 
   p.gnuplot_command = "plot";
-  p.gnuplot_with = "steps";
+  p.gnuplot_with = "histeps";
   p.gnuplot_yrange = "[-1.25:4.25]";
 
   // instantiation

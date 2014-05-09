@@ -21,10 +21,15 @@ namespace libmpdataxx
       
       public:
 
-      void fill_halos_sclr(const arr_t &a)
+      void fill_halos_sclr(const arr_t &a, const bool deriv = false)
       {
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
-	  a(rng_t(i, i)) = a(this->left_edge_sclr);
+        {
+	  if (deriv)
+            a(rng_t(i, i)) = 0;
+          else
+            a(rng_t(i, i)) = a(this->left_edge_sclr);
+        }
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
@@ -43,10 +48,15 @@ namespace libmpdataxx
       
       public:
 
-      void fill_halos_sclr(const arr_t &a)
+      void fill_halos_sclr(const arr_t &a, const bool deriv = false)
       {
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-	  a(rng_t(i, i)) = a(this->rght_edge_sclr);
+        {
+	  if (deriv) 
+            a(rng_t(i, i)) = 0;
+          else
+            a(rng_t(i, i)) = a(this->rght_edge_sclr);
+        }
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)

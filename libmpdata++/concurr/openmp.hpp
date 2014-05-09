@@ -52,6 +52,7 @@ namespace libmpdataxx
 
         void barrier()
         {
+          // TODO: if (size() != 1) ???
 #pragma omp barrier
         }
 
