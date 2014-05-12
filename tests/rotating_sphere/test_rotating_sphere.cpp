@@ -20,8 +20,8 @@ struct ct_params_t : ct_params_default_t
 //<listing-1>
   enum { n_dims = 3 };
 //</listing-1>
-  enum { n_eqs = 1 };
-  enum { opts = formulae::opts::abs };
+  enum { n_eqns = 1 };
+  enum { opts = opts::abs };
 };
 
 template<class T>
@@ -55,9 +55,9 @@ void setup(T &solver)
     yc = 20 * dy,
     zc = 20 * dz;
   // constant angular velocity rotational field
-  solver.advector(x) = (-omega * pow(2, -0.5) * (j * dy - yc) + omega / 2 * (k * dz - zc)) * dt / dx;
-  solver.advector(y) = (omega * pow(2, -0.5) * (i * dx - xc) - omega / 2 * (k * dz - zc)) * dt / dy;
-  solver.advector(z) = (-omega / 2 * (i * dx - xc) + omega / 2 * (j * dy - yc)) * dt / dz;
+  solver.advector(x) = omega / sqrt(3) * (-(j * dy - yc) + (k * dz - zc)) * dt / dx;
+  solver.advector(y) = omega / sqrt(3) * ( (i * dx - xc) - (k * dz - zc)) * dt / dy;
+  solver.advector(z) = omega / sqrt(3) * (-(i * dx - xc) + (j * dy - yc)) * dt / dz;
 }
 
 int main()
@@ -82,7 +82,7 @@ int main()
 
   // instantation
   concurr::threads<
-  solver_t,
+  sim_t,
   bcond::open, bcond::open,
   bcond::open, bcond::open,
   bcond::open, bcond::open

@@ -11,7 +11,7 @@
 using boost::math::constants::pi;
 
 #include <libmpdata++/solvers/mpdata.hpp>
-#include <libmpdata++/concurr/serial.hpp>
+#include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/hdf5_xdmf.hpp>
 using namespace libmpdataxx;
 
@@ -23,7 +23,7 @@ void test(const std::string filename)
   {
     using real_t = double;
     enum { n_dims = 2 };
-    enum { n_eqs = 1 };
+    enum { n_eqns = 1 };
     enum { opts = opts_arg };
   };
   
@@ -41,14 +41,14 @@ void test(const std::string filename)
   typename sim_t::rt_params_t p;
 
   p.n_iters = opts_iters; 
-  p.span = {nlon, nlat};
+  p.grid_size = {nlon, nlat};
 
   p.outfreq = nt; 
   p.outvars[0].name = "psi";
   p.outdir = filename;
 
 //<listing-2>
-  concurr::serial<
+  concurr::threads<
     sim_t, 
     bcond::cyclic, bcond::cyclic,
     bcond::polar, bcond::polar
@@ -93,17 +93,17 @@ void test(const std::string filename)
 
 int main()
 {
-  {
 //<listing-1>
-    enum { opts = formulae::opts::nug };
+    enum { opts = opts::nug };
 //</listing-1>
-
-    enum { opts = formulae::opts::nug | formulae::opts::iga | formuale::opts::fct };
+  {
+    enum { opts = opts::nug | opts::iga | opts::fct };
     const int opts_iters = 2;
     test<opts, opts_iters>("default");
-    
-    enum { opts = formulae::opts::nug | formulae::opts::tot | formuale::opts::fct };
+  }
+  {  
+    enum { opts = opts::nug | opts::tot | opts::fct };
     const int opts_iters = 3;
-    test<opts, opts_iters>("default");
+    test<opts, opts_iters>("best");
   }
 }
