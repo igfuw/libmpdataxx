@@ -50,10 +50,10 @@ namespace libmpdataxx
 	  }
           
           // filling Y halos for GC_x, and X halos for GC_y
-          this->bcyl->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h^(this->halo-1)); // TODO: one xchng?
-          this->bcyr->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h^(this->halo-1));
-          this->bcxl->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h^(this->halo-1)); // TODO: one xchng?
-          this->bcxr->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h^(this->halo-1));
+          this->bcyl->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h); // TODO: one xchng?
+          this->bcyr->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h);
+          this->bcxl->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h); // TODO: one xchng?
+          this->bcxr->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h);
 	} 
 
 	// method invoked by the solver
@@ -97,10 +97,10 @@ namespace libmpdataxx
 	      // filling Y halos for GC_x, and X halos for GC_y
 	      // TODO: document why; is it needed in the last iteration?; what about FCT?
 	      this->mem->barrier();
-	      this->bcyl->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h^(this->halo-1)); // TODO: one xchng?
-	      this->bcyr->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h^(this->halo-1));
-	      this->bcxl->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h^(this->halo-1)); // TODO: one xchng?
-	      this->bcxr->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h^(this->halo-1));
+	      this->bcyl->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h); // TODO: one xchng?
+	      this->bcyr->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h);
+	      this->bcxl->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h); // TODO: one xchng?
+	      this->bcxr->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h);
 	      this->mem->barrier();
 
 	      this->fct_adjust_antidiff(e, iter);

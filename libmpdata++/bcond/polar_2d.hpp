@@ -23,49 +23,43 @@ namespace libmpdataxx
       public:
 
       // method invoked by the solver
-      void bcinit(const arr_t &a, const rng_t &j) {}
-
-      void fill_halos_sclr(const arr_t &a, const rng_t &j)
+      void fill_halos_sclr(const arr_t &a, const rng_t &j, const bool deriv = false)
       {
 	using namespace idxperm;
         for (int i = 0; i < this->halo; ++i)
-        {
-          a(pi<d>(this->left_halo_sclr.last() - i,
-                  this->west_polar_halo(j)        ))
-          =
-          a(pi<d>(this->left_edge_sclr + i,
-                  this->east_sclr_polar_edge(j) ));
-
-          a(pi<d>(this->left_halo_sclr.last() - i,
-                  this->east_polar_halo(j)        ))
-          =
-          a(pi<d>(this->left_edge_sclr + i,
-                  this->west_sclr_polar_edge(j) ));
+        { 
+          for (int jj = j.first(); jj <= j.last(); jj++)
+          {
+            a(pi<d>(this->left_halo_sclr.last() - i,
+                    jj)) 
+            =
+            a(pi<d>(this->left_edge_sclr + i,
+                    this->polar_neighbours(jj)));
+              
+          }
         }
       }
 
-      void fill_halos_vctr_alng(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
-	a(pi<d>(this->left_halo_vctr, j)) = 0;
+	av[d](pi<d>(this->left_halo_vctr, j)) = 0;
       }
 
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
         for (int i = 0; i < this->halo; ++i)
-        {
-          a(pi<d>(this->left_halo_sclr.last() - i,
-                  this->east_polar_halo(j)        ))
-          =
-          a(pi<d>(this->left_intr_vctr.first() + i,
-                     this->west_vctr_polar_edge(j)    ));
-          
-          a(pi<d>(this->left_halo_sclr.last() - i,
-                  this->west_polar_halo(j)        ))
-          =
-          a(pi<d>(this->left_intr_vctr.first() + i,
-                  this->east_vctr_polar_edge(j)    ));
+        { 
+          for (int jj = j.first(); jj <= j.last(); jj++)
+          {
+            a(pi<d>(this->left_halo_sclr.first() + i,
+                    jj + h)) 
+            =
+            a(pi<d>(this->left_intr_vctr.last() - i,
+                    this->polar_neighbours(jj) + h));
+              
+          }
         }
       }
     };
@@ -80,51 +74,44 @@ namespace libmpdataxx
       public:
 
       // method invoked by the solver
-      
-      void bcinit(const arr_t &a, const rng_t &j) {}
-
-      void fill_halos_sclr(const arr_t &a, const rng_t &j)
+      void fill_halos_sclr(const arr_t &a, const rng_t &j, const bool deriv = false)
       {
 	using namespace idxperm;
 
         for (int i = 0; i < this->halo; ++i)
         { 
-          a(pi<d>(this->rght_halo_sclr.first() + i,
-                  this->west_polar_halo(j)         ))
-          =
-          a(pi<d>(this->rght_edge_sclr - i,
-                  this->east_sclr_polar_edge(j) ));
-
-          a(pi<d>(this->rght_halo_sclr.first() + i,
-                  this->east_polar_halo(j)         ))
-          =
-          a(pi<d>(this->rght_edge_sclr - i,
-                  this->west_sclr_polar_edge(j) ));
+          for (int jj = j.first(); jj <= j.last(); jj++)
+          {
+            a(pi<d>(this->rght_halo_sclr.first() + i,
+                    jj)) 
+            =
+            a(pi<d>(this->rght_edge_sclr - i,
+                    this->polar_neighbours(jj)));
+              
+          }
         }
       }
 
-      void fill_halos_vctr_alng(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
-	a(pi<d>(this->rght_halo_vctr, j)) = 0;
+	av[d](pi<d>(this->rght_halo_vctr, j)) = 0;
       }
       
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
         for (int i = 0; i < this->halo; ++i)
-        {
-          a(pi<d>(this->rght_halo_sclr.first() + i,
-                  this->east_polar_halo(j)         ))
-          =
-          a(pi<d>(this->rght_intr_vctr.last() - i,
-                  this->west_vctr_polar_edge(j)   ));
-          
-          a(pi<d>(this->rght_halo_sclr.first() + i,
-                  this->west_polar_halo(j)         ))
-          =
-          a(pi<d>(this->rght_intr_vctr.last() - i,
-                  this->east_vctr_polar_edge(j)   ));
+        { 
+          for (int jj = j.first(); jj <= j.last(); jj++)
+          {
+            a(pi<d>(this->rght_halo_sclr.first() + i,
+                    jj + h)) 
+            =
+            a(pi<d>(this->rght_intr_vctr.last() - i,
+                    this->polar_neighbours(jj) + h));
+              
+          }
         }
       }
     };

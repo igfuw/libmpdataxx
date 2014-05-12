@@ -30,34 +30,9 @@ namespace libmpdataxx
       // member fields
       const int pole;
 
-      rng_t west_polar_halo(const rng_t &i)
+      int polar_neighbours(const int j)
       {
-        return rng_t(i.first(), i.first() + this->halo + pole);
-      }
-
-      rng_t east_polar_halo(const rng_t &i)
-      {
-        return rng_t(i.first() + this->halo + pole + 1, i.last());
-      }
-
-      rng_t west_sclr_polar_edge(const rng_t &i)
-      {
-        return rng_t(i.first() + this->halo + 1, i.first() + 2 * this->halo + pole);
-      }
-
-      rng_t east_sclr_polar_edge(const rng_t &i)
-      {
-        return rng_t(i.first() + pole, i.last() - this->halo);
-      }
-      
-      rng_t west_vctr_polar_edge(const rng_t &i)
-      {
-        return rng_t(i.first() + this->halo + 1, i.first() + 2 * this->halo + pole - 1);
-      }
-
-      rng_t east_vctr_polar_edge(const rng_t &i)
-      {
-        return rng_t(i.first() + pole + 1, i.last() - this->halo);
+        return (j + pole) % (2 * pole);
       }
 
       public:
