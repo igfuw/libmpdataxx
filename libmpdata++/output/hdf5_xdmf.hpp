@@ -74,9 +74,17 @@ namespace libmpdataxx
           // creating the dimensions
           // x,y,z
           offst = 0;
-          chunk = limit = shape = this->mem->advectee().extent();
+
+          limit = shape = this->mem->advectee().extent();
+          
+          chunk = 1;
+          // change chunk size along the last dimension
+          *(chunk.end() - 1) = *(shape.end() - 1);
+
           count = 1;
+          // see above
           *(count.end() - 1) = *(shape.end() - 1);
+
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
 
