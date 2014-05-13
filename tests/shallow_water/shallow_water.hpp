@@ -71,6 +71,7 @@ class shallow_water_common : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
   {
     parent_t::hook_post_step();
     assert(min(this->psi_n(ct_params_t::ix::h)(this->ijk)) >= 0);  
+//   std::cerr<<min(this->psi_n(ct_params_t::ix::h)(this->ijk))<<std::endl;
   }
 
   void hook_ante_step()

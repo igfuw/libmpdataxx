@@ -48,7 +48,11 @@ void test(const std::string &outdir)
     // options
     enum { opts = opts_arg };
     enum { rhs_scheme = solvers::trapez };
-    
+
+    //enum { fp_round_mode = FE_TOWARDZERO };
+    //enum { fp_round_mode = FE_UPWARD };
+    //enum { fp_round_mode = FE_TONEAREST };
+
     // indices
     struct ix { enum {
 	qx, qy, h, 
@@ -81,7 +85,7 @@ void test(const std::string &outdir)
     {ix::qx, {.name="qx", .unit="TODO"}}, 
     {ix::qy, {.name="qy", .unit="TODO"}}
   };
-  p.vip_eps = 1e-8;
+  p.vip_eps = 1e-7;
 
   // instantiation
   concurr::threads<
@@ -107,9 +111,9 @@ void test(const std::string &outdir)
 
 int main()
 {
-  test<opts::fct | opts::iga>("spreading_drop_2d_fct+iga.out");
-  //test<opts::fct | opts::abs>("spreading_drop_2d_fct+abs.out");
-  system("python ../../../tests/shallow_water/papierplot_shallow_water_2d.py fct+iga");
-  system("python ../../../tests/shallow_water/plot2D_shallow_water_2d.py");
+  test<formulae::opts::fct | formulae::opts::iga>("spreading_drop_2d_fct+iga.out");
+  test<formulae::opts::fct | formulae::opts::abs>("spreading_drop_2d_fct+abs.out");
+  system("python ../../../tests/shallow_water/papierplot_shallow_water_2d.py fct+abs fct+iga");
+  //system("python ../../../tests/shallow_water/plot2D_shallow_water_2d.py");
 }
 

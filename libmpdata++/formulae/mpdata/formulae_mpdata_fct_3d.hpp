@@ -122,8 +122,8 @@ namespace libmpdataxx
           +
           ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) /* * 1 */
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) /* * 1 */)
-          //+
-          //blitz::epsilon(typename arr_3d_t::T_numtype(0))
+          +
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -231,8 +231,8 @@ namespace libmpdataxx
           +
           ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) /* * 1 */
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) /* * 1 */)
-          //+
-          //blitz::epsilon(typename arr_3d_t::T_numtype(0))
+          +
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 

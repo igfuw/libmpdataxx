@@ -48,8 +48,8 @@ int main()
     using slv_out_t = output::hdf5_xdmf<slv_t>;
 //</listing-3>
 //<listing-4>
-    using cnr_t = concurr::openmp<
-      slv_t, 
+    using run_t = concurr::openmp<
+      slv_out_t, 
       bcond::cyclic, 
       bcond::cyclic
     >;
@@ -57,9 +57,9 @@ int main()
 //<listing-5>
     typename slv_out_t::rt_params_t p;
     p.grid_size = { nx };
-    cnr_t cnr(p);
+    run_t run(p);
 //</listing-5>
-    cnr.advance(nt);
+    run.advance(nt);
   }
 
   // Boost.Thread

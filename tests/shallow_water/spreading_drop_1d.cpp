@@ -34,9 +34,7 @@ struct ct_params_t : ct_params_default_t
   enum { opts = opts_arg };
   enum { rhs_scheme = solvers::trapez };
   
-  //enum { fp_round_mode = FE_TONEAREST };
-
-  // indices
+  // indices - TODO move vip to separate enum
   struct ix { enum {
     qx, h, 
     vip_i=qx, vip_den=h
@@ -102,6 +100,7 @@ void test(const std::string &pfx)
   // solver choice
   using solver_t = shallow_water<ct_params_t<opts>>;
 
+//<listing-2>
   // run-time parameters
   typename solver_t::rt_params_t p; 
 
@@ -109,7 +108,8 @@ void test(const std::string &pfx)
   p.di = .05;
   p.grid_size = { int(16 / p.di) };
   p.g = 1;
-  p.vip_eps = 1.e-10; // in 1D apparently it's enough!
+  p.vip_eps = 1.e-10; 
+//</listing-2>
 
   // instantiation
   concurr::serial<

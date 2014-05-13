@@ -20,7 +20,7 @@ namespace libmpdataxx
     { 
       euler_a, // Euler's method, Eulerian spirit:        psi^n+1 = ADV(psi^n) + R^n
       euler_b, // Euler's method, semi-Lagrangian spirit: psi^n+1 = ADV(psi^n + R^n)
-      trapez   // paraphrase of the Strang splitting:     psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1 
+      trapez   // paraphrase of trapezoidal rule:         psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1 
     };
 
     template <class ct_params_t>
