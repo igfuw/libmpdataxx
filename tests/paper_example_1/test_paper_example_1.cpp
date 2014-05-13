@@ -29,12 +29,11 @@ int main()
   // run-time parameters
   typename sim_t::rt_params_t p;
 
-  int nx = 128, nt = 128;
-  ct_params_t::real_t dx = 0.128;
+  int nx = 101, nt = 100;
+  ct_params_t::real_t dx = 0.1;
 
   p.grid_size = { nx };
-  p.n_iters = 2;
-  p.outfreq = nt / 10; 
+  p.outfreq = 20; 
  
   // instantiation
   run_t run(p);
@@ -42,7 +41,7 @@ int main()
   // initial condition
   blitz::firstIndex i;
   // Witch of Agnesi with a=.5 
-  run.advectee() = 1 / (
+  run.advectee() = -.5 + 1 / (
     pow(dx*(i - (nx-1)/2.), 2) + 1
   );
   // Courant number

@@ -52,6 +52,7 @@ namespace libmpdataxx
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
 	   << "set term " << p.gnuplot_term << "\n"
 	   << "set size " << p.gnuplot_size << "\n"
+	   << "set termoption font \"," << p.gnuplot_fontsize << "\"\n"
            << "set termoption solid\n"
         ;
 	if (p.gnuplot_xrange == "[*:*]") 
@@ -64,7 +65,11 @@ namespace libmpdataxx
         {
           if (p.gnuplot_command == "splot") 
           {
-            *gp << "set yrange [0:" << nt << "]\n";
+            *gp << "set yrange [0:" << nt << "]\n"
+	        << "set xtics out\n"
+	        << "set ytics out\n"
+	        << "set ztics out\n"
+	        << "set ticslevel " << p.gnuplot_ticslevel << "\n";
             if (p.gnuplot_xyplane_at != "") *gp << "set xyplane at " << p.gnuplot_xyplane_at << "\n";
             if (p.gnuplot_yrange != "[*:*]")
               throw std::runtime_error("gnupot_yrange was specified for a 1D splot where Y axis represents time");
@@ -213,6 +218,8 @@ namespace libmpdataxx
               ? std::string("square") // 2D
               : std::string("noratio")  // 1D
           ),
+          gnuplot_fontsize = std::string("15"), 
+          gnuplot_ticslevel = std::string("0"), 
           gnuplot_view = std::string(""), 
           gnuplot_title = std::string(""), 
           gnuplot_zrange = std::string("[*:*]"),
