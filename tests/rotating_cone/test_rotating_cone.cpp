@@ -37,7 +37,7 @@ void test(const std::string filename)
     dy = 1,
     omg = .1,
     h = 4., // TODO: other name!
-    h0 = 0;
+    h0 = 1;
     //  h0 = 100.; // change it to 1 to see scary things!
 
 /// @brief settings from @copybrief Anderson_and_Fattahi_1974
@@ -50,8 +50,8 @@ void test(const std::string filename)
 
   int nt = 628 * 6;
 
-  using sim_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
-  typename sim_t::rt_params_t p;
+  using slv_out_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
+  typename slv_out_t::rt_params_t p;
 
   // pre instantiation
   p.n_iters = opts_iters; 
@@ -88,7 +88,7 @@ void test(const std::string filename)
 //<listing-2>
   // instantiation
   concurr::threads<
-    sim_t, 
+    slv_out_t, 
     bcond::open, bcond::open,
     bcond::open, bcond::open
   > run(p); 

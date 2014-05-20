@@ -26,7 +26,6 @@ blitz::firstIndex i;
 boost::ptr_map<std::string, std::ofstream> outfiles;
 using T = double; // with long double this is a good test to show differences between float and double!!!
 
-
 // helper function template to ease adding the solvers to the pointer map
 template <opts::opts_t opt, class vec_t>
 void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_iters)
@@ -45,9 +44,8 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   p.n_iters = n_iters;
   p.grid_size = {nx};
 
-  // TODO: wouldn't open bc be better?
   boost::assign::ptr_map_insert<
-    concurr::serial<solver_t, bcond::cyclic, bcond::cyclic> // map element type
+    concurr::serial<solver_t, bcond::open, bcond::open> // map element type
   >(slvs)(
     key,  // map key
     p     // concurr's ctor args
@@ -64,21 +62,35 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
 
 
 // gauss shape functor definition 
-struct gauss_t
-{
+//struct gauss_t
+//{
   // member fields
-  T A0, A, sgma, x0;
+//  T A0, A, sgma, x0;
 
   // call operator
-  T operator()(T x) const 
-  { 
-    return A0 + A * exp( T(-.5) * pow(x - x0, 2) / pow(sgma, 2));
-  }
-  
+//  T operator()(T x) const 
+//  { 
+//    return A0 + A * exp( T(-.5) * pow(x - x0, 2) / pow(sgma, 2));
+//  }
+ 
   // Blitz magick
-  BZ_DECLARE_FUNCTOR(gauss_t)
-};
+//  BZ_DECLARE_FUNCTOR(gauss_t)
+//};
 
+struct gauss_int_t 
+{
+  //member fields
+  T A0, A, sgma, x0, dx;
+
+  //integral from a to b of gauss function
+  T operator()(T a) const
+  {
+    return A0 * dx + A * sgma * sqrt(pi<T>()/2) * (erf( (a+dx/2 - x0) / sqrt(2) / sgma ) - erf((a-dx/2 - x0) / sqrt(2) / sgma));
+  } 
+
+  // Blitz magick
+  BZ_DECLARE_FUNCTOR(gauss_int_t)
+};
 
 // all the test logic
 int main() 
@@ -87,7 +99,7 @@ int main()
   const T 
     t_max    = 1., // "arbitrarily"
     dx_max   = 1.,
-    x_max    = 44. * dx_max, // see note about compact support in asserts below
+    x_max    = 10 * 44. * dx_max, // see note about compact support in asserts below
     sgma     = 1.5 * dx_max, 
     velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
     x0       = .5 * x_max, 
@@ -98,13 +110,15 @@ int main()
     courants({ .05, .1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95}),
     dxs({dx_max, dx_max/2, dx_max/4, dx_max/8, dx_max/16, dx_max/32, dx_max/64, dx_max/128 });
 
-  // gauss shape functor instantiation
-  gauss_t gauss({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0});
-
   // looping over different grid increments
   for (auto &dx : dxs) 
   {
     std::cerr << "dx = " << dx << std::endl;
+
+    // gauss shape functor instantiation
+//  gauss_t gauss({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0});
+    gauss_int_t gauss_int({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0, .dx = dx});
+
     
     // looping over different Courant numbers
     for (auto &cour : courants)
@@ -142,7 +156,7 @@ int main()
 
       // calculating the analytical solution
       decltype(slvs.end()->second->advectee()) exact(nx);
-      exact = gauss(i*dx - velocity * dt * nt);
+      exact = gauss_int(i*dx - velocity * dt * nt) / dx;
 
       // looping over solvers
       for (auto keyval : slvs) 
@@ -154,13 +168,14 @@ int main()
 
         // setting the solver up
 	slv.advector() = cour; 
-        slv.advectee() = gauss(i*dx);
+        slv.advectee() = gauss_int(i*dx) / dx;
    
         // running the solver
 	slv.advance(nt);
 
-        // asserting that periodic boundries did not affect the result
+        // asserting that boundary conditions do not affect the result
         // and that the chosen domain length is enough to have compact support up to machine precision
+        // exact(0) === 0; slv.advectee(0) === 0;
         assert(exact(0) == slv.advectee()(0));
         assert(exact(nx-1) == slv.advectee()(nx-1));
 

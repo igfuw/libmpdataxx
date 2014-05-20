@@ -45,14 +45,21 @@ zi = griddata(x,y,err,xi,yi,interp='linear')
 fig = plt.gcf()
 fig.gca().set_xlim(mn,mx)
 fig.gca().set_ylim(mn,mx)
-fig.gca().set_title(r'log$_2$(err)')
-fig.gca().set_xlabel('r; C=0')
-fig.gca().set_ylabel('r; C=1')
+#fig.gca().set_title(r'log$_2$(err)', fontsize = 30)
+fig.gca().set_xlabel('r; C=0', fontsize = 30)
+fig.gca().set_ylabel('r; C=1', fontsize = 30)
+fig.set_size_inches(9.78,8.2)
+#fig.set_size_inches(8.2,8)
+plt.tick_params(length=10, width=2, labelsize=24)
+
 
 # colours
 mpble = fig.gca().contourf(xi,yi,zi,levels,cmap=plt.cm.jet)
 # colorbar
-plt.colorbar(mpble) 
+cbar = plt.colorbar(mpble) 
+#cbar.set_label('$log_2(err)$', labelpad=-40, padx = 10, y=0.45, fontsize=35)
+cbar.set_label(r'log$_2$(err)', fontsize=30, labelpad = 20)
+cbar.ax.tick_params(labelsize=24) 
 # grid
 for r in range(mx,0,-1):
   zix = 1

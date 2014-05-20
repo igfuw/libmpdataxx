@@ -63,12 +63,11 @@ void setup(T &solver)
 int main()
 {
   int nt = 5 * 314;
-
   using slv_t = solvers::mpdata<ct_params_t>;
 //<listing-2>
-  using sim_t = output::hdf5_xdmf<slv_t>;
+  using slv_out_t = output::hdf5_xdmf<slv_t>;
 //</listing-2>
-  sim_t::rt_params_t p;
+  slv_out_t::rt_params_t p;
 
   // pre instantation
   p.n_iters = 4;

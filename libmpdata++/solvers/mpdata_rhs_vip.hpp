@@ -124,7 +124,7 @@ namespace libmpdataxx
 	} 
 	else
 	{ 
-	  assert(false); // TODO
+	  assert(false); // TODO (perhaps better change definition of stash?)
 	}
       }  
 

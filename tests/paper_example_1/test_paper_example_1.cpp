@@ -19,15 +19,15 @@ int main()
   using slv_t = solvers::mpdata<ct_params_t>;
 
   // output choice
-  using sim_t = output::gnuplot<slv_t>;
+  using slv_out_t = output::gnuplot<slv_t>;
   
   // concurency choice
   using run_t = concurr::serial<
-    sim_t, bcond::open, bcond::open
-  >;
+    slv_out_t, bcond::open, bcond::open
+  >;         //left bcond   //right bcond
 
   // run-time parameters
-  typename sim_t::rt_params_t p;
+  typename slv_out_t::rt_params_t p;
 
   int nx = 101, nt = 100;
   ct_params_t::real_t dx = 0.1;
