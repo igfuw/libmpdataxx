@@ -81,7 +81,7 @@ int main()
 
   // instantation
   concurr::threads<
-  sim_t,
+  slv_out_t,
   bcond::open, bcond::open,
   bcond::open, bcond::open,
   bcond::open, bcond::open

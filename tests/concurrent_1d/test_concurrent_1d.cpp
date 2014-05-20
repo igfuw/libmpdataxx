@@ -31,7 +31,7 @@ int main()
   struct ct_params_t : ct_params_default_t
   { 
     using real_t = long double; 
-    enum { n_dims = 1 };
+    enum { n_dims = 2 }; // TODO: rename the test
     enum { n_eqns = 1 };
   };
 //</listing-1>
