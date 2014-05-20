@@ -76,7 +76,7 @@ int main()
       {
         using real_t = T;
         enum { n_dims = 2 };
-        enum { n_eqns = 2 };
+        enum { n_eqns = 1 };
         enum { opts = opts::abs };
       };
       add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
@@ -88,7 +88,7 @@ int main()
       {
         using real_t = T;
         enum { n_dims = 2 };
-        enum { n_eqns = 2 };
+        enum { n_eqns = 1 };
         enum { opts = 0 };
       };
       add_solver<output::gnuplot<solvers::mpdata<ct_params_t>>>(
