@@ -25,6 +25,18 @@ namespace libmpdataxx
     ) { 
       return i-1; 
     }
+    
+    inline int operator+(
+      const int i, const hlf_t &
+    ) { 
+      return i; 
+    } 
+
+    inline int operator-(
+      const int i, const hlf_t &
+    ) { 
+      return i-1; 
+    }
 
     template<class n_t>
     inline rng_t operator^(

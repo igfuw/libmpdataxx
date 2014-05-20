@@ -17,7 +17,9 @@ enum {x, y, z};
 struct ct_params_t : ct_params_default_t
 {
   using real_t = double;
+//<listing-1>
   enum { n_dims = 3 };
+//</listing-1>
   enum { n_eqns = 1 };
   enum { opts = opts::abs };
 };
@@ -53,17 +55,20 @@ void setup(T &solver)
     yc = 20 * dy,
     zc = 20 * dz;
   // constant angular velocity rotational field
-  solver.advector(x) = (-omega * pow(2, -0.5) * (j * dy - yc) + omega / 2 * (k * dz - zc)) * dt / dx;
-  solver.advector(y) = (omega * pow(2, -0.5) * (i * dx - xc) - omega / 2 * (k * dz - zc)) * dt / dy;
-  solver.advector(z) = (-omega / 2 * (i * dx - xc) + omega / 2 * (j * dy - yc)) * dt / dz;
+  solver.advector(x) = omega / sqrt(3) * (-(j * dy - yc) + (k * dz - zc)) * dt / dx;
+  solver.advector(y) = omega / sqrt(3) * ( (i * dx - xc) - (k * dz - zc)) * dt / dy;
+  solver.advector(z) = omega / sqrt(3) * (-(i * dx - xc) + (j * dy - yc)) * dt / dz;
 }
 
 int main()
 {
   int nt = 5 * 314;
 
-  using solver_t = output::hdf5_xdmf<solvers::mpdata<ct_params_t>>;
-  solver_t::rt_params_t p;
+  using slv_t = solvers::mpdata<ct_params_t>;
+//<listing-2>
+  using sim_t = output::hdf5_xdmf<slv_t>;
+//</listing-2>
+  sim_t::rt_params_t p;
 
   // pre instantation
   p.n_iters = 4;
@@ -71,11 +76,13 @@ int main()
 
   p.outfreq = nt;
   p.outvars[0].name = "psi";
-  p.outdir = "test";
+//<listing-3>
+  p.outdir = "rotating_sphere_3d";
+//</listing-3>
 
   // instantation
   concurr::threads<
-  solver_t,
+  sim_t,
   bcond::open, bcond::open,
   bcond::open, bcond::open,
   bcond::open, bcond::open
