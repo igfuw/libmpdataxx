@@ -37,8 +37,8 @@ void test(const std::string filename)
     dlmb = 2 * pi / (nlon - 1),
     dphi = pi / nlat;
 
-  using slv_out_t = output::hdf5_xdmf<solvers::mpdata<ct_params_t>>;
-  typename slv_out_t::rt_params_t p;
+  using sim_t = output::hdf5_xdmf<solvers::mpdata<ct_params_t>>;
+  typename sim_t::rt_params_t p;
 
   p.n_iters = opts_iters; 
   p.grid_size = {nlon, nlat};
