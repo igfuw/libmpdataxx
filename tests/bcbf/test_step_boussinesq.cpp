@@ -8,7 +8,7 @@
  * buoyant convection in Boussinesq flow
  */
 
-#include "bombel.hpp"
+#include "boussinesq.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx;
@@ -37,7 +37,7 @@ int main()
   typename ct_params_t::real_t Tht_amb = 1; //1; //300; // ambient state (constant thoughout the domain)
 
   // conjugate residual
-  using solver_t = output::gnuplot<bombel<ct_params_t>>;
+  using solver_t = output::gnuplot<boussinesq<ct_params_t>>;
 
   // run-time parameters
   solver_t::rt_params_t p;

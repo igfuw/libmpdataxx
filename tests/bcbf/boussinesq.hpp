@@ -10,7 +10,7 @@
 #include <libmpdata++/solvers/mpdata_rhs_vip_prs.hpp>
 
 template <class ct_params_t>
-class bombel : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
+class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 {
   using parent_t = libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>;
   using ix = typename ct_params_t::ix;
@@ -55,7 +55,7 @@ class bombel : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
   };
 
   // ctor
-  bombel( 
+  boussinesq( 
     typename parent_t::ctor_args_t args, 
     const rt_params_t &p
   ) :

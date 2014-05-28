@@ -3,15 +3,9 @@
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- *
- * @brief a bombel 
- *
- * @section FIGURE
- *
- * \image html "../../tests/bombel/figure.svg"
  */
 
-#include "bombel.hpp"
+#include "boussinesq.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx;
@@ -32,7 +26,7 @@ int main()
   };
   using ix = typename ct_params_t::ix;  
 
-  using solver_t = output::gnuplot<bombel<ct_params_t>>;
+  using solver_t = output::gnuplot<boussinesq<ct_params_t>>;
 
   // run-time parameters
   solver_t::rt_params_t rt_params; 
