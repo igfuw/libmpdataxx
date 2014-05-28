@@ -16,7 +16,7 @@ def analytic_fig(ax, time_l = [0,1,2,3], nx=320):
         h = eq.d1_height(lamb, x_range)
         v = eq.d1_velocity(lamb, x_range)
         ax.plot(x_range, h, oznacz[it])
-        ax.plot(x_range, v, oznacz[it]+ "--")
+        ax.plot(x_range, v, oznacz[it]+ "-")
     ps.ticks_changes(ax)
 
 
@@ -37,8 +37,8 @@ def analytic_model_fig(ax, x_range, h_m, v_m, t_m, it):
 
     ax.plot(x_range, eq.d1_initial(x_range), 'k', x_range, h_a, 'b',
             x_range, h_m[it], "r")
-    ax.plot(x_range, 0*x_range, "k--", x_range, v_a, 'b--',
-            x_range, v_m[it], "r--")
+    ax.plot(x_range, 0*x_range, "k-", x_range, v_a, 'b-',
+            x_range, v_m[it], "r-")
 
     ax.set_ylim(-2,2)
     ps.ticks_changes(ax)
