@@ -45,9 +45,11 @@ namespace libmpdataxx
         const rng_t j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        frac<opts>(
+        (
           beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
-          ,// -----------------------------------------------------------
+        ) 
+        / // -----------------------------------------------------------
+        (
           ( pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * psi(pi<dim>(i-1, j)) 
           - negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * psi(pi<dim>(i+1, j)) )  // additional parenthesis so that we first sum
           +                                                                          // fluxes in separate dimensions 
@@ -68,9 +70,11 @@ namespace libmpdataxx
         const rng_t j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        frac<opts>(
+        (
           beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
-          ,// --------------------------------------------------------------------------
+        )
+        / // --------------------------------------------------------------------------
+        (
           ( pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * pospart<opts>(psi(pi<dim>(i-1, j))) 
           - negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * pospart<opts>(psi(pi<dim>(i+1, j)))
           - pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * negpart<opts>(psi(pi<dim>(i,   j)))
@@ -97,9 +101,11 @@ namespace libmpdataxx
       ) return_macro(
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         ,
-        frac<opts>(
+        (
           beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
-          ,// -------------------------------------------
+        )
+        / // -------------------------------------------
+        (
           ( pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) /* *1 */ 
           - negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) /* *1 */) // see note in positive sign beta up
           +
@@ -138,9 +144,11 @@ namespace libmpdataxx
         const rng_t j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
-        frac<opts>(
+        (
           beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
-          ,// ---------------------------------------------------------
+        )
+        /
+        ( // ---------------------------------------------------------
           ( pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * psi(pi<dim>(i, j))
           - negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * psi(pi<dim>(i, j)) )  //see note in positive sign beta up
           +
@@ -161,9 +169,11 @@ namespace libmpdataxx
         const rng_t j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
-        frac<opts>(
+        (
           beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
-          ,// --------------------------
+        ) 
+        / // --------------------------
+        (
           ( pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * pospart<opts>(psi(pi<dim>(i,   j)))
           - negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * pospart<opts>(psi(pi<dim>(i,   j)))
           - pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * negpart<opts>(psi(pi<dim>(i-1, j)))
@@ -190,9 +200,11 @@ namespace libmpdataxx
       ) return_macro(
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         ,
-        frac<opts>(
+        (
           beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
-          ,// -------------------------------------------
+        )
+        / // -------------------------------------------
+        (
           ( pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) /* *1 */
           - negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) /* *1 */)  //see note in positive sign beta up
           +
