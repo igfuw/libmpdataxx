@@ -53,6 +53,8 @@ namespace libmpdataxx
           +                                                                          // fluxes in separate dimensions 
           ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * psi(pi<dim>(i, j-1))    // could be important for accuracy if one of them
           - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * psi(pi<dim>(i, j+1)) )  // is of different magnitude than the other
+          + 
+          blitz::epsilon(typename arr_2d_t::T_numtype(0))
         ) 
       ) 
 
@@ -78,6 +80,8 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * pospart<opts>(psi(pi<dim>(i, j+1)))
           - pospart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * negpart<opts>(psi(pi<dim>(i, j  )))
           + negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * negpart<opts>(psi(pi<dim>(i, j  ))) )
+          + 
+          blitz::epsilon(typename arr_2d_t::T_numtype(0))
         ) 
       ) 
 
@@ -142,6 +146,8 @@ namespace libmpdataxx
           +
           ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * psi(pi<dim>(i, j))
           - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * psi(pi<dim>(i, j)) )
+          + 
+          blitz::epsilon(typename arr_2d_t::T_numtype(0))
         ) 
       ) 
 
@@ -167,6 +173,8 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * pospart<opts>(psi(pi<dim>(i,   j)))
           - pospart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * negpart<opts>(psi(pi<dim>(i, j-1)))
           + negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * negpart<opts>(psi(pi<dim>(i, j+1))) )
+          + 
+          blitz::epsilon(typename arr_2d_t::T_numtype(0))
         ) 
       ) 
 

@@ -64,6 +64,8 @@ namespace libmpdataxx
           +                                                                   // fluxes in separate dimensions
           ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * psi(pi<d>(i, j, k-1))   
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * psi(pi<d>(i, j, k+1)) )
+          + 
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -95,6 +97,8 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * pospart<opts>(psi(pi<d>(i, j, k+1)))
           - pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * negpart<opts>(psi(pi<d>(i, j  , k)))
           + negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * negpart<opts>(psi(pi<d>(i, j  , k))) )
+          + 
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -173,6 +177,8 @@ namespace libmpdataxx
           +
           ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * psi(pi<d>(i, j, k))
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * psi(pi<d>(i, j, k)) )
+          + 
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -204,6 +210,8 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * pospart<opts>(psi(pi<d>(i,   j, k)))
           - pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * negpart<opts>(psi(pi<d>(i, j, k-1)))
           + negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * negpart<opts>(psi(pi<d>(i, j, k+1))) )
+          + 
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 

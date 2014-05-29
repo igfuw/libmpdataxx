@@ -49,6 +49,7 @@ namespace libmpdataxx
           ,// ----------------------------
             pospart<opts>(GC_corr(i-h)) * psi(i-1) 
           - negpart<opts>(GC_corr(i+h)) * psi(i+1)
+          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -68,6 +69,7 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr(i+h)) * pospart<opts>(psi(i+1))
           - pospart<opts>(GC_corr(i+h)) * negpart<opts>(psi(i  ))
           + negpart<opts>(GC_corr(i-h)) * negpart<opts>(psi(i  ))
+          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -120,6 +122,7 @@ namespace libmpdataxx
           ,// --------------------------
             pospart<opts>(GC_corr(i+h)) * psi(i) 
           - negpart<opts>(GC_corr(i-h)) * psi(i)
+          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -139,6 +142,7 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr(i-h)) * pospart<opts>(psi(i  ))
           - pospart<opts>(GC_corr(i-h)) * negpart<opts>(psi(i-1))
           + negpart<opts>(GC_corr(i+h)) * negpart<opts>(psi(i+1))
+          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -158,6 +162,7 @@ namespace libmpdataxx
           ,// --------------------------
             pospart<opts>(GC_corr(i+h)) /* * 1 */
           - negpart<opts>(GC_corr(i-h)) /* * 1 */
+          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
           + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
