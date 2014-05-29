@@ -12,7 +12,7 @@
 #include <libmpdata++/output/detail/output_common.hpp>
 
 #define GNUPLOT_ENABLE_BLITZ
-#include <gnuplot-iostream/gnuplot-iostream.h> // TODO: Debian does not use a subdirectory
+#include <gnuplot-iostream.h>
 
 #include <boost/format.hpp>
 
@@ -143,7 +143,7 @@ namespace libmpdataxx
  
       // helper constructs to make it compilable for both 1D and 2D versions
       std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { throw std::logic_error("binfmt() only for 2D!"); }
-      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a); }
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a) + " scan=yx "; }
 
       void record(const int var)
       {
