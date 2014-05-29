@@ -3,9 +3,6 @@
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- *
- * \include "mpdata_1d_opt_eps/test_mpdata_1d_opt_khn.cpp"
- * \image html "../../tests/mpdata_1d_opt_eps/figure_iters=3.svg" TODO
  */
 
 #include <libmpdata++/solvers/mpdata.hpp>
@@ -63,8 +60,8 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<T, n_dims>> slvs;
 
-  add_solver<opts::abs>(slvs, "kahan_off", 2, "opts::abs");
-  add_solver<opts::abs | opts::khn>(slvs, "kahan_on", 2, "opts::abs | opts::khn");
+  add_solver<opts::abs | opts::nkh>(slvs, "kahan_off", 2, "opts::abs | opts::nkh");
+  add_solver<opts::abs>(slvs, "kahan_on", 2, "opts::abs");
 
   for (auto &slv : slvs) slv.advance(nt);
 }

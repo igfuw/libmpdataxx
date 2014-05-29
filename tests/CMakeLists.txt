@@ -64,7 +64,7 @@ add_subdirectory(mpdata_1d_opt_eps)
 add_subdirectory(mpdata_1d_opt_npa)
 add_subdirectory(mpdata_1d_opt_iga)
 add_subdirectory(mpdata_1d_opt_nug)
-add_subdirectory(mpdata_1d_opt_khn)
+add_subdirectory(mpdata_1d_opt_nkh)
 # adv+rhs
 add_subdirectory(harmosc)
 # adv+rhs+vip
