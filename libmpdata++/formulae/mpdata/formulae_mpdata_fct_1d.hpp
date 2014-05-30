@@ -44,14 +44,11 @@ namespace libmpdataxx
         const rng_t i,
         typename std::enable_if<!opts::isset(opts, opts::abs) && !opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
-        (
+        fct_frac(
           beta_up_nominator<opts>(psi, psi_max, G, i)
-        ) 
-        / // ----------------------------
-        (
+	  , // ----------------------------
             pospart<opts>(GC_corr(i-h)) * psi(i-1) 
           - negpart<opts>(GC_corr(i+h)) * psi(i+1)
-          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -64,16 +61,13 @@ namespace libmpdataxx
         const rng_t i,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
-        (
+        fct_frac(
           beta_up_nominator<opts>(psi, psi_max, G, i)
-        )
-        / // ----------------------------
-        (
+	  , // ----------------------------
             pospart<opts>(GC_corr(i-h)) * pospart<opts>(psi(i-1)) // TODO: some parenthesis?
           - negpart<opts>(GC_corr(i+h)) * pospart<opts>(psi(i+1))
           - pospart<opts>(GC_corr(i+h)) * negpart<opts>(psi(i  ))
           + negpart<opts>(GC_corr(i-h)) * negpart<opts>(psi(i  ))
-          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -88,14 +82,11 @@ namespace libmpdataxx
       ) return_macro(
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         ,
-        (
+        fct_frac(
           beta_up_nominator<opts>(psi, psi_max, G, i)
-        ) 
-        / // ----------------------------
-        (
+          , // ----------------------------
           pospart<opts>(GC_corr(i-h))   /* * 1 */
           - negpart<opts>(GC_corr(i+h)) /* * 1 */
-          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -123,14 +114,11 @@ namespace libmpdataxx
         const rng_t i, 
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
-        (
+        fct_frac(
           beta_dn_nominator<opts>(psi, psi_min, G, i)
-        ) 
-        / // --------------------------
-        (
+          , // --------------------------
             pospart<opts>(GC_corr(i+h)) * psi(i) 
           - negpart<opts>(GC_corr(i-h)) * psi(i)
-          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -143,16 +131,13 @@ namespace libmpdataxx
         const rng_t i, 
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
-        (
+        fct_frac(
           beta_dn_nominator<opts>(psi, psi_min, G, i)
-        )
-        / // --------------------------
-        (
+	  , // --------------------------
             pospart<opts>(GC_corr(i+h)) * pospart<opts>(psi(i  ))
           - negpart<opts>(GC_corr(i-h)) * pospart<opts>(psi(i  ))
           - pospart<opts>(GC_corr(i-h)) * negpart<opts>(psi(i-1))
           + negpart<opts>(GC_corr(i+h)) * negpart<opts>(psi(i+1))
-          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
@@ -167,14 +152,11 @@ namespace libmpdataxx
       ) return_macro(
         static_assert(!opts::isset(opts, opts::abs), "iga & abs are mutually exclusive");
         ,
-        (
+        fct_frac(
           beta_dn_nominator<opts>(psi, psi_min, G, i)
-        ) 
-        / // --------------------------
-        (
+          , // --------------------------
             pospart<opts>(GC_corr(i+h)) /* * 1 */
           - negpart<opts>(GC_corr(i-h)) /* * 1 */
-          + blitz::epsilon(typename arr_1d_t::T_numtype(0))
         ) 
       ) 
 
