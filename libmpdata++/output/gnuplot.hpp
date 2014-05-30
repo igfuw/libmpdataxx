@@ -11,7 +11,6 @@
 
 #include <libmpdata++/output/detail/output_common.hpp>
 
-#define GNUPLOT_ENABLE_BLITZ
 #include <gnuplot-iostream.h>
 
 #include <boost/format.hpp>
