@@ -26,8 +26,8 @@ struct intcond
   real_t operator()(const real_t &x, const real_t &y) const
   {
     return 
-      x*x + y*y <= 1 // if
-      ? 1 - x*x - y*y  // then
+      0.25*x*x + y*y <= 1 // if
+      ? 1 - 0.25*x*x - y*y  // then
       : 0;             // else
   }
   BZ_DECLARE_FUNCTOR2(intcond);
@@ -111,8 +111,8 @@ void test(const std::string &outdir)
 
 int main()
 {
-  test<opts::fct | opts::iga>("spreading_drop_2d_fct+iga.out");
-  test<opts::fct | opts::abs>("spreading_drop_2d_fct+abs.out");
+  test<opts::fct | opts::iga>("spreading_drop_2delipsa_fct+iga.out");
+  test<opts::fct | opts::abs>("spreading_drop_2delipsa_fct+abs.out");
   system("python ../../../tests/shallow_water/papierplot_shallow_water_2d.py fct+abs fct+iga");
   system("python ../../../tests/shallow_water/plot2D_shallow_water_2d.py");
 }
