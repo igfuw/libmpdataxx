@@ -53,9 +53,11 @@ namespace libmpdataxx
         const rng_t k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        frac<opts>(
+        (
           beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
-        , //----------------------------------------------------------------------
+        ) 
+        / //----------------------------------------------------------------------
+        (
           ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * psi(pi<d>(i-1, j, k))
           - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * psi(pi<d>(i+1, j, k)) )  // additional parenthesis so that we first sum
           +                                                                   // fluxes in separate dimensions
@@ -64,6 +66,8 @@ namespace libmpdataxx
           +                                                                   // fluxes in separate dimensions
           ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * psi(pi<d>(i, j, k-1))   
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * psi(pi<d>(i, j, k+1)) )
+          + 
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -78,9 +82,11 @@ namespace libmpdataxx
         const rng_t k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        frac<opts>(
+        (
           beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
-        , //-------------------------------------------------------------------------------------
+        )
+        / //-------------------------------------------------------------------------------------
+        (
           ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * pospart<opts>(psi(pi<d>(i-1, j, k)))
           - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * pospart<opts>(psi(pi<d>(i+1, j, k)))
           - pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * negpart<opts>(psi(pi<d>(i,   j, k)))
@@ -95,6 +101,8 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * pospart<opts>(psi(pi<d>(i, j, k+1)))
           - pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * negpart<opts>(psi(pi<d>(i, j  , k)))
           + negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * negpart<opts>(psi(pi<d>(i, j  , k))) )
+          + 
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -111,9 +119,11 @@ namespace libmpdataxx
       ) return_macro(
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         ,
-        frac<opts>(
+        (
           beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
-        , //--------------------------------------------------
+        )
+        / //--------------------------------------------------
+        (
           ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) /* * 1 */
           - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) /* * 1 */) // see note in positive sign beta up
           +
@@ -162,9 +172,11 @@ namespace libmpdataxx
         const rng_t k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        frac<opts>(
+        (
           beta_dn_nominator<opts, d>(psi, psi_min, G, i, j, k)
-        , //--------------------------------------------------------------------
+        ) 
+        / //--------------------------------------------------------------------
+        (
           ( pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * psi(pi<d>(i, j, k))
           - negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * psi(pi<d>(i, j, k)) )  //see note in positive sign beta up
           +
@@ -173,6 +185,8 @@ namespace libmpdataxx
           +
           ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * psi(pi<d>(i, j, k))
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * psi(pi<d>(i, j, k)) )
+          + 
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -187,9 +201,11 @@ namespace libmpdataxx
         const rng_t k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        frac<opts>(
+        (
           beta_dn_nominator<opts, d>(psi, psi_min, G, i, j, k)
-        , //-----------------------------------------------------------------------------------
+        ) 
+        / //-----------------------------------------------------------------------------------
+        (
           ( pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * pospart<opts>(psi(pi<d>(i,   j, k)))
           - negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * pospart<opts>(psi(pi<d>(i,   j, k)))
           - pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * negpart<opts>(psi(pi<d>(i-1, j, k)))
@@ -204,6 +220,8 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * pospart<opts>(psi(pi<d>(i,   j, k)))
           - pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * negpart<opts>(psi(pi<d>(i, j, k-1)))
           + negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * negpart<opts>(psi(pi<d>(i, j, k+1))) )
+          + 
+          blitz::epsilon(typename arr_3d_t::T_numtype(0))
         )
       )
 
@@ -220,9 +238,11 @@ namespace libmpdataxx
       ) return_macro(
         static_assert(!opts::isset(opts, opts::abs), "iga & abs are mutually exclusive");
         ,
-        frac<opts>(
+        (
           beta_dn_nominator<opts, d>(psi, psi_min, G, i, j, k)
-        , //--------------------------------------------------
+        )
+        / //--------------------------------------------------
+        (
           ( pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) /* * 1 */
           - negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) /* * 1 */)  //see note in positive sign beta up
           +

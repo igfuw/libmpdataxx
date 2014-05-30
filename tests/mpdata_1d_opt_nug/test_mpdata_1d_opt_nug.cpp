@@ -11,7 +11,7 @@
 #include <libmpdata++/solvers/mpdata.hpp> 
 #include <libmpdata++/concurr/threads.hpp>
 #define GNUPLOT_ENABLE_BLITZ
-#include <gnuplot-iostream/gnuplot-iostream.h> // TODO: Debian does not use a subdirectory
+#include <gnuplot-iostream.h> 
 
 using namespace libmpdataxx;
 
