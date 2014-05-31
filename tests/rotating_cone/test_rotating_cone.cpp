@@ -38,7 +38,7 @@ void test(const std::string filename)
     omg = .1,
     h = 4., // TODO: other name!
     h0 = 1;
-    //  h0 = 100.; // change it to 1 to see scary things! - not any more!
+    //  h0 = 100.; // change it to 1 to see scary things!
 
 /// @brief settings from @copybrief Anderson_and_Fattahi_1974
 //    dt = 10 * pi<real_t>(),

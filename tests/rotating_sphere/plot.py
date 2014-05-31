@@ -77,7 +77,7 @@ Render()
 
 # export to SVG
 exporters = servermanager.createModule('exporters')
-svg_exporter = exporters.GL2PSRenderViewExporterSVG()
+svg_exporter = exporters.GL2PSExporterSVG()
 svg_exporter.Rasterize3Dgeometry = False;
 svg_exporter.GL2PSdepthsortmethod = 'BSP sorting (slow, best)';
 svg_exporter.SetView(view)

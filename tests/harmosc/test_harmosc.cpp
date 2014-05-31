@@ -67,10 +67,6 @@ int main()
       0,                                            // then
       0.5 * (1 + cos(2 * pi<real_t>() * i / 100))   // else
     );
-//    run.advectee(ix::psi) = pow(
-//      sin(i * pi<real_t>() / (p.grid_size[0]-1) + pi<real_t>()/3), 
-//      300
-//    );
     run.advectee(ix::phi) = real_t(0);
   }
   run.advector() = .5;
