@@ -60,7 +60,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
     for ic, casename in enumerate(casename_l):
         print "plotting for " + casename + ", t = " + str(time)
         #model variables TODO: time
-        h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2delipsa_" + casename +
+        h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2d_" + casename +
                                               ".out/timestep0000000" + str(int(time/dt))
                                               + '.h5')
         # calculate velocity (momentum/height) only in the droplet region.
@@ -80,7 +80,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
         #ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
         #            fontsize=12, horizontalalignment='left', verticalalignment='top')
         
-    plt.savefig("papier_shallowwater_2delipsa.pdf")
+    plt.savefig("papier_shallowwater_2d.pdf")
     plt.show()
 
 main("./", sys.argv[1:])
