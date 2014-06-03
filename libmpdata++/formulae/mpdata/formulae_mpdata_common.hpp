@@ -54,6 +54,15 @@ namespace libmpdataxx
         nom / (den + blitz::tiny(typename den_t::T_numtype(0))) // note: for negative signal eps -> -eps
       )
 
+      // a bigger-epsilon version for FCT (used regardless of opts::eps setting)
+      template<class nom_t, class den_t>
+      inline auto fct_frac(
+        const nom_t &nom, 
+        const den_t &den
+      ) return_macro(,
+        nom / (den + blitz::epsilon(typename den_t::T_numtype(0))) 
+      )
+
     }; // namespace mpdata
   }; // namespace formulae
 }; // namespcae libmpdataxx
