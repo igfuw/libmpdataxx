@@ -22,7 +22,7 @@ int main()
     using real_t = double;
     enum { n_dims = 2 };
     enum { n_eqns = 3 };
-    enum { rhs_scheme = solvers::euler_b };
+    enum { rhs_scheme = solvers::trapez };
     enum { prs_scheme = solvers::cr };
     struct ix { enum {
       u, w, tht, 
@@ -34,7 +34,7 @@ int main()
 
   const int r0 = 250; 
   const int nx = 201, ny = 201, nt = 800;
-  typename ct_params_t::real_t Tht_amb = 1; //1; //300; // ambient state (constant thoughout the domain)
+  typename ct_params_t::real_t Tht_ref = 300; //1; // reference state (constant thoughout the domain)
 
   // conjugate residual
   using solver_t = output::gnuplot<boussinesq<ct_params_t>>;
@@ -44,7 +44,7 @@ int main()
 
   p.dt = .75;
   p.di = p.dj = 10.; 
-  p.Tht_amb = Tht_amb; 
+  p.Tht_ref = Tht_ref; 
 
   p.outfreq = 100; //12;
   p.outvars = {
@@ -58,13 +58,13 @@ int main()
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
 //  rt_params.gnuplot_cbrange = "[299.85 : 300.65]";
-  p.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
+  p.gnuplot_cbrange = "[299.85 : 300.65]";
   p.gnuplot_maxcolors = 8;
 //  rt_params.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
-  p.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
+  p.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
   p.gnuplot_term = "svg";
 //<listing-2>
-  p.tol = 1e-5;
+  p.tol = 1e-6;
 //</listing-2>
   p.grid_size = {nx, ny};
 
@@ -79,7 +79,7 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    slv.advectee(ix::tht) = Tht_amb + where(
+    slv.advectee(ix::tht) = Tht_ref + where(
       // if
       pow(i * p.di - 4    * r0 , 2) + 
       pow(j * p.dj - 1.04 * r0 , 2) <= pow(r0, 2), 

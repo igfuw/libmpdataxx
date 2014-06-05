@@ -20,11 +20,10 @@ class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 
   private:
   // member fields
-  real_t g, Tht_amb;
+  real_t g, Tht_ref;
 
 //<listing-1>
   // explicit forcings 
-  // (to be applied before the eliptic solver)
   void update_rhs(
     libmpdataxx::arrvec_t<
       typename parent_t::arr_t
@@ -32,26 +31,22 @@ class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
     const real_t &dt, 
     const int &at 
   ) {
-    // we only know R at n (and not at n+1)
-    enum { n };
-    assert(at == n); 
-
     parent_t::update_rhs(rhs, dt, at); 
 
     const auto Tht  = this->psi_n(ix::tht); 
     const auto &ijk = this->ijk;
 
     rhs.at(ix::w)(ijk) += 
-      g / 300 * (Tht(ijk) - Tht_amb) / Tht_amb; 
+      g * (Tht(ijk) - Tht_ref) / Tht_ref; 
   }
 //</listing-1>
-//    rhs.at(ix::w)(ijk) += g /*/ 300*/ * (Tht(ijk) - Tht_amb) / Tht_amb; 
+//    rhs.at(ix::w)(ijk) += g /*/ 300*/ * (Tht(ijk) - Tht_ref) / Tht_ref; 
 
   public:
 
   struct rt_params_t : parent_t::rt_params_t 
   { 
-    real_t g = 9.81, Tht_amb = 0; 
+    real_t g = 9.81, Tht_ref = 0; 
   };
 
   // ctor
@@ -61,8 +56,8 @@ class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
   ) :
     parent_t(args, p),
     g(p.g),
-    Tht_amb(p.Tht_amb)
+    Tht_ref(p.Tht_ref)
   {
-    assert(Tht_amb != 0);
+    assert(Tht_ref != 0);
   }
 };
