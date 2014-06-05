@@ -57,7 +57,7 @@ namespace libmpdataxx
           - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * psi(pi<dim>(i, j+1)) )  // is of different magnitude than the other
           + 
           blitz::epsilon(typename arr_2d_t::T_numtype(0))
-        ) 
+        )
       ) 
 
       template <opts_t opts, int dim, class arr_2d_t>

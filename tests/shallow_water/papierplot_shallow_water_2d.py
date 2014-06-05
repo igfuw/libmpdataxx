@@ -20,7 +20,7 @@ def analytic_fig(ax, time_l = [0,1,2,3], x_range = np.linspace(-8,8,320),
         h = eq.d2_height(lamb, x_range, y_range)
         v = eq.d2_velocity(lamb, x_range, y_range)
         ax.plot(x_range, h, oznacz[it])
-        ax.plot(x_range, v, oznacz[it]+ "-")
+        ax.plot(x_range, v, oznacz[it]+ "--")
 
     ps.ticks_changes(ax)
 
@@ -40,8 +40,8 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
 
     ax.plot(x_range, eq.d2_initial(x_range, y_range), 'k', x_range, h_a, 'b',
             x_range, h_m, "r")
-    ax.plot(x_range, 0*x_range, "k-", x_range, v_a, 'b-',
-            x_range, v_m, "r-")
+    ax.plot(x_range, 0*x_range, "k-", x_range, v_a, 'b--',
+            x_range, v_m, "r--")
 
     #ax.set_ylim(-2,2)
     ps.ticks_changes(ax)

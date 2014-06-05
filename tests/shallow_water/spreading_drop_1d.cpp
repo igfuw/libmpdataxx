@@ -136,8 +136,8 @@ void test(const std::string &pfx)
 
 int main()
 {
-  test<opts::iga | opts::fct>("fct+iga");
-  test<opts::abs | opts::fct>("fct+abs");
+  test<opts::abs | opts::fct | opts::dfl >("fct+abs");
+  test<opts::iga | opts::fct | opts::dfl >("fct+iga");
   //plotting model results and analitic solution; 
   //python uses sys.argv[1:0] for choosing model outputs
   system("python ../../../tests/shallow_water/papierplot_shallow_water_1d.py fct+abs fct+iga ");
