@@ -121,18 +121,18 @@ int nt = 628 * 2;
     tmp = blitz::pow(i * dx - x0d, 2) + 
           blitz::pow(j * dy - y0d, 2);
     
-/*    density_tmp = h0d + where(
+    density_tmp = h0d + where(
       tmp - pow(rd, 2) <= 0,                   //if
       hd * blitz::sqr(1 - tmp / pow(rd, 2)),   //then
       0.                                       //else
     );
-*/
 
-   density_tmp = 1.;
+
+    //density_tmp = 1.;
 
     // constant-angular-velocity rotational field
-    run.advector(x) =  1. / density_tmp * omg * (j * dy - yc) * dt/dx;
-    run.advector(y) = -1. / density_tmp * omg * (i * dx - xc) * dt/dy;
+    run.advector(x) =  1. /* / density_tmp */ * omg * (j * dy - yc) * dt/dx;
+    run.advector(y) = -1. /* / density_tmp */ * omg * (i * dx - xc) * dt/dy;
    
     run.g_factor() = density_tmp;
 
