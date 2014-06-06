@@ -165,8 +165,12 @@ namespace libmpdataxx
           {
             std::ostringstream tmp;
 	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep << "'\n";
+	    if (p.gnuplot_title == "notitle") tmp << "set title ''\n";
+            else
+            {
 	    tmp << "set title '"<< this->outvars[var].name << "  (" // TODO: handle the option
-              << " t/dt=" << std::setprecision(3) << this->timestep << ")'\n";
+                << " t/dt=" << std::setprecision(3) << this->timestep << ")'\n";
+            }
             *gp << tmp.str();
           }
 	  *gp << p.gnuplot_command;
