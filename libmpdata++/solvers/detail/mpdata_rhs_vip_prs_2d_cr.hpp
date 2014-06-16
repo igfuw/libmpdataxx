@@ -79,7 +79,7 @@
 */
 
 #pragma once
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_common.hpp>
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_common.hpp>
 #include <libmpdata++/formulae/nabla_formulae.hpp> // gradient, diveregnce
 
 namespace libmpdataxx
@@ -89,9 +89,9 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t>
-      class mpdata_rhs_vip_prs_cr : public detail::mpdata_rhs_vip_prs_common<ct_params_t>
+      class mpdata_rhs_vip_prs_2d_cr : public detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>
       {
-	using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t>;
+	using parent_t = detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>;
 	using real_t = typename ct_params_t::real_t;
         using ix = typename ct_params_t::ix;
 
@@ -171,7 +171,7 @@ namespace libmpdataxx
 	struct rt_params_t : parent_t::rt_params_t { };
 
 	// ctor
-	mpdata_rhs_vip_prs_cr(
+	mpdata_rhs_vip_prs_2d_cr(
 	  typename parent_t::ctor_args_t args,
 	  const rt_params_t &p
 	) :

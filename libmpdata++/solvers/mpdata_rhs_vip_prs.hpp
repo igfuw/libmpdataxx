@@ -6,9 +6,10 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_cr.hpp> 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_mr.hpp> 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_pc.hpp> 
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_cr.hpp> 
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_3d_cr.hpp> 
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_mr.hpp> 
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_pc.hpp> 
 
 namespace libmpdataxx
 {
@@ -26,36 +27,48 @@ namespace libmpdataxx
     class mpdata_rhs_vip_prs
     {};
 
-    // minimal residual 
+    // minimal residual 2D
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)mr>::type
-    > : public detail::mpdata_rhs_vip_prs_mr<ct_params_t>
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)mr && ct_params_t::n_dims == 2>::type
+    > : public detail::mpdata_rhs_vip_prs_2d_mr<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_mr<ct_params_t>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_2d_mr<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
     };
 
-    // conjugate residual 
+    // conjugate residual 2D
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr>::type
-    > : public detail::mpdata_rhs_vip_prs_cr<ct_params_t>
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr && ct_params_t::n_dims == 2>::type
+    > : public detail::mpdata_rhs_vip_prs_2d_cr<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_cr<ct_params_t>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_2d_cr<ct_params_t>; 
+      using parent_t::parent_t; // inheriting constructors
+    };
+    
+    // conjugate residual 3D
+    template<typename ct_params_t>
+    class mpdata_rhs_vip_prs<
+      ct_params_t,
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr && ct_params_t::n_dims == 3>::type
+    > : public detail::mpdata_rhs_vip_prs_3d_cr<ct_params_t>
+    {
+      using parent_t = detail::mpdata_rhs_vip_prs_3d_cr<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
     };
 
-    // preconditioned
+
+    // preconditioned 2D
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)pc>::type
-    > : public detail::mpdata_rhs_vip_prs_pc<ct_params_t>
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)pc && ct_params_t::n_dims == 2>::type
+    > : public detail::mpdata_rhs_vip_prs_2d_pc<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_pc<ct_params_t>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_2d_pc<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
     };
   }; // namespace solvers

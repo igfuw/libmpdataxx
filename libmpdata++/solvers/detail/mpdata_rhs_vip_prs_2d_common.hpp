@@ -17,7 +17,7 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t>
-      class mpdata_rhs_vip_prs_common : public mpdata_rhs_vip<ct_params_t>
+      class mpdata_rhs_vip_prs_2d_common : public mpdata_rhs_vip<ct_params_t>
       {
 	using parent_t = mpdata_rhs_vip<ct_params_t>;
         using ix = typename ct_params_t::ix;
@@ -98,7 +98,7 @@ namespace libmpdataxx
         };
 
 	// ctor
-	mpdata_rhs_vip_prs_common(
+	mpdata_rhs_vip_prs_2d_common(
 	  typename parent_t::ctor_args_t args,
 	  const rt_params_t &p
 	) : 
