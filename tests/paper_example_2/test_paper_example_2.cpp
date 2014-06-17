@@ -94,9 +94,4 @@ int main()
 //</listing-8>
     test<opts>("out_iga_tot_fct.svg");
   }
-  {
-    enum { opts = opts::iga | opts::fct | opts::khn };
-    test<opts>("out_iga_fct_khn.svg");
-  }
-
 }

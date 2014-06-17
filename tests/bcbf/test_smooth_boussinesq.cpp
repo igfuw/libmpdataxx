@@ -36,7 +36,7 @@ int main()
 
   rt_params.dt = .5;
   rt_params.di = rt_params.dj = 10.;
-  rt_params.Tht_amb = 300; // [K] ambient state (constant thoughout the domain)
+  rt_params.Tht_ref = 300; // [K] ambient state (constant thoughout the domain)
 
   rt_params.outfreq = 1;
   rt_params.outvars = {
@@ -63,7 +63,7 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    run.advectee(ix::tht) = rt_params.Tht_amb 
+    run.advectee(ix::tht) = rt_params.Tht_ref 
       + .5 * exp( -sqr(i-(nx-1)/2.) / (2.*pow((nx-1)/20, 2))   // TODO: assumed dx=dy=1?
 		  -sqr(j-(ny-1)/4.) / (2.*pow((ny-1)/20, 2)) )
     ;
