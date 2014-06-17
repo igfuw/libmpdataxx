@@ -4,8 +4,6 @@
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
- * \include "rotating_cone/test_rotating_cone.cpp"
- * \image html "../../tests/rotating_cone/figure.svg"
  */
 
 #include <cmath>
@@ -24,10 +22,8 @@ void test(const std::string filename)
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
-//<listing-1>
     enum { n_dims = 2 };
     enum { n_eqns = 1 };
-//</listing-1>
     enum { opts = opts_arg };
   };
 
@@ -36,18 +32,12 @@ void test(const std::string filename)
     dx = 1,
     dy = 1,
     omg = .1,
-    h = 4., 
-    h0 = 1;
-
-/// @brief settings from @copybrief Anderson_and_Fattahi_1974
-//    dt = 10 * pi<real_t>(),
-//    omg = -.001,// / (2 * pi<real_t>()),
-//    r = 4. * dx,
-//    h0 = -.5,
-//    x0 = 21. * dx,
-//    y0 = 15. * dy;
-
-  int nt = 628 * 6;
+    h = 4., // TODO: other name!
+    h0 = 1, 
+    h0d = 1,
+    hd = 10;
+  
+int nt = 628 * 2;
 
   using slv_out_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
   typename slv_out_t::rt_params_t p;
@@ -56,7 +46,7 @@ void test(const std::string filename)
   p.n_iters = opts_iters; 
   p.grid_size = {101, 101};
 
-  p.outfreq = nt; 
+  p.outfreq = 10; 
   p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;
@@ -72,54 +62,44 @@ void test(const std::string filename)
     tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
     p.gnuplot_cbrange = tmp.str();
   }
-  p.gnuplot_xrange = "[25 : 75]";
-  p.gnuplot_yrange = "[50 : 100]";
-//  p.gnuplot_xrange = "[0 : 100]";
-//  p.gnuplot_yrange = "[0 : 100]";
+//  p.gnuplot_xrange = "[25 : 75]";
+//  p.gnuplot_yrange = "[50 : 100]";
+  p.gnuplot_xrange = "[0 : 100]";
+  p.gnuplot_yrange = "[0 : 100]";
+  p.gnuplot_maxcolors = 10;
   {
     std::ostringstream tmp;
     tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
     p.gnuplot_cntrparam = tmp.str();
   }
   p.gnuplot_fontsize = "14";
-  p.gnuplot_cbrange = "[.75 : 5.25]";
-  p.gnuplot_palette = "defined (" 
-    "0.75 '#ff0000',"
-    "1.00 '#ff0000',"
-    "1.00 '#ffffff',"
-    "1.25 '#ffffff',"
-    "1.25 '#993399',"
-    "2.25 '#00CCFF',"
-    "3.25 '#66CC00',"
-    "4.25 '#FC8727',"
-    "5.25 '#FFFF00') maxcolors 18";
   p.gnuplot_term = "svg";
   p.gnuplot_title = "notitle";
 
-//<listing-2>
   // instantiation
   concurr::threads<
     slv_out_t, 
     bcond::open, bcond::open,
     bcond::open, bcond::open
   > run(p); 
-//</listing-2>
   {
 
-//TODO - dawniej listing 3 zaczynal się tutaj - może tak zostać?
     // constants used in the set-up definition
     enum {x, y};
     const typename ct_params_t::real_t
       r = 15. * dx,
+      rd = 10 * dx,
       x0 = 50 * dx,
       y0 = 75 * dy,
+      x0d = 25 * dx,    //location of desity perturbation
+      y0d = 50 * dy,
       xc = .5 * (p.grid_size[x]-1) * dx,
       yc = .5 * (p.grid_size[y]-1) * dy;
 
-//<listing-3>
     // temporary array of the same ...
     decltype(run.advectee())        // type 
-      tmp(run.advectee().extent()); // and size 
+      tmp(run.advectee().extent()), // and size
+      density_tmp(run.advectee().extent()); 
     // ... as the one returned by advectee()
 
     // helper vars for Blitz++ tensor notation
@@ -137,14 +117,26 @@ void test(const std::string filename)
       0.                                     //else
     );
 
-    // constant-angular-velocity rotational field
-    run.advector(x) =  omg * (j * dy - yc) * dt/dx;
-    run.advector(y) = -omg * (i * dx - xc) * dt/dy;
-//</listing-3>
-  }
-    // TODO: an assert confirming that the above did what it should have done
-    //       (in context of the advector()'s use of blitz::Array::reindex())
+    // density shape (cone again ...)
+    tmp = blitz::pow(i * dx - x0d, 2) + 
+          blitz::pow(j * dy - y0d, 2);
+    
+    density_tmp = h0d + where(
+      tmp - pow(rd, 2) <= 0,                   //if
+      hd * blitz::sqr(1 - tmp / pow(rd, 2)),   //then
+      0.                                       //else
+    );
 
+
+    //density_tmp = 1.;
+
+    // constant-angular-velocity rotational field
+    run.advector(x) =  1. /* / density_tmp */ * omg * (j * dy - yc) * dt/dx;
+    run.advector(y) = -1. /* / density_tmp */ * omg * (i * dx - xc) * dt/dy;
+   
+    run.g_factor() = density_tmp;
+
+  }
   // time stepping
   run.advance(nt);
   
@@ -153,21 +145,21 @@ void test(const std::string filename)
 
 int main()
 {
-  {
-    enum { opts = 0 };
+/*  {
+    enum { opts = 0 | opts::nug };
     enum { opts_iters = 2};
     test<opts, opts_iters>("basic");
   }
+*/
   {
-    enum { opts = opts::fct };
+    enum { opts = opts::fct | opts::nug };
     enum { opts_iters = 2};
     test<opts, opts_iters>("fct");
   }
+/*
   {
     enum { opts = opts::fct | opts::tot };
-//<listing-4>
     enum { opts_iters = 3};
-//</listing-4>
     test<opts, opts_iters>("iters3_tot_fct");
   }
   {
@@ -180,4 +172,5 @@ int main()
     enum { opts_iters = 2};
     test<opts, opts_iters>("iga_tot_fct");
   }
+*/
 }
