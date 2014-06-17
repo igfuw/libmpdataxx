@@ -33,16 +33,16 @@ namespace libmpdataxx
 	virtual void fill_stash_helper(const int d, const int e) final
 	{
 	  if (ix::vip_den == -1)
-	    this->stash[d](this->ijk) = this->psi_n(e)(this->ijk);
+	    this->stash[d](this->ijk) = this->state(e)(this->ijk);
 	  else if (this->initial_h_non_zero)
-	    this->stash[d](this->ijk) = this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk);
+	    this->stash[d](this->ijk) = this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk);
 	  else
 	  {
 	    this->stash[d](this->ijk) = where(
 	      // if
-	      this->psi_n(ix::vip_den)(this->ijk) > eps,
+	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
-	      this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
+	      this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk),
 	      // else
 	      0
 	    );
@@ -58,16 +58,16 @@ namespace libmpdataxx
 	  this->stash[d](this->ijk) /= -2.;
 
 	  if (ix::vip_den == -1) 
-	    this->stash[d](this->ijk) += 3./2 * this->psi_n(e)(this->ijk);
+	    this->stash[d](this->ijk) += 3./2 * this->state(e)(this->ijk);
 	  else if (this->initial_h_non_zero)
-	    this->stash[d](this->ijk) += 3./2 * (this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk)); 
+	    this->stash[d](this->ijk) += 3./2 * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
 	  else
 	  {
 	    this->stash[d](this->ijk) += where(
 	      // if
-	      this->psi_n(ix::vip_den)(this->ijk) > eps,
+	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
-	      3./2 * this->psi_n(e)(this->ijk) / this->psi_n(ix::vip_den)(this->ijk),
+	      3./2 * this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk),
 	      // else
 	      0   
 	    );  
@@ -90,7 +90,7 @@ namespace libmpdataxx
 	  
           // set-up initial_h_non_zero
           if (ct_params_t::ix::vip_den != -1) 
-            initial_h_non_zero = min(this->psi_n(ct_params_t::ix::vip_den)(this->ijk)) > 0;
+            initial_h_non_zero = min(this->state(ct_params_t::ix::vip_den)(this->ijk)) > 0;
 
 	  // to make extrapolation possible at the first time-step
 	  fill_stash();
