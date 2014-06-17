@@ -38,7 +38,7 @@ class bombel : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 
     parent_t::update_rhs(rhs, dt, at); 
 
-    const auto Tht  = this->psi_n(ix::tht); 
+    const auto Tht  = this->state(ix::tht); 
     const auto &ijk = this->ijk;
 
     rhs.at(ix::w)(ijk) += 

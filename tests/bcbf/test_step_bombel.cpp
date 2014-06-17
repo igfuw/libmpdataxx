@@ -57,11 +57,18 @@ int main()
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
-//  rt_params.gnuplot_cbrange = "[299.85 : 300.65]";
-  p.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
-  p.gnuplot_maxcolors = 8;
-//  rt_params.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
-  p.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
+  p.gnuplot_cbrange = "[.85 : 1.65]";
+  p.gnuplot_cntrparam = "levels incremental .85, 0.1, 1.65";
+  p.gnuplot_palette = "defined (" 
+    "0.85 '#ff0000'," //         /\-
+    "1.00 '#ff0000'," //        /  \-
+    "1.00 '#ffffff'," //  -----/    \---
+    "1.05 '#ffffff'," // -----/      \---___
+    "1.05 '#993399'," //     /        \-     ---
+    "1.20 '#00CCFF'," //    /          \-       ---
+    "1.35 '#66CC00'," //   /____________\-
+    "1.50 '#FC8727'," //
+    "1.65 '#FFFF00') maxcolors 16";
   p.gnuplot_term = "svg";
 //<listing-2>
   p.tol = 1e-5;

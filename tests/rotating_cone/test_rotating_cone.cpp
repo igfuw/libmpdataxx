@@ -36,9 +36,8 @@ void test(const std::string filename)
     dx = 1,
     dy = 1,
     omg = .1,
-    h = 4., // TODO: other name!
+    h = 4., 
     h0 = 1;
-    //  h0 = 100.; // change it to 1 to see scary things!
 
 /// @brief settings from @copybrief Anderson_and_Fattahi_1974
 //    dt = 10 * pi<real_t>(),
@@ -77,12 +76,22 @@ void test(const std::string filename)
   p.gnuplot_yrange = "[50 : 100]";
 //  p.gnuplot_xrange = "[0 : 100]";
 //  p.gnuplot_yrange = "[0 : 100]";
-  p.gnuplot_maxcolors = 10;
   {
     std::ostringstream tmp;
     tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
     p.gnuplot_cntrparam = tmp.str();
   }
+  p.gnuplot_cbrange = "[.75 : 5.25]";
+  p.gnuplot_palette = "defined (" 
+    "0.75 '#ff0000',"
+    "1.00 '#ff0000',"
+    "1.00 '#ffffff',"
+    "1.25 '#ffffff',"
+    "1.25 '#993399',"
+    "2.25 '#00CCFF',"
+    "3.25 '#66CC00',"
+    "4.25 '#FC8727',"
+    "5.25 '#FFFF00') maxcolors 18";
   p.gnuplot_term = "svg";
 
 //<listing-2>
