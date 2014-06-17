@@ -66,7 +66,6 @@ int nt = 628 * 2;
 //  p.gnuplot_yrange = "[50 : 100]";
   p.gnuplot_xrange = "[0 : 100]";
   p.gnuplot_yrange = "[0 : 100]";
-  p.gnuplot_maxcolors = 10;
   {
     std::ostringstream tmp;
     tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
