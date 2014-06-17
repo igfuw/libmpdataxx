@@ -64,7 +64,6 @@ int main()
       tmp << "[" << h0 -.5 << " : " << h0 + h + .5 << "]";
       p.gnuplot_cbrange = tmp.str();
     }
-    p.gnuplot_maxcolors = 10;
     {
       std::ostringstream tmp;
       tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
