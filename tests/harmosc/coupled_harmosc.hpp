@@ -34,8 +34,8 @@ struct coupled_harmosc : public
     parent_t::update_rhs(rhs, dt, at);
 
     // just to shorten code
-    const auto psi = this->psi_n(ix::psi);
-    const auto phi = this->psi_n(ix::phi);
+    const auto &psi = this->state(ix::psi);
+    const auto &phi = this->state(ix::phi);
     const auto &i = this->i;
 
     switch (at) 
