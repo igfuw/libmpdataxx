@@ -80,7 +80,6 @@ namespace libmpdataxx
 		this->mem->GC[1](i,   j+h)
 	      )
 	    ));
-std::cerr<<"max_abs_div = " << max_abs_div <<std::endl;
 	    if (max_abs_div > blitz::epsilon(typename parent_t::real_t(44))) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
