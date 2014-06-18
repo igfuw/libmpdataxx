@@ -104,8 +104,8 @@ namespace libmpdataxx
 	  rng_t &i = this->i;
 	  rng_t &j = this->j;
 
-	  this->tmp_u(i,j) = this->psi_n(ix::u)(i,j);
-	  this->tmp_w(i,j) = this->psi_n(ix::w)(i,j);
+	  this->tmp_u(i,j) = this->state(ix::u)(i,j);
+	  this->tmp_w(i,j) = this->state(ix::w)(i,j);
 
 	  this->xchng_sclr(this->Phi,   i^halo, j^halo);
 	  this->xchng_sclr(this->tmp_u, i^halo, j^halo);

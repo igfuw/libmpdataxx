@@ -3,15 +3,9 @@
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- *
- * @brief a bombel 
- *
- * @section FIGURE
- *
- * \image html "../../tests/bombel/figure.svg"
  */
 
-#include "bombel.hpp"
+#include "boussinesq.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx;
@@ -32,7 +26,7 @@ int main()
   };
   using ix = typename ct_params_t::ix;  
 
-  using solver_t = output::gnuplot<bombel<ct_params_t>>;
+  using solver_t = output::gnuplot<boussinesq<ct_params_t>>;
 
   // run-time parameters
   solver_t::rt_params_t rt_params; 
@@ -42,7 +36,7 @@ int main()
 
   rt_params.dt = .5;
   rt_params.di = rt_params.dj = 10.;
-  rt_params.Tht_amb = 300; // [K] ambient state (constant thoughout the domain)
+  rt_params.Tht_ref = 300; // [K] ambient state (constant thoughout the domain)
 
   rt_params.outfreq = 1;
   rt_params.outvars = {
@@ -69,7 +63,7 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    run.advectee(ix::tht) = rt_params.Tht_amb 
+    run.advectee(ix::tht) = rt_params.Tht_ref 
       + .5 * exp( -sqr(i-(nx-1)/2.) / (2.*pow((nx-1)/20, 2))   // TODO: assumed dx=dy=1?
 		  -sqr(j-(ny-1)/4.) / (2.*pow((ny-1)/20, 2)) )
     ;

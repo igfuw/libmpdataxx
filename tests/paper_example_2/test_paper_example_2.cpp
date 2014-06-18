@@ -29,14 +29,15 @@ void test(const std::string filename)
   p.grid_size = { nx };
   p.outfreq = nt; 
   p.outvars = {
-    {0, {.name = "single-sign", .unit = "1"}},
-    {1, {.name = "variable-sign", .unit = "1"}}
+    {0, {.name = "", .unit = "1"}},
+    {1, {.name = "", .unit = "1"}}
   };
 //</listing-2>
   p.gnuplot_output = filename; 
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
   p.gnuplot_yrange = "[-1.25:4.25]";
+  p.gnuplot_fontsize = "17";
 
   // instantiation
   concurr::serial<sim_t, bcond::cyclic, bcond::cyclic> run(p);

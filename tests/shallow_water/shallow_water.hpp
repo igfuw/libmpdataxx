@@ -70,14 +70,14 @@ class shallow_water_common : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
   void hook_post_step()
   {
     parent_t::hook_post_step();
-    assert(min(this->psi_n(ct_params_t::ix::h)(this->ijk)) >= 0);  
-//   std::cerr<<min(this->psi_n(ct_params_t::ix::h)(this->ijk))<<std::endl;
+    assert(min(this->state(ct_params_t::ix::h)(this->ijk)) >= 0);  
+//   std::cerr<<min(this->state(ct_params_t::ix::h)(this->ijk))<<std::endl;
   }
 
   void hook_ante_step()
   {
     parent_t::hook_ante_step();
-    assert(min(this->psi_n(ct_params_t::ix::h)(this->ijk)) >= 0);  
+    assert(min(this->state(ct_params_t::ix::h)(this->ijk)) >= 0);  
   }
 
   public:
@@ -124,8 +124,8 @@ class shallow_water<
 
     rhs.at(ix::qx)(this->i) -= 
       this->g 
-      * this->psi_n(ix::h)(this->i) 
-      * grad(this->psi_n(ix::h), this->i, this->di); 
+      * this->state(ix::h)(this->i) 
+      * grad(this->state(ix::h), this->i, this->di); 
   }
 //</listing-1>
 };
@@ -151,7 +151,7 @@ class shallow_water<
   )
   {
     using namespace libmpdataxx::formulae::nabla;
-    rhs(pi<d>(i,j)) -= this->g * this->psi_n(ix::h)(pi<d>(i,j)) * grad<d>(this->psi_n(ix::h), i, j, di); 
+    rhs(pi<d>(i,j)) -= this->g * this->state(ix::h)(pi<d>(i,j)) * grad<d>(this->state(ix::h), i, j, di); 
   }
 
   /// @brief Shallow Water Equations: Momentum forcings for the X and Y coordinates

@@ -52,7 +52,7 @@ namespace libmpdataxx
 	} 
 	else
 	{ 
-	  assert(false); // TODO
+	  assert(false); // TODO: and if G is not const...
 	}
       }
 

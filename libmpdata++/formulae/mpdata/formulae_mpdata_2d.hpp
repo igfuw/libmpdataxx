@@ -9,6 +9,7 @@
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common_2d.hpp>
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_hot_2d.hpp>
+#include <libmpdata++/formulae/mpdata/formulae_mpdata_dfl_2d.hpp>
 #include <boost/preprocessor/punctuation/comma.hpp>
 
 namespace libmpdataxx 
@@ -126,6 +127,8 @@ namespace libmpdataxx
         * B<opts BOOST_PP_COMMA() dim>(psi, i, j)
         // third order terms
         + HOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
+        // divergent flow correction
+        + DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j) 
       ) 
     }; // namespace mpdata
   }; // namespace formulae

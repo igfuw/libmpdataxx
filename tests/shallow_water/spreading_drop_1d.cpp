@@ -31,7 +31,7 @@ struct ct_params_t : ct_params_default_t
   enum { n_eqns = 2 };
   
   // options
-  enum { opts = opts_arg };
+  enum { opts = opts_arg | opts::dfl };
   enum { rhs_scheme = solvers::trapez };
   
   // indices - TODO move vip to separate enum
@@ -108,7 +108,7 @@ void test(const std::string &pfx)
   p.di = .05;
   p.grid_size = { int(16 / p.di) };
   p.g = 1;
-  p.vip_eps = 1.e-10; 
+  p.vip_eps = 1e-10; 
 //</listing-2>
 
   // instantiation
@@ -136,8 +136,8 @@ void test(const std::string &pfx)
 
 int main()
 {
-  test<opts::iga | opts::fct>("fct+iga");
-  test<opts::abs | opts::fct>("fct+abs");
+  test<opts::abs | opts::fct >("fct+abs");
+  test<opts::iga | opts::fct >("fct+iga");
   //plotting model results and analitic solution; 
   //python uses sys.argv[1:0] for choosing model outputs
   system("python ../../../tests/shallow_water/papierplot_shallow_water_1d.py fct+abs fct+iga ");

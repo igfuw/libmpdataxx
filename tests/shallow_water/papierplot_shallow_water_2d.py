@@ -40,7 +40,7 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
 
     ax.plot(x_range, eq.d2_initial(x_range, y_range), 'k', x_range, h_a, 'b',
             x_range, h_m, "r")
-    ax.plot(x_range, 0*x_range, "k--", x_range, v_a, 'b--',
+    ax.plot(x_range, 0*x_range, "k-", x_range, v_a, 'b--',
             x_range, v_m, "r--")
 
     #ax.set_ylim(-2,2)

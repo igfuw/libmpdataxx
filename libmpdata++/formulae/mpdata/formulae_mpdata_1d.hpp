@@ -69,7 +69,7 @@ namespace libmpdataxx
         // third-order terms
         + HOT<opts>(psi, GC, G, i) //higher order term
         // divergent flow terms
-        + DFL<opts>(GC, G, i) //divergent flow correction
+        + DFL<opts>(psi, GC, G, i) //divergent flow correction
       )
     }; // namespace mpdata
   }; // namespace formulae
