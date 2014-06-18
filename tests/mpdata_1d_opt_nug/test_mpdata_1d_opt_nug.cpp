@@ -68,7 +68,7 @@ int main()
   const int n_dims = 1;
   boost::ptr_vector<concurr::any<T, n_dims>> slvs;
 
-  // Starting point: a non-divergeng G \times C
+  // Starting point: a non-divergent G \times C
   T GC = .25;
 
   phi =   1,  5, 10, 10,  10,  5,  1,  1,   1,   1,   1,  1,  1,  1,  1;
