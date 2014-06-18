@@ -116,23 +116,16 @@ int nt = 628 * 2;
       0.                                     //else
     );
 
-    // density shape (cone again ...)
-    tmp = blitz::pow(i * dx - x0d, 2) + 
-          blitz::pow(j * dy - y0d, 2);
-    
-    density_tmp = h0d + where(
-      tmp - pow(rd, 2) <= 0,                   //if
-      hd * blitz::sqr(1 - tmp / pow(rd, 2)),   //then
-      0.                                       //else
-    );
-
+    // density shape (function of radius only)
+    density_tmp = h0d + blitz::pow2((i * dx - xc) * dt/dx) + blitz::pow2((j * dy - yc) * dt/dy);
 
     //density_tmp = 1.;
 
     // constant-angular-velocity rotational field
-    run.advector(x) =  1. /* / density_tmp */ * omg * (j * dy - yc) * dt/dx;
-    run.advector(y) = -1. /* / density_tmp */ * omg * (i * dx - xc) * dt/dy;
-   
+    run.advector(x) =  1. * omg * (j * dy - yc) * dt/dx *
+                       (h0d + blitz::pow2(((i+0.5) * dx - xc) * dt/dx) + blitz::pow2((j * dy - yc) * dt/dy));
+    run.advector(y) = -1. * omg * (i * dx - xc) * dt/dy *
+                       (h0d + blitz::pow2((i * dx - xc) * dt/dx) + blitz::pow2(((j+0.5) * dy - yc) * dt/dy));
     run.g_factor() = density_tmp;
 
   }
