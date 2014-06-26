@@ -119,7 +119,7 @@ namespace libmpdataxx
 
 	  //pseudo-time loop
 	  real_t error = 1.;
-	  while (error > this->tol) 
+	  while (error > this->prs_tol) 
 	  {
 	    this->lap_err(i,j) = this->lap(this->err, i, j, this->di, this->dj); 
 

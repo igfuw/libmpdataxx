@@ -14,9 +14,7 @@
 using namespace libmpdataxx;
 
 #include <boost/math/constants/constants.hpp>
-using boost::math::constants::pi;
 
-using T = double;
 
 const int nt = 1400;
 
@@ -25,7 +23,7 @@ int main()
 //<listing-1>
   struct ct_params_t : ct_params_default_t
   {
-    using real_t = T;
+    using real_t = double;
     enum { n_dims = 1 };
     enum { n_eqns = 2 };
     enum { rhs_scheme = 
@@ -42,9 +40,9 @@ int main()
 
 //<listing-2>
   // run-time parameters
+  using boost::math::constants::pi;
   p.dt = 1;
-  p.omega = 2 * pi<typename ct_params_t::real_t>() 
-            / p.dt / 400;
+  p.omega = 2 * pi<real_t>() / p.dt / 400;
 //</listing-2>
   p.grid_size = {1001};
   p.outfreq = 10;

@@ -178,7 +178,7 @@ namespace libmpdataxx
 	      std::abs(this->mem->min(this->err(i, j)))
 	    );
 
-	    if (error <= this->tol) break;
+	    if (error <= this->prs_tol) break;
 
 	    //TODO exit pseudotime loop here if <err> < error
 

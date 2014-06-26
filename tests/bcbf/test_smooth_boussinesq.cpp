@@ -31,7 +31,7 @@ int main()
   // run-time parameters
   solver_t::rt_params_t rt_params; 
 
-  rt_params.tol = 1e-5;
+  rt_params.prs_tol = 1e-5;
   rt_params.grid_size = {nx, ny};
 
   rt_params.dt = .5;
