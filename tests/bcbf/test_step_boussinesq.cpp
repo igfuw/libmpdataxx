@@ -73,7 +73,7 @@ int main()
     "300.65 '#FFFF00') maxcolors 16";
   p.gnuplot_term = "svg";
 //<listing-2>
-  p.tol = 1e-7;
+  p.prs_tol = 1e-7;
 //</listing-2>
   p.grid_size = {nx, ny};
 

@@ -53,7 +53,16 @@ void test(const std::string filename)
   typename slv_out_t::rt_params_t p;
 
   // pre instantiation
-  p.n_iters = opts_iters; 
+  switch (opts_iters) // the crazy logic below is just for prettying the listing!
+  {
+    case 3: 
+//<listing-4>
+      p.n_iters = 3;
+//</listing-4>
+      break;
+    default:
+      p.n_iters = opts_iters; 
+  }
   p.grid_size = {101, 101};
 
   p.outfreq = nt; 
@@ -165,9 +174,7 @@ int main()
   }
   {
     enum { opts = opts::fct | opts::tot };
-//<listing-4>
     enum { opts_iters = 3};
-//</listing-4>
     test<opts, opts_iters>("iters3_tot_fct");
   }
   {
