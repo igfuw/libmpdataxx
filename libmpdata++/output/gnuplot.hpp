@@ -43,6 +43,7 @@ namespace libmpdataxx
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
 	   << "set term " << p.gnuplot_term << "\n"
 	   << "set size " << p.gnuplot_size << "\n"
+           << "set cbtics " << p.gnuplot_cbtics << "\n"
 	   << "set termoption font \"," << p.gnuplot_fontsize << "\"\n"
            << "set termoption solid\n"
         ;
@@ -225,7 +226,8 @@ namespace libmpdataxx
           gnuplot_lt = std::string("-1"), // black
           gnuplot_cntrparam = std::string(""),
           gnuplot_term = std::string("svg dynamic"),
-          gnuplot_palette = std::string("");
+          gnuplot_palette = std::string(""),
+          gnuplot_cbtics = std::string("");
         bool 
           gnuplot_contour = false,
           gnuplot_grid = true,
