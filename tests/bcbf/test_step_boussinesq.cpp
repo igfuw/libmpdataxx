@@ -57,20 +57,21 @@ int main()
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
-  p.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
-  p.gnuplot_cbrange = "[299.85 : 300.65]";
+  p.gnuplot_cntrparam = "levels incremental 299.95, 0.1, 300.65";
+  p.gnuplot_cbrange = "[299.95 : 300.65]";
+  p.gnuplot_cbtics = "('299.99' 299.99, '300.10' 300.1, '300.20' 300.2, '300.30' 300.3, '300.40' 300.4, '300.50' 300.5, '300.60' 300.6)";
   p.gnuplot_palette = "defined (" 
-    "299.85 '#ff0000'," //         
+    "299.95 '#ff0000'," //         
     "299.99 '#ff0000'," // 
-    "299.99 '#dddddd'," //         /\-
-    "300.00 '#dddddd'," //        /  \-
+    "299.99 '#ffffff'," //         /\-
+    "300.00 '#ffffff'," //        /  \-
     "300.00 '#ffffff'," //  -----/    \---
     "300.05 '#ffffff'," // -----/      \---___
     "300.05 '#993399'," //     /        \-     ---
     "300.20 '#00CCFF'," //    /          \-       ---
     "300.35 '#66CC00'," //   /____________\-
     "300.50 '#FC8727'," //
-    "300.65 '#FFFF00') maxcolors 16";
+    "300.65 '#FFFF00') maxcolors 14";
   p.gnuplot_term = "svg";
 //<listing-2>
   p.prs_tol = 1e-7;
@@ -98,6 +99,7 @@ int main()
       0
     );
 std::cerr << "min(psi) = " << min(slv.advectee(ix::tht)) << "\n";
+std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
     slv.advectee(ix::u) = 0; 
     slv.advectee(ix::w) = 0; 
   }
@@ -105,4 +107,5 @@ std::cerr << "min(psi) = " << min(slv.advectee(ix::tht)) << "\n";
   // integration
   slv.advance(nt); 
 std::cerr << "min(psi) = " << min(slv.advectee(ix::tht)) << "\n";
+std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
 };
