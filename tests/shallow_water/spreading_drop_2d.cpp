@@ -46,12 +46,8 @@ void test(const std::string &outdir)
     enum { n_eqns = 3 };
     
     // options
-    enum { opts = opts_arg };
+    enum { opts = opts_arg | opts::dfl };
     enum { rhs_scheme = solvers::trapez };
-
-    //enum { fp_round_mode = FE_TOWARDZERO };
-    //enum { fp_round_mode = FE_UPWARD };
-    //enum { fp_round_mode = FE_TONEAREST };
 
     // indices
     struct ix { enum {

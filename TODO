@@ -1,4 +1,5 @@
 0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- dfl in 3D
 - dfl option in all shallow_water tests
 - rename p.di, p.dj, p.dk -> p.grid_step?
 - isolate test that causes iga to produce negative values!

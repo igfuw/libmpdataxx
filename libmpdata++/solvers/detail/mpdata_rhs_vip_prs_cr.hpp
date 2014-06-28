@@ -112,8 +112,8 @@ namespace libmpdataxx
 	  rng_t &i = this->i;
 	  rng_t &j = this->j;
 
-	  this->tmp_u(i, j) = this->psi_n(ix::u)(i, j);
-	  this->tmp_w(i, j) = this->psi_n(ix::w)(i, j);
+	  this->tmp_u(i, j) = this->state(ix::u)(i, j);
+	  this->tmp_w(i, j) = this->state(ix::w)(i, j);
 
 	  this->xchng_sclr(this->Phi,   i^halo, j^halo);
 	  this->xchng_sclr(this->tmp_u, i^halo, j^halo);
@@ -131,7 +131,7 @@ namespace libmpdataxx
 	  //pseudo-time loop
 	  this->iters = 0;
 	  real_t error = 1.;
-	  while (error > this->tol)
+	  while (error > this->prs_tol)
 	  {
 	    tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
 	    if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;

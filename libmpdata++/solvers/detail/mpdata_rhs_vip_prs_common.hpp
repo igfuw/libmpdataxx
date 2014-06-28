@@ -28,7 +28,7 @@ namespace libmpdataxx
 	protected:
 
 	// member fields
-	const typename ct_params_t::real_t tol;
+	const typename ct_params_t::real_t prs_tol;
         int iters = 0;
 
         typename parent_t::arr_t Phi, tmp_u, tmp_w, err, lap_err, lap_tmp1, lap_tmp2;
@@ -63,8 +63,8 @@ namespace libmpdataxx
 	{
 	  const rng_t &i = this->i, &j = this->j;
 
-	  this->psi_n(ix::u)(i,j) += tmp_u(i,j);
-	  this->psi_n(ix::w)(i,j) += tmp_w(i,j);
+	  this->state(ix::u)(i,j) += tmp_u(i,j);
+	  this->state(ix::w)(i,j) += tmp_w(i,j);
 	}
 
         void hook_ante_loop(const int nt)
@@ -94,7 +94,7 @@ namespace libmpdataxx
 
 	struct rt_params_t : parent_t::rt_params_t 
         { 
-          real_t tol;
+          real_t prs_tol;
         };
 
 	// ctor
@@ -103,7 +103,7 @@ namespace libmpdataxx
 	  const rt_params_t &p
 	) : 
 	  parent_t(args, p),
-          tol(p.tol),
+          prs_tol(p.prs_tol),
            lap_err(args.mem->tmp[__FILE__][0][0]),
              tmp_u(args.mem->tmp[__FILE__][0][1]),
              tmp_w(args.mem->tmp[__FILE__][0][2]),

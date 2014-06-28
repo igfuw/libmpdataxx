@@ -34,9 +34,9 @@ struct coupled_harmosc : public
     parent_t::update_rhs(rhs, dt, at);
 
     // just to shorten code
-    auto psi = this->psi_n(ix::psi);
-    auto phi = this->psi_n(ix::phi);
-    auto &i = this->i;
+    const auto &psi = this->state(ix::psi);
+    const auto &phi = this->state(ix::phi);
+    const auto &i = this->i;
 
     switch (at) 
     { // explicit solution for R^{n} 

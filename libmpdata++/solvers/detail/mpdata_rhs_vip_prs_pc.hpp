@@ -142,8 +142,8 @@ namespace libmpdataxx
 	  rng_t &i = this->i;
 	  rng_t &j = this->j;
 
-	  this->tmp_u(i, j) = this->psi_n(ix::u)(i, j);
-	  this->tmp_w(i, j) = this->psi_n(ix::w)(i, j);
+	  this->tmp_u(i, j) = this->state(ix::u)(i, j);
+	  this->tmp_w(i, j) = this->state(ix::w)(i, j);
 
 	  this->xchng_sclr(this->Phi,   i^halo, j^halo);
 	  this->xchng_sclr(this->tmp_u, i^halo, j^halo);
@@ -178,7 +178,7 @@ namespace libmpdataxx
 	      std::abs(this->mem->min(this->err(i, j)))
 	    );
 
-	    if (error <= this->tol) break;
+	    if (error <= this->prs_tol) break;
 
 	    //TODO exit pseudotime loop here if <err> < error
 
@@ -202,8 +202,8 @@ namespace libmpdataxx
 	  this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, this->di);
 	  this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, this->dj);
 
-	  this->tmp_u(i, j) -= this->psi_n(ix::u)(i, j);
-	  this->tmp_w(i, j) -= this->psi_n(ix::w)(i, j);
+	  this->tmp_u(i, j) -= this->state(ix::u)(i, j);
+	  this->tmp_w(i, j) -= this->state(ix::w)(i, j);
 	}
 
 	public:
