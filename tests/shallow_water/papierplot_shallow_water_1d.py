@@ -47,13 +47,17 @@ def analytic_model_fig(ax, x_range, h_m, v_m, t_m, it):
 # it - model time level used for comparison with analytic solution
 # x_shift - shift between initial cond. in model and for analytic solution
 def main(dir, casename_l, x_shift=8, time_l=[0,3], it=300):
-    plt.figure(1, figsize = (6,8))
-    ax = plt.subplot(len(casename_l)+1,1,1)
+    plt.figure(1, figsize = (6,3))
+    ax = plt.subplot(1,1,1)
     #plotting analytic solution
     print "plotting analytic solution"
     analytic_fig(ax, time_l)
+    plt.savefig("papier_shallowwater_1d_analytic.pdf")
+    plt.show()
     #plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l): 
+        plt.figure(1, figsize = (6,3))
+        ax = plt.subplot(1,1,1)
         h_m = reading_modeloutput(dir+casename+".h")
         p_m = reading_modeloutput(dir+casename+".q")
         #calculating velocity from momentum, only for the droplet area 
@@ -64,14 +68,13 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], it=300):
         x_range  = x_m[0]
 
         print "plotting " + str(casename) + ", t = " + str(t_m[it,0])        
-        ax = plt.subplot(len(casename_l)+1,1,ic+2)
         analytic_model_fig(ax, x_range, h_m, v_m, t_m, it)
         # annotating figures
         #ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
         #            fontsize=12, horizontalalignment='left', verticalalignment='top')
         
-    plt.savefig("papier_shallowwater_1d.pdf")
-    plt.show()
+        plt.savefig("papier_shallowwater_1d_"+str(casename)+".pdf")
+        plt.show()
 
 main("./", sys.argv[1:])
 
