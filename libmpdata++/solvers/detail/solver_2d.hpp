@@ -80,7 +80,6 @@ namespace libmpdataxx
 		this->mem->GC[1](i,   j+h)
 	      )
 	    ));
-
 	    if (max_abs_div > blitz::epsilon(typename parent_t::real_t(44))) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
@@ -145,7 +144,7 @@ namespace libmpdataxx
             )));
 
           // allocate Kahan summation temporary vars
-          if (opts::isset(ct_params_t::opts, opts::khn))
+          if (!opts::isset(ct_params_t::opts, opts::nkh))
 	    for (int n = 0; n < 3; ++n) 
 	      mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
                 parent_t::rng_sclr(p.grid_size[0]), 

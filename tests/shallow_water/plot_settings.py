@@ -9,4 +9,4 @@ def ticks_changes(ax):
 
     # changing ticks' size  
     for item in plt.xticks()[1] + plt.yticks()[1]:
-        item.set_fontsize(10)
+        item.set_fontsize(15)

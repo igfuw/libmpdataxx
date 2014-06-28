@@ -36,9 +36,8 @@ void test(const std::string filename)
     dx = 1,
     dy = 1,
     omg = .1,
-    h = 4., // TODO: other name!
+    h = 4., 
     h0 = 1;
-    //  h0 = 100.; // change it to 1 to see scary things!
 
 /// @brief settings from @copybrief Anderson_and_Fattahi_1974
 //    dt = 10 * pi<real_t>(),
@@ -54,7 +53,16 @@ void test(const std::string filename)
   typename slv_out_t::rt_params_t p;
 
   // pre instantiation
-  p.n_iters = opts_iters; 
+  switch (opts_iters) // the crazy logic below is just for prettying the listing!
+  {
+    case 3: 
+//<listing-4>
+      p.n_iters = 3;
+//</listing-4>
+      break;
+    default:
+      p.n_iters = opts_iters; 
+  }
   p.grid_size = {101, 101};
 
   p.outfreq = nt; 
@@ -77,13 +85,25 @@ void test(const std::string filename)
   p.gnuplot_yrange = "[50 : 100]";
 //  p.gnuplot_xrange = "[0 : 100]";
 //  p.gnuplot_yrange = "[0 : 100]";
-  p.gnuplot_maxcolors = 10;
   {
     std::ostringstream tmp;
     tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
     p.gnuplot_cntrparam = tmp.str();
   }
+  p.gnuplot_fontsize = "14";
+  p.gnuplot_cbrange = "[.75 : 5.25]";
+  p.gnuplot_palette = "defined (" 
+    "0.75 '#ff0000',"
+    "1.00 '#ff0000',"
+    "1.00 '#ffffff',"
+    "1.25 '#ffffff',"
+    "1.25 '#993399',"
+    "2.25 '#00CCFF',"
+    "3.25 '#66CC00',"
+    "4.25 '#FC8727',"
+    "5.25 '#FFFF00') maxcolors 18";
   p.gnuplot_term = "svg";
+  p.gnuplot_title = "notitle";
 
 //<listing-2>
   // instantiation
@@ -94,7 +114,8 @@ void test(const std::string filename)
   > run(p); 
 //</listing-2>
   {
-//<listing-3>
+
+//TODO - dawniej listing 3 zaczynal się tutaj - może tak zostać?
     // constants used in the set-up definition
     enum {x, y};
     const typename ct_params_t::real_t
@@ -104,6 +125,7 @@ void test(const std::string filename)
       xc = .5 * (p.grid_size[x]-1) * dx,
       yc = .5 * (p.grid_size[y]-1) * dy;
 
+//<listing-3>
     // temporary array of the same ...
     decltype(run.advectee())        // type 
       tmp(run.advectee().extent()); // and size 
@@ -142,27 +164,27 @@ int main()
 {
   {
     enum { opts = 0 };
-    const int opts_iters = 2;
+    enum { opts_iters = 2};
     test<opts, opts_iters>("basic");
   }
   {
     enum { opts = opts::fct };
-    const int opts_iters = 2;
+    enum { opts_iters = 2};
     test<opts, opts_iters>("fct");
   }
   {
     enum { opts = opts::fct | opts::tot };
-    const int opts_iters = 3;
+    enum { opts_iters = 3};
     test<opts, opts_iters>("iters3_tot_fct");
   }
   {
     enum { opts = opts::iga | opts::fct};
-    const int opts_iters = 2;
+    enum { opts_iters = 2};
     test<opts, opts_iters>("iga_fct");
   }
   {
     enum { opts = opts::iga | opts::tot | opts::fct };
-    const int opts_iters = 2;
+    enum { opts_iters = 2};
     test<opts, opts_iters>("iga_tot_fct");
   }
 }

@@ -11,8 +11,7 @@
 
 #include <libmpdata++/output/detail/output_common.hpp>
 
-#define GNUPLOT_ENABLE_BLITZ
-#include <gnuplot-iostream/gnuplot-iostream.h> // TODO: Debian does not use a subdirectory
+#include <gnuplot-iostream.h>
 
 #include <boost/format.hpp>
 
@@ -37,21 +36,14 @@ namespace libmpdataxx
         *gp 
 	   << (p.gnuplot_grid ? "" : "un") << "set grid\n"
 	   << "set border " << p.gnuplot_border << "\n"
-	   << "set palette rgbformulae -3, -3, 19 " /*defined (" // makes gnuplot discard maxcolors :(
-	     "0 '#ffffff'," //         /\-
-	     "1 '#993399'," //        /  \-
-	     "2 '#00CCFF'," //  -----/    \---
-	     "3 '#66CC00'," // -----/      \---___
-	     "4 '#FFFF00'," //     /        \-    ---
-	     "5 '#FC8727'," //    /__________\-
-	     "6 '#FD0000'"  // 
-	   ")*/ << " maxcolors " << p.gnuplot_maxcolors << "\n" 
+	   << "set palette " << p.gnuplot_palette << "\n"
 	   << "set view " << p.gnuplot_view << "\n"
 	   << "set zrange " << p.gnuplot_zrange << "\n"
 	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
 	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
 	   << "set term " << p.gnuplot_term << "\n"
 	   << "set size " << p.gnuplot_size << "\n"
+           << "set cbtics " << p.gnuplot_cbtics << "\n"
 	   << "set termoption font \"," << p.gnuplot_fontsize << "\"\n"
            << "set termoption solid\n"
         ;
@@ -143,7 +135,7 @@ namespace libmpdataxx
  
       // helper constructs to make it compilable for both 1D and 2D versions
       std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { throw std::logic_error("binfmt() only for 2D!"); }
-      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a); }
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a) + " scan=yx "; }
 
       void record(const int var)
       {
@@ -166,8 +158,11 @@ namespace libmpdataxx
           {
             std::ostringstream tmp;
 	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep << "'\n";
-	    tmp << "set title '"<< this->outvars[var].name << "  (" // TODO: handle the option
-              << " t/dt=" << std::setprecision(3) << this->timestep << ")'\n";
+	    if (p.gnuplot_title == "notitle") 
+              tmp << "set title ''\n";
+            else
+	      tmp << "set title '"<< this->outvars[var].name << "  (" // TODO: handle the option
+                  << "t/dt=" << std::setprecision(3) << this->timestep << ")'\n";
             *gp << tmp.str();
           }
 	  *gp << p.gnuplot_command;
@@ -230,8 +225,9 @@ namespace libmpdataxx
           gnuplot_border = std::string(""),
           gnuplot_lt = std::string("-1"), // black
           gnuplot_cntrparam = std::string(""),
-          gnuplot_term = std::string("svg dynamic");
-        int gnuplot_maxcolors = 100; 
+          gnuplot_term = std::string("svg dynamic"),
+          gnuplot_palette = std::string(""),
+          gnuplot_cbtics = std::string("");
         bool 
           gnuplot_contour = false,
           gnuplot_grid = true,

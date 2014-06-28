@@ -33,7 +33,6 @@ void add_solver(
   p.outfreq = nt; 
   p.gnuplot_with = "lines";
   p.gnuplot_border = "4095";
-  p.gnuplot_maxcolors = 42; 
   p.gnuplot_zrange = "[-.666:1]";
   {
     std::ostringstream tmp;

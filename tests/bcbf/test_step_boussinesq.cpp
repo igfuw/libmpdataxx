@@ -8,7 +8,7 @@
  * buoyant convection in Boussinesq flow
  */
 
-#include "bombel.hpp"
+#include "boussinesq.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx;
@@ -22,7 +22,7 @@ int main()
     using real_t = double;
     enum { n_dims = 2 };
     enum { n_eqns = 3 };
-    enum { rhs_scheme = solvers::euler_b };
+    enum { rhs_scheme = solvers::trapez };
     enum { prs_scheme = solvers::cr };
     struct ix { enum {
       u, w, tht, 
@@ -34,17 +34,17 @@ int main()
 
   const int r0 = 250; 
   const int nx = 201, ny = 201, nt = 800;
-  typename ct_params_t::real_t Tht_amb = 1; //1; //300; // ambient state (constant thoughout the domain)
+  typename ct_params_t::real_t Tht_ref = 300; //1; // reference state (constant throughout the domain)
 
   // conjugate residual
-  using solver_t = output::gnuplot<bombel<ct_params_t>>;
+  using solver_t = output::gnuplot<boussinesq<ct_params_t>>;
 
   // run-time parameters
   solver_t::rt_params_t p;
 
   p.dt = .75;
   p.di = p.dj = 10.; 
-  p.Tht_amb = Tht_amb; 
+  p.Tht_ref = Tht_ref; 
 
   p.outfreq = 100; //12;
   p.outvars = {
@@ -57,14 +57,24 @@ int main()
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
-//  rt_params.gnuplot_cbrange = "[299.85 : 300.65]";
-  p.gnuplot_cbrange = "[299.85 - 299 : 300.65 - 299]";
-  p.gnuplot_maxcolors = 8;
-//  rt_params.gnuplot_cntrparam = "levels incremental 299.85, 0.1, 300.65";
-  p.gnuplot_cntrparam = "levels incremental 299.85 - 299, 0.1, 300.65 - 299";
+  p.gnuplot_cntrparam = "levels incremental 299.95, 0.1, 300.65";
+  p.gnuplot_cbrange = "[299.95 : 300.65]";
+  p.gnuplot_cbtics = "('299.99' 299.99, '300.10' 300.1, '300.20' 300.2, '300.30' 300.3, '300.40' 300.4, '300.50' 300.5, '300.60' 300.6)";
+  p.gnuplot_palette = "defined (" 
+    "299.95 '#ff0000'," //         
+    "299.99 '#ff0000'," // 
+    "299.99 '#ffffff'," //         /\-
+    "300.00 '#ffffff'," //        /  \-
+    "300.00 '#ffffff'," //  -----/    \---
+    "300.05 '#ffffff'," // -----/      \---___
+    "300.05 '#993399'," //     /        \-     ---
+    "300.20 '#00CCFF'," //    /          \-       ---
+    "300.35 '#66CC00'," //   /____________\-
+    "300.50 '#FC8727'," //
+    "300.65 '#FFFF00') maxcolors 14";
   p.gnuplot_term = "svg";
 //<listing-2>
-  p.tol = 1e-5;
+  p.prs_tol = 1e-7;
 //</listing-2>
   p.grid_size = {nx, ny};
 
@@ -79,7 +89,7 @@ int main()
     blitz::firstIndex i;
     blitz::secondIndex j;
 
-    slv.advectee(ix::tht) = Tht_amb + where(
+    slv.advectee(ix::tht) = Tht_ref + where(
       // if
       pow(i * p.di - 4    * r0 , 2) + 
       pow(j * p.dj - 1.04 * r0 , 2) <= pow(r0, 2), 
@@ -88,10 +98,14 @@ int main()
       // else
       0
     );
+std::cerr << "min(psi) = " << min(slv.advectee(ix::tht)) << "\n";
+std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
     slv.advectee(ix::u) = 0; 
     slv.advectee(ix::w) = 0; 
   }
 
   // integration
   slv.advance(nt); 
+std::cerr << "min(psi) = " << min(slv.advectee(ix::tht)) << "\n";
+std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
 };
