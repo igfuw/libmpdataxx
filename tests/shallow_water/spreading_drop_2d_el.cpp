@@ -16,7 +16,7 @@ using boost::math::constants::pi;
 #include <fstream>
 
 const int 
-  nt = 300,
+  nt = 2000,
   outfreq = 100;
 
 using real_t = double;
@@ -76,7 +76,7 @@ void test(const std::string &outdir)
   p.dt = .01;
   p.di = .05;
   p.dj = .05;
-  p.grid_size = { int(16 / p.di), int(16 / p.dj) };
+  p.grid_size = { int(32 / p.di), int(32 / p.dj) };
   p.g = 1;
   p.outfreq = outfreq;
   p.outdir = outdir;
@@ -111,9 +111,9 @@ void test(const std::string &outdir)
 
 int main()
 {
-  test<opts::fct | opts::iga>("spreading_drop_2delipsa_fct+iga.out");
-  test<opts::fct | opts::abs>("spreading_drop_2delipsa_fct+abs.out");
-  system("python ../../../tests/shallow_water/papierplot_shallow_water_2d_el.py fct+abs fct+iga");
+  test<opts::fct | opts::iga>("spreading_drop_2delipsa_fct+iga_long20.out");
+  test<opts::fct | opts::abs>("spreading_drop_2delipsa_fct+abs_long20.out");
+  //system("python ../../../tests/shallow_water/papierplot_shallow_water_2d_el.py fct+abs fct+iga");
   // system("python ../../../tests/shallow_water/plot2D_shallow_water_2d.py");
 }
 
