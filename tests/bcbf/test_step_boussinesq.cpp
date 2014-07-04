@@ -24,7 +24,6 @@ int main()
     enum { n_eqns = 3 };
     enum { rhs_scheme = solvers::trapez };
     enum { prs_scheme = solvers::cr };
-//    enum { opts = ct_params_default_t::opts | opts::dfl };
     struct ix { enum {
       u, w, tht, 
       vip_i=u, vip_j=w, vip_den=-1

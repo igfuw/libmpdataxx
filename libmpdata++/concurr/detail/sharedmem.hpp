@@ -125,6 +125,36 @@ namespace libmpdataxx
           barrier();
           return result;
         }
+        
+        /// @brief concurrency-aware 3D summation of array elements
+        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j, const rng_t &k)
+        {
+	  // doing a two-step sum to reduce numerical error 
+	  // and make parallel results reproducible
+	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
+          {
+	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr(c, j, k));
+          }
+          barrier();
+          real_t result = blitz::kahan_sum(*sumtmp);
+          barrier();
+          return result;
+        }
+
+        /// @brief concurrency-aware 3D summation of a (element-wise) product of two arrays
+        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j, const rng_t &k)
+        {
+	  // doing a two-step sum to reduce numerical error 
+	  // and make parallel results reproducible
+	  for (int c = i.first(); c <= i.last(); ++c)
+          {
+	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr1(c, j, k) * arr2(c, j, k)); 
+          }
+          barrier();
+          real_t result = blitz::kahan_sum(*sumtmp);
+          barrier();
+          return result;
+        }
 
         real_t min(const arr_t &arr)
         {

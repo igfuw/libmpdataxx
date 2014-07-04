@@ -44,10 +44,18 @@ namespace libmpdataxx
         /
         G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j) 
         * 
-        (	
-          (GC[dim](pi<dim>((i+1)+h, j)) - GC[dim](pi<dim>(i-h, j))) 
+        (
+          (
+            GC[dim](pi<dim>((i+1)+h, j)) - 
+            GC[dim](pi<dim>(i-h    , j))
+          )
           +
-          GC_bar<dim>(GC[dim-1], i, j) 
+          (
+            GC[dim-1](pi<dim>(i+1, j+h)) + 
+            GC[dim-1](pi<dim>(i,   j+h)) -
+            GC[dim-1](pi<dim>(i+1, j-h)) - 
+            GC[dim-1](pi<dim>(i,   j-h))
+          )
         )
       )
 
@@ -65,9 +73,17 @@ namespace libmpdataxx
         G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j) 
         * 
         (
-          (GC[dim](pi<dim>((i+1)+h, j)) - GC[dim](pi<dim>(i-h, j)))
+          (
+            GC[dim](pi<dim>((i+1)+h, j)) - 
+            GC[dim](pi<dim>(i-h    , j))
+          )
           +
-          GC_bar<dim>(GC[dim-1], i, j) 
+          (
+            GC[dim-1](pi<dim>(i+1, j+h)) + 
+            GC[dim-1](pi<dim>(i,   j+h)) -
+            GC[dim-1](pi<dim>(i+1, j-h)) - 
+            GC[dim-1](pi<dim>(i,   j-h))
+          )
         )
         *
         0.5 *  (psi(pi<dim>(i+1, j)) + psi(pi<dim>(i, j)))  //to be compatible with iga formulation
