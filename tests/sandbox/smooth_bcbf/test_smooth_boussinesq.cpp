@@ -5,7 +5,7 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 
-#include "boussinesq.hpp"
+#include "../../tutorial/8_boussinesq_2d/boussinesq.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx;
