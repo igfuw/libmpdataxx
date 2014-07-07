@@ -103,7 +103,6 @@ void test(const std::string &pfx)
 //<listing-2>
   // run-time parameters
   typename solver_t::rt_params_t p; 
-
   p.dt = .01;
   p.di = .05;
   p.grid_size = { int(16 / p.di) };

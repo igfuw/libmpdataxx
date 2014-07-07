@@ -131,7 +131,7 @@ namespace libmpdataxx
 	  //pseudo-time loop
 	  this->iters = 0;
 	  real_t error = 1.;
-	  while (error > this->tol)
+	  while (error > this->prs_tol)
 	  {
 	    tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
 	    if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
