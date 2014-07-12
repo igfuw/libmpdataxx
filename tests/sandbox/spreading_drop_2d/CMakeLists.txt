@@ -1,0 +1,1 @@
+libmpdataxx_add_test(spreading_drop_2d)

@@ -1,0 +1,1 @@
+libmpdataxx_add_test(revolving_sphere_3d)
