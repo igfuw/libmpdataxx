@@ -46,9 +46,7 @@ namespace libmpdataxx
 	  psi_min(args.mem->tmp[__FILE__][0][0]),
 	  psi_max(args.mem->tmp[__FILE__][0][1]),
 	  GC_mono(args.mem->tmp[__FILE__][1])
-        {
-          assert(parent_t::n_iters > 1 && "FCT is defined for MPDATA with a corrective iteration (not for donorcell)");
-        }
+        {}
 
 	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)
 	{
