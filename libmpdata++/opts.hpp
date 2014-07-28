@@ -48,7 +48,7 @@ namespace libmpdataxx
     enum { fp_round_mode = FE_TOWARDZERO };
     //enum { fp_bits = 64 };  // TODO
     struct ix {};
-    static constexpr int hist_scale(const int &e) { return 0; } // base-2 logarithm
+    static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
   };
 
 }; // namespace libmpdataxx
