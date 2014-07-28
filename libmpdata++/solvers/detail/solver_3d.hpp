@@ -31,8 +31,7 @@ namespace libmpdataxx
       
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
-	rng_t i, j, k; // TODO: if stored as idx_t this also could be placed in solver_common
-        idx_t<parent_t::n_dims> ijk;
+	rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
 	void xchng_sclr(typename parent_t::arr_t arr,
                        rng_t range_i, rng_t range_j, rng_t range_k,
@@ -105,11 +104,14 @@ namespace libmpdataxx
           ctor_args_t args,
           const typename parent_t::rt_params_t &p
         ) :
-	  parent_t(args.mem, p),
+	  parent_t(
+            args.mem, 
+            p,
+	    idx_t<parent_t::n_dims>({args.i, args.j, args.k})
+          ),
 	  i(args.i), 
           j(args.j), 
           k(args.k),  
-          ijk({args.i, args.j, args.k}),
 	  bcxl(std::move(args.bcxl)),
 	  bcxr(std::move(args.bcxr)),
 	  bcyl(std::move(args.bcyl)),

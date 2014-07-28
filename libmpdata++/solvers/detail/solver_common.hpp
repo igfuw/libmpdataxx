@@ -47,6 +47,8 @@ namespace libmpdataxx
 
 	protected: 
 
+	idx_t<n_dims> ijk;
+
         long long int timestep = 0;
         std::vector<int> n; 
 
@@ -109,9 +111,10 @@ namespace libmpdataxx
         };
 
 	// ctor
-	solver_common(mem_t *mem, const rt_params_t &p) :
+	solver_common(mem_t *mem, const rt_params_t &p, const decltype(ijk) &ijk) :
 	  n(n_eqns, 0), 
-          mem(mem)
+          mem(mem),
+          ijk(ijk)
 	{
           // compile-time sanity checks
 	  static_assert(n_eqns > 0, "!");
@@ -165,9 +168,15 @@ namespace libmpdataxx
 
             // proper solver stuff
             hook_ante_step();
+
+	    for (int e = 0; e < n_eqns; ++e) scale(e, ct_params_t::hint_scale(e));
+
 	    for (int e = 0; e < n_eqns; ++e) xchng(e);
 	    for (int e = 0; e < n_eqns; ++e) advop(e);
 	    for (int e = 0; e < n_eqns; ++e) cycle(e); // note: cycle assumes ascending loop index
+
+	    for (int e = 0; e < n_eqns; ++e) scale(e, -ct_params_t::hint_scale(e));
+
             timestep++;
             hook_post_step();
 	  }   
@@ -181,13 +190,21 @@ namespace libmpdataxx
 	// psi[n] getter - just to shorten the code
         // note that e.g. in hook_post_loop it points rather to 
         // psi^{n+1} than psi^{n} (hence not using the name psi_n)
-	virtual const arr_t &state(int e) final
+	virtual const arr_t &state(const int &e) const final
 	{
-	  return this->mem->psi[e][this->n[e]];
+	  return this->mem->psi[e][n[e]];
 	}
 
-        static rng_t rng_vctr(const int n) { return rng_t(0, n-1)^h^(halo-1); }
-        static rng_t rng_sclr(const int n) { return rng_t(0, n-1)^halo; }
+        static rng_t rng_vctr(const int &n) { return rng_t(0, n-1)^h^(halo-1); }
+        static rng_t rng_sclr(const int &n) { return rng_t(0, n-1)^halo; }
+
+        private:
+        void scale(const int &e, const int &exp)
+        {
+          if (exp == 0) return;
+          else if (exp > 0) state(e)(ijk) /= (1 << exp);
+          else if (exp < 0) state(e)(ijk) *= (1 << -exp);
+        }
       };
 
       template<typename ct_params_t, int n_tlev, int minhalo, class enableif = void>
