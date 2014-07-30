@@ -1,4 +1,5 @@
-0.09 (pre-submission, things that need to be explicitely mentioned in the text):
+- user-defined eliptic operator (compatible with user-defined rhs)
+- would nothrows improve performance?
 - detail/sharedmem: make summation helper vars one-dimensional
 - FCT: should we use C_mono for calculating new C_mono in third and next iterations?
 - dfl in 3D
