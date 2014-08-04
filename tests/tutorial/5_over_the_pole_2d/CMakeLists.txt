@@ -1,0 +1,1 @@
+libmpdataxx_add_test(over_the_pole_2d)

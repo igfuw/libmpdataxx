@@ -1,2 +1,0 @@
-libmpdataxx_add_test(test_smooth_boussinesq)
-libmpdataxx_add_test(test_step_boussinesq)

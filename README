@@ -1,13 +1,15 @@
 libmpdata++
 ===========
 
-First, that's all work in progress!
+0. Please check: http://arxiv.org/abs/1407.1309
 
+1. Try it the stadard CMake's way:
 
-...libmpdataxx$ mkdir build
-...libmpdataxx$ cd build
-...libmpdataxx/build$ cmake     \
-  -DCMAKE_BUILD_TYPE=Release    \
-  -DCMAKE_CXX_COMPILER=clang++  \
-  ..
-
+  $ mkdir build
+  $ cd build
+  $ cmake ..                     \
+    -DCMAKE_BUILD_TYPE=Release   \
+    -DCMAKE_CXX_COMPILER=clang++ 
+  $ make
+  $ make test
+  $ make install
