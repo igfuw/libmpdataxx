@@ -32,7 +32,6 @@ namespace libmpdataxx
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr;
 
 	rng_t i, j;
-        idx_t<parent_t::n_dims> ijk;
 
 	void xchng_sclr(typename parent_t::arr_t arr, rng_t range_i, rng_t range_j, const bool deriv = false) // for a given array
 	{
@@ -101,10 +100,13 @@ namespace libmpdataxx
           ctor_args_t args,
           const typename parent_t::rt_params_t &p
         ) :
-	  parent_t(args.mem, p),
+	  parent_t(
+            args.mem, 
+            p, 
+            idx_t<parent_t::n_dims>({args.i, args.j})
+          ),
 	  i(args.i), 
 	  j(args.j),  
-          ijk({args.i, args.j}),
 	  bcxl(std::move(args.bcxl)), 
 	  bcxr(std::move(args.bcxr)), 
 	  bcyl(std::move(args.bcyl)),

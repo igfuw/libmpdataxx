@@ -39,7 +39,7 @@ namespace libmpdataxx
 
 	void hook_ante_loop(const int nt) 
 	{   
-  //  note that it's not needed for upstream
+          //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
 	  {
@@ -134,18 +134,7 @@ namespace libmpdataxx
 		this->j
 	      ); 
 	    }
-/*
-if (min(this->mem->psi[e][this->n[e]]) < 0)   { std::cerr << "AQQ" << std::endl; throw; }
-if (min(this->mem->psi[e][this->n[e]+1]) < 0) 
-{ 
-  std::cerr << "BQQ" << std::endl; 
-  std::cerr << "min(psi)=" << min(this->mem->psi[e][this->n[e]+1]) << std::endl;
-  std::cerr << "max(|Cx|)=" << max(abs(this->GC(iter)[0])) << std::endl;
-  std::cerr << "max(|Cy|)=" << max(abs(this->GC(iter)[1])) << std::endl;
-  throw; 
-}
-*/
-	 }
+	  }
 	}
 
 	public:
