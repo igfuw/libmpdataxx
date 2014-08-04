@@ -38,7 +38,6 @@ void test(const std::string &outdir)
 {
   // compile-time parameters
   // enum { hint_noneg = opts::bit(ix::h) };  // TODO: reconsider?
-//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = ::real_t;
@@ -50,15 +49,14 @@ void test(const std::string &outdir)
     enum { rhs_scheme = solvers::trapez };
 
     // indices
-    struct ix { enum {
-	qx, qy, h, 
-	vip_i=qx, vip_j=qy, vip_den=h
-    }; }; 
+    struct ix { 
+      enum { qx, qy, h };
+      enum { vip_i=qx, vip_j=qy, vip_den=h };
+    };  
     
     // hints
     enum { hint_norhs = opts::bit(ix::h) }; 
   };
-//</listing-1>
 
   using ix = typename ct_params_t::ix;
 

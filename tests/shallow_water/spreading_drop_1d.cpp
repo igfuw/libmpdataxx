@@ -34,11 +34,11 @@ struct ct_params_t : ct_params_default_t
   enum { opts = opts_arg | opts::dfl };
   enum { rhs_scheme = solvers::trapez };
   
-  // indices - TODO move vip to separate enum
-  struct ix { enum {
-    qx, h, 
-    vip_i=qx, vip_den=h
-  }; }; 
+  // indices
+  struct ix { 
+    enum { qx, h };
+    enum { vip_i=qx, vip_den=h };
+  }; 
   
   // hints
   enum { hint_norhs = opts::bit(ix::h) }; 
@@ -124,12 +124,16 @@ void test(const std::string &pfx)
   run.advectee(ix::qx) = 0;
 
   // integration
+  double tmp = 0;
   out_t out(pfx);
   output<ix>(run, 0, p.di, p.dt, out);
   for (int t = 0; t < nt; t += outfreq)
   {
     run.advance(outfreq); 
     output<ix>(run, t + outfreq, p.di, p.dt, out);
+   
+    if (max(run.advector()) > tmp) tmp = max(run.advector());
+    std::cerr<<"max advector = "<< tmp  <<std::endl;
   }
 }
 

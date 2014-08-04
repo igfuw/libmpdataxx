@@ -40,7 +40,7 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
 
     ax.plot(x_range, eq.d2_initial(x_range, y_range), 'k', x_range, h_a, 'b',
             x_range, h_m, "r")
-    ax.plot(x_range, 0*x_range, "k-", x_range, v_a, 'b--',
+    ax.plot(x_range, 0*x_range, "k--", x_range, v_a, 'b--',
             x_range, v_m, "r--")
 
     #ax.set_ylim(-2,2)
@@ -52,12 +52,17 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
 # dt -  model time step
 # x_shift - shift between initial cond. in model and for analytic solution
 def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
-    plt.figure(1, figsize = (6,8))
-    ax = plt.subplot(len(casename_l)+1,1,1)
+    plt.figure(1, figsize = (6,3))
+    ax = plt.subplot(1,1,1)
     #plotting analytic solution
     analytic_fig(ax, time_l)
+    plt.savefig("papier_shallowwater_2d_analytic.pdf")
+    plt.show()
     #plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l):
+        plt.figure(1, figsize = (6,3))
+        ax = plt.subplot(1,1,1)
+
         print "plotting for " + casename + ", t = " + str(time)
         #model variables TODO: time
         h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2d_" + casename +
@@ -67,9 +72,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
         #calculating velocity from momentum, only for the droplet area 
         v_m = np.where(h_m > 0,  py_m/h_m, 0)
         print "where with h_m = 0 !!"
-        
-        ax = plt.subplot(len(casename_l)+1,1,ic+2)
-        
+                
         # choosing a plane of a cross section TODO: should be 160?
         # TODO: x_range/y_range should be calculated from hdf file!!
         print "TODO: x_range/y_range should be calculated from hdf file!!"
@@ -80,8 +83,8 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
         #ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
         #            fontsize=12, horizontalalignment='left', verticalalignment='top')
         
-    plt.savefig("papier_shallowwater_2d.pdf")
-    plt.show()
+        plt.savefig("papier_shallowwater_2d_"+str(casename)+".pdf")
+        plt.show()
 
 main("./", sys.argv[1:])
 

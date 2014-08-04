@@ -103,6 +103,8 @@ lt = GetLookupTableForArray('psi', 5)
 bar = CreateScalarBar(LookupTable = ort_dp.LookupTable)
 bar.Position = [0.9, 0.25]
 bar.LabelColor = [0, 0, 0]
+bar.NumberOfLabels = 6
+bar.LabelFontSize = 16
 view.Representations.append(bar)
 
 Render()
