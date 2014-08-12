@@ -1,15 +1,18 @@
 - remove asserts for iga & n_ietrs > 2?
+- negative epsilon option?
 - user-defined eliptic operator (compatible with user-defined rhs)
 - would nothrows improve performance?
 - detail/sharedmem: make summation helper vars one-dimensional
 - FCT: should we use C_mono for calculating new C_mono in third and next iterations?
 - dfl in 3D
+- histogram-like probing of analytic functions in shallow water?
 - swtich off assert(nondivergent) if dfl option set?
 - dfl option in all shallow_water tests
 - rename p.di, p.dj, p.dk -> p.grid_step?
 - p -> rt_params in examples (Dorota'a suggesting at the first meeting)
 - n_bits enum!
-- asserts for Courant number < 1 
+- asserts for Courant number < 1  (overloaded in shallow water: C=(u +/- sqrt(gh))) * dt/dx < 1
+- asserts for Lipshitz number ( |dt \partial R / \partial \psi| < const) -> ref. JCP 2009 (gas dynamics)
 - asserts in 1D for non-divergent initial Corant number field
 - could a param copy be made a mem member?
 - multiple xdmf instances
