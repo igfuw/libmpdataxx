@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from scipy.optimize import fsolve
+from scipy.integrate import odeint
 
 #eq. 5.6 (Schar&Smolarkiewicz, 1996) 
 def d1_lambda_eq(x, *time):
@@ -40,3 +41,5 @@ def d2_velocity(lamb, x, y):
 #initial condition
 def d2_initial(x,y):
     return np.where(d2_rad2(x,y)<=1, 1-d2_rad2(x,y), 0)
+
+
