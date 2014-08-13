@@ -60,7 +60,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
     #plt.show()
     #plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l):
-        plt.figure(1, figsize = (6,3))
+        plt.figure(ic+1, figsize = (6,3))
         ax = plt.subplot(1,1,1)
 
         print "plotting for " + casename + ", t = " + str(time)
