@@ -55,7 +55,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], it=300):
     #plt.show()
     #plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l): 
-        plt.figure(1, figsize = (6,3))
+        plt.figure(ic+1, figsize = (6,3))
         ax = plt.subplot(1,1,1)
         h_m = reading_modeloutput(dir+casename+".h")
         p_m = reading_modeloutput(dir+casename+".q")
