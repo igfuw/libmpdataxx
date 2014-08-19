@@ -24,7 +24,13 @@ find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnu
 # TODO: should't this path be added somewhere now?
 
 # Boost libraries
-find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem REQUIRED QUIET)
+find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem QUIET)
+if (NOT Boost_FOUND)
+  message(FATAL_ERROR "
+  Boost.{Thread,date_time,system,iostreams,timer,filesystem} not found.
+  Please install it (e.g. sudo apt-get install libboost-all-dev).
+")
+endif()
 
 # Blitz
 find_package(Blitz++ REQUIRED) 
