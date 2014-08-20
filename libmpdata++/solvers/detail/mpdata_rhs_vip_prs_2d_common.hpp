@@ -40,11 +40,31 @@ namespace libmpdataxx
           const real_t &dx, 
           const real_t &dy
         ) return_macro(
-          this->xchng_sclr(arr, i^this->halo, j^this->halo);
+          this->xchng_pres(arr, i, j);
           lap_tmp1(i, j) = formulae::nabla::grad<0>(arr, i, j, dx);
           lap_tmp2(i, j) = formulae::nabla::grad<1>(arr, j, i, dy);
-          this->xchng_sclr(lap_tmp1, i^this->halo, j^this->halo, /* deriv = */ true);
-          this->xchng_sclr(lap_tmp2, i^this->halo, j^this->halo, /* deriv = */ true);
+          this->set_edges(lap_tmp1, lap_tmp2, i, j);
+          this->xchng_pres(lap_tmp1, i, j);
+          this->xchng_pres(lap_tmp2, i, j);
+          ,
+          formulae::nabla::div(lap_tmp1, lap_tmp2, i, j, dx, dy)
+        );
+        
+        auto err_init(
+          typename parent_t::arr_t &arr, 
+          typename parent_t::arr_t &v1, 
+          typename parent_t::arr_t &v2, 
+          const rng_t &i, 
+          const rng_t &j, 
+          const real_t &dx, 
+          const real_t &dy
+        ) return_macro(
+          this->xchng_pres(arr, i^this->halo, j^this->halo);
+          lap_tmp1(i, j) = formulae::nabla::grad<0>(arr, i, j, dx) - v1(i, j);
+          lap_tmp2(i, j) = formulae::nabla::grad<1>(arr, j, i, dy) - v2(i, j);
+          this->set_edges(lap_tmp1, lap_tmp2, i, j);
+          this->xchng_pres(lap_tmp1, i, j);
+          this->xchng_pres(lap_tmp2, i, j);
           ,
           formulae::nabla::div(lap_tmp1, lap_tmp2, i, j, dx, dy)
         );
@@ -54,8 +74,44 @@ namespace libmpdataxx
 	  const int halo = parent_t::halo;
 	  // Phi = dt/2 * (Prs-Prs_amb) / rho 
 	  Phi(this->i, this->j) = real_t(0); // ... but assuming zero perturbation at t=0
-	  this->xchng_sclr(Phi, this->i^halo, this->j^halo);
+	  this->xchng_pres(Phi, this->i^halo, this->j^halo);
 	}
+	
+        void xchng_pres(typename parent_t::arr_t arr, rng_t range_i, rng_t range_j)
+        {
+          this->mem->barrier();
+          this->bcxl->fill_halos_pres(arr, range_j);
+          this->bcxr->fill_halos_pres(arr, range_j);
+          this->bcyl->fill_halos_pres(arr, range_i);
+          this->bcyr->fill_halos_pres(arr, range_i);
+          this->mem->barrier();
+        }
+        
+        void set_edges(typename parent_t::arr_t arr1,
+                       typename parent_t::arr_t arr2,
+                       rng_t range_i,
+                       rng_t range_j)
+        {
+          this->bcxl->set_edge_pres(arr1, range_j);
+          this->bcxr->set_edge_pres(arr1, range_j);
+          this->bcyl->set_edge_pres(arr2, range_i);
+          this->bcyr->set_edge_pres(arr2, range_i);
+          this->mem->barrier();
+        }
+        
+        void set_edges(typename parent_t::arr_t arr1,
+                       typename parent_t::arr_t arr2,
+                       typename parent_t::arr_t v1,
+                       typename parent_t::arr_t v2,
+                       rng_t range_i,
+                       rng_t range_j)
+        {
+          this->bcxl->set_edge_pres(arr1, v1, range_j);
+          this->bcxr->set_edge_pres(arr1, v1, range_j);
+          this->bcyl->set_edge_pres(arr2, v2, range_i);
+          this->bcyr->set_edge_pres(arr2, v2, range_i);
+          this->mem->barrier();
+        }
 
 	virtual void pressure_solver_update() = 0;
 
