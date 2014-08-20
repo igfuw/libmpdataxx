@@ -15,11 +15,13 @@ compiler:
 #
 
 before_install:
-  - sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe"
-  - sudo apt-get update
-  - sudo apt-get -t trusty install libboost-thread-dev libboost-iostreams-dev libboost-timer-dev libblitz0-dev gnuplot-nox libgnuplot-iostream-dev libhdf5-dev
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe"; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install libboost-thread-dev libboost-iostreams-dev libboost-timer-dev; fi #libblitz0-dev gnuplot-nox libgnuplot-iostream-dev libhdf5-dev
     #  - sudo apt-get install libboost-date_time-dev
     #  - sudo apt-get install libboost-filesystem-dev
+    
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
 
 before_script:
     - mkdir build && cd build
