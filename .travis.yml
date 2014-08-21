@@ -20,7 +20,7 @@ before_install:
     #  - sudo add-apt-repository -y "deb http://ftp.icm.edu.pl/pub/Linux/debian/ sid main"
     #  - sudo sh .travis/add-trusty
   - sudo apt-get update
-  - sudo apt-get install gcc
+    #  - sudo apt-get install gcc
   - sudo apt-get install libhdf5-7
   - sudo apt-get install libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
   - sudo apt-get install -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
