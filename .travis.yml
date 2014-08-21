@@ -21,7 +21,7 @@ before_install:
   - sudo sh .travis/add-trusty
   - sudo apt-get update
     #- sudo apt-get install -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
-  - sudo apt-get install -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev cmake 
+  - sudo apt-get install -t trusty -y libboost-thread-dev libboost-timer-dev libboost-iostreams-dev libboost-filesystem-dev libblitz0-dev cmake
     #- sudo apt-get install -qq libboost-thread1.48-dev libboost-filesystem1.48-dev libboost-timer1.48-dev libboost-date-time1.48-dev 
     #  - sudo apt-get install -y --allow-unauthenticated debian-archive-keyring
     #  - sudo apt-get install -y --allow-unauthenticated libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev libgnuplot-iostream-dev cmake
