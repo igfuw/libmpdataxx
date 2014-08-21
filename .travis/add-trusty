@@ -1,0 +1,9 @@
+#!/bin/sh
+set -x
+echo 'deb http://us.archive.ubuntu.com/ubuntu trusty main universe' > /etc/apt/sources.list.d/trusty.list
+
+(
+  echo 'Package: *'
+  echo 'Pin: release a=trusty'
+  echo 'Pin-Priority: 200'
+) > /etc/apt/preferences.d/trusty.pref

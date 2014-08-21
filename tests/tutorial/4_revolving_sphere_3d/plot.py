@@ -1,12 +1,25 @@
-# Usage: pvpython plot.py file.xmf
+USAGE = 'Usage: pvpython plot.py timestep*.xmf'
 
-from paraview.simple import *
-from sys import argv
+from sys import argv, exit
 
-fname = argv[1]
+try:
+    from paraview.simple import *
+except ImportError:
+    print USAGE
+    exit(1)
+
+# checking arguments
+if (
+    len(argv) != 2 or
+    not argv[1].startswith('timestep') or
+    not argv[1].endswith('.xmf')
+   ):
+    print USAGE
+    exit(1)
 
 # opening xmf file
-reader = XDMFReader(FileName=fname)
+fname = argv[1]
+reader = OpenDataFile(fname)
 
 # creating the view
 view = CreateRenderView()
@@ -77,9 +90,12 @@ Render()
 
 # export to SVG
 exporters = servermanager.createModule('exporters')
-svg_exporter = exporters.GL2PSExporterSVG()
+if hasattr(exporters, 'GL2PSRenderViewExporterSVG'):
+    svg_exporter = exporters.GL2PSRenderViewExporterSVG()
+else:
+    svg_exporter = exporters.GL2PSExporterSVG()
 svg_exporter.Rasterize3Dgeometry = False;
 svg_exporter.GL2PSdepthsortmethod = 'BSP sorting (slow, best)';
 svg_exporter.SetView(view)
-svg_exporter.FileName = fname.rstrip('.xmf') + ".svg"
+svg_exporter.FileName = fname.rpartition('.')[0] + ".svg"
 svg_exporter.Write()
