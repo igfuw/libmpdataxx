@@ -3,7 +3,7 @@ os:
   - linux
   - osx
 compiler:
-  #  - gcc
+  - gcc
   - clang
 
 # For now disable gcc on osx as g++4.8 is not yet available
@@ -21,7 +21,8 @@ before_install:
     #  - sudo sh .travis/add-trusty
   - sudo apt-get update
   - sudo apt-get install clang
-  - sudo apt-get install -y libstdc++-4.8-dev
+  - sudo apt-get install g++
+    #  - sudo apt-get install -y libstdc++-4.8-dev
     #  - sudo apt-get install gcc
   - sudo apt-get install libhdf5-7
   - sudo apt-get install libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
@@ -39,5 +40,5 @@ before_script:
 script:
     - make
 
-after_script:
-    - make test
+#after_script:
+#    - make test
