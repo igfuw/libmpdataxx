@@ -15,7 +15,7 @@ compiler:
 #
 
 before_install:
-  #  - echo $TRAVIS_OS_NAME
+  - echo $TRAVIS_OS_NAME
     #  - sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe"
     #  - sudo add-apt-repository -y "deb http://ftp.icm.edu.pl/pub/Linux/debian/ sid main"
   - sudo sh .travis/add-trusty
