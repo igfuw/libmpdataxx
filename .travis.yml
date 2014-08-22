@@ -10,9 +10,9 @@ before_install:
   - sudo apt-get update
   - if [[ $CXX == 'clang++' ]]; then sudo apt-get install clang; fi
   - if [[ $CXX == 'g++'     ]]; then sudo apt-get install g++  ; fi
-  - sudo apt-get install libhdf5-7
-  - sudo apt-get install libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
-  - sudo apt-get install -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
+  - sudo apt-get install --no-install-recommends libhdf5-7
+  - sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
+  - sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
 
 before_script:
     - mkdir build && cd build
@@ -25,8 +25,8 @@ script:
     
     # libcloudphxx (needed by icicle, skipping tests and CUDA build)
     - cd ../..
-    - sudo apt-get install -t trusty -y libthrust-dev libboost-python-dev python-numpy
-    - sudo apt-get remove -y nvidia-cuda-toolkit
+    - sudo apt-get install --no-install-recommends -t trusty -y libthrust-dev libboost-python-dev python-numpy
+    #- sudo apt-get remove -y nvidia-cuda-toolkit
     - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
     - cd libcloudphxx
     - mkdir build && cd build
@@ -36,7 +36,7 @@ script:
 
     # icicle (no tests - just testing if any changes in libmpdata's API did not break icicle)
     - cd ../..
-    - sudo apt-get install -t trusty -y libboost-program-options-dev
+    - sudo apt-get install --no-install-recommends -t trusty -y libboost-program-options-dev
     - git clone --depth=1 git://github.com/igfuw/icicle.git
     - cd icicle
     - mkdir build && cd build
