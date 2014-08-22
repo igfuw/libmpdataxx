@@ -21,10 +21,22 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE} -pg")
 
 # gnuplot-iostream
 find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnuplot-iostream.h)
+if (NOT GNUPLOT-IOSTREAM_INCLUDE_DIR)
+  message(FATAL_ERROR "
+  gnuplot-iostream not found.
+  Please install it (e.g. sudo apt-get install libgnuplot-iostream-dev).
+")
+endif()
 # TODO: should't this path be added somewhere now?
 
 # Boost libraries
-find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem REQUIRED QUIET)
+find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem QUIET)
+if (NOT Boost_FOUND)
+  message(FATAL_ERROR "
+  Boost.{Thread,date_time,system,iostreams,timer,filesystem} not found.
+  Please install it (e.g. sudo apt-get install libboost-all-dev).
+")
+endif()
 
 # Blitz
 find_package(Blitz++ REQUIRED) 
