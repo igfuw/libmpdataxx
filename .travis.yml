@@ -7,6 +7,8 @@ compiler:
 
 before_install:
   - sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe"
+  - sudo bash -c 'echo -e Package':' *\\\nPin':' release a=trusty\\\nPin-Priority':' 200 > /etc/apt/preferences.d/trusty.pref'
+  - cat /etc/apt/preferences.d/trusty.pref
   - sudo apt-get update
   - if [[ $CXX == 'clang++' ]]; then sudo apt-get install clang; fi
   - if [[ $CXX == 'g++'     ]]; then sudo apt-get install g++  ; fi
