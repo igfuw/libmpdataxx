@@ -115,14 +115,8 @@ namespace libmpdataxx
 	  this->tmp_u(i, j) = this->state(ix::u)(i, j);
 	  this->tmp_w(i, j) = this->state(ix::w)(i, j);
 
-	  this->xchng_sclr(this->Phi,   i^halo, j^halo);
-	  this->xchng_sclr(this->tmp_u, i^halo, j^halo);
-	  this->xchng_sclr(this->tmp_w, i^halo, j^halo);
-
-	  //initail error   
-	  this->err(i, j) =
-	    - 1./ rho * div(rho * this->tmp_u, rho * this->tmp_w , i, j, this->di, this->dj)
-	    + this->lap(this->Phi, i, j, this->di, this->dj);
+	  //initial error   
+          this->err(i, j) = this->err_init(this->Phi, this->tmp_u, this->tmp_w, i, j, this->di, this->dj);
 	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
 	  p_err(i ,j) = this->err(i, j);
@@ -160,10 +154,12 @@ namespace libmpdataxx
   //std::cerr<<"      number of iterations untill convergence: "<<this->iters<<std::endl;
   //std::cerr<<"      error: "<<error<<std::endl;
 
-	  this->xchng_sclr(this->Phi, i^halo, j^halo);
+	  this->xchng_pres(this->Phi, i^halo, j^halo);
 
 	  this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->di);
 	  this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dj);
+          
+          this->set_edges(this->tmp_u, this->tmp_w, this->state(ix::u), this->state(ix::w), i, j);
 	}
 
 	public:
