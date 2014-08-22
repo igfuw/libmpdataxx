@@ -7,24 +7,12 @@ compiler:
 
 before_install:
   - sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe"
-  - sudo bash -c 'echo -e Package':' *\\\nPin':' release a=trusty\\\nPin-Priority':' 200 > /etc/apt/preferences.d/trusty.pref'
-  - cat /etc/apt/preferences.d/trusty.pref
   - sudo apt-get update
   - if [[ $CXX == 'clang++' ]]; then sudo apt-get install --no-install-recommends clang; fi
   - if [[ $CXX == 'g++'     ]]; then sudo apt-get install --no-install-recommends g++  ; fi
-  #- sudo apt-get install --no-install-recommends libhdf5-7
-  #- sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
-  #- sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
-  - sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev
-  - sudo apt-get install --no-install-recommends -t trusty -y libboost-timer-dev 
-  - sudo apt-get install --no-install-recommends -t trusty -y libblitz0-dev 
-
-  - sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0
-  - sudo apt-get install --no-install-recommends -t trusty -y gnuplot-nox 
-
-  - sudo apt-get install --no-install-recommends -t trusty -y libhdf5-serial-dev 
-  - sudo apt-get install --no-install-recommends -t trusty -y cmake 
-  - sudo apt-get install --no-install-recommends -t trusty -y libgnuplot-iostream-dev
+  - sudo apt-get install --no-install-recommends libhdf5-7
+  - sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
+  - sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
 
 before_script:
     - mkdir build && cd build
@@ -37,7 +25,12 @@ script:
     
     # libcloudphxx (needed by icicle, skipping tests and CUDA build)
     - cd ../..
-    - sudo apt-get install --no-install-recommends -t trusty -y libthrust-dev libboost-python-dev python-numpy
+    - sudo apt-get install --no-install-recommends -t trusty -y libboost-python-dev python-numpy
+
+    - sudo bash -c 'echo -e Package':' *\\\nPin':' release a=trusty\\\nPin-Priority':' 200 > /etc/apt/preferences.d/trusty.pref'
+    - cat /etc/apt/preferences.d/trusty.pref
+    - sudo apt-get install --no-install-recommends -t trusty -y libthrust-dev
+
     #- sudo apt-get remove -y nvidia-cuda-toolkit
     - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
     - cd libcloudphxx
