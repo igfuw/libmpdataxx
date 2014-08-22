@@ -2,7 +2,7 @@ language: cpp
 os: 
   - linux
 compiler:
-  - gcc
+#  - gcc
   - clang
 
 before_install:
@@ -16,11 +16,27 @@ before_install:
 
 before_script:
     - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=RELEASE ../
+    #- cmake -DCMAKE_BUILD_TYPE=Debug ../
 
 script:
+    #- make
+    #- make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log
+    #- sudo make install
+    
+    # libcloudphxx (needed by icicle)
+    - cd ../..
+    - sudo apt-get install -t trusty -y libthrust-dev libboost-python-dev python-numpy
+    - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
+    - cd libcloudphxx
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - make
-    - make -C tests/unit test
+    - sudo make install
 
-after_failure:
-    - cat tests/unit/Testing/Temporary/LastTest.log
+    # icicle (no tests - just testing if any changes in libmpdata's API did not break icicle)
+    - cd ../..
+    - git clone --depth=1 git://github.com/igfuw/icicle.git
+    - cd icicle
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Debug ../
+    - make
