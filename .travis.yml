@@ -22,7 +22,7 @@ script:
     - cd build
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - make
-    - make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log
+    - make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - sudo make install
     
     # libcloudph++ (needed by icicle, skipping tests and CUDA build)
