@@ -23,9 +23,10 @@ script:
     #- make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log
     #- sudo make install
     
-    # libcloudphxx (needed by icicle)
+    # libcloudphxx (needed by icicle, skipping tests and CUDA build)
     - cd ../..
     - sudo apt-get install -t trusty -y libthrust-dev libboost-python-dev python-numpy
+    - sudo apt-get remove -y nvidia-cuda-toolkit
     - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
     - cd libcloudphxx
     - mkdir build && cd build
@@ -35,6 +36,7 @@ script:
 
     # icicle (no tests - just testing if any changes in libmpdata's API did not break icicle)
     - cd ../..
+    - sudo apt-get install -t trusty -y libboost-program-options-dev
     - git clone --depth=1 git://github.com/igfuw/icicle.git
     - cd icicle
     - mkdir build && cd build
