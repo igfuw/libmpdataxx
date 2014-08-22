@@ -18,7 +18,10 @@ before_install:
   - sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev
   - sudo apt-get install --no-install-recommends -t trusty -y libboost-timer-dev 
   - sudo apt-get install --no-install-recommends -t trusty -y libblitz0-dev 
+
+  - sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0
   - sudo apt-get install --no-install-recommends -t trusty -y gnuplot-nox 
+
   - sudo apt-get install --no-install-recommends -t trusty -y libhdf5-serial-dev 
   - sudo apt-get install --no-install-recommends -t trusty -y cmake 
   - sudo apt-get install --no-install-recommends -t trusty -y libgnuplot-iostream-dev
