@@ -20,6 +20,7 @@ before_script:
 
 script:
     - make
+    - make -C tests/unit test
 
-after_script:
-    - cd tests/unit && make test
+after_failure:
+    - cat tests/unit/Testing/Temporary/LastTest.log
