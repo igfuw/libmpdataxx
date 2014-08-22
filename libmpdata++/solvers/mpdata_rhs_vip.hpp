@@ -134,6 +134,7 @@ namespace libmpdataxx
 
 	intrp<0>(this->stash[0], im, this->j^this->halo, di);
 	intrp<1>(this->stash[1], jm, this->i^this->halo, dj);
+        this->xchng_vctr_alng(this->mem->GC);
       }
 
       void extrapolate_in_time() final
