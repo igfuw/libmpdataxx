@@ -21,8 +21,10 @@ script:
     - mkdir build 
     - cd build
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
-    - VERBOSE=1 make
+    - VERBOSE=1 make -C tests/unit
     - make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - cmake -DCMAKE_BUILD_TYPE=Release ../
+    - VERBOSE=1 make
     - sudo make install
     
     # libcloudph++ (needed by icicle, skipping tests and CUDA build)
@@ -32,7 +34,7 @@ script:
     - cd libcloudphxx
     - mkdir build 
     - cd build
-    - cmake -DCMAKE_BUILD_TYPE=Debug ../ 
+    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make 
     - sudo make install
 
@@ -43,5 +45,5 @@ script:
     - cd icicle
     - mkdir build 
     - cd build
-    - cmake -DCMAKE_BUILD_TYPE=Debug ../ 
+    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make
