@@ -48,6 +48,8 @@ namespace libmpdataxx
           case 1:
           av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
           av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+
+          default: assert(false);
         }
 
 	assert(std::isfinite(sum(av[d  ](pi<d>(i+h, j, k)))));
@@ -116,6 +118,8 @@ namespace libmpdataxx
           case 1:
 	  av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
 	  av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+
+          default: assert(false);
         }
 
 	assert(std::isfinite(sum(av[d  ](pi<d>(i-h, j, k)))));

@@ -48,8 +48,8 @@ find_package(HDF5 COMPONENTS CXX HL)
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
-  set_target_properties(${test} PROPERTIES LINK_FLAGS_DEBUG "-lblitz") # TODO: use ${BLITZ_LIBRARIES}
   target_link_libraries(${test} ${Boost_LIBRARIES} ${HDF5_LIBRARIES})
+  target_link_libraries(${test} debug "-lblitz") # TODO: use ${BLITZ_LIBRARIES}
 # TODO: target_compile_options() // added to CMake on Jun 3rd 2013
   add_test(${test} ${test})
 endfunction()

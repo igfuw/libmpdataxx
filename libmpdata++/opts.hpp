@@ -7,7 +7,7 @@
 #pragma once
 
 #include <cfenv> // for fesetround() 
-#pragma STDC FENV_ACCESS ON
+//#pragma STDC FENV_ACCESS ON (as of august 2014 seems not implemented in either gcc or clang - gcc bug 34678)
 
 namespace libmpdataxx
 {
