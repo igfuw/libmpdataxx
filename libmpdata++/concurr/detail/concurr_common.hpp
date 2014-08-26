@@ -75,9 +75,26 @@ namespace libmpdataxx
       >
       class concurr_common : public any<typename solver_t_::real_t, solver_t_::n_dims>
       {
+
         public:
 
         typedef solver_t_ solver_t;
+        
+        static_assert(
+          (solver_t::n_dims == 3) ||
+          (solver_t::n_dims == 2 
+            && bczl == bcond::null 
+            && bczr == bcond::null
+          ) ||
+          (solver_t::n_dims == 1 
+            && bczl == bcond::null 
+            && bczr == bcond::null
+            && bcyl == bcond::null 
+            && bcyr == bcond::null
+          )
+          ,
+          "more boundary conditions than dimensions"
+        );
 
         private:
 
