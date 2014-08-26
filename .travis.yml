@@ -25,6 +25,7 @@ script:
     - make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - cmake -DCMAKE_BUILD_TYPE=Release ../
     - VERBOSE=1 make
+    - make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - sudo make install
     
     # libcloudph++ (needed by icicle, skipping tests and CUDA build)
