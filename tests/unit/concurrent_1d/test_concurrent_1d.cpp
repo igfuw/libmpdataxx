@@ -50,8 +50,7 @@ int main()
 //<listing-4>
     using run_t = concurr::openmp<
       slv_out_t, 
-      bcond::cyclic, bcond::cyclic,
-      bcond::open,   bcond::open
+      bcond::cyclic, bcond::cyclic
     >;
 //</listing-4>
 //<listing-5>
