@@ -12,4 +12,4 @@ libmpdata++
     -DCMAKE_CXX_COMPILER=clang++ 
   $ make
   $ make test
-  $ make install
+  $ sudo make install
