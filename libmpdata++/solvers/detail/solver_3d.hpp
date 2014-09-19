@@ -31,19 +31,24 @@ namespace libmpdataxx
       
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
-	rng_t i, j, k; // TODO: if stored as idx_t this also could be placed in solver_common
-        idx_t<parent_t::n_dims> ijk;
+	rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
-	void xchng(int e) 
+	void xchng_sclr(typename parent_t::arr_t arr,
+                       rng_t range_i, rng_t range_j, rng_t range_k,
+                       const bool deriv = false) // for a given array
 	{
           this->mem->barrier();
-	  bcxl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], j^this->halo, k^this->halo);
-	  bcxr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], j^this->halo, k^this->halo);
-	  bcyl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], k^this->halo, i^this->halo);
-	  bcyr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], k^this->halo, i^this->halo);
-	  bczl->fill_halos_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
-	  bczr->fill_halos_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
+	  bcxl->fill_halos_sclr(arr, range_j, range_k, deriv);
+	  bcxr->fill_halos_sclr(arr, range_j, range_k, deriv);
+	  bcyl->fill_halos_sclr(arr, range_k, range_i, deriv);
+	  bcyr->fill_halos_sclr(arr, range_k, range_i, deriv);
+	  bczl->fill_halos_sclr(arr, range_i, range_j, deriv);
+	  bczr->fill_halos_sclr(arr, range_i, range_j, deriv);
           this->mem->barrier();
+	}
+	void xchng(int e) 
+	{
+	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
 	}
 
         void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec)
@@ -99,11 +104,14 @@ namespace libmpdataxx
           ctor_args_t args,
           const typename parent_t::rt_params_t &p
         ) :
-	  parent_t(args.mem, p),
+	  parent_t(
+            args.mem, 
+            p,
+	    idx_t<parent_t::n_dims>({args.i, args.j, args.k})
+          ),
 	  i(args.i), 
           j(args.j), 
           k(args.k),  
-          ijk({args.i, args.j, args.k}),
 	  bcxl(std::move(args.bcxl)),
 	  bcxr(std::move(args.bcxr)),
 	  bcyl(std::move(args.bcyl)),

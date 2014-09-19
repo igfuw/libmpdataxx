@@ -1,0 +1,1 @@
+libmpdataxx_add_test(hello_world)

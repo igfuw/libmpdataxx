@@ -42,33 +42,7 @@ function(libmpdataxx_add_test test)
   add_test(${test} ${test})
 endfunction()
 
-# list of tests
-
-#misc
-add_subdirectory(kahan_sum)
-# adv
-add_subdirectory(paper_example_1)
-add_subdirectory(paper_example_2)
-add_subdirectory(gnuplot-iostream_1d)
-add_subdirectory(gnuplot-iostream_2d)
-add_subdirectory(var_sign_2d)
-add_subdirectory(concurrent_1d)
-add_subdirectory(err_isolines)
-add_subdirectory(rotating_cone)
-#add_subdirectory(rotating_cone_nug)
-add_subdirectory(rotating_sphere)
-add_subdirectory(over_the_pole)
-add_subdirectory(mpdata_fct_1d)
-add_subdirectory(mpdata_1d_opt_abs)
-add_subdirectory(mpdata_1d_opt_tot)
-add_subdirectory(mpdata_1d_opt_eps)
-add_subdirectory(mpdata_1d_opt_npa)
-add_subdirectory(mpdata_1d_opt_iga)
-add_subdirectory(mpdata_1d_opt_nug)
-add_subdirectory(mpdata_1d_opt_nkh)
-# adv+rhs
-add_subdirectory(harmosc)
-# adv+rhs+vip
-add_subdirectory(shallow_water)
-# adv+rhs+vip+prs
-add_subdirectory(bcbf)
+# tests
+add_subdirectory(tutorial)
+add_subdirectory(sandbox)
+add_subdirectory(unit)

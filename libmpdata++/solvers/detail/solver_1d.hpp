@@ -29,8 +29,7 @@ namespace libmpdataxx
 
         typename parent_t::bcp_t bcxl, bcxr;
      
-	rng_t i; // TODO: idx_t i do common?
-        idx_t<parent_t::n_dims> ijk;
+	rng_t i; 
 
 	void xchng(int e) 
 	{
@@ -80,11 +79,14 @@ namespace libmpdataxx
           ctor_args_t args,
           const typename parent_t::rt_params_t &p
         ) :
-	  parent_t(args.mem, p), 
+	  parent_t(
+            args.mem, 
+            p, 
+            idx_t<parent_t::n_dims>(args.i)
+          ), 
           bcxl(std::move(args.bcxl)), 
           bcxr(std::move(args.bcxr)),
-          i(args.i),
-          ijk(args.i)
+          i(args.i)
 	{}
 
         // memory allocation logic using static methods

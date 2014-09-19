@@ -1,1 +1,0 @@
-libmpdataxx_add_test(test_err_isolines)
