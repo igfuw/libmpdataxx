@@ -16,6 +16,7 @@
 #include <libmpdata++/bcond/open_2d.hpp>
 #include <libmpdata++/bcond/open_3d.hpp>
 #include <libmpdata++/bcond/polar_2d.hpp>
+#include <libmpdata++/bcond/rigid_2d.hpp>
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
@@ -74,9 +75,26 @@ namespace libmpdataxx
       >
       class concurr_common : public any<typename solver_t_::real_t, solver_t_::n_dims>
       {
+
         public:
 
         typedef solver_t_ solver_t;
+        
+        static_assert(
+          (solver_t::n_dims == 3) ||
+          (solver_t::n_dims == 2 
+            && bczl == bcond::null 
+            && bczr == bcond::null
+          ) ||
+          (solver_t::n_dims == 1 
+            && bczl == bcond::null 
+            && bczr == bcond::null
+            && bcyl == bcond::null 
+            && bcyr == bcond::null
+          )
+          ,
+          "more boundary conditions than dimensions"
+        );
 
         private:
 
@@ -202,6 +220,9 @@ namespace libmpdataxx
                 case bcond::open:
 	          bxl.reset(new bcond::open_left_2d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                   break;
+                case bcond::rigid:
+	          bxl.reset(new bcond::rigid_left_2d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
+                  break;
 	        default: assert(false);
               }
 
@@ -213,6 +234,9 @@ namespace libmpdataxx
                   break;
                 case bcond::open:
                   bxr.reset(new bcond::open_rght_2d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
+                  break;
+                case bcond::rigid:
+                  bxr.reset(new bcond::rigid_rght_2d<0, real_t>(rng_t(0, grid_size[0]-1), solver_t::halo));
                   break;
 	        defalt: assert(false);
               }
@@ -231,6 +255,9 @@ namespace libmpdataxx
                 case bcond::open:
                   byl.reset(new bcond::open_left_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
+                case bcond::rigid:
+                  byl.reset(new bcond::rigid_left_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
+                  break;
                 default: assert(false);
               }
 
@@ -247,6 +274,9 @@ namespace libmpdataxx
                   break;
                 case bcond::open:
                   byr.reset(new bcond::open_rght_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
+                  break;
+                case bcond::rigid:
+                  byr.reset(new bcond::rigid_rght_2d<1, real_t>(rng_t(0, grid_size[1]-1), solver_t::halo));
                   break;
                 default: assert(false);
               }

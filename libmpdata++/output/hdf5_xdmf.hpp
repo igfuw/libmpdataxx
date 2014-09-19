@@ -171,7 +171,7 @@ namespace libmpdataxx
 	    // TODO: units attribute
 
             H5::DataSpace space = vars[v.first].getSpace();
-            switch (solver_t::n_dims)
+            switch (int(solver_t::n_dims))
             {
               case 2:
               {

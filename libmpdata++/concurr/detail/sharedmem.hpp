@@ -75,7 +75,7 @@ namespace libmpdataxx
         sharedmem_common(const std::array<int, 1> &grid_size, const int &size)
           : n(0), grid_size(grid_size) // TODO: is n(0) needed?
         {
-          if (size > grid_size[0]) throw std::exception(); // TODO: error_macro? / assert()?
+          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
           //sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));  // TODO: write a different sum that would't use sumtmp
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
@@ -83,7 +83,7 @@ namespace libmpdataxx
         sharedmem_common(const std::array<int, 2> &grid_size, const int &size)
           : n(0), grid_size(grid_size)
         {
-          if (size > grid_size[0]) throw std::exception(); // TODO: error_macro?
+          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
           sumtmp.reset(new blitz::Array<real_t, 2>(grid_size[0], 1));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
@@ -91,7 +91,7 @@ namespace libmpdataxx
         sharedmem_common(const std::array<int, 3> &grid_size, const int &size)
           : n(0), grid_size(grid_size)
         {
-          if (size > grid_size[0]) throw std::exception(); // TODO: error_macro?
+          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
           sumtmp.reset(new blitz::Array<real_t, 2>(grid_size[0], grid_size[1]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }

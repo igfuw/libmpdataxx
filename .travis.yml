@@ -1,0 +1,50 @@
+language: cpp
+os: 
+    - linux
+compiler:
+    - gcc
+    - clang
+
+before_install:
+    - sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe multiverse"
+    - sudo apt-get update
+
+install:
+    - if [[ $CXX == 'clang++' ]]; then sudo apt-get install --no-install-recommends clang; fi
+    - if [[ $CXX == 'g++'     ]]; then sudo apt-get install --no-install-recommends g++  ; fi
+    - sudo apt-get install --no-install-recommends libhdf5-7
+    - sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
+    - sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
+
+script:
+    # libmpdata++
+    - mkdir build 
+    - cd build
+    - cmake -DCMAKE_BUILD_TYPE=Debug ../
+    - VERBOSE=1 make -C tests/unit
+    - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - cmake -DCMAKE_BUILD_TYPE=Release ../
+    - VERBOSE=1 make
+    - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - sudo make install
+    
+    # libcloudph++ (needed by icicle, skipping tests and CUDA build)
+    - cd ../..
+    - sudo apt-get install --no-install-recommends -t trusty -y libboost-python-dev python-numpy libthrust-dev
+    - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
+    - cd libcloudphxx
+    - mkdir build 
+    - cd build
+    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
+    - make 
+    - sudo make install
+
+    ## icicle (no tests - just testing if any changes in libmpdata's API did not break icicle)
+    - cd ../..
+    - sudo apt-get install --no-install-recommends -t trusty -y libboost-program-options-dev
+    - git clone --depth=1 git://github.com/igfuw/icicle.git
+    - cd icicle
+    - mkdir build 
+    - cd build
+    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
+    - make
