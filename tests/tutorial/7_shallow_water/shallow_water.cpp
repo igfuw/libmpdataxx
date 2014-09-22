@@ -107,7 +107,7 @@ void test(const std::string &pfx)
   p.di = .05;
   p.grid_size = { int(16 / p.di) };
   p.g = 1;
-  p.vip_eps = 1e-10; 
+  p.vip_eps = 1e-8; 
 //</listing-2>
 
   // instantiation
