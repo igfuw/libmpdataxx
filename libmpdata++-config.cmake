@@ -1,3 +1,8 @@
+#TODO:
+# - use this file in libmpdataxx tests
+# - optional components: hdf, gnuplot, openmp, threads, ...
+# - do not set global flags?
+
 include(CheckCXXSourceCompiles)
 
 # C++11
