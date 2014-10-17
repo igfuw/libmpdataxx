@@ -5,7 +5,7 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 
-#include "shallow_water.hpp"
+#include <libmpdata++/solvers/shallow_water.hpp>
 #include <libmpdata++/concurr/serial.hpp>
 using namespace libmpdataxx; 
 

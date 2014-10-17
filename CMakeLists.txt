@@ -30,3 +30,11 @@ install(
   DESTINATION 
     include
 )
+
+# make-install rule for FindLibmpdataxx.cmake
+install(
+  FILES
+    libmpdata++-config.cmake
+  DESTINATION
+    share/libmpdata++
+)
