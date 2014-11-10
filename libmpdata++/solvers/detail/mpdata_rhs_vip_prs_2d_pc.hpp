@@ -86,16 +86,19 @@ namespace libmpdataxx
       template <class ct_params_t>
       class mpdata_rhs_vip_prs_2d_pc : public detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>
       {
+        public:
+	
+        using real_t = typename ct_params_t::real_t;
+
+        private:
+
 	using parent_t = detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>;
-	using real_t =typename parent_t::real_t;
         using ix = typename ct_params_t::ix;
 
 	using arr_2d_t = typename parent_t::arr_t;
 
 	arr_2d_t p_err, q_err, lap_p_err, lap_q_err;
 	arr_2d_t pcnd_err;   //TODO is it needed?
-
-	private:
 
 	const int pc_iters;
 

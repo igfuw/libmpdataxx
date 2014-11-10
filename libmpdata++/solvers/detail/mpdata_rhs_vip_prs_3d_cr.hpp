@@ -28,8 +28,13 @@ namespace libmpdataxx
       template <class ct_params_t>
       class mpdata_rhs_vip_prs_3d_cr : public detail::mpdata_rhs_vip_prs_3d_common<ct_params_t>
       {
-	using parent_t = detail::mpdata_rhs_vip_prs_3d_common<ct_params_t>;
+        public:
+
 	using real_t = typename ct_params_t::real_t;
+
+        private:
+
+	using parent_t = detail::mpdata_rhs_vip_prs_3d_common<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
 	typename parent_t::arr_t p_err, lap_p_err;
