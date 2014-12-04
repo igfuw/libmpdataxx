@@ -112,7 +112,7 @@ namespace libmpdataxx
         for (int i = 0; i < this->algos.size(); ++i) 
         {  
           threads.push_back(new std::thread(
-            &solver_t::solve, std::ref(this->algos[i]), nt
+            &solver_t::solve, &(this->algos[i]), nt
           ));
           detail::cxx11_thread_id[threads.back().get_id()] = i;
         }
