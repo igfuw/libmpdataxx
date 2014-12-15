@@ -73,7 +73,7 @@ void test(const std::string &dirname, double rey)
     blitz::secondIndex j;
     blitz::thirdIndex k;
 
-    slv.advectee(ix::u) = sin(p.di * i) * cos(p.dj * j) * cos(p.dk * k);
+    slv.advectee(ix::u) =  sin(p.di * i) * cos(p.dj * j) * cos(p.dk * k);
     slv.advectee(ix::v) = -cos(p.di * i) * sin(p.dj * j) * cos(p.dk * k); 
     slv.advectee(ix::w) = 0.0; 
   }
@@ -84,6 +84,5 @@ void test(const std::string &dirname, double rey)
 int main()
 {
   test("rey=800", 800);
-  //TODO: make it work
-  //test("rey=100", 100);
+  test("rey=100", 100);
 }
