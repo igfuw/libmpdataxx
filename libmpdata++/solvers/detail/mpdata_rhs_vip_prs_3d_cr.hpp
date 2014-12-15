@@ -28,8 +28,13 @@ namespace libmpdataxx
       template <class ct_params_t>
       class mpdata_rhs_vip_prs_3d_cr : public detail::mpdata_rhs_vip_prs_3d_common<ct_params_t>
       {
-	using parent_t = detail::mpdata_rhs_vip_prs_3d_common<ct_params_t>;
+        public:
+
 	using real_t = typename ct_params_t::real_t;
+
+        private:
+
+	using parent_t = detail::mpdata_rhs_vip_prs_3d_common<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
 	typename parent_t::arr_t p_err, lap_p_err;
@@ -50,9 +55,9 @@ namespace libmpdataxx
 	  rng_t &j = this->j;
 	  rng_t &k = this->k;
 
-	  this->tmp_u(i, j, k) = this->psi_n(ix::u)(i, j, k);
-	  this->tmp_v(i, j, k) = this->psi_n(ix::v)(i, j, k);
-	  this->tmp_w(i, j, k) = this->psi_n(ix::w)(i, j, k);
+	  this->tmp_u(i, j, k) = this->state(ix::u)(i, j, k);
+	  this->tmp_v(i, j, k) = this->state(ix::v)(i, j, k);
+	  this->tmp_w(i, j, k) = this->state(ix::w)(i, j, k);
 
 	  this->xchng_sclr(this->Phi,   i^halo, j^halo, k^halo);
 	  this->xchng_sclr(this->tmp_u, i^halo, j^halo, k^halo);
@@ -75,7 +80,7 @@ namespace libmpdataxx
 	  //pseudo-time loop
 	  this->iters = 0;
 	  real_t error = 1.;
-	  while (error > this->tol)
+	  while (error > this->prs_tol)
 	  {
 	    tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j, k);
 	    if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j, k) / tmp_den;

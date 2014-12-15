@@ -49,6 +49,7 @@ namespace libmpdataxx
     //enum { fp_bits = 64 };  // TODO
     struct ix {};
     static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
+    enum { stress_diff = 0};
   };
 
 }; // namespace libmpdataxx
