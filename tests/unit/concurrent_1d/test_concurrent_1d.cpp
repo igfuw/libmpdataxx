@@ -9,6 +9,7 @@
 
 #include <libmpdata++/concurr/openmp.hpp>
 #include <libmpdata++/concurr/boost_thread.hpp>
+#include <libmpdata++/concurr/cxx11_thread.hpp>
 #include <libmpdata++/concurr/serial.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 
@@ -58,6 +59,18 @@ int main()
     p.grid_size = { nx };
     run_t run(p);
 //</listing-5>
+    run.advectee() = 0;
+    run.advector() = 0;
+    run.advance(nt);
+  }
+
+  // C++11 threads
+  std::cerr << "C++11 threads run" << std::endl;
+  {
+    using solver_t = solvers::mpdata<ct_params_t>;
+    typename solver_t::rt_params_t p;
+    p.grid_size = {nx};
+    concurr::cxx11_thread<solver_t, bcond::cyclic, bcond::cyclic> run(p);
     run.advectee() = 0;
     run.advector() = 0;
     run.advance(nt);
