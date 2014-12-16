@@ -32,8 +32,9 @@ namespace libmpdataxx
 	static_assert(n_dims > 0, "n_dims <= 0");
 	static_assert(n_tlev > 0, "n_tlev <= 0");
 
-        std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; // TODO: T_sumtype
-        std::unique_ptr<blitz::Array<real_t, 2>> sumtmp; // TODO: T_sumtype
+        // TODO: T_sumtype (perhaps worh using double even if summing floats?)
+        std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; 
+        std::unique_ptr<blitz::Array<real_t, 1>> sumtmp;
 
 	public:
 
@@ -84,7 +85,7 @@ namespace libmpdataxx
           : n(0), grid_size(grid_size)
         {
           if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
-          sumtmp.reset(new blitz::Array<real_t, 2>(grid_size[0], 1));
+          sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
@@ -92,7 +93,7 @@ namespace libmpdataxx
           : n(0), grid_size(grid_size)
         {
           if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
-          sumtmp.reset(new blitz::Array<real_t, 2>(grid_size[0], grid_size[1]));
+          sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
   
@@ -103,7 +104,7 @@ namespace libmpdataxx
 	  // and make parallel results reproducible
 	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
           {
-	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr(c, j));
+	    (*sumtmp)(c) = blitz::kahan_sum(arr(c, j));
           }
           barrier();
           real_t result = blitz::kahan_sum(*sumtmp);
@@ -118,7 +119,7 @@ namespace libmpdataxx
 	  // and make parallel results reproducible
 	  for (int c = i.first(); c <= i.last(); ++c)
           {
-	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr1(c, j) * arr2(c, j)); 
+	    (*sumtmp)(c) = blitz::kahan_sum(arr1(c, j) * arr2(c, j)); 
           }
           barrier();
           real_t result = blitz::kahan_sum(*sumtmp);
@@ -133,7 +134,7 @@ namespace libmpdataxx
 	  // and make parallel results reproducible
 	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
           {
-	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr(c, j, k));
+	    (*sumtmp)(c) = blitz::kahan_sum(arr(c, j, k));
           }
           barrier();
           real_t result = blitz::kahan_sum(*sumtmp);
@@ -148,7 +149,7 @@ namespace libmpdataxx
 	  // and make parallel results reproducible
 	  for (int c = i.first(); c <= i.last(); ++c)
           {
-	    (*sumtmp)(c, 0) = blitz::kahan_sum(arr1(c, j, k) * arr2(c, j, k)); 
+	    (*sumtmp)(c) = blitz::kahan_sum(arr1(c, j, k) * arr2(c, j, k)); 
           }
           barrier();
           real_t result = blitz::kahan_sum(*sumtmp);
