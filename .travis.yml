@@ -5,6 +5,19 @@ compiler:
     - gcc
     - clang
 
+matrix:
+    include:
+        - compiler: gcc
+          env: MPI=none
+        - compiler: gcc
+          env: MPI=mpich
+        - compiler: gcc
+          env: MPI=lam
+        - compiler: gcc
+          env: MPI=openmpi
+        - compiler: clang
+          env: MPI=none
+
 before_install:
     - sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe multiverse"
     - sudo apt-get update
@@ -15,6 +28,10 @@ install:
     - sudo apt-get install --no-install-recommends libhdf5-7
     - sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
     - sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
+    - if [[ $MPI == 'mpich'   ]]; then sudo apt-get install --no-install-recommends -t trusty -y mpich libmpich-dev; fi
+    - if [[ $MPI == 'lam'     ]]; then sudo apt-get install --no-install-recommends -t trusty -y lam-runtime lam4-dev; fi
+    - if [[ $MPI == 'openmpi' ]]; then sudo apt-get install --no-install-recommends -t trusty -y openmpi-bin libopenmpi-dev; fi
+    - if [[ $MPI != 'none'    ]]; then export CXX=mpicc ; fi
 
 script:
     # libmpdata++
