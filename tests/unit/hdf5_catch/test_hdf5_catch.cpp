@@ -38,10 +38,6 @@ int main()
     bcond::cyclic, bcond::cyclic
   > run(p);
 
-  // disabling automatic printing of exceptions
-  auto error_stack = H5Eget_current_stack();
-  H5Eset_auto(error_stack, NULL, NULL);
-
   // integration
   try
   {

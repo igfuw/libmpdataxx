@@ -111,7 +111,7 @@ namespace libmpdataxx
 
 	protected:
 
-        // (cannot be nested due to tempaltes)
+        // (cannot be nested due to templates)
         typedef sharedmem<
           typename solver_t::real_t,
           solver_t::n_dims,
