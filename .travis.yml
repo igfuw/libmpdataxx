@@ -4,19 +4,19 @@ os:
 compiler:
     - gcc
     - clang
-
+env:
+    - MPI=none
+    - MPI=openmpi
+    - MPI=lam
+    - MPI=mpich
 matrix:
-    include:
-        - compiler: gcc
-          env: MPI=none
-        - compiler: gcc
-          env: MPI=mpich
-        - compiler: gcc
-          env: MPI=lam
-        - compiler: gcc
-          env: MPI=openmpi
+    exclude:
         - compiler: clang
-          env: MPI=none
+          env: MPI=mpich
+        - compiler: clang
+          env: MPI=lam
+        - compiler: clang
+          env: MPI=openmpi
 
 before_install:
     - sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe multiverse"
