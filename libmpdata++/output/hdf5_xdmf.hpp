@@ -10,7 +10,6 @@
 #pragma once
 
 #include <libmpdata++/output/detail/output_common.hpp>
-#include <libmpdata++/detail/error.hpp>
 #include <libmpdata++/output/detail/xdmf_writer.hpp>
 
 #include <boost/filesystem.hpp>
@@ -59,7 +58,6 @@ namespace libmpdataxx
 
       void start(const int nt)
       {
-        try
         {
           // turn off the default output printing
           //H5::Exception::dontPrint(); // TODO: when done with boost exceptions set-up
@@ -132,7 +130,6 @@ namespace libmpdataxx
 
           xdmfw.setup("coord.h5", dim_names, attr_names, cshape);
         }
-        catch (const H5::Exception &e) { handle(e); }
       }
 
       void record_all()
@@ -157,7 +154,6 @@ namespace libmpdataxx
         // write temporal xmf
         xdmfw.write_temporal(outdir + "/temp.xmf", timesteps);
 
-        try
         {
 	  for (const auto &v : this->outvars)
           {
@@ -203,16 +199,6 @@ namespace libmpdataxx
             }
           }
         }
-        catch (const H5::Exception &e) { handle(e); }
-      }
-
-      void handle(const H5::Exception &e)
-      {
-	BOOST_THROW_EXCEPTION(
-	  error(e.getCDetailMsg())
-	    << boost::errinfo_api_function(e.getCFuncName())
-	    << boost::errinfo_file_name(outdir.c_str())
-	);
       }
 
       protected:

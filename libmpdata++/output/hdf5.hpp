@@ -11,7 +11,6 @@
 #pragma once
 
 #include <libmpdata++/output/detail/output_common.hpp>
-#include <libmpdata++/detail/error.hpp>
 
 // the C++ HDF5 API
 #include <H5Cpp.h>
@@ -53,7 +52,6 @@ namespace libmpdataxx
 
       void start(const int nt)
       {
-        try 
         {
           // turn off the default output printing
           //H5::Exception::dontPrint(); // TODO: when done with boost exceptions set-up
@@ -121,7 +119,6 @@ namespace libmpdataxx
 	    }
           }
         }
-        catch (const H5::Exception &e) { handle(e); }
       }
 
       void record_all()
@@ -133,7 +130,6 @@ namespace libmpdataxx
         offst[0] = shape[0]-1;
         count[1] = 1;
 
-        try
         {
 	  dims[0].extend(shape);
 	  {
@@ -162,16 +158,6 @@ namespace libmpdataxx
 	    default: assert(false); // TODO: 1D and 3D versions
 	  }
         }
-        catch (const H5::Exception &e) { handle(e); }
-      }
-
-      void handle(const H5::Exception &e) 
-      {
-	BOOST_THROW_EXCEPTION(
-	  error(e.getCDetailMsg()) 
-	    << boost::errinfo_api_function(e.getCFuncName())
-	    << boost::errinfo_file_name(outfile.c_str())
-	);
       }
 
       protected:
@@ -180,7 +166,6 @@ namespace libmpdataxx
       void setup_aux(const std::string &name)
       {
         assert(this->mem->rank() == 0);
-        try 
         {
 	  aux[name] = (*hdfp).createDataSet(
 	    name, 
@@ -189,14 +174,12 @@ namespace libmpdataxx
 	    params
 	  );
         }
-        catch (const H5::Exception &e) { handle(e); } 
       }
 
       // data is assumed to be contiguous and in the same layout as hdf variable
       void record_aux(const std::string &name, typename solver_t::real_t *data)
       {
         assert(this->mem->rank() == 0);
-        try 
         {
           aux[name].extend(shape);
 	  H5::DataSpace space = aux[name].getSpace();
@@ -207,7 +190,6 @@ namespace libmpdataxx
 	  aux[name].write(data, flttype_solver, H5::DataSpace(hdf_dims, count), space); 
 
         }
-        catch (const H5::Exception &e) { handle(e); } 
       }
 
       public:

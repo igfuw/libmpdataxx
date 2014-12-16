@@ -23,7 +23,6 @@
 - G in velocity interpolation
 - G in pressure solver
 - sanity checks for members of the ct_params_class
-- unify error handling (std::runtime_error?) get rid of error.hpp; (is there anything needed besides asserts... or boost.asserts?)
 - should all classes be named with _t suffix?
 - a check for positive-definiteness of the signal in debug mode
 - output out of hooks? (or separate output hooks?)
