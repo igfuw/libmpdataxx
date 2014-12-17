@@ -31,7 +31,7 @@ install:
     - if [[ $MPI == 'mpich'   ]]; then sudo apt-get install --no-install-recommends -t trusty -y mpich libmpich-dev; fi
     - if [[ $MPI == 'lam'     ]]; then sudo apt-get install --no-install-recommends -t trusty -y lam-runtime lam4-dev; fi
     - if [[ $MPI == 'openmpi' ]]; then sudo apt-get install --no-install-recommends -t trusty -y openmpi-bin libopenmpi-dev; fi
-    - if [[ $MPI != 'none'    ]]; then export CXX=mpicxx ; fi
+    - if [[ $MPI != 'none'    ]]; then export CXX=mpic++.$MPI ; fi
 
 script:
     # libmpdata++
