@@ -36,9 +36,13 @@ namespace libmpdataxx
 	public:
 
 	// ctor
-	polar_common(const rng_t &i, const int halo, const int pole) :
-	  parent_t(i, halo),
-	  pole(pole)
+	polar_common(
+          const rng_t &i, 
+          const int halo, 
+          const int grid_size_0
+        ) :
+	  parent_t(i, halo, grid_size_0),
+	  pole((grid_size_0 - 1) / 2)
 	{} 
       };
     }; // namespace detail

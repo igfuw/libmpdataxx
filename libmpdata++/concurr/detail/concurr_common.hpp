@@ -162,6 +162,24 @@ namespace libmpdataxx
 
         private:
  
+        template <
+          bcond::bcond_e type,
+          bcond::drctn_e dir,
+          int dim
+        >
+        void bcx_set(
+          typename solver_t::bcp_t &bcp, 
+          const std::array<int, solver_t::n_dims> &grid_size
+        ) {
+	  bcp.reset(
+            new bcond::bcond<real_t, type, dir, solver_t::n_dims, dim>(
+	      slab<dim>(grid_size), 
+	      solver_t::halo, 
+	      grid_size[0]
+            )
+          );
+        }
+
         // 1D version
         void init(
           const typename solver_t::rt_params_t &p,
@@ -170,27 +188,8 @@ namespace libmpdataxx
         {
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
 
-          switch (bcxl) // TODO: make a function that does it
-          {
-            case bcond::cyclic: 
-              bxl.reset(new bcond::cyclic_left_1d<real_t>(slab<0>(grid_size), solver_t::halo));
-              break;
-            case bcond::open: 
-              bxl.reset(new bcond::open_left_1d<real_t>(slab<0>(grid_size), solver_t::halo));
-              break;
-            default: assert(false);
-          }
-
-          switch (bcxr) // TODO: make a function that does it
-          {
-            case bcond::cyclic:
-	      bxr.reset(new bcond::cyclic_rght_1d<real_t>(slab<0>(grid_size), solver_t::halo));
-              break;
-            case bcond::open: 
-              bxr.reset(new bcond::open_rght_1d<real_t>(slab<0>(grid_size), solver_t::halo));
-              break;
-            default: assert(false);
-          }
+          bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
+	  bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
 
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
@@ -212,87 +211,23 @@ namespace libmpdataxx
 	}
 
         // 2D version
+        // TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
         void init(
           const typename solver_t::rt_params_t &p,
 	  const std::array<int, 2> &grid_size, 
           const int &n0, const int &n1 = 1
         ) {
-// TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
           for (int i0 = 0; i0 < n0; ++i0) 
           {
             for (int i1 = 0; i1 < n1; ++i1) 
             {
 	      typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
 
-              // dim 1, left
-              switch (bcxl) // TODO: make a function taht does it
-              {
-	        case bcond::cyclic:
-		  bxl.reset(new bcond::cyclic_left_2d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                  break;
-                case bcond::open:
-	          bxl.reset(new bcond::open_left_2d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                  break;
-                case bcond::rigid:
-	          bxl.reset(new bcond::rigid_left_2d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                  break;
-	        default: assert(false);
-              }
+              bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
+	      bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
 
-              // dim 1, rght
-	      switch (bcxr) // TODO: make a function taht does it
-              {
-                case bcond::cyclic:
-                  bxr.reset(new bcond::cyclic_rght_2d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                  break;
-                case bcond::open:
-                  bxr.reset(new bcond::open_rght_2d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                  break;
-                case bcond::rigid:
-                  bxr.reset(new bcond::rigid_rght_2d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                  break;
-	        defalt: assert(false);
-              }
-
-              // dim 2, left
-	      switch (bcyl) // TODO: make a function taht does it
-              {
-                case bcond::cyclic:
-                  byl.reset(new bcond::cyclic_left_2d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                  break;
-                case bcond::polar:
-                  byl.reset(new bcond::polar_left_2d<1, real_t>(slab<1>(grid_size),
-                            solver_t::halo,
-                            (grid_size[0] - 1) / 2));
-                  break;
-                case bcond::open:
-                  byl.reset(new bcond::open_left_2d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                  break;
-                case bcond::rigid:
-                  byl.reset(new bcond::rigid_left_2d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                  break;
-                default: assert(false);
-              }
-
-              // dim 2, rght
-	      switch (bcyr) // TODO: make a function taht does it
-              {
-                case bcond::cyclic:
-                  byr.reset(new bcond::cyclic_rght_2d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                  break;
-                case bcond::polar:
-                  byr.reset(new bcond::polar_rght_2d<1, real_t>(slab<1>(grid_size),
-                            solver_t::halo,
-                            (grid_size[0] - 1) / 2));
-                  break;
-                case bcond::open:
-                  byr.reset(new bcond::open_rght_2d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                  break;
-                case bcond::rigid:
-                  byr.reset(new bcond::rigid_rght_2d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                  break;
-                default: assert(false);
-              }
+              bcx_set<bcxl, bcond::left, 1>(byl, grid_size);
+	      bcx_set<bcxr, bcond::rght, 1>(byr, grid_size);
 
               shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
               shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
@@ -322,84 +257,21 @@ namespace libmpdataxx
         ) {
           typename solver_t::bcp_t bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;
 
-// TODO: renew pointers only if invalid ?
+	  // TODO: renew pointers only if invalid ?
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
 	    for (int i1 = 0; i1 < n1; ++i1) 
             {
 	      for (int i2 = 0; i2 < n2; ++i2) 
               {
-                // dim 1, left
-                switch (bcxl) // TODO: make a function that does it
-                {
-                  case bcond::cyclic:
-                    bxl.reset(new bcond::cyclic_left_3d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                    break;
-                  case bcond::open:
-                    bxl.reset(new bcond::open_left_3d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                    break;
-                  default: assert(false);
-                }
+                bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
+                bcx_set<bcxl, bcond::rght, 0>(bxr, grid_size);
 
-                // dim 1, rght
-                switch (bcxr) // TODO: make a function that does it
-                {
-                  case bcond::cyclic:
-                    bxr.reset(new bcond::cyclic_rght_3d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                    break;
-                  case bcond::open:
-                    bxr.reset(new bcond::open_rght_3d<0, real_t>(slab<0>(grid_size), solver_t::halo));
-                    break;
-                  default: assert(false);
-                }
+                bcx_set<bcxl, bcond::left, 1>(byl, grid_size);
+                bcx_set<bcxl, bcond::rght, 1>(byr, grid_size);
 
-                // dim 2, left
-                switch (bcyl) // TODO: make a function taht does it
-                {
-                  case bcond::cyclic:
-                    byl.reset(new bcond::cyclic_left_3d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                    break;
-                  case bcond::open:
-                    byl.reset(new bcond::open_left_3d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                    break;
-                  default: assert(false);
-                }
-
-                // dim 2, rght
-                switch (bcyr) // TODO: make a function taht does it
-                {
-                  case bcond::cyclic:
-		    byr.reset(new bcond::cyclic_rght_3d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                    break;
-                  case bcond::open:
-		    byr.reset(new bcond::open_rght_3d<1, real_t>(slab<1>(grid_size), solver_t::halo));
-                    break;
-                  default: assert(false);
-                }
-
-                // dim 3, left
-                switch (bczl) // TODO: make a function taht does it
-                {
-                  case bcond::cyclic:
-		    bzl.reset(new bcond::cyclic_left_3d<2, real_t>(slab<2>(grid_size), solver_t::halo));
-                    break;
-                  case bcond::open:
-		    bzl.reset(new bcond::open_left_3d<2, real_t>(slab<2>(grid_size), solver_t::halo));
-                    break;
-                  default: assert(false);
-                }
-
-                // dim 3, rght
-                switch (bczr) // TODO: make a function taht does it
-                {
-                  case bcond::cyclic:
-		    bzr.reset(new bcond::cyclic_rght_3d<2, real_t>(slab<2>(grid_size), solver_t::halo));
-                    break;
-                  case bcond::open:
-		    bzr.reset(new bcond::open_rght_3d<2, real_t>(slab<2>(grid_size), solver_t::halo));
-                    break;
-                  default: assert(false);
-                }
+                bcx_set<bcxl, bcond::left, 2>(bzl, grid_size);
+                bcx_set<bcxl, bcond::rght, 2>(bzr, grid_size);
 
                 shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
                 shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1

@@ -38,7 +38,7 @@ namespace libmpdataxx
       // ctor
       // parent constructor takes minimal parameters that construct valid member ranges, note that they
       // aren't actually used !
-      shared() : parent_t(rng_t(0, 2), 1) {}
+      shared() : parent_t(rng_t(-1, -1), -1, -1) {} // TODO: bcond_any?
     };
 
   }; // namespace bcond

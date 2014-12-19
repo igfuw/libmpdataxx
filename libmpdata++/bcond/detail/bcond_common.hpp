@@ -15,6 +15,18 @@ namespace libmpdataxx
     using namespace arakawa_c;
 
     enum bcond_e { null, cyclic, polar, open, rigid }; 
+    enum drctn_e { left, rght };
+
+    template<
+      typename real_t, 
+      bcond_e knd,
+      drctn_e dir, 
+      int n_dims,
+      int dim,
+      class enableif = void
+    > 
+    class bcond
+    {};
 
     namespace detail
     {
@@ -95,7 +107,7 @@ namespace libmpdataxx
 	public:
 
 	// ctor
-	bcond_common(const rng_t &i, const int halo) :
+	bcond_common(const rng_t &i, const int halo, const int grid_size_0) :
 	  halo(halo),
 	  // sclr
 	  left_edge_sclr(
