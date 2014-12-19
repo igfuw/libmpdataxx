@@ -1,22 +1,20 @@
-/** @file
-* @copyright University of Warsaw
-* @section LICENSE
-* GPLv2+ (see the COPYING file or http://www.gnu.org/licenses/)
-*/
+// 2D polar boundary conditions for libmpdata++
+//
+// licensing: GPU GPL v3
+// copyright: University of Warsaw
 
 #pragma once
 
-#include <libmpdata++/bcond/polar_common.hpp>
-#include <libmpdata++/formulae/idxperm.hpp>
+#include <libmpdata++/bcond/detail/polar_common.hpp>
 
 namespace libmpdataxx
 {
   namespace bcond
   {
     template<int d, typename real_t>
-    class polar_left_2d : public polar_common<real_t>
+    class polar_left_2d : public detail::polar_common<real_t>
     {
-      using parent_t = polar_common<real_t>;
+      using parent_t = detail::polar_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -65,9 +63,9 @@ namespace libmpdataxx
     };
 
     template<int d, typename real_t>
-    class polar_rght_2d : public polar_common<real_t>
+    class polar_rght_2d : public detail::polar_common<real_t>
     {
-      using parent_t = polar_common<real_t>;
+      using parent_t = detail::polar_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
