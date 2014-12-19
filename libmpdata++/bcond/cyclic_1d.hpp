@@ -1,21 +1,20 @@
-/** @file
-* @copyright University of Warsaw
-* @section LICENSE
-* GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
-*/
+// 1D cyclic boundary conditions for libmpdata++
+//
+// licensing: GPU GPL v3
+// copyright: University of Warsaw
 
 #pragma once
 
-#include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/bcond/detail/bcond_common.hpp>
 
 namespace libmpdataxx
 {
   namespace bcond
   {
     template <typename real_t>
-    class cyclic_left_1d : public bcond_t<real_t>
+    class cyclic_left_1d : public detail::bcond_common<real_t>
     {
-      using parent_t = bcond_t<real_t>;
+      using parent_t = detail::bcond_common<real_t>;
       using arr_t = blitz::Array<real_t, 1>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -33,9 +32,9 @@ namespace libmpdataxx
     };
 
     template <typename real_t>
-    class cyclic_rght_1d : public bcond_t<real_t>
+    class cyclic_rght_1d : public detail::bcond_common<real_t>
     {
-      using parent_t = bcond_t<real_t>;
+      using parent_t = detail::bcond_common<real_t>;
       using arr_t = blitz::Array<real_t, 1>;
       using parent_t::parent_t; // inheriting ctor
 
