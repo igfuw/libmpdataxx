@@ -18,7 +18,7 @@ namespace libmpdataxx
         dir == left &&
         n_dims == 2
       >::type 
-    > : public detail::bcond_common<real_t>
+    > : public detail::polar_common<real_t>
     { 
       using parent_t = detail::polar_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
@@ -75,7 +75,7 @@ namespace libmpdataxx
         dir == rght &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t>
+    > : public detail::polar_common<real_t>
     { 
       using parent_t = detail::polar_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;

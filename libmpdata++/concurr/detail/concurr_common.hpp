@@ -226,8 +226,8 @@ namespace libmpdataxx
               bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
 	      bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
 
-              bcx_set<bcxl, bcond::left, 1>(byl, grid_size);
-	      bcx_set<bcxr, bcond::rght, 1>(byr, grid_size);
+              bcx_set<bcyl, bcond::left, 1>(byl, grid_size);
+	      bcx_set<bcyr, bcond::rght, 1>(byr, grid_size);
 
               shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
               shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
@@ -265,13 +265,13 @@ namespace libmpdataxx
 	      for (int i2 = 0; i2 < n2; ++i2) 
               {
                 bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
-                bcx_set<bcxl, bcond::rght, 0>(bxr, grid_size);
+                bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
 
-                bcx_set<bcxl, bcond::left, 1>(byl, grid_size);
-                bcx_set<bcxl, bcond::rght, 1>(byr, grid_size);
+                bcx_set<bcyl, bcond::left, 1>(byl, grid_size);
+                bcx_set<bcyr, bcond::rght, 1>(byr, grid_size);
 
-                bcx_set<bcxl, bcond::left, 2>(bzl, grid_size);
-                bcx_set<bcxl, bcond::rght, 2>(bzr, grid_size);
+                bcx_set<bczl, bcond::left, 2>(bzl, grid_size);
+                bcx_set<bczr, bcond::rght, 2>(bzr, grid_size);
 
                 shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
                 shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1

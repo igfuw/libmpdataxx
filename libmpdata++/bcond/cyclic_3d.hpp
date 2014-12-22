@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <libmpdata++/bcond/detail/cyclic_common.hpp>
+#include <libmpdata++/bcond/detail/bcond_common.hpp>
 
 namespace libmpdataxx
 {
