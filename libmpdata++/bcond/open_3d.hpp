@@ -43,6 +43,7 @@ namespace libmpdataxx
 	using namespace idxperm;
 	const int i = this->left_edge_sclr;
 
+        // TODO: exactly the same code below!
         switch (d) // note: order and lack of breaks intentional!
         {
           case 0:
@@ -52,6 +53,9 @@ namespace libmpdataxx
           case 1:
           av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
           av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+
+          case 2: 
+          break;
 
           default: assert(false);
         }
@@ -128,6 +132,9 @@ namespace libmpdataxx
           case 1:
 	  av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
 	  av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+
+          case 2: 
+          break;
 
           default: assert(false);
         }
