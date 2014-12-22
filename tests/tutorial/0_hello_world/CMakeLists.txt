@@ -1,1 +1,1 @@
-libmpdataxx_add_test(hello_world)
+libmpdataxx_add_test_gi(hello_world)
