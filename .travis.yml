@@ -10,6 +10,7 @@ before_install:
     - sudo apt-get update
 
 install:
+    - if [[ $CXX == 'clang++' ]]; then sudo apt-get remove clang libclang-dev libclang1 lldb llvm llvm-dev llvm-runtime; fi
     - if [[ $CXX == 'clang++' ]]; then sudo apt-get install --no-install-recommends clang-3.5; fi
     - if [[ $CXX == 'g++'     ]]; then sudo apt-get install --no-install-recommends g++  ; fi
     - sudo apt-get install --no-install-recommends libhdf5-7
@@ -20,7 +21,6 @@ script:
     # libmpdata++
     - mkdir build 
     - cd build
-    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang++-3.5 ../ ; fi
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
