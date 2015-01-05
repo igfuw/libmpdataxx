@@ -1,22 +1,20 @@
-/** @file
-* @copyright University of Warsaw
-* @section LICENSE
-* GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
-*/
+// 2D open boundary conditions for libmpdata++
+//
+// licensing: GPU GPL v3
+// copyright: University of Warsaw
 
 #pragma once
 
-#include <libmpdata++/bcond/open_common.hpp>
-#include <libmpdata++/formulae/idxperm.hpp>
+#include <libmpdata++/bcond/detail/bcond_common.hpp>
 
 namespace libmpdataxx
 {
   namespace bcond
   {
     template<int d, typename real_t>
-    class open_left_2d : public bcond_t<real_t>
+    class open_left_2d : public detail::bcond_common<real_t>
     {
-      using parent_t = bcond_t<real_t>;
+      using parent_t = detail::bcond_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -68,9 +66,9 @@ namespace libmpdataxx
     };
 
     template<int d, typename real_t>
-    class open_rght_2d : public bcond_t<real_t>
+    class open_rght_2d : public detail::bcond_common<real_t>
     {
-      using parent_t = bcond_t<real_t>;
+      using parent_t = detail::bcond_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
       

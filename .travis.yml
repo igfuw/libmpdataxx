@@ -4,22 +4,40 @@ os:
 compiler:
     - gcc
     - clang
+env:
+    - MPI=none
+    - MPI=openmpi
+    - MPI=lam
+    - MPI=mpich
+matrix:
+    exclude:
+        - compiler: clang
+          env: MPI=mpich
+        - compiler: clang
+          env: MPI=lam
+        - compiler: clang
+          env: MPI=openmpi
 
 before_install:
     - sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe multiverse"
     - sudo apt-get update
 
 install:
-    - if [[ $CXX == 'clang++' ]]; then sudo apt-get install --no-install-recommends clang; fi
+    - if [[ $CXX == 'clang++' ]]; then sudo apt-get install --no-install-recommends clang-3.5; fi
     - if [[ $CXX == 'g++'     ]]; then sudo apt-get install --no-install-recommends g++  ; fi
     - sudo apt-get install --no-install-recommends libhdf5-7
     - sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
     - sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev
+    - if [[ $MPI == 'mpich'   ]]; then sudo apt-get install --no-install-recommends -t trusty -y mpich libmpich-dev; fi
+    - if [[ $MPI == 'lam'     ]]; then sudo apt-get install --no-install-recommends -t trusty -y lam-runtime lam4-dev; fi
+    - if [[ $MPI == 'openmpi' ]]; then sudo apt-get install --no-install-recommends -t trusty -y openmpi-bin libopenmpi-dev; fi
+    - if [[ $MPI != 'none'    ]]; then export CXX=mpic++.$MPI ; fi
 
 script:
     # libmpdata++
     - mkdir build 
     - cd build
+    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
