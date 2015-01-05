@@ -12,8 +12,6 @@ before_install:
 install:
     - if [[ $CXX == 'clang++' ]]; then export LLVM_VERSION=3.5; fi
     - if [[ $CXX == 'clang++' ]]; then sudo apt-get install --no-install-recommends clang-${LLVM_VERSION}; fi
-    - if [[ $CXX == 'clang++' ]]; then export LD_LIBRARY_PATH=/usr/lib/llvm-${LLVM_VERSION}/lib/; fi
-    - if [[ $CXX == 'clang++' ]]; then export PATH=/usr/lib/llvm-${LLVM_VERSION}/bin:$PATH; fi
     - if [[ $CXX == 'g++'     ]]; then sudo apt-get install --no-install-recommends g++  ; fi
     - sudo apt-get install --no-install-recommends libhdf5-7
     - sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev
@@ -23,6 +21,7 @@ script:
     # libmpdata++
     - mkdir build 
     - cd build
+    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/lib/llvm-${LLVM_VERSION}/bin/clang++-${LLVM_VERSION}; fi
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
