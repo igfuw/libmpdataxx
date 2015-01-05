@@ -51,7 +51,7 @@ namespace libmpdataxx
       };
       
       // setting to a given array
-      virtual void set_edge_pres(const blitz::Array<real_t, 2> &,const blitz::Array<real_t, 2> &, const rng_t &) 
+      virtual void set_edge_pres(const blitz::Array<real_t, 2> &, const blitz::Array<real_t, 2> &, const rng_t &) 
       {
         assert(false && "bcond::set_edge_b() called!");
       };
@@ -148,6 +148,11 @@ namespace libmpdataxx
       virtual void fill_halos_sclr(const blitz::Array<real_t, 1> &, const bool) { };
       virtual void fill_halos_sclr(const blitz::Array<real_t, 2> &, const rng_t &, const bool) { };
       virtual void fill_halos_sclr(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &, const bool) { };
+      
+      virtual void fill_halos_pres(const blitz::Array<real_t, 2> &, const rng_t &) { };
+      
+      virtual void set_edge_pres(const blitz::Array<real_t, 2> &, const rng_t &) { };
+      virtual void set_edge_pres(const blitz::Array<real_t, 2> &, const blitz::Array<real_t, 2> &, const rng_t &) { };
 
       virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 1>> &) { };
       virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &) { };
