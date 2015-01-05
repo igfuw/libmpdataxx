@@ -20,7 +20,7 @@ script:
     # libmpdata++
     - mkdir build 
     - cd build
-    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang-3.5 ../ ; fi
+    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang++-3.5 ../ ; fi
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
