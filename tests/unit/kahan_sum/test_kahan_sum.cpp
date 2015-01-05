@@ -7,21 +7,27 @@ void main_tmpl()
   // Kahan sum reduction test
   if (sizeof(real_t) == sizeof(float)) 
   {
-    blitz::Array<real_t, 1> a(10);
+    blitz::Array<real_t, 1> a(10), rev(10);
     a = 1e-8;
     a(0) = 1e8;
+    std::cerr << std::setprecision(20);
     std::cerr  
       << a
-      << std::setprecision(20)
-      << "blitz::sum = " << blitz::sum(a) << std::endl
-      << " kahan_sum = " << blitz::kahan_sum(a) << std::endl;
+      << "      blitz::sum = " << blitz::sum(a) << std::endl
+      << "       kahan_sum = " << blitz::kahan_sum(a) << std::endl;
+    rev = a.reverse(0);
+    std::cerr  
+      << rev
+      << "rev + blitz::sum = " << blitz::sum(rev) << std::endl
+      << "rev +  kahan_sum = " << blitz::kahan_sum(rev) << std::endl;
+    
     
     // that's why we might need a Kahan sum
-    if (blitz::sum(a) - blitz::sum(a.reverse(0)) < 4e-8) 
-      throw std::exception();
+    if (std::abs(blitz::sum(a) - blitz::sum(rev)) < 4e-8) 
+      throw std::runtime_error("A");
     // that's to show it works
-    if (blitz::kahan_sum(a) - blitz::kahan_sum(a.reverse(0)) > 4e-8) 
-      throw std::exception();
+    if (std::abs(blitz::kahan_sum(a) - blitz::kahan_sum(rev)) > 4e-8) 
+      throw std::runtime_error("B");
   }
 }
 
