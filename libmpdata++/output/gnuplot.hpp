@@ -31,7 +31,8 @@ namespace libmpdataxx
       void start(const int nt)
       {
         gp.reset(new Gnuplot());
-        *gp << std::scientific << std::setprecision(10);
+        *gp << std::fixed << std::setprecision(5);
+        // fixed instead of scientyfic to allow automatic comparison of test results for values near zero
 
         // some common 1D/2D settings
         *gp 
