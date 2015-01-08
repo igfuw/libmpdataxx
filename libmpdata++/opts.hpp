@@ -44,6 +44,7 @@ namespace libmpdataxx
     enum { hint_norhs = 0 };
     struct ix {};
     static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
+    enum { stress_diff = 0};
   };
 
 }; // namespace libmpdataxx
