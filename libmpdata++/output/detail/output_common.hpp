@@ -26,6 +26,7 @@ namespace libmpdataxx
 	std::map<int, info_t> outvars;
 
 	int outfreq;
+	int outwindow;
 
 	virtual void record(const int var) {}
 	virtual void start(const int nt) {}
@@ -54,8 +55,12 @@ namespace libmpdataxx
 	  if (this->mem->rank() == 0)
 	  {
             // TODO: output of solver statistics every timesteps could probably go here
-	    if (this->timestep % outfreq == 0) record_all();
-	  }
+            for (int t = 0; t < outwindow; ++t)
+            {
+	      if ((this->timestep - t) % outfreq == 0) record_all();
+            }
+          }
+	  
 	  this->mem->barrier(); // waiting for the output to be finished
 	}
 
@@ -64,6 +69,7 @@ namespace libmpdataxx
 	struct rt_params_t : parent_t::rt_params_t 
 	{ 
 	  int outfreq = 1; 
+	  int outwindow = 1;
 	  std::map<int, info_t> outvars;
 	};
 
@@ -74,6 +80,7 @@ namespace libmpdataxx
 	) :
           parent_t(args, p),
 	  outfreq(p.outfreq), 
+	  outwindow(p.outwindow),
           outvars(p.outvars)
 	{
           // default value for outvars
