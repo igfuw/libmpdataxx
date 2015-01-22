@@ -111,6 +111,6 @@ int main()
   test<opts::fct | opts::abs>("spreading_drop_2d_fct+abs.out");
   system("python ../../../../tests/tutorial/7_shallow_water/plot_2d.py fct+abs fct+iga");
   system("python ../../../../tests/tutorial/7_shallow_water/3Dplot_2d.py");
-  system("python ../../../../tests/tutorial/7_shallow_water/errors.py fct+abs fct+iga");
+  system("python ../../../../tests/tutorial/7_shallow_water/errors_2d.py fct+abs fct+iga");
 }
 
