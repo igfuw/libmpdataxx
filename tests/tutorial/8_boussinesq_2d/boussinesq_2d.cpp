@@ -118,17 +118,30 @@ int main()
       // else
       0
     );
-std::cerr << "min(psi) = " << min(slv.advectee(ix::tht)) << "\n";
-std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
+//    std::cerr << "min(psi) = " << min(slv.advectee(ix::tht)) << "\n";
+//    std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
     slv.advectee(ix::u) = 0; 
     slv.advectee(ix::w) = 0; 
   }
 
+  long double int_init = sum(pow(slv.advectee(ix::tht), 2));
+//  std::cerr << "int = " << int_init << std::endl;
+
+  std::cerr<<slv.advectee(ix::tht).extent(0)<<std::endl;
+  std::cerr<<slv.advectee(ix::tht).extent(1)<<std::endl;
+
   // integration
-  slv.advance(nt); 
-std::cerr << "min(psi)-300 = " << min(slv.advectee(ix::tht))-300.0 << "\n";
-std::cerr << "max(psi)-300 = " << max(slv.advectee(ix::tht))-300.5 << "\n";
-std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
+  slv.advance(nt);  
+
+  long double int_fin = sum(pow(slv.advectee(ix::tht), 2));
+//  std::cerr << "int = " << int_fin << std::endl;
+
+//  std::cerr << slv.advectee(ix::tht).extent(0) * slv.advectee(ix::tht).extent(1) / int_init << std::endl; 
+  std::cerr<< "diff int = " << (int_init - int_fin) / int_init << std::endl;
+
+//  std::cerr << "min(psi)-300 = " << min(slv.advectee(ix::tht))-300.0 << "\n";
+//  std::cerr << "max(psi)-300 = " << max(slv.advectee(ix::tht))-300.5 << "\n";
+//  std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
   if (min(slv.advectee(ix::tht)) < 300-eps || max(slv.advectee(ix::tht)) > 300.5+eps)
     throw std::runtime_error("too big under- or over-shots :("); 
 };

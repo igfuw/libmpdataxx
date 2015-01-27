@@ -154,10 +154,21 @@ void test(const std::string filename)
     // TODO: an assert confirming that the above did what it should have done
     //       (in context of the advector()'s use of blitz::Array::reindex())
 
+  //true solution 
+  decltype(run.advectee()) true_solution(run.advectee().extent()); 
+  decltype(run.advectee()) error_2(run.advectee().extent()); 
+  true_solution = run.advectee();
+
   // time stepping
   run.advance(nt);
   
+  error_2 = pow(true_solution - run.advectee(), 2);
+  std::cout<<"min(solution) = " << min(true_solution) <<std::endl;
+  std::cout<<"max(solution) = " << max(true_solution) <<std::endl;
   std::cout<<"min(psi) = " << min(run.advectee()) << std::endl;
+  std::cout<<"max(psi) = " << max(run.advectee()) << std::endl;
+  std::cout<<"rms error = " << sqrt(sum(error_2) / (run.advectee().extent(0) * run.advectee().extent(1))) << std::endl;
+
 }
 
 int main()
@@ -167,6 +178,7 @@ int main()
     enum { opts_iters = 2};
     test<opts, opts_iters>("basic");
   }
+
   {
     enum { opts = opts::fct };
     enum { opts_iters = 2};
@@ -187,4 +199,5 @@ int main()
     enum { opts_iters = 2};
     test<opts, opts_iters>("iga_tot_fct");
   }
+
 }
