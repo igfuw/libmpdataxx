@@ -1,1 +1,1 @@
-libmpdataxx_add_test(coupled_harmosc)
+libmpdataxx_add_test_gi(coupled_harmosc)

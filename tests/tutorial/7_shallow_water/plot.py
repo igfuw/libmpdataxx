@@ -19,6 +19,7 @@ def analytic_fig(ax, time_l = [0,1,2,3], nx=320):
         ax.plot(x_range, v, oznacz[it]+ "--")
     ps.ticks_changes(ax)
 
+
 #reading model output from text file and converting to an array
 def reading_modeloutput(filename):
     f = open(filename)
@@ -36,7 +37,7 @@ def analytic_model_fig(ax, x_range, h_m, v_m, t_m, it):
 
     ax.plot(x_range, eq.d1_initial(x_range), 'k', x_range, h_a, 'b',
             x_range, h_m[it], "r")
-    ax.plot(x_range, 0*x_range, "k-", x_range, v_a, 'b--',
+    ax.plot(x_range, 0*x_range, "k--", x_range, v_a, 'b--',
             x_range, v_m[it], "r--")
 
     ax.set_ylim(-2,2)
@@ -69,13 +70,11 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], it=300):
         print "plotting " + str(casename) + ", t = " + str(t_m[it,0])        
         analytic_model_fig(ax, x_range, h_m, v_m, t_m, it)
         # annotating figures
-        # ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
-        #             fontsize=12, horizontalalignment='left', verticalalignment='top')
+        #ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
+        #            fontsize=12, horizontalalignment='left', verticalalignment='top')
         
-
         plt.savefig("papier_shallowwater_1d_"+str(casename)+".pdf")
         plt.show()
-
 
 main("./", sys.argv[1:])
 

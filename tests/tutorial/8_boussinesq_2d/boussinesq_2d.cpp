@@ -31,6 +31,7 @@ int main()
   }; 
 //</listing-1>
   using ix = typename ct_params_t::ix;
+  using real_t = typename ct_params_t::real_t;
 
   const int r0 = 250; 
   const int nx = 201, ny = 201, nt = 800;
@@ -57,21 +58,40 @@ int main()
   p.gnuplot_with = "lines";
   p.gnuplot_surface = false;
   p.gnuplot_contour = true;
-  p.gnuplot_cntrparam = "levels incremental 299.95, 0.1, 300.65";
-  p.gnuplot_cbrange = "[299.95 : 300.65]";
-  p.gnuplot_cbtics = "('299.99' 299.99, '300.10' 300.1, '300.20' 300.2, '300.30' 300.3, '300.40' 300.4, '300.50' 300.5, '300.60' 300.6)";
-  p.gnuplot_palette = "defined (" 
-    "299.95 '#ff0000'," //         
-    "299.99 '#ff0000'," // 
-    "299.99 '#ffffff'," //         /\-
-    "300.00 '#ffffff'," //        /  \-
-    "300.00 '#ffffff'," //  -----/    \---
-    "300.05 '#ffffff'," // -----/      \---___
-    "300.05 '#993399'," //     /        \-     ---
-    "300.20 '#00CCFF'," //    /          \-       ---
-    "300.35 '#66CC00'," //   /____________\-
-    "300.50 '#FC8727'," //
-    "300.65 '#FFFF00') maxcolors 14";
+
+  real_t eps = .01;
+
+  if (false) // TODO
+  {
+    // physics-oriented plot
+    p.gnuplot_cntrparam = "levels incremental 299.95, 0.1, 300.55";
+    p.gnuplot_cbrange = "[299.95 : 300.55]";
+    p.gnuplot_cbtics = "300.05, 0.1, 300.45";
+    p.gnuplot_palette = "defined ("
+      "299.95 '#ffffff', "
+      "300.05 '#ffffff', 300.05 '#993399', "
+      "300.15 '#993399', 300.15 '#00CCFF', "
+      "300.25 '#00CCFF', 300.25 '#66CC00', "
+      "300.35 '#66CC00', 300.35 '#FC8727', "
+      "300.45 '#FC8727', 300.45 '#FFFF00', "
+      "300.55 '#FFFF00'"
+    ")";
+  } 
+  else
+  {
+    // numerics-oriented plot
+    p.gnuplot_cntrparam = "levels discrete 299.99, 300.00, 300.05, 300.50, 300.51";
+    p.gnuplot_cbrange = "[299.95 : 300.55]";
+    p.gnuplot_cbtics = "('299.99' 299.95, '300.00' 300.00, '300.05' 300.05, '300.50' 300.50, '300.51' 300.55)"; // note: intentionally non-linear!!! TODO: use eps to construct the strings!
+    p.gnuplot_palette = "defined ("
+      "299.95 '#BACA66', "
+      "300.00 '#BACA66', 300.00 '#ffffff', "
+      "300.05 '#ffffff', 300.05 '#cccccc', "
+      "300.50 '#cccccc',"
+      "300.50 '#ff0000', 300.55 '#ff0000'"
+    ")";
+  }
+
   p.gnuplot_term = "svg";
 //<listing-2>
   p.prs_tol = 1e-7;
@@ -106,6 +126,9 @@ std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(sl
 
   // integration
   slv.advance(nt); 
-std::cerr << "min(psi) = " << min(slv.advectee(ix::tht)) << "\n";
+std::cerr << "min(psi)-300 = " << min(slv.advectee(ix::tht))-300.0 << "\n";
+std::cerr << "max(psi)-300 = " << max(slv.advectee(ix::tht))-300.5 << "\n";
 std::cerr << "max(u)^2 + max(w)^2 = " << max(pow(slv.advectee(ix::u),2) + pow(slv.advectee(ix::w),2)) << "\n";
+  if (min(slv.advectee(ix::tht)) < 300-eps || max(slv.advectee(ix::tht)) > 300.5+eps)
+    throw std::runtime_error("too big under- or over-shots :("); 
 };
