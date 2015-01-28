@@ -43,13 +43,14 @@ find_package(Blitz++ REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${BLITZ_INCLUDE_DIR}") # TODO: same for boost and others???
 
 # HDF5 libraries
-find_package(HDF5 COMPONENTS CXX HL)
+find_package(HDF5 COMPONENTS CXX HL REQUIRED)
 
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${Boost_LIBRARIES} ${HDF5_LIBRARIES})
   target_link_libraries(${test} debug "-lblitz") # TODO: use ${BLITZ_LIBRARIES}
+  target_include_directories(${test} PUBLIC ${HDF5_INCLUDE_DIRS})
 # TODO: target_compile_options() // added to CMake on Jun 3rd 2013
   add_test(${test} ${test})
 endfunction()
