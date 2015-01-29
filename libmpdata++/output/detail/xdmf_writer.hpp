@@ -19,6 +19,11 @@ namespace libmpdataxx
       class xdmf_writer
       {
         using ptree = boost::property_tree::ptree;
+#if (BOOST_VERSION >= 105600)
+        using xml_writer_settings = boost::property_tree::xml_writer_settings<std::string>;
+#else
+        using xml_writer_settings = boost::property_tree::xml_writer_settings<char>;
+#endif
 
         struct data_item
         {
@@ -106,7 +111,7 @@ namespace libmpdataxx
           {
             attribute a;
             a.name = n;
-            a.item.dimensions = dimensions;
+            a.item.dimensions = dimensions - 1;
             attrs.push_back(a);
           }
         }
@@ -132,7 +137,7 @@ namespace libmpdataxx
           for (auto a : attrs)
             a.add(grid_node);
 
-          boost::property_tree::xml_writer_settings<char> settings('\t', 1);
+          xml_writer_settings settings('\t', 1);
           write_xml(xmf_name, pt, std::locale(), settings);
         }
 
@@ -154,7 +159,7 @@ namespace libmpdataxx
             ts_node.put("<xmlattr>.xpointer", "gid");
           }
 
-          boost::property_tree::xml_writer_settings<char> settings('\t', 1);
+          xml_writer_settings settings('\t', 1);
           write_xml(xmf_name, pt, std::locale(), settings);
         }
 

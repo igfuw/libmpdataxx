@@ -1,1 +1,1 @@
-libmpdataxx_add_test(boussinesq_2d)
+libmpdataxx_add_test_gi(boussinesq_2d)

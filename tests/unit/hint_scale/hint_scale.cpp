@@ -1,6 +1,8 @@
 #include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/serial.hpp>
 
+#include <cfenv> // for fesetround() - see TODO below 
+
 using namespace libmpdataxx;
 
 template <bool scale>
@@ -57,6 +59,9 @@ bool test()
 
 int main()
 {
+  // TODO: find another sample data that does not require it
+  fesetround(FE_TOWARDZERO);
+  
   // expecting fail
   if (test<false>()) 
     throw std::runtime_error("failed to detect expected values below zero!");

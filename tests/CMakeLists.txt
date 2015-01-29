@@ -43,15 +43,28 @@ find_package(Blitz++ REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${BLITZ_INCLUDE_DIR}") # TODO: same for boost and others???
 
 # HDF5 libraries
-find_package(HDF5 COMPONENTS CXX HL)
+find_package(HDF5 COMPONENTS CXX HL REQUIRED)
 
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${Boost_LIBRARIES} ${HDF5_LIBRARIES})
   target_link_libraries(${test} debug "-lblitz") # TODO: use ${BLITZ_LIBRARIES}
+  target_include_directories(${test} PUBLIC ${HDF5_INCLUDE_DIRS})
 # TODO: target_compile_options() // added to CMake on Jun 3rd 2013
   add_test(${test} ${test})
+endfunction()
+
+function(libmpdataxx_add_test_gi test)
+  add_executable(${test} ${test}.cpp)
+  target_link_libraries(${test} ${Boost_LIBRARIES})
+  target_link_libraries(${test} debug "-lblitz") # TODO: use ${BLITZ_LIBRARIES}
+
+  # this will not work with multiple threads (make -j) as it depends on the order of execution + $PPID might be different?
+  add_test(NAME "init_${test}" COMMAND "bash" "-c" "> log-$PPID")
+  add_test(NAME "calc_${test}" COMMAND "bash" "-c" "GNUPLOT_IOSTREAM_CMD=\"cat >> log-`echo $PPID`\" ${CMAKE_CURRENT_BINARY_DIR}/${test}")
+  add_test(NAME "diff_${test}" COMMAND "bash" "-c" "zcmp log-$PPID ${CMAKE_CURRENT_SOURCE_DIR}/log-orig.gz")
+  add_test(NAME "plot_${test}" COMMAND "bash" "-c" "gnuplot log-$PPID")
 endfunction()
 
 # tests

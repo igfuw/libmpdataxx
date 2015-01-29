@@ -6,9 +6,6 @@
 
 #pragma once
 
-#include <cfenv> // for fesetround() 
-//#pragma STDC FENV_ACCESS ON (as of august 2014 seems not implemented in either gcc or clang - gcc bug 34678)
-
 namespace libmpdataxx
 {
   namespace opts
@@ -45,10 +42,9 @@ namespace libmpdataxx
   {
     enum { opts = opts::iga | opts::fct };
     enum { hint_norhs = 0 };
-    enum { fp_round_mode = FE_TOWARDZERO };
-    //enum { fp_bits = 64 };  // TODO
     struct ix {};
     static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
+    enum { stress_diff = 0};
   };
 
 }; // namespace libmpdataxx
