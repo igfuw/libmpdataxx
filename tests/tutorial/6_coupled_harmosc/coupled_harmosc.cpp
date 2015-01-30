@@ -9,28 +9,12 @@
  */
 
 #include "coupled_harmosc.hpp"
+#include "coupled_harmosc_stats.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
-using namespace libmpdataxx;
-
 #include <boost/math/constants/constants.hpp>
 
-// ------------------------------------------------------------
-  template <class ct_params_t>
-  struct coupled_harmosc_stats : coupled_harmosc<ct_params_t>
-  {
-    using parent_t = coupled_harmosc<ct_params_t>;
-    using parent_t::parent_t;
-   
-    void hook_post_step()
-    {
-      parent_t::hook_post_step();
-      this->mem->barrier();
-      std::cerr << "AQQ:" << this->timestep << " rank=" << this->mem->rank() << std::endl;
-    }
-  };
-// ------------------------------------------------------------
-
+using namespace libmpdataxx;
 
 const int nt = 1400;
 
@@ -47,9 +31,9 @@ int main()
     struct ix { enum {psi, phi}; };
   };
 //</listing-1>
-  using real_t = double;
-//  using real_t = typename ct_params_t::real_t;
-  
+
+  using real_t = typename ct_params_t::real_t;
+
   using sim_t = output::gnuplot<
     coupled_harmosc_stats<ct_params_t>
   >;
@@ -62,7 +46,7 @@ int main()
   p.omega = 2 * pi<real_t>() / p.dt / 400;
 //</listing-2>
   p.grid_size = {1001};
-  p.outfreq = 200; //10; 
+  p.outfreq = 10; 
 
   using ix = typename ct_params_t::ix;
   p.outvars = {
@@ -84,75 +68,8 @@ int main()
     );
     run.advectee(ix::phi) = real_t(0);
   }
-  //run.advector() = .5;
-  run.advector() = 0.;
+  run.advector() = .5;
 
-  //stats
- 
-/*
-  int mult = 1;    //number of 1/4 oscillations
-  float full = 100.;  //1/4 of full oscillation
-*/
   // integration
-  //run.advance(mult*full*p.dt);
-  run.advance(100);
-
-  //the sign doesn't matter cause we compare psi^2 and phi^2
-//  decltype(run.advectee(ix::psi)) solution(run.advectee().extent());
-//  if (mult % 2){
-//  {
-//    blitz::firstIndex i;
-//    solution = where(        
-//      i<= (50 /*+ 0.5*mult*full*/) || i>= (150 /*+ 0.5*mult*full*/),  // if
-//      0,                                            // then
-//      0.5 * (1 + cos(2 * pi<real_t>() * i / 100.))   // else
-//    );
-//   }}
-//  else{
-//  {
-//    blitz::firstIndex i;
-//    solution = where(        
-//      i<= (50 /*+ 0.5*mult*full*/) || i>= (150 /*+ 0.5*mult*full*/),  // if
-//      0,                                            // then
-//      0.5 * (1 + cos(2 * pi<real_t>() * i / 100.))   // else
-//    );
-//   }}
-
-//  decltype(run.advectee(ix::psi)) tmp(run.advectee().extent());
-//  tmp = pow(pow(run.advectee(ix::psi), 2) +  pow(run.advectee(ix::phi), 2) - pow(solution, 2), 2);
-//  std::cerr <<"rms = " << sqrt((sum(tmp) - tmp(tmp.extent(0)-1)) / (tmp.extent(0) - 1)) / mult / full / p.dt << std::endl;
-  
-
-  std::cerr<<std::fixed;
-  std::cerr<<std::setprecision(20);
-  std::cerr<<"min(psi) = "<< min(run.advectee(ix::psi))<<std::endl;
-  std::cerr<<minIndex(run.advectee(ix::psi)) <<std::endl;
-  std::cerr<<"max(psi) = "<< max(run.advectee(ix::psi))<<std::endl;
-  std::cerr<<maxIndex(run.advectee(ix::psi)) <<std::endl;
-  std::cerr<<"min(phi) = "<< min(run.advectee(ix::phi))<<std::endl;
-  std::cerr<<minIndex(run.advectee(ix::phi)) <<std::endl;
-  std::cerr<<"max(phi) = "<< max(run.advectee(ix::phi))<<std::endl;
-  std::cerr<<maxIndex(run.advectee(ix::phi)) <<std::endl;
-
-/*
-  if ((mult % 4) == 0) {
-    std::cerr<<maxIndex(run.advectee(ix::psi)) <<std::endl;
-    std::cerr<<maxIndex(solution) <<std::endl;
-  } 
-  if ((mult % 4) == 1){
-    std::cerr<<minIndex(run.advectee(ix::phi)) <<std::endl;
-    std::cerr<<maxIndex(solution) <<std::endl;
-  }
-  if ((mult % 4) == 2) {
-    std::cerr<<minIndex(run.advectee(ix::psi)) <<std::endl;
-    std::cerr<<maxIndex(solution) <<std::endl;
-  } 
-  if ((mult % 4) == 3){
-    std::cerr<<maxIndex(run.advectee(ix::phi)) <<std::endl;
-    std::cerr<<maxIndex(solution) <<std::endl;
-  }
-
-  std::cerr <<"advectees = " << sum(pow(run.advectee(ix::psi), 2)) + sum(pow(run.advectee(ix::phi), 2))<<std::endl;
-  std::cerr <<"solution = " << sum(pow(solution, 2))  << std::endl;
-*/  
+  run.advance(nt);
 }

@@ -24,9 +24,11 @@ script:
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test
     - cmake -DCMAKE_BUILD_TYPE=Release ../
     - VERBOSE=1 make
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test
     - sudo make install
     
     # libcloudph++ (needed by icicle, skipping tests and CUDA build)
