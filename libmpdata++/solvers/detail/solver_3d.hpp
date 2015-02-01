@@ -31,7 +31,7 @@ namespace libmpdataxx
       
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
-	rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
+	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
 	void xchng_sclr(typename parent_t::arr_t arr,
                        rng_t range_i, rng_t range_j, rng_t range_k,

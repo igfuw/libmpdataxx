@@ -31,7 +31,7 @@ namespace libmpdataxx
       
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr;
 
-	rng_t i, j;
+	const rng_t i, j; // TODO: to be removed
 
 	void xchng_sclr(typename parent_t::arr_t arr, rng_t range_i, rng_t range_j, const bool deriv = false) // for a given array
 	{

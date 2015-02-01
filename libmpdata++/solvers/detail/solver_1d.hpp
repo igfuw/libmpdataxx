@@ -29,7 +29,7 @@ namespace libmpdataxx
 
         typename parent_t::bcp_t bcxl, bcxr;
      
-	rng_t i; 
+	const rng_t i; //TODO: to be removed
 
 	void xchng(int e) 
 	{

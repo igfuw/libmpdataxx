@@ -47,7 +47,7 @@ namespace libmpdataxx
 
 	protected: 
 
-	idx_t<n_dims> ijk;
+	const idx_t<n_dims> ijk;
 
         long long int timestep = 0;
         std::vector<int> n; 
