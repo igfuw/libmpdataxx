@@ -19,10 +19,11 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends libhdf5-7; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then brew install llvm --with-clang; fi
+    #- if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then brew install llvm --with-clang; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then brew install gcc48; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo brew tap homebrew/science; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot blitz; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5 --enable-cxx; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5 --with-cxx; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h; fi
 
 script:
@@ -31,6 +32,7 @@ script:
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ ../; fi # Travis default is not the packaged one
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ ../; fi 
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
