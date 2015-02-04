@@ -35,7 +35,7 @@ namespace libmpdataxx
 	protected:
 
 	// member fields
-	rng_t im, jm;
+	const rng_t im, jm;
 
 	void hook_ante_loop(const int nt) 
 	{   
