@@ -24,6 +24,7 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo brew tap homebrew/science; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot blitz; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5 --with-cxx; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --with-c++11; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h; fi
 
 script:
