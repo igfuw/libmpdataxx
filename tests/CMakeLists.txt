@@ -30,7 +30,7 @@ endif()
 # TODO: should't this path be added somewhere now?
 
 # Boost libraries
-find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem QUIET)
+find_package(Boost COMPONENTS thread date_time system timer filesystem iostreams QUIET)
 if (NOT Boost_FOUND)
   message(FATAL_ERROR "
   Boost.{Thread,date_time,system,iostreams,timer,filesystem} not found.
