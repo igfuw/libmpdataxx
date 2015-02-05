@@ -32,7 +32,7 @@ script:
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ ../; fi # the one from homebrew
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/llvm35/3.5.1/bin/clang++-3.5 ../; fi # the one from homebrew
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
@@ -54,7 +54,7 @@ script:
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ ../; fi # the one from homebrew
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang++-3.5 ../; fi # the one from homebrew
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make 
@@ -68,7 +68,7 @@ script:
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ ../; fi # the one from homebrew
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang++-3.5 ../; fi # the one from homebrew
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make
