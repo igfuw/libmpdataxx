@@ -15,6 +15,8 @@
 #include <libmpdata++/solvers/detail/solver_3d.hpp> // TODO: this is not used here but has to be included... tricky!
 #include <libmpdata++/solvers/detail/mpdata_common.hpp>
 
+#include <boost/unordered_map.hpp> 
+
 namespace libmpdataxx
 {
   namespace solvers
@@ -31,6 +33,61 @@ namespace libmpdataxx
       > : public detail::mpdata_common<ct_params_t, minhalo>
       {
 	using parent_t = detail::mpdata_common<ct_params_t, minhalo>;
+
+struct key_t
+{
+  const typename parent_t::arr_t* psin;
+  const arrvec_t<typename parent_t::arr_t>* unco;
+
+  bool operator==(key_t const& other) const
+  {
+    return psin == other.psin && unco == other.unco;
+  }
+
+  friend std::size_t hash_value(key_t const& p)
+  {
+    std::size_t seed = 0;
+    boost::hash_combine(seed, p.psin);
+    boost::hash_combine(seed, p.unco);
+    return seed;
+  }
+};
+
+boost::unordered_map<
+  key_t,
+  decltype(formulae::mpdata::antidiff<ct_params_t::opts, 0, typename parent_t::arr_t>(
+    typename parent_t::arr_t(),
+    arrvec_t<typename parent_t::arr_t>(),
+    typename parent_t::arr_t(),
+    rng_t(),
+    rng_t(),
+    rng_t()
+  ))
+> cache_0;
+
+boost::unordered_map<
+  key_t,
+  decltype(formulae::mpdata::antidiff<ct_params_t::opts, 1, typename parent_t::arr_t>(
+    typename parent_t::arr_t(),
+    arrvec_t<typename parent_t::arr_t>(),
+    typename parent_t::arr_t(),
+    rng_t(),
+    rng_t(),
+    rng_t()
+  ))
+> cache_1;
+
+boost::unordered_map<
+  key_t,
+  decltype(formulae::mpdata::antidiff<ct_params_t::opts, 2, typename parent_t::arr_t>(
+    typename parent_t::arr_t(),
+    arrvec_t<typename parent_t::arr_t>(),
+    typename parent_t::arr_t(),
+    rng_t(),
+    rng_t(),
+    rng_t()
+  ))
+> cache_2;
 
 	protected:
 
@@ -89,35 +146,49 @@ namespace libmpdataxx
 	      this->mem->barrier();
 
 	      // calculating the antidiffusive C 
-	      this->GC_corr(iter)[0](this->im+h, this->j, this->k) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  *this->mem->G,
-                  this->im,
-                  this->j,
-                  this->k
-		);
+const key_t key({
+  &this->mem->psi[e][this->n[e]],
+  &this->GC_unco(iter)
+});
 
-	      this->GC_corr(iter)[1](this->i, this->jm+h, this->k) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  *this->mem->G,
-                  this->jm,
-                  this->k,
-                  this->i
-	        );
+if (cache_0.count(key) == 0) cache_0.insert({
+  key, 
+  formulae::mpdata::antidiff<ct_params_t::opts, 0>(
+	  this->mem->psi[e][this->n[e]], 
+	  this->GC_unco(iter),
+	  *this->mem->G,
+	  this->im,
+	  this->j,
+	  this->k
+  )
+});
+	      this->GC_corr(iter)[0](this->im+h, this->j, this->k) = cache_0.find(key)->second;
+
+if (cache_1.count(key) == 0) cache_1.insert({
+  key, 
+  formulae::mpdata::antidiff<ct_params_t::opts, 1>(
+	  this->mem->psi[e][this->n[e]], 
+	  this->GC_unco(iter),
+	  *this->mem->G,
+	  this->jm,
+	  this->k,
+	  this->i
+  )
+});
+	      this->GC_corr(iter)[1](this->i, this->jm+h, this->k) = cache_1.find(key)->second;
 	      
-	      this->GC_corr(iter)[2](this->i, this->j, this->km+h) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 2>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  *this->mem->G,
-                  this->km,
-                  this->i,
-                  this->j
-	        );
+if (cache_2.count(key) == 0) cache_2.insert({
+  key, 
+  formulae::mpdata::antidiff<ct_params_t::opts, 2>(
+	  this->mem->psi[e][this->n[e]], 
+	  this->GC_unco(iter),
+	  *this->mem->G,
+	  this->km,
+	  this->i,
+	  this->j
+  )
+});
+	      this->GC_corr(iter)[2](this->i, this->j, this->km+h) = cache_2.find(key)->second;
    
 	      // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
 	      // halos for GC_z 
