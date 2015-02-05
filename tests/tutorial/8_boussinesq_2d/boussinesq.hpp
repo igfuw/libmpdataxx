@@ -4,9 +4,7 @@
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
-
 #pragma once
-
 #include <libmpdata++/solvers/mpdata_rhs_vip_prs.hpp>
 
 template <class ct_params_t>
@@ -18,10 +16,11 @@ class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
   public:
   using real_t = typename ct_params_t::real_t;
 
-  private:
+  protected:
   // member fields
   real_t g, Tht_ref;
 
+  private:
 //<listing-1>
   // explicit forcings 
   void update_rhs(

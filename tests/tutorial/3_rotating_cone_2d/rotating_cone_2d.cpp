@@ -9,13 +9,13 @@
  */
 
 #include <cmath>
-
 #include <boost/math/constants/constants.hpp>
 using boost::math::constants::pi;
-
 #include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
+#include "rotating_cone_stats.hpp"
+
 using namespace libmpdataxx;
 
 template <int opts_arg, int opts_iters>
@@ -31,25 +31,22 @@ void test(const std::string filename)
     enum { opts = opts_arg };
   };
 
-  typename ct_params_t::real_t 
-    dt = .1,
-    dx = 1,
-    dy = 1,
-    omg = .1,
-    h = 4., 
-    h0 = 1;
-
-/// @brief settings from @copybrief Anderson_and_Fattahi_1974
-//    dt = 10 * pi<real_t>(),
-//    omg = -.001,// / (2 * pi<real_t>()),
-//    r = 4. * dx,
-//    h0 = -.5,
-//    x0 = 21. * dx,
-//    y0 = 15. * dy;
+  typename ct_params_t::real_t    /// @brief settings from @copybrief Anderson_and_Fattahi_1974
+    dt = .1,                      //    dt = 10 * pi<real_t>(),
+    dx = 1,                       //    x0 = 21. * dx,
+    dy = 1,                       //    y0 = 15. * dy;
+    omg = .1,                     //    omg = -.001,// / (2 * pi<real_t>()),
+    h = 4.,                       //    r = 4. * dx,
+    h0 = 1;                       //    h0 = -.5,
 
   int nt = 628 * 6;
 
-  using slv_out_t = output::gnuplot<solvers::mpdata<ct_params_t>>;
+  using slv_out_t = 
+    stats<
+      output::gnuplot<
+        solvers::mpdata<ct_params_t>
+      >
+    >;
   typename slv_out_t::rt_params_t p;
 
   // pre instantiation
@@ -83,8 +80,6 @@ void test(const std::string filename)
   }
   p.gnuplot_xrange = "[25 : 75]";
   p.gnuplot_yrange = "[50 : 100]";
-//  p.gnuplot_xrange = "[0 : 100]";
-//  p.gnuplot_yrange = "[0 : 100]";
   {
     std::ostringstream tmp;
     tmp << "levels incremental " << h0 -.25 << ", .25," << h0 + h + .25;
@@ -115,7 +110,6 @@ void test(const std::string filename)
 //</listing-2>
   {
 
-//TODO - dawniej listing 3 zaczynal się tutaj - może tak zostać?
     // constants used in the set-up definition
     enum {x, y};
     const typename ct_params_t::real_t
@@ -151,24 +145,11 @@ void test(const std::string filename)
     run.advector(y) = -omg * (i * dx - xc) * dt/dy;
 //</listing-3>
   }
-    // TODO: an assert confirming that the above did what it should have done
-    //       (in context of the advector()'s use of blitz::Array::reindex())
-
-  //true solution 
-  decltype(run.advectee()) true_solution(run.advectee().extent()); 
-  decltype(run.advectee()) error_2(run.advectee().extent()); 
-  true_solution = run.advectee();
+  // TODO: an assert confirming that the above did what it should have done
+  //       (in context of the advector()'s use of blitz::Array::reindex())
 
   // time stepping
   run.advance(nt);
-  
-  error_2 = pow(true_solution - run.advectee(), 2);
-  std::cout<<"min(solution) = " << min(true_solution) <<std::endl;
-  std::cout<<"max(solution) = " << max(true_solution) <<std::endl;
-  std::cout<<"min(psi) = " << min(run.advectee()) << std::endl;
-  std::cout<<"max(psi) = " << max(run.advectee()) << std::endl;
-  std::cout<<"rms error = " << sqrt(sum(error_2) / (run.advectee().extent(0) * run.advectee().extent(1))) << std::endl;
-
 }
 
 int main()
@@ -178,7 +159,6 @@ int main()
     enum { opts_iters = 2};
     test<opts, opts_iters>("basic");
   }
-
   {
     enum { opts = opts::fct };
     enum { opts_iters = 2};
@@ -199,5 +179,4 @@ int main()
     enum { opts_iters = 2};
     test<opts, opts_iters>("iga_tot_fct");
   }
-
 }
