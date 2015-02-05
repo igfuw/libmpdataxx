@@ -16,7 +16,6 @@
 #include <libmpdata++/solvers/detail/mpdata_common.hpp>
 
 #include <boost/unordered_map.hpp> 
-#include <boost/functional/hash.hpp>
 
 namespace libmpdataxx
 {
