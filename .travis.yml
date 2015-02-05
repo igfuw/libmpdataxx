@@ -4,7 +4,7 @@ os:
     - osx
 compiler:
     - gcc
-    - clang
+#    - clang
 
 osx_image: xcode61
 
