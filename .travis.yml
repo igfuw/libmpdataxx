@@ -20,7 +20,7 @@ script:
     # libmpdata++
     - mkdir build 
     - cd build
-    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi
+    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
@@ -39,6 +39,7 @@ script:
     - cd libcloudphxx
     - mkdir build 
     - cd build
+    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
     - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make 
     - sudo make install
@@ -50,5 +51,6 @@ script:
     - cd icicle
     - mkdir build 
     - cd build
+    - if [[ $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
     - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make
