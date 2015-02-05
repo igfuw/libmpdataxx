@@ -8,6 +8,8 @@
  */
 #pragma once
 
+#include <fstream>
+
 template <class ct_params_t>
 struct boussinesq_stats : boussinesq<ct_params_t>
 {
