@@ -51,9 +51,9 @@ namespace libmpdataxx
 	  real_t tmp_den = 1.; //TODO
 
 	  int halo = this->halo;
-	  rng_t &i = this->i;
-	  rng_t &j = this->j;
-	  rng_t &k = this->k;
+	  const rng_t &i = this->i;
+	  const rng_t &j = this->j;
+	  const rng_t &k = this->k;
 
 	  this->tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
 	  this->tmp_v(this->ijk) = this->state(ix::v)(this->ijk);
