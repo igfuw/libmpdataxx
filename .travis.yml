@@ -6,7 +6,7 @@ compiler:
 #    - gcc
     - clang
 
-osx_image: xcode61
+#osx_image: xcode61
 
 before_install:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
@@ -19,7 +19,7 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends libhdf5-7; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev libblitz0-dev gnuplot-nox libhdf5-serial-dev cmake libgnuplot-iostream-dev; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then brew install llvm35; fi
+    #- if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then brew install llvm35; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then brew install gcc48; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo brew tap homebrew/science; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot blitz; fi
@@ -32,7 +32,7 @@ script:
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/llvm35/3.5.1/bin/clang++-3.5 ../; fi # the one from homebrew
+#    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/local/Cellar/llvm35/3.5.1/bin/clang++-3.5 ../; fi # the one from homebrew
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C tests/unit
@@ -46,7 +46,8 @@ script:
     # libcloudph++'s dependencies
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-python-dev python-numpy libthrust-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then git clone --depth=1 git://github.com/thrust/thrust.git; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s thrust/thrust /usr/local/include/thrust; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then ls -la /usr/local/include/thrust; fi #TEMP
 
     # libcloudph++ (needed by icicle, skipping tests and CUDA build)
     - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
@@ -54,7 +55,7 @@ script:
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang++-3.5 ../; fi # the one from homebrew
+#    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang++-3.5 ../; fi # the one from homebrew
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make 
@@ -68,7 +69,7 @@ script:
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang++-3.5 ../; fi # the one from homebrew
+#    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=clang++-3.5 ../; fi # the one from homebrew
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make
