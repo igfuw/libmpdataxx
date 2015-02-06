@@ -45,9 +45,9 @@ script:
     
     # libcloudph++'s dependencies
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-python-dev python-numpy libthrust-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install boost-python; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then git clone --depth=1 git://github.com/thrust/thrust.git; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then ls -la /usr/local/include/thrust; fi #TEMP
 
     # libcloudph++ (needed by icicle, skipping tests and CUDA build)
     - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
