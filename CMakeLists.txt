@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.8) # for OpenMP test to work in C++-only proj
 # forcing XCode clang to be identified as AppleClang and not Clang
 if(APPLE)
   cmake_policy(VERSION 3.0)
-  cmake_policy(CMP0025 NEW)
+  cmake_policy(SET CMP0025 NEW)
 endif()
 
 project(libmpdata++ CXX)
