@@ -10,13 +10,12 @@
 
 #include <fstream>
 
-template <class ct_params_t>
-struct boussinesq_stats : boussinesq<ct_params_t>
+template <class parent_t>
+struct stats : public parent_t
 {
-  using parent_t = boussinesq<ct_params_t>;
   using parent_t::parent_t;
-  using real_t = typename ct_params_t::real_t;
-  using ix = typename ct_params_t::ix;
+  using real_t = typename parent_t::real_t;
+  using ix = typename parent_t::ix;
 
   real_t 
     sum_init_pert,

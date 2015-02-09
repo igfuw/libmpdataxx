@@ -11,7 +11,6 @@ template <class ct_params_t>
 class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 {
   using parent_t = libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>;
-  using ix = typename ct_params_t::ix;
 
   public:
   using real_t = typename ct_params_t::real_t;
@@ -19,6 +18,7 @@ class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
   protected:
   // member fields
   real_t g, Tht_ref;
+  using ix = typename ct_params_t::ix;
 
   private:
 //<listing-1>
