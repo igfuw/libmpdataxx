@@ -71,8 +71,8 @@ struct stats : public parent_t
     {
       if (!ofs.is_open())
         ofs.open("stats.txt", std::ofstream::out);
+
       // ... and errors and signal extrema throughout the simulation
-//      ofs << std::fixed << std::setprecision(8)<<std::endl;
       ofs << "timestep      = " << this->timestep<<std::endl;
       ofs << "min(tht)      = " << min(this->mem->advectee(ix::tht)) << std::endl;
       ofs << "max(tht)      = " << max(this->mem->advectee(ix::tht)) << std::endl;
