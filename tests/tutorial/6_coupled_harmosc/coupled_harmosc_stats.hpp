@@ -13,13 +13,12 @@
 #include <iostream>
 #include <fstream>
 
-template <class ct_params_t>
-struct coupled_harmosc_stats : coupled_harmosc<ct_params_t>
+template <class parent_t>
+struct stats : public parent_t
 {
-  using parent_t = coupled_harmosc<ct_params_t>;
   using parent_t::parent_t;
-  using real_t = typename ct_params_t::real_t;
-  using ix = typename ct_params_t::ix;
+  using real_t = typename parent_t::real_t;
+  using ix = typename parent_t::ix;
 
   std::ofstream ofs;                
  

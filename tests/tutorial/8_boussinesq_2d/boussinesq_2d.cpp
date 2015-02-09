@@ -39,11 +39,14 @@ int main()
   typename ct_params_t::real_t Tht_ref = 300; //1; // reference state (constant throughout the domain)
 
   // conjugate residual
-  using solver_t = output::gnuplot<
-    boussinesq_stats<ct_params_t>
-  >;
+  using slv_out_t = 
+    stats< 
+      output::gnuplot<
+        boussinesq<ct_params_t>
+      >
+    >;
   // run-time parameters
-  solver_t::rt_params_t p;
+  slv_out_t::rt_params_t p;
 
   p.dt = .75;
   p.di = p.dj = 10.; 
@@ -82,7 +85,7 @@ int main()
   p.grid_size = {nx, ny};
 
   libmpdataxx::concurr::threads<
-    solver_t, 
+    slv_out_t, 
     bcond::cyclic, bcond::cyclic,
     bcond::cyclic, bcond::cyclic
   > slv(p);

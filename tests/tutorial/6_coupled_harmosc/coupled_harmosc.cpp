@@ -34,10 +34,13 @@ int main()
 
   using real_t = typename ct_params_t::real_t;
 
-  using sim_t = output::gnuplot<
-    coupled_harmosc_stats<ct_params_t>
-  >;
-  typename sim_t::rt_params_t p; 
+  using slv_out_t = 
+    stats<
+      output::gnuplot<
+        coupled_harmosc<ct_params_t>
+      >
+    >;
+  typename slv_out_t::rt_params_t p; 
 
 //<listing-2>
   // run-time parameters
@@ -56,7 +59,7 @@ int main()
   p.gnuplot_command = "plot";
 
   // instantiation
-  concurr::threads<sim_t, bcond::cyclic, bcond::cyclic> run(p);
+  concurr::threads<slv_out_t, bcond::cyclic, bcond::cyclic> run(p);
 
   // initial condition
   {
