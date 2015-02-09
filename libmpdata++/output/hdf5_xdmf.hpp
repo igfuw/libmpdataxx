@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <libmpdata++/output/hdf5_base.hpp>
+#include <libmpdata++/output/hdf5.hpp>
 #include <libmpdata++/detail/error.hpp>
 #include <libmpdata++/output/detail/xdmf_writer.hpp>
 
