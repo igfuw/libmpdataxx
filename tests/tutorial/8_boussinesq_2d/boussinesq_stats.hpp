@@ -19,8 +19,14 @@ struct stats : public parent_t
   real_t 
     sum_init_pert,
     sum_init_pert_2,
-    sum_init_tht,
-    sum_init_tht_2;
+//    sum_init_tht,
+//    sum_init_tht_2,
+    error_1,
+    error_2;
+
+  real_t flag = 0;
+  real_t sum_err1 = 0;
+  real_t sum_err2 = 0;  
 
   std::ofstream ofs;
 
@@ -38,26 +44,27 @@ struct stats : public parent_t
     sum_init_pert_2 = sum(// due to cyclic boundary condition summing has to be done over the whole domain minus one edge per each dimension
       pow((this->mem->advectee(ix::tht) - this->Tht_ref)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd)) , 2)
     );
-    sum_init_tht    = sum(// due to cyclic boundary condition summing has to be done over the whole domain minus one edge per each dimension
+/*    sum_init_tht    = sum(// due to cyclic boundary condition summing has to be done over the whole domain minus one edge per each dimension
       this->mem->advectee(ix::tht)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd))
     );
     sum_init_tht_2  = sum(// due to cyclic boundary condition summing has to be done over the whole domain minus one edge per each dimension
       pow(this->mem->advectee(ix::tht)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd)), 2)
     );
+*/
 
     // outputting definition of errors ...
     ofs << "error1 := (sum of perturbation - sum of initial perturbation) / sum of initial perturbation * 100%" << std::endl;
     ofs << "error2 := (sum of perturbation^2 - sum of initial perturbation^2) / sum of initial perturbation^2 * 100%" << std::endl;
-    ofs << "error3 := (sum of theta - sum of initial theta) / sum of initial theta * 100%" << std::endl;
-    ofs << "error4 := (sum of theta^2 - sum of initial theta^2) / sum of initial theta^2 * 100%" << std::endl;
+//    ofs << "error3 := (sum of theta - sum of initial theta) / sum of initial theta * 100%" << std::endl;
+//    ofs << "error4 := (sum of theta^2 - sum of initial theta^2) / sum of initial theta^2 * 100%" << std::endl;
     ofs << " " << std::endl;     
     // ... initial perturbation ...
     ofs << std::scientific << std::setprecision(6)<<std::endl;
     ofs <<"timestep = 0" << std::endl;
     ofs << "sum of initial perturbation         = " << sum_init_pert   << std::endl;
     ofs << "sum of initial perturbation squared = " << sum_init_pert_2 << std::endl;
-    ofs << "sum of initial theta                = " << sum_init_tht    << std::endl;
-    ofs << "sum of initial theta squared        = " << sum_init_tht_2  << std::endl;
+//    ofs << "sum of initial theta                = " << sum_init_tht    << std::endl;
+//    ofs << "sum of initial theta squared        = " << sum_init_tht_2  << std::endl;
     ofs << " " << std::endl; 
   }
 
@@ -67,7 +74,7 @@ struct stats : public parent_t
     this->mem->barrier();
     if (this->mem->rank() != 0) return;
 
-    if (this->timestep % 100 == 0)
+    if (this->timestep % 10 == 0)
     {
       if (!ofs.is_open())
         ofs.open("stats.txt", std::ofstream::out);
@@ -77,16 +84,38 @@ struct stats : public parent_t
       ofs << "min(tht)      = " << min(this->mem->advectee(ix::tht)) << std::endl;
       ofs << "max(tht)      = " << max(this->mem->advectee(ix::tht)) << std::endl;
       ofs << "max(velocity) = " << max(sqrt(pow(this->mem->advectee(ix::u),2) + pow(this->mem->advectee(ix::w),2))) <<std::endl;
-      ofs << "error1        = " << 
-        (                                                    //see ante_loop comment 
-          sum((this->mem->advectee(ix::tht) - this->Tht_ref)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd)))  - sum_init_pert
-        ) / sum_init_pert * 100 << std::endl;
-      ofs << "error2        = " << 
+
+      error_1 = 
+        (                                                                         //see ante_loop comment
+          sum((this->mem->advectee(ix::tht) - this->Tht_ref)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd)))  
+          - 
+          sum_init_pert
+        ) 
+        / sum_init_pert * 100;
+
+      error_2 = 
         (
-          sum(
-            pow((this->mem->advectee(ix::tht) - this->Tht_ref)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd)), 2)
-          )  - sum_init_pert_2
-        ) / sum_init_pert_2 * 100 << std::endl;
+          sum(pow((this->mem->advectee(ix::tht) - this->Tht_ref)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd)), 2))  
+          - 
+          sum_init_pert_2
+        ) 
+        / sum_init_pert_2 * 100;
+
+      ofs << "error_1 = " << error_1 << std::endl; 
+      ofs << "error_2 = " << error_2 << std::endl;
+      ofs << "  " << std::endl; 
+   
+      flag++;
+      sum_err1 += error_1;
+      sum_err2 += error_2;
+     
+      if (this->timestep == 800)
+      {
+        ofs << "number of outputted timesteps = " << flag << std::endl;
+        ofs << "int(error1) = " << sum_err1 / flag <<std::endl;
+        ofs << "int(error2) = " << sum_err2 / flag <<std::endl;
+      }
+/*
       ofs << "error3        = " << 
         (
           sum(this->mem->advectee(ix::tht)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd)))  - sum_init_tht
@@ -97,7 +126,7 @@ struct stats : public parent_t
             pow(this->mem->advectee(ix::tht)(blitz::Range(1, blitz::toEnd), blitz::Range(1, blitz::toEnd)),2)
           )  - sum_init_tht_2
         ) / sum_init_tht_2 * 100 << std::endl;
-      ofs << "  " << std::endl; 
+*/
     }
   }
 };
