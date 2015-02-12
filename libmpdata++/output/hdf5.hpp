@@ -36,8 +36,6 @@ namespace libmpdataxx
       const std::string outdir;
       std::unique_ptr<H5::H5File> hdfp;
       std::map<int, H5::DataSet> vars;
-      std::map<int, H5::DataSet> dims;
-      std::map<const std::string, H5::DataSet> aux;
       std::map<int, std::string> dim_names;
 
       // HDF types of host data
@@ -50,16 +48,13 @@ namespace libmpdataxx
 	      H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, limit, chunk, count, offst;
+      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, count, offst;
       H5::DSetCreatPropList params;
 
       void start(const int nt)
       {
         try
         {
-          // turn off the default output printing
-          //H5::Exception::dontPrint(); // TODO: when done with boost exceptions set-up
-
           // creating the directory
           boost::filesystem::create_directory(outdir);
 
@@ -71,7 +66,7 @@ namespace libmpdataxx
           // x,y,z
           offst = 0;
 
-          limit = shape = this->mem->advectee().extent();
+          shape = this->mem->advectee().extent();
           
           chunk = 1;
           // change chunk size along the last dimension
@@ -89,6 +84,7 @@ namespace libmpdataxx
 
           // creating variables
           {
+            // X, Y, Z
             for (int i = 0; i < parent_t::n_dims; ++i)
             {
 
@@ -111,11 +107,30 @@ namespace libmpdataxx
                 default : break;
               }
 
-              dims[i] = (*hdfp).createDataSet(name, flttype_output, H5::DataSpace(parent_t::n_dims, cshape.data()));
+              auto curr_dim = (*hdfp).createDataSet(name, flttype_output, H5::DataSpace(parent_t::n_dims, cshape.data()));
 
-              H5::DataSpace dim_space = dims[i].getSpace();
+              H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, cshape.data(), offst.data());
-              dims[i].write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space);
+              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space);
+            }
+            // T
+            {
+              const hsize_t 
+                nt_out = nt / this->outfreq + 1, // incl. t=0
+                zero = 0,
+                one = 1;
+              float dt = this->dt;
+
+              blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
+              coord = this->outfreq * this->dt * blitz::firstIndex();
+
+              auto curr_dim = (*hdfp).createDataSet("T", flttype_output, H5::DataSpace(1, &nt_out));
+
+              H5::DataSpace dim_space = curr_dim.getSpace();
+              dim_space.selectHyperslab(H5S_SELECT_SET, &nt_out, &zero);
+              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
+
+              curr_dim.createAttribute("dt", flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &dt);
             }
           }
         }
@@ -152,7 +167,7 @@ namespace libmpdataxx
             vars[v.first] = (*hdfp).createDataSet(
               v.second.name,
               flttype_output,
-              H5::DataSpace(parent_t::n_dims, shape.data(), limit.data()),
+              H5::DataSpace(parent_t::n_dims, shape.data()),
               params
             );
 	    // TODO: units attribute
@@ -208,40 +223,23 @@ namespace libmpdataxx
 	);
       }
 
-      // TODO
-      // auxiliary fields handling (e.g. diagnostic fields)
-      //void setup_aux(const std::string &name)
-      //{
-      //  assert(this->mem->rank() == 0);
-      //  try
-      //  {
-      //    aux[name] = (*hdfp).createDataSet(
-      //      name,
-      //      flttype_output,
-      //      H5::DataSpace(hdf_dims, shape, limit),
-      //      params
-      //    );
-      //  }
-      //  catch (const H5::Exception &e) { handle(e); }
-      //}
+      // data is assumed to be contiguous and in the same layout as hdf variable
+      void record_aux(const std::string &name, typename solver_t::real_t *data)
+      {
+        assert(this->mem->rank() == 0);
 
-      //// data is assumed to be contiguous and in the same layout as hdf variable
-      //void record_aux(const std::string &name, typename solver_t::real_t *data)
-      //{
-      //  assert(this->mem->rank() == 0);
-      //  try
-      //  {
-      //    aux[name].extend(shape);
-      //    H5::DataSpace space = aux[name].getSpace();
+        auto aux = (*hdfp).createDataSet(
+          name,
+          flttype_output,
+          H5::DataSpace(parent_t::n_dims, shape.data()),
+          params
+        );
 
-      //    offst[1] = 0;
-      //    count[1] = shape[1];
-      //    space.selectHyperslab(H5S_SELECT_SET, count, offst);
-      //    aux[name].write(data, flttype_solver, H5::DataSpace(hdf_dims, count), space);
-
-      //  }
-      //  catch (const H5::Exception &e) { handle(e); }
-      //}
+        auto space = aux.getSpace();
+        offst = 0;
+        space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
+        aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space);
+      }
 
       public:
 
