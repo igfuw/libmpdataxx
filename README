@@ -5,11 +5,10 @@ libmpdata++
 
 1. Try it the stadard CMake's way:
 
-  $ mkdir build
+  $ mkdir build 
   $ cd build
-  $ cmake ..                     \
-    -DCMAKE_BUILD_TYPE=Release   \
-    -DCMAKE_CXX_COMPILER=clang++ 
+  $ cmake .. -DCMAKE_BUILD_TYPE=Release
+  $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
   $ make
   $ make test
   $ sudo make install

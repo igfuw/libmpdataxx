@@ -12,8 +12,20 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # TODO (report to CMake?)
 set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -g")
 
 # Release mode
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(
+  CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
+  CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+)
   set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -Ofast -march=native")
+
+  # preventing Kahan summation from being optimised out
+  if (
+    (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5) OR
+    (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1) #TODO: never actually checked!
+  )
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-vectorize") 
+  endif()
 endif()
 
 # Profile mode

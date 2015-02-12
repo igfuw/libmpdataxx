@@ -1,4 +1,14 @@
-cmake_minimum_required(VERSION 2.8.8) # for OpenMP test to work in C++-only project (see http://public.kitware.com/Bug/view.php?id=11910)
+if(APPLE)
+  # needed for the XCode clang to be identified as AppleClang and not Clang
+  cmake_minimum_required(VERSION 3.0) 
+  cmake_policy(SET CMP0025 NEW)
+  cmake_policy(SET CMP0042 NEW)
+else()
+  # needed for the OpenMP test to work in C++-only project 
+  # (see http://public.kitware.com/Bug/view.php?id=11910)
+  cmake_minimum_required(VERSION 2.8.8) 
+endif()
+
 project(libmpdata++ CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
