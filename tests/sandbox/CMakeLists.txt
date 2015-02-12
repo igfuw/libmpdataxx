@@ -1,7 +1,6 @@
 add_subdirectory(gnuplot-iostream_1d)
 add_subdirectory(gnuplot-iostream_2d)
 add_subdirectory(var_sign_2d)
-add_subdirectory(rotating_cone_nug)
 add_subdirectory(mpdata_fct_1d)
 add_subdirectory(mpdata_1d_opt_abs)
 add_subdirectory(mpdata_1d_opt_tot)
