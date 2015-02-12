@@ -10,6 +10,7 @@
  */
 //
 
+#pragma once
 //<listing-1>
 #include <libmpdata++/solvers/mpdata_rhs.hpp>
 
