@@ -72,12 +72,17 @@ namespace libmpdataxx
           const rng_t &i;
         };
 
+        struct rt_params_t : parent_t::rt_params_t
+        {
+          typename parent_t::real_t di = 0;
+        };
+
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         ) :
 	  parent_t(
             args.mem, 
@@ -87,7 +92,9 @@ namespace libmpdataxx
           bcxl(std::move(args.bcxl)), 
           bcxr(std::move(args.bcxr)),
           i(args.i)
-	{}
+	{
+          this->di = p.di;
+        }
 
         // memory allocation logic using static methods
 
@@ -111,7 +118,7 @@ namespace libmpdataxx
 
         public:
 
-	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)   
+	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)   
         {
           mem->psi.resize(parent_t::n_eqns);
 	  for (int e = 0; e < parent_t::n_eqns; ++e) // equations

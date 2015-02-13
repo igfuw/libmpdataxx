@@ -97,12 +97,17 @@ namespace libmpdataxx
           const rng_t &i, &j, &k; 
         };  
 
+        struct rt_params_t : parent_t::rt_params_t
+        {
+          typename parent_t::real_t di = 0, dj = 0, dk = 0;
+        };
+
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         ) :
 	  parent_t(
             args.mem, 
@@ -118,13 +123,17 @@ namespace libmpdataxx
 	  bcyr(std::move(args.bcyr)),
 	  bczl(std::move(args.bczl)),
 	  bczr(std::move(args.bczr))
-	{} 
+	{
+          this->di = p.di;
+          this->dj = p.dj;
+          this->dk = p.dk;
+        } 
 
 	public:
 
 	static void alloc(
           typename parent_t::mem_t *mem,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         )   
         {
           // psi
