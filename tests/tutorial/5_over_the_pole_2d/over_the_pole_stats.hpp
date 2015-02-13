@@ -63,6 +63,7 @@ struct stats : public parent_t
       gf = this->mem->g_factor().copy()(ii, jj);
 
       //output stats
+      ofs << "timestep = " << this->timestep                          << std::endl;
       ofs << "emin = " << (min(fc) - min(ic)) / max(ic)               << std::endl;
       ofs << "emax = " << (max(fc) - max(ic)) / max(ic)               << std::endl;
       ofs << "err0 = " << sqrt(sum(pow2(fc - ic) * gf)) / max(ic)     << std::endl;
