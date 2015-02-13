@@ -8,6 +8,8 @@
 #pragma once
 
 #include <map>
+#include <vector>
+#include <functional>
 
 namespace libmpdataxx
 {
@@ -86,6 +88,16 @@ namespace libmpdataxx
           // default value for outvars
           if (this->outvars.size() == 0 && parent_t::n_eqns == 1)
             outvars = {{0, {.name = "", .unit = ""}}};
+          
+          // assign 1 to dt, di, dj, dk for output purposes if they are not defined by the user
+          for (auto ref : 
+                std::vector<std::reference_wrapper<typename parent_t::real_t>>{this->dt, this->di, this->dj, this->dk})
+          {
+            if (ref.get() == 0)
+            {
+              ref.get() = 1;
+            }
+          }
         }
       };
     }; // namespace detail

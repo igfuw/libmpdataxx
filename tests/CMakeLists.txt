@@ -75,8 +75,8 @@ function(libmpdataxx_add_test_gi test)
   # this will not work with multiple threads (make -j) as it depends on the order of execution + $PPID might be different?
   add_test(NAME "init_${test}" COMMAND "bash" "-c" "> log-$PPID")
   add_test(NAME "calc_${test}" COMMAND "bash" "-c" "GNUPLOT_IOSTREAM_CMD=\"cat >> log-`echo $PPID`\" ${CMAKE_CURRENT_BINARY_DIR}/${test}")
-  add_test(NAME "diff_${test}" COMMAND "bash" "-c" "zcmp log-$PPID ${CMAKE_CURRENT_SOURCE_DIR}/log-orig.gz")
   add_test(NAME "plot_${test}" COMMAND "bash" "-c" "gnuplot log-$PPID")
+  add_test(NAME "diff_${test}" COMMAND "bash" "-c" "zcmp log-$PPID ${CMAKE_CURRENT_SOURCE_DIR}/log-orig.gz && rm log-$PPID")
 endfunction()
 
 # tests
