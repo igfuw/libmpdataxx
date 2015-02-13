@@ -12,6 +12,13 @@ add_test(over_the_pole_2d_diff bash -c "
     echo   'comparing timestep0000005120.h5'                                                           &&
     h5diff $dir/timestep0000005120.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000005120.h5  &&
     echo   'comparing timestep0000005120.xmf'                                                          &&
-    cmp    $dir/timestep0000005120.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000005120.xmf;
+    cmp    $dir/timestep0000005120.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000005120.xmf || exit 1;
   done 
 ")
+add_test(over_the_pole_2d_stats_diff bash -c "
+  for i in best default; do 
+    echo ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
+    echo ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
+    zcmp ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
+  done
+") 
