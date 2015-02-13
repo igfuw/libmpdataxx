@@ -29,7 +29,7 @@ int main()
 
   p.grid_size = { 10, 10 };
   p.dt = 1;
-  p.outfile = "-/-"; // <- intentionaly invalid
+  p.outdir = "tmp"; 
 
   // instantiation
   concurr::serial<
@@ -42,6 +42,7 @@ int main()
   try
   {
     run.advance(1); 
+    run.advance(1);  // this will fail and trow a HDF exception
   } 
   catch (H5::Exception)
   {
