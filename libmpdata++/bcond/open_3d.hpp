@@ -49,6 +49,9 @@ namespace libmpdataxx
           av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
           av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
 
+          case 2:
+          break;
+
           default: assert(false);
         }
 
@@ -118,6 +121,9 @@ namespace libmpdataxx
           case 1:
 	  av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
 	  av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+
+          case 2:
+          break;
 
           default: assert(false);
         }
