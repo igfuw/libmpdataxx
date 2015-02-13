@@ -66,7 +66,7 @@ namespace libmpdataxx
       }
 
       virtual void apply_rhs(
-        const typename parent_t::real_t &dt
+        const typename parent_t::real_t &dt_arg
       ) final
       {
         for (int e = 0; e < parent_t::n_eqns; ++e) 
@@ -75,7 +75,7 @@ namespace libmpdataxx
           if (opts::isset(ct_params_t::hint_norhs, opts::bit(e))) continue;
 
           // otherwise apply the rhs
-          this->state(e)(this->ijk) += this->dt * rhs.at(e)(this->ijk);
+          this->state(e)(this->ijk) += dt_arg * rhs.at(e)(this->ijk);
         }
       }
 
