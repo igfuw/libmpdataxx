@@ -98,9 +98,6 @@ namespace libmpdataxx
 #if !defined(NDEBUG)
           hook_ante_loop_called = true;
 #endif
-          // set the floating point rounding mode (see rotating cone test with zero background and opts=fct+iga)
-          // doing it here to ensure all threads do the same, and to be able to set it via ct_params_t
-          fesetround(ct_params_t::fp_round_mode);
         }
 
 	public:

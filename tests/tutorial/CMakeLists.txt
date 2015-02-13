@@ -1,5 +1,5 @@
 # adv
-add_subdirectory(0_hello_world)
+add_subdirectory(0_basic_example)
 add_subdirectory(1_advscheme_opts)
 add_subdirectory(2_convergence_1d)
 add_subdirectory(3_rotating_cone_2d)
