@@ -69,6 +69,7 @@ void test(const std::string& dir_name)
   p.di = dx;
   p.dj = dy;
   p.dk = dz;
+  p.dt = dt;
 
   // instantation
   concurr::threads<
