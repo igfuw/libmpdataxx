@@ -46,6 +46,9 @@ namespace libmpdataxx
         using ix = typename ct_params_t::ix;
 
 	protected: 
+        
+        // declared here for output purposes
+        real_t dt, di, dj, dk;
 
 	idx_t<n_dims> ijk;
 
@@ -105,10 +108,15 @@ namespace libmpdataxx
         struct rt_params_t 
         {
           std::array<int, n_dims> grid_size;
+          real_t dt=0;
         };
 
 	// ctor
 	solver_common(mem_t *mem, const rt_params_t &p, const decltype(ijk) &ijk) :
+          dt(p.dt),
+          di(0),
+          dj(0),
+          dk(0),
 	  n(n_eqns, 0), 
           mem(mem),
           ijk(ijk)
