@@ -1,1 +1,1 @@
-libmpdataxx_add_test(advscheme_opts)
+libmpdataxx_add_test_gi(advscheme_opts)

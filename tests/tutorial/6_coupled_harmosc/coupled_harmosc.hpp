@@ -10,6 +10,7 @@
  */
 //
 
+#pragma once
 //<listing-1>
 #include <libmpdata++/solvers/mpdata_rhs.hpp>
 
@@ -53,7 +54,6 @@ struct coupled_harmosc : public
         / (1 + pow(dt * omega, 2))
 	- psi(i)
       ) / dt;
-
       rhs.at(ix::phi)(i) += (
         (phi(i) - dt * omega * psi(i)) 
         / (1 + pow(dt * omega, 2))
