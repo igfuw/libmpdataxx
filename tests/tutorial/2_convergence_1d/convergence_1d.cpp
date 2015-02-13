@@ -162,6 +162,7 @@ int main()
         // calculating the deviation from analytical solution
         T err = sqrt(sum(pow(slv.advectee() - exact, 2)) / nx) / (nt * dt);
 
+        outfiles[key] << std::scientific << std::setprecision(4) <<std::endl;
         outfiles[key] << dx << "\t" << cour << "\t" << err << std::endl;
       }
     }
