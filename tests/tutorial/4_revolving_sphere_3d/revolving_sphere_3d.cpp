@@ -32,7 +32,12 @@ void test(const std::string& dir_name)
 
   using slv_t = solvers::mpdata<ct_params_t>;
 //<listing-2>
-  using slv_out_t = output::hdf5_xdmf<slv_t>;
+  using slv_out_t = 
+    stats<
+      output::hdf5_xdmf<
+        slv_t
+      >
+    >;
 //</listing-2>
   typename slv_out_t::rt_params_t p;
 
