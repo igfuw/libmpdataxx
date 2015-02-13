@@ -16,7 +16,7 @@ struct stats : public parent_t
 
   typename parent_t::arr_t ic, fc, gf;
 
-  real_t last_timestep, err0, err1, err2;
+  real_t last_timestep;
 
   blitz::Range ii, jj;
  
