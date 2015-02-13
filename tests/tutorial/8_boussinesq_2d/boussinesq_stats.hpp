@@ -19,11 +19,11 @@ struct stats : public parent_t
   real_t 
     sum_init_pert,
     sum_init_pert_2,
-    error_1,
-    error_2,
-    flag = 0, 
-    sum_err1 = 0, 
-    sum_err2 = 0;
+    error_1,           // error_1 is actually too small to be outputted and then autmatically tested by zdiff 
+    error_2,           // ~ 1e-11, 1e-12
+    flag = 0,          // instead the average error1 will be calculated and then checked if it is lower than 1e-10
+    sum_err1 = 0,      // if yes, then in stats there will be an OK at the end of output stats
+    sum_err2 = 0;      // so that we can sill capture if error1 behaves correctly by zdiff command
 
   std::ofstream ofs;
 
@@ -96,7 +96,6 @@ struct stats : public parent_t
         ) 
         / sum_init_pert_2 * 100;
 
-      ofs << "error_1 = " << error_1 << std::endl; 
       ofs << "error_2 = " << error_2 << std::endl;
       ofs << "  " << std::endl; 
    
@@ -107,8 +106,12 @@ struct stats : public parent_t
       if (this->timestep == 800) // those errors can be compared with Table 2 in Smolarkiewicz & Pudykiewicz 1992
       {                          // row 2 column 5 and 6
         ofs << "number of outputted timesteps = " << flag << std::endl;
-        ofs << "int(error1) = " << sum_err1 / flag <<std::endl;
         ofs << "int(error2) = " << sum_err2 / flag <<std::endl;
+
+        if( sum_err1 / flag < 1e-10)
+          ofs << "int(error1)/int(dt) is less than 1e-10" << std::endl;
+        else
+          ofs << "int(error1)/int(dt) is NOT less than 1e-10 (and it is wrong!)" << std::endl;
       }
     }
   }
