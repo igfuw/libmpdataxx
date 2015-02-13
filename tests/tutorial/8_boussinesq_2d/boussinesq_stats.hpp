@@ -104,8 +104,8 @@ struct stats : public parent_t
       sum_err1 += error_1;
       sum_err2 += error_2;
      
-      if (this->timestep == 800)
-      {
+      if (this->timestep == 800) // those errors can be compared with Table 2 in Smolarkiewicz & Pudykiewicz 1992
+      {                          // row 2 column 5 and 6
         ofs << "number of outputted timesteps = " << flag << std::endl;
         ofs << "int(error1) = " << sum_err1 / flag <<std::endl;
         ofs << "int(error2) = " << sum_err2 / flag <<std::endl;
