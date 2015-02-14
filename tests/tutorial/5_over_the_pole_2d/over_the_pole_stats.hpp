@@ -39,7 +39,7 @@ struct stats : public parent_t
                                     //nlat
 
     ic.resize(ii, jj);
-    ic = this->mem->advectee().copy()(ii, jj);
+    ic = this->mem->advectee()(ii, jj);
 
     // at the end of the test true solution is equal to the inital state
     ofs << std::fixed << std::setprecision(8) << std::endl;
@@ -58,9 +58,9 @@ struct stats : public parent_t
     { 
       // final condition
       fc.resize(ii, jj);
-      fc = this->mem->advectee().copy()(ii, jj);
+      fc = this->mem->advectee()(ii, jj);
       gf.resize(ii, jj);
-      gf = this->mem->g_factor().copy()(ii, jj);
+      gf = this->mem->g_factor()(ii, jj);
 
       //output stats
       ofs << "timestep = " << this->timestep                          << std::endl;

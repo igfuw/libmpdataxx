@@ -76,9 +76,9 @@ void test(const std::string filename)
              + blitz::pow2(blitz::sin((dphi * (j + 0.5) - pi / 2 - y0) / 2))                     );
 
   run.advectee() = where(
-    tmp - pow(r, 2) <= 0,                  //if
-    1 - sqrt(tmp) / r,   //then
-    0.                                     //else
+    tmp - pow(r, 2) <= 0,    //if
+    1 - sqrt(tmp) / r,       //then
+    0.                       //else
   );
   
   typename ct_params_t::real_t
