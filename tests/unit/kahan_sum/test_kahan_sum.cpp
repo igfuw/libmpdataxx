@@ -1,4 +1,5 @@
 #include <libmpdata++/blitz.hpp>
+#include <stdexcept>
 
 template <typename real_t>
 void main_tmpl()

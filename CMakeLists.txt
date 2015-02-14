@@ -13,7 +13,7 @@ check_cxx_source_compiles("
   int main(){b i(1);}
 " CXX11_SUPPORTED)
 if (NOT CXX11_SUPPORTED)
-  message(FATAL_ERROR "C++11 compatibility test failed - please update your compiler.")
+  message(FATAL_ERROR "C++11 compatibility test failed - please update your compiler or point CMake to another one with -DCMAKE_CXX_COMPILER=...")
 endif()
 
 # the library

@@ -3,7 +3,10 @@ libmpdata++
 
 0. Please check: http://arxiv.org/abs/1407.1309
 
-1. Try it the stadard CMake's way:
+1. Install CMake
+
+2. Try an automated build the stadard CMake's way 
+   (CMake will warn about missing dependencies):
 
   $ mkdir build
   $ cd build
