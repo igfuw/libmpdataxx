@@ -13,6 +13,7 @@ using boost::math::constants::pi;
 #include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/hdf5_xdmf.hpp>
+#include "over_the_pole_stats.hpp"
 using namespace libmpdataxx;
 
 template <int opts_arg, int opts_iters>
@@ -37,8 +38,13 @@ void test(const std::string filename)
     dlmb = 2 * pi / (nlon - 1),
     dphi = pi / nlat;
 
-  using sim_t = output::hdf5_xdmf<solvers::mpdata<ct_params_t>>;
-  typename sim_t::rt_params_t p;
+  using slv_out_t = 
+    stats<
+      output::hdf5_xdmf<
+        solvers::mpdata<ct_params_t>
+      >
+    >;
+  typename slv_out_t::rt_params_t p;
 
   p.n_iters = opts_iters; 
   p.grid_size = {nlon, nlat};
@@ -49,7 +55,7 @@ void test(const std::string filename)
 
 //<listing-2>
   concurr::threads<
-    sim_t, 
+    slv_out_t, 
     bcond::cyclic, bcond::cyclic,
     bcond::polar, bcond::polar
   > run(p); 
@@ -70,9 +76,9 @@ void test(const std::string filename)
              + blitz::pow2(blitz::sin((dphi * (j + 0.5) - pi / 2 - y0) / 2))                     );
 
   run.advectee() = where(
-    tmp - pow(r, 2) <= 0,                  //if
-    1 - sqrt(tmp) / r,   //then
-    0.                                     //else
+    tmp - pow(r, 2) <= 0,    //if
+    1 - sqrt(tmp) / r,       //then
+    0.                       //else
   );
   
   typename ct_params_t::real_t
