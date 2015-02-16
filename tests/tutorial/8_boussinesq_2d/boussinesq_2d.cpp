@@ -7,10 +7,10 @@
  * @brief test for pressure solvers (as in Smolarkiewicz & Pudykiewicz 1992, fig.3) 
  * buoyant convection in Boussinesq flow
  */
-#include "boussinesq.hpp"
-#include "boussinesq_stats.hpp"
+#include <libmpdata++/solvers/boussinesq.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
+#include "boussinesq_stats.hpp"
 
 using namespace libmpdataxx;
 
@@ -42,7 +42,7 @@ int main()
   using slv_out_t = 
     stats< 
       output::gnuplot<
-        boussinesq<ct_params_t>
+        solvers::boussinesq<ct_params_t>
       >
     >;
   // run-time parameters
