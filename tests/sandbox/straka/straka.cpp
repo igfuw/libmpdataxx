@@ -6,7 +6,7 @@
  *
  */
 
-#include "../../tutorial/8_boussinesq_2d/boussinesq.hpp"
+#include <libmpdata++/solvers/boussinesq.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 using namespace libmpdataxx;
@@ -34,7 +34,7 @@ int main()
   typename ct_params_t::real_t Tht_ref = 300; //1; // reference state (constant throughout the domain)
 
   // conjugate residual
-  using solver_t = output::gnuplot<boussinesq<ct_params_t>>;
+  using solver_t = output::gnuplot<solvers::boussinesq<ct_params_t>>;
 
   // run-time parameters
   solver_t::rt_params_t p;
