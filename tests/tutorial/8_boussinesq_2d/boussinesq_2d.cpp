@@ -36,7 +36,7 @@ int main()
 
   const int r0 = 250; 
   const int nx = 201, ny = 201, nt = 800;
-  typename ct_params_t::real_t Tht_ref = 300; //1; // reference state (constant throughout the domain)
+  typename ct_params_t::real_t Tht_ref = 300; // reference state (constant throughout the domain)
 
   // conjugate residual
   using slv_out_t = 
