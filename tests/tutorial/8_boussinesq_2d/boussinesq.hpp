@@ -39,7 +39,6 @@ class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
       g * (Tht(ijk) - Tht_ref) / Tht_ref; 
   }
 //</listing-1>
-//    rhs.at(ix::w)(ijk) += g /*/ 300*/ * (Tht(ijk) - Tht_ref) / Tht_ref; 
 
   public:
 
