@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Xdmf>
+	<Domain>
+		<Grid Name="Grid" GridType="Uniform" xml:id="gid">
+			<Time Value="5120.000000"/>
+			<Topology TopologyType="2DSMesh" Dimensions="130 65 "/>
+			<Geometry GeometryType="X_Y">
+				<DataItem Dimensions="130 65 " NumberType="Float" Format="HDF">coord.h5:/X</DataItem>
+				<DataItem Dimensions="130 65 " NumberType="Float" Format="HDF">coord.h5:/Y</DataItem>
+			</Geometry>
+			<Attribute Name="psi" AttributeType="Scalar" Center="Cell">
+				<DataItem Dimensions="129 64 " NumberType="Float" Format="HDF">timestep0000005120.h5:/psi</DataItem>
+			</Attribute>
+		</Grid>
+	</Domain>
+</Xdmf>
