@@ -42,14 +42,27 @@ script:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
+
+    # compiling and running all unit tests in Debug mode
     - VERBOSE=1 make -C tests/unit
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+
+    # compiling and running selected tutorial tests in Debug mode
     - VERBOSE=1 make -C tests/tutorial/6_coupled_harmosc
     - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+
+    # compiling everything in the Release mode
     - cmake -DCMAKE_BUILD_TYPE=Release ../
     - VERBOSE=1 make
+
+    # running selected tests in Release mode
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C tests/tutorial/4_revolving_sphere_3d test || cat tests/tutorial/4_revolving_sphere_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_over_the_pole_2d test || cat tests/tutorial/5_over_the_pole_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C tests/tutorial/8_boussinesq_2d test || cat tests/tutorial/8_boussinesq_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+
+    # installing
     - sudo make install
     - cd ../..
     
