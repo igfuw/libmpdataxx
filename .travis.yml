@@ -55,11 +55,26 @@ script:
     - cmake -DCMAKE_BUILD_TYPE=Release ../
     - VERBOSE=1 make
 
-    # running selected tests in Release mode
+    # running selected tests in Release mode for 1 and 4 threads
+    - OMP_NUM_THREADS=1 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/4_revolving_sphere_3d test || cat tests/tutorial/4_revolving_sphere_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=1 make -C tests/tutorial/0_basic_example test || cat tests/tutorial/0_basic_example/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C tests/tutorial/0_basic_example test || cat tests/tutorial/0_basic_example/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=1 make -C tests/tutorial/1_advscheme_opts test || cat tests/tutorial/1_advscheme_opts/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C tests/tutorial/1_advscheme_opts test || cat tests/tutorial/1_advscheme_opts/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    #- OMP_NUM_THREADS=1 make -C tests/tutorial/2_convergence_1d test || cat tests/tutorial/2_convergence_1d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    #- OMP_NUM_THREADS=4 make -C tests/tutorial/2_convergence_1d test || cat tests/tutorial/2_convergence_1d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=1 make -C tests/tutorial/3_rotating_cone_2d test || cat tests/tutorial/3_rotating_cone_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C tests/tutorial/3_rotating_cone_2d test || cat tests/tutorial/3_rotating_cone_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    #- OMP_NUM_THREADS=1 make -C tests/tutorial/4_revolving_sphere_3d test || cat tests/tutorial/4_revolving_sphere_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    #- OMP_NUM_THREADS=4 make -C tests/tutorial/4_revolving_sphere_3d test || cat tests/tutorial/4_revolving_sphere_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=1 make -C tests/tutorial/5_over_the_pole_2d test || cat tests/tutorial/5_over_the_pole_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - OMP_NUM_THREADS=4 make -C tests/tutorial/5_over_the_pole_2d test || cat tests/tutorial/5_over_the_pole_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=1 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    #- OMP_NUM_THREADS=1 make -C tests/tutorial/7_shallow_water test || cat tests/tutorial/7_shallow_water/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    #- OMP_NUM_THREADS=4 make -C tests/tutorial/7_shallow_water test || cat tests/tutorial/7_shallow_water/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=1 make -C tests/tutorial/8_boussinesq_2d test || cat tests/tutorial/8_boussinesq_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - OMP_NUM_THREADS=4 make -C tests/tutorial/8_boussinesq_2d test || cat tests/tutorial/8_boussinesq_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
 
     # installing
