@@ -6,7 +6,7 @@ add_test(
       echo \$i ;
       echo  compare to ; 
       echo ${CMAKE_CURRENT_BINARY_DIR}/`basename \${i/.gz/}`;
-      zcmp \$i ${CMAKE_CURRENT_BINARY_DIR}/`basename \${i/.gz/}` || exit 1; 
+      zdiff \$i ${CMAKE_CURRENT_BINARY_DIR}/`basename \${i/.gz/}` || exit 1; 
     done;
   "
 )
