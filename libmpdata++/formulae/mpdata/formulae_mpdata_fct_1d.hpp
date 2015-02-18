@@ -168,8 +168,8 @@ namespace libmpdataxx
       template <opts_t opts, class arr_1d_t>
       inline auto GC_mono(  // for variable sign signal and no inf. gauge
         const arr_1d_t &psi,
-        const arr_1d_t &psi_min, // from before the first iteration
-        const arr_1d_t &psi_max, // from before the first iteration
+        const arr_1d_t &beta_up,
+        const arr_1d_t &beta_dn,
         const arr_1d_t &GC_corr,
         const arr_1d_t &G,
         const rng_t i,
@@ -184,13 +184,13 @@ namespace libmpdataxx
             psi(i) > 0,
             // then
             min(1, min(
-              beta_dn<opts>(psi, psi_min, GC_corr, G, i    ), 
-              beta_up<opts>(psi, psi_max, GC_corr, G, i + 1)
+              beta_dn(i    ), 
+              beta_up(i + 1)
             )), 
             // else
             min(1, min(
-              beta_up<opts>(psi, psi_max, GC_corr, G, i    ), 
-              beta_dn<opts>(psi, psi_min, GC_corr, G, i + 1)
+              beta_up(i    ), 
+              beta_dn(i + 1)
             ))  
           ),  
           // else
@@ -199,13 +199,13 @@ namespace libmpdataxx
             psi(i+1) > 0, // TODO: what if crossing zero?
             // then
             min(1, min(
-              beta_up<opts>(psi, psi_max, GC_corr, G, i    ), 
-              beta_dn<opts>(psi, psi_min, GC_corr, G, i + 1)
+              beta_up(i    ), 
+              beta_dn(i + 1)
             )), 
             // else
             min(1, min(
-              beta_dn<opts>(psi, psi_min, GC_corr, G, i   ), 
-              beta_up<opts>(psi, psi_max, GC_corr, G, i + 1)
+              beta_dn(i   ), 
+              beta_up(i + 1)
             ))  
           )   
         )   
@@ -214,8 +214,8 @@ namespace libmpdataxx
       template <opts_t opts, class arr_1d_t>
       inline auto GC_mono( // for inf. gauge option or positive sign signal
         const arr_1d_t &psi,
-        const arr_1d_t &psi_min, // from before the first iteration
-        const arr_1d_t &psi_max, // from before the first iteration
+        const arr_1d_t &beta_up,
+        const arr_1d_t &beta_dn,
         const arr_1d_t &GC_corr,
         const arr_1d_t &G,
         const rng_t i,
@@ -226,13 +226,13 @@ namespace libmpdataxx
           GC_corr( i+h ) > 0,
           // then
           min(1, min(
-            beta_dn<opts>(psi, psi_min, GC_corr, G, i),
-            beta_up<opts>(psi, psi_max, GC_corr, G, i + 1)
+            beta_dn(i),
+            beta_up(i + 1)
           )), 
           // else
           min(1, min(
-            beta_up<opts>(psi, psi_max, GC_corr, G, i),
-            beta_dn<opts>(psi, psi_min, GC_corr, G, i + 1)
+            beta_up(i),
+            beta_dn(i + 1)
           ))  
         )
       )  

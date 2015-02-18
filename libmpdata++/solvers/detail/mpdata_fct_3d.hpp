@@ -76,6 +76,7 @@ namespace libmpdataxx
           this->xchng_sclr(this->beta_dn, this->i, this->j, this->k);
 
 	  // calculating the monotonic corrective velocity
+          // TODO: do not pass psi_min / psi_max
 	  this->GC_mono[0]( im+h, this->j, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, this->beta_up, this->beta_dn, GC_corr, G, im, this->j, this->k);
 	  this->GC_mono[1]( this->i, jm+h, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, this->beta_up, this->beta_dn, GC_corr, G, jm, this->k, this->i);
 	  this->GC_mono[2]( this->i, this->j, km+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 2>(psi, this->psi_min, this->psi_max, this->beta_up, this->beta_dn, GC_corr, G, km, this->i, this->j);

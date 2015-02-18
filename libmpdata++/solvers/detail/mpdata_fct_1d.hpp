@@ -51,9 +51,17 @@ namespace libmpdataxx
 	  // fill halos in GC_corr
           this->xchng_vctr_alng(GC_corr);
 
+          // calculating betas
+          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr[d], G, this->i);
+          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr[d], G, this->i);
+
+          // fill halos for betas
+          this->xchng_sclr(this->beta_up);
+          this->xchng_sclr(this->beta_dn);
+
 	  // calculating the monotonic corrective velocity
 	  this->GC_mono[d]( this->im+h ) = formulae::mpdata::GC_mono<ct_params_t::opts>(
-	    psi, this->psi_min, this->psi_max, GC_corr[d], G, im
+	    psi, this->beta_up, this->beta_dn, GC_corr[d], G, im
 	  );
 	  
 	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
