@@ -18,7 +18,7 @@ namespace libmpdataxx
       using namespace arakawa_c;
 
       //see Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
-      template <opts_t opts, int d, class arr_3d_t>
+      template <opts_t opts, class arr_3d_t>
       inline auto beta_up_nominator(
         const arr_3d_t &psi,
         const arr_3d_t &psi_max,
@@ -29,20 +29,20 @@ namespace libmpdataxx
       ) return_macro(, 
         (
           max(max(max(max(max(max(max(
-                      psi_max(pi<d>(i, j, k)),
-                      psi(pi<d>(i, j, k))),
-                      psi(pi<d>(i+1, j, k))),
-                      psi(pi<d>(i-1, j, k))),
-                      psi(pi<d>(i, j+1, k))),
-                      psi(pi<d>(i, j-1, k))),
-                      psi(pi<d>(i, j, k+1))),
-                      psi(pi<d>(i, j, k-1))
+                      psi_max(i, j, k),
+                      psi(i, j, k)),
+                      psi(i+1, j, k)),
+                      psi(i-1, j, k)),
+                      psi(i, j+1, k)),
+                      psi(i, j-1, k)),
+                      psi(i, j, k+1)),
+                      psi(i, j, k-1)
           )
-        - psi(pi<d>(i, j, k))
-        ) * formulae::G<opts BOOST_PP_COMMA() d>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
+        - psi(i, j, k)
+        ) * formulae::G<opts BOOST_PP_COMMA() 0>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
       ) 
 
-      template <opts_t opts, int d, class arr_3d_t>
+      template <opts_t opts, class arr_3d_t>
       inline auto beta_up( //positive sign signal
         const arr_3d_t &psi,
         const arr_3d_t &psi_max, // from before the first iteration
@@ -54,20 +54,20 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         fct_frac(
-          beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
+          beta_up_nominator<opts>(psi, psi_max, G, i, j, k)
 	  , //----------------------------------------------------------------------
-          ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * psi(pi<d>(i-1, j, k))
-          - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * psi(pi<d>(i+1, j, k)) )  // additional parenthesis so that we first sum
-          +                                                                   // fluxes in separate dimensions
-          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) * psi(pi<d>(i, j-1, k))    // could be important for accuracy if one of them
-          - negpart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) * psi(pi<d>(i, j+1, k)) )  // is of different magnitude than the other
-          +                                                                   // fluxes in separate dimensions
-          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * psi(pi<d>(i, j, k-1))   
-          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * psi(pi<d>(i, j, k+1)) )
+          ( pospart<opts>(GC_corr[0](i-h, j, k)) * psi(i-1, j, k)
+          - negpart<opts>(GC_corr[0](i+h, j, k)) * psi(i+1, j, k) )  // additional parenthesis so that we first sum
+          +                                                    // fluxes in separate dimensions
+          ( pospart<opts>(GC_corr[1](i, j-h, k)) * psi(i, j-1, k)    // could be important for accuracy if one of them
+          - negpart<opts>(GC_corr[1](i, j+h, k)) * psi(i, j+1, k) )  // is of different magnitude than the other
+          +                                                    // fluxes in separate dimensions
+          ( pospart<opts>(GC_corr[2](i, j, k-h)) * psi(i, j, k-1)   
+          - negpart<opts>(GC_corr[2](i, j, k+h)) * psi(i, j, k+1) )
         )
       )
 
-      template <opts_t opts, int d, class arr_3d_t>
+      template <opts_t opts, class arr_3d_t>
       inline auto beta_up( //variable-sign signal
         const arr_3d_t &psi,
         const arr_3d_t &psi_max, // from before the first iteration
@@ -79,26 +79,26 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         fct_frac(
-          beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
+          beta_up_nominator<opts>(psi, psi_max, G, i, j, k)
           , //-------------------------------------------------------------------------------------
-          ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * pospart<opts>(psi(pi<d>(i-1, j, k)))
-          - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * pospart<opts>(psi(pi<d>(i+1, j, k)))
-          - pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * negpart<opts>(psi(pi<d>(i,   j, k)))
-          + negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * negpart<opts>(psi(pi<d>(i,   j, k))) ) // see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i-h, j, k)) * pospart<opts>(psi(i-1, j, k))
+          - negpart<opts>(GC_corr[0](i+h, j, k)) * pospart<opts>(psi(i+1, j, k))
+          - pospart<opts>(GC_corr[0](i+h, j, k)) * negpart<opts>(psi(i,   j, k))
+          + negpart<opts>(GC_corr[0](i-h, j, k)) * negpart<opts>(psi(i,   j, k)) ) // see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) * pospart<opts>(psi(pi<d>(i, j-1, k)))
-          - negpart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) * pospart<opts>(psi(pi<d>(i, j+1, k)))
-          - pospart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) * negpart<opts>(psi(pi<d>(i, j  , k)))
-          + negpart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) * negpart<opts>(psi(pi<d>(i, j  , k))) )
+          ( pospart<opts>(GC_corr[1](i, j-h, k)) * pospart<opts>(psi(i, j-1, k))
+          - negpart<opts>(GC_corr[1](i, j+h, k)) * pospart<opts>(psi(i, j+1, k))
+          - pospart<opts>(GC_corr[1](i, j+h, k)) * negpart<opts>(psi(i, j  , k))
+          + negpart<opts>(GC_corr[1](i, j-h, k)) * negpart<opts>(psi(i, j  , k)) )
           +
-          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * pospart<opts>(psi(pi<d>(i, j, k-1)))
-          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * pospart<opts>(psi(pi<d>(i, j, k+1)))
-          - pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * negpart<opts>(psi(pi<d>(i, j  , k)))
-          + negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * negpart<opts>(psi(pi<d>(i, j  , k))) )
+          ( pospart<opts>(GC_corr[2](i, j, k-h)) * pospart<opts>(psi(i, j, k-1))
+          - negpart<opts>(GC_corr[2](i, j, k+h)) * pospart<opts>(psi(i, j, k+1))
+          - pospart<opts>(GC_corr[2](i, j, k+h)) * negpart<opts>(psi(i, j  , k))
+          + negpart<opts>(GC_corr[2](i, j, k-h)) * negpart<opts>(psi(i, j  , k)) )
         )
       )
 
-      template <opts_t opts, int d, class arr_3d_t>
+      template <opts_t opts, class arr_3d_t>
       inline auto beta_up( //inf. gauge option
         const arr_3d_t &psi,
         const arr_3d_t &psi_max, // from before the first iteration
@@ -112,20 +112,20 @@ namespace libmpdataxx
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         ,
         fct_frac(
-          beta_up_nominator<opts, d>(psi, psi_max, G, i, j, k)
+          beta_up_nominator<opts>(psi, psi_max, G, i, j, k)
           , //--------------------------------------------------
-          ( pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) /* * 1 */
-          - negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) /* * 1 */) // see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i-h, j, k)) /* * 1 */
+          - negpart<opts>(GC_corr[0](i+h, j, k)) /* * 1 */) // see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) /* * 1 */
-          - negpart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) /* * 1 */)
+          ( pospart<opts>(GC_corr[1](i, j-h, k)) /* * 1 */
+          - negpart<opts>(GC_corr[1](i, j+h, k)) /* * 1 */)
           +
-          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) /* * 1 */
-          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) /* * 1 */)
+          ( pospart<opts>(GC_corr[2](i, j, k-h)) /* * 1 */
+          - negpart<opts>(GC_corr[2](i, j, k+h)) /* * 1 */)
         )
       )
 
-      template <opts_t opts, int d, class arr_3d_t>
+      template <opts_t opts, class arr_3d_t>
       inline auto beta_dn_nominator(
         const arr_3d_t &psi,
         const arr_3d_t &psi_min,
@@ -135,21 +135,21 @@ namespace libmpdataxx
         const rng_t k
       ) return_macro(,
         (
-          psi(pi<d>(i, j, k))
+          psi(i, j, k)
           - min(min(min(min(min(min(min(
-                    psi_min(pi<d>(i, j, k)),
-                    psi(pi<d>(i, j+1, k))),
-                    psi(pi<d>(i-1, j, k))),
-                    psi(pi<d>(i, j, k  ))),
-                    psi(pi<d>(i+1, j, k))),
-                    psi(pi<d>(i, j, k+1))),
-                    psi(pi<d>(i, j, k-1))),
-                    psi(pi<d>(i, j-1, k))
+                    psi_min(i, j, k),
+                    psi(i, j+1, k)),
+                    psi(i-1, j, k)),
+                    psi(i, j, k  )),
+                    psi(i+1, j, k)),
+                    psi(i, j, k+1)),
+                    psi(i, j, k-1)),
+                    psi(i, j-1, k)
           )
-        ) * formulae::G<opts BOOST_PP_COMMA() d>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
+        ) * formulae::G<opts BOOST_PP_COMMA() 0>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
       )
 
-      template <opts_t opts, int d, class arr_3d_t>
+      template <opts_t opts, class arr_3d_t>
       inline auto beta_dn( //positive-sign signal
         const arr_3d_t &psi,
         const arr_3d_t &psi_min, // from before the first iteration
@@ -161,20 +161,20 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         fct_frac(
-          beta_dn_nominator<opts, d>(psi, psi_min, G, i, j, k)
+          beta_dn_nominator<opts>(psi, psi_min, G, i, j, k)
 	  , //--------------------------------------------------------------------
-          ( pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * psi(pi<d>(i, j, k))
-          - negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * psi(pi<d>(i, j, k)) )  //see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i+h, j, k)) * psi(i, j, k)
+          - negpart<opts>(GC_corr[0](i-h, j, k)) * psi(i, j, k) )  //see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) * psi(pi<d>(i, j, k))
-          - negpart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) * psi(pi<d>(i, j, k)) )
+          ( pospart<opts>(GC_corr[1](i, j+h, k)) * psi(i, j, k)
+          - negpart<opts>(GC_corr[1](i, j-h, k)) * psi(i, j, k) )
           +
-          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * psi(pi<d>(i, j, k))
-          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * psi(pi<d>(i, j, k)) )
+          ( pospart<opts>(GC_corr[2](i, j, k+h)) * psi(i, j, k)
+          - negpart<opts>(GC_corr[2](i, j, k-h)) * psi(i, j, k) )
         )
       )
 
-      template <opts_t opts, int d, class arr_3d_t>
+      template <opts_t opts, class arr_3d_t>
       inline auto beta_dn( //variable-sign signal
         const arr_3d_t &psi,
         const arr_3d_t &psi_min, // from before the first iteration
@@ -186,26 +186,26 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         fct_frac(
-          beta_dn_nominator<opts, d>(psi, psi_min, G, i, j, k)
+          beta_dn_nominator<opts>(psi, psi_min, G, i, j, k)
 	  , //-----------------------------------------------------------------------------------
-          ( pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * pospart<opts>(psi(pi<d>(i,   j, k)))
-          - negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * pospart<opts>(psi(pi<d>(i,   j, k)))
-          - pospart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) * negpart<opts>(psi(pi<d>(i-1, j, k)))
-          + negpart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) * negpart<opts>(psi(pi<d>(i+1, j, k))) )  //see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i+h, j, k)) * pospart<opts>(psi(i,   j, k))
+          - negpart<opts>(GC_corr[0](i-h, j, k)) * pospart<opts>(psi(i,   j, k))
+          - pospart<opts>(GC_corr[0](i-h, j, k)) * negpart<opts>(psi(i-1, j, k))
+          + negpart<opts>(GC_corr[0](i+h, j, k)) * negpart<opts>(psi(i+1, j, k)) )  //see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) * pospart<opts>(psi(pi<d>(i,   j, k)))
-          - negpart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) * pospart<opts>(psi(pi<d>(i,   j, k)))
-          - pospart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) * negpart<opts>(psi(pi<d>(i, j-1, k)))
-          + negpart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) * negpart<opts>(psi(pi<d>(i, j+1, k))) )
+          ( pospart<opts>(GC_corr[1](i, j+h, k)) * pospart<opts>(psi(i,   j, k))
+          - negpart<opts>(GC_corr[1](i, j-h, k)) * pospart<opts>(psi(i,   j, k))
+          - pospart<opts>(GC_corr[1](i, j-h, k)) * negpart<opts>(psi(i, j-1, k))
+          + negpart<opts>(GC_corr[1](i, j+h, k)) * negpart<opts>(psi(i, j+1, k)) )
           +
-          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * pospart<opts>(psi(pi<d>(i,   j, k)))
-          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * pospart<opts>(psi(pi<d>(i,   j, k)))
-          - pospart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) * negpart<opts>(psi(pi<d>(i, j, k-1)))
-          + negpart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) * negpart<opts>(psi(pi<d>(i, j, k+1))) )
+          ( pospart<opts>(GC_corr[2](i, j, k+h)) * pospart<opts>(psi(i,   j, k))
+          - negpart<opts>(GC_corr[2](i, j, k-h)) * pospart<opts>(psi(i,   j, k))
+          - pospart<opts>(GC_corr[2](i, j, k-h)) * negpart<opts>(psi(i, j, k-1))
+          + negpart<opts>(GC_corr[2](i, j, k+h)) * negpart<opts>(psi(i, j, k+1)) )
         )
       )
 
-      template <opts_t opts, int d, class arr_3d_t>
+      template <opts_t opts, class arr_3d_t>
       inline auto beta_dn( //inf. gauge option
         const arr_3d_t &psi,
         const arr_3d_t &psi_min, // from before the first iteration
@@ -219,16 +219,16 @@ namespace libmpdataxx
         static_assert(!opts::isset(opts, opts::abs), "iga & abs are mutually exclusive");
         ,
         fct_frac(
-          beta_dn_nominator<opts, d>(psi, psi_min, G, i, j, k)
+          beta_dn_nominator<opts>(psi, psi_min, G, i, j, k)
 	  , //--------------------------------------------------
-          ( pospart<opts>(GC_corr[d+0](pi<d>(i+h, j, k))) /* * 1 */
-          - negpart<opts>(GC_corr[d+0](pi<d>(i-h, j, k))) /* * 1 */)  //see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i+h, j, k)) /* * 1 */
+          - negpart<opts>(GC_corr[0](i-h, j, k)) /* * 1 */)  //see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[d+1](pi<d>(i, j+h, k))) /* * 1 */
-          - negpart<opts>(GC_corr[d+1](pi<d>(i, j-h, k))) /* * 1 */)
+          ( pospart<opts>(GC_corr[1](i, j+h, k)) /* * 1 */
+          - negpart<opts>(GC_corr[1](i, j-h, k)) /* * 1 */)
           +
-          ( pospart<opts>(GC_corr[d+2](pi<d>(i, j, k+h))) /* * 1 */
-          - negpart<opts>(GC_corr[d+2](pi<d>(i, j, k-h))) /* * 1 */)
+          ( pospart<opts>(GC_corr[2](i, j, k+h)) /* * 1 */
+          - negpart<opts>(GC_corr[2](i, j, k-h)) /* * 1 */)
         )
       )
 

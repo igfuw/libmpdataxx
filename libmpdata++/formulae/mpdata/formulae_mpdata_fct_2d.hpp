@@ -18,7 +18,7 @@ namespace libmpdataxx
       using namespace arakawa_c;
  
       //see Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, class arr_2d_t>
       inline auto beta_up_nominator(
         const arr_2d_t &psi,
         const arr_2d_t &psi_max,
@@ -27,15 +27,15 @@ namespace libmpdataxx
         const rng_t j
       ) return_macro(,
           (  
-            max(max(max(max(max(psi_max(pi<dim>(i, j)), 
-                                    psi(pi<dim>(i, j+1))),
-             psi(pi<dim>(i-1, j))), psi(pi<dim>(i, j  ))), psi(pi<dim>(i+1, j))),
-                                    psi(pi<dim>(i, j-1))
-             ) - psi(pi<dim>(i, j))
-          ) * formulae::G<opts BOOST_PP_COMMA() dim>(G, i, j) //to make beta up dimensionless when transporting mixing ratios with momentum
+            max(max(max(max(max(psi_max(i, j), 
+                                    psi(i, j+1)),
+                      psi(i-1, j)), psi(i, j  )), psi(i+1, j)),
+                                    psi(i, j-1)
+             ) - psi(i, j)
+          ) * formulae::G<opts BOOST_PP_COMMA() 0>(G, i, j) //to make beta up dimensionless when transporting mixing ratios with momentum
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, class arr_2d_t>
       inline auto beta_up( //positive sign signal
         const arr_2d_t &psi,
         const arr_2d_t &psi_max, // from before the first iteration
@@ -46,17 +46,17 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         fct_frac(
-          beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
+          beta_up_nominator<opts>(psi, psi_max, G, i, j)
           , // -----------------------------------------------------------
-          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * psi(pi<dim>(i-1, j)) 
-          - negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * psi(pi<dim>(i+1, j)) )  // additional parenthesis so that we first sum
-          +                                                                          // fluxes in separate dimensions 
-          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * psi(pi<dim>(i, j-1))    // could be important for accuracy if one of them
-          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * psi(pi<dim>(i, j+1)) )  // is of different magnitude than the other
+          ( pospart<opts>(GC_corr[0](i-h, j)) * psi(i-1, j) 
+          - negpart<opts>(GC_corr[0](i+h, j)) * psi(i+1, j) )  // additional parenthesis so that we first sum
+          +                                                    // fluxes in separate dimensions 
+          ( pospart<opts>(GC_corr[1](i, j-h)) * psi(i, j-1)    // could be important for accuracy if one of them
+          - negpart<opts>(GC_corr[1](i, j+h)) * psi(i, j+1) )  // is of different magnitude than the other
         )
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, class arr_2d_t>
       inline auto beta_up( //variable-sign signal
         const arr_2d_t &psi,
         const arr_2d_t &psi_max, // from before the first iteration
@@ -67,21 +67,21 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         fct_frac(
-          beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
+          beta_up_nominator<opts>(psi, psi_max, G, i, j)
           , // --------------------------------------------------------------------------
-          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * pospart<opts>(psi(pi<dim>(i-1, j))) 
-          - negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * pospart<opts>(psi(pi<dim>(i+1, j)))
-          - pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * negpart<opts>(psi(pi<dim>(i,   j)))
-          + negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * negpart<opts>(psi(pi<dim>(i,   j))) ) // see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i-h, j)) * pospart<opts>(psi(i-1, j)) 
+          - negpart<opts>(GC_corr[0](i+h, j)) * pospart<opts>(psi(i+1, j))
+          - pospart<opts>(GC_corr[0](i+h, j)) * negpart<opts>(psi(i,   j))
+          + negpart<opts>(GC_corr[0](i-h, j)) * negpart<opts>(psi(i,   j)) ) // see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * pospart<opts>(psi(pi<dim>(i, j-1)))
-          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * pospart<opts>(psi(pi<dim>(i, j+1)))
-          - pospart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * negpart<opts>(psi(pi<dim>(i, j  )))
-          + negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * negpart<opts>(psi(pi<dim>(i, j  ))) )
+          ( pospart<opts>(GC_corr[1](i, j-h)) * pospart<opts>(psi(i, j-1))
+          - negpart<opts>(GC_corr[1](i, j+h)) * pospart<opts>(psi(i, j+1))
+          - pospart<opts>(GC_corr[1](i, j+h)) * negpart<opts>(psi(i, j  ))
+          + negpart<opts>(GC_corr[1](i, j-h)) * negpart<opts>(psi(i, j  )) )
         ) 
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, class arr_2d_t>
       inline auto beta_up( //inf. gauge option
         const arr_2d_t &psi,
         const arr_2d_t &psi_max, // from before the first iteration
@@ -94,17 +94,17 @@ namespace libmpdataxx
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         ,
         fct_frac(
-          beta_up_nominator<opts, dim>(psi, psi_max, G, i, j)
+          beta_up_nominator<opts>(psi, psi_max, G, i, j)
           , // -------------------------------------------
-          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) /* *1 */ 
-          - negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) /* *1 */) // see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i-h, j)) /* *1 */ 
+          - negpart<opts>(GC_corr[0](i+h, j)) /* *1 */) // see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) /* *1 */
-          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) /* *1 */)
+          ( pospart<opts>(GC_corr[1](i, j-h)) /* *1 */
+          - negpart<opts>(GC_corr[1](i, j+h)) /* *1 */)
         ) 
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, class arr_2d_t>
       inline auto beta_dn_nominator(
         const arr_2d_t &psi, 
         const arr_2d_t &psi_min,
@@ -113,16 +113,16 @@ namespace libmpdataxx
         const rng_t j 
       ) return_macro(,
           (
-            psi(pi<dim>(i, j))
-            - min(min(min(min(min( psi_min(pi<dim>(i,j)), 
-                                       psi(pi<dim>(i, j+1))),
-                psi(pi<dim>(i-1, j))), psi(pi<dim>(i, j  ))), psi(pi<dim>(i+1, j))),
-                                       psi(pi<dim>(i, j-1))
+            psi(i, j)
+            - min(min(min(min(min( psi_min(i,j), 
+                                       psi(i, j+1)),
+                         psi(i-1, j)), psi(i, j  )), psi(i+1, j)),
+                                       psi(i, j-1)
             )
-          ) * formulae::G<opts BOOST_PP_COMMA() dim>(G, i, j)  //see beta_up_nominator
+          ) * formulae::G<opts BOOST_PP_COMMA() 0>(G, i, j)  //see beta_up_nominator
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, class arr_2d_t>
       inline auto beta_dn( //positive-sign signal
         const arr_2d_t &psi, 
         const arr_2d_t &psi_min, // from before the first iteration
@@ -133,17 +133,17 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
         fct_frac(
-          beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
+          beta_dn_nominator<opts>(psi, psi_min, G, i, j)
 	  , // ---------------------------------------------------------
-          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * psi(pi<dim>(i, j))
-          - negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * psi(pi<dim>(i, j)) )  //see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i+h, j)) * psi(i, j)
+          - negpart<opts>(GC_corr[0](i-h, j)) * psi(i, j) )  //see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * psi(pi<dim>(i, j))
-          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * psi(pi<dim>(i, j)) )
+          ( pospart<opts>(GC_corr[1](i, j+h)) * psi(i, j)
+          - negpart<opts>(GC_corr[1](i, j-h)) * psi(i, j) )
         ) 
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, class arr_2d_t>
       inline auto beta_dn( //variable-sign signal
         const arr_2d_t &psi, 
         const arr_2d_t &psi_min, // from before the first iteration
@@ -154,21 +154,21 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0 
       ) return_macro(,
         fct_frac(
-          beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
+          beta_dn_nominator<opts>(psi, psi_min, G, i, j)
           , // --------------------------
-          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * pospart<opts>(psi(pi<dim>(i,   j)))
-          - negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * pospart<opts>(psi(pi<dim>(i,   j)))
-          - pospart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) * negpart<opts>(psi(pi<dim>(i-1, j)))
-          + negpart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) * negpart<opts>(psi(pi<dim>(i+1, j))) )  //see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i+h, j)) * pospart<opts>(psi(i,   j))
+          - negpart<opts>(GC_corr[0](i-h, j)) * pospart<opts>(psi(i,   j))
+          - pospart<opts>(GC_corr[0](i-h, j)) * negpart<opts>(psi(i-1, j))
+          + negpart<opts>(GC_corr[0](i+h, j)) * negpart<opts>(psi(i+1, j)) )  //see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * pospart<opts>(psi(pi<dim>(i,   j)))
-          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * pospart<opts>(psi(pi<dim>(i,   j)))
-          - pospart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) * negpart<opts>(psi(pi<dim>(i, j-1)))
-          + negpart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) * negpart<opts>(psi(pi<dim>(i, j+1))) )
+          ( pospart<opts>(GC_corr[1](i, j+h)) * pospart<opts>(psi(i,   j))
+          - negpart<opts>(GC_corr[1](i, j-h)) * pospart<opts>(psi(i,   j))
+          - pospart<opts>(GC_corr[1](i, j-h)) * negpart<opts>(psi(i, j-1))
+          + negpart<opts>(GC_corr[1](i, j+h)) * negpart<opts>(psi(i, j+1)) )
         ) 
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, class arr_2d_t>
       inline auto beta_dn( //inf. gauge option
         const arr_2d_t &psi, 
         const arr_2d_t &psi_min, // from before the first iteration
@@ -181,13 +181,13 @@ namespace libmpdataxx
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         ,
         fct_frac(
-          beta_dn_nominator<opts, dim>(psi, psi_min, G, i, j)
+          beta_dn_nominator<opts>(psi, psi_min, G, i, j)
           , // -------------------------------------------
-          ( pospart<opts>(GC_corr[dim-0](pi<dim>(i+h, j))) /* *1 */
-          - negpart<opts>(GC_corr[dim-0](pi<dim>(i-h, j))) /* *1 */)  //see note in positive sign beta up
+          ( pospart<opts>(GC_corr[0](i+h, j)) /* *1 */
+          - negpart<opts>(GC_corr[0](i-h, j)) /* *1 */)  //see note in positive sign beta up
           +
-          ( pospart<opts>(GC_corr[dim-1](pi<dim>(i, j+h))) /* *1 */
-          - negpart<opts>(GC_corr[dim-1](pi<dim>(i, j-h))) /* *1 */)
+          ( pospart<opts>(GC_corr[1](i, j+h)) /* *1 */
+          - negpart<opts>(GC_corr[1](i, j-h)) /* *1 */)
         ) 
       ) 
 

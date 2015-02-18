@@ -57,8 +57,8 @@ namespace libmpdataxx
           this->xchng_vctr_alng(GC_corr);
  
           // calculating betas
-          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts, 0>(psi, this->psi_max, GC_corr, G, this->i, this->j);
-          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts, 0>(psi, this->psi_min, GC_corr, G, this->i, this->j);
+          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr, G, this->i, this->j);
+          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr, G, this->i, this->j);
 
           // filling halos for betas
           this->xchng_sclr(this->beta_up, this->i, this->j);
