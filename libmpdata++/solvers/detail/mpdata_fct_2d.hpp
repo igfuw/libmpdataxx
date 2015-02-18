@@ -55,10 +55,18 @@ namespace libmpdataxx
 
 	  // fill halos of GC_corr -> mpdata works with halo=1, we need halo=2
           this->xchng_vctr_alng(GC_corr);
+ 
+          // calculating betas
+          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts, 0>(psi, this->psi_max, GC_corr, G, this->i, this->j);
+          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts, 0>(psi, this->psi_min, GC_corr, G, this->i, this->j);
+
+          // filling halos for betas
+          this->xchng_sclr(this->beta_up, this->i, this->j);
+          this->xchng_sclr(this->beta_dn, this->i, this->j);
 
 	  // calculating the monotonic corrective velocity
-	  this->GC_mono[0]( im+h, this->j ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, this->j);
-	  this->GC_mono[1]( this->i, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, this->i);
+	  this->GC_mono[0]( im+h, this->j ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j);
+	  this->GC_mono[1]( this->i, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->i);
 
 	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
 	  if (iter == this->n_iters - 1 && parent_t::n_eqns > 1) this->mem->barrier();  // TODO: move to common

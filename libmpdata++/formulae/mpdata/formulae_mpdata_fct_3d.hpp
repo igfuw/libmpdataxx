@@ -235,8 +235,6 @@ namespace libmpdataxx
       template <opts_t opts, int d, class arr_3d_t>
       inline auto GC_mono( //for variable-sign signal and no infinite gauge option
         const arr_3d_t &psi,
-        const arr_3d_t &psi_min, // from before the first iteration
-        const arr_3d_t &psi_max, // from before the first iteration
         const arr_3d_t &beta_up,
         const arr_3d_t &beta_dn,
         const arrvec_t<arr_3d_t> &GC_corr,
@@ -255,13 +253,13 @@ namespace libmpdataxx
             psi(pi<d>(i, j, k)) > 0, // TODO: wouldn't it be better with >= ?
             // then
 	    min(1, min(
-              beta_dn(i,     j, k),
-              beta_up(i + 1, j, k)
+              beta_dn(pi<d>(i,     j, k)),
+              beta_up(pi<d>(i + 1, j, k))
 	    )),
             // else
 	    min(1, min(
-	      beta_up(i,     j, k),
-	      beta_dn(i + 1, j, k)
+	      beta_up(pi<d>(i,     j, k)),
+	      beta_dn(pi<d>(i + 1, j, k))
 	    ))
           ),
           // else
@@ -270,13 +268,13 @@ namespace libmpdataxx
             psi(pi<d>(i+1, j, k)) > 0, // TODO: what if crossing zero?
             // then
 	    min(1, min(
-	      beta_up(i,     j, k),
-	      beta_dn(i + 1, j, k)
+	      beta_up(pi<d>(i,     j, k)),
+	      beta_dn(pi<d>(i + 1, j, k))
 	    )),
             // else
 	    min(1, min(
-	      beta_dn(i,     j, k),
-	      beta_up(i + 1, j, k)
+	      beta_dn(pi<d>(i,     j, k)),
+	      beta_up(pi<d>(i + 1, j, k))
 	    ))
           )
         )
@@ -285,8 +283,6 @@ namespace libmpdataxx
       template <opts_t opts, int d, class arr_3d_t>
       inline auto GC_mono( //for infinite gauge option or positive-sign signal
         const arr_3d_t &psi,
-        const arr_3d_t &psi_min, // from before the first iteration
-        const arr_3d_t &psi_max, // from before the first iteration
         const arr_3d_t &beta_up,
         const arr_3d_t &beta_dn,
         const arrvec_t<arr_3d_t> &GC_corr,
@@ -301,13 +297,13 @@ namespace libmpdataxx
           GC_corr[d]( pi<d>(i+h, j, k) ) >= 0, // TODO: what about where(GC!=0, where()...) - could be faster for fields with a lot of zeros? (as an option?)
           // then
 	  min(1, min(
-	    beta_dn(i,     j, k),
-	    beta_up(i + 1, j, k)
+	    beta_dn(pi<d>(i,     j, k)),
+	    beta_up(pi<d>(i + 1, j, k))
 	  )),
           // else
 	  min(1, min(
-	    beta_up(i,     j, k),
-	    beta_dn(i + 1, j, k)
+	    beta_up(pi<d>(i,     j, k)),
+	    beta_dn(pi<d>(i + 1, j, k))
 	  ))
         )
       )

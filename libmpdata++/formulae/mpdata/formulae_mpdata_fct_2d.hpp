@@ -191,76 +191,76 @@ namespace libmpdataxx
         ) 
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, int d, class arr_2d_t>
       inline auto GC_mono( //for variable-sign signal and no infinite gauge option
         const arr_2d_t &psi,
-        const arr_2d_t &psi_min, // from before the first iteration
-        const arr_2d_t &psi_max, // from before the first iteration
+        const arr_2d_t &beta_up,
+        const arr_2d_t &beta_dn,
         const arrvec_t<arr_2d_t> &GC_corr,
         const arr_2d_t &G,
         const rng_t i,
         const rng_t j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        GC_corr[dim]( pi<dim>(i+h, j) ) * where( // TODO: is it possible to implement it without where()?
+        GC_corr[d]( pi<d>(i+h, j) ) * where( // TODO: is it possible to implement it without where()?
           // if
-          GC_corr[dim]( pi<dim>(i+h, j) ) > 0, // >= ?
+          GC_corr[d]( pi<d>(i+h, j) ) > 0, // >= ?
           // then
           where(
             // if
-            psi(pi<dim>(i, j)) > 0, // TODO: wouldn't it be better with >= ?
+            psi(pi<d>(i, j)) > 0, // TODO: wouldn't it be better with >= ?
             // then
 	    min(1, min(
-              beta_dn<opts, dim>(psi, psi_min, GC_corr, G, i,     j),
-              beta_up<opts, dim>(psi, psi_max, GC_corr, G, i + 1, j) 
+              beta_dn(pi<d>(i,     j)),
+              beta_up(pi<d>(i + 1, j)) 
 	    )),
             // else
 	    min(1, min(
-	      beta_up<opts, dim>(psi, psi_max, GC_corr, G, i,     j),
-	      beta_dn<opts, dim>(psi, psi_min, GC_corr, G, i + 1, j)
+	      beta_up(pi<d>(i,     j)),
+	      beta_dn(pi<d>(i + 1, j))
 	    ))
           ),
           // else
           where(
             // if
-            psi(pi<dim>(i+1, j)) > 0, // TODO: what if crossing zero?
+            psi(pi<d>(i+1, j)) > 0, // TODO: what if crossing zero?
             // then
 	    min(1, min(
-	      beta_up<opts, dim>(psi, psi_max, GC_corr, G, i,     j),
-	      beta_dn<opts, dim>(psi, psi_min, GC_corr, G, i + 1, j)
+	      beta_up(pi<d>(i,     j)),
+	      beta_dn(pi<d>(i + 1, j))
 	    )),
             // else
 	    min(1, min(
-	      beta_dn<opts, dim>(psi, psi_min, GC_corr, G, i,     j),
-	      beta_up<opts, dim>(psi, psi_max, GC_corr, G, i + 1, j)
+	      beta_dn(pi<d>(i,     j)),
+	      beta_up(pi<d>(i + 1, j))
 	    ))
           )
         )
       ) 
 
-      template <opts_t opts, int dim, class arr_2d_t>
+      template <opts_t opts, int d, class arr_2d_t>
       inline auto GC_mono( //for infinite gauge option or positive-sign signal
         const arr_2d_t &psi,
-        const arr_2d_t &psi_min, // from before the first iteration
-        const arr_2d_t &psi_max, // from before the first iteration
+        const arr_2d_t &beta_up,
+        const arr_2d_t &beta_dn,
         const arrvec_t<arr_2d_t> &GC_corr,
         const arr_2d_t &G,
         const rng_t i,
         const rng_t j,
         typename std::enable_if<opts::isset(opts, opts::iga) || !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        GC_corr[dim]( pi<dim>(i+h, j) ) * where(
+        GC_corr[d]( pi<d>(i+h, j) ) * where(
           // if
-          GC_corr[dim]( pi<dim>(i+h, j) ) >= 0, // TODO: what about where(C!=0, where()...) - could be faster for fields with a lot of zeros? (as an option?)
+          GC_corr[d]( pi<d>(i+h, j) ) >= 0, // TODO: what about where(C!=0, where()...) - could be faster for fields with a lot of zeros? (as an option?)
           // then
 	  min(1, min(
-	    beta_dn<opts, dim>(psi, psi_min, GC_corr, G, i,     j),
-	    beta_up<opts, dim>(psi, psi_max, GC_corr, G, i + 1, j)
+	    beta_dn(pi<d>(i,     j)),
+	    beta_up(pi<d>(i + 1, j))
 	  )),
           // else
 	  min(1, min(
-	    beta_up<opts, dim>(psi, psi_max, GC_corr, G, i,     j),
-	    beta_dn<opts, dim>(psi, psi_min, GC_corr, G, i + 1, j)
+	    beta_up(pi<d>(i,     j)),
+	    beta_dn(pi<d>(i + 1, j))
 	  ))
         )
       )
