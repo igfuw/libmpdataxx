@@ -107,6 +107,7 @@ void test(const std::string& dir_name)
 
 int main()
 {
+/*
   {
     enum { opts = 0 };
     enum { opts_iters = 1};
@@ -125,6 +126,7 @@ int main()
     test<opts, opts_iters>("basic");
   }
 
+*/
   {
     enum { opts = opts::iga | opts::fct};
     enum { opts_iters = 2};
