@@ -89,8 +89,8 @@ namespace libmpdataxx
 	    }
 
             // sanity checks for input // TODO: move to common
-            assert(std::isfinite(sum(psi[this->n[e]](this->ijk)))); 
-            assert(std::isfinite(sum(flux_ref[0](i^h))));
+            //assert(std::isfinite(sum(psi[this->n[e]](this->ijk)))); 
+            //assert(std::isfinite(sum(flux_ref[0](i^h))));
 
 	    // donor-cell call // TODO: could be made common for 1D/2D/3D
             formulae::donorcell::donorcell_sum<ct_params_t::opts>(
@@ -104,7 +104,7 @@ namespace libmpdataxx
             );
 
             // sanity checks for output // TODO: move to common
-            assert(std::isfinite(sum(psi[this->n[e]+1](this->ijk)))); 
+            //assert(std::isfinite(sum(psi[this->n[e]+1](this->ijk)))); 
 	  }
 	}
 

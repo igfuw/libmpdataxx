@@ -134,9 +134,9 @@ namespace libmpdataxx
             const auto &flx = (*(this->flux_ptr));
 
             // sanity check for input
-            assert(std::isfinite(sum(this->mem->psi[e][this->n[e]](this->ijk))));
-            assert(std::isfinite(sum(flx[0](i^h, j  ))));
-            assert(std::isfinite(sum(flx[1](i,   j^h))));
+            //assert(std::isfinite(sum(this->mem->psi[e][this->n[e]](this->ijk))));
+            //assert(std::isfinite(sum(flx[0](i^h, j  ))));
+            //assert(std::isfinite(sum(flx[1](i,   j^h))));
 
 	    // donor-cell call 
 	    // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
@@ -153,7 +153,7 @@ namespace libmpdataxx
 	    ); 
 
             // sanity check for output // TODO: move to common
-            assert(std::isfinite(sum(this->mem->psi[e][this->n[e]+1](this->ijk))));
+            //assert(std::isfinite(sum(this->mem->psi[e][this->n[e]+1](this->ijk))));
 	  }
 	}
 
