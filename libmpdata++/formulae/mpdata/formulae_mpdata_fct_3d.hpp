@@ -23,9 +23,9 @@ namespace libmpdataxx
         const arr_3d_t &psi,
         const arr_3d_t &psi_max,
         const arr_3d_t &G,
-        const rng_t i, 
-        const rng_t j,
-        const rng_t k
+        const rng_t &i, 
+        const rng_t &j,
+        const rng_t &k
       ) return_macro(, 
         (
           max(max(max(max(max(max(max(
@@ -48,9 +48,9 @@ namespace libmpdataxx
         const arr_3d_t &psi_max, // from before the first iteration
         const flx_t &flx,
         const arr_3d_t &G,
-        const rng_t i, 
-        const rng_t j,
-        const rng_t k
+        const rng_t &i, 
+        const rng_t &j,
+        const rng_t &k
       ) return_macro(,
         fct_frac(
           beta_up_nominator<opts>(psi, psi_max, G, i, j, k)
@@ -71,9 +71,9 @@ namespace libmpdataxx
         const arr_3d_t &psi,
         const arr_3d_t &psi_min,
         const arr_3d_t &G,
-        const rng_t i,
-        const rng_t j,
-        const rng_t k
+        const rng_t &i,
+        const rng_t &j,
+        const rng_t &k
       ) return_macro(,
         (
           psi(i, j, k)
@@ -96,9 +96,9 @@ namespace libmpdataxx
         const arr_3d_t &psi_min, // from before the first iteration
         const flx_t &flx,
         const arr_3d_t &G,
-        const rng_t i,
-        const rng_t j,
-        const rng_t k
+        const rng_t &i,
+        const rng_t &j,
+        const rng_t &k
       ) return_macro(,
         fct_frac(
           beta_dn_nominator<opts>(psi, psi_min, G, i, j, k)
@@ -121,9 +121,9 @@ namespace libmpdataxx
         const arr_3d_t &beta_dn,
         const arrvec_t<arr_3d_t> &GC_corr,
         const arr_3d_t &G,
-        const rng_t i,
-        const rng_t j,
-        const rng_t k,
+        const rng_t &i,
+        const rng_t &j,
+        const rng_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         GC_corr[d]( pi<d>(i+h, j, k) ) * where( // TODO: is it possible to implement it without where()?
@@ -169,9 +169,9 @@ namespace libmpdataxx
         const arr_3d_t &beta_dn,
         const arrvec_t<arr_3d_t> &GC_corr,
         const arr_3d_t &G,
-        const rng_t i,
-        const rng_t j,
-        const rng_t k,
+        const rng_t &i,
+        const rng_t &j,
+        const rng_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga) || !opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
         GC_corr[d]( pi<d>(i+h, j, k) ) * where(

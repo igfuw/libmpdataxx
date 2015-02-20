@@ -44,16 +44,33 @@ namespace libmpdataxx
 	{
 	  const int d = 0; // 1D version -> working in x dimension only
 	  const auto psi = this->mem->psi[e][this->n[e]];
-	  const auto &GC_corr = parent_t::GC_corr(iter);
+	  auto &GC_corr = parent_t::GC_corr(iter);
 	  const auto &G = *this->mem->G;
-	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
+	  const auto &i(this->i);
+	  const auto &im(this->im); // calculating once for i-1/2 and i+1/2
 
 	  // fill halos in GC_corr
           this->xchng_vctr_alng(GC_corr);
 
+          // calculation of fluxes for betas denominators
+          if (opts::isset(ct_params_t::opts, opts::iga))
+          {
+            this->flux_ptr = &GC_corr;
+          }
+          else
+          {
+            this->flux[0](im+h) = formulae::donorcell::flux<ct_params_t::opts>(psi, GC_corr[0], im);
+            this->flux_ptr = &this->flux;
+          }
+
+          const auto &flx = (*(this->flux_ptr));
+
+          // sanity check for input
+          assert(std::isfinite(sum(flx[0](i^h))));
+
           // calculating betas
-          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr[d], G, this->i);
-          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr[d], G, this->i);
+          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i);
+          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i);
 
           // fill halos for betas
           this->xchng_sclr(this->beta_up);

@@ -59,12 +59,8 @@ namespace libmpdataxx
 	  const auto psi = this->mem->psi[e][this->n[e]];
 	  auto &GC_corr = parent_t::GC_corr(iter);
           const auto &G = *this->mem->G;
-	  const auto &i = this->i;
-	  const auto &j = this->j;
-	  const auto &k = this->k;
-	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
-	  const auto &jm = this->jm; // calculating once for j-1/2 and j+1/2
-	  const auto &km = this->km; // calculating once for k-1/2 and k+1/2
+	  const auto &i(this->i), &j(this->j), &k(this->k);
+	  const auto &im(this->im), &jm(this->jm), &km(this->km); // calculating once for (i/j/k)-1/2 and (i/j/k)+1/2
 
 	  // fill halos -> mpdata works with halo=1, we need halo=2
           this->xchng_vctr_alng(GC_corr);

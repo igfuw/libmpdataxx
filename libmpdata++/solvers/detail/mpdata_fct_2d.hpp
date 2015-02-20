@@ -48,17 +48,35 @@ namespace libmpdataxx
 	void fct_adjust_antidiff(int e, int iter)
 	{
 	  const auto psi = this->mem->psi[e][this->n[e]];
-	  const auto &GC_corr = parent_t::GC_corr(iter);
+	  auto &GC_corr = parent_t::GC_corr(iter);
           const auto &G = *this->mem->G;
-	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
-	  const auto &jm = this->jm; // calculating once for i-1/2 and i+1/2
+	  const auto &i(this->i), &j(this->j);
+	  const auto &im(this->im), &jm(this->jm); // calculating once for (i/j)-1/2 and (i/j)+1/2
 
 	  // fill halos of GC_corr -> mpdata works with halo=1, we need halo=2
           this->xchng_vctr_alng(GC_corr);
+
+          // calculation of fluxes for betas denominators
+          if (opts::isset(ct_params_t::opts, opts::iga))
+          {
+            this->flux_ptr = &GC_corr;
+          }
+          else
+          {
+            this->flux[0](im+h, j) = formulae::donorcell::flux<ct_params_t::opts, 0>(psi, GC_corr[0], im, j);
+            this->flux[1](i, jm+h) = formulae::donorcell::flux<ct_params_t::opts, 1>(psi, GC_corr[1], jm, i);
+            this->flux_ptr = &this->flux;
+          }
+
+          const auto &flx = (*(this->flux_ptr));
+
+          // sanity check for input
+          assert(std::isfinite(sum(flx[0](i^h, j  ))));
+          assert(std::isfinite(sum(flx[1](i,   j^h))));
  
           // calculating betas
-          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr, G, this->i, this->j);
-          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr, G, this->i, this->j);
+          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i, j);
+          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i, j);
 
           // filling halos for betas
           this->xchng_sclr(this->beta_up, this->i, this->j);
