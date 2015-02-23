@@ -30,18 +30,18 @@ namespace libmpdataxx
 
 	void fct_init(int e)
 	{
-	  const auto i = this->i^1, j = this->j^1; // not optimal - with multiple threads some indices are repeated among threads
+	  const auto i1 = this->i^1, j1 = this->j^1; // not optimal - with multiple threads some indices are repeated among threads
 	  const auto psi = this->mem->psi[e][this->n[e]]; 
 
-	  this->psi_min(i,j) = min(min(min(min(
-			 psi(i,j+1),
-	    psi(i-1,j)), psi(i,j  )), psi(i+1,j)),
-			 psi(i,j-1)
+	  this->psi_min(i1,j1) = min(min(min(min(
+			   psi(i1,j1+1),
+	    psi(i1-1,j1)), psi(i1,j1  )), psi(i1+1,j1)),
+			   psi(i1,j1-1)
 	  );
-	  this->psi_max(i,j) = max(max(max(max(
-			 psi(i,j+1),
-	    psi(i-1,j)), psi(i,j  )), psi(i+1,j)), 
-			 psi(i,j-1)
+	  this->psi_max(i1,j1) = max(max(max(max(
+			   psi(i1,j1+1),
+	    psi(i1-1,j1)), psi(i1,j1  )), psi(i1+1,j1)), 
+			   psi(i1,j1-1)
 	  ); 
 	}
 
@@ -52,17 +52,14 @@ namespace libmpdataxx
           const auto &G = *this->mem->G;
 	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 	  const auto &jm = this->jm; // calculating once for i-1/2 and i+1/2
+	  const auto i1 = this->i^1, j1 = this->j^1; // not optimal - with multiple threads some indices are repeated among threads
 
 	  // fill halos of GC_corr -> mpdata works with halo=1, we need halo=2
           this->xchng_vctr_alng(GC_corr);
  
           // calculating betas
-          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr, G, this->i, this->j);
-          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr, G, this->i, this->j);
-
-          // filling halos for betas
-          this->xchng_sclr(this->beta_up, this->i, this->j);
-          this->xchng_sclr(this->beta_dn, this->i, this->j);
+          this->beta_up(i1, j1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr, G, i1, j1);
+          this->beta_dn(i1, j1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr, G, i1, j1);
 
 	  // calculating the monotonic corrective velocity
 	  this->GC_mono[0]( im+h, this->j ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j);

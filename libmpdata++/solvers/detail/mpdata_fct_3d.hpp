@@ -30,27 +30,27 @@ namespace libmpdataxx
 
 	void fct_init(int e)
 	{
-	  const auto i = this->i^1, j = this->j^1, k = this->k^1; // not optimal - with multiple threads some indices are repeated among threads
+	  const auto i1 = this->i^1, j1 = this->j^1, k1 = this->k^1; // not optimal - with multiple threads some indices are repeated among threads
 	  const auto psi = this->mem->psi[e][this->n[e]]; 
 
-	  this->psi_min(i,j,k) = min(min(min(min(min(min(
-			psi(i,j,k),
-			psi(i+1,j,k)),
-			psi(i-1,j,k)),
-			psi(i,j+1,k)),
-			psi(i,j-1,k)),
-			psi(i,j,k+1)),
-			psi(i,j,k-1)
+	  this->psi_min(i1,j1,k1) = min(min(min(min(min(min(
+			psi(i1,  j1,  k1),
+			psi(i1+1,j1,  k1)),
+			psi(i1-1,j1,  k1)),
+			psi(i1,  j1+1,k1)),
+			psi(i1,  j1-1,k1)),
+			psi(i1,  j1,  k1+1)),
+			psi(i1,  j1,  k1-1)
 	  );
 			
-	  this->psi_max(i,j,k) = max(max(max(max(max(max(
-			psi(i,j,k),
-			psi(i+1,j,k)), 
-			psi(i-1,j,k)),
-			psi(i,j+1,k)),
-			psi(i,j-1,k)),
-			psi(i,j,k+1)), 
-			psi(i,j,k-1) 
+	  this->psi_max(i1,j1,k1) = max(max(max(max(max(max(
+			psi(i1,  j1,  k1),
+			psi(i1+1,j1,  k1)), 
+			psi(i1-1,j1,  k1)),
+			psi(i1,  j1+1,k1)),
+			psi(i1,  j1-1,k1)),
+			psi(i1,  j1,  k1+1)), 
+			psi(i1,  j1,  k1-1) 
 	  ); 
 	}
 
@@ -62,18 +62,14 @@ namespace libmpdataxx
 	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
 	  const auto &jm = this->jm; // calculating once for j-1/2 and j+1/2
 	  const auto &km = this->km; // calculating once for k-1/2 and k+1/2
+	  const auto i1 = this->i^1, j1 = this->j^1, k1 = this->k^1; // not optimal - with multiple threads some indices are repeated among threads
 
 	  // fill halos -> mpdata works with halo=1, we need halo=2
           this->xchng_vctr_alng(GC_corr);
 
           // calculating betas
-          // TODO: remove d from beta_up / beta_dn 
-          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr, G, this->i, this->j, this->k);
-          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr, G, this->i, this->j, this->k);
-
-          // fill halos for betas
-          this->xchng_sclr(this->beta_up, this->i, this->j, this->k);
-          this->xchng_sclr(this->beta_dn, this->i, this->j, this->k);
+          this->beta_up(i1, j1, k1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr, G, i1, j1, k1);
+          this->beta_dn(i1, j1, k1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr, G, i1, j1, k1);
 
 	  // calculating the monotonic corrective velocity
           // TODO: do not pass psi_min / psi_max

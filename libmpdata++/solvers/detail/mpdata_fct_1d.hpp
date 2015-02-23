@@ -30,14 +30,14 @@ namespace libmpdataxx
 
 	void fct_init(int e)
 	{
-	  const auto i = this->i^1; // TODO: isn't it a race condition with more than one thread?
+	  const auto i1 = this->i^1; // TODO: isn't it a race condition with more than one thread?
 	  const auto psi = this->mem->psi[e][this->n[e]];
 
 	  /// \f$ \psi^{max}_{i}=max_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n  
 	  /// \f$ \psi^{min}_{i}=min_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n    
 	  /// eq.(20a, 20b) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
-	  this->psi_min(i) = min(min(psi(i-1), psi(i)), psi(i+1));
-	  this->psi_max(i) = max(max(psi(i-1), psi(i)), psi(i+1)); 
+	  this->psi_min(i1) = min(min(psi(i1-1), psi(i1)), psi(i1+1));
+	  this->psi_max(i1) = max(max(psi(i1-1), psi(i1)), psi(i1+1)); 
 	}
 
 	void fct_adjust_antidiff(int e, int iter)
@@ -47,17 +47,14 @@ namespace libmpdataxx
 	  const auto &GC_corr = parent_t::GC_corr(iter);
 	  const auto &G = *this->mem->G;
 	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
+	  const auto i1 = this->i^1; // TODO: isn't it a race condition with more than one thread?
 
 	  // fill halos in GC_corr
           this->xchng_vctr_alng(GC_corr);
 
-          // calculating betas
-          this->beta_up(this->ijk) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr[d], G, this->i);
-          this->beta_dn(this->ijk) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr[d], G, this->i);
-
-          // fill halos for betas
-          this->xchng_sclr(this->beta_up);
-          this->xchng_sclr(this->beta_dn);
+          // calculating betas 
+          this->beta_up(i1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, GC_corr[d], G, i1);
+          this->beta_dn(i1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, GC_corr[d], G, i1);
 
 	  // calculating the monotonic corrective velocity
 	  this->GC_mono[d]( this->im+h ) = formulae::mpdata::GC_mono<ct_params_t::opts>(
