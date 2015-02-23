@@ -46,5 +46,3 @@ def d2_velocity(lamb, x, y):
 #initial condition
 def d2_initial(x,y):
     return np.where(d2_rad2(x,y)<=1, 1-d2_rad2(x,y), 0)
-
-

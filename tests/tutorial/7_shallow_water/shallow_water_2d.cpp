@@ -4,20 +4,10 @@
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
-
 #include <libmpdata++/solvers/shallow_water.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/hdf5_xdmf.hpp>
 using namespace libmpdataxx; 
-
-#include <boost/math/constants/constants.hpp>
-using boost::math::constants::pi;
-
-#include <fstream>
-
-const int 
-  nt = 300,
-  outfreq = 100;
 
 using real_t = double;
 
@@ -58,14 +48,20 @@ void test(const std::string &outdir)
     enum { hint_norhs = opts::bit(ix::h) }; 
   };
 
+  const int 
+    nt = 300,
+    outfreq = 100;
+
   using ix = typename ct_params_t::ix;
 
   // solver choice
-  using solver_t = output::hdf5_xdmf<shallow_water<ct_params_t>>;
-
+  using slv_out_t = 
+    output::hdf5_xdmf<
+      shallow_water<ct_params_t>
+    >;
 
   // run-time parameters
-  typename solver_t::rt_params_t p; 
+  typename slv_out_t::rt_params_t p; 
 
   p.dt = .01;
   p.di = .05;
@@ -83,10 +79,10 @@ void test(const std::string &outdir)
 
   // instantiation
   concurr::threads<
-    solver_t, 
-    bcond::cyclic, bcond::cyclic,
-    bcond::cyclic, bcond::cyclic
-  > run(p); // TODO: change into open bc
+    slv_out_t, 
+    bcond::open, bcond::open,
+    bcond::open, bcond::open
+  > run(p); 
 
   // initial condition
   {
@@ -105,10 +101,7 @@ void test(const std::string &outdir)
 
 int main()
 {
-  test<opts::fct | opts::iga>("spreading_drop_2d_fct+iga.out");
-  test<opts::fct | opts::abs>("spreading_drop_2d_fct+abs.out");
-  system("python ../../../../tests/tutorial/7_shallow_water/plot_2d.py fct+abs fct+iga");
-  system("python ../../../../tests/tutorial/7_shallow_water/3Dplot_2d.py");
-  system("python ../../../../tests/tutorial/7_shallow_water/errors_2d.py fct+abs fct+iga");
+  test<opts::fct | opts::iga>("2d_fct_iga");
+  test<opts::fct | opts::abs>("2d_fct_abs");
+//  system("python ../../../../tests/tutorial/7_shallow_water/errors_2d.py fct+abs fct+iga");
 }
-

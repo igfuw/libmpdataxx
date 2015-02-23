@@ -7,43 +7,10 @@
 
 #include <libmpdata++/solvers/shallow_water.hpp>
 #include <libmpdata++/concurr/serial.hpp>
+#include <libmpdata++/output/hdf5_xdmf.hpp>
 using namespace libmpdataxx; 
 
-#include <boost/math/constants/constants.hpp>
-using boost::math::constants::pi;
-
-#include <fstream>
-
-const int 
-  nt = 300,
-  outfreq = 1;
-
 using real_t = double;
-
-// compile-time parameters
-// enum { hint_noneg = opts::bit(ix::h) };  // TODO: reconsider?
-//<listing-1>
-template <int opts_arg>
-struct ct_params_t : ct_params_default_t
-{
-  using real_t = ::real_t;
-  enum { n_dims = 1 };
-  enum { n_eqns = 2 };
-  
-  // options
-  enum { opts = opts_arg | opts::dfl };
-  enum { rhs_scheme = solvers::trapez };
-  
-  // indices
-  struct ix { 
-    enum { qx, h };
-    enum { vip_i=qx, vip_den=h };
-  }; 
-  
-  // hints
-  enum { hint_norhs = opts::bit(ix::h) }; 
-};
-//</listing-1>
 
 struct intcond
 {
@@ -57,64 +24,62 @@ struct intcond
   BZ_DECLARE_FUNCTOR(intcond);
 };
 
-// TODO: all this plotting logic should be done with a new libmpdataxx::output
-struct out_t
+template<int opts_arg>
+void test(const std::string& outdir) 
 {
-  std::ofstream x, h, q, t;
-  out_t(const std::string &pfx) : 
-    x(pfx + ".x"), 
-    h(pfx + ".h"), 
-    q(pfx + ".q"), 
-    t(pfx + ".t")
-  {}
-};
-
-template <class ix, class run_t>
-void output(run_t &run, const int &t, const real_t &dx, const real_t &dt, out_t &out)
-{
-  // x coordinate (once)
-  if (t == 0)
+  // compile-time parameters
+  // enum { hint_noneg = opts::bit(ix::h) };  // TODO: reconsider?
+//<listing-1>
+  struct ct_params_t : ct_params_default_t
   {
-    for (int i = 0; i < run.advectee().extent(0); ++i) 
-      out.x << i * dx << "\t";
-    out.x << "\n";
-  } 
-
-  // time
-  out.t << t * dt << "\t" << "\n"; 
+    using real_t = ::real_t;
+    enum { n_dims = 1 };
+    enum { n_eqns = 2 };
   
-  // layer depth
-  for (auto &it : run.advectee(ix::h)) out.h << it << "\t";
-  out.h << "\n";
+    // options
+    enum { opts = opts_arg | opts::dfl };
+    enum { rhs_scheme = solvers::trapez };
+  
+    // indices
+    struct ix { 
+      enum { qx, h };
+      enum { vip_i=qx, vip_den=h };
+    }; 
+  
+    // hints
+    enum { hint_norhs = opts::bit(ix::h) }; 
+  };
+//</listing-1>
 
-  // momentum
-  for (auto &it : run.advectee(ix::qx)) out.q << it << "\t";
-  out.q << "\n";
-}
+  const int nt = 300;
 
-template<int opts>
-void test(const std::string &pfx) 
-{
-  using ix = typename ct_params_t<opts>::ix;
+  using ix = typename ct_params_t::ix;
 
   // solver choice
-  using solver_t = shallow_water<ct_params_t<opts>>;
-
+  using slv_out_t =
+    output::hdf5<
+      shallow_water<ct_params_t>
+    >;
+ 
 //<listing-2>
   // run-time parameters
-  typename solver_t::rt_params_t p; 
+  typename slv_out_t::rt_params_t p;
   p.dt = .01;
   p.di = .05;
   p.grid_size = { int(16 / p.di) };
   p.g = 1;
   p.vip_eps = 1e-8; 
 //</listing-2>
-
+  p.outvars[ix::qx].name = "qx";
+  p.outvars[ix::h].name  = "h";
+  p.outdir = outdir;
+  p.outfreq = nt; 
+ 
   // instantiation
   concurr::serial<
-    solver_t, 
-    bcond::cyclic, bcond::cyclic
-  > run(p); // TODO: change into open bc
+    slv_out_t, 
+    bcond::open, bcond::open
+  > run(p);
 
   // initial condition
   {
@@ -124,26 +89,20 @@ void test(const std::string &pfx)
   run.advectee(ix::qx) = 0;
 
   // integration
-  double tmp = 0;
-  out_t out(pfx);
-  output<ix>(run, 0, p.di, p.dt, out);
-  for (int t = 0; t < nt; t += outfreq)
-  {
-    run.advance(outfreq); 
-    output<ix>(run, t + outfreq, p.di, p.dt, out);
-   
-    if (max(run.advector()) > tmp) tmp = max(run.advector());
-    std::cerr<<"max advector = "<< tmp  <<std::endl;
-  }
+  run.advance(nt); 
+  
+  //TODO - move to stats 
+  std::cerr<<"min advector = "<< min(run.advector())  << std::endl;
+  std::cerr<<"max advector = "<< max(run.advector())  << std::endl;
 }
 
 int main()
 {
-  test<opts::abs | opts::fct >("fct+abs");
-  test<opts::iga | opts::fct >("fct+iga");
+  test<opts::abs | opts::fct >("1d_fct_abs");
+  test<opts::iga | opts::fct >("1d_fct_iga");
   //plotting model results and analitic solution; 
   //python uses sys.argv[1:0] for choosing model outputs
-  system("python ../../../../tests/tutorial/7_shallow_water/plot.py fct+abs fct+iga ");
-  system("python ../../../../tests/tutorial/7_shallow_water/errors_1d.py fct+abs fct+iga ");
+  //TODO - move to make test
+ // system("python ../../../../tests/tutorial/7_shallow_water/plot.py fct+abs fct+iga ");
+ // system("python ../../../../tests/tutorial/7_shallow_water/errors_1d.py fct+abs fct+iga ");
 }
-
