@@ -15,7 +15,7 @@
 #include <boost/math/constants/constants.hpp>
 
 #include <libmpdata++/solvers/mpdata.hpp>
-#include <libmpdata++/concurr/serial.hpp>
+#include <libmpdata++/concurr/cxx11_thread.hpp>
 
 // making things simpler (yet less elegant)
 using namespace libmpdataxx;
@@ -43,7 +43,7 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   p.grid_size = {nx};
 
   boost::assign::ptr_map_insert<
-    concurr::serial<solver_t, bcond::open, bcond::open> // map element type
+    concurr::cxx11_thread<solver_t, bcond::open, bcond::open> // map element type
   >(slvs)(
     key,  // map key
     p     // concurr's ctor args
