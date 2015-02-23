@@ -144,5 +144,6 @@ int main()
   //plotting model results and analitic solution; 
   //python uses sys.argv[1:0] for choosing model outputs
   system("python ../../../../tests/tutorial/7_shallow_water/plot.py fct+abs fct+iga ");
+  system("python ../../../../tests/tutorial/7_shallow_water/errors_1d.py fct+abs fct+iga ");
 }
 

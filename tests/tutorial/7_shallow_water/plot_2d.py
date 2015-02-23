@@ -57,7 +57,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
     #plotting analytic solution
     analytic_fig(ax, time_l)
     plt.savefig("papier_shallowwater_2d_analytic.pdf")
-    #plt.show()
+    plt.show()
     #plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l):
         plt.figure(ic+1, figsize = (6,3))
@@ -84,7 +84,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
         #            fontsize=12, horizontalalignment='left', verticalalignment='top')
         
         plt.savefig("papier_shallowwater_2d_"+str(casename)+".pdf")
-        #plt.show()
+        plt.show()
 
 main("./", sys.argv[1:])
 
