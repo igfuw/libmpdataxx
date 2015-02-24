@@ -7,7 +7,6 @@
 #pragma once
 
 #include <libmpdata++/solvers/detail/solver_common.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
 
 namespace libmpdataxx
 {
@@ -48,13 +47,13 @@ namespace libmpdataxx
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
 	}
 
-        virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec, int ext = 0) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/);
-          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/);
-          bcyl->fill_halos_vctr_alng(arrvec, i/*^1*/);
-          bcyr->fill_halos_vctr_alng(arrvec, i/*^1*/);
+          bcxl->fill_halos_vctr_alng(arrvec, j^ext);
+          bcxr->fill_halos_vctr_alng(arrvec, j^ext);
+          bcyl->fill_halos_vctr_alng(arrvec, i^ext);
+          bcyr->fill_halos_vctr_alng(arrvec, i^ext);
           // TODO: open bc nust be last!!!
           this->mem->barrier();
         }

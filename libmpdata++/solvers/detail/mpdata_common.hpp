@@ -34,6 +34,7 @@ namespace libmpdataxx
 
 	// member fields
 	std::vector<GC_t*> tmp;
+        GC_t &flux, *flux_ptr;
 
         // methods
 	GC_t &GC_unco(int iter)
@@ -58,7 +59,7 @@ namespace libmpdataxx
 	  return GC_corr(iter);
 	}
 
-	// for Flux-Corrected Transport (TODO: more general names?) // TODO: move to mpdata_common
+	// for Flux-Corrected Transport 
 	virtual void fct_init(int e) { }
 	virtual void fct_adjust_antidiff(int e, int iter) { }
 
@@ -84,12 +85,13 @@ namespace libmpdataxx
 	) : 
 	  parent_t(args, p),
           n_iters(p.n_iters),
-          tmp(n_tmp(n_iters))
+          tmp(n_tmp(n_iters)),
+          flux(args.mem->tmp[__FILE__][n_tmp(p.n_iters)])
         {
+          assert(n_iters > 0); // TODO: throw!
+
 	  for (int n = 0; n < n_tmp(n_iters); ++n)
 	    tmp[n] = &args.mem->tmp[__FILE__][n];
-
-          assert(n_iters > 0);
         }
 
         public:
@@ -102,6 +104,7 @@ namespace libmpdataxx
 	  parent_t::alloc(mem, p);
 	  for (int n = 0; n < n_tmp(p.n_iters); ++n)
 	    parent_t::alloc_tmp_vctr(mem, p.grid_size, __FILE__);
+          parent_t::alloc_tmp_vctr(mem, p.grid_size, __FILE__); // fluxes
 	}   
       };
 
