@@ -52,9 +52,7 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   boost::assign::ptr_map_insert(outfiles)(key);
   if (!outfiles[key].is_open())
   {
-    char bits[3];
-    sprintf(bits, "%03lu", 8 * sizeof(typename ct_params_t::real_t));
-    outfiles[key].open("err_mpdata_" + key + "_" + bits + "_bits.txt", std::ios::trunc); 
+    outfiles[key].open("err_mpdata_" + key + ".txt", std::ios::trunc); 
   }
 }
 
@@ -120,17 +118,17 @@ int main()
 
       // MPDATA
       add_solver<0>(slvs, "iters=2", nx, 2);
-      add_solver<opts::tot>(slvs, "iters=2_tot", nx, 2);
+      //add_solver<opts::tot>(slvs, "iters=2_tot", nx, 2);
       add_solver<0>(slvs, "iters=3", nx, 3);
       add_solver<opts::tot>(slvs, "iters=3_tot", nx, 3);
       add_solver<opts::iga>(slvs, "iters=i", nx, 2);
-      add_solver<opts::iga | opts::tot>(slvs, "iters=i_tot", nx, 2);
+      //add_solver<opts::iga | opts::tot>(slvs, "iters=i_tot", nx, 2);
 
       // MPDATA-FCT
       add_solver<opts::fct>(slvs, "iters=2_fct", nx, 2);
-      add_solver<opts::fct | opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
-      add_solver<opts::fct>(slvs, "iters=3_fct", nx, 3);
-      add_solver<opts::fct | opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
+      //add_solver<opts::fct | opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
+      //add_solver<opts::fct>(slvs, "iters=3_fct", nx, 3);
+      //add_solver<opts::fct | opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
       add_solver<opts::fct | opts::iga>(slvs, "iters=i_fct", nx, 2);
       add_solver<opts::fct | opts::iga | opts::tot>(slvs, "iters=i_fct_tot", nx, 2);
 
