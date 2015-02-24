@@ -37,7 +37,6 @@ namespace libmpdataxx
       protected:
 
       // member fields
-      typename parent_t::real_t dt;
       arrvec_t<typename parent_t::arr_t> &rhs;
 
 //<listing-1>
@@ -67,7 +66,7 @@ namespace libmpdataxx
       }
 
       virtual void apply_rhs(
-        const typename parent_t::real_t &dt
+        const typename parent_t::real_t &dt_arg
       ) final
       {
         for (int e = 0; e < parent_t::n_eqns; ++e) 
@@ -76,27 +75,21 @@ namespace libmpdataxx
           if (opts::isset(ct_params_t::hint_norhs, opts::bit(e))) continue;
 
           // otherwise apply the rhs
-          this->state(e)(this->ijk) += dt * rhs.at(e)(this->ijk);
+          this->state(e)(this->ijk) += dt_arg * rhs.at(e)(this->ijk);
         }
       }
 
       public:
-
-      struct rt_params_t : parent_t::rt_params_t 
-      { 
-        typename parent_t::real_t dt = 0; 
-      };
       
       // ctor
       mpdata_rhs(
 	typename parent_t::ctor_args_t args, 
-	const rt_params_t &p
+	const typename parent_t::rt_params_t &p
       ) :
 	parent_t(args, p), 
-        dt(p.dt),
         rhs(args.mem->tmp[__FILE__][0])
       {
-        assert(dt != 0);
+        assert(this->dt != 0);
       }
 
       // dtor
@@ -117,7 +110,7 @@ namespace libmpdataxx
           case rhs_scheme_t::euler_b: 
             break;
           case rhs_scheme_t::trapez:
-            update_rhs(rhs, dt / 2, n);
+            update_rhs(rhs, this->dt / 2, n);
             break;
           default: 
             assert(false);
@@ -135,14 +128,14 @@ namespace libmpdataxx
         switch ((rhs_scheme_t)ct_params_t::rhs_scheme)
         {
           case rhs_scheme_t::euler_a: 
-            update_rhs(rhs, dt, n);
+            update_rhs(rhs, this->dt, n);
             break;
           case rhs_scheme_t::euler_b: 
-            update_rhs(rhs, dt, n);
-            apply_rhs(dt); 
+            update_rhs(rhs, this->dt, n);
+            apply_rhs(this->dt); 
             break;
           case rhs_scheme_t::trapez: 
-            apply_rhs(dt / 2); 
+            apply_rhs(this->dt / 2); 
             break;
           default: 
             assert(false);
@@ -155,20 +148,20 @@ namespace libmpdataxx
         switch ((rhs_scheme_t)ct_params_t::rhs_scheme)
         {
           case rhs_scheme_t::euler_a: 
-            apply_rhs(dt);
+            apply_rhs(this->dt);
             break;
           case rhs_scheme_t::euler_b: 
             break;
           case rhs_scheme_t::trapez: 
-            update_rhs(rhs, dt / 2, n+1);
-            apply_rhs(dt / 2);
+            update_rhs(rhs, this->dt / 2, n+1);
+            apply_rhs(this->dt / 2);
             break;
           default:
             assert(false);
         }
       } 
 
-      static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
+      static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)
       {
         // TODO: optimise to skip allocs for equations with no rhs
 	parent_t::alloc(mem, p);

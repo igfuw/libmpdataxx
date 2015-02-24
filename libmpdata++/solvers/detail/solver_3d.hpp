@@ -7,7 +7,6 @@
 #pragma once
 
 #include <libmpdata++/solvers/detail/solver_common.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
 
 namespace libmpdataxx
 {
@@ -31,7 +30,7 @@ namespace libmpdataxx
       
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
-	rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
+	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
 	void xchng_sclr(typename parent_t::arr_t arr,
                        rng_t range_i, rng_t range_j, rng_t range_k,
@@ -51,15 +50,15 @@ namespace libmpdataxx
 	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
 	}
 
-        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec)
+        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec, int ext = 0)
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/); 
-          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/);
-          bcyl->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/); 
-          bcyr->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/);
-          bczl->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
-          bczr->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
+          bcxl->fill_halos_vctr_alng(arrvec, j^ext, k^ext); 
+          bcxr->fill_halos_vctr_alng(arrvec, j^ext, k^ext);
+          bcyl->fill_halos_vctr_alng(arrvec, k^ext, i^ext); 
+          bcyr->fill_halos_vctr_alng(arrvec, k^ext, i^ext);
+          bczl->fill_halos_vctr_alng(arrvec, i^ext, j^ext);
+          bczr->fill_halos_vctr_alng(arrvec, i^ext, j^ext);
           this->mem->barrier();
         }
         
@@ -97,12 +96,17 @@ namespace libmpdataxx
           const rng_t &i, &j, &k; 
         };  
 
+        struct rt_params_t : parent_t::rt_params_t
+        {
+          typename parent_t::real_t di = 0, dj = 0, dk = 0;
+        };
+
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         ) :
 	  parent_t(
             args.mem, 
@@ -118,13 +122,17 @@ namespace libmpdataxx
 	  bcyr(std::move(args.bcyr)),
 	  bczl(std::move(args.bczl)),
 	  bczr(std::move(args.bczr))
-	{} 
+	{
+          this->di = p.di;
+          this->dj = p.dj;
+          this->dk = p.dk;
+        } 
 
 	public:
 
 	static void alloc(
           typename parent_t::mem_t *mem,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         )   
         {
           // psi

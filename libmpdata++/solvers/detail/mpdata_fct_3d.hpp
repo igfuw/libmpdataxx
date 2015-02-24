@@ -30,49 +30,80 @@ namespace libmpdataxx
 
 	void fct_init(int e)
 	{
-	  const auto i = this->i^1, j = this->j^1, k = this->k^1; // not optimal - with multiple threads some indices are repeated among threads
+	  const auto i1 = this->i^1, j1 = this->j^1, k1 = this->k^1; // not optimal - with multiple threads some indices are repeated among threads
 	  const auto psi = this->mem->psi[e][this->n[e]]; 
 
-	  this->psi_min(i,j,k) = min(min(min(min(min(min(
-			psi(i,j,k),
-			psi(i+1,j,k)),
-			psi(i-1,j,k)),
-			psi(i,j+1,k)),
-			psi(i,j-1,k)),
-			psi(i,j,k+1)),
-			psi(i,j,k-1)
+	  this->psi_min(i1,j1,k1) = min(min(min(min(min(min(
+			psi(i1,  j1,  k1),
+			psi(i1+1,j1,  k1)),
+			psi(i1-1,j1,  k1)),
+			psi(i1,  j1+1,k1)),
+			psi(i1,  j1-1,k1)),
+			psi(i1,  j1,  k1+1)),
+			psi(i1,  j1,  k1-1)
 	  );
 			
-	  this->psi_max(i,j,k) = max(max(max(max(max(max(
-			psi(i,j,k),
-			psi(i+1,j,k)), 
-			psi(i-1,j,k)),
-			psi(i,j+1,k)),
-			psi(i,j-1,k)),
-			psi(i,j,k+1)), 
-			psi(i,j,k-1) 
+	  this->psi_max(i1,j1,k1) = max(max(max(max(max(max(
+			psi(i1,  j1,  k1),
+			psi(i1+1,j1,  k1)), 
+			psi(i1-1,j1,  k1)),
+			psi(i1,  j1+1,k1)),
+			psi(i1,  j1-1,k1)),
+			psi(i1,  j1,  k1+1)), 
+			psi(i1,  j1,  k1-1) 
 	  ); 
 	}
 
 	void fct_adjust_antidiff(int e, int iter)
 	{
 	  const auto psi = this->mem->psi[e][this->n[e]];
-	  const auto &GC_corr = parent_t::GC_corr(iter);
+	  auto &GC_corr = parent_t::GC_corr(iter);
           const auto &G = *this->mem->G;
-	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
-	  const auto &jm = this->jm; // calculating once for j-1/2 and j+1/2
-	  const auto &km = this->km; // calculating once for k-1/2 and k+1/2
+	  const auto &im(this->im), &jm(this->jm), &km(this->km); // calculating once for (i/j/k)-1/2 and (i/j/k)+1/2
+
+          // not optimal - with multiple threads some indices are repeated among threads
+	  const auto 
+            i = this->i, j = this->j, k = this->k,
+            i1 = i^1, j1 = j^1, k1 = k^1,
+            im1 = this->im^1, jm1 = this->jm^1, km1 = this->km^1; 
 
 	  // fill halos -> mpdata works with halo=1, we need halo=2
-          this->xchng_vctr_alng(GC_corr);
+          this->xchng_vctr_alng(GC_corr, 1); // TODO: double check
+          
+          // calculation of fluxes for betas denominators
+          if (opts::isset(ct_params_t::opts, opts::iga))
+          {
+            this->flux_ptr = &GC_corr;
+          }
+          else
+          {
+            this->flux[0](im1+h, j1,    k1   ) = formulae::donorcell::flux<ct_params_t::opts, 0>(psi, GC_corr[0], im1, j1, k1);
+            this->flux[1](i1,    jm1+h, k1   ) = formulae::donorcell::flux<ct_params_t::opts, 1>(psi, GC_corr[1], jm1, k1, i1);
+            this->flux[2](i1,    j1,    km1+h) = formulae::donorcell::flux<ct_params_t::opts, 2>(psi, GC_corr[2], km1, i1, j1);
+            this->flux_ptr = &this->flux;
+          }
+
+          const auto &flx = (*(this->flux_ptr));
+
+          // calculating betas
+          this->beta_up(i1, j1, k1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1, j1, k1);
+          this->beta_dn(i1, j1, k1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1, j1, k1);
+
+          // should detect the need for ext=1 in hallo-filling above
+	  assert(std::isfinite(sum(this->beta_up(i1, j, k))));
+	  assert(std::isfinite(sum(this->beta_up(i, j1, k))));
+	  assert(std::isfinite(sum(this->beta_up(i, j, k1))));
+	  assert(std::isfinite(sum(this->beta_dn(i1, j, k))));
+	  assert(std::isfinite(sum(this->beta_dn(i, j1, k))));
+	  assert(std::isfinite(sum(this->beta_dn(i, j, k1))));
+
+          // assuring flx, psi_min and psi_max are not overwritten
+          this->beta_barrier(iter);
 
 	  // calculating the monotonic corrective velocity
-	  this->GC_mono[0]( im+h, this->j, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, this->j, this->k);
-	  this->GC_mono[1]( this->i, jm+h, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, this->k, this->i);
-	  this->GC_mono[2]( this->i, this->j, km+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 2>(psi, this->psi_min, this->psi_max, GC_corr, G, km, this->i, this->j);
-
-	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-	  if (iter == this->n_iters - 1) this->mem->barrier();  // TODO: move to common // TODO: different condition in 1D and 2D!
+	  this->GC_mono[0]( im+h, this->j, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j, this->k);
+	  this->GC_mono[1]( this->i, jm+h, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->k, this->i);
+	  this->GC_mono[2]( this->i, this->j, km+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 2>(psi, this->beta_up, this->beta_dn, GC_corr, G, km, this->i, this->j);
         }
       };
     }; // namespace detail

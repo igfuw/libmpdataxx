@@ -35,7 +35,7 @@ namespace libmpdataxx
 	protected:
 
 	// member fields
-	rng_t im, jm, km;
+	const rng_t im, jm, km;
 
 	void hook_ante_loop(const int nt) 
 	{   
@@ -143,35 +143,54 @@ namespace libmpdataxx
 
 	      // TODO: shouldn't the above halo-filling be repeated here?
 	    }
+
+            const auto &i(this->i), &j(this->j), &k(this->k);
+            const auto &ijk(this->ijk);
+            const auto &psi(this->mem->psi[e]);
+            const auto &n(this->n[e]);
+            auto &GC(this->GC(iter));
+            using namespace formulae::donorcell;
+
+            // calculation of fluxes
+            if (!opts::isset(ct_params_t::opts, opts::iga) || iter == 0)
+            {
+              this->flux[0](im+h, j, k) = flux<ct_params_t::opts, 0>(psi[n], GC[0], im, j, k);
+              this->flux[1](i, jm+h, k) = flux<ct_params_t::opts, 1>(psi[n], GC[1], jm, k, i);
+              this->flux[2](i, j, km+h) = flux<ct_params_t::opts, 2>(psi[n], GC[2], km, i, j);
+              this->flux_ptr = &this->flux; // TODO: if !iga this is needed only once per simulation, TODO: move to common
+            }
+            else
+            {
+              assert(iter == 1); // infinite gauge option uses just one corrective step // TODO: not true?
+              this->flux_ptr = &GC;
+            }
+
+            const auto &flx = (*(this->flux_ptr));
+
+            // sanity check for input
+            assert(std::isfinite(sum(psi[n](ijk))));
+            assert(std::isfinite(sum(flx[0](i^h, j,   k  ))));
+            assert(std::isfinite(sum(flx[1](i,   j^h, k  ))));
+            assert(std::isfinite(sum(flx[2](i,   j,   k^h))));
+
 	    // donor-cell call 
-	    if (!opts::isset(ct_params_t::opts, opts::iga) || iter == 0)
-	    {
-	      formulae::donorcell::op_3d<ct_params_t::opts>(
-		this->mem->khn_tmp,
-		this->mem->psi[e], 
-		this->GC(iter), 
-		*this->mem->G,
-		this->n[e], 
-		this->i, 
-		this->j,
-		this->k
-	      ); 
-	    }
-	      // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
-	    else
-	    {
-	      assert(iter == 1); // infinite gauge option uses just one corrective step
-	      formulae::donorcell::op_3d_iga<ct_params_t::opts>(
-		this->mem->khn_tmp,
-		this->mem->psi[e], 
-		this->GC(iter), 
-		*this->mem->G,
-		this->n[e], 
-		this->i, 
-		this->j,
-		this->k
-	      ); 
-	    }
+	    // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
+	    donorcell_sum<ct_params_t::opts>(
+	      this->mem->khn_tmp,
+              ijk,
+	      psi[n+1](ijk), 
+	      psi[n  ](ijk), 
+              flx[0](i+h, j,   k  ),
+              flx[0](i-h, j,   k  ),
+              flx[1](i,   j+h, k  ),
+              flx[1](i,   j-h, k  ),
+              flx[2](i,   j,   k+h),
+              flx[2](i,   j,   k-h),
+              formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k)
+	    ); 
+
+            // sanity check for output
+            assert(std::isfinite(sum(psi[n+1](ijk))));
 	  }
 	}
 

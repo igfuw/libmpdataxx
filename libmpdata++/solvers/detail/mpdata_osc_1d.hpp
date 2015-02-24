@@ -32,7 +32,7 @@ namespace libmpdataxx
 
 	protected:
 
-	rng_t im;
+	const rng_t im;
 
 	void hook_ante_loop(const int nt)
 	{
@@ -72,30 +72,39 @@ namespace libmpdataxx
 	      this->fct_adjust_antidiff(e, iter); // i.e. calculate GC_mono=GC_mono(GC_corr) in FCT
 	    }
 
-	    // donor-cell call
+	    // calculation of fluxes
 	    if (!opts::isset(ct_params_t::opts, opts::iga) || iter == 0)
 	    {
-	      formulae::donorcell::op_1d<ct_params_t::opts>(
-		this->mem->khn_tmp,
-		this->mem->psi[e], 
-		this->GC(iter)[0], 
-		*this->mem->G, 
-		this->n[e], 
-		this->i
-	      ); 
+              this->flux[0](im+h) = formulae::donorcell::flux<ct_params_t::opts>(
+                this->mem->psi[e][this->n[e]],
+                this->GC(iter)[0], 
+                im
+              );
+              this->flux_ptr = &this->flux; // TODO: if !iga this is needed only once per simulation, TODO: move to common
 	    }
 	    else
 	    {
-	      assert(iter == 1); // infinite gauge option uses just one corrective step
-	      formulae::donorcell::op_1d_iga<ct_params_t::opts>(
-		this->mem->khn_tmp,
-		this->mem->psi[e], 
-		this->GC(iter)[0], 
-		*this->mem->G, 
-		this->n[e], 
-		this->i
-	      ); 
+	      assert(iter == 1); // infinite gauge option uses just one corrective step // TODO: not true?
+              this->flux_ptr = &this->GC(iter); // TODO: move to common
 	    }
+
+            // sanity checks for input // TODO: move to common
+            //assert(std::isfinite(sum(psi[this->n[e]](this->ijk)))); 
+            //assert(std::isfinite(sum(flux_ref[0](i^h))));
+
+	    // donor-cell call // TODO: could be made common for 1D/2D/3D
+            formulae::donorcell::donorcell_sum<ct_params_t::opts>(
+              this->mem->khn_tmp,
+              this->ijk,
+              this->mem->psi[e][this->n[e]+1](this->ijk),
+              this->mem->psi[e][this->n[e]  ](this->ijk),
+              (*(this->flux_ptr))[0](this->i+h),
+              (*(this->flux_ptr))[0](this->i-h),
+              formulae::G<ct_params_t::opts>(*this->mem->G, this->i)
+            );
+
+            // sanity checks for output // TODO: move to common
+            //assert(std::isfinite(sum(psi[this->n[e]+1](this->ijk)))); 
 	  }
 	}
 
