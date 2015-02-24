@@ -47,7 +47,7 @@ add_test(shallow_water_3d_plot bash -c "
 ") 
 add_test(shallow_water_2d_stats bash -c "
   for dir in 2d_fct_abs 2d_fct_iga; do
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/errors_2d.py $dir;
+    python  ${CMAKE_CURRENT_SOURCE_DIR}/errors_2d.py $dir                           && 
     zdiff $dir'_stats.txt' ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir'_stats.txt.gz'  || exit 1;
   done
 ") 
