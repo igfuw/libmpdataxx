@@ -7,7 +7,6 @@
 #pragma once
 
 #include <libmpdata++/solvers/detail/solver_common.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
 
 namespace libmpdataxx
 {
@@ -51,15 +50,15 @@ namespace libmpdataxx
 	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
 	}
 
-        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec)
+        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec, int ext = 0)
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/); 
-          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/);
-          bcyl->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/); 
-          bcyr->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/);
-          bczl->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
-          bczr->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
+          bcxl->fill_halos_vctr_alng(arrvec, j^ext, k^ext); 
+          bcxr->fill_halos_vctr_alng(arrvec, j^ext, k^ext);
+          bcyl->fill_halos_vctr_alng(arrvec, k^ext, i^ext); 
+          bcyr->fill_halos_vctr_alng(arrvec, k^ext, i^ext);
+          bczl->fill_halos_vctr_alng(arrvec, i^ext, j^ext);
+          bczr->fill_halos_vctr_alng(arrvec, i^ext, j^ext);
           this->mem->barrier();
         }
         

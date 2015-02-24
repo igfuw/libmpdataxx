@@ -7,6 +7,11 @@
 #pragma once
 #include <libmpdata++/solvers/mpdata_rhs_vip_prs.hpp>
 
+namespace libmpdataxx
+{
+  namespace solvers
+  {
+
 template <class ct_params_t>
 class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 {
@@ -58,4 +63,7 @@ class boussinesq : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
   {
     assert(Tht_ref != 0);
   }
+};
+
+  };
 };
