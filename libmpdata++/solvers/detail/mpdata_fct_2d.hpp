@@ -55,7 +55,7 @@ namespace libmpdataxx
 	  const auto &im(this->im), &jm(this->jm); // calculating once for (i/j)-1/2 and (i/j)+1/2
 
 	  // fill halos of GC_corr -> mpdata works with halo=1, we need halo=2
-          this->xchng_vctr_alng(GC_corr, 1);
+          this->xchng_vctr_alng(GC_corr, 1); // TODO: double check if ext=1 needed
 
           // calculation of fluxes for betas denominators
           if (opts::isset(ct_params_t::opts, opts::iga))
@@ -71,20 +71,22 @@ namespace libmpdataxx
 
           const auto &flx = (*(this->flux_ptr));
 
-          // sanity check for input
-          assert(std::isfinite(sum(flx[0](i1^h, j1  ))));
-          assert(std::isfinite(sum(flx[1](i1,   j1^h))));
- 
           // calculating betas
           this->beta_up(i1, j1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1, j1);
           this->beta_dn(i1, j1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1, j1);
 
+          // should detect the need for ext=1 halo-filling above (TODO: double check)
+	  assert(std::isfinite(sum(this->beta_up(i1, this->j))));
+	  assert(std::isfinite(sum(this->beta_up(this->i, j1))));
+	  assert(std::isfinite(sum(this->beta_dn(i1, this->j))));
+	  assert(std::isfinite(sum(this->beta_dn(this->i, j1))));
+
+          // assuring flx, psi_min and psi_max are not overwritten
+          this->beta_barrier(iter);
+
 	  // calculating the monotonic corrective velocity
 	  this->GC_mono[0]( im+h, this->j ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j);
 	  this->GC_mono[1]( this->i, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->i);
-
-	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-	  if (iter == this->n_iters - 1 && parent_t::n_eqns > 1) this->mem->barrier();  // TODO: move to common
 	}
       };
     }; // namespace detail

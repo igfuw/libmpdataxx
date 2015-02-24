@@ -72,14 +72,14 @@ namespace libmpdataxx
           // calculating betas
           this->beta_up(i1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1);
           this->beta_dn(i1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1);
+	  
+          // assuring flx, psi_min and psi_max are not overwritten
+          this->beta_barrier(iter);
 
 	  // calculating the monotonic corrective velocity
 	  this->GC_mono[d]( this->im+h ) = formulae::mpdata::GC_mono<ct_params_t::opts>(
 	    psi, this->beta_up, this->beta_dn, GC_corr[d], G, im
 	  );
-	  
-	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-	  if (iter == this->n_iters - 1 && parent_t::n_eqns > 1) this->mem->barrier();  // TODO: move to common
 	}
       };
     }; // namespace detail
