@@ -7,6 +7,10 @@
 
 # 1d isolines test from pks & wwg 1990
 
+# for plotting in detached screen 
+import matplotlib
+matplotlib.use('Svg')
+
 from numpy import loadtxt, zeros, linspace
 from sys import argv
 from math import pi, log, cos, sin, sqrt

@@ -30,34 +30,56 @@ namespace libmpdataxx
 
 	void fct_init(int e)
 	{
-	  const auto i = this->i^1; // TODO: isn't it a race condition with more than one thread?
+	  const auto i1 = this->i^1; // TODO: isn't it a race condition with more than one thread?
 	  const auto psi = this->mem->psi[e][this->n[e]];
 
 	  /// \f$ \psi^{max}_{i}=max_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n  
 	  /// \f$ \psi^{min}_{i}=min_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n    
 	  /// eq.(20a, 20b) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
-	  this->psi_min(i) = min(min(psi(i-1), psi(i)), psi(i+1));
-	  this->psi_max(i) = max(max(psi(i-1), psi(i)), psi(i+1)); 
+	  this->psi_min(i1) = min(min(psi(i1-1), psi(i1)), psi(i1+1));
+	  this->psi_max(i1) = max(max(psi(i1-1), psi(i1)), psi(i1+1)); 
 	}
 
 	void fct_adjust_antidiff(int e, int iter)
 	{
 	  const int d = 0; // 1D version -> working in x dimension only
 	  const auto psi = this->mem->psi[e][this->n[e]];
-	  const auto &GC_corr = parent_t::GC_corr(iter);
+	  auto &GC_corr = parent_t::GC_corr(iter);
 	  const auto &G = *this->mem->G;
 	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
+	  const auto i1 = this->i^1; 
+	  const auto im1 = this->im^1; 
 
 	  // fill halos in GC_corr
           this->xchng_vctr_alng(GC_corr);
 
+          // calculation of fluxes for betas denominators
+          if (opts::isset(ct_params_t::opts, opts::iga))
+          {
+            this->flux_ptr = &GC_corr;
+          }
+          else
+          {
+            this->flux[0](im1+h) = formulae::donorcell::flux<ct_params_t::opts>(psi, GC_corr[0], im1);
+            this->flux_ptr = &this->flux;
+          }
+
+          const auto &flx = (*(this->flux_ptr));
+
+          // sanity check for input
+          assert(std::isfinite(sum(flx[0](i1^h))));
+
+          // calculating betas
+          this->beta_up(i1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1);
+          this->beta_dn(i1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1);
+	  
+          // assuring flx, psi_min and psi_max are not overwritten
+          this->beta_barrier(iter);
+
 	  // calculating the monotonic corrective velocity
 	  this->GC_mono[d]( this->im+h ) = formulae::mpdata::GC_mono<ct_params_t::opts>(
-	    psi, this->psi_min, this->psi_max, GC_corr[d], G, im
+	    psi, this->beta_up, this->beta_dn, GC_corr[d], G, im
 	  );
-	  
-	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-	  if (iter == this->n_iters - 1 && parent_t::n_eqns > 1) this->mem->barrier();  // TODO: move to common
 	}
       };
     }; // namespace detail

@@ -12,8 +12,20 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # TODO (report to CMake?)
 set(CMAKE_CXX_FLAGS_DEBUG "-DBZ_DEBUG -g")
 
 # Release mode
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(
+  CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
+  CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+)
   set(CMAKE_CXX_FLAGS_RELEASE "-Wfatal-errors -DNDEBUG -Ofast -march=native")
+
+  # preventing Kahan summation from being optimised out
+  if (
+    (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5) OR
+    (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1) #TODO: never actually checked!
+  )
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-vectorize") 
+  endif()
 endif()
 
 # Profile mode
@@ -43,15 +55,28 @@ find_package(Blitz++ REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${BLITZ_INCLUDE_DIR}") # TODO: same for boost and others???
 
 # HDF5 libraries
-find_package(HDF5 COMPONENTS CXX HL)
+find_package(HDF5 COMPONENTS CXX HL REQUIRED)
 
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${Boost_LIBRARIES} ${HDF5_LIBRARIES})
   target_link_libraries(${test} debug "-lblitz") # TODO: use ${BLITZ_LIBRARIES}
+  target_include_directories(${test} PUBLIC ${HDF5_INCLUDE_DIRS})
 # TODO: target_compile_options() // added to CMake on Jun 3rd 2013
   add_test(${test} ${test})
+endfunction()
+
+function(libmpdataxx_add_test_gi test)
+  add_executable(${test} ${test}.cpp)
+  target_link_libraries(${test} ${Boost_LIBRARIES})
+  target_link_libraries(${test} debug "-lblitz") # TODO: use ${BLITZ_LIBRARIES}
+
+  # this will not work with multiple threads (make -j) as it depends on the order of execution + $PPID might be different?
+  add_test(NAME "init_${test}" COMMAND "bash" "-c" "> log-$PPID")
+  add_test(NAME "calc_${test}" COMMAND "bash" "-c" "GNUPLOT_IOSTREAM_CMD=\"cat >> log-`echo $PPID`\" ${CMAKE_CURRENT_BINARY_DIR}/${test}")
+  add_test(NAME "plot_${test}" COMMAND "bash" "-c" "gnuplot log-$PPID")
+  add_test(NAME "diff_${test}" COMMAND "bash" "-c" "zdiff log-$PPID ${CMAKE_CURRENT_SOURCE_DIR}/log-orig.gz && rm log-$PPID")
 endfunction()
 
 # tests

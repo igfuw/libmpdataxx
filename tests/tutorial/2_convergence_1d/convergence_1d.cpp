@@ -4,8 +4,7 @@
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
- * \include "err_isolines/test_err_isolines.cpp"
- * \image html "../../tests/err_isolines/figure.svg" 
+ * convergence test 
  */
 
 #include <fstream>
@@ -16,8 +15,7 @@
 #include <boost/math/constants/constants.hpp>
 
 #include <libmpdata++/solvers/mpdata.hpp>
-#include <libmpdata++/concurr/serial.hpp>
-
+#include <libmpdata++/concurr/cxx11_thread.hpp>
 
 // making things simpler (yet less elegant)
 using namespace libmpdataxx;
@@ -45,7 +43,7 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   p.grid_size = {nx};
 
   boost::assign::ptr_map_insert<
-    concurr::serial<solver_t, bcond::open, bcond::open> // map element type
+    concurr::cxx11_thread<solver_t, bcond::open, bcond::open> // map element type
   >(slvs)(
     key,  // map key
     p     // concurr's ctor args
@@ -54,29 +52,11 @@ void add_solver(vec_t &slvs, const std::string &key, const int nx, const int n_i
   boost::assign::ptr_map_insert(outfiles)(key);
   if (!outfiles[key].is_open())
   {
-    char bits[3];
-    sprintf(bits, "%03lu", 8 * sizeof(typename ct_params_t::real_t));
-    outfiles[key].open("err_mpdata_" + key + "_" + bits + "_bits.txt", std::ios::trunc); 
+    outfiles[key].open("err_mpdata_" + key + ".txt", std::ios::trunc); 
   }
 }
 
-
-// gauss shape functor definition 
-//struct gauss_t
-//{
-  // member fields
-//  T A0, A, sgma, x0;
-
-  // call operator
-//  T operator()(T x) const 
-//  { 
-//    return A0 + A * exp( T(-.5) * pow(x - x0, 2) / pow(sgma, 2));
-//  }
- 
-  // Blitz magick
-//  BZ_DECLARE_FUNCTOR(gauss_t)
-//};
-
+// integrated gauss shape
 struct gauss_int_t 
 {
   //member fields
@@ -97,11 +77,11 @@ int main()
 {
   // simulation parameters
   const T 
-    t_max    = 1., // "arbitrarily"
+    t_max    = 1.,                // "arbitrarily"
     dx_max   = 1.,
     x_max    = 10 * 44. * dx_max, // see note about compact support in asserts below
     sgma     = 1.5 * dx_max, 
-    velocity = dx_max / t_max, // "solution advects over the one grid increment for r=8"
+    velocity = dx_max / t_max,    // "solution advects over the one grid increment for r=8"
     x0       = .5 * x_max, 
     A0       = 0,
     A        = 1. / sgma / sqrt(2 * pi<T>());
@@ -116,10 +96,8 @@ int main()
     std::cerr << "dx = " << dx << std::endl;
 
     // gauss shape functor instantiation
-//  gauss_t gauss({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0});
     gauss_int_t gauss_int({.A0 = A0, .A = A, .sgma = sgma, .x0 = x0, .dx = dx});
 
-    
     // looping over different Courant numbers
     for (auto &cour : courants)
     { 
@@ -140,17 +118,17 @@ int main()
 
       // MPDATA
       add_solver<0>(slvs, "iters=2", nx, 2);
-      add_solver<opts::tot>(slvs, "iters=2_tot", nx, 2);
+      //add_solver<opts::tot>(slvs, "iters=2_tot", nx, 2);
       add_solver<0>(slvs, "iters=3", nx, 3);
       add_solver<opts::tot>(slvs, "iters=3_tot", nx, 3);
       add_solver<opts::iga>(slvs, "iters=i", nx, 2);
-      add_solver<opts::iga | opts::tot>(slvs, "iters=i_tot", nx, 2);
+      //add_solver<opts::iga | opts::tot>(slvs, "iters=i_tot", nx, 2);
 
       // MPDATA-FCT
       add_solver<opts::fct>(slvs, "iters=2_fct", nx, 2);
-      add_solver<opts::fct | opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
-      add_solver<opts::fct>(slvs, "iters=3_fct", nx, 3);
-      add_solver<opts::fct | opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
+      //add_solver<opts::fct | opts::tot>(slvs, "iters=2_fct_tot", nx, 2);
+      //add_solver<opts::fct>(slvs, "iters=3_fct", nx, 3);
+      //add_solver<opts::fct | opts::tot>(slvs, "iters=3_fct_tot", nx, 3);
       add_solver<opts::fct | opts::iga>(slvs, "iters=i_fct", nx, 2);
       add_solver<opts::fct | opts::iga | opts::tot>(slvs, "iters=i_fct_tot", nx, 2);
 
@@ -182,6 +160,7 @@ int main()
         // calculating the deviation from analytical solution
         T err = sqrt(sum(pow(slv.advectee() - exact, 2)) / nx) / (nt * dt);
 
+        outfiles[key] << std::scientific << std::setprecision(4) <<std::endl;
         outfiles[key] << dx << "\t" << cour << "\t" << err << std::endl;
       }
     }

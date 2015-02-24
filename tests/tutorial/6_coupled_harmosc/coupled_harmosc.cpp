@@ -9,12 +9,12 @@
  */
 
 #include "coupled_harmosc.hpp"
+#include "coupled_harmosc_stats.hpp"
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
-using namespace libmpdataxx;
-
 #include <boost/math/constants/constants.hpp>
 
+using namespace libmpdataxx;
 
 const int nt = 1400;
 
@@ -31,12 +31,16 @@ int main()
     struct ix { enum {psi, phi}; };
   };
 //</listing-1>
+
   using real_t = typename ct_params_t::real_t;
-  
-  using sim_t = output::gnuplot<
-    coupled_harmosc<ct_params_t>
-  >;
-  typename sim_t::rt_params_t p; 
+
+  using slv_out_t = 
+    stats<
+      output::gnuplot<
+        coupled_harmosc<ct_params_t>
+      >
+    >;
+  typename slv_out_t::rt_params_t p; 
 
 //<listing-2>
   // run-time parameters
@@ -45,7 +49,7 @@ int main()
   p.omega = 2 * pi<real_t>() / p.dt / 400;
 //</listing-2>
   p.grid_size = {1001};
-  p.outfreq = 10;
+  p.outfreq = 10; 
 
   using ix = typename ct_params_t::ix;
   p.outvars = {
@@ -55,7 +59,7 @@ int main()
   p.gnuplot_command = "plot";
 
   // instantiation
-  concurr::threads<sim_t, bcond::cyclic, bcond::cyclic> run(p);
+  concurr::threads<slv_out_t, bcond::cyclic, bcond::cyclic> run(p);
 
   // initial condition
   {
