@@ -103,5 +103,4 @@ int main()
 {
   test<opts::fct | opts::iga>("2d_fct_iga");
   test<opts::fct | opts::abs>("2d_fct_abs");
-//  system("python ../../../../tests/tutorial/7_shallow_water/errors_2d.py fct+abs fct+iga");
 }

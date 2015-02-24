@@ -51,7 +51,9 @@ void test(const std::string& outdir)
   };
 //</listing-1>
 
-  const int nt = 300;
+  const int 
+    nt = 300,
+    outfreq = 100;
 
   using ix = typename ct_params_t::ix;
 
@@ -73,7 +75,7 @@ void test(const std::string& outdir)
   p.outvars[ix::qx].name = "qx";
   p.outvars[ix::h].name  = "h";
   p.outdir = outdir;
-  p.outfreq = nt; 
+  p.outfreq = outfreq; 
  
   // instantiation
   concurr::serial<
@@ -90,19 +92,10 @@ void test(const std::string& outdir)
 
   // integration
   run.advance(nt); 
-  
-  //TODO - move to stats 
-  std::cerr<<"min advector = "<< min(run.advector())  << std::endl;
-  std::cerr<<"max advector = "<< max(run.advector())  << std::endl;
 }
 
 int main()
 {
   test<opts::abs | opts::fct >("1d_fct_abs");
   test<opts::iga | opts::fct >("1d_fct_iga");
-  //plotting model results and analitic solution; 
-  //python uses sys.argv[1:0] for choosing model outputs
-  //TODO - move to make test
- // system("python ../../../../tests/tutorial/7_shallow_water/plot.py fct+abs fct+iga ");
- // system("python ../../../../tests/tutorial/7_shallow_water/errors_1d.py fct+abs fct+iga ");
 }

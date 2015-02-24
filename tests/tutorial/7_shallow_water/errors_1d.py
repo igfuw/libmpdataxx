@@ -4,51 +4,58 @@ import numpy as np
 import h5py
 import analytic_eq as eq
 
-#reading model output from text file and converting to an array                
+#reading model output and saving as numpy arrays   
 def reading_modeloutput(filename):
-    f = open(filename)
-    list_nt = []
-    for line in f:
-        lst = line.split('\t')
-        list_nt.append(lst[:-1])
-    return np.array(list_nt, dtype=float)
+    f  = h5py.File(filename, "r")
+    h  = np.array(f["h"]).transpose()
+    qx = np.array(f["qx"]).transpose()
+    return h, qx
 
-
-
-def errors(dir, casename, dt_output, dx, time_l, x_lim):
+def errors(dir, dt, dx, time_l, x_lim):
     x_range = np.arange(-x_lim, x_lim, dx)
-    # reading the model output (all time levels) 
-    h_m_nt = reading_modeloutput(dir+casename+".h")
-    p_m_nt = reading_modeloutput(dir+casename+".q")
-    t_m_nt = reading_modeloutput(dir+casename+".t")
 
     for it, time in enumerate(time_l):
-        it_output = int(time/dt_output)
-        print "\n", "TIME t = " + str(time)
-        assert (time == t_m_nt[it_output][0]), "something wrog with time levels"
+
+        # reading the model output
+        time_str = '%0*d' % (10, int(time/dt))
+        print dir + "/timestep" + time_str + '.h5'
+        h_m, px_m = reading_modeloutput(dir + "/timestep" + time_str + '.h5')
 
         # calculating the analytical solution 
         lamb = eq.d1_lambda_evol(time)
         h_an = eq.d1_height(lamb, x_range)
+
         # calculating the errors of the drop depth, eq. 25 and 26 from the paper
-        h_diff = h_m_nt[it_output] - h_an
-        points_nr = h_m_nt[it_output].shape[0]
-        print "number of points in the domain, max(h_an), max(h_num)", points_nr, h_an.max(), h_m_nt[it_output].max()
-        delh_inf = abs(h_diff).max() 
-        delh_2 = 1./time * ((h_diff**2).sum() / points_nr )**0.5 
+        h_diff    = h_m - h_an
+        points_nr = h_m.shape[0]
+        delh_inf  = abs(h_diff).max() 
+        delh_2    = 1./time * ((h_diff**2).sum() / points_nr )**0.5 
 
-        print "L_inf = max|h_m-h_an| = ", delh_inf 
-        print "L_2 = sqrt(sum(h_m-h_an)^2 / N) / time = ", delh_2, "\n"
+        # outputing general info
+        if time == 1:
+            file = open(dir + "_stats.txt", "w")
+            file.write( "dx                                 = " + str(dx)                       + "\n")
+            file.write( "dt                                 = " + str(dt)                       + "\n")
+            file.write( "number of points in the domain     = " + str(points_nr)                + "\n")
+            file.write( "L_inf                              = max|h_m-h_an|"                    + "\n")
+            file.write( "L_2                                = sqrt(sum(h_m-h_an)^2 / N) / time" + "\n" + "\n")
+
+        # outputting error statistics
+        file.write( "time                               = " + str(time)                         + "\n")
+        file.write( "max(h_an)                          = " + str(round(h_an.max(), 8))         + "\n")
+        file.write( "max(h_num)                         = " + str(round(h_m.max(), 8))          + "\n")
+        file.write( "L_inf                              = " + str(round(delh_inf, 8))           + "\n")
+        file.write( "L_2                                = " + str(round(delh_2, 8))             + "\n" + "\n")
+        if time == 3:
+            file.close()
         
-# comparing errors for reference simulation at different time steps
-def evolution_test(dir, casename, dt_output, dx, time_l=[1,2,3], x_lim=8):
-    errors(dir, casename, dt_output, dx, time_l, x_lim)
+# printing errors at different time steps
+def evolution_test(dir, dt, dx, time_l=[1,2,3], x_lim=8):
+    errors(dir, dt, dx, time_l, x_lim)
     
-
 def main(dir, casename_l):
     for casename in casename_l:
-        print "****** errrors for " + casename
-        evolution_test(dir, casename,
-                       dt_output=0.01, dx=0.05)
+        print casename
+        evolution_test(dir + str(casename), dt=0.01, dx=0.05) #TODO: read it from the h5 file
         
 main("./", sys.argv[1:])

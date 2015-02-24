@@ -14,6 +14,7 @@ def reading_modeloutput(filename):
 
 def errors(dir, dt, dx, time_l, xy_lim):
     x_range = y_range = np.arange(-xy_lim, xy_lim, dx)
+
     for it, time in enumerate(time_l):
 
         # reading the model output
@@ -38,6 +39,7 @@ def errors(dir, dt, dx, time_l, xy_lim):
             file.write( "number of points in the domain     = " + str(points_nr)                + "\n")
             file.write( "L_inf                              = max|h_m-h_an|"                    + "\n")
             file.write( "L_2                                = sqrt(sum(h_m-h_an)^2 / N) / time" + "\n" + "\n")
+
         # outputting error statistics
         file.write( "time                               = " + str(time)                         + "\n")
         file.write( "max(h_an)                          = " + str(round(h_an.max(), 8))         + "\n")
@@ -47,7 +49,7 @@ def errors(dir, dt, dx, time_l, xy_lim):
         if time == 3:
             file.close()
         
-# comparing errors for reference simulation at different time steps
+# printing errors at different time steps
 def evolution_test(dir, dt, dx, time_l=[1,2,3], xy_lim=8):
     errors(dir, dt, dx, time_l, xy_lim)
 
