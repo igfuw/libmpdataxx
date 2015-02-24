@@ -50,7 +50,7 @@ namespace libmpdataxx
         // declared here for output purposes
         real_t dt, di, dj, dk;
 
-	idx_t<n_dims> ijk;
+	const idx_t<n_dims> ijk;
 
         long long int timestep = 0;
         std::vector<int> n; 

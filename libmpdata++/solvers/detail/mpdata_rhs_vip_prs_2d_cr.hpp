@@ -113,19 +113,19 @@ namespace libmpdataxx
 	  real_t rho = 1.;     //TODO    
 	  real_t tmp_den = 1.; //TODO
 
-	  int halo = this->halo;
-	  rng_t &i = this->i;
-	  rng_t &j = this->j;
+	  const int halo = this->halo;
+	  const rng_t &i = this->ijk[0];
+	  const rng_t &j = this->ijk[1];
 
-	  this->tmp_u(i, j) = this->state(ix::u)(i, j);
-	  this->tmp_w(i, j) = this->state(ix::w)(i, j);
+	  this->tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
+	  this->tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
 
 	  //initial error   
-          this->err(i, j) = this->err_init(this->Phi, this->tmp_u, this->tmp_w, i, j, this->di, this->dj);
+          this->err(this->ijk) = this->err_init(this->Phi, this->tmp_u, this->tmp_w, i, j, this->di, this->dj);
 	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
-	  p_err(i ,j) = this->err(i, j);
-	  lap_p_err(i,j) = this->lap(p_err, i, j, this->di, this->dj);
+	  p_err(this->ijk) = this->err(this->ijk);
+	  lap_p_err(this->ijk) = this->lap(p_err, i, j, this->di, this->dj);
 
 	  //pseudo-time loop
 	  this->iters = 0;
@@ -134,15 +134,15 @@ namespace libmpdataxx
 	  {
 	    tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
 	    if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
-	    this->Phi(i, j) += beta * p_err(i, j);
-	    this->err(i, j) += beta * lap_p_err(i, j);
+	    this->Phi(this->ijk) += beta * p_err(this->ijk);
+	    this->err(this->ijk) += beta * lap_p_err(this->ijk);
 
-	    this->lap_err(i, j) = this->lap(this->err, i, j, this->di, this->dj);         
+	    this->lap_err(this->ijk) = this->lap(this->err, i, j, this->di, this->dj);         
 
 	    if (tmp_den != 0) alpha = - this->mem->sum(this->lap_err, lap_p_err, i, j) / tmp_den;          
 
-	    p_err(i, j) *= alpha;
-	    p_err(i, j) += this->err(i, j);  
+	    p_err(this->ijk) *= alpha;
+	    p_err(this->ijk) += this->err(this->ijk);  
    
 	    lap_p_err(i,j) *= alpha;
 	    lap_p_err(i,j) += this->lap_err(i,j);
@@ -161,8 +161,8 @@ namespace libmpdataxx
 
 	  this->xchng_pres(this->Phi, i^halo, j^halo);
 
-	  this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->di);
-	  this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dj);
+	  this->tmp_u(this->ijk) = - grad<0>(this->Phi, i, j, this->di);
+	  this->tmp_w(this->ijk) = - grad<1>(this->Phi, j, i, this->dj);
           
           this->set_edges(this->tmp_u, this->tmp_w, this->state(ix::u), this->state(ix::w), i, j);
 	}

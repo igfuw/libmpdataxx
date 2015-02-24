@@ -43,9 +43,9 @@ namespace libmpdataxx
           const real_t &dz
         ) return_macro(
           this->xchng_sclr(arr, i^this->halo, j^this->halo, k^this->halo);
-          lap_tmp1(i, j, k) = formulae::nabla::grad<0>(arr, i, j, k, dx);
-          lap_tmp2(i, j, k) = formulae::nabla::grad<1>(arr, j, k, i, dy);
-          lap_tmp3(i, j, k) = formulae::nabla::grad<2>(arr, k, i, j, dz);
+          lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx);
+          lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy);
+          lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz);
           this->xchng_sclr(lap_tmp1, i^this->halo, j^this->halo, k^this->halo, /* deriv = */ true);
           this->xchng_sclr(lap_tmp2, i^this->halo, j^this->halo, k^this->halo, /* deriv = */ true);
           this->xchng_sclr(lap_tmp3, i^this->halo, j^this->halo, k^this->halo, /* deriv = */ true);
@@ -57,7 +57,7 @@ namespace libmpdataxx
 	{ 
 	  const int halo = parent_t::halo;
 	  // Phi = dt/2 * (Prs-Prs_amb) / rho 
-	  Phi(this->i, this->j, this->k) = real_t(0); // ... but assuming zero perturbation at t=0
+	  Phi(this->ijk) = real_t(0); // ... but assuming zero perturbation at t=0
 	  this->xchng_sclr(Phi, this->i^halo, this->j^halo, this->k^halo);
 	}
 
@@ -65,11 +65,9 @@ namespace libmpdataxx
 
 	void pressure_solver_apply()
 	{
-	  const rng_t &i = this->i, &j = this->j, &k = this->k;
-
-	  this->state(ix::u)(i, j, k) += tmp_u(i, j, k);
-	  this->state(ix::v)(i, j, k) += tmp_v(i, j, k);
-	  this->state(ix::w)(i, j, k) += tmp_w(i, j, k);
+	  this->state(ix::u)(this->ijk) += tmp_u(this->ijk);
+	  this->state(ix::v)(this->ijk) += tmp_v(this->ijk);
+	  this->state(ix::w)(this->ijk) += tmp_w(this->ijk);
 	}
 
         void hook_ante_loop(const int nt)
@@ -78,9 +76,9 @@ namespace libmpdataxx
 	  ini_pressure();
  
           // allow pressure_solver_apply at the first time step
-          tmp_u(this->i, this->j, this->k) = 0;
-          tmp_v(this->i, this->j, this->k) = 0;
-          tmp_w(this->i, this->j, this->k) = 0;
+          tmp_u(this->ijk) = 0;
+          tmp_v(this->ijk) = 0;
+          tmp_w(this->ijk) = 0;
         }
 
         void hook_ante_step()

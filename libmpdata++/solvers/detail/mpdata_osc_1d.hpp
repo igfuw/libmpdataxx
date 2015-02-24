@@ -32,7 +32,7 @@ namespace libmpdataxx
 
 	protected:
 
-	rng_t im;
+	const rng_t im;
 
 	void hook_ante_loop(const int nt)
 	{
