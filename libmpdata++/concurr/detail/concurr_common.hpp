@@ -21,51 +21,12 @@
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
-
-// TODO: simplify 1d/2d/3d logic below or split into separate files?
+#include <libmpdata++/concurr/any.hpp>
 
 namespace libmpdataxx
 {
-  /// @brief concurr namespace
   namespace concurr
   {
-    template <typename real_t, int n_dims>
-    struct any
-    {
-      virtual 
-//<listing-1>
-      void advance(int) 
-//</listing-1>
-      { assert(false); throw; }  
-
-      virtual 
-//<listing-2>
-      blitz::Array<real_t, n_dims> advectee(int eqn = 0)
-//</listing-2>
-      { assert(false); throw; }
-
-      virtual 
-//<listing-3>
-      blitz::Array<real_t, n_dims> advector(int dim = 0) 
-//</listing-3>
-      { assert(false); throw; }
-
-      virtual 
-//<listing-4>
-      blitz::Array<real_t, n_dims> g_factor() 
-//</listing-4>
-      { assert(false); throw; }
-
-      virtual 
-//<listing-5>
-      bool *panic_ptr() 
-//</listing-5>
-      { assert(false && "unimplemented!"); throw; }
-
-      // dtor
-      virtual ~any() {}
-    };
-
     namespace detail
     {
       template<
@@ -76,7 +37,6 @@ namespace libmpdataxx
       >
       class concurr_common : public any<typename solver_t_::real_t, solver_t_::n_dims>
       {
-
         public:
 
         typedef solver_t_ solver_t;
