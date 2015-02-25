@@ -7,8 +7,8 @@ libmpdata++
 
   $ mkdir build 
   $ cd build
-  $ cmake .. -DCMAKE_BUILD_TYPE=Release
   $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
+  $ cmake .. -DCMAKE_BUILD_TYPE=Release
   $ make
   $ make test
   $ sudo make install
