@@ -68,7 +68,7 @@ namespace libmpdataxx
             im1 = this->im^1, jm1 = this->jm^1, km1 = this->km^1; 
 
 	  // fill halos -> mpdata works with halo=1, we need halo=2
-          this->xchng_vctr_alng(GC_corr, 1); // TODO: double check
+          this->xchng_vctr_alng(GC_corr);
           
           // calculation of fluxes for betas denominators
           if (opts::isset(ct_params_t::opts, opts::iga))
