@@ -177,7 +177,11 @@ namespace libmpdataxx
 	    for (int e = 0; e < n_eqns; ++e) scale(e, ct_params_t::hint_scale(e));
 
 	    for (int e = 0; e < n_eqns; ++e) xchng(e);
-	    for (int e = 0; e < n_eqns; ++e) advop(e);
+	    for (int e = 0; e < n_eqns; ++e) 
+            { 
+              advop(e);
+              if (e != n_eqns - 1) this->mem->barrier();
+            }
 	    for (int e = 0; e < n_eqns; ++e) cycle(e); // note: cycle assumes ascending loop index
 
 	    for (int e = 0; e < n_eqns; ++e) scale(e, -ct_params_t::hint_scale(e));
