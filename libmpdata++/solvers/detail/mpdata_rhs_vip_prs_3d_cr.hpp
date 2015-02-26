@@ -51,13 +51,13 @@ namespace libmpdataxx
 	  real_t tmp_den = 1.; //TODO
 
 	  int halo = this->halo;
-	  rng_t &i = this->i;
-	  rng_t &j = this->j;
-	  rng_t &k = this->k;
+	  const rng_t &i = this->i;
+	  const rng_t &j = this->j;
+	  const rng_t &k = this->k;
 
-	  this->tmp_u(i, j, k) = this->state(ix::u)(i, j, k);
-	  this->tmp_v(i, j, k) = this->state(ix::v)(i, j, k);
-	  this->tmp_w(i, j, k) = this->state(ix::w)(i, j, k);
+	  this->tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
+	  this->tmp_v(this->ijk) = this->state(ix::v)(this->ijk);
+	  this->tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
 
 	  this->xchng_sclr(this->Phi,   i^halo, j^halo, k^halo);
 	  this->xchng_sclr(this->tmp_u, i^halo, j^halo, k^halo);
@@ -65,7 +65,7 @@ namespace libmpdataxx
 	  this->xchng_sclr(this->tmp_w, i^halo, j^halo, k^halo);
 
 	  //initail error   
-	  this->err(i, j, k) =
+	  this->err(this->ijk) =
 	    - 1./ rho * div(rho * this->tmp_u,
                             rho * this->tmp_v,
                             rho * this->tmp_w,
@@ -74,8 +74,8 @@ namespace libmpdataxx
 	    + this->lap(this->Phi, i, j, k, this->di, this->dj, this->dk);
 	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
-	  p_err(i, j, k) = this->err(i, j, k);
-	  lap_p_err(i,j, k) = this->lap(p_err, i, j, k, this->di, this->dj, this->dk);
+	  p_err(this->ijk) = this->err(this->ijk);
+	  lap_p_err(this->ijk) = this->lap(p_err, i, j, k, this->di, this->dj, this->dk);
 
 	  //pseudo-time loop
 	  this->iters = 0;
@@ -84,22 +84,22 @@ namespace libmpdataxx
 	  {
 	    tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j, k);
 	    if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j, k) / tmp_den;
-	    this->Phi(i, j, k) += beta * p_err(i, j, k);
-	    this->err(i, j, k) += beta * lap_p_err(i, j, k);
+	    this->Phi(this->ijk) += beta * p_err(this->ijk);
+	    this->err(this->ijk) += beta * lap_p_err(this->ijk);
 
-	    this->lap_err(i, j, k) = this->lap(this->err, i, j, k, this->di, this->dj, this->dk);         
+	    this->lap_err(this->ijk) = this->lap(this->err, i, j, k, this->di, this->dj, this->dk);         
 
 	    if (tmp_den != 0) alpha = - this->mem->sum(this->lap_err, lap_p_err, i, j, k) / tmp_den;          
 
-	    p_err(i, j, k) *= alpha;
-	    p_err(i, j, k) += this->err(i, j, k);  
+	    p_err(this->ijk) *= alpha;
+	    p_err(this->ijk) += this->err(this->ijk);  
    
-	    lap_p_err(i, j, k) *= alpha;
-	    lap_p_err(i, j, k) += this->lap_err(i, j, k);
+	    lap_p_err(this->ijk) *= alpha;
+	    lap_p_err(this->ijk) += this->lap_err(this->ijk);
    
 	    error = std::max(
-	      std::abs(this->mem->max(this->err(i, j, k))), 
-	      std::abs(this->mem->min(this->err(i, j, k)))
+	      std::abs(this->mem->max(this->err(this->ijk))), 
+	      std::abs(this->mem->min(this->err(this->ijk)))
 	    );
 	    this->iters++;
 	  }
@@ -111,9 +111,9 @@ namespace libmpdataxx
 
 	  this->xchng_sclr(this->Phi, i^halo, j^halo, k^halo);
 
-	  this->tmp_u(i, j, k) = - grad<0>(this->Phi, i, j, k, this->di);
-	  this->tmp_v(i, j, k) = - grad<1>(this->Phi, j, k, i, this->dj);
-	  this->tmp_w(i, j, k) = - grad<2>(this->Phi, k, i, j, this->dk);
+	  this->tmp_u(this->ijk) = - grad<0>(this->Phi, i, j, k, this->di);
+	  this->tmp_v(this->ijk) = - grad<1>(this->Phi, j, k, i, this->dj);
+	  this->tmp_w(this->ijk) = - grad<2>(this->Phi, k, i, j, this->dk);
 	}
 
 	public:

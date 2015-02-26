@@ -11,7 +11,6 @@
 #include <cmath>
 
 #include <libmpdata++/solvers/mpdata.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
 

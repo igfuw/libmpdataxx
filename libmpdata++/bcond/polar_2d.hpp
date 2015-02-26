@@ -1,22 +1,26 @@
-/** @file
-* @copyright University of Warsaw
-* @section LICENSE
-* GPLv2+ (see the COPYING file or http://www.gnu.org/licenses/)
-*/
+// 2D polar boundary conditions for libmpdata++
+//
+// licensing: GPU GPL v3
+// copyright: University of Warsaw
 
 #pragma once
 
-#include <libmpdata++/bcond/polar_common.hpp>
-#include <libmpdata++/formulae/idxperm.hpp>
+#include <libmpdata++/bcond/detail/polar_common.hpp>
 
 namespace libmpdataxx
 {
   namespace bcond
   {
-    template<int d, typename real_t>
-    class polar_left_2d : public polar_common<real_t>
-    {
-      using parent_t = polar_common<real_t>;
+    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,         knd,         dir,     n_dims,     d,  
+      typename std::enable_if<
+        knd == polar &&
+        dir == left &&
+        n_dims == 2
+      >::type 
+    > : public detail::polar_common<real_t>
+    { 
+      using parent_t = detail::polar_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -64,10 +68,16 @@ namespace libmpdataxx
       }
     };
 
-    template<int d, typename real_t>
-    class polar_rght_2d : public polar_common<real_t>
-    {
-      using parent_t = polar_common<real_t>;
+    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,         knd,         dir,     n_dims,     d,  
+      typename std::enable_if<
+        knd == polar &&
+        dir == rght &&
+        n_dims == 2
+      >::type
+    > : public detail::polar_common<real_t>
+    { 
+      using parent_t = detail::polar_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
