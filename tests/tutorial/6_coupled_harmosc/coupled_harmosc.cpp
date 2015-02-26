@@ -49,7 +49,7 @@ int main()
   p.omega = 2 * pi<real_t>() / p.dt / 400;
 //</listing-2>
   p.grid_size = {1001};
-  p.outfreq = 10; 
+  p.outfreq = 20; 
 
   using ix = typename ct_params_t::ix;
   p.outvars = {
