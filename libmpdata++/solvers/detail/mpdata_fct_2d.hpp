@@ -55,7 +55,7 @@ namespace libmpdataxx
 	  const auto &im(this->im), &jm(this->jm); // calculating once for (i/j)-1/2 and (i/j)+1/2
 
 	  // fill halos of GC_corr -> mpdata works with halo=1, we need halo=2
-          this->xchng_vctr_alng(GC_corr, 1); // TODO: double check if ext=1 needed
+          this->xchng_vctr_alng(GC_corr);
 
           // calculation of fluxes for betas denominators
           if (opts::isset(ct_params_t::opts, opts::iga))

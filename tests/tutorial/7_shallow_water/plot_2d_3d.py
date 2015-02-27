@@ -12,8 +12,6 @@ def reading_modeloutput(filename):
     qy = np.array(f["qy"])
     return h, qx, qy 
 
-
-
 def plotting_2D(X, Y, Z):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
@@ -23,7 +21,6 @@ def plotting_2D(X, Y, Z):
     fig.colorbar(cset) #, fraction=0.05)
     ps.ticks_changes(ax)
 
-
     ax.set_xlabel('x')
     #ax.set_xlim(-40, 40)
     ax.set_ylabel('y')
@@ -31,9 +28,7 @@ def plotting_2D(X, Y, Z):
     ax.set_zlabel('h')
     ax.set_zlim(-0.1, 0.1)
 
-    plt.savefig("plot2D_it=3.pdf")
-    plt.show()
-
+    plt.savefig("2d_fct_iga_view.pdf")
 
 #TODO napisac uwage o dx, dy
 def main(filename):
@@ -43,4 +38,4 @@ def main(filename):
     h, qx, qy = reading_modeloutput(filename)
     plotting_2D(X, Y, h)
 
-main("./spreading_drop_2d_fct+iga.out/timestep0000000300.h5")
+main("./2d_fct_iga/timestep0000000300.h5")

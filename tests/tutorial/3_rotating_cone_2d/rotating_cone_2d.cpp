@@ -48,6 +48,7 @@ void test(const std::string filename)
       >
     >;
   typename slv_out_t::rt_params_t p;
+  p.dt = dt;  //to have this->dt in stats 
 
   // pre instantiation
   switch (opts_iters) // the crazy logic below is just for prettying the listing!

@@ -37,11 +37,8 @@ namespace libmpdataxx
 
         void beta_barrier(const int &iter)
         {
-	  if ( 
-	    (iter == this->n_iters - 1 && parent_t::n_eqns > 1) // in the last iteration advop for the next equation will overwrite psi_min/psi_max
-	    ||
-	    (!opts::isset(ct_params_t::opts, opts::iga)) // this->flux would be overwritten by donor-cell
-	  ) this->mem->barrier();
+	  if (!opts::isset(ct_params_t::opts, opts::iga)) // this->flux would be overwritten by donor-cell
+	    this->mem->barrier();
         }
 
         public:

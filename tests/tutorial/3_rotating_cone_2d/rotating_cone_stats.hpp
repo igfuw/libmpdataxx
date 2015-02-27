@@ -62,7 +62,8 @@ struct stats : public parent_t
       ofs << "max(psi)     = " << max(this->mem->advectee()) << std::endl;
  
       error_2 = pow(true_solution - this->mem->advectee(), 2);
-      ofs << "rms error    = " << sqrt(sum(error_2) / this->mem->advectee().extent(0) / this->mem->advectee().extent(1)) << std::endl;
+      ofs << "rms error    = " 
+        << sqrt(sum(error_2) / this->mem->advectee().extent(0) / this->mem->advectee().extent(1)) / this->timestep / this->dt << std::endl;
     }
   }
 };

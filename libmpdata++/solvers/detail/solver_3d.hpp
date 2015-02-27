@@ -50,15 +50,15 @@ namespace libmpdataxx
 	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
 	}
 
-        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec, int ext = 0)
+        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec)
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j^ext, k^ext); 
-          bcxr->fill_halos_vctr_alng(arrvec, j^ext, k^ext);
-          bcyl->fill_halos_vctr_alng(arrvec, k^ext, i^ext); 
-          bcyr->fill_halos_vctr_alng(arrvec, k^ext, i^ext);
-          bczl->fill_halos_vctr_alng(arrvec, i^ext, j^ext);
-          bczr->fill_halos_vctr_alng(arrvec, i^ext, j^ext);
+          bcxl->fill_halos_vctr_alng(arrvec, j, k); 
+          bcxr->fill_halos_vctr_alng(arrvec, j, k);
+          bcyl->fill_halos_vctr_alng(arrvec, k, i); 
+          bcyr->fill_halos_vctr_alng(arrvec, k, i);
+          bczl->fill_halos_vctr_alng(arrvec, i, j);
+          bczr->fill_halos_vctr_alng(arrvec, i, j);
           this->mem->barrier();
         }
         
