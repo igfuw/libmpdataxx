@@ -35,7 +35,7 @@ void test(const std::string filename)
     dt = .1,                      //    dt = 10 * pi<real_t>(),
     dx = 1,                       //    x0 = 21. * dx,
     dy = 1,                       //    y0 = 15. * dy;
-    omg = .1,                     //    omg = -.001,// / (2 * pi<real_t>()),
+    omega = .1,                   //    omega = -.001,// / (2 * pi<real_t>()),
     h = 4.,                       //    r = 4. * dx,
     h0 = 1;                       //    h0 = -.5,
 
@@ -142,8 +142,8 @@ void test(const std::string filename)
     );
 
     // constant-angular-velocity rotational field
-    run.advector(x) =  omg * (j * dy - yc) * dt/dx;
-    run.advector(y) = -omg * (i * dx - xc) * dt/dy;
+    run.advector(x) =  omega * (j * dy - yc) * dt/dx;
+    run.advector(y) = -omega * (i * dx - xc) * dt/dy;
 //</listing-3>
   }
   // TODO: an assert confirming that the above did what it should have done
