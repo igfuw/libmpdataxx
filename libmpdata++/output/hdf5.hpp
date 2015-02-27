@@ -10,7 +10,6 @@
 #pragma once
 
 #include <libmpdata++/output/detail/output_common.hpp>
-#include <libmpdata++/detail/error.hpp>
 #include <libmpdata++/output/detail/xdmf_writer.hpp>
 
 #include <boost/filesystem.hpp>
@@ -53,7 +52,6 @@ namespace libmpdataxx
 
       void start(const int nt)
       {
-        try
         {
           // creating the directory
           boost::filesystem::create_directory(outdir);
@@ -134,7 +132,6 @@ namespace libmpdataxx
             }
           }
         }
-        catch (const H5::Exception &e) { handle(e); }
       }
 
       std::string base_name()
@@ -159,7 +156,6 @@ namespace libmpdataxx
         // creating the timestep file
         hdfp.reset(new H5::H5File(outdir + "/" + hdf_name(), H5F_ACC_TRUNC));
 
-        try
         {
 	  for (const auto &v : this->outvars)
           {
@@ -211,16 +207,6 @@ namespace libmpdataxx
             }
           }
         }
-        catch (const H5::Exception &e) { handle(e); }
-      }
-
-      void handle(const H5::Exception &e)
-      {
-	BOOST_THROW_EXCEPTION(
-	  error(e.getCDetailMsg())
-	    << boost::errinfo_api_function(e.getCFuncName())
-	    << boost::errinfo_file_name(outdir.c_str())
-	);
       }
 
       // data is assumed to be contiguous and in the same layout as hdf variable

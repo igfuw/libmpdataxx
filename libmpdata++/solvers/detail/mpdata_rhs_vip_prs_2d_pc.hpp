@@ -112,19 +112,19 @@ namespace libmpdataxx
 	  rng_t &j = this->j;
 
 	  //initail q_err for preconditioner
-	  q_err(i, j) = real_t(0);
+	  q_err(this->ijk) = real_t(0);
 	  this->xchng_sclr(q_err, i^this->halo, j^this->halo);
 
 	  //initail preconditioner error   
-	  this->pcnd_err(i, j) = this->lap(this->q_err, i, j, this->di, this->dj) - this->err(i, j);
+	  this->pcnd_err(this->ijk) = this->lap(this->q_err, i, j, this->di, this->dj) - this->err(this->ijk);
 	    //TODO does it change with non_const density?
 	  this->xchng_sclr(pcnd_err, i^halo, j^halo);
 	  
 	  assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
 	  for (int it=0; it<=pc_iters; it++)
 	  {
-	    q_err(i,j)     += real_t(.25) * pcnd_err(i, j);
-	    pcnd_err(i, j) += real_t(.25) * this->lap(this->pcnd_err, i, j, this->di, this->dj);
+	    q_err(this->ijk)    += real_t(.25) * pcnd_err(this->ijk);
+	    pcnd_err(this->ijk) += real_t(.25) * this->lap(this->pcnd_err, i, j, this->di, this->dj);
 
 	    this->xchng_sclr(q_err, i^halo, j^halo);
 	  }
@@ -145,25 +145,25 @@ namespace libmpdataxx
 	  rng_t &i = this->i;
 	  rng_t &j = this->j;
 
-	  this->tmp_u(i, j) = this->state(ix::u)(i, j);
-	  this->tmp_w(i, j) = this->state(ix::w)(i, j);
+	  this->tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
+	  this->tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
 
 	  this->xchng_sclr(this->Phi,   i^halo, j^halo);
 	  this->xchng_sclr(this->tmp_u, i^halo, j^halo);
 	  this->xchng_sclr(this->tmp_w, i^halo, j^halo);
 
 	  //initail error   
-	  this->err(i, j) =
+	  this->err(this->ijk) =
 	    - 1./ rho * div(rho * this->tmp_u, rho * this->tmp_w , i, j, this->di, this->dj)
 	    + this->lap(this->Phi, i, j, this->di, this->dj);
 	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
 	  precond();
 
-	  p_err(i, j) = q_err(i, j);
+	  p_err(this->ijk) = q_err(this->ijk);
 	  this->xchng_sclr(p_err, i^this->halo, j^this->halo);
 
-	  this->lap_p_err(i, j) = this->lap(this->p_err, i, j, this->di, this->dj);
+	  this->lap_p_err(this->ijk) = this->lap(this->p_err, i, j, this->di, this->dj);
 
 	  //pseudo-time loop
 	  real_t error = 1.;
@@ -173,12 +173,12 @@ namespace libmpdataxx
 	    if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
 	    //else TODO!
    
-	    this->Phi(i, j) += beta * p_err(i, j);
-	    this->err(i, j) += beta * lap_p_err(i, j);
+	    this->Phi(this->ijk) += beta * p_err(this->ijk);
+	    this->err(this->ijk) += beta * lap_p_err(this->ijk);
 
 	    error = std::max(
-	      std::abs(this->mem->max(this->err(i, j))), 
-	      std::abs(this->mem->min(this->err(i, j)))
+	      std::abs(this->mem->max(this->err(this->ijk))), 
+	      std::abs(this->mem->min(this->err(this->ijk)))
 	    );
 
 	    if (error <= this->prs_tol) break;
@@ -187,26 +187,26 @@ namespace libmpdataxx
 
 	    precond();
 
-	    this->lap_q_err(i, j) = this->lap(this->q_err, i, j, this->di, this->dj);
+	    this->lap_q_err(this->ijk) = this->lap(this->q_err, i, j, this->di, this->dj);
 
 	    if (tmp_den != 0) alpha = - this->mem->sum(lap_q_err, lap_p_err, i, j) / tmp_den;
 
-	    p_err(i, j) *= alpha;
-	    p_err(i, j) += q_err(i, j);  
+	    p_err(this->ijk) *= alpha;
+	    p_err(this->ijk) += q_err(this->ijk);  
    
-	    lap_p_err(i, j) *= alpha;
-	    lap_p_err(i, j) += lap_q_err(i, j);
+	    lap_p_err(this->ijk) *= alpha;
+	    lap_p_err(this->ijk) += lap_q_err(this->ijk);
 	    this->iters++;
 	  }
 	  //end of pseudo_time loop
 
 	  this->xchng_sclr(this->Phi, i^halo, j^halo);
 
-	  this->tmp_u(i, j) -= grad<0>(this->Phi, i, j, this->di);
-	  this->tmp_w(i, j) -= grad<1>(this->Phi, j, i, this->dj);
+	  this->tmp_u(this->ijk) -= grad<0>(this->Phi, i, j, this->di);
+	  this->tmp_w(this->ijk) -= grad<1>(this->Phi, j, i, this->dj);
 
-	  this->tmp_u(i, j) -= this->state(ix::u)(i, j);
-	  this->tmp_w(i, j) -= this->state(ix::w)(i, j);
+	  this->tmp_u(this->ijk) -= this->state(ix::u)(this->ijk);
+	  this->tmp_w(this->ijk) -= this->state(ix::w)(this->ijk);
 	}
 
 	public:

@@ -28,12 +28,12 @@ namespace libmpdataxx
       fct = opts::bit(0), // flux-corrected transport
       abs = opts::bit(1), // use the abs() trick to handle variable-sign signal
       tot = opts::bit(2), // third-order accuracy terms
-      eps = opts::bit(3), // use frac=nom/(den+eps) instead of frac=where(den!=0,nom/den,0) 
+      pfc = opts::bit(3), // use conditional statements like frac=where(den!=0,nom/den,0) instead of frac=nom/(den+eps) in psi-fraction factors 
       npa = opts::bit(4), // use nprt=(x-abs(x))/2 instead of nprt=min(0,x), and analogous formulae for pprt
       iga = opts::bit(5), // infinite-gauge option
       nug = opts::bit(6), // non-unit G (default G = 1) - see Smolarkiewicz 2006 eq (25) and discussion below for info on G
       dfl = opts::bit(7), // devergent flows
-      nkh = opts::bit(8)  // don't use Kahan summation algorithm in the donor-cell formulae
+      khn = opts::bit(8)  // use Kahan summation algorithm in the donor-cell formulae
     };
 
   }; // namespace opts

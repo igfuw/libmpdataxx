@@ -34,6 +34,11 @@ def d2_lambda_evol(time):
 def d2_height(lamb, x, y):
     return np.where(d2_rad2(x,y) <= lamb**2, lamb**-2 * (1. - d2_rad2(x,y)/lamb**2), 0)
 
+# height in 2d
+def d2_height_plane(lamb, x, y):
+    X, Y = np.meshgrid(x, y)
+    return np.where(d2_rad2(X,Y) <= lamb**2, lamb**-2 * (1. - d2_rad2(X,Y)/lamb**2), 0)
+
 def d2_velocity(lamb, x, y):
     lamb_t = 2**0.5 * (1 - lamb**-2)**0.5
     return np.where(d2_rad2(x,y) <= lamb**2, x * lamb_t / lamb, 0)
@@ -41,5 +46,3 @@ def d2_velocity(lamb, x, y):
 #initial condition
 def d2_initial(x,y):
     return np.where(d2_rad2(x,y)<=1, 1-d2_rad2(x,y), 0)
-
-

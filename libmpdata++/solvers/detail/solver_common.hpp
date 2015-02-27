@@ -12,7 +12,7 @@
 
 #include <libmpdata++/solvers/detail/monitor.hpp>
 
-#include <libmpdata++/bcond/bcond.hpp>
+#include <libmpdata++/bcond/detail/bcond_common.hpp>
 
 #include <array>
 
@@ -41,7 +41,7 @@ namespace libmpdataxx
 
         typedef typename ct_params_t::real_t real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
-        using bcp_t = std::unique_ptr<bcond::bcond_t<real_t>>;
+        using bcp_t = std::unique_ptr<bcond::detail::bcond_common<real_t>>;
 
         using ix = typename ct_params_t::ix;
 
@@ -50,7 +50,7 @@ namespace libmpdataxx
         // declared here for output purposes
         real_t dt, di, dj, dk;
 
-	idx_t<n_dims> ijk;
+	const idx_t<n_dims> ijk;
 
         long long int timestep = 0;
         std::vector<int> n; 
@@ -177,7 +177,11 @@ namespace libmpdataxx
 	    for (int e = 0; e < n_eqns; ++e) scale(e, ct_params_t::hint_scale(e));
 
 	    for (int e = 0; e < n_eqns; ++e) xchng(e);
-	    for (int e = 0; e < n_eqns; ++e) advop(e);
+	    for (int e = 0; e < n_eqns; ++e) 
+            { 
+              advop(e);
+              if (e != n_eqns - 1) this->mem->barrier();
+            }
 	    for (int e = 0; e < n_eqns; ++e) cycle(e); // note: cycle assumes ascending loop index
 
 	    for (int e = 0; e < n_eqns; ++e) scale(e, -ct_params_t::hint_scale(e));

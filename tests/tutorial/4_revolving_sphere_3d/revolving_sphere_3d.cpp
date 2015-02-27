@@ -11,6 +11,7 @@ using boost::math::constants::pi;
 #include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/hdf5_xdmf.hpp>
+#include "revolving_sphere_stats.hpp"
 using namespace libmpdataxx;
 
 template<int opts_arg, int opts_iters>
@@ -32,7 +33,12 @@ void test(const std::string& dir_name)
 
   using slv_t = solvers::mpdata<ct_params_t>;
 //<listing-2>
-  using slv_out_t = output::hdf5_xdmf<slv_t>;
+  using slv_out_t = 
+    stats<
+      output::hdf5_xdmf<
+        slv_t
+      >
+    >;
 //</listing-2>
   typename slv_out_t::rt_params_t p;
 
@@ -63,6 +69,7 @@ void test(const std::string& dir_name)
   p.di = dx;
   p.dj = dy;
   p.dk = dz;
+  p.dt = dt;
 
   // instantation
   concurr::threads<

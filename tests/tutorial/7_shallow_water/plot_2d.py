@@ -1,11 +1,13 @@
 from scipy.optimize import fsolve
 import math
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
-import matplotlib.ticker as ticker
 import numpy as np
 import h5py
 import sys
+
+import matplotlib
+matplotlib.use('Pdf')
+import matplotlib.pyplot as plt
+
 import plot_settings as ps
 import analytic_eq as eq
 
@@ -46,7 +48,6 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
     #ax.set_ylim(-2,2)
     ps.ticks_changes(ax)
 
-
 # time_l - list of time levels for analytic solutions
 # time - model time level used for comparison with analytic solution
 # dt -  model time step
@@ -56,8 +57,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
     ax = plt.subplot(1,1,1)
     #plotting analytic solution
     analytic_fig(ax, time_l)
-    plt.savefig("papier_shallowwater_2d_analytic.pdf")
-    #plt.show()
+    plt.savefig("2d_analytic.pdf")
     #plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l):
         plt.figure(ic+1, figsize = (6,3))
@@ -65,29 +65,21 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
 
         print "plotting for " + casename + ", t = " + str(time)
         #model variables TODO: time
-        h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2d_" + casename +
-                                              ".out/timestep0000000" + str(int(time/dt))
+        h_m, px_m, py_m = reading_modeloutput(dir + casename +
+                                              "/timestep0000000" + str(int(time/dt))
                                               + '.h5')
         # calculate velocity (momentum/height) only in the droplet region.
         #calculating velocity from momentum, only for the droplet area 
         v_m = np.where(h_m > 0,  py_m/h_m, 0)
-        print "where with h_m = 0 !!"
                 
         # choosing a plane of a cross section TODO: should be 160?
         # TODO: x_range/y_range should be calculated from hdf file!!
-        print "TODO: x_range/y_range should be calculated from hdf file!!"
         analytic_model_fig(ax,
                            np.linspace(-8,8,h_m.shape[0]), np.zeros(h_m[0].shape[0]),
                            h_m[159], v_m[159], time)
         
         #ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
         #            fontsize=12, horizontalalignment='left', verticalalignment='top')
-        
-        plt.savefig("papier_shallowwater_2d_"+str(casename)+".pdf")
-        #plt.show()
+        plt.savefig(str(casename)+".pdf")
 
 main("./", sys.argv[1:])
-
-    
-    
-    

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Xdmf xmlns:xi="http://www.w3.org/2001/XInclude">
+	<Domain>
+		<Grid Name="TimeGrid" GridType="Collection" CollectionType="Temporal">
+			<xi:include href="timestep0000000000.xmf" xpointer="gid"/>
+			<xi:include href="timestep0000000100.xmf" xpointer="gid"/>
+			<xi:include href="timestep0000000200.xmf" xpointer="gid"/>
+			<xi:include href="timestep0000000300.xmf" xpointer="gid"/>
+		</Grid>
+	</Domain>
+</Xdmf>

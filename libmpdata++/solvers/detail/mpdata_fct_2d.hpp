@@ -30,38 +30,63 @@ namespace libmpdataxx
 
 	void fct_init(int e)
 	{
-	  const auto i = this->i^1, j = this->j^1; // not optimal - with multiple threads some indices are repeated among threads
+	  const auto i1 = this->i^1, j1 = this->j^1; // not optimal - with multiple threads some indices are repeated among threads
 	  const auto psi = this->mem->psi[e][this->n[e]]; 
 
-	  this->psi_min(i,j) = min(min(min(min(
-			 psi(i,j+1),
-	    psi(i-1,j)), psi(i,j  )), psi(i+1,j)),
-			 psi(i,j-1)
+	  this->psi_min(i1,j1) = min(min(min(min(
+			   psi(i1,j1+1),
+	    psi(i1-1,j1)), psi(i1,j1  )), psi(i1+1,j1)),
+			   psi(i1,j1-1)
 	  );
-	  this->psi_max(i,j) = max(max(max(max(
-			 psi(i,j+1),
-	    psi(i-1,j)), psi(i,j  )), psi(i+1,j)), 
-			 psi(i,j-1)
+	  this->psi_max(i1,j1) = max(max(max(max(
+			   psi(i1,j1+1),
+	    psi(i1-1,j1)), psi(i1,j1  )), psi(i1+1,j1)), 
+			   psi(i1,j1-1)
 	  ); 
 	}
 
 	void fct_adjust_antidiff(int e, int iter)
 	{
 	  const auto psi = this->mem->psi[e][this->n[e]];
-	  const auto &GC_corr = parent_t::GC_corr(iter);
+	  auto &GC_corr = parent_t::GC_corr(iter);
           const auto &G = *this->mem->G;
-	  const auto &im = this->im; // calculating once for i-1/2 and i+1/2
-	  const auto &jm = this->jm; // calculating once for i-1/2 and i+1/2
+	  const auto i1 = this->i^1, j1 = this->j^1; 
+	  const auto im1 = this->im^1, jm1 = this->jm^1; 
+	  const auto &im(this->im), &jm(this->jm); // calculating once for (i/j)-1/2 and (i/j)+1/2
 
 	  // fill halos of GC_corr -> mpdata works with halo=1, we need halo=2
           this->xchng_vctr_alng(GC_corr);
 
-	  // calculating the monotonic corrective velocity
-	  this->GC_mono[0]( im+h, this->j ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->psi_min, this->psi_max, GC_corr, G, im, this->j);
-	  this->GC_mono[1]( this->i, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->psi_min, this->psi_max, GC_corr, G, jm, this->i);
+          // calculation of fluxes for betas denominators
+          if (opts::isset(ct_params_t::opts, opts::iga))
+          {
+            this->flux_ptr = &GC_corr;
+          }
+          else
+          {
+            this->flux[0](im1+h, j1) = formulae::donorcell::flux<ct_params_t::opts, 0>(psi, GC_corr[0], im1, j1);
+            this->flux[1](i1, jm1+h) = formulae::donorcell::flux<ct_params_t::opts, 1>(psi, GC_corr[1], jm1, i1);
+            this->flux_ptr = &this->flux;
+          }
 
-	  // in the last iteration waiting as advop for the next equation will overwrite psi_min/psi_max
-	  if (iter == this->n_iters - 1 && parent_t::n_eqns > 1) this->mem->barrier();  // TODO: move to common
+          const auto &flx = (*(this->flux_ptr));
+
+          // calculating betas
+          this->beta_up(i1, j1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1, j1);
+          this->beta_dn(i1, j1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1, j1);
+
+          // should detect the need for ext=1 halo-filling above (TODO: double check)
+	  assert(std::isfinite(sum(this->beta_up(i1, this->j))));
+	  assert(std::isfinite(sum(this->beta_up(this->i, j1))));
+	  assert(std::isfinite(sum(this->beta_dn(i1, this->j))));
+	  assert(std::isfinite(sum(this->beta_dn(this->i, j1))));
+
+          // assuring flx, psi_min and psi_max are not overwritten
+          this->beta_barrier(iter);
+
+	  // calculating the monotonic corrective velocity
+	  this->GC_mono[0]( im+h, this->j ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j);
+	  this->GC_mono[1]( this->i, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->i);
 	}
       };
     }; // namespace detail

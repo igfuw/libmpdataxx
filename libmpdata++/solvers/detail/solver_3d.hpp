@@ -7,7 +7,6 @@
 #pragma once
 
 #include <libmpdata++/solvers/detail/solver_common.hpp>
-#include <libmpdata++/bcond/bcond.hpp>
 
 namespace libmpdataxx
 {
@@ -31,7 +30,7 @@ namespace libmpdataxx
       
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
-	rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
+	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
 	void xchng_sclr(typename parent_t::arr_t arr,
                        rng_t range_i, rng_t range_j, rng_t range_k,
@@ -54,12 +53,12 @@ namespace libmpdataxx
         void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec)
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/); 
-          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/);
-          bcyl->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/); 
-          bcyr->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/);
-          bczl->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
-          bczr->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
+          bcxl->fill_halos_vctr_alng(arrvec, j, k); 
+          bcxr->fill_halos_vctr_alng(arrvec, j, k);
+          bcyl->fill_halos_vctr_alng(arrvec, k, i); 
+          bcyr->fill_halos_vctr_alng(arrvec, k, i);
+          bczl->fill_halos_vctr_alng(arrvec, i, j);
+          bczr->fill_halos_vctr_alng(arrvec, i, j);
           this->mem->barrier();
         }
         
@@ -172,7 +171,7 @@ namespace libmpdataxx
             )));
 
 	  // allocate Kahan summation temporary vars
-	  if (!opts::isset(ct_params_t::opts, opts::nkh))
+	  if (opts::isset(ct_params_t::opts, opts::khn))
 	    for (int n = 0; n < 3; ++n) 
 	      mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
 	        parent_t::rng_sclr(p.grid_size[0]), 
