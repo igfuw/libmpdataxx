@@ -15,7 +15,7 @@
 
 #include <libmpdata++/solvers/mpdata.hpp>
 
-#include <libmpdata++/output/gnuplot.hpp>
+#include <libmpdata++/output/hdf5.hpp>
 
 int main()
 {
@@ -37,7 +37,9 @@ int main()
   };
 //</listing-1>
 
-  const int nx = 10, nt = 1000;
+  const int  
+    nx = 100, // if it is less than the number of cores, the default setting will fail
+    nt = 1000;
    
   // OpenMP
   std::cerr << "OpenMP run" << std::endl;
@@ -46,7 +48,7 @@ int main()
     using slv_t = solvers::mpdata<ct_params_t>;
 //</listing-2>
 //<listing-3>
-    using slv_out_t = output::gnuplot<slv_t>;
+    using slv_out_t = output::hdf5<slv_t>;
 //</listing-3>
 //<listing-4>
     using run_t = concurr::openmp<
@@ -57,6 +59,7 @@ int main()
 //<listing-5>
     typename slv_out_t::rt_params_t p;
     p.grid_size = { nx };
+    p.outdir = "output";
     run_t run(p);
 //</listing-5>
     run.advectee() = 0;

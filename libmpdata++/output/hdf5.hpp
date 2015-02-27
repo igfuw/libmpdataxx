@@ -241,7 +241,12 @@ namespace libmpdataxx
 	const rt_params_t &p
       ) : parent_t(args, p),
         outdir(p.outdir)
-      { }
+      {
+        // TODO: clean it up - it should not be here
+        // overrding the default from output_common
+        if (this->outvars.size() == 1 && parent_t::n_eqns == 1)
+          this->outvars[0].name = "psi";
+      }
     };
   }; // namespace output
 }; // namespace libmpdataxx
