@@ -25,11 +25,13 @@ def analytic_fig(ax, time_l = [0,1,2,3], nx=320):
     ps.ticks_changes(ax)
 
 #reading model output from text file and converting to an array
-def reading_modeloutput(filename):
-    f = h5py.File(filename, "r")
+def reading_modeloutput(dirname, nt):
+    f = h5py.File(dirname + "/timestep0000000" + str(nt) + ".h5", "r")
     h = np.array(f["h"])
     qx = np.array(f["qx"])
-    return h, qx
+    f = h5py.File(dirname + "/coord.h5", "r")
+    dt = f["T"].attrs["dt"][0]
+    return h, qx, dt
 
 #plotting together analytic solution and model output 
 def analytic_model_fig(ax, x_range, h_m, v_m, time=1):
@@ -47,9 +49,8 @@ def analytic_model_fig(ax, x_range, h_m, v_m, time=1):
 
 # time_l - list of time levels for analytic solutions
 # time - model time level used for comparison with analytic solution
-# dt -  model time step
 # x_shift - shift between initial cond. in model and for analytic solution
-def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
+def main(dir, casename_l, x_shift=8, time_l=[0,3], nt=300):
     plt.figure(1, figsize = (6,3))
     ax = plt.subplot(1,1,1)
     #plotting analytic solution
@@ -60,17 +61,14 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=3, dt=0.01):
         plt.figure(ic+1, figsize = (6,3))
         ax = plt.subplot(1,1,1)
 
-        print "plotting for " + casename + ", t = " + str(time)
-        #model variables TODO: time
-        h_m, px_m = reading_modeloutput(dir + casename +
-                                            "/timestep0000000" + str(int(time/dt))
-                                            + '.h5')
+        print "plotting for " + casename + ", t/dt = " + str(nt)
+        h_m, px_m, dt = reading_modeloutput(dir + casename, nt)
         # calculate velocity (momentum/height) only in the droplet region.
         v_m = np.where(h_m > 0,  px_m/h_m, 0)
                 
         # choosing a plane of a cross section TODO: should be 160?
         # TODO: x_range/y_range should be calculated from hdf file!!
-        analytic_model_fig(ax, np.linspace(-8,8,h_m.shape[0]), h_m, v_m, time)
+        analytic_model_fig(ax, np.linspace(-8,8,h_m.shape[0]), h_m, v_m, nt * dt)
  
         #ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
         #            fontsize=12, horizontalalignment='left', verticalalignment='top')
