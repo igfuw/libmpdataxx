@@ -83,7 +83,7 @@ namespace libmpdataxx
         const g_t &g
       )
       {
-        if (opts::isset(opts, opts::nkh))
+        if (!opts::isset(opts, opts::khn))
         {
 	  psi_new = psi_old + (-flx_1 + flx_2) / g;
         }
@@ -109,7 +109,7 @@ namespace libmpdataxx
         const g_t &g
       )
       {
-        if (opts::isset(opts, opts::nkh))
+        if (!opts::isset(opts, opts::khn))
         {
 	  // note: the parentheses are intended to minimise chances of numerical errors
 	  psi_new = psi_old + ((-flx_1 + flx_2) + (-flx_3 + flx_4)) / g;
@@ -140,7 +140,7 @@ namespace libmpdataxx
         const g_t &g
       )
       {
-        if (opts::isset(opts, opts::nkh))
+        if (!opts::isset(opts, opts::khn))
         {
 	  // note: the parentheses are intended to minimise chances of numerical errors
 	  psi_new = psi_old + ((-flx_1 + flx_2) + (-flx_3 + flx_4) + (-flx_5 + flx_6)) / g;

@@ -1,6 +1,9 @@
-from mpl_toolkits.mplot3d import axes3d
+import matplotlib
+matplotlib.use('Pdf')
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from mpl_toolkits.mplot3d import axes3d
+
 import numpy as np
 import h5py
 import plot_settings as ps
