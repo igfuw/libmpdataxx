@@ -27,8 +27,9 @@ namespace libmpdataxx
 	struct info_t { std::string name, unit; };
 	std::map<int, info_t> outvars;
 
-	int outfreq;
-	int outwindow;
+	const int outfreq;
+	const int outwindow;
+        const std::string outdir;
 
 	virtual void record(const int var) {}
 	virtual void start(const int nt) {}
@@ -73,6 +74,8 @@ namespace libmpdataxx
 	  int outfreq = 1; 
 	  int outwindow = 1;
 	  std::map<int, info_t> outvars;
+          std::string outdir;
+          // TODO: pass adiitional info? (command_line, library versions, ...)
 	};
 
 	// ctor
@@ -83,7 +86,8 @@ namespace libmpdataxx
           parent_t(args, p),
 	  outfreq(p.outfreq), 
 	  outwindow(p.outwindow),
-          outvars(p.outvars)
+          outvars(p.outvars),
+          outdir(p.outdir)
 	{
           // default value for outvars
           if (this->outvars.size() == 0 && parent_t::n_eqns == 1)
