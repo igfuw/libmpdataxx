@@ -4,11 +4,9 @@ import matplotlib.ticker as ticker
 import numpy as np
 import h5py
 import sys
-
 import matplotlib
 matplotlib.use('Pdf')
 import matplotlib.pyplot as plt
-
 import plot_settings as ps
 import analytic_eq as eq
 import pdb
