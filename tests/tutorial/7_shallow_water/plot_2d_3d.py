@@ -29,6 +29,7 @@ def plotting_2D(X, Y, Z):
     ax.set_zlim(-0.1, 0.1)
 
     plt.savefig("2d_fct_iga_view.pdf")
+    plt.show()
 
 #TODO napisac uwage o dx, dy
 def main(filename):

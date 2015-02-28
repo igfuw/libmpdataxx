@@ -10,10 +10,9 @@ import warnings
 import pdb
 
 # plotting analytic solutions for height and velocity 
-def analytic_fig(ax, x_lim, time_l = [0,1,2,3], nx=320):
+def analytic_fig(ax, x_lim, time_l=[0,1,2,3], nx=320):
     x_range = np.linspace(-x_lim, x_lim, nx)
     oznacz = ['k', 'b', 'c', 'y', 'g', 'm', 'r']
-    y0 = eq.d1_initial(x_range)
     for it, time in enumerate(time_l):
         lamb = eq.d1_lambda_evol(time)
         h = eq.d1_height(lamb, x_range)
@@ -22,7 +21,7 @@ def analytic_fig(ax, x_lim, time_l = [0,1,2,3], nx=320):
         ax.plot(x_range, v, oznacz[it]+ "--")
     ps.ticks_changes(ax)
 
-#reading model output from hdf file and converting to an array
+# reading model output from hdf file and converting to an array
 def reading_modeloutput(dir, time):
     dir_model = {} 
     f_crd = h5py.File(dir+ "/coord.h5", "r")
@@ -35,7 +34,7 @@ def reading_modeloutput(dir, time):
     dir_model["qx"] = np.array(f_out["qx"])
     return dir_model
 
-#plotting together analytical solution and model output 
+# plotting together analytical solution and model output 
 def analytic_model_fig(ax, var_md, time=1):
     lamb = eq.d1_lambda_evol(time)
     h_a = eq.d1_height(lamb, var_md["x_range"])
@@ -52,16 +51,16 @@ def analytic_model_fig(ax, var_md, time=1):
 def main(dir, casename_l, x_lim=8, time_an=[0,3], time=3):
     plt.figure(1, figsize = (6,3))
     ax = plt.subplot(1,1,1)
-    #plotting analytical solution
+    # plotting analytical solution
     analytic_fig(ax, x_lim, time_an)
     plt.savefig("1d_analytic.pdf")
-    plt.show()
-    #plotting comparison between analytic solution and model results for various options
+    #plt.show()
+    # plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l):
         plt.figure(ic+1, figsize = (6,3))
         ax = plt.subplot(1,1,1)
         print "plotting for " + casename + ", t = " + str(time)
-         var_model = reading_modeloutput(dir + casename, time)
+        var_model = reading_modeloutput(dir + casename, time)
         # calculate velocity (momentum/height) only in the droplet region.
         var_model["vx"] = np.where(var_model["h"] > 0, var_model["qx"]/var_model["h"], 0)
         # calculating model output coord. 
@@ -73,5 +72,6 @@ def main(dir, casename_l, x_lim=8, time_an=[0,3], time=3):
         analytic_model_fig(ax, var_model, time)
  
         plt.savefig(str(casename)+".pdf")
-        plt.show()
+        #plt.show()
+
 main("./", sys.argv[1:])
