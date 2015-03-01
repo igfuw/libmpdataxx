@@ -53,7 +53,7 @@ script:
 #    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
 
     # compiling everything in the Release mode
-#    - cmake -DCMAKE_BUILD_TYPE=Release ../
+    - cmake -DCMAKE_BUILD_TYPE=Release ../
 #    - VERBOSE=1 make
 
     # running selected tests in Release mode for 1 and 4 threads
