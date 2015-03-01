@@ -46,7 +46,7 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libhdf5-serial-dev hdf5-tools; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5 --with-cxx; fi # Homebrew does not support --with-cxx & --with-threadsafe
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.14.tar.bz2; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then tar xvjf hdf5-1.8.14; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then tar xjf hdf5-1.8.14.tar.bz2; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cd hdf5-1.8.14; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then ./configure --enable-cxx --enable-threadsafe --enable-unsupported --prefix=/usr/local; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then make all install; fi
