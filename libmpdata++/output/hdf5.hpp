@@ -16,9 +16,6 @@
 
 // the C++ HDF5 API
 #include <H5Cpp.h>
-#if !defined(H5_HAVE_THREADSAFE)
-#  error libmpdata++ requires a thread-safe version of HDF5
-#endif
 
 #include <vector>
 #include <string>
