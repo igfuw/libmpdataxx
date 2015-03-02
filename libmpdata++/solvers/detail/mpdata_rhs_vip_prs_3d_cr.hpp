@@ -98,8 +98,8 @@ namespace libmpdataxx
 	    lap_p_err(this->ijk) += this->lap_err(this->ijk);
    
 	    error = std::max(
-	      std::abs(this->mem->max(this->err(this->ijk))), 
-	      std::abs(this->mem->min(this->err(this->ijk)))
+	      std::abs(this->mem->max(this->rank, this->err(this->ijk))), 
+	      std::abs(this->mem->min(this->rank, this->err(this->ijk)))
 	    );
 	    this->iters++;
 	  }
