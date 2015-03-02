@@ -89,7 +89,7 @@ namespace libmpdataxx
 	void hook_ante_loop(const int nt)
 	{
           // fill Courant numbers with zeros so that the divergence test does no harm
-          if (this->mem->rank() == 0)
+          if (this->rank == 0)
             for (int d=0; d < parent_t::n_dims; ++d) this->mem->GC.at(d) = 0; 
           this->mem->barrier();
 

@@ -159,6 +159,7 @@ namespace libmpdataxx
 	    algos.push_back(
               new solver_t(
                 typename solver_t::ctor_args_t({
+                  i0,
 		  mem.get(), 
 		  i0 == 0      ? bxl : shrdl,
 		  i0 == n0 - 1 ? bxr : shrdr,
@@ -195,6 +196,7 @@ namespace libmpdataxx
               algos.push_back(
                 new solver_t(
                   typename solver_t::ctor_args_t({
+                    i0,
 		    mem.get(), 
 		    i0 == 0      ? bxl : shrdl,
 		    i0 == n0 - 1 ? bxr : shrdr,
@@ -239,6 +241,7 @@ namespace libmpdataxx
 		algos.push_back(
                   new solver_t(
                     typename solver_t::ctor_args_t({
+                      i0,
                       mem.get(), 
 		      i0 == 0      ? bxl : shrdl,
 		      i0 == n0 - 1 ? bxr : shrdr,
