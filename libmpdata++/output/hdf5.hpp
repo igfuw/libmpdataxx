@@ -58,7 +58,9 @@ namespace libmpdataxx
 
           // creating the coordinates file
           std::string dim_file = outdir + "/coord.h5";
+std::cerr << "creating " << dim_file << std::endl; //.."(rank=" << this->mem->rank() << ")" << std::endl;
           hdfp.reset(new H5::H5File(dim_file, H5F_ACC_TRUNC));
+std::cerr << "... done (" << dim_file << ")." << std::endl;
 
           // creating the dimensions
           // x,y,z
@@ -154,7 +156,9 @@ namespace libmpdataxx
         //count[1] = 1; TODO
 
         // creating the timestep file
+std::cerr << "creating "<< hdf_name() << std::endl; //" file ... (rank=" << this->mem->rank() << ")" << std::endl;
         hdfp.reset(new H5::H5File(outdir + "/" + hdf_name(), H5F_ACC_TRUNC));
+std::cerr << "... done (" << hdf_name() << ")." << std::endl;
 
         {
 	  for (const auto &v : this->outvars)
