@@ -106,8 +106,8 @@ namespace libmpdataxx
 	  //const real_t beta = .25; //TODO tylko Richardson
 
 	  int halo = this->halo;
-	  rng_t &i = this->i;
-	  rng_t &j = this->j;
+	  const rng_t &i = this->i;
+	  const rng_t &j = this->j;
 
 	  this->tmp_u(i,j) = this->state(ix::u)(i,j);
 	  this->tmp_w(i,j) = this->state(ix::w)(i,j);
@@ -130,8 +130,8 @@ namespace libmpdataxx
 	    this->err(this->ijk) += beta * this->lap_err(this->ijk);
 
 	    error = std::max(
-	      std::abs(this->mem->max(this->err(i,j))),
-	      std::abs(this->mem->min(this->err(i,j)))
+	      std::abs(this->mem->max(this->rank, this->err(i,j))),
+	      std::abs(this->mem->min(this->rank, this->err(i,j)))
 	    );
 	    this->iters++;
 	  }
