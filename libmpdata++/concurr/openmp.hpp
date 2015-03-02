@@ -32,15 +32,6 @@ namespace libmpdataxx
 
       struct mem_t : parent_t::mem_t
       {
-        int rank()
-        {
-#if defined(_OPENMP)
-          return omp_get_thread_num();
-#else
-          return 0;
-#endif
-        }
-
 	static int size() 
 	{
 #if defined(_OPENMP)

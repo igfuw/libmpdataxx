@@ -37,7 +37,7 @@ namespace libmpdataxx
 	void hook_ante_loop(const int nt) 
 	{
 	  parent_t::hook_ante_loop(nt);
-	  if (this->mem->rank() == 0) 
+	  if (this->rank == 0) 
           {
             start(nt);
             record_all();
@@ -55,7 +55,7 @@ namespace libmpdataxx
 	  parent_t::hook_post_step();
 
 	  this->mem->barrier(); // waiting for all threads befor doing global output
-	  if (this->mem->rank() == 0)
+	  if (this->rank == 0)
 	  {
             // TODO: output of solver statistics every timesteps could probably go here
             for (int t = 0; t < outwindow; ++t)

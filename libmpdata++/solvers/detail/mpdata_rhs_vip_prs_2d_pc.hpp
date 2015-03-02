@@ -108,8 +108,8 @@ namespace libmpdataxx
 	  using formulae::nabla::grad;
 	  
 	  int halo = this->halo;
-	  rng_t &i = this->i;
-	  rng_t &j = this->j;
+	  const rng_t &i = this->i;
+	  const rng_t &j = this->j;
 
 	  //initail q_err for preconditioner
 	  q_err(this->ijk) = real_t(0);
@@ -142,8 +142,8 @@ namespace libmpdataxx
 	  real_t tmp_den = 1.; //TODO
 
 	  int halo = this->halo;
-	  rng_t &i = this->i;
-	  rng_t &j = this->j;
+	  const rng_t &i = this->i;
+	  const rng_t &j = this->j;
 
 	  this->tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
 	  this->tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
@@ -177,8 +177,8 @@ namespace libmpdataxx
 	    this->err(this->ijk) += beta * lap_p_err(this->ijk);
 
 	    error = std::max(
-	      std::abs(this->mem->max(this->err(this->ijk))), 
-	      std::abs(this->mem->min(this->err(this->ijk)))
+	      std::abs(this->mem->max(this->rank, this->err(this->ijk))), 
+	      std::abs(this->mem->min(this->rank, this->err(this->ijk)))
 	    );
 
 	    if (error <= this->prs_tol) break;

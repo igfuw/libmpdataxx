@@ -20,11 +20,6 @@ namespace libmpdataxx
 {
   namespace concurr
   {
-    namespace detail
-    {
-      std::map<boost::thread::id, int> boost_thread_id;
-    };
-
     template <
       class solver_t,
       bcond::bcond_e bcxl,
@@ -43,11 +38,6 @@ namespace libmpdataxx
         boost::barrier b;
 
         public:
-
-        int rank()
-        {
-          return detail::boost_thread_id[boost::this_thread::get_id()];
-        }
 
 	static int size() 
 	{
@@ -81,7 +71,6 @@ namespace libmpdataxx
           thp.reset(new boost::thread(
             &solver_t::solve, boost::ref(this->algos[i]), nt
           ));
-          detail::boost_thread_id[thp->get_id()] = i;
           threads.add_thread(thp.release());
         }
         threads.join_all();
