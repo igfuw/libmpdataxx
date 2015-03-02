@@ -150,7 +150,7 @@ namespace libmpdataxx
       void record_all()
       {
         // in concurrent setup only the first solver does output
-        assert(this->mem->rank() == 0);
+        assert(this->rank == 0);
         //count[1] = 1; TODO
 
         // creating the timestep file
@@ -212,7 +212,7 @@ namespace libmpdataxx
       // data is assumed to be contiguous and in the same layout as hdf variable
       void record_aux(const std::string &name, typename solver_t::real_t *data)
       {
-        assert(this->mem->rank() == 0);
+        assert(this->rank == 0);
 
         auto aux = (*hdfp).createDataSet(
           name,
