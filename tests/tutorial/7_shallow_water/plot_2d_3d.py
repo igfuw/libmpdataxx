@@ -15,8 +15,9 @@ def reading_modeloutput(dir, time):
     time_model = np.array(f_crd["T"])
     assert(time in time_model),"time level not in model output"
     dt = round(f_crd["T"].attrs["dt"], 4)
-    dir_model["X"] = np.array(f_crd["X"])
-    dir_model["Y"] = np.array(f_crd["Y"])
+    # TODO dx should be written somewhere                                 
+    dir_model["dx"] = round(np.array(f_crd["X"])[1,0]-np.array(f_crd["X"])[0,0], 4)
+    dir_model["dy"] = round(np.array(f_crd["Y"])[0,1]-np.array(f_crd["Y"])[0,0], 4)
     f_out = h5py.File(dir+"/timestep0000000" + str(int(time/dt))+ '.h5', "r")
     dir_model["h"] = np.array(f_out["h"])
     return dir_model
@@ -34,16 +35,15 @@ def plotting_3D(X, Y, Z):
     ax.set_zlim(-0.1, 0.1)
     plt.savefig("2d_fct_iga_view.pdf")
 
-
-def main(dir, time):
+def main(dir, time, xy_lim=8):
     var_model = reading_modeloutput(dir, time)
-    # model coord.
-    x_model_shift = 0.5 * var_model["X"][:,0].max()
-    var_model["x_range"] = 0.5*(var_model["X"][1:,0]+var_model["X"][:-1,0]) - x_model_shift
-    y_model_shift = 0.5 * var_model["Y"][0,:].max()
-    var_model["y_range"] = 0.5*(var_model["Y"][0,1:]+var_model["Y"][0,:-1]) - y_model_shift
-    X, Y = np.meshgrid(var_model["x_range"], var_model["y_range"])
+    # calculating model output coord.                      
+    var_model["x_range"] = np.arange(-xy_lim+var_model["dx"]/2., xy_lim, var_model["dx"])
+    var_model["y_range"] = np.arange(-xy_lim+var_model["dy"]/2., xy_lim, var_model["dy"])
+    assert(var_model["x_range"].shape[0] == var_model["h"].shape[0]), "domain size differs from model output shape"
+    assert(var_model["y_range"].shape[0] == var_model["h"].shape[1]), "domain size differs from model output shape"
 
+    X, Y = np.meshgrid(var_model["x_range"], var_model["y_range"])
     plotting_3D(X, Y, var_model["h"])
 
 main(dir="./2d_fct_iga", time=3)
