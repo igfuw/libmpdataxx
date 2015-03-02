@@ -65,7 +65,7 @@ execute_process(
     zdiff $TMP.gz $TMP             &&
     rm $TMP $TMP.gz
   " 
-  OUTPUT_QUIET ERROR_QUIET
+#  OUTPUT_QUIET ERROR_QUIET
   RESULT_VARIABLE STATUS
 )
 if(NOT STATUS EQUAL 0)
