@@ -26,7 +26,7 @@ struct stats : public parent_t
   {
     parent_t::hook_post_step();
     this->mem->barrier();
-    if (this->mem->rank() != 0) return;
+    if (this->rank != 0) return;
 
     if (this->timestep % 100 == 0)
     {
