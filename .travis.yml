@@ -34,7 +34,7 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot blitz; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5 --with-cxx; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h; fi
-#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
 
 script:
     # libmpdata++
@@ -70,38 +70,38 @@ script:
 #    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - OMP_NUM_THREADS=4 make -C tests/tutorial/7_shallow_water all
     - OMP_NUM_THREADS=4 make -C tests/tutorial/7_shallow_water test || cat tests/tutorial/7_shallow_water/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/8_boussinesq_2d all
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/8_boussinesq_2d test || cat tests/tutorial/8_boussinesq_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+#    - OMP_NUM_THREADS=4 make -C tests/tutorial/8_boussinesq_2d all
+#    - OMP_NUM_THREADS=4 make -C tests/tutorial/8_boussinesq_2d test || cat tests/tutorial/8_boussinesq_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
 
     # installing
     - sudo make install
     - cd ../..
     
     # libcloudph++'s dependencies
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-python-dev python-numpy libthrust-dev; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install boost-python; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then git clone --depth=1 git://github.com/thrust/thrust.git; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-python-dev python-numpy libthrust-dev; fi
+#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install boost-python; fi
+#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then git clone --depth=1 git://github.com/thrust/thrust.git; fi
+#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust; fi
 
     # libcloudph++ (needed by icicle, skipping tests and CUDA build)
-    - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
-    - cd libcloudphxx
-    - mkdir build 
-    - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
-    - make 
-    - sudo make install
-    - cd ../..
+#    - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
+#    - cd libcloudphxx
+#    - mkdir build 
+#    - cd build
+#    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
+#    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
+#    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
+#    - make 
+#    - sudo make install
+#    - cd ../..
 
     ## icicle (no tests - just testing if any changes in libmpdata's API did not break icicle)
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-program-options-dev; fi
-    - git clone --depth=1 git://github.com/igfuw/icicle.git
-    - cd icicle
-    - mkdir build 
-    - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
-    - make
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-program-options-dev; fi
+#    - git clone --depth=1 git://github.com/igfuw/icicle.git
+#    - cd icicle
+#    - mkdir build 
+#    - cd build
+#    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
+#    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
+#    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
+#    - make
