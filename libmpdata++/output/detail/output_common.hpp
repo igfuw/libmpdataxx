@@ -38,7 +38,7 @@ namespace libmpdataxx
 	  parent_t::hook_ante_loop(nt);
 	  if (this->mem->rank() == 0) 
           {
-//std::cerr << "rank = " << this->mem->rank() << std::endl;
+std::cerr << "rank = " << this->mem->rank() << std::endl;
             start(nt);
             record_all();
           }
