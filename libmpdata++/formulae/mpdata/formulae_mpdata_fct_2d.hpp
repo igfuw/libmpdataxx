@@ -104,13 +104,13 @@ namespace libmpdataxx
         const rng_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       ) return_macro(,
-        GC_corr[d]( pi<d>(i+h, j) ) * where( // TODO: is it possible to implement it without where()?
+        GC_corr[d]( pi<d>(i+h, j) ) * where(
           // if
-          GC_corr[d]( pi<d>(i+h, j) ) > 0, // >= ?
+          GC_corr[d]( pi<d>(i+h, j) ) > 0,
           // then
           where(
             // if
-            psi(pi<d>(i, j)) > 0, // TODO: wouldn't it be better with >= ?
+            psi(pi<d>(i, j)) > 0,
             // then
 	    min(1, min(
               beta_dn(pi<d>(i,     j)),
@@ -125,7 +125,7 @@ namespace libmpdataxx
           // else
           where(
             // if
-            psi(pi<d>(i+1, j)) > 0, // TODO: what if crossing zero?
+            psi(pi<d>(i+1, j)) > 0,
             // then
 	    min(1, min(
 	      beta_up(pi<d>(i,     j)),
@@ -153,7 +153,7 @@ namespace libmpdataxx
       ) return_macro(,
         GC_corr[d]( pi<d>(i+h, j) ) * where(
           // if
-          GC_corr[d]( pi<d>(i+h, j) ) >= 0, // TODO: what about where(C!=0, where()...) - could be faster for fields with a lot of zeros? (as an option?)
+          GC_corr[d]( pi<d>(i+h, j) ) > 0, 
           // then
 	  min(1, min(
 	    beta_dn(pi<d>(i,     j)),
