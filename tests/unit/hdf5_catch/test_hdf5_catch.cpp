@@ -40,6 +40,7 @@ int main()
   try
   {
     run.advector() = 0;
+    run.advectee() = 0;
     run.advance(1); 
     boost::filesystem::rename(boost::filesystem::path(p.outdir), boost::filesystem::path(p.outdir + ".off"));
     run.advance(1);  // this will fail and trow a HDF exception
