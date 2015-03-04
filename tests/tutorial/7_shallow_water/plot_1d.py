@@ -43,8 +43,8 @@ def analytic_model_fig(ax, var_md, time=1):
     v_a = eq.d1_velocity(lamb, var_md["x_range"])
     ax.plot(var_md["x_range"], eq.d1_initial(var_md["x_range"]), 'k', 
             var_md["x_range"], h_a, 'b', var_md["x_range"], var_md["h"], "r")
-    ax.plot(var_md["x_range"], 0*var_md["x_range"], "k-", var_md["x_range"], v_a, 'b--',
-            var_md["x_range"], var_md["vx"], "r--")
+    ax.plot(var_md["x_range"], 0*var_md["x_range"], "k-", var_md["x_range"], 
+            v_a, 'b--', var_md["x_range"], var_md["vx"], "r--")
     ps.ticks_changes(ax)
 
 # time_an - list of time levels for analytical solutions
@@ -59,7 +59,7 @@ def main(dir, casename_l, x_lim=8, time_an=[0,3], time=3):
     plt.show()
     # plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l):
-        plt.figure(ic+1, figsize = (6,3))
+        plt.figure(ic+2, figsize = (6,3))
         ax = plt.subplot(1,1,1)
         print "plotting for " + casename + ", t = " + str(time)
         var_model = reading_modeloutput(dir + casename, time)
