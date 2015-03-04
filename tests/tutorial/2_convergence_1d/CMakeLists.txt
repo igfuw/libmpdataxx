@@ -2,7 +2,7 @@ libmpdataxx_add_test(convergence_1d)
 add_test(
   NAME convergence_1d_diff 
   COMMAND bash -c "
-    for i in ${CMAKE_CURRENT_SOURCE_DIR}/*.txt.gz; do
+    for i in ${CMAKE_CURRENT_SOURCE_DIR}/refdata/*.txt.gz; do
       echo \$i ;
       echo  compare to ; 
       echo ${CMAKE_CURRENT_BINARY_DIR}/`basename \${i/.gz/}`;
@@ -13,7 +13,7 @@ add_test(
 add_test(
   NAME convergence_1d_plot
   COMMAND bash -c "
-    for i in ${CMAKE_CURRENT_SOURCE_DIR}/*.txt.gz; do
+    for i in ${CMAKE_CURRENT_SOURCE_DIR}/refdata/*.txt.gz; do
       python ../../../../tests/tutorial/2_convergence_1d/plot.py ${CMAKE_CURRENT_BINARY_DIR}/`basename \${i/.gz/}`;
     done;
   "
