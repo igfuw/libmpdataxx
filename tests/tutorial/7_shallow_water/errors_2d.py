@@ -52,12 +52,12 @@ def errors(dir, time_l, xy_lim):
 
         # outputting error statistics
         file.write( "time                               = " + str(time)                            + "\n")
-        file.write( "max(h_an)                          = " + str(round(h_an.max(), 8))            + "\n")
-        file.write( "max(h_num)                         = " + str(round(var_model["h"].max(), 8))  + "\n")
-        file.write( "L_inf                              = " + str(round(delh_inf, 8))              + "\n") 
-        file.write( "L_2                                = " + str(round(delh_2, 8))                + "\n")
-        file.write( "max(px_num)                        = " + str(round(var_model["qx"].max(), 8)) + "\n")
-        file.write( "max(py_num)                        = " + str(round(var_model["qx"].max(), 8)) + "\n" + "\n")
+        file.write( "max(h_an)                          = " + str(round(h_an.max(), 7))            + "\n")
+        file.write( "max(h_num)                         = " + str(round(var_model["h"].max(), 7))  + "\n")
+        file.write( "L_inf                              = " + str(round(delh_inf, 7))              + "\n") 
+        file.write( "L_2                                = " + str(round(delh_2, 7))                + "\n")
+        file.write( "max(px_num)                        = " + str(round(var_model["qx"].max(), 7)) + "\n")
+        file.write( "max(py_num)                        = " + str(round(var_model["qx"].max(), 7)) + "\n" + "\n")
 
     file.close()
         
