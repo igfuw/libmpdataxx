@@ -239,7 +239,7 @@ namespace libmpdataxx
           gnuplot_surface = true;
       };
 
-      const rt_params_t p; // TODO: that's a copy - convenient but might be memory-consuming, make a struct p.gnupot that would be copied
+      rt_params_t p; // TODO: that's a copy - convenient but might be memory-consuming, make a struct p.gnupot that would be copied
       // TODO: make a gnuplot_params map and copy only this map!
 
       // ctor
@@ -247,7 +247,10 @@ namespace libmpdataxx
 	typename parent_t::ctor_args_t args,
 	const rt_params_t &p
       ) : parent_t(args, p), p(p)
-      {}
+      {
+        if (!this->outdir.empty()) 
+          this->p.gnuplot_output = this->outdir + "/" + p.gnuplot_output; // TODO: get rid of gnuplot_output
+      }
     }; 
   }; // namespace output
 }; // namespace libmpdataxx
