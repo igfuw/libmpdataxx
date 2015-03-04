@@ -19,6 +19,6 @@ add_test(over_the_pole_2d_stats_diff bash -c "
   for i in best default; do 
     echo  ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
     echo  ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
-    zdiff ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
+    zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
   done
 ") 
