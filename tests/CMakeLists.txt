@@ -57,6 +57,31 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${BLITZ_INCLUDE_DIR}") # TODO: same fo
 # HDF5 libraries
 find_package(HDF5 COMPONENTS CXX HL REQUIRED)
 
+# gzip
+execute_process(
+  COMMAND bash -c "
+    TMP=`mktemp cmake-zdiff-XXXXX` &&
+    gzip < $TMP > $TMP.gz          &&
+    zdiff $TMP.gz $TMP             &&
+    rm $TMP $TMP.gz
+  " 
+  OUTPUT_QUIET ERROR_QUIET
+  RESULT_VARIABLE STATUS
+)
+if(NOT STATUS EQUAL 0)
+  SET(msg "zdiff does not work properly!")
+  if(APPLE)
+    message(FATAL_ERROR "${msg}
+      On OSX, if using Homebrew, the foloowing should help:
+        brew tap homebrew/dupes
+        brew install gzip
+        export PATH=/usr/local/bin:$PATH
+    ")
+  else()
+    message(FATAL_ERROR ${msg})
+  endif()
+endif()
+
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)

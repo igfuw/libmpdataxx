@@ -32,7 +32,6 @@ namespace libmpdataxx
 
       protected:
 
-      const std::string outdir;
       std::unique_ptr<H5::H5File> hdfp;
       std::map<int, H5::DataSet> vars;
       std::map<int, std::string> dim_names;
@@ -54,10 +53,10 @@ namespace libmpdataxx
       {
         {
           // creating the directory
-          boost::filesystem::create_directory(outdir);
+          boost::filesystem::create_directory(this->outdir);
 
           // creating the coordinates file
-          std::string dim_file = outdir + "/coord.h5";
+          std::string dim_file = this->outdir + "/coord.h5";
           hdfp.reset(new H5::H5File(dim_file, H5F_ACC_TRUNC));
 
           // creating the dimensions
@@ -150,11 +149,11 @@ namespace libmpdataxx
       void record_all()
       {
         // in concurrent setup only the first solver does output
-        assert(this->mem->rank() == 0);
+        assert(this->rank == 0);
         //count[1] = 1; TODO
 
         // creating the timestep file
-        hdfp.reset(new H5::H5File(outdir + "/" + hdf_name(), H5F_ACC_TRUNC));
+        hdfp.reset(new H5::H5File(this->outdir + "/" + hdf_name(), H5F_ACC_TRUNC));
 
         {
 	  for (const auto &v : this->outvars)
@@ -212,7 +211,7 @@ namespace libmpdataxx
       // data is assumed to be contiguous and in the same layout as hdf variable
       void record_aux(const std::string &name, typename solver_t::real_t *data)
       {
-        assert(this->mem->rank() == 0);
+        assert(this->rank == 0);
 
         auto aux = (*hdfp).createDataSet(
           name,
@@ -229,18 +228,11 @@ namespace libmpdataxx
 
       public:
 
-      struct rt_params_t : parent_t::rt_params_t
-      {
-	std::string outdir;
-// TODO: pass adiitional info? (command_line, library versions, ...) (-> output_common?)
-      };
-
       // ctor
       hdf5(
 	typename parent_t::ctor_args_t args,
-	const rt_params_t &p
-      ) : parent_t(args, p),
-        outdir(p.outdir)
+	const typename parent_t::rt_params_t &p
+      ) : parent_t(args, p)
       { }
     };
   }; // namespace output

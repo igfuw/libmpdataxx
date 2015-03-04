@@ -26,6 +26,14 @@ if (NOT CXX11_SUPPORTED)
   message(FATAL_ERROR "C++11 compatibility test failed - please update your compiler.")
 endif()
 
+# generate a header file with git revision id
+if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
+  execute_process(COMMAND
+   bash -c "git log -1 --format=\"format:#define GIT_REVISION \\\"%H\\\"%n\" HEAD > libmpdata++/git_revision.hpp"
+   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} 
+  )
+endif()
+
 # the library
 add_subdirectory(libmpdata++) 
 
