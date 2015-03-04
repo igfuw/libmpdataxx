@@ -39,19 +39,19 @@ def errors(dir, time_l, x_lim):
         # outputing general info
         if time == time_l[0]:
             file = open(dir + "_stats.txt", "w")
-            file.write( "dx                                 = " + str(var_model["dx"])                       + "\n")
-            file.write( "dt                                 = " + str(var_model["dt"])                       + "\n")
+            file.write( "dx                                 = " + str(var_model["dx"])          + "\n")
+            file.write( "dt                                 = " + str(var_model["dt"])          + "\n")
             file.write( "number of points in the domain     = " + str(points_nr)                + "\n")
             file.write( "L_inf                              = max|h_m-h_an|"                    + "\n")
             file.write( "L_2                                = sqrt(sum(h_m-h_an)^2 / N) / time" + "\n" + "\n")
 
-        # outputting error statistics
-        file.write( "time                               = " + str(time)                         + "\n")
-        file.write( "max(h_an)                          = " + str(round(h_an.max(), 8))         + "\n")
-        file.write( "max(h_num)                         = " + str(round(var_model["h"].max(), 8))          + "\n")
-        file.write( "L_inf                              = " + str(round(delh_inf, 8))           + "\n")
-        file.write( "L_2                                = " + str(round(delh_2, 8))             + "\n" + "\n")
-        file.write( "max(px_num)                        = " + str(round(var_model["qx"].max(), 8))          + "\n")
+        # outputting error statistics                                             
+        file.write( "time                               = " + str(time)                            + "\n")
+        file.write( "max(h_an)                          = " + str(round(h_an.max(), 8))            + "\n")
+        file.write( "max(h_num)                         = " + str(round(var_model["h"].max(), 8))  + "\n")
+        file.write( "L_inf                              = " + str(round(delh_inf, 8))              + "\n")
+        file.write( "L_2                                = " + str(round(delh_2, 8))                + "\n")
+        file.write( "max(px_num)                        = " + str(round(var_model["qx"].max(), 8)) + "\n" + "\n")
     file.close()
         
 # printing errors at different time steps
