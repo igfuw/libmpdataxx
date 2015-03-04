@@ -56,7 +56,6 @@ def main(dir, casename_l, x_lim=8, time_an=[0,3], time=3):
     # plotting analytical solution
     analytic_fig(ax, x_lim, time_an)
     plt.savefig("1d_analytic.pdf")
-    plt.show()
     # plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l):
         plt.figure(ic+1, figsize = (6,3))
