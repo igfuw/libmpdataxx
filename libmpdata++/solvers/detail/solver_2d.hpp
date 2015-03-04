@@ -87,7 +87,10 @@ namespace libmpdataxx
  
         struct ctor_args_t
         {   
+          // <TODO> these should be common for 1D,2D,3D
+          int rank;
           typename parent_t::mem_t *mem;
+          // </TODO>
           typename parent_t::bcp_t &bcxl, &bcxr, &bcyl, &bcyr; 
           const rng_t &i, &j; 
         };  
@@ -105,6 +108,7 @@ namespace libmpdataxx
           const rt_params_t &p
         ) :
 	  parent_t(
+            args.rank,
             args.mem, 
             p, 
             idx_t<parent_t::n_dims>({args.i, args.j})

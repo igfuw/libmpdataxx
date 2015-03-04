@@ -47,6 +47,8 @@ namespace libmpdataxx
 
 	protected: 
         
+        const int rank;
+
         // declared here for output purposes
         real_t dt, di, dj, dk;
 
@@ -64,7 +66,7 @@ namespace libmpdataxx
 	virtual void cycle(int e) final
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
-          if (e == n_eqns - 1) this->mem->cycle(); 
+          if (e == n_eqns - 1) mem->cycle(rank); 
 	}
 
 	virtual void xchng(int e) = 0;
@@ -112,7 +114,13 @@ namespace libmpdataxx
         };
 
 	// ctor
-	solver_common(mem_t *mem, const rt_params_t &p, const decltype(ijk) &ijk) :
+	solver_common(
+          const int &rank, 
+          mem_t *mem, 
+          const rt_params_t &p, 
+          const decltype(ijk) &ijk
+        ) :
+          rank(rank), 
           dt(p.dt),
           di(0),
           dj(0),
@@ -148,12 +156,12 @@ namespace libmpdataxx
           // being generous about out-of-loop barriers 
           if (timestep == 0)
           {
-	    this->mem->barrier();
+	    mem->barrier();
 #if !defined(NDEBUG)
 	    hook_ante_loop_called = false;
 #endif
 	    hook_ante_loop(nt);
-	    this->mem->barrier();
+	    mem->barrier();
           }
 
           // moved here so that if an exception is thrown from hook_ante_loop these do not cause complaints
@@ -168,8 +176,8 @@ namespace libmpdataxx
 	    monitor(float(timestep) / nt);  // TODO: does this value make sanse with repeated advence() calls?
 
             // might be used to implement multi-threaded signal handling
-            this->mem->barrier();
-            if (this->mem->panic) break;
+            mem->barrier();
+            if (mem->panic) break;
 
             // proper solver stuff
             hook_ante_step();
@@ -180,7 +188,7 @@ namespace libmpdataxx
 	    for (int e = 0; e < n_eqns; ++e) 
             { 
               advop(e);
-              if (e != n_eqns - 1) this->mem->barrier();
+              if (e != n_eqns - 1) mem->barrier();
             }
 	    for (int e = 0; e < n_eqns; ++e) cycle(e); // note: cycle assumes ascending loop index
 
@@ -190,7 +198,7 @@ namespace libmpdataxx
             hook_post_step();
 	  }   
 
-          this->mem->barrier();
+          mem->barrier();
           // note: hook_post_loop was removed as conficling with multiple-advance()-call logic
         }
 
@@ -201,7 +209,7 @@ namespace libmpdataxx
         // psi^{n+1} than psi^{n} (hence not using the name psi_n)
 	virtual const arr_t &state(const int &e) const final
 	{
-	  return this->mem->psi[e][n[e]];
+	  return mem->psi[e][n[e]];
 	}
 
         static rng_t rng_vctr(const int &n) { return rng_t(0, n-1)^h^(halo-1); }

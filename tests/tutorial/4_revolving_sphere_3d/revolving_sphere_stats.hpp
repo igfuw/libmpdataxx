@@ -23,7 +23,7 @@ struct stats : public parent_t
   void hook_ante_loop(const int nt)
   {
     parent_t::hook_ante_loop(nt);
-    if (this->mem->rank() != 0) return;
+    if (this->rank != 0) return;
 
     //checking what are the MPDATA options of each test simulation (iga / fct / ...) 
     //basing on hdf outdir name and naming output stats file accordingly
@@ -47,7 +47,7 @@ struct stats : public parent_t
   {
     parent_t::hook_post_step();
     this->mem->barrier();
-    if (this->mem->rank() != 0) return;
+    if (this->rank != 0) return;
     if (this->timestep == last_timestep) 
     { 
       // final condition

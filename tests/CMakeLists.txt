@@ -61,7 +61,7 @@ find_package(HDF5 COMPONENTS CXX HL REQUIRED)
 execute_process(
   COMMAND bash -c "
     TMP=`mktemp cmake-zdiff-XXXXX` &&
-    gzip -k $TMP                   &&
+    gzip < $TMP > $TMP.gz          &&
     zdiff $TMP.gz $TMP             &&
     rm $TMP $TMP.gz
   " 
