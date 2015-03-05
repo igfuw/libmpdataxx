@@ -1,5 +1,13 @@
 USAGE = 'Usage: pvpython plot.py timestep*.xmf'
 
+#TODO Paraview needs DISPLAY to be set, which won't work on Travis CI.
+#We have a workaround in CMakeLists.txt that skips this test in such cases.
+#It would be best to use the below code with cmake skip test but ...
+# ... see https://public.kitware.com/Bug/view.php?id=13825
+#import os, sys
+#if (not os.environ.has_key("DISPLAY") or os.environ["DISPLAY"]==""):
+#  sys.exit(44)
+
 from sys import argv, exit
 from math import sqrt
 
