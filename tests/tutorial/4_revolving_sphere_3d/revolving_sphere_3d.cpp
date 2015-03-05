@@ -21,9 +21,9 @@ void test(const std::string& dir_name)
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
-  //<listing-1>
+//<listing-1>
     enum { n_dims = 3 };
-  //</listing-1>
+//</listing-1>
     enum { n_eqns = 1 };
     enum { opts = opts_arg };
   };
