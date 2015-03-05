@@ -2,7 +2,7 @@
 set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CXX_FLAGS}") 
 
 # OpenMP
-find_package(OpenMP)
+find_package(OpenMP QUIET)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 #find_package(Threads REQUIRED) # does not work for clang :(
@@ -35,8 +35,9 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE} -pg")
 find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnuplot-iostream.h)
 if (NOT GNUPLOT-IOSTREAM_INCLUDE_DIR)
   message(FATAL_ERROR "
-  gnuplot-iostream not found.
-  Please install it (e.g. sudo apt-get install libgnuplot-iostream-dev).
+  gnuplot-iostream not found. Please install it, e.g.:
+    Debian/Ubuntu: sudo apt-get install libgnuplot-iostream-dev
+    manual: wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h 
 ")
 endif()
 # TODO: should't this path be added somewhere now?

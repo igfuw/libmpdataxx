@@ -233,7 +233,12 @@ namespace libmpdataxx
 	typename parent_t::ctor_args_t args,
 	const typename parent_t::rt_params_t &p
       ) : parent_t(args, p)
-      { }
+      {
+        // TODO: clean it up - it should not be here
+        // overrding the default from output_common
+        if (this->outvars.size() == 1 && parent_t::n_eqns == 1)
+          this->outvars[0].name = "psi";
+      }
     };
   }; // namespace output
 }; // namespace libmpdataxx
