@@ -118,7 +118,7 @@ namespace libmpdataxx
           // else
           where(
             // if
-            psi(i+1) > 0, // TODO: what if crossing zero?
+            psi(i+1) > 0,
             // then
             min(1, min(
               beta_up(i    ), 
