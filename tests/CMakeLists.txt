@@ -102,7 +102,7 @@ function(libmpdataxx_add_test_gi test)
   add_test(NAME "init_${test}" COMMAND "bash" "-c" "> log-$PPID")
   add_test(NAME "calc_${test}" COMMAND "bash" "-c" "GNUPLOT_IOSTREAM_CMD=\"cat >> log-`echo $PPID`\" ${CMAKE_CURRENT_BINARY_DIR}/${test}")
   add_test(NAME "plot_${test}" COMMAND "bash" "-c" "gnuplot log-$PPID")
-  add_test(NAME "diff_${test}" COMMAND "bash" "-c" "zdiff log-$PPID ${CMAKE_CURRENT_SOURCE_DIR}/log-orig.gz && rm log-$PPID")
+  add_test(NAME "diff_${test}" COMMAND "bash" "-c" "zdiff log-$PPID ${CMAKE_CURRENT_SOURCE_DIR}/refdata/log-orig.gz && rm log-$PPID")
 endfunction()
 
 # tests
