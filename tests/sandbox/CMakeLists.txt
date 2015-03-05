@@ -1,11 +1,30 @@
-add_subdirectory(gnuplot-iostream_1d)
-add_subdirectory(gnuplot-iostream_2d)
-add_subdirectory(var_sign_2d)
-add_subdirectory(mpdata_fct_1d)
-add_subdirectory(mpdata_1d_opt_abs)
-add_subdirectory(mpdata_1d_opt_tot)
-add_subdirectory(mpdata_1d_opt_npa)
-add_subdirectory(mpdata_1d_opt_iga)
-add_subdirectory(spreading_drop_2d)
+cmake_minimum_required(VERSION 2.8.12)
+project(libmpdata++-tests-sandbox CXX)
+
+include(${CMAKE_SOURCE_DIR}/../../libmpdata++-config.cmake)
+if(NOT libmpdataxx_FOUND) 
+  message(FATAL_ERROR "local libmpdata++-config.cmake not found!")
+endif()
+
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(CMAKE_CXX_FLAGS ${libmpdataxx_CXX_FLAGS_RELEASE})
+  set(CMAKE_CXX_FLAGS_RELEASE "")
+else()
+  set(CMAKE_CXX_FLAGS_DEBUG ${libmpdataxx_CXX_FLAGS_DEBUG})
+endif()
+
+# to make <libmpdata++/...> work
+set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CXX_FLAGS}")
+
+# macro to be used in the subdirectories
+function(libmpdataxx_add_test test)
+  add_executable(${test} ${test}.cpp)
+  target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
+  target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
+  add_test(${test} ${test})
+endfunction()
+
+enable_testing()
+
 add_subdirectory(straka)
 add_subdirectory(turbulence)

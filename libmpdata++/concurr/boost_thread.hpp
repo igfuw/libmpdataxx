@@ -9,9 +9,9 @@
 #include <libmpdata++/concurr/detail/concurr_common.hpp>
 
 // TODO: make it work with clang as well!
-#if !defined(_REENTRANT)
-#  error _REENTRANT not defined, please use something like -pthread flag for gcc
-#endif
+//#if !defined(_REENTRANT)
+//#  error _REENTRANT not defined, please use something like -pthread flag for gcc
+//#endif
 #include <boost/thread.hpp>
 
 #include <cstdlib> // std::getenv()

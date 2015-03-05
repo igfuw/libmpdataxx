@@ -63,38 +63,49 @@ install:
 
 script:
     # libmpdata++
+    - cmake .
+    - cd ..
+
+    # compiling and running all unit tests in Debug mode
+    - cd tests/unit
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
+    - VERBOSE=1 make -j 4
+    - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - cd ../../
 
-    # compiling and running all unit tests in Debug mode
-    - VERBOSE=1 make -C tests/unit
-    - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-
-    # compiling and running selected tutorial tests in Debug mode
-    - VERBOSE=1 make -C tests/tutorial/6_coupled_harmosc
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    # compiling and running selected paper tests in Debug mode
+    - cd tests/paper_2015_GMD
+    - mkdir build
+    - cd build
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
+    - VERBOSE=1 make -C 6_coupled_harmosc
+    - OMP_NUM_THREADS=4 make -C 6_coupled_harmosc test || cat 6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
 
     # compiling everything in the Release mode
     - cmake -DCMAKE_BUILD_TYPE=Release ../
-    - VERBOSE=1 make
+    - VERBOSE=1 make -j 4
 
-    # running selected tests in Release mode for 1 and 4 threads
-    - OMP_NUM_THREADS=1 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=1 make -C tests/tutorial/0_basic_example test || cat tests/tutorial/0_basic_example/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=1 make -C tests/tutorial/1_advscheme_opts test || cat tests/tutorial/1_advscheme_opts/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/2_convergence_1d test || cat tests/tutorial/2_convergence_1d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/3_rotating_cone_2d test || cat tests/tutorial/3_rotating_cone_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/4_revolving_sphere_3d test || cat tests/tutorial/4_revolving_sphere_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/5_over_the_pole_2d test || cat tests/tutorial/5_over_the_pole_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/7_shallow_water test || cat tests/tutorial/7_shallow_water/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/8_boussinesq_2d test || cat tests/tutorial/8_boussinesq_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    # running all paper tests in Release mode 
+    #- OMP_NUM_THREADS=1 make -C test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make -C test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - cd ../..
+
+    # compiling but _not_ running sandbox tests 
+    - cd tests/sandbox
+    - mkdir build
+    - cd build
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
+    - VERBOSE=1 make -j 4
+    - cd ../..
 
     # installing
+    - cd libmpdata++
     - sudo make install
     - cd ../..
 

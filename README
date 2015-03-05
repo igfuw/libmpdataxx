@@ -1,17 +1,38 @@
 libmpdata++
 ===========
 
-0. Please check: http://arxiv.org/abs/1407.1309
+0. To get more information on libmpdata++, please check: 
+  - http://libmpdataxx.igf.fuw.edu.pl/
+  - http://arxiv.org/abs/1407.1309
+  - http://www.geosci-model-dev-discuss.net/7/8179/2014/
 
-1. Install CMake
-
-2. Try an automated build the stadard CMake's way 
-   (CMake will warn about missing dependencies):
-
-  $ mkdir build 
+1. To check if all dependencies are availble, please try:
+  $ cd libmpdata++
+  $ cmake .
+  $ cd ..
+  
+2. To perform unit tests, please try:
+  $ cd tests/unit
+  $ mkdir build
   $ cd build
-  $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
-  $ cmake .. -DCMAKE_BUILD_TYPE=Release
+  $ cmake ..
   $ make
   $ make test
+  $ cd ../..
+
+3. To reproduce all results from the GMD paper, please try:
+  $ cd tests/paper_2015_GMD
+  $ mkdir build 
+  $ cd build
+  $ cmake ..
+  $ make
+  $ make test
+  $ cd ../..
+
+4. To install the library system-wide, please try:
+  $ cd libmpdata++
   $ sudo make install
+
+Some CMake hints:
+- to point CMake to a non-default C++ compiler (e.g. clang++):
+  $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
