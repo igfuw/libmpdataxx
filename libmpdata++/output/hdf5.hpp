@@ -232,8 +232,7 @@ namespace libmpdataxx
       hdf5(
 	typename parent_t::ctor_args_t args,
 	const typename parent_t::rt_params_t &p
-      ) : parent_t(args, p),
-        outdir(p.outdir)
+      ) : parent_t(args, p)
       {
         // TODO: clean it up - it should not be here
         // overrding the default from output_common
