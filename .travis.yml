@@ -63,8 +63,11 @@ install:
 
 script:
     # libmpdata++
-    - cmake .
-    - cd ..
+    - cd libmpdata++
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cd ../..
 
     # compiling and running all unit tests in Debug mode
     - cd tests/unit
@@ -75,7 +78,7 @@ script:
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -j 4
     - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - cd ../../
+    - cd ../../..
 
     # compiling and running selected paper tests in Debug mode
     - cd tests/paper_2015_GMD
@@ -93,7 +96,7 @@ script:
     # running all paper tests in Release mode 
     #- OMP_NUM_THREADS=1 make -C test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - OMP_NUM_THREADS=4 make -C test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - cd ../..
+    - cd ../../..
 
     # compiling but _not_ running sandbox tests 
     - cd tests/sandbox
@@ -102,10 +105,10 @@ script:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - VERBOSE=1 make -j 4
-    - cd ../..
+    - cd ../../..
 
     # installing
-    - cd libmpdata++
+    - cd libmpdata++/build
     - sudo make install
     - cd ../..
 

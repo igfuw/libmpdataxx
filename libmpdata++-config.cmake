@@ -1,4 +1,5 @@
 # TODO: optional components: hdf, gnuplot, openmp, threads, ...
+#TODO: FindPackageHandleStandardArgs?
 
 
 set(libmpdataxx_INCLUDE_DIRS "")

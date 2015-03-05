@@ -8,8 +8,10 @@ libmpdata++
 
 1. To check if all dependencies are availble, please try:
   $ cd libmpdata++
-  $ cmake .
-  $ cd ..
+  $ mkdir build
+  $ cd build
+  $ cmake ..
+  $ cd ../..
   
 2. To perform unit tests, please try:
   $ cd tests/unit
@@ -18,7 +20,7 @@ libmpdata++
   $ cmake ..
   $ make
   $ make test
-  $ cd ../..
+  $ cd ../../..
 
 3. To reproduce all results from the GMD paper, please try:
   $ cd tests/paper_2015_GMD
@@ -27,7 +29,7 @@ libmpdata++
   $ cmake ..
   $ make
   $ make test
-  $ cd ../..
+  $ cd ../../..
 
 4. To install the library system-wide, please try:
   $ cd libmpdata++
