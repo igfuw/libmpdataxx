@@ -4,7 +4,7 @@ set(libmpdataxx_FOUND False)
 set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
 set(libmpdataxx_CXX_FLAGS_DEBUG "-std=c++11")
-set(libmpdataxx_CXX_FLAGS_RELEASE "-std=c++11 -Wfatal-errors")
+set(libmpdataxx_CXX_FLAGS_RELEASE "-std=c++11")
 
 
 ############################################################################################
@@ -159,7 +159,7 @@ if(
   CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
   CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
 )
-  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -DNDEBUG -Ofast -march=native")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -I/usr/include -Wfatal-errors -DNDEBUG -Ofast -march=native")
 
   # preventing Kahan summation from being optimised out
   if (
