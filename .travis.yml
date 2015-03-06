@@ -22,6 +22,9 @@ before_install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export PATH=/usr/local/bin:$PATH; fi # so that brew-installed ones are first
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew tap homebrew/dupes; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gzip; fi
+     
+    # to avoid problems with plotting by paraview on Travis
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then unset DISPLAY; fi 
 
 install:
     # compilers
