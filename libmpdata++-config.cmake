@@ -64,7 +64,9 @@ endif()
 ############################################################################################
 # multi-threading
 # find_package(ThreadsCXX) <- this requires C language to be enabled
-# TODO: better solution!
+# TODO: better solution! 
+# TODO: not needed for serial-only programs!
+# TODO: -fopenmp implies -pthread on gcc
 set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -pthread")
 set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
 
