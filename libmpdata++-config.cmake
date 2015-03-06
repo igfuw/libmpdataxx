@@ -80,7 +80,7 @@ if (NOT BLITZ_VER_AT_LEAST_0_10)
 endif()
 
 set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${BLITZ_INCLUDE_DIR}")
-set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARY}") #TODO: in principle only for debug mode
+set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARY}")
 
 ############################################################################################
 # OpenMP
@@ -99,12 +99,14 @@ if (NOT Boost_FOUND)
 ")
 endif()
 set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
+#TODO: include_dirs
 
 
 ############################################################################################
 # HDF5 libraries
 find_package(HDF5 COMPONENTS CXX HL) # REQUIRED?
 set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${HDF5_LIBRARIES}")
+#TODO: include_dirs
 
 
 ############################################################################################
@@ -118,7 +120,7 @@ if (NOT GNUPLOT-IOSTREAM_INCLUDE_DIR)
     manual: wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h 
 ")
 endif()
-
+set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${GNUPLOT-IOSTREAM_INCLUDE_DIR}")
 
 
 ############################################################################################

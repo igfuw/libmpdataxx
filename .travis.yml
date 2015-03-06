@@ -118,8 +118,10 @@ script:
     - mkdir build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release #TODO: Debug mode?
-    - make
-    - ./spreading_drop_2d_el 
+    #<TODO> - has to wait before commiting changes to shallow-water-elliptic-drop repo
+    #- make
+    #- ./spreading_drop_2d_el 
+    #</TODO>
     # TODO: make test!
     - cd ../../..
     
