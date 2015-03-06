@@ -36,30 +36,6 @@ endif()
 
 
 ############################################################################################
-# debug mode compiler flags
-set(libmpdataxx_CXX_FLAGS_DEBUG "-std=c++11 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
-
-
-############################################################################################
-# release mode compiler flags
-if(
-  CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
-  CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
-)
-  set(libmpdataxx_CXX_FLAGS_RELEASE "-std=c++11 -DNDEBUG -Ofast -march=native")
-
-  # preventing Kahan summation from being optimised out
-  if (
-    (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.6) OR
-    (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1) #TODO: never actually checked!
-  )
-    set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -fno-vectorize") 
-  endif()
-endif()
-
-
-############################################################################################
 # multi-threading
 # find_package(ThreadsCXX) <- this requires C language to be enabled
 # TODO: better solution! 
@@ -111,10 +87,8 @@ endif()
 
 ############################################################################################
 # Boost libraries
-message(STATUS "Looking for Boost")
 find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem QUIET)
 if(Boost_FOUND)
-  message(STATUS "Looking for Boost - found")
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
 else()
@@ -130,10 +104,8 @@ endif()
 
 ############################################################################################
 # HDF5 libraries
-message(STATUS "Looking for HDF5")
 find_package(HDF5 COMPONENTS CXX HL QUIET)
 if(HDF5_FOUND)
-  message(STATUS "Looking for HDF5 - found")
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${HDF5_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${HDF5_INCLUDE_DIRS}")
 else()
@@ -149,10 +121,8 @@ endif()
 
 ############################################################################################
 # gnuplot-iostream
-message(STATUS "Looking for gnuplot-iostream")
 find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnuplot-iostream.h)
 if(GNUPLOT-IOSTREAM_INCLUDE_DIR)
-  message(STATUS "Looking for gnuplot-iostream - found")
 else()
   message(STATUS "gnuplot-iostream not found.
 
@@ -164,10 +134,8 @@ else()
 endif()
 set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${GNUPLOT-IOSTREAM_INCLUDE_DIR}")
 
-message(STATUS "Looking for gnuplot")
 find_program(GNUPLOT_FOUND NAMES gnuplot)
 if(GNUPLOT_FOUND)
-  message(STATUS "Looking for gnuplot - found")
 else()
   message(STATUS "gnuplot not found.
 
@@ -176,6 +144,30 @@ else()
 *   Debian/Ubuntu: sudo apt-get install gnuplot
 *   Homebrew: brew install gnuplot
   ")
+endif()
+
+
+############################################################################################
+# debug mode compiler flags
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++11 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
+
+
+############################################################################################
+# release mode compiler flags
+if(
+  CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
+  CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+)
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++11 -DNDEBUG -Ofast -march=native")
+
+  # preventing Kahan summation from being optimised out
+  if (
+    (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.6) OR
+    (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1) #TODO: never actually checked!
+  )
+    set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -fno-vectorize") 
+  endif()
 endif()
 
 
