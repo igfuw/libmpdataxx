@@ -15,7 +15,8 @@ import os
 # checking arguments
 if (
     len(argv) != 2 or
-    not argv[1].startswith('timestep') or
+    #not argv[1].startswith('timestep') or
+    not argv[1].rpartition('/')[2].startswith('timestep') or
     not argv[1].endswith('.xmf')
    ):
     print USAGE
@@ -57,8 +58,10 @@ ort_dp.ColorArrayName = 'psi'
 # assigning color map to scalar values
 psi = ort.CellData.GetArray('psi')
 path = os.path.abspath(os.path.dirname(__file__))
-LoadLookupTable(path + '/cmap.xml')
-ort_dp.LookupTable=AssignLookupTable(psi, 'my_set1', [0, 1])
+
+if "LoadLookupTable" in dir(paraview.simple):
+	LoadLookupTable(path + '/cmap.xml')
+	ort_dp.LookupTable=AssignLookupTable(psi, 'my_set1', [0, 1])
 
 # psi contours
 ct = Contour()
@@ -114,13 +117,14 @@ y_ct_dp.AmbientColor = [0, 0, 0]
 y_ct_dp.LineWidth = 1
 
 # color bar
-lt = GetLookupTableForArray('psi', 6)
-bar = CreateScalarBar(LookupTable = ort_dp.LookupTable)
-bar.Position = [0.9, 0.25]
-bar.LabelColor = [0, 0, 0]
-bar.NumberOfLabels = 6
-bar.LabelFontSize = 16
-view.Representations.append(bar)
+if "LoadLookupTable" in dir(paraview.simple):
+	lt = GetLookupTableForArray('psi', 6)
+	bar = CreateScalarBar(LookupTable = ort_dp.LookupTable)
+	bar.Position = [0.9, 0.25]
+	bar.LabelColor = [0, 0, 0]
+	bar.NumberOfLabels = 6
+	bar.LabelFontSize = 16
+	view.Representations.append(bar)
 
 Render()
 
