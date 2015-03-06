@@ -3,8 +3,8 @@
 set(libmpdataxx_FOUND False)
 set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
-set(libmpdataxx_CXX_FLAGS_DEBUG "-std=c++11")
-set(libmpdataxx_CXX_FLAGS_RELEASE "-std=c++11")
+set(libmpdataxx_CXX_FLAGS_DEBUG "")
+set(libmpdataxx_CXX_FLAGS_RELEASE "")
 
 
 ############################################################################################
@@ -17,6 +17,30 @@ else()
   # needed for the OpenMP test to work in C++-only project 
   # (see http://public.kitware.com/Bug/view.php?id=11910)
   cmake_minimum_required(VERSION 2.8.8) 
+endif()
+
+
+############################################################################################
+# debug mode compiler flags
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++11 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
+
+
+############################################################################################
+# release mode compiler flags
+if(
+  CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
+  CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+)
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++11 -DNDEBUG -Ofast -march=native")
+
+  # preventing Kahan summation from being optimised out
+  if (
+    (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.6) OR
+    (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1) #TODO: never actually checked!
+  )
+    set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -fno-vectorize") 
+  endif()
 endif()
 
 
@@ -144,30 +168,6 @@ else()
 *   Debian/Ubuntu: sudo apt-get install gnuplot
 *   Homebrew: brew install gnuplot
   ")
-endif()
-
-
-############################################################################################
-# debug mode compiler flags
-set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
-
-
-############################################################################################
-# release mode compiler flags
-if(
-  CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
-  CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
-)
-  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -I/usr/include -Wfatal-errors -DNDEBUG -Ofast -march=native")
-
-  # preventing Kahan summation from being optimised out
-  if (
-    (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.6) OR
-    (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.1) #TODO: never actually checked!
-  )
-    set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -fno-vectorize") 
-  endif()
 endif()
 
 
