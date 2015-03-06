@@ -94,8 +94,8 @@ script:
     - VERBOSE=1 make -j 4
 
     # running all paper tests in Release mode 
-    #- OMP_NUM_THREADS=1 make -C test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    #- OMP_NUM_THREADS=1 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - cd ../../..
 
     # compiling but _not_ running sandbox tests 

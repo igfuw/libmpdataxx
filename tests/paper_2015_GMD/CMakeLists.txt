@@ -65,6 +65,8 @@ function(libmpdataxx_add_test_gi test)
   add_test(NAME "diff_${test}" COMMAND "bash" "-c" "zdiff log-$PPID ${CMAKE_CURRENT_SOURCE_DIR}/refdata/log-orig.gz && rm log-$PPID")
 endfunction()
 
+enable_testing()
+
 # adv
 add_subdirectory(0_basic_example)
 add_subdirectory(1_advscheme_opts)

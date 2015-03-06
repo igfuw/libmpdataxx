@@ -6,7 +6,7 @@ libmpdata++
   - http://arxiv.org/abs/1407.1309
   - http://www.geosci-model-dev-discuss.net/7/8179/2014/
 
-1. To check if all dependencies are availble, please try:
+1. Please start with:
   $ cd libmpdata++
   $ mkdir build
   $ cd build
@@ -38,3 +38,8 @@ libmpdata++
 Some CMake hints:
 - to point CMake to a non-default C++ compiler (e.g. clang++):
   $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
+- to switch to debug-mode compilation (has to be done after compiler choice):
+  $ cmake .. -DCMAKE_BUILD_TYPE=Debug
+- to switch back to release-mode (the default):
+  $ cmake .. -DCMAKE_BUILD_TYPE=Release
+  
