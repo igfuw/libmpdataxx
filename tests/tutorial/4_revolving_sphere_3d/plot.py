@@ -51,6 +51,8 @@ th_dp.Representation = "Surface With Edges"
 th_dp.DiffuseColor = [1, 1, 1]
 th_dp.EdgeColor = [0, 0, 0]
 
+th.Scalars = ["CELLS", "psi"]
+
 Show(th)
 
 L = 100
