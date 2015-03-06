@@ -4,7 +4,7 @@ set(libmpdataxx_FOUND False)
 set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
 set(libmpdataxx_CXX_FLAGS_DEBUG "-std=c++11")
-set(libmpdataxx_CXX_FLAGS_RELEASE "-std=c++11")
+set(libmpdataxx_CXX_FLAGS_RELEASE "-std=c++11 -Wfatal-errors")
 
 
 ############################################################################################
