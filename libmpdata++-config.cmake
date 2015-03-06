@@ -39,7 +39,7 @@ endif()
 
 ############################################################################################
 # debug mode compiler flags
-set(libmpdataxx_CXX_FLAGS_DEBUG "-std=c++11 -DBZ_DEBUG -g")
+set(libmpdataxx_CXX_FLAGS_DEBUG "-std=c++11 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
 
 
 ############################################################################################
@@ -59,6 +59,14 @@ if(
     set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -fno-vectorize") 
   endif()
 endif()
+
+
+############################################################################################
+# multi-threading
+# find_package(ThreadsCXX) <- this requires C language to be enabled
+# TODO: better solution!
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -pthread")
+set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
 
 
 ############################################################################################
