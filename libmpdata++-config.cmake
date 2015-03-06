@@ -2,9 +2,11 @@
 #TODO: FindPackageHandleStandardArgs?
 
 
+############################################################################################
+# the following variables will be set:
+set(libmpdataxx_FOUND False)
 set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
-set(libmpdataxx_FOUND "")
 set(libmpdataxx_CXX_FLAGS_DEBUG "")
 set(libmpdataxx_CXX_FLAGS_RELEASE "")
 

@@ -15,7 +15,7 @@ osx_image: xcode611
 before_install:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ utopic main universe multiverse"; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t utopic -y"; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo brew tap homebrew/science; fi
 
