@@ -1,0 +1,33 @@
+Development of libmpdata++ has been carried out at the
+Faculty of Physics [1], University of Warsaw [2], Poland.
+The University of Warsaw holds the copyright to libmpdata++.
+
+The development was funded mainly by the Poland's National
+Science Centre (NCN, [3]).
+
+The development team consists of (in alphabetic order):
+
+  Sylwester Arabas 
+    (core code, library design, OOP-formulae concepts [4], 
+    concurrency, gnuplot output)
+  Dorota Jarecka 
+    (shallow-water systems, OOP-formulae concepts [4])
+  Anna Jaruga 
+    (core code, non-oscillatory option, pressure solvers, 
+    automatic tests, OOP-formulae concepts [4], documentation [5])
+  Hanna Pawłowska 
+    (team management)
+  Piotr Smolarkiewicz (the author of MPDATA)
+    (consultancy, numerics, documentation [5])
+  Maciej Waruszewski 
+    (core code, extension to 3D, diffusion terms, 
+    non-carthesian geometry, performance optimisations, 
+    3D visualisation, open & rigid boundary conditions,
+    HDF5/XDMF output)
+
+[1]: http://www.fuw.edu.pl/
+[2]: http://en.uw.edu.pl/
+[3]: http://www.ncn.gov.pl/
+[4]: http://dx.doi.org/10.3233/SPR-140379
+[5]: http://arxiv.org/abs/1407.1309 
+     http://www.geosci-model-dev-discuss.net/7/8179/2014/
