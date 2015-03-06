@@ -3,8 +3,8 @@
 set(libmpdataxx_FOUND False)
 set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
-set(libmpdataxx_CXX_FLAGS_DEBUG "")
-set(libmpdataxx_CXX_FLAGS_RELEASE "")
+set(libmpdataxx_CXX_FLAGS_DEBUG "-std=c++11")
+set(libmpdataxx_CXX_FLAGS_RELEASE "-std=c++11")
 
 
 ############################################################################################
@@ -33,16 +33,6 @@ check_cxx_source_compiles("
 if (NOT CXX11_SUPPORTED)
   message(FATAL_ERROR "C++11 compatibility test failed - please update your compiler or point CMake to another one with -DCMAKE_CXX_COMPILER=...")
 endif()
-
-
-############################################################################################
-# multi-threading
-# find_package(ThreadsCXX) <- this requires C language to be enabled
-# TODO: better solution! 
-# TODO: not needed for serial-only programs!
-# TODO: -fopenmp implies -pthread on gcc
-set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -pthread")
-set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
 
 
 ############################################################################################
@@ -86,6 +76,16 @@ endif()
 
 
 ############################################################################################
+# multi-threading
+# find_package(ThreadsCXX) <- this requires C language to be enabled
+# TODO: better solution! 
+# TODO: not needed for serial-only programs!
+# TODO: -fopenmp implies -pthread on gcc
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -pthread")
+set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
+
+
+############################################################################################
 # Boost libraries
 find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem QUIET)
 if(Boost_FOUND)
@@ -123,6 +123,7 @@ endif()
 # gnuplot-iostream
 find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnuplot-iostream.h)
 if(GNUPLOT-IOSTREAM_INCLUDE_DIR)
+  set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${GNUPLOT-IOSTREAM_INCLUDE_DIR}")
 else()
   message(STATUS "gnuplot-iostream not found.
 
@@ -132,7 +133,6 @@ else()
 *   manual: wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h 
   ")
 endif()
-set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${GNUPLOT-IOSTREAM_INCLUDE_DIR}")
 
 find_program(GNUPLOT_FOUND NAMES gnuplot)
 if(GNUPLOT_FOUND)
@@ -149,7 +149,7 @@ endif()
 
 ############################################################################################
 # debug mode compiler flags
-set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++11 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
 
 
 ############################################################################################
@@ -159,7 +159,7 @@ if(
   CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
   CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
 )
-  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++11 -DNDEBUG -Ofast -march=native")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -DNDEBUG -Ofast -march=native")
 
   # preventing Kahan summation from being optimised out
   if (

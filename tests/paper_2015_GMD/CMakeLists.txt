@@ -57,6 +57,7 @@ endfunction()
 function(libmpdataxx_add_test_gi test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
+  target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
 
   # this will not work with multiple threads (make -j) as it depends on the order of execution + $PPID might be different?
   add_test(NAME "init_${test}" COMMAND "bash" "-c" "> log-$PPID")
