@@ -1,7 +1,3 @@
-# TODO: optional components: hdf, gnuplot, openmp, threads, ...
-#TODO: FindPackageHandleStandardArgs?
-
-
 ############################################################################################
 # the following variables will be set:
 set(libmpdataxx_FOUND False)
@@ -82,7 +78,12 @@ include(CheckIncludeFileCXX)
 set(CMAKE_REQUIRED_FLAGS "-I${BLITZ_INCLUDE_DIR}")
 check_include_file_cxx("blitz/array.h" BLITZ_FOUND)
 if (NOT BLITZ_FOUND)
-  message(FATAL_ERROR "Blitz++ includes not found - please install Blitz++ or point CMake to it.")
+  message(FATAL_ERROR "Blitz++ includes not found.
+
+* To insall Blitz++, please try:
+*   Debian/Ubuntu: sudo apt-get install libblitz0-dev
+*   Homebrew: brew install blitz
+  ")
 endif()
 
 include(CheckCXXSourceCompiles)
@@ -97,42 +98,85 @@ set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARY}")
 ############################################################################################
 # OpenMP
 find_package(OpenMP QUIET)
-set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS}")
-set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS}")
+if(OPENMP_FOUND)
+  set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS}")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS}")
+else()
+  message(STATUS "OpenMP not supported by the compiler.
+
+* Programs using libmpdata++'s OpenMP concurrency will compile but run in serial mode
+  ")
+endif()
 
 
 ############################################################################################
 # Boost libraries
+message(STATUS "Looking for Boost")
 find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem QUIET)
-if (NOT Boost_FOUND)
-  message(FATAL_ERROR "
-  Boost.{Thread,date_time,system,iostreams,timer,filesystem} not found.
-  Please install it (e.g. sudo apt-get install libboost-all-dev).
-")
+if(Boost_FOUND)
+  message(STATUS "Looking for Boost - found")
+  set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
+  set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
+else()
+  #TODO: check separately for optional and mandatory components
+  message(FATAL_ERROR "Boost (or some of its components) not found.
+
+* Programs based on libmpdata++ will not compile. 
+* To insall Boost, please try:
+*   Debian/Ubuntu: sudo apt-get install libboost-all-dev
+  ")
 endif()
-set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
-#TODO: include_dirs
 
 
 ############################################################################################
 # HDF5 libraries
-find_package(HDF5 COMPONENTS CXX HL) # REQUIRED?
-set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${HDF5_LIBRARIES}")
-#TODO: include_dirs
+message(STATUS "Looking for HDF5")
+find_package(HDF5 COMPONENTS CXX HL QUIET)
+if(HDF5_FOUND)
+  message(STATUS "Looking for HDF5 - found")
+  set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${HDF5_LIBRARIES}")
+  set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${HDF5_INCLUDE_DIRS}")
+else()
+  message(STATUS "HDF5 not found. 
+
+* Programs using libmpdata++'s HDF5 output will not compile.
+* To install HDF5, please try:
+*   Debian/Ubuntu: sudo apt-get install libhdf5-serial-dev hdf5-tools
+*   Homebrew: brew install hdf5 --with-cxx
+  ")
+endif()
 
 
 ############################################################################################
 # gnuplot-iostream
-#TODO: check if gnuplot installed
+message(STATUS "Looking for gnuplot-iostream")
 find_path(GNUPLOT-IOSTREAM_INCLUDE_DIR PATH_SUFFIXES gnuplot-iostream/ NAMES gnuplot-iostream.h)
-if (NOT GNUPLOT-IOSTREAM_INCLUDE_DIR)
-  message(FATAL_ERROR "
-  gnuplot-iostream not found. Please install it, e.g.:
-    Debian/Ubuntu: sudo apt-get install libgnuplot-iostream-dev
-    manual: wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h 
-")
+if(GNUPLOT-IOSTREAM_INCLUDE_DIR)
+  message(STATUS "Looking for gnuplot-iostream - found")
+else()
+  message(STATUS "gnuplot-iostream not found.
+
+* Programs using libmpdata++'s gnuplot-iostream output will not compile.
+* To install gnuplot-iostream, please try:
+*   Debian/Ubuntu: sudo apt-get install libgnuplot-iostream-dev
+*   manual: wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h 
+  ")
 endif()
 set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${GNUPLOT-IOSTREAM_INCLUDE_DIR}")
+
+message(STATUS "Looking for gnuplot")
+find_program(GNUPLOT_FOUND NAMES gnuplot)
+if(GNUPLOT_FOUND)
+  message(STATUS "Looking for gnuplot - found")
+else()
+  message(STATUS "gnuplot not found.
+
+* Programs using libmpdata++'s gnuplot-iostream output will not run.
+* To install gnuplot, please try:
+*   Debian/Ubuntu: sudo apt-get install gnuplot
+*   Homebrew: brew install gnuplot
+  ")
+endif()
 
 
 ############################################################################################

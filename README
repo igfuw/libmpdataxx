@@ -35,11 +35,16 @@ libmpdata++
   $ cd libmpdata++
   $ sudo make install
 
+
 Some CMake hints:
 - to point CMake to a non-default C++ compiler (e.g. clang++):
   $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
+
 - to switch to debug-mode compilation (has to be done after compiler choice):
   $ cmake .. -DCMAKE_BUILD_TYPE=Debug
+
 - to switch back to release-mode (the default):
   $ cmake .. -DCMAKE_BUILD_TYPE=Release
   
+- the quickest way to clean all files from a previous build (incl. all CMake caches)
+  $ rm -rf build
