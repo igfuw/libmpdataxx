@@ -10,7 +10,9 @@ endif()
 # the policies we care about:
 # - CMP0025 - make CMake distinguis between Apple and LLVM clang
 # - CMP0042 - make CMake use RPATHs on OSX
-cmake_policy(VERSION 3.0)
+if(CMAKE_VERSION VERSION_GREATER 2.9)
+  cmake_policy(VERSION 3.0)
+endif()
 
 ############################################################################################
 # the following variables will be set:
