@@ -27,6 +27,10 @@ before_install:
     # to avoid problems with plotting by paraview on Travis
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then unset DISPLAY; fi 
 
+    # you may not believe it, but GCC (4.8.2) is giving ICEs otherwise!
+    - export make_j="make -j 4"
+    - if [[ $CXX == 'g++' ]]; then export make_j="make"; fi
+
 install:
     # compilers
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.5; fi
@@ -80,7 +84,7 @@ script:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
-    - VERBOSE=1 make #-j 4
+    - VERBOSE=1 make_j
     - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - cd ../../..
 
@@ -96,7 +100,7 @@ script:
 
     # compiling everything in the Release mode
     - cmake -DCMAKE_BUILD_TYPE=Release ../
-    - VERBOSE=1 make #-j 4
+    - VERBOSE=1 make_j
 
     # running all paper tests in Release mode 
     #- OMP_NUM_THREADS=1 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
@@ -110,7 +114,7 @@ script:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake ..
-    - VERBOSE=1 make #-j 4
+    - VERBOSE=1 make_j
     - cd ../../..
 
     # installing
