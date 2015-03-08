@@ -1,3 +1,17 @@
+if(APPLE)
+  # needed for the XCode clang to be identified as AppleClang and not Clang
+  cmake_minimum_required(VERSION 3.0) 
+else()
+  # needed for the OpenMP test to work in C++-only project 
+  # (see http://public.kitware.com/Bug/view.php?id=11910)
+  cmake_minimum_required(VERSION 2.8.8) 
+endif()
+
+# the policies we care about:
+# - CMP0025 - make CMake distinguis between Apple and LLVM clang
+# - CMP0042 - make CMake use RPATHs on OSX
+cmake_policy(VERSION 3.0)
+
 ############################################################################################
 # the following variables will be set:
 set(libmpdataxx_FOUND False)
@@ -5,19 +19,6 @@ set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
 set(libmpdataxx_CXX_FLAGS_DEBUG "")
 set(libmpdataxx_CXX_FLAGS_RELEASE "")
-
-
-############################################################################################
-if(APPLE)
-  # needed for the XCode clang to be identified as AppleClang and not Clang
-  cmake_minimum_required(VERSION 3.0) 
-  cmake_policy(SET CMP0025 NEW)
-  cmake_policy(SET CMP0042 NEW)
-else()
-  # needed for the OpenMP test to work in C++-only project 
-  # (see http://public.kitware.com/Bug/view.php?id=11910)
-  cmake_minimum_required(VERSION 2.8.8) 
-endif()
 
 
 ############################################################################################
@@ -62,28 +63,29 @@ endif()
 ############################################################################################
 # Blitz++
 find_path(BLITZ_INCLUDE_DIR blitz/array.h) #TODO: Fedora uses different path for config.h!
-find_library(BLITZ_LIBRARY NAMES blitz)
-
-include(CheckIncludeFileCXX)
-set(CMAKE_REQUIRED_FLAGS "-I${BLITZ_INCLUDE_DIR}")
-check_include_file_cxx("blitz/array.h" BLITZ_FOUND)
-if (NOT BLITZ_FOUND)
+if (NOT BLITZ_INCLUDE_DIR)
   message(FATAL_ERROR "Blitz++ includes not found.
 
 * To insall Blitz++, please try:
 *   Debian/Ubuntu: sudo apt-get install libblitz0-dev
 *   Homebrew: brew install blitz
   ")
-endif()
+else()
+  find_library(BLITZ_LIBRARY NAMES blitz)
 
-include(CheckCXXSourceCompiles)
-check_cxx_source_compiles("#include <blitz/array.h>\nint main(){blitz::Array<float,1> a(2); a = blitz::safeToReturn(a+a);}" BLITZ_VER_AT_LEAST_0_10)
-if (NOT BLITZ_VER_AT_LEAST_0_10)
-  message(FATAL_ERROR "Blitz++ ver >= 0.10 requirement not met - please update Blitz++.")
-endif()
+  include(CheckIncludeFileCXX)
+  set(CMAKE_REQUIRED_FLAGS "-I${BLITZ_INCLUDE_DIR}")
+  check_include_file_cxx("blitz/array.h" BLITZ_FOUND)
 
-set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${BLITZ_INCLUDE_DIR}")
-set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARY}")
+  include(CheckCXXSourceCompiles)
+  check_cxx_source_compiles("#include <blitz/array.h>\nint main(){blitz::Array<float,1> a(2); a = blitz::safeToReturn(a+a);}" BLITZ_VER_AT_LEAST_0_10)
+  if (NOT BLITZ_VER_AT_LEAST_0_10)
+    message(FATAL_ERROR "Blitz++ ver >= 0.10 requirement not met - please update Blitz++.")
+  endif()
+
+  set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${BLITZ_INCLUDE_DIR}")
+  set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARY}")
+endif()
 
 ############################################################################################
 # OpenMP

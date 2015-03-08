@@ -1,10 +1,25 @@
 libmpdata++
 ===========
 
-0. To get more information on libmpdata++, please check: 
+To get more information on libmpdata++, please check: 
   - http://libmpdataxx.igf.fuw.edu.pl/
   - http://arxiv.org/abs/1407.1309
   - http://www.geosci-model-dev-discuss.net/7/8179/2014/
+
+In short, libmpdata++ is a header-only C++ library. Compilation
+of programs that use libmpdata++ requires:
+- a C++11 compliant compiler
+- Blitz++ and Boost C++ libraries
+- HDF5 and gnuplot-iostream libraries (optional)
+
+During development of libmpdata++, we are continuesly testing
+the code on Linux using GCC and LLVM/Clang as well as on OSX
+using Apple/Clang - these are considered the supported platforms.
+
+Compilation and execution of the examples shipped with libmpdata++ 
+is easiest done using CMake, and the following instructions assume
+you're using CMake. Some hints on CMake usage are included at the
+end of this file.
 
 1. Please start with:
   $ cd libmpdata++
@@ -48,3 +63,6 @@ Some CMake hints:
   
 - the quickest way to clean all files from a previous build (incl. all CMake caches)
   $ rm -rf build
+
+- the output of commands executed by "make test" can be viewed with:
+  $ less Testing/Temporary/LastTest.log
