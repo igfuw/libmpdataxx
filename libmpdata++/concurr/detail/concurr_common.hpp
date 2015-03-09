@@ -6,6 +6,11 @@
 
 #pragma once
 
+// ensuring thread-safe versions of system headers are used
+#if !defined(_REENTRANT)
+#  error _REENTRANT not defined, please use something like -pthread flag for gcc
+#endif
+
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <libmpdata++/blitz.hpp>
 

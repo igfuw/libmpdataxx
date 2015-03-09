@@ -1,17 +1,68 @@
 libmpdata++
 ===========
 
-0. Please check: http://arxiv.org/abs/1407.1309
+To get more information on libmpdata++, please check: 
+  - http://libmpdataxx.igf.fuw.edu.pl/
+  - http://arxiv.org/abs/1407.1309
+  - http://www.geosci-model-dev-discuss.net/7/8179/2014/
 
-1. Install CMake
+In short, libmpdata++ is a header-only C++ library. Compilation
+of programs that use libmpdata++ requires:
+- a C++11 compliant compiler
+- Blitz++ and Boost C++ libraries
+- HDF5 and gnuplot-iostream libraries (optional)
 
-2. Try an automated build the stadard CMake's way 
-   (CMake will warn about missing dependencies):
+During development of libmpdata++, we are continuesly testing
+the code on Linux using GCC and LLVM/Clang as well as on OSX
+using Apple/Clang - these are considered the supported platforms.
 
-  $ mkdir build 
+Compilation and execution of the examples shipped with libmpdata++ 
+is easiest done using CMake, and the following instructions assume
+you're using CMake. Some hints on CMake usage are included at the
+end of this file.
+
+1. Please start with:
+  $ cd libmpdata++
+  $ mkdir build
   $ cd build
-  $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
-  $ cmake .. -DCMAKE_BUILD_TYPE=Release
+  $ cmake ..
+  $ cd ../..
+  
+2. To perform unit tests, please try:
+  $ cd tests/unit
+  $ mkdir build
+  $ cd build
+  $ cmake ..
   $ make
   $ make test
+  $ cd ../../..
+
+3. To reproduce all results from the GMD paper, please try:
+  $ cd tests/paper_2015_GMD
+  $ mkdir build 
+  $ cd build
+  $ cmake ..
+  $ make
+  $ make test
+  $ cd ../../..
+
+4. To install the library system-wide, please try:
+  $ cd libmpdata++/build
   $ sudo make install
+
+
+Some CMake hints:
+- to point CMake to a non-default C++ compiler (e.g. clang++):
+  $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
+
+- to switch to debug-mode compilation (has to be done after compiler choice):
+  $ cmake .. -DCMAKE_BUILD_TYPE=Debug
+
+- to switch back to release-mode (the default):
+  $ cmake .. -DCMAKE_BUILD_TYPE=Release
+  
+- the quickest way to clean all files from a previous build (incl. all CMake caches)
+  $ rm -rf build
+
+- the output of commands executed by "make test" can be viewed with:
+  $ less Testing/Temporary/LastTest.log

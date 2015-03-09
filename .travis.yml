@@ -13,8 +13,9 @@ matrix:
 osx_image: xcode611
 
 before_install:
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo brew tap homebrew/science; fi
 
@@ -26,78 +27,98 @@ before_install:
     # to avoid problems with plotting by paraview on Travis
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then unset DISPLAY; fi 
 
+    # you may not believe it, but GCC (4.8.2) is giving ICEs otherwise!
+    - export make_j="make -j 4"
+    - if [[ $CXX == 'g++' ]]; then export make_j="make"; fi
+
 install:
     # compilers
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo apt-get install --no-install-recommends clang-3.5; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then sudo apt-get install --no-install-recommends g++; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.5; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then sudo $apt_get_install g++; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then brew install gcc48; fi   # would need a gcc-compiled boost ... (see note below)
 
     # boost
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-thread-dev libboost-timer-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread-dev libboost-timer-dev; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
 
     # cmake 
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y cmake; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install cmake; fi
 
     # blitz
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install blitz; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libblitz0-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libblitz0-dev; fi
 
     # hdf5
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends libhdf5-7; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libhdf5-serial-dev hdf5-tools; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libhdf5-7; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libhdf5-serial-dev hdf5-tools; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5 --with-cxx; fi
 
     # gnuplot-iostream
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty gnuplot-nox libgnuplot-iostream-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install gnuplot-nox libgnuplot-iostream-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h; fi
 
     # h5py
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y python-h5py; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python-h5py; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
 
     # scipy 
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y python-scipy; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python-scipy; fi
 
     # matplotlib
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y python-matplotlib; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python-matplotlib; fi
 
 script:
     # libmpdata++
+    - cd libmpdata++
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cd ../..
+
+    # compiling and running all unit tests in Debug mode
+    - cd tests/unit
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
+    - VERBOSE=1 $make_j
+    - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - cd ../../..
 
-    # compiling and running all unit tests in Debug mode
-    - VERBOSE=1 make -C tests/unit
-    - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-
-    # compiling and running selected tutorial tests in Debug mode
-    - VERBOSE=1 make -C tests/tutorial/6_coupled_harmosc
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    # compiling and running selected paper tests in Debug mode
+    - cd tests/paper_2015_GMD
+    - mkdir build
+    - cd build
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
+    - cmake -DCMAKE_BUILD_TYPE=Debug ../
+    - VERBOSE=1 make -C 6_coupled_harmosc
+    - OMP_NUM_THREADS=4 make -C 6_coupled_harmosc test || cat 6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
 
     # compiling everything in the Release mode
     - cmake -DCMAKE_BUILD_TYPE=Release ../
-    - VERBOSE=1 make
+    - VERBOSE=1 $make_j
 
-    # running selected tests in Release mode for 1 and 4 threads
-    - OMP_NUM_THREADS=1 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/unit test || cat tests/unit/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=1 make -C tests/tutorial/0_basic_example test || cat tests/tutorial/0_basic_example/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=1 make -C tests/tutorial/1_advscheme_opts test || cat tests/tutorial/1_advscheme_opts/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/2_convergence_1d test || cat tests/tutorial/2_convergence_1d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/3_rotating_cone_2d test || cat tests/tutorial/3_rotating_cone_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/4_revolving_sphere_3d test || cat tests/tutorial/4_revolving_sphere_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/5_over_the_pole_2d test || cat tests/tutorial/5_over_the_pole_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/6_coupled_harmosc test || cat tests/tutorial/6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/7_shallow_water test || cat tests/tutorial/7_shallow_water/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make -C tests/tutorial/8_boussinesq_2d test || cat tests/tutorial/8_boussinesq_2d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    # running all paper tests in Release mode 
+    #- OMP_NUM_THREADS=1 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - cd ../../..
+
+    # compiling but _not_ running sandbox tests 
+    - cd tests/sandbox
+    - mkdir build
+    - cd build
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
+    - cmake ..
+    - VERBOSE=1 $make_j
+    - cd ../../..
 
     # installing
+    - cd libmpdata++/build
     - sudo make install
     - cd ../..
 
@@ -107,13 +128,15 @@ script:
     - mkdir build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release #TODO: Debug mode?
-    - make
-    - ./spreading_drop_2d_el 
+    #<TODO> - has to wait before commiting changes to shallow-water-elliptic-drop repo
+    #- make
+    #- ./spreading_drop_2d_el 
+    #</TODO>
     # TODO: make test!
     - cd ../../..
     
     # libcloudph++'s dependencies
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-python-dev python-numpy libthrust-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-python-dev python-numpy libthrust-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install boost-python; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then git clone --depth=1 git://github.com/thrust/thrust.git; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust; fi
@@ -131,7 +154,7 @@ script:
     - cd ../..
 
     ## icicle (no tests - just testing if any changes in libmpdata's API did not break icicle)
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install --no-install-recommends -t trusty -y libboost-program-options-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-program-options-dev; fi
     - git clone --depth=1 git://github.com/igfuw/icicle.git
     - cd icicle
     - mkdir build 
