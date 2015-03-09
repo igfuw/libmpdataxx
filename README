@@ -47,7 +47,7 @@ end of this file.
   $ cd ../../..
 
 4. To install the library system-wide, please try:
-  $ cd libmpdata++
+  $ cd libmpdata++/build
   $ sudo make install
 
 
