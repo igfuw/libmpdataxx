@@ -34,8 +34,8 @@ before_install:
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
     - export PY3DEB=""
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++' ]]; then PY3DEB=3; fi
-    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
+    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
  
 install:
     # compilers
