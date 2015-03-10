@@ -10,7 +10,7 @@ def reading_modeloutput(dir, time):
     f_crd = h5py.File(dir+ "/coord.h5", "r")
     time_model = np.array(f_crd["T"])
     assert(time in time_model),"time level not in model output"
-    dir_model["dt"] = round(f_crd["T"].attrs["dt"], 4)
+    dir_model["dt"] = round(f_crd["T"].attrs["dt"][0], 4)
     # TODO dx should be written somewhere 
     dir_model["dx"] = np.array(f_crd["X"])[1]-np.array(f_crd["X"])[0]
     f_out = h5py.File(dir+"/timestep0000000" + str(int(time/dir_model["dt"]))+ '.h5', "r")
@@ -74,7 +74,7 @@ def evolution_test(dir, time_l=[1,2,3], x_lim=8):
     
 def main(dir, casename_l):
     for casename in casename_l:
-        print casename
+        print(casename)
         evolution_test(dir + str(casename)) #TODO: read it from the h5 file
         
 main("./", sys.argv[1:])
