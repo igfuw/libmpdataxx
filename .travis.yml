@@ -31,6 +31,12 @@ before_install:
     - export make_j="make -j 4"
     - if [[ $CXX == 'g++' ]]; then export make_j="make"; fi
 
+    # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
+    - export PY3DEB=""
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++' ]]; then PY3DEB=3; fi
+    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
+    - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
+ 
 install:
     # compilers
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.5; fi
@@ -60,14 +66,14 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h; fi
 
     # h5py
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python-h5py; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
 
     # scipy 
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python-scipy; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-scipy; fi
 
     # matplotlib
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python-matplotlib; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-matplotlib; fi
 
 script:
     # libmpdata++
@@ -136,7 +142,7 @@ script:
     - cd ../../..
     
     # libcloudph++'s dependencies
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-python-dev python-numpy libthrust-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-python-dev libthrust-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install boost-python; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then git clone --depth=1 git://github.com/thrust/thrust.git; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust; fi
