@@ -62,12 +62,12 @@ def errors(dir, time_l, xy_lim):
         # outputting error statistics
         fstring = (
                    "time                               = {time:.4f}\n"
-                   "max(h_an)                          = {max_h_an:.8f}\n"
-                   "max(h_num)                         = {max_h_num:.8f}\n"
-                   "L_inf                              = {L_inf:.8f}\n"
-                   "L_2                                = {L_2:.8f}\n"
-                   "max(px_num)                        = {max_px_num:.8f}\n"
-                   "max(py_num)                        = {max_py_num:.8f}\n\n"
+                   "max(h_an)                          = {max_h_an:.7f}\n"
+                   "max(h_num)                         = {max_h_num:.7f}\n"
+                   "L_inf                              = {L_inf:.7f}\n"
+                   "L_2                                = {L_2:.7f}\n"
+                   "max(px_num)                        = {max_px_num:.7f}\n"
+                   "max(py_num)                        = {max_py_num:.7f}\n\n"
                   )
         file.write(fstring.format(
                                   time = time,
