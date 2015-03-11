@@ -35,7 +35,6 @@ before_install:
     - export PY3DEB=""
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++' ]]; then PY3DEB=3; fi
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
-    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
  
 install:
     # compilers
@@ -74,6 +73,9 @@ install:
 
     # matplotlib
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-matplotlib; fi
+
+    # make Python 3 the default if requested
+    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
 
 script:
     # libmpdata++
