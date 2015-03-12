@@ -48,6 +48,8 @@ and install the library right away.
   $ make test
   $ cd ../../..
 
+The unit tests should complete in a dozen of seconds.
+
 3. To reproduce all results from the GMD paper, please try:
   $ cd tests/paper_2015_GMD
   $ mkdir build 
@@ -57,7 +59,7 @@ and install the library right away.
   $ make test     
   $ cd ../../..
 
-Running the above tests can take about 15 minutes. The "make test"
+This takes ca. 15 minutes on a quad-core laptop. The "make test"
 command performs simulations and also checks the output against
 reference data (tests/paper_2015_GMD/*/refdata/*). The subfolders
 of paper_2015_GMD correspond to consecutive chapters in the GMD
