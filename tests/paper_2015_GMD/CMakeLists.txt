@@ -54,6 +54,45 @@ if(NOT STATUS EQUAL 0)
   endif()
 endif()
 
+find_program(PVPYTHON_FOUND NAMES pvpython)
+if(NOT PVPYTHON_FOUND)
+  message(STATUS "pvpython not found.
+
+* Plotting scripts using Paraview will not work.
+* To install Paraview (incl. pvpython), please try:
+*   Debian/Ubuntu: sudo apt-get install paraview
+  ")
+endif()
+
+find_package(PythonInterp)
+if(NOT PYTHONINTERP_FOUND)
+  message(STATUS "Python not found, some tests scripts will not work.")
+endif()
+
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import matplotlib"
+  RESULT_VARIABLE IMPORT_MATPLOTLIB_EXITCODE OUTPUT_QUIET ERROR_QUIET
+)
+if(NOT ${IMPORT_MATPLOTLIB_EXITCODE} EQUAL 0)
+  message(STATUS "matplotlib not found.
+
+* Plotting scripts using matplotlib will not work.
+* To install matplotlib, please try:
+*   Debian/Ubuntu: sudo apt-get install python-matplotlib
+  ")
+endif()
+
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import scipy"
+  RESULT_VARIABLE IMPORT_SCIPY_EXITCODE OUTPUT_QUIET ERROR_QUIET
+)
+if(NOT ${IMPORT_SCIPY_EXITCODE} EQUAL 0)
+  message(STATUS "SciPy not found.
+
+* Some tests scripts will not work.
+* To install SciPy, please try:
+*   Debian/Ubuntu: sudo apt-get install python-scipy
+  ")
+endif()
+
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)

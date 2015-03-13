@@ -64,29 +64,19 @@ endif()
 
 ############################################################################################
 # Blitz++
-find_path(BLITZ_INCLUDE_DIR blitz/array.h) #TODO: Fedora uses different path for config.h!
-if (NOT BLITZ_INCLUDE_DIR)
-  message(FATAL_ERROR "Blitz++ includes not found.
+find_package(PkgConfig)
+pkg_check_modules(BLITZ QUIET blitz>=0.10)
+if (NOT BLITZ_FOUND)
+  message(FATAL_ERROR "Blitz++ library not found or Blitz++ version requirement not met (>=0.10)
 
 * To insall Blitz++, please try:
 *   Debian/Ubuntu: sudo apt-get install libblitz0-dev
+*   Fedora: sudo yum install blitz-devel
 *   Homebrew: brew install blitz
   ")
 else()
-  find_library(BLITZ_LIBRARY NAMES blitz)
-
-  include(CheckIncludeFileCXX)
-  set(CMAKE_REQUIRED_FLAGS "-I${BLITZ_INCLUDE_DIR}")
-  check_include_file_cxx("blitz/array.h" BLITZ_FOUND)
-
-  include(CheckCXXSourceCompiles)
-  check_cxx_source_compiles("#include <blitz/array.h>\nint main(){blitz::Array<float,1> a(2); a = blitz::safeToReturn(a+a);}" BLITZ_VER_AT_LEAST_0_10)
-  if (NOT BLITZ_VER_AT_LEAST_0_10)
-    message(FATAL_ERROR "Blitz++ ver >= 0.10 requirement not met - please update Blitz++.")
-  endif()
-
-  set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${BLITZ_INCLUDE_DIR}")
-  set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARY}")
+  set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${BLITZ_INCLUDE_DIRS}")
+  set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARIES}")
 endif()
 
 ############################################################################################
@@ -176,4 +166,6 @@ endif()
 
 
 ############################################################################################
+list(REMOVE_DUPLICATES libmpdataxx_INCLUDE_DIRS)
+list(REMOVE_ITEM libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_FOUND TRUE)
