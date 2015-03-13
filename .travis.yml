@@ -137,7 +137,7 @@ script:
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release #TODO: Debug mode?
     - make
-    - ./spreading_drop_2d_el 
+    #- ./spreading_drop_2d_el 
     # TODO: make test!
     - cd ../../..
     
