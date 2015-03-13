@@ -116,6 +116,7 @@ else()
 * Programs based on libmpdata++ will not compile. 
 * To insall Boost, please try:
 *   Debian/Ubuntu: sudo apt-get install libboost-all-dev
+*   Fedora: sudo yum install boost-devel
   ")
 endif()
 
@@ -132,6 +133,7 @@ else()
 * Programs using libmpdata++'s HDF5 output will not compile.
 * To install HDF5, please try:
 *   Debian/Ubuntu: sudo apt-get install libhdf5-serial-dev hdf5-tools
+*   Fedora: sudo yum install hdf5-devel
 *   Homebrew: brew install hdf5 --with-cxx
   ")
 endif()
@@ -160,6 +162,7 @@ else()
 * Programs using libmpdata++'s gnuplot-iostream output will not run.
 * To install gnuplot, please try:
 *   Debian/Ubuntu: sudo apt-get install gnuplot
+*   Fedora: sudo yum install gnuplot
 *   Homebrew: brew install gnuplot
   ")
 endif()
