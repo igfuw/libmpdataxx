@@ -9,11 +9,12 @@ To get more information on libmpdata++, please check:
 
 In short, libmpdata++ is a header-only C++ library. 
 Compilation of programs that use libmpdata++ requires:
-- a C++11 compliant compiler
+- a C++11 compliant compiler (optionally with OpenMP support)
 - Blitz++ and Boost C++ libraries
-- HDF5 and gnuplot-iostream libraries (optional)
+- HDF5 and gnuplot-iostream libraries 
+  (optional, depending on the type of output mechanism chosen)
 
-During development of libmpdata++, we are continuesly testing
+During development of libmpdata++, we are continuously testing
 the code on Linux using GCC and LLVM/Clang as well as on OSX
 using Apple/Clang - these are considered the supported platforms.
 
@@ -35,7 +36,7 @@ it may contain useful information on obtaining the dependencies.
   $ cd ../..
   
 The next two steps are optional test. Running the tests is highly
-recommended to verify if the library works correclty in your 
+recommended to verify if the library works correctly in your 
 environment. Nevertheless, in principle you can skip to step four
 and install the library right away.
   
@@ -60,10 +61,12 @@ The unit tests should complete in a dozen of seconds.
   $ cd ../../..
 
 This takes ca. 15 minutes on a quad-core laptop. The "make test"
-command performs simulations and also checks the output against
-reference data (tests/paper_2015_GMD/*/refdata/*). The subfolders
-of paper_2015_GMD correspond to consecutive chapters in the GMD
-paper.
+command performs simulations, checks the output against reference 
+data (tests/paper_2015_GMD/*/refdata/*) and plots all figures 
+included in the paper. The subfolders of paper_2015_GMD correspond 
+to consecutive chapters in the GMD paper. Some of the scripts run
+by "make test" require additional packages including Python, Python
+libraries (NumPy, SciPy, matplotlib) and Paraview.
 
 4. To install the library system-wide, please try:
   $ cd libmpdata++/build
@@ -81,14 +84,15 @@ Some CMake hints:
 - to alter the installation prefix (e.g. /usr/ instead of /usr/local):
   $ cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/usr
 
-- to switch to debug-mode compilation (has to be done after compiler choice):
+- to switch between debug and release (default) compilation modes 
+  (has to be done after compiler choice):
   $ cmake .. -DCMAKE_BUILD_TYPE=Debug
-
-- to switch back to release-mode (the default):
   $ cmake .. -DCMAKE_BUILD_TYPE=Release
   
-- the quickest way to clean all files from a previous build (CMake caches)
-  $ rm -rf build
+- two alternative ways of cleaning leftovers from a previous build 
+  (including CMake cache files):
+  $ rm -rf build/CMakeCache.txt build/CMakeFiles
+  $ rm -rf build; mkdir build
 
 - the output of commands executed by "make test" can be viewed with:
   $ less Testing/Temporary/LastTest.log
