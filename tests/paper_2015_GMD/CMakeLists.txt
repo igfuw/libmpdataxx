@@ -26,9 +26,6 @@ endif()
 # to make <libmpdata++/...> work
 set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CXX_FLAGS}")
 
-# TODO: check for Paraview (+ version requirement)
-# TODO: check for matplotlib, ...
-
 # gzip
 execute_process(
   COMMAND bash -c "
@@ -61,6 +58,7 @@ if(NOT PVPYTHON_FOUND)
 * Plotting scripts using Paraview will not work.
 * To install Paraview (incl. pvpython), please try:
 *   Debian/Ubuntu: sudo apt-get install paraview
+*   Fedora: sudo yum install paraview
   ")
 endif()
 
@@ -78,6 +76,7 @@ if(NOT ${IMPORT_MATPLOTLIB_EXITCODE} EQUAL 0)
 * Plotting scripts using matplotlib will not work.
 * To install matplotlib, please try:
 *   Debian/Ubuntu: sudo apt-get install python-matplotlib
+*   Fedora: sudo yum install python-matplotlib
   ")
 endif()
 
@@ -90,6 +89,7 @@ if(NOT ${IMPORT_SCIPY_EXITCODE} EQUAL 0)
 * Some tests scripts will not work.
 * To install SciPy, please try:
 *   Debian/Ubuntu: sudo apt-get install python-scipy
+*   Fedora: sudo yum install scipy
   ")
 endif()
 
