@@ -28,7 +28,7 @@ def reading_modeloutput(dir, time):
     f_crd = h5py.File(dir+ "/coord.h5", "r")
     time_model = np.array(f_crd["T"])
     assert(time in time_model),"time level not in model output"
-    dt = round(f_crd["T"].attrs["dt"], 4)
+    dt = round(f_crd["T"].attrs["dt"][0], 4)
     # TODO dx should be written somewhere                    
     dir_model["dx"] = round(np.array(f_crd["X"])[1,0]-np.array(f_crd["X"])[0,0], 4)
     f_out = h5py.File(dir+"/timestep0000000" + str(int(time/dt))+ '.h5', "r")
@@ -64,7 +64,7 @@ def main(dir, casename_l, xy_lim=8, time_l=[0,3], time=3):
     for ic, casename in enumerate(casename_l):
         plt.figure(ic+2, figsize = (6,3))
         ax = plt.subplot(1,1,1)
-        print "plotting for " + casename + ", t = " + str(time)
+        print("plotting for " + casename + ", t = " + str(time))
         var_model = reading_modeloutput(dir + casename, time)
         # calculate velocity (momentum/height) only in the droplet region.
         var_model["vx"] = np.where(var_model["h"]>0, var_model["qx"]/var_model["h"], 0)
