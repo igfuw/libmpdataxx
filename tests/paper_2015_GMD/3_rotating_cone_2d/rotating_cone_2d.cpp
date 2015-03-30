@@ -72,7 +72,7 @@ void test(const std::string filename)
   }
   p.gnuplot_view = "map";
   p.gnuplot_with = "lines";
-  p.gnuplot_surface = false;
+  p.gnuplot_surface = false; 
   p.gnuplot_contour = true;
   {
     std::ostringstream tmp;
@@ -136,9 +136,9 @@ void test(const std::string filename)
 
     // ... cut off at zero
     run.advectee() = h0 + where(
-      tmp - pow(r, 2) <= 0,                  //if
-      h * blitz::sqr(1 - tmp / pow(r, 2)),   //then
-      0.                                     //else
+      tmp - pow(r, 2) <= 0,                // if
+      h - blitz::sqrt(tmp / pow(r/h,2)),   // then  
+      0.                                   // else
     );
 
     // constant-angular-velocity rotational field
