@@ -19,8 +19,8 @@ endif()
 set(libmpdataxx_FOUND False)
 set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
-set(libmpdataxx_CXX_FLAGS_DEBUG "")
-set(libmpdataxx_CXX_FLAGS_RELEASE "")
+set(libmpdataxx_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS}")
+set(libmpdataxx_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS}")
 
 
 ############################################################################################
