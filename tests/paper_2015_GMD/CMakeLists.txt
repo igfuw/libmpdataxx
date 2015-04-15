@@ -17,7 +17,7 @@ if(NOT libmpdataxx_FOUND)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(CMAKE_CXX_FLAGS ${libmpdataxx_CXX_FLAGS_RELEASE})
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${libmpdataxx_CXX_FLAGS_RELEASE}")
   set(CMAKE_CXX_FLAGS_RELEASE "")
 else()
   set(CMAKE_CXX_FLAGS_DEBUG ${libmpdataxx_CXX_FLAGS_DEBUG})
