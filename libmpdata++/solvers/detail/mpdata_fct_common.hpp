@@ -26,7 +26,7 @@ namespace libmpdataxx
         protected:
 
         // member fields
-	typename parent_t::arr_t psi_min, psi_max; 
+	typename parent_t::arr_t psi_min, psi_max, beta_up, beta_dn; 
 	arrvec_t<typename parent_t::arr_t> GC_mono; 
 
 	arrvec_t<typename parent_t::arr_t> &GC(int iter) 
@@ -34,6 +34,12 @@ namespace libmpdataxx
 	  if (iter > 0) return GC_mono;
 	  return parent_t::GC(iter);
 	}
+
+        void beta_barrier(const int &iter)
+        {
+	  if (!opts::isset(ct_params_t::opts, opts::iga)) // this->flux would be overwritten by donor-cell
+	    this->mem->barrier();
+        }
 
         public:
 
@@ -45,7 +51,9 @@ namespace libmpdataxx
           parent_t(args, p),
 	  psi_min(args.mem->tmp[__FILE__][0][0]),
 	  psi_max(args.mem->tmp[__FILE__][0][1]),
-	  GC_mono(args.mem->tmp[__FILE__][1])
+	  GC_mono(args.mem->tmp[__FILE__][1]),
+	  beta_up(args.mem->tmp[__FILE__][2][0]),
+	  beta_dn(args.mem->tmp[__FILE__][2][1])
         {}
 
 	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)
@@ -53,6 +61,7 @@ namespace libmpdataxx
 	  parent_t::alloc(mem, p);
 	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 2); // psi_min and psi_max
 	  parent_t::alloc_tmp_vctr(mem, p.grid_size, __FILE__);    // GC_mono
+	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 2); // beta_up, beta_dn
 	}
       };
 

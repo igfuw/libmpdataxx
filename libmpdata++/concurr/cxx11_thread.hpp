@@ -22,8 +22,6 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      std::map<std::thread::id, int> cxx11_thread_id;
-
       // based on boost barrier's code
       class barrier
       {
@@ -79,11 +77,6 @@ namespace libmpdataxx
 
         public:
 
-        int rank()
-        {
-          return detail::cxx11_thread_id[std::this_thread::get_id()];
-        }
-
 	static int size() 
 	{
 	  const char *env_var("OMP_NUM_THREADS");
@@ -114,7 +107,6 @@ namespace libmpdataxx
           threads.push_back(new std::thread(
             &solver_t::solve, &(this->algos[i]), nt
           ));
-          detail::cxx11_thread_id[threads.back().get_id()] = i;
         }
         for (auto &th : threads) th.join();
       }

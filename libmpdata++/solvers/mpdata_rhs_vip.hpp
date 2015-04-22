@@ -32,7 +32,6 @@ namespace libmpdataxx
 
       // member fields
       const rng_t im;
-      const typename ct_params_t::real_t di;
 
       void fill_stash() final
       {
@@ -45,7 +44,7 @@ namespace libmpdataxx
 
 	if (!this->mem->G)
 	{
-	  this->mem->GC[0](im + h) = this->dt / di * .5 * (
+	  this->mem->GC[0](im + h) = this->dt / this->di * .5 * (
 	    this->stash[0](im    ) + 
 	    this->stash[0](im + 1)
 	  );
@@ -64,21 +63,15 @@ namespace libmpdataxx
 
       public:
 
-      struct rt_params_t : parent_t::rt_params_t 
-      { 
-	typename ct_params_t::real_t di=0;
-      };
-
       // ctor
       mpdata_rhs_vip(
 	typename parent_t::ctor_args_t args,
-	const rt_params_t &p
+	const typename parent_t::rt_params_t &p
       ) : 
 	parent_t(args, p),
-	im(args.i.first() - 1, args.i.last()),
-	di(p.di)
+	im(args.i.first() - 1, args.i.last())
       {
-        assert(di != 0);
+        assert(this->di != 0);
       } 
     };
 
@@ -96,7 +89,6 @@ namespace libmpdataxx
 
       // member fields
       const rng_t im, jm;
-      const typename ct_params_t::real_t di, dj;
 
       void fill_stash() final 
       {
@@ -117,7 +109,7 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
+	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / this->di * .5 * (
 	    psi(pi<d>(i,    j)) + 
 	    psi(pi<d>(i + 1,j))
 	  );
@@ -132,8 +124,8 @@ namespace libmpdataxx
       {
         using namespace libmpdataxx::arakawa_c;
 
-	intrp<0>(this->stash[0], im, this->j^this->halo, di);
-	intrp<1>(this->stash[1], jm, this->i^this->halo, dj);
+	intrp<0>(this->stash[0], im, this->j^this->halo, this->di);
+	intrp<1>(this->stash[1], jm, this->i^this->halo, this->dj);
         this->xchng_vctr_alng(this->mem->GC);
       }
 
@@ -148,24 +140,18 @@ namespace libmpdataxx
       }
 
       public:
-
-      struct rt_params_t : parent_t::rt_params_t 
-      { 
-	typename ct_params_t::real_t di=0, dj=0;
-      };
       
       // ctor
       mpdata_rhs_vip(
 	typename parent_t::ctor_args_t args,
-	const rt_params_t &p
+	const typename parent_t::rt_params_t &p
       ) : 
 	parent_t(args, p),
 	im(args.i.first() - 1, args.i.last()),
-	jm(args.j.first() - 1, args.j.last()),
-	di(p.di), dj(p.dj)
+	jm(args.j.first() - 1, args.j.last())
       {
-        assert(di != 0);
-        assert(dj != 0);
+        assert(this->di != 0);
+        assert(this->dj != 0);
       }
     };
     
@@ -183,7 +169,6 @@ namespace libmpdataxx
 
       // member fields
       const rng_t im, jm, km;
-      const typename ct_params_t::real_t di, dj, dk;
 
       void fill_stash() final 
       {
@@ -206,7 +191,7 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / this->di * .5 * (
 	    psi(pi<d>(i,     j, k)) + 
 	    psi(pi<d>(i + 1, j, k))
 	  );
@@ -221,9 +206,9 @@ namespace libmpdataxx
       {
         using namespace libmpdataxx::arakawa_c;
 
-	intrp<0>(this->stash[0], im, this->j^this->halo, this->k^this->halo, di);
-	intrp<1>(this->stash[1], jm, this->k^this->halo, this->i^this->halo, dj);
-	intrp<2>(this->stash[2], km, this->i^this->halo, this->j^this->halo, dk);
+	intrp<0>(this->stash[0], im, this->j^this->halo, this->k^this->halo, this->di);
+	intrp<1>(this->stash[1], jm, this->k^this->halo, this->i^this->halo, this->dj);
+	intrp<2>(this->stash[2], km, this->i^this->halo, this->j^this->halo, this->dk);
       }
 
       void extrapolate_in_time() final
@@ -249,25 +234,19 @@ namespace libmpdataxx
 
       public:
 
-      struct rt_params_t : parent_t::rt_params_t 
-      { 
-	typename ct_params_t::real_t di=0, dj=0, dk=0;
-      };
-
       // ctor
       mpdata_rhs_vip(
 	typename parent_t::ctor_args_t args,
-	const rt_params_t &p
+	const typename parent_t::rt_params_t &p
       ) : 
 	parent_t(args, p),
 	im(args.i.first() - 1, args.i.last()),
 	jm(args.j.first() - 1, args.j.last()),
-	km(args.k.first() - 1, args.k.last()),
-	di(p.di), dj(p.dj), dk(p.dk)
+	km(args.k.first() - 1, args.k.last())
       {
-        assert(di != 0);
-        assert(dj != 0);
-        assert(dk != 0);
+        assert(this->di != 0);
+        assert(this->dj != 0);
+        assert(this->dk != 0);
       } 
     }; 
   }; // namespace solvers

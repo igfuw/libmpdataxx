@@ -57,17 +57,11 @@ namespace libmpdataxx
         {
           assert(false && "sharedmem_common::barrier() called!");
         }
-
-        virtual int rank()
-        {
-          assert(false && "sharedmem_common::rank() called!");
-          throw;
-        }
      
-        void cycle()
+        void cycle(const int &rank)
         {
           barrier();
-          if (rank() == 0) n = (n + 1) % n_tlev - n_tlev; // - n_tlev assures Python-type end-of-array cyclic behaviour works
+          if (rank == 0) n = (n + 1) % n_tlev - n_tlev; // - n_tlev assures Python-type end-of-array cyclic behaviour works
           barrier();
         }
 
@@ -157,18 +151,18 @@ namespace libmpdataxx
           return result;
         }
 
-        real_t min(const arr_t &arr)
+        real_t min(const int &rank, const arr_t &arr)
         {
-          (*xtmtmp)(rank()) = blitz::min(arr); 
+          (*xtmtmp)(rank) = blitz::min(arr); 
           barrier();
           real_t result = blitz::min(*xtmtmp);
           barrier();
           return result;
         }
 
-        real_t max(const arr_t &arr)
+        real_t max(const int &rank, const arr_t &arr)
         {
-          (*xtmtmp)(rank()) = blitz::max(arr); 
+          (*xtmtmp)(rank) = blitz::max(arr); 
           barrier();
           real_t result = blitz::max(*xtmtmp);
           barrier();

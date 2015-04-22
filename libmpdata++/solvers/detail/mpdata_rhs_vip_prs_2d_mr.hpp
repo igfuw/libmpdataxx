@@ -106,14 +106,14 @@ namespace libmpdataxx
 	  //const real_t beta = .25; //TODO tylko Richardson
 
 	  int halo = this->halo;
-	  rng_t &i = this->i;
-	  rng_t &j = this->j;
+	  const rng_t &i = this->i;
+	  const rng_t &j = this->j;
 
 	  this->tmp_u(i,j) = this->state(ix::u)(i,j);
 	  this->tmp_w(i,j) = this->state(ix::w)(i,j);
 
 	  //initial error   
-          this->err(i, j) = this->err_init(this->Phi, this->tmp_u, this->tmp_w, i, j, this->di, this->dj);
+          this->err(this->ijk) = this->err_init(this->Phi, this->tmp_u, this->tmp_w, i, j, this->di, this->dj);
 	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
 
 	  //pseudo-time loop
@@ -126,12 +126,12 @@ namespace libmpdataxx
 	    real_t beta = - this->mem->sum(this->err, this->lap_err, i, j) / this->mem->sum(this->lap_err, this->lap_err, i, j);
   // endif
 
-	    this->Phi(i, j) += beta * this->err(i, j);
-	    this->err(i, j) += beta * this->lap_err(i, j);
+	    this->Phi(this->ijk) += beta * this->err(this->ijk);
+	    this->err(this->ijk) += beta * this->lap_err(this->ijk);
 
 	    error = std::max(
-	      std::abs(this->mem->max(this->err(i,j))),
-	      std::abs(this->mem->min(this->err(i,j)))
+	      std::abs(this->mem->max(this->rank, this->err(i,j))),
+	      std::abs(this->mem->min(this->rank, this->err(i,j)))
 	    );
 	    this->iters++;
 	  }
@@ -139,8 +139,8 @@ namespace libmpdataxx
 
 	  this->xchng_pres(this->Phi, i^halo, j^halo);
 
-	  this->tmp_u(i, j) = - grad<0>(this->Phi, i, j, this->di);
-	  this->tmp_w(i, j) = - grad<1>(this->Phi, j, i, this->dj);
+	  this->tmp_u(this->ijk) = - grad<0>(this->Phi, i, j, this->di);
+	  this->tmp_w(this->ijk) = - grad<1>(this->Phi, j, i, this->dj);
 
           this->set_edges(this->tmp_u, this->tmp_w, this->state(ix::u), this->state(ix::w), i, j);
 	}
