@@ -8,12 +8,7 @@
   *   (for more detailed discussion consult Smolarkiewicz & Margolin 1994 
   *  Appl. Math and Comp. Sci. 
   *  Variational solver for elliptic problems in atmospheric flows)
-  *
-  * @section DERIVATION
-  * 
-  * for introduction see the derivation of minimal residual pressure solver (solver_pressure_mr.hpp)
-  * 
-*/
+  */
 
 #pragma once
 #include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_3d_common.hpp>

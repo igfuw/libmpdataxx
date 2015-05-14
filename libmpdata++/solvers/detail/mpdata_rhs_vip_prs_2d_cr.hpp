@@ -8,75 +8,7 @@
   *   (for more detailed discussion consult Smolarkiewicz & Margolin 1994 
   *  Appl. Math and Comp. Sci. 
   *  Variational solver for elliptic problems in atmospheric flows)
-  *
-  * @section DERIVATION
-  * 
-  * for introduction see the derivation of minimal residual pressure solver (solver_pressure_mr.hpp)
-  * 
-  * \f$ -\frac{1}{\bar{\rho}} \nabla \cdot (\bar{\rho} (\hat{u} - \frac{\triangle t}{2} \nabla \Phi)) = 0 \f$
-  *
-  * above equation can be written as \f$ \mathcal{L}(\Phi) - R = 0 \f$ 
-  * 
-  * where \f$ \mathcal{L}() \f$ in theory may be any linear semidefinite operator
-  * (this scheme doesn't require the operator to be self-adjoint)
-  *
-  * (for a concise discussion of the needed assumtions for operator \f$ \mathcal{L}() \f$ consult Smolarkiewicz & Margolin 1994)
-  *
-  * in this case:
-  *
-  * \f$ \mathcal{L}() = \Delta() \f$
-  *
-  * \f$ R = - \frac{1}{\rho} \nabla \cdot {\rho} \hat{u} \f$ 
-  *
-  * to obtain faster convergence (than minimum residual scheme) we start from dampened wave equation (instead of diffusion equation)
-  * 
-  * \f$ \mathcal{L}(\Phi) - R = 0 \;\;\;\;\;\;   \Rightarrow \;\;\;\;\;\;\;\;
-  * \mathcal{L}(\Phi) - R = \frac{\partial^2 \Phi}{\partial \tau^2} + \frac{1}{T}\frac{\partial \Phi}{\partial \tau} \f$ 
-  *
-  * using centered differencing for the second derivative and one-sided differencing or the first derivative 
-  * leads to three term recurrence formula
-  *
-  * \f$ \Phi^{n+1} = \gamma \Phi^{n} + (1-\gamma)\Phi^{n-1} + \beta (\mathcal{L}(\Phi^{n}) - R)  \f$
-  *
-  * where
-  * 
-  * \f$ \gamma = \frac{2+\frac{\triangle \tau}{T}}{1+\frac{\triangle \tau}{T}}  \f$
-  *
-  * \f$ \beta = \frac{\triangle \tau^2}{1+\frac{\triangle \tau}{T}}  \f$
-  * 
-  * which after rearranging leads to
-  *
-  * \f$ \Phi^{n+1} = \Phi^{n} + \beta ^{n} (\alpha ^{n} p^{n-1} + r^{n}) \f$
-  * 
-  * where:
-  *
-  * \f$ \alpha ^{n} = \frac{(\gamma ^{n} -1) \beta ^{n-1}}{\beta ^{n}} \f$
-  *
-  * \f$ p^{n} = \frac{\Phi^{n+1}-\Phi ^{n}}{\beta ^{n} } \f$
-  *
-  * \f$ r^n = \mathcal{L}(\Phi ^{n}) -R \f$
-  *
-  * this leads to recurrence algorithm for \f$ \Phi \f$, residual error (\f$ r \f$) and directional error (\f$ p \f$)
-  * 
-  * \f$ \Phi ^{n+1} = \Phi ^{n} + \beta ^{n} p^{n} \f$
-  *
-  * \f$ r^{n+1} = r^{n} + \beta ^{n} \mathcal{L}(p^{n}) \f$
-  *
-  * \f$ p^{n+1} = r^{n+1} + \alpha ^{n+1} p^{n} \f$
-  *
-  * with the coefficients
-  *
-  * \f$ \beta ^{n}= - \frac{<r^{n} \mathcal{L}(p^n)>}{<\mathcal{L}(p^n) \mathcal{L}(p^n)>} \f$
-  *
-  * \f$ \alpha ^{n+1}= -  \frac{<\mathcal{L}(r^{n+1}) \mathcal{L}(p^n)>}{<\mathcal{L}(p^n) \mathcal{L}(p^n)> } \f$
-  *
-  * The recurrence of \f$ p \f$ implies a recuurence for \f$ \mathcal{L}(p) \f$
-  *
-  * \f$ \mathcal{L}(p^{n+1}) = \mathcal{L}(r^{n+1}) + \alpha^{n+1} \mathcal{L}(p^{n}) \f$
-  * 
-  * iterations in pseudo-time stop when residual error is smaller than a given value (for example .0001)
-
-*/
+  */
 
 #pragma once
 #include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_common.hpp>

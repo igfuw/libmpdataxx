@@ -8,68 +8,6 @@
   *   (for more detailed discussion consult Smolarkiewicz & Szmelter 2011
   *    A Nonhydrostatic Unstructured-Mesh Soundproof Model for Simulation of Internal Gravity Waves
   *    Acta Geophysica)
-  *
-  * @section DERIVATION
-  * 
-  * for introduction see the derivation of minimal residual pressure solver (solver_pressure_mr.hpp)
-  * and conjugate residual pressure solver (solver_pressure_cr.hpp)
-  * 
-  * in preconditioned solver initail equation \f$ \mathcal{L}(\Phi) - R = 0 \f$ 
-  * is replaced by \f$ \mathcal{L}^{\prime}(\Phi) - R^{\prime} = 0 \f$
-  * so that convergence of variational schmes is accelerated
-  *
-  * there is no set of rules explaining how to design a good preconditioner
-  * 
-  * assume that operator \f$ \mathcal{P} \f$ is our preconditioner
-  *
-  * In principle \f$ \mathcal{P} \f$ can be any linear operator 
-  * such that \f$ \mathcal{L} \mathcal{P} ^{-1} \f$ is negative definite.
-  * The goal is to augument the initial recurrence so that it converges faster.
-  * On the other hand, for the preconditioner to be useful, the convergence of the 
-  * auxiliary problem must be sufficiently rapid to overcome the additional effort
-  * of inverting \f$ \mathcal{P} \f$
-  * 
-  * For the preconditioned conjugate residual scheme we start from 
-  *
-  * \f$ \mathcal{L}(\Phi) - R = 
-  *   \frac{\partial^2 \mathcal{P}(\Phi)}{\partial \tau^2} + \frac{1}{T}\frac{\partial \mathcal{P}(\Phi)}{\partial \tau} \f$
-  *
-  * acting with \f$ \mathcal{P}^{-1} \f$ on the both sides of the above equation leads to the recurrence formulas
-  *
-  * \f$ \Phi^{n+1} = \Phi^{n} + \beta^{n} \mathcal{P}^{-1}(p^{n})\f$
-  *
-  * \f$ r^{n+1} = r^{n} + \beta^{n} \mathcal{L} \mathcal{P}^{-1}(p^{n}) \f$
-  *
-  * \f$ \mathcal{P}^{-1}(p^{n+1}) = \alpha^{n+1} \mathcal{P}^{-1}(p^{n}) + \mathcal{P}^{-1}(r^{n+1})  \f$
-  * 
-  * redefining \f$ p_{new} = \mathcal{P}^{-1}(p_{old}) \f$ leads to 
-  *
-  * \f$ p^{n+1} = \alpha^{n+1} p^{n} + q^{n+1} \f$
-  *
-  * where \f$ q^{n+1} = \mathcal{P}^{-1}(r^{n+1}) \f$
-  *
-  * and the coefficients
-  *
-  * \f$ \beta^{n} = - \frac{<r^{n} \mathcal{L}(p^{n})>}{<\mathcal{L}(p^{n}) \mathcal{L}(p^{n})>} \f$
-  *
-  * \f$ \alpha^{n+1} = - \frac{<\mathcal{L}(q^{n+1}) \mathcal{L}(p^{n})>}{< \mathcal{L}(p^{n}) \mathcal{L}(p^{n})>} \f$
-  *
-  * The recurrence of \f$ p \f$ implies a recurence for \f$ \mathcal{L}(p) \f$
-  *
-  * \f$ \mathcal{L}(p^{n+1}) = \mathcal{L}(q^{n+1}) + \alpha^{n+1} \mathcal{L}(p^{n}) \f$
-  * 
-  * iterations in pseudo-time stop when residual error is smaller than a given value (for example .0001)
-  *
-  * Added difficulty of preconditioned scheme stems from the need to solve the auxiliary elliptic problem at initialization
-  * \f$ p^{0} = \mathcal{P}^{-1}(r^{0}) \f$ and at each iteration \f$ q^{n+1} = \mathcal{P}^{-1}(r^{n+1}) \f$ .
-  * In this approach the inversion of \f$ \mathcal{P} \f$ is done using Richardson scheme (minimum residual scheme with \f$ \beta = .25 \f$).
-  * 
-  * \f$ e = \mathcal{P}^{-1}(r) \;\;\;\;\;\; / \mathcal{P} \f$
-  * 
-  * \f$ \mathcal{P}(e) - r = 0 \f$
-  *
-  * \f$ \mathcal{P}(e) - r = \frac{\partial e}{\partial \xi} \f$
-
   */
 
 #pragma once
