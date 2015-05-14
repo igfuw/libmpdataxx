@@ -76,7 +76,6 @@
 #pragma once
 
 #include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_common.hpp>
-#include <libmpdata++/formulae/nabla_formulae.hpp> //gradient, diveregnce
 
 namespace libmpdataxx
 {
@@ -96,57 +95,49 @@ namespace libmpdataxx
 	using parent_t = mpdata_rhs_vip_prs_2d_common<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
-	void pressure_solver_update()
+	real_t beta, tmp_den;
+	typename parent_t::arr_t lap_err;
+
+        void pressure_solver_loop_init() {}
+
+        void pressure_solver_loop_body()
+        {
+          this->lap_err(this->i, this->j) = this->lap(this->err, this->i, this->j, this->di, this->dj); 
+
+          tmp_den = this->mem->sum(this->lap_err, this->lap_err, this->i, this->j);
+          if (tmp_den != 0) beta = - this->mem->sum(this->err, this->lap_err, this->i, this->j) / tmp_den;
+
+          this->Phi(this->ijk) += beta * this->err(this->ijk);
+          this->err(this->ijk) += beta * this->lap_err(this->ijk);
+
+          real_t error = std::max(
+            std::abs(this->mem->max(this->rank, this->err(this->ijk))), 
+            std::abs(this->mem->min(this->rank, this->err(this->ijk)))
+          );
+
+          if (error <= this->prs_tol) this->converged = true;
+        }
+
+        public:
+
+	struct rt_params_t : parent_t::rt_params_t { };
+
+	// ctor
+	mpdata_rhs_vip_prs_2d_mr(
+	  typename parent_t::ctor_args_t args,
+	  const rt_params_t &p
+	) :
+	  parent_t(args, p),
+          beta(.25),
+          tmp_den(1.),
+	  lap_err(args.mem->tmp[__FILE__][0][0])
+	{}
+
+	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
 	{
-	  using namespace arakawa_c;
-	  using formulae::nabla::grad;
-	  using formulae::nabla::div;
-
-	  const real_t rho = 1.; // TODO    
-	  //const real_t beta = .25; //TODO tylko Richardson
-
-	  int halo = this->halo;
-	  const rng_t &i = this->i;
-	  const rng_t &j = this->j;
-
-	  this->tmp_u(i,j) = this->state(ix::u)(i,j);
-	  this->tmp_w(i,j) = this->state(ix::w)(i,j);
-
-	  //initial error   
-          this->err(this->ijk) = this->err_init(this->Phi, this->tmp_u, this->tmp_w, i, j, this->di, this->dj);
-	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
-
-	  //pseudo-time loop
-	  real_t error = 1.;
-	  while (error > this->prs_tol) 
-	  {
-	    this->lap_err(i,j) = this->lap(this->err, i, j, this->di, this->dj); 
-
-  // if (!richardson) TODO - jako opcja (template?)
-	    real_t beta = - this->mem->sum(this->err, this->lap_err, i, j) / this->mem->sum(this->lap_err, this->lap_err, i, j);
-  // endif
-
-	    this->Phi(this->ijk) += beta * this->err(this->ijk);
-	    this->err(this->ijk) += beta * this->lap_err(this->ijk);
-
-	    error = std::max(
-	      std::abs(this->mem->max(this->rank, this->err(i,j))),
-	      std::abs(this->mem->min(this->rank, this->err(i,j)))
-	    );
-	    this->iters++;
-	  }
-	  //end of pseudo_time loop
-
-	  this->xchng_pres(this->Phi, i^halo, j^halo);
-
-	  this->tmp_u(this->ijk) = - grad<0>(this->Phi, i, j, this->di);
-	  this->tmp_w(this->ijk) = - grad<1>(this->Phi, j, i, this->dj);
-
-          this->set_edges(this->tmp_u, this->tmp_w, this->state(ix::u), this->state(ix::w), i, j);
+	  parent_t::alloc(mem, p);
+	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 1);
 	}
-
-	// inheriting ctor
-        using parent_t::parent_t;
       }; 
     }; // namespace detail
   }; // namespace solvers

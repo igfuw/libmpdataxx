@@ -80,7 +80,6 @@
 
 #pragma once
 #include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_common.hpp>
-#include <libmpdata++/formulae/nabla_formulae.hpp> // gradient, diveregnce
 
 namespace libmpdataxx
 {
@@ -100,72 +99,39 @@ namespace libmpdataxx
 	using parent_t = detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
-	typename parent_t::arr_t p_err, lap_p_err;
-
-	void pressure_solver_update()
-	{
-	  using namespace arakawa_c;
-	  using formulae::nabla::grad;
-	  using formulae::nabla::div;
-
-	  real_t beta = .25;   //TODO
-	  real_t alpha = 1.;   //TODO
-	  real_t rho = 1.;     //TODO    
-	  real_t tmp_den = 1.; //TODO
-
-	  const int halo = this->halo;
-	  const rng_t &i = this->ijk[0];
-	  const rng_t &j = this->ijk[1];
-
-	  this->tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
-	  this->tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
-
-	  //initial error   
-          this->err(this->ijk) = this->err_init(this->Phi, this->tmp_u, this->tmp_w, i, j, this->di, this->dj);
-	    /* + 1./rho * grad(Phi) * grad(rho) */ // should be added if rho is not constant
-
+	real_t beta, alpha, tmp_den;
+	typename parent_t::arr_t lap_err, p_err, lap_p_err;
+	
+        void pressure_solver_loop_init()
+        {
 	  p_err(this->ijk) = this->err(this->ijk);
-	  lap_p_err(this->ijk) = this->lap(p_err, i, j, this->di, this->dj);
+	  lap_p_err(this->ijk) = this->lap(p_err, this->i, this->j, this->di, this->dj);
+        }
 
-	  //pseudo-time loop
-	  this->iters = 0;
-	  real_t error = 1.;
-	  while (error > this->prs_tol)
-	  {
-	    tmp_den = this->mem->sum(lap_p_err, lap_p_err, i, j);
-	    if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, i, j) / tmp_den;
-	    this->Phi(this->ijk) += beta * p_err(this->ijk);
-	    this->err(this->ijk) += beta * lap_p_err(this->ijk);
+        void pressure_solver_loop_body()
+        {
+          tmp_den = this->mem->sum(lap_p_err, lap_p_err, this->i, this->j);
+          if (tmp_den != 0) beta = - this->mem->sum(this->err, lap_p_err, this->i, this->j) / tmp_den;
+          this->Phi(this->ijk) += beta * p_err(this->ijk);
+          this->err(this->ijk) += beta * lap_p_err(this->ijk);
 
-	    this->lap_err(this->ijk) = this->lap(this->err, i, j, this->di, this->dj);         
+          this->lap_err(this->ijk) = this->lap(this->err, this->i, this->j, this->di, this->dj);         
 
-	    if (tmp_den != 0) alpha = - this->mem->sum(this->lap_err, lap_p_err, i, j) / tmp_den;          
+          if (tmp_den != 0) alpha = - this->mem->sum(this->lap_err, lap_p_err, this->i, this->j) / tmp_den;          
 
-	    p_err(this->ijk) *= alpha;
-	    p_err(this->ijk) += this->err(this->ijk);  
-   
-	    lap_p_err(i,j) *= alpha;
-	    lap_p_err(i,j) += this->lap_err(i,j);
-   
-	    error = std::max(
-	      std::abs(this->mem->max(this->rank, this->err(i,j))), 
-	      std::abs(this->mem->min(this->rank, this->err(i,j)))
-	    );
-	    this->iters++;
-	  }
-	  //end of pseudo_time loop
+          p_err(this->ijk) *= alpha;
+          p_err(this->ijk) += this->err(this->ijk);  
+ 
+          lap_p_err(this->ijk) *= alpha;
+          lap_p_err(this->ijk) += this->lap_err(this->ijk);
 
-  // TODO: record it
-  //std::cerr<<"      number of iterations untill convergence: "<<this->iters<<std::endl;
-  //std::cerr<<"      error: "<<error<<std::endl;
+          real_t error = std::max(
+            std::abs(this->mem->max(this->rank, this->err(this->ijk))), 
+            std::abs(this->mem->min(this->rank, this->err(this->ijk)))
+          );
 
-	  this->xchng_pres(this->Phi, i^halo, j^halo);
-
-	  this->tmp_u(this->ijk) = - grad<0>(this->Phi, i, j, this->di);
-	  this->tmp_w(this->ijk) = - grad<1>(this->Phi, j, i, this->dj);
-          
-          this->set_edges(this->tmp_u, this->tmp_w, this->state(ix::u), this->state(ix::w), i, j);
-	}
+          if (error <= this->prs_tol) this->converged = true;
+        }
 
 	public:
 
@@ -177,14 +143,18 @@ namespace libmpdataxx
 	  const rt_params_t &p
 	) :
 	  parent_t(args, p),
-	  lap_p_err(args.mem->tmp[__FILE__][0][0]),
-	      p_err(args.mem->tmp[__FILE__][0][1])
+          beta(.25),
+          alpha(1.),
+          tmp_den(1.),
+	  lap_err(args.mem->tmp[__FILE__][0][0]),
+	  lap_p_err(args.mem->tmp[__FILE__][0][1]),
+	      p_err(args.mem->tmp[__FILE__][0][2])
 	{}
 
 	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
 	{
 	  parent_t::alloc(mem, p);
-	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 2);
+	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 3);
 	}
       }; 
     }; // namespace detail
