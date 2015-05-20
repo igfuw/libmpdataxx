@@ -23,6 +23,7 @@
 #include <libmpdata++/bcond/open_3d.hpp>
 #include <libmpdata++/bcond/polar_2d.hpp>
 #include <libmpdata++/bcond/rigid_2d.hpp>
+#include <libmpdata++/bcond/rigid_3d.hpp>
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
