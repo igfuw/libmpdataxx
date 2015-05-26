@@ -1,4 +1,4 @@
-// 2D rigid boundary conditions for libmpdata++
+// 3D rigid boundary conditions for libmpdata++
 //
 // licensing: GPU GPL v3
 // copyright: University of Warsaw
