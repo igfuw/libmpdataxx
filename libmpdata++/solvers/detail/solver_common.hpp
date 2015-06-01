@@ -207,7 +207,7 @@ namespace libmpdataxx
 	// psi[n] getter - just to shorten the code
         // note that e.g. in hook_post_loop it points rather to 
         // psi^{n+1} than psi^{n} (hence not using the name psi_n)
-	virtual const arr_t &state(const int &e) const final
+	virtual arr_t &state(const int &e) final
 	{
 	  return mem->psi[e][n[e]];
 	}
