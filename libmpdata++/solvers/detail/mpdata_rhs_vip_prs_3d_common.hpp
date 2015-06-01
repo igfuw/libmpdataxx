@@ -39,9 +39,9 @@ namespace libmpdataxx
           const rng_t &i, 
           const rng_t &j, 
           const rng_t &k, 
-          const real_t &dx, 
-          const real_t &dy,
-          const real_t &dz
+          const real_t dx, 
+          const real_t dy,
+          const real_t dz
         ) return_macro(
           this->xchng_pres(arr, i, j, k);
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx);
@@ -63,9 +63,9 @@ namespace libmpdataxx
           const rng_t &i, 
           const rng_t &j, 
           const rng_t &k, 
-          const real_t &dx, 
-          const real_t &dy, 
-          const real_t &dz
+          const real_t dx, 
+          const real_t dy, 
+          const real_t dz
         ) return_macro(
           this->xchng_pres(arr, i^this->halo, j^this->halo, k^this->halo);
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx) - v1(this->ijk);
@@ -87,7 +87,10 @@ namespace libmpdataxx
 	  this->xchng_sclr(Phi, this->i^halo, this->j^halo, this->k^halo);
 	}
 
-        void xchng_pres(typename parent_t::arr_t arr, rng_t range_i, rng_t range_j, rng_t range_k)
+        void xchng_pres(typename parent_t::arr_t &arr,
+                        const rng_t &range_i,
+                        const rng_t &range_j,
+                        const rng_t &range_k)
         {
           this->mem->barrier();
           this->bcxl->fill_halos_pres(arr, range_j, range_k);
@@ -99,12 +102,12 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        void set_edges(typename parent_t::arr_t arr1,
-                       typename parent_t::arr_t arr2,
-                       typename parent_t::arr_t arr3,
-                       rng_t range_i,
-                       rng_t range_j,
-                       rng_t range_k)
+        void set_edges(typename parent_t::arr_t &arr1,
+                       typename parent_t::arr_t &arr2,
+                       typename parent_t::arr_t &arr3,
+                       const rng_t &range_i,
+                       const rng_t &range_j,
+                       const rng_t &range_k)
         {
           this->bcxl->set_edge_pres(arr1, range_j, range_k);
           this->bcxr->set_edge_pres(arr1, range_j, range_k);
@@ -115,15 +118,15 @@ namespace libmpdataxx
           this->mem->barrier();
         }
         
-        void set_edges(typename parent_t::arr_t arr1,
-                       typename parent_t::arr_t arr2,
-                       typename parent_t::arr_t arr3,
-                       typename parent_t::arr_t v1,
-                       typename parent_t::arr_t v2,
-                       typename parent_t::arr_t v3,
-                       rng_t range_i,
-                       rng_t range_j,
-                       rng_t range_k)
+        void set_edges(typename parent_t::arr_t &arr1,
+                       typename parent_t::arr_t &arr2,
+                       typename parent_t::arr_t &arr3,
+                       const typename parent_t::arr_t &v1,
+                       const typename parent_t::arr_t &v2,
+                       const typename parent_t::arr_t &v3,
+                       const rng_t &range_i,
+                       const rng_t &range_j,
+                       const rng_t &range_k)
         {
           this->bcxl->set_edge_pres(arr1, v1, range_j, range_k);
           this->bcxr->set_edge_pres(arr1, v1, range_j, range_k);

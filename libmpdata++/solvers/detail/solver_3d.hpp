@@ -32,9 +32,12 @@ namespace libmpdataxx
 
 	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
-	void xchng_sclr(typename parent_t::arr_t arr,
-                       rng_t range_i, rng_t range_j, rng_t range_k,
-                       const bool deriv = false) // for a given array
+	void xchng_sclr(typename parent_t::arr_t &arr,
+                       const rng_t &range_i,
+                       const rng_t &range_j,
+                       const rng_t &range_k,
+                       const bool deriv = false
+        ) // for a given array
 	{
           this->mem->barrier();
 	  bcxl->fill_halos_sclr(arr, range_j, range_k, deriv);
