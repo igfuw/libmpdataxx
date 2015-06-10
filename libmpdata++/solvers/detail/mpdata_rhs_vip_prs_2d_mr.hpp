@@ -52,7 +52,7 @@ namespace libmpdataxx
             std::abs(this->mem->min(this->rank, this->err(this->ijk)))
           );
 
-          if (error <= this->prs_tol) this->converged = true;
+          if (error <= this->err_tol) this->converged = true;
         }
 
         public:
