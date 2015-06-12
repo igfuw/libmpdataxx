@@ -32,6 +32,15 @@ namespace libmpdataxx
 	a(pi<d>(this->left_halo_sclr, j, k)) = a(pi<d>(this->rght_intr_sclr, j, k)); 
       }
 
+      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
+      }
+      
+      void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k) {}
+      
+      void set_edge_pres(const arr_t &a, const arr_t &b, const rng_t &j, const rng_t &k) {}
+
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
 	using namespace idxperm;
@@ -64,6 +73,15 @@ namespace libmpdataxx
 	using namespace idxperm;
 	a(pi<d>(this->rght_halo_sclr, j, k)) = a(pi<d>(this->left_intr_sclr, j, k));
       }
+
+      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
+      }
+      
+      void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k) {}
+
+      void set_edge_pres(const arr_t &a, const arr_t &b, const rng_t &j, const rng_t &k) {}
       
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
