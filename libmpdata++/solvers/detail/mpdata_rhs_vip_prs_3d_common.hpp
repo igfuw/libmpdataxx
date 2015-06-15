@@ -24,6 +24,7 @@ namespace libmpdataxx
 
         public:
         using real_t = typename ct_params_t::real_t;
+        using arr_t = typename parent_t::arr_t;
 
 	protected:
 
@@ -32,10 +33,20 @@ namespace libmpdataxx
         int iters = 0;
         bool converged = false;
 
-        typename parent_t::arr_t Phi, tmp_u, tmp_v, tmp_w, err, lap_tmp1, lap_tmp2, lap_tmp3;
+        arr_t Phi, tmp_u, tmp_v, tmp_w, err, lap_tmp1, lap_tmp2, lap_tmp3;
+
+        real_t prs_sum(const arr_t &arr, const rng_t &i, const rng_t &j, const rng_t &k)
+        {
+          return this->mem->sum(arr, i, j, k, ct_params_t::prs_khn);
+        }
+
+        real_t prs_sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j, const rng_t &k)
+        {
+          return this->mem->sum(arr1, arr2, i, j, k, ct_params_t::prs_khn);
+        }
 
         auto lap(
-          typename parent_t::arr_t &arr, 
+          arr_t &arr, 
           const rng_t &i, 
           const rng_t &j, 
           const rng_t &k, 
@@ -56,10 +67,10 @@ namespace libmpdataxx
         );
 
         auto err_init(
-          typename parent_t::arr_t &arr, 
-          typename parent_t::arr_t &v1, 
-          typename parent_t::arr_t &v2, 
-          typename parent_t::arr_t &v3, 
+          arr_t &arr, 
+          arr_t &v1, 
+          arr_t &v2, 
+          arr_t &v3, 
           const rng_t &i, 
           const rng_t &j, 
           const rng_t &k, 
@@ -87,7 +98,7 @@ namespace libmpdataxx
 	  this->xchng_sclr(Phi, this->i^halo, this->j^halo, this->k^halo);
 	}
 
-        void xchng_pres(typename parent_t::arr_t &arr,
+        void xchng_pres(arr_t &arr,
                         const rng_t &range_i,
                         const rng_t &range_j,
                         const rng_t &range_k)
@@ -102,9 +113,9 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        void set_edges(typename parent_t::arr_t &arr1,
-                       typename parent_t::arr_t &arr2,
-                       typename parent_t::arr_t &arr3,
+        void set_edges(arr_t &arr1,
+                       arr_t &arr2,
+                       arr_t &arr3,
                        const rng_t &range_i,
                        const rng_t &range_j,
                        const rng_t &range_k)
@@ -118,12 +129,12 @@ namespace libmpdataxx
           this->mem->barrier();
         }
         
-        void set_edges(typename parent_t::arr_t &arr1,
-                       typename parent_t::arr_t &arr2,
-                       typename parent_t::arr_t &arr3,
-                       const typename parent_t::arr_t &v1,
-                       const typename parent_t::arr_t &v2,
-                       const typename parent_t::arr_t &v3,
+        void set_edges(arr_t &arr1,
+                       arr_t &arr2,
+                       arr_t &arr3,
+                       const arr_t &v1,
+                       const arr_t &v2,
+                       const arr_t &v3,
                        const rng_t &range_i,
                        const rng_t &range_j,
                        const rng_t &range_k)

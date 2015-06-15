@@ -46,8 +46,8 @@ namespace libmpdataxx
         {
           for (int v = 0; v < k_iters; ++v)
           {
-            tmp_den[v] = this->mem->sum(lap_p_err[v], lap_p_err[v], this->i, this->j, this->k);
-            if (tmp_den[v] != 0) beta = - this->mem->sum(this->err, lap_p_err[v], this->i, this->j, this->k) / tmp_den[v];
+            tmp_den[v] = this->prs_sum(lap_p_err[v], lap_p_err[v], this->i, this->j, this->k);
+            if (tmp_den[v] != 0) beta = - this->prs_sum(this->err, lap_p_err[v], this->i, this->j, this->k) / tmp_den[v];
             this->Phi(this->ijk) += beta * p_err[v](this->ijk);
             this->err(this->ijk) += beta * lap_p_err[v](this->ijk);
 
@@ -63,7 +63,7 @@ namespace libmpdataxx
             for (int l = 0; l <= v; ++l)
             {
               if (tmp_den[l] != 0) 
-                alpha[l] = - this->mem->sum(lap_err, lap_p_err[l], this->i, this->j, this->k) / tmp_den[l];
+                alpha[l] = - this->prs_sum(lap_err, lap_p_err[l], this->i, this->j, this->k) / tmp_den[l];
             }
             
             if (v < (k_iters - 1))
