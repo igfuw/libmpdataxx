@@ -68,8 +68,8 @@ namespace libmpdataxx
 
         void pressure_solver_loop_body()
         {
-          tmp_den = this->mem->sum(lap_p_err, lap_p_err, this->i, this->j);
-          if (tmp_den != 0) beta = -this->mem->sum(this->err, lap_p_err, this->i, this->j) / tmp_den;
+          tmp_den = this->prs_sum(lap_p_err, lap_p_err, this->i, this->j);
+          if (tmp_den != 0) beta = -this->prs_sum(this->err, lap_p_err, this->i, this->j) / tmp_den;
  
           this->Phi(this->ijk) += beta * p_err(this->ijk);
           this->err(this->ijk) += beta * lap_p_err(this->ijk);
@@ -85,7 +85,7 @@ namespace libmpdataxx
 
           this->lap_q_err(this->ijk) = this->lap(this->q_err, this->i, this->j, this->di, this->dj);
 
-          if (tmp_den != 0) alpha = -this->mem->sum(lap_q_err, lap_p_err, this->i, this->j) / tmp_den;
+          if (tmp_den != 0) alpha = -this->prs_sum(lap_q_err, lap_p_err, this->i, this->j) / tmp_den;
 
           p_err(this->ijk) *= alpha;
           p_err(this->ijk) += q_err(this->ijk);  

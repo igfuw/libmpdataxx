@@ -41,8 +41,8 @@ namespace libmpdataxx
         {
           this->lap_err(this->i, this->j) = this->lap(this->err, this->i, this->j, this->di, this->dj); 
 
-          tmp_den = this->mem->sum(this->lap_err, this->lap_err, this->i, this->j);
-          if (tmp_den != 0) beta = - this->mem->sum(this->err, this->lap_err, this->i, this->j) / tmp_den;
+          tmp_den = this->prs_sum(this->lap_err, this->lap_err, this->i, this->j);
+          if (tmp_den != 0) beta = - this->prs_sum(this->err, this->lap_err, this->i, this->j) / tmp_den;
 
           this->Phi(this->ijk) += beta * this->err(this->ijk);
           this->err(this->ijk) += beta * this->lap_err(this->ijk);
