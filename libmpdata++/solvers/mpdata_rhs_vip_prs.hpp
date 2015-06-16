@@ -26,7 +26,9 @@ namespace libmpdataxx
     // the mpdata class
     template<typename ct_params_t, class enableif = void> 
     class mpdata_rhs_vip_prs
-    {};
+    {
+      static_assert(!std::is_void<enableif>::value, "please specify pressure scheme type !");
+    };
 
     // minimal residual 2D
     template<typename ct_params_t>
