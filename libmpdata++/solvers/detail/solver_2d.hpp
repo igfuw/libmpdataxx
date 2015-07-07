@@ -72,6 +72,7 @@ namespace libmpdataxx
           // sanity check for non-divergence of the initial Courant number field
           // (including compatibility with the initial condition)
           // TODO: same in 1D
+          if (!opts::isset(ct_params_t::opts, opts::dfl))
           {
             typename ct_params_t::real_t max_abs_div = max(abs(
 	      ( 

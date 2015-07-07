@@ -72,19 +72,22 @@ namespace libmpdataxx
           xchng_vctr_alng(this->mem->GC);
  
           // sanity check for non-divergence of the initial Courant number field
-          // TODO: same in 1D and 3D
-          if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
-	    ( 
-              this->mem->GC[0](i-h, j, k) - 
-	      this->mem->GC[0](i+h, j, k)
-            ) + (
-	      this->mem->GC[1](i, j-h, k) - 
-	      this->mem->GC[1](i, j+h, k)
-            ) + (
-	      this->mem->GC[2](i, j, k-h) - 
-	      this->mem->GC[2](i, j, k+h)
-            )
-	  ))) throw std::runtime_error("initial advector field is divergent");
+          // TODO: same in 1D
+          if (!opts::isset(ct_params_t::opts, opts::dfl))
+          {
+            if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
+              ( 
+                this->mem->GC[0](i-h, j, k) - 
+                this->mem->GC[0](i+h, j, k)
+              ) + (
+                this->mem->GC[1](i, j-h, k) - 
+                this->mem->GC[1](i, j+h, k)
+              ) + (
+                this->mem->GC[2](i, j, k-h) - 
+                this->mem->GC[2](i, j, k+h)
+              )
+            ))) throw std::runtime_error("initial advector field is divergent");
+          }
         }
 
         public:
