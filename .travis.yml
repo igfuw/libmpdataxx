@@ -165,8 +165,7 @@ script:
 
     ## icicle (no tests - just testing if any changes in libmpdata's API did not break icicle)
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-program-options-dev; fi
-    - git clone --depth=1 git://github.com/igfuw/icicle.git
-    - cd icicle
+    - cd libcloudphxx/tests/paper_GMD_2015
     - mkdir build 
     - cd build
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
