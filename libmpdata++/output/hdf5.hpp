@@ -35,7 +35,7 @@ namespace libmpdataxx
       std::unique_ptr<H5::H5File> hdfp;
       std::map<int, H5::DataSet> vars;
       std::map<int, std::string> dim_names;
-      static constexpr auto const_name = "const.h5";
+      const std::string const_name = "const.h5";
 
       // HDF types of host data
       const H5::FloatType
