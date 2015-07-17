@@ -25,7 +25,7 @@ def analytic_fig(ax, x_lim, time_l=[0,1,2,3], nx=320):
 # reading model output from hdf file and converting to an array
 def reading_modeloutput(dir, time):
     dir_model = {} 
-    f_crd = h5py.File(dir+ "/coord.h5", "r")
+    f_crd = h5py.File(dir+ "/const.h5", "r")
     time_model = np.array(f_crd["T"])
     assert(time in time_model),"time level not in model output"
     dt = round(f_crd["T"].attrs["dt"][0], 4)

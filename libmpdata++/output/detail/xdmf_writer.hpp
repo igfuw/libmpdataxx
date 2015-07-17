@@ -91,6 +91,7 @@ namespace libmpdataxx
         topology top;
         geometry geo;
         std::vector<attribute> attrs;
+        std::vector<attribute> c_attrs;
 
         public:
 
@@ -115,6 +116,17 @@ namespace libmpdataxx
             attrs.push_back(a);
           }
         }
+        
+        void add_const_attribute(const std::string& name,
+                                 const std::string& hdf_name,
+                                 const blitz::TinyVector<int, dim>& dimensions)
+        {
+          attribute a;
+          a.name = name;
+          a.item.dimensions = dimensions - 1;
+          a.item.data = hdf_name + ":/" + a.name;
+          c_attrs.push_back(a);
+        }
 
         void write(const std::string& xmf_name, const std::string& hdf_name, const double time)
         {
@@ -136,6 +148,9 @@ namespace libmpdataxx
 
           for (auto a : attrs)
             a.add(grid_node);
+          
+          for (auto ca : c_attrs)
+            ca.add(grid_node);
 
           xml_writer_settings settings('\t', 1);
           write_xml(xmf_name, pt, std::locale(), settings);
