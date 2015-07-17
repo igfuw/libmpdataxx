@@ -13,7 +13,7 @@ matrix:
 osx_image: xcode611
 
 before_install:
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty trusty-updates main universe multiverse"; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
@@ -38,7 +38,7 @@ before_install:
  
 install:
     # compilers
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.5; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.6; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then sudo $apt_get_install g++; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then brew install gcc48; fi   # would need a gcc-compiled boost ... (see note below)
 
@@ -89,7 +89,7 @@ script:
     - cd tests/unit
     - mkdir build 
     - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++-3.6 ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 $make_j
@@ -100,7 +100,7 @@ script:
     - cd tests/paper_2015_GMD
     - mkdir build
     - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++-3.6 ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Debug ../
     - VERBOSE=1 make -C 6_coupled_harmosc
@@ -119,7 +119,7 @@ script:
     - cd tests/sandbox
     - mkdir build
     - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++-3.6 ../; fi # Travis default is not the packaged one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake ..
     - VERBOSE=1 $make_j
@@ -156,7 +156,7 @@ script:
     - cd libcloudphxx
     - mkdir build 
     - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++-3.6 ../; fi # Travis default is not the packaged     one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make 
@@ -168,7 +168,7 @@ script:
     - cd libcloudphxx/tests/paper_GMD_2015
     - mkdir build 
     - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++-3.6 ../; fi # Travis default is not the packaged     one
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake -DCMAKE_BUILD_TYPE=Release ../ 
     - make

@@ -5,9 +5,9 @@
 			<Time Value="62.882119"/>
 			<Topology TopologyType="3DSMesh" Dimensions="60 60 60 "/>
 			<Geometry GeometryType="X_Y_Z">
-				<DataItem Dimensions="60 60 60 " NumberType="Float" Format="HDF">coord.h5:/X</DataItem>
-				<DataItem Dimensions="60 60 60 " NumberType="Float" Format="HDF">coord.h5:/Y</DataItem>
-				<DataItem Dimensions="60 60 60 " NumberType="Float" Format="HDF">coord.h5:/Z</DataItem>
+				<DataItem Dimensions="60 60 60 " NumberType="Float" Format="HDF">const.h5:/X</DataItem>
+				<DataItem Dimensions="60 60 60 " NumberType="Float" Format="HDF">const.h5:/Y</DataItem>
+				<DataItem Dimensions="60 60 60 " NumberType="Float" Format="HDF">const.h5:/Z</DataItem>
 			</Geometry>
 			<Attribute Name="psi" AttributeType="Scalar" Center="Cell">
 				<DataItem Dimensions="59 59 59 " NumberType="Float" Format="HDF">timestep0000000556.h5:/psi</DataItem>

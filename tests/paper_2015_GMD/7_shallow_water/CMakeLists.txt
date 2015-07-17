@@ -1,8 +1,8 @@
 libmpdataxx_add_test(shallow_water_1d)
 add_test(shallow_water_1d_diff bash -c "
   for dir in 1d_fct_abs 1d_fct_iga; do 
-    echo   'comparing coord.h5'                                                                                        &&
-    h5diff -v $dir/coord.h5                            ${CMAKE_CURRENT_SOURCE_DIR}/refdata/coord_1d.h5                 &&
+    echo   'comparing const.h5'                                                                                        &&
+    h5diff -v $dir/const.h5                            ${CMAKE_CURRENT_SOURCE_DIR}/refdata/const_1d.h5                 &&
     echo   'comparing timestep0000000000.h5'                                                                           &&
     h5diff -v $dir/timestep0000000000.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5  &&
     echo   'comparing timestep0000000556.h5'                                                                           &&
@@ -23,8 +23,8 @@ for dir in 1d_fct_abs 1d_fct_iga; do
 libmpdataxx_add_test(shallow_water_2d)
 add_test(shallow_water_2d_diff bash -c "
   for dir in 2d_fct_abs 2d_fct_iga; do 
-    echo   'comparing coord.h5'                                                                                        &&
-    h5diff -v $dir/coord.h5                            ${CMAKE_CURRENT_SOURCE_DIR}/refdata/coord_2d.h5                 &&
+    echo   'comparing const.h5'                                                                                        &&
+    h5diff -v $dir/const.h5                            ${CMAKE_CURRENT_SOURCE_DIR}/refdata/const_2d.h5                 &&
     echo   'comparing temp.xmf'                                                                                        &&
     diff    $dir/temp.xmf                              ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf               &&
     echo   'comparing timestep0000000000.h5'                                                                           &&
