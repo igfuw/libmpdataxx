@@ -7,7 +7,7 @@ import analytic_eq as eq
 #reading model output and saving as numpy arrays   
 def reading_modeloutput(dir, time):
     dir_model = {}
-    f_crd = h5py.File(dir+ "/coord.h5", "r")
+    f_crd = h5py.File(dir+ "/const.h5", "r")
     time_model = np.array(f_crd["T"])
     assert(time in time_model),"time level not in model output"
     dir_model["dt"] = round(f_crd["T"].attrs["dt"][0], 4)
