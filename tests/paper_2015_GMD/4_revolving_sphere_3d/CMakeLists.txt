@@ -2,8 +2,8 @@ libmpdataxx_add_test(revolving_sphere_3d)
 
 add_test(revolving_sphere_3d_diff bash -c "
   for dir in basic fct iga iga_fct upwind; do 
-    echo   'comparing coord.h5'                                                                                        &&
-    h5diff -v $dir/coord.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/coord.h5                                 &&
+    echo   'comparing const.h5'                                                                                        &&
+    h5diff -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/const.h5                                 &&
     echo   'comparing temp.xmf'                                                                                        &&
     diff    $dir/temp.xmf               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                              &&
     echo   'comparing timestep0000000000.h5'                                                                           &&

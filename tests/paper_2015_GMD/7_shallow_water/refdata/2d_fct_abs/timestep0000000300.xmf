@@ -5,8 +5,8 @@
 			<Time Value="3.000000"/>
 			<Topology TopologyType="2DSMesh" Dimensions="321 321 "/>
 			<Geometry GeometryType="X_Y">
-				<DataItem Dimensions="321 321 " NumberType="Float" Format="HDF">coord.h5:/X</DataItem>
-				<DataItem Dimensions="321 321 " NumberType="Float" Format="HDF">coord.h5:/Y</DataItem>
+				<DataItem Dimensions="321 321 " NumberType="Float" Format="HDF">const.h5:/X</DataItem>
+				<DataItem Dimensions="321 321 " NumberType="Float" Format="HDF">const.h5:/Y</DataItem>
 			</Geometry>
 			<Attribute Name="qx" AttributeType="Scalar" Center="Cell">
 				<DataItem Dimensions="320 320 " NumberType="Float" Format="HDF">timestep0000000300.h5:/qx</DataItem>

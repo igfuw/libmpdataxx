@@ -35,6 +35,7 @@ namespace libmpdataxx
       std::unique_ptr<H5::H5File> hdfp;
       std::map<int, H5::DataSet> vars;
       std::map<int, std::string> dim_names;
+      const std::string const_name = "const.h5";
 
       // HDF types of host data
       const H5::FloatType
@@ -55,9 +56,9 @@ namespace libmpdataxx
           // creating the directory
           boost::filesystem::create_directory(this->outdir);
 
-          // creating the coordinates file
-          std::string dim_file = this->outdir + "/coord.h5";
-          hdfp.reset(new H5::H5File(dim_file, H5F_ACC_TRUNC));
+          // creating the const file
+          std::string const_file = this->outdir + "/" + const_name;
+          hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC));
 
           // creating the dimensions
           // x,y,z
@@ -128,6 +129,47 @@ namespace libmpdataxx
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
 
               curr_dim.createAttribute("dt", flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &dt);
+            }
+            // G factor
+            if (this->mem->G.get() != nullptr)
+            {
+              auto g_set = (*hdfp).createDataSet("G", flttype_output, H5::DataSpace(parent_t::n_dims, shape.data()));
+              H5::DataSpace g_space = g_set.getSpace();
+              switch (int(solver_t::n_dims))
+              {
+                case 1:
+                {
+                  g_space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
+                  g_set.write( &((*this->mem->G)(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), g_space);
+                  break;
+                }
+                case 2:
+                {
+                  // halos present -> data not contiguous -> looping over the major rank
+                  for (int i = 0; i < this->mem->grid_size[0]; ++i)
+                  {
+                    offst[0] = i;
+                    g_space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
+                    g_set.write( &((*this->mem->G)(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), g_space);
+                  }
+                  break;
+                }
+                case 3:
+                {
+                  // halos present -> data not contiguous -> looping over the major rank
+                  for (int i = 0; i < this->mem->grid_size[0]; ++i)
+                  {
+                    for (int j = 0; j < this->mem->grid_size[1]; ++j)
+                    {
+                      offst[0] = i;
+                      offst[1] = j;
+                      g_space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
+                      g_set.write( &((*this->mem->G)(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), g_space);
+                    }
+                  }
+                  break;
+                }
+              }
             }
           }
         }
