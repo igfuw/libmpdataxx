@@ -13,6 +13,13 @@ namespace libmpdataxx
 {
   namespace solvers
   {
+    enum vip_vab_t
+    {
+      noab,
+      expl,
+      impl
+    };
+
     namespace detail
     {
       // 
@@ -85,6 +92,7 @@ namespace libmpdataxx
 
 	virtual void extrapolate_in_time() = 0;
 	virtual void interpolate_in_space() = 0;
+	virtual void add_absorber() { throw std::logic_error("absorber not yet implemented in 1d & 3d"); }
 
 	void hook_ante_loop(const int nt)
 	{
@@ -116,6 +124,7 @@ namespace libmpdataxx
 
 	  // intentionally after stash !!!
 	  // (we have to stash data from the current time step before applying any forcings to it)
+          if (ct_params_t::vip_vab != noab) add_absorber();
 	  parent_t::hook_ante_step(); 
 	}
 

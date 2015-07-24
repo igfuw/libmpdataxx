@@ -13,6 +13,7 @@ namespace libmpdataxx
 {
   namespace solvers
   {
+
     // to be specialised
     template <typename ct_params_t, class enableif = void>
     class mpdata_rhs_vip 
@@ -137,6 +138,15 @@ namespace libmpdataxx
 	this->xchng_sclr(this->stash[0], this->i^this->halo, this->j^this->halo);      // filling halos 
 	this->extrp(1, ix::vip_j);
 	this->xchng_sclr(this->stash[1], this->i^this->halo, this->j^this->halo);      // filling halos 
+      }
+      
+      void add_absorber() final
+      {
+	  typename ct_params_t::real_t factor = (ct_params_t::vip_vab == impl ? 0.5 : 1.);
+          this->state(ix::vip_i)(this->ijk) -= factor * this->dt * 
+            (*this->mem->vab_coeff)(this->ijk) * (this->state(ix::vip_i)(this->ijk) - this->mem->vab_relax[0](this->ijk));
+          this->state(ix::vip_j)(this->ijk) -= factor * this->dt * 
+            (*this->mem->vab_coeff)(this->ijk) * (this->state(ix::vip_j)(this->ijk) - this->mem->vab_relax[1](this->ijk));
       }
 
       public:

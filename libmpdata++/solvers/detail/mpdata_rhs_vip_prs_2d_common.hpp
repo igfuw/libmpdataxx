@@ -44,7 +44,7 @@ namespace libmpdataxx
         {
           return this->mem->sum(arr1, arr2, i, j, ct_params_t::prs_khn);
         }
-
+      
         auto lap(
           arr_t &arr, 
           const rng_t &i, 
@@ -55,6 +55,11 @@ namespace libmpdataxx
           this->xchng_pres(arr, i, j);
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, dx);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, i, dy);
+          if (ct_params_t::vip_vab == impl)
+          {
+            lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+            lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+          }
           this->set_edges(lap_tmp1, lap_tmp2, i, j);
           this->xchng_pres(lap_tmp1, i, j);
           this->xchng_pres(lap_tmp2, i, j);
@@ -74,6 +79,11 @@ namespace libmpdataxx
           this->xchng_pres(arr, i^this->halo, j^this->halo);
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, dx) - v1(this->ijk);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, i, dy) - v2(this->ijk);
+          if (ct_params_t::vip_vab == impl)
+          {
+            lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+            lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+          }
           this->set_edges(lap_tmp1, lap_tmp2, i, j);
           this->xchng_pres(lap_tmp1, i, j);
           this->xchng_pres(lap_tmp2, i, j);
@@ -133,6 +143,14 @@ namespace libmpdataxx
 	void pressure_solver_update()
         {
           const auto &i = this->i, &j = this->j;
+          
+          if (ct_params_t::vip_vab == impl)
+          {
+            this->state(ix::u)(this->ijk) +=
+              0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[0](this->ijk);
+            this->state(ix::w)(this->ijk) +=
+              0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[1](this->ijk);
+          }
 
 	  tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
 	  tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
@@ -187,6 +205,11 @@ namespace libmpdataxx
           parent_t::hook_post_step(); // forcings
 	  pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
 	  pressure_solver_apply();
+          
+          if (ct_params_t::vip_vab == impl) {
+            this->state(ix::vip_i)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+            this->state(ix::vip_j)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+          }
         }
 
 	public:

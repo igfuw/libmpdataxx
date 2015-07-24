@@ -38,6 +38,14 @@ namespace libmpdataxx
       blitz::Array<real_t, n_dims> g_factor() 
 //</listing-4>
       { assert(false); throw; }
+     
+      virtual 
+      blitz::Array<real_t, n_dims> vab_coefficient() 
+      { assert(false); throw; }
+      
+      virtual 
+      blitz::Array<real_t, n_dims> vab_relaxed_state(int d = 0) 
+      { assert(false); throw; }
 
       virtual 
 //<listing-5>

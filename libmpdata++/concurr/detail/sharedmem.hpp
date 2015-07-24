@@ -46,6 +46,8 @@ namespace libmpdataxx
 	arrvec_t<arr_t> GC;
         std::vector<arrvec_t<arr_t>> psi; // TODO: since n_eqns is known, could make it an std::array!
 	std::unique_ptr<arr_t> G;
+	std::unique_ptr<arr_t> vab_coeff; // velocity absorber coefficient
+	arrvec_t<arr_t> vab_relax; // velocity absorber relaxed state
         arrvec_t<arr_t> khn_tmp; // Kahan sum for donor-cell
 
 	std::unordered_map< 
@@ -252,6 +254,16 @@ namespace libmpdataxx
             rng_t(0, this->grid_size[0]-1)
           ).reindex({0});
         }
+        
+        blitz::Array<real_t, 1> vab_coefficient()
+        {
+          throw std::logic_error("absorber not yet implemented in 1d");
+        }
+	
+        blitz::Array<real_t, 1> vab_relaxed_state(int d = 0)  
+	{   
+          throw std::logic_error("absorber not yet implemented in 1d");
+	}   
 
       };
 
@@ -299,6 +311,32 @@ namespace libmpdataxx
             rng_t(0, this->grid_size[1]-1),
           })).reindex({0, 0});
         }
+        
+        blitz::Array<real_t, 2> vab_coefficient()
+        {
+          // a sanity check
+          if (this->vab_coeff.get() == nullptr) 
+            throw std::runtime_error("vab_coeff() called with option vip_vab unset?");
+
+          // the same logic as in advectee() - see above
+          return (*this->vab_coeff)(idx_t<2>({
+            rng_t(0, this->grid_size[0]-1),
+            rng_t(0, this->grid_size[1]-1),
+          })).reindex({0, 0});
+        }
+	
+        blitz::Array<real_t, 2> vab_relaxed_state(int d = 0)  
+	{   
+          assert(d == 0 || d== 1);
+          // a sanity check
+          if (this->vab_coeff.get() == nullptr) 
+            throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
+          // the same logic as in advectee() - see above
+	  return this->vab_relax[d](idx_t<2>({
+	    rng_t(0, this->grid_size[0]-1),
+	    rng_t(0, this->grid_size[1]-1)
+	  })).reindex({0, 0});
+	}   
 
       };
 
@@ -355,6 +393,16 @@ namespace libmpdataxx
             rng_t(0, this->grid_size[2]-1)
           })).reindex({0, 0, 0});
         }
+        
+        blitz::Array<real_t, 3> vab_coefficient()
+        {
+          throw std::logic_error("absorber not yet implemented in 3d");
+        }
+	
+        blitz::Array<real_t, 3> vab_relaxed_state(int d = 0)  
+	{   
+          throw std::logic_error("absorber not yet implemented in 3d");
+	}   
 
       };
     }; // namespace detail

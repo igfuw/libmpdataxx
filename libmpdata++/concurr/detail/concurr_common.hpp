@@ -290,6 +290,16 @@ namespace libmpdataxx
 	{
 	  return mem->g_factor();
 	}
+	
+        typename solver_t::arr_t vab_coefficient() final
+	{
+	  return mem->vab_coefficient();
+	}
+        
+        typename solver_t::arr_t vab_relaxed_state(int d = 0) final
+	{
+	  return mem->vab_relaxed_state(d);
+	}
 
         bool *panic_ptr() final
         {
