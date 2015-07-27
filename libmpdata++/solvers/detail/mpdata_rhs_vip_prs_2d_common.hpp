@@ -146,14 +146,14 @@ namespace libmpdataxx
           
           if (ct_params_t::vip_vab == impl)
           {
-            this->state(ix::u)(this->ijk) +=
+            this->state(ix::vip_i)(this->ijk) +=
               0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[0](this->ijk);
-            this->state(ix::w)(this->ijk) +=
+            this->state(ix::vip_j)(this->ijk) +=
               0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[1](this->ijk);
           }
 
-	  tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
-	  tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
+	  tmp_u(this->ijk) = this->state(ix::vip_i)(this->ijk);
+	  tmp_w(this->ijk) = this->state(ix::vip_j)(this->ijk);
 
 	  //initial error   
           err(this->ijk) = err_init(Phi, tmp_u, tmp_w, i, j, this->di, this->dj);
@@ -175,13 +175,13 @@ namespace libmpdataxx
 	  tmp_u(this->ijk) = - grad<0>(Phi, i, j, this->di);
 	  tmp_w(this->ijk) = - grad<1>(Phi, j, i, this->dj);
 
-          set_edges(tmp_u, tmp_w, this->state(ix::u), this->state(ix::w), i, j);
+          set_edges(tmp_u, tmp_w, this->state(ix::vip_i), this->state(ix::vip_j), i, j);
         }
 
 	void pressure_solver_apply()
 	{
-	  this->state(ix::u)(this->ijk) += tmp_u(this->ijk);
-	  this->state(ix::w)(this->ijk) += tmp_w(this->ijk);
+	  this->state(ix::vip_i)(this->ijk) += tmp_u(this->ijk);
+	  this->state(ix::vip_j)(this->ijk) += tmp_w(this->ijk);
 	}
 
         void hook_ante_loop(const int nt)
