@@ -142,7 +142,7 @@ namespace libmpdataxx
       
       void add_absorber() final
       {
-	  typename ct_params_t::real_t factor = (ct_params_t::vip_vab == impl ? 0.5 : 1.);
+	  typename ct_params_t::real_t factor = (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl ? 0.5 : 1.);
           this->state(ix::vip_i)(this->ijk) -= factor * this->dt * 
             (*this->mem->vab_coeff)(this->ijk) * (this->state(ix::vip_i)(this->ijk) - this->mem->vab_relax[0](this->ijk));
           this->state(ix::vip_j)(this->ijk) -= factor * this->dt * 
@@ -169,7 +169,7 @@ namespace libmpdataxx
 	parent_t::alloc(mem, p);
 
         // allocate velocity absorber
-        if (ct_params_t::vip_vab != 0)
+        if (static_cast<vip_vab_t>(ct_params_t::vip_vab) != 0)
         {
           mem->vab_coeff.reset(mem->old(new typename parent_t::arr_t(
                   parent_t::rng_sclr(p.grid_size[0]),

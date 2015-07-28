@@ -55,7 +55,7 @@ namespace libmpdataxx
           this->xchng_pres(arr, i, j);
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, dx);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, i, dy);
-          if (ct_params_t::vip_vab == impl)
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
           {
             lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
             lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
@@ -79,7 +79,7 @@ namespace libmpdataxx
           this->xchng_pres(arr, i^this->halo, j^this->halo);
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, dx) - v1(this->ijk);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, i, dy) - v2(this->ijk);
-          if (ct_params_t::vip_vab == impl)
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
           {
             lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
             lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
@@ -144,7 +144,7 @@ namespace libmpdataxx
         {
           const auto &i = this->i, &j = this->j;
           
-          if (ct_params_t::vip_vab == impl)
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
           {
             this->state(ix::vip_i)(this->ijk) +=
               0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[0](this->ijk);
@@ -206,7 +206,7 @@ namespace libmpdataxx
 	  pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
 	  pressure_solver_apply();
           
-          if (ct_params_t::vip_vab == impl) {
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) {
             this->state(ix::vip_i)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
             this->state(ix::vip_j)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
           }

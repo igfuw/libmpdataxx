@@ -124,7 +124,7 @@ namespace libmpdataxx
 
 	  // intentionally after stash !!!
 	  // (we have to stash data from the current time step before applying any forcings to it)
-          if (ct_params_t::vip_vab != noab) add_absorber();
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) != noab) add_absorber();
 	  parent_t::hook_ante_step(); 
 	}
 
