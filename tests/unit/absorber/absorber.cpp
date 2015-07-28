@@ -84,9 +84,15 @@ void test(double coeff, int nt, double tol, const std::string& name)
   else
   {
     if (err_u > tol)
+    {
+      std::cerr << err_u << std::endl;
       throw(std::runtime_error("u " + name));
+    }
     if (err_w > tol)
+    {
+      std::cerr << err_w << std::endl;
       throw(std::runtime_error("w " + name));
+    }
   }
 }
 

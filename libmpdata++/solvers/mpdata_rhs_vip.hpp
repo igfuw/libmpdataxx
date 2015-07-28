@@ -148,6 +148,20 @@ namespace libmpdataxx
           this->state(ix::vip_j)(this->ijk) -= factor * this->dt * 
             (*this->mem->vab_coeff)(this->ijk) * (this->state(ix::vip_j)(this->ijk) - this->mem->vab_relax[1](this->ijk));
       }
+      
+      void normalize_absorber() final
+      {
+        this->state(ix::vip_i)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+        this->state(ix::vip_j)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+      }
+      
+      void add_relax() final
+      {
+        this->state(ix::vip_i)(this->ijk) +=
+          0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[0](this->ijk);
+        this->state(ix::vip_j)(this->ijk) +=
+          0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[1](this->ijk);
+      }
 
       public:
       

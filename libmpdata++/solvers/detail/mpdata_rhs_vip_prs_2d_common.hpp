@@ -143,14 +143,6 @@ namespace libmpdataxx
 	void pressure_solver_update()
         {
           const auto &i = this->i, &j = this->j;
-          
-          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
-          {
-            this->state(ix::vip_i)(this->ijk) +=
-              0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[0](this->ijk);
-            this->state(ix::vip_j)(this->ijk) +=
-              0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[1](this->ijk);
-          }
 
 	  tmp_u(this->ijk) = this->state(ix::vip_i)(this->ijk);
 	  tmp_w(this->ijk) = this->state(ix::vip_j)(this->ijk);
@@ -202,14 +194,12 @@ namespace libmpdataxx
     
         void hook_post_step()
         {
-          parent_t::hook_post_step(); // forcings
+          // intentionally calling "great-grandparent" i.e. mpdata_rhs hook
+          parent_t::parent_t::parent_t::hook_post_step(); // forcings
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) parent_t::add_relax();
 	  pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
 	  pressure_solver_apply();
-          
-          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) {
-            this->state(ix::vip_i)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
-            this->state(ix::vip_j)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
-          }
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) parent_t::normalize_absorber();
         }
 
 	public:
