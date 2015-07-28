@@ -168,21 +168,6 @@ namespace libmpdataxx
                 parent_t::rng_sclr(p.grid_size[0]), 
                 parent_t::rng_sclr(p.grid_size[1])
               )));
-          
-          // allocate velocity absorber
-          if (ct_params_t::vip_vab != 0)
-          {
-	    mem->vab_coeff.reset(mem->old(new typename parent_t::arr_t(
-                    parent_t::rng_sclr(p.grid_size[0]),
-                    parent_t::rng_sclr(p.grid_size[1])
-            )));
-	    
-            for (int n = 0; n < ct_params_t::n_dims; ++n)
-              mem->vab_relax.push_back(mem->old(new typename parent_t::arr_t(
-                      parent_t::rng_sclr(p.grid_size[0]),
-                      parent_t::rng_sclr(p.grid_size[1])
-              )));
-          }
         }
 
         protected:
