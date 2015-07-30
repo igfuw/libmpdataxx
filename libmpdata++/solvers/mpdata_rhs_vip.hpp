@@ -26,10 +26,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 1>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+      
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im;
@@ -83,10 +84,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 2>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im, jm;
@@ -206,10 +208,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 3>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+      
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im, jm, km;

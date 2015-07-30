@@ -26,10 +26,11 @@ namespace libmpdataxx
       template <class ct_params_t > 
       class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_t>
       {
-	using parent_t = mpdata_rhs<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
 	protected:
+	
+        using parent_t = mpdata_rhs<ct_params_t>;
 
 	// member fields
 	arrvec_t<typename parent_t::arr_t> &stash;
