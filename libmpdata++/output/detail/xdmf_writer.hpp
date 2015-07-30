@@ -13,7 +13,7 @@ namespace libmpdataxx
 {
   namespace output
   {
-    namespace detail
+    namespace detail { namespace 
     {
       template<int dim>
       class xdmf_writer
@@ -201,6 +201,6 @@ namespace libmpdataxx
       const std::string xdmf_writer<dim>::name = "Grid";
       template<int dim>
       const std::string xdmf_writer<dim>::grid_type = "Uniform";
-    }
+    }}
   }
 }

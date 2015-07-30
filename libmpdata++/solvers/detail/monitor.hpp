@@ -14,7 +14,7 @@ namespace libmpdataxx
 {
   namespace solvers
   {
-    namespace detail
+    namespace detail { namespace 
     {
       void monitor(float frac)
       {
@@ -38,7 +38,7 @@ namespace libmpdataxx
 #elif defined(HAVE_PTHREAD_SETNAME_NP) && defined(HAVE_PTHREAD_GETNAME_NP)
         pthread_setname_np(name);
 #endif
-      }
+      }}
     };
   };
 };
