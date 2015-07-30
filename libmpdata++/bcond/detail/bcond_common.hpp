@@ -15,6 +15,18 @@ namespace libmpdataxx
     using namespace arakawa_c;
 
     enum bcond_e { null, cyclic, polar, open, rigid }; 
+    enum drctn_e { left, rght };
+
+    template<
+      typename real_t, 
+      bcond_e knd,
+      drctn_e dir, 
+      int n_dims,
+      int dim,
+      class enableif = void
+    > 
+    class bcond
+    {};
 
     namespace detail
     {
@@ -28,6 +40,7 @@ namespace libmpdataxx
 	{ 
 	  assert(false && "bcond::fill_halos_sclr() called!"); 
 	};
+
 	virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 1>> &) 
 	{ 
 	  assert(false && "bcond::fill_halos_vctr() called!"); 
@@ -60,6 +73,7 @@ namespace libmpdataxx
 	{
 	  assert(false && "bcond::fill_halos_vctr_alng() called!");
 	};
+
 	virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 2> &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
@@ -70,15 +84,37 @@ namespace libmpdataxx
 	{
 	  assert(false && "bcond::fill_halos_sclr() called!");
 	};
+	
+        virtual void fill_halos_pres(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &)
+	{
+	  assert(false && "bcond::fill_halos_pres() called!");
+	};
+	
+	// setting to a value
+	virtual void set_edge_pres(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
+	{
+	  assert(false && "bcond::set_edge_a() called!");
+	};
+	
+	// setting to a given array
+	virtual void set_edge_pres(const blitz::Array<real_t, 3> &,
+                                   const blitz::Array<real_t, 3> &,
+                                   const rng_t &,
+                                   const rng_t &
+                                  ) 
+	{
+	  assert(false && "bcond::set_edge_b() called!");
+	};
+
 	virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr() called!");
 	};
+
 	virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
 	};
-	
 
 	protected:
 	  // sclr
@@ -95,7 +131,7 @@ namespace libmpdataxx
 	public:
 
 	// ctor
-	bcond_common(const rng_t &i, const int halo) :
+	bcond_common(const rng_t &i, const int halo, const int grid_size_0) :
 	  halo(halo),
 	  // sclr
 	  left_edge_sclr(

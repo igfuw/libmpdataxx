@@ -28,7 +28,10 @@ BZ_NAMESPACE(blitz)
 #pragma GCC optimize ("O3") // assuming -Ofast could optimise out the algorithm
     bool operator()(const T_sourcetype& x, const int=0) const 
     { 
-      volatile T_resulttype t, y; // without volatile clang optimises the algorithm out with -Ofast
+#if defined(__FAST_MATH__) && defined(__llvm__)
+      volatile // without volatile clang optimises the algorithm out with -Ofast
+#endif
+      T_resulttype t, y; 
       y = x - c_;
       t = sum_ + y;
       c_ = (t - sum_) - y;

@@ -1,1 +1,0 @@
-libmpdataxx_add_test(rotating_cone_2d)

@@ -57,17 +57,11 @@ namespace libmpdataxx
         {
           assert(false && "sharedmem_common::barrier() called!");
         }
-
-        virtual int rank()
-        {
-          assert(false && "sharedmem_common::rank() called!");
-          throw;
-        }
      
-        void cycle()
+        void cycle(const int &rank)
         {
           barrier();
-          if (rank() == 0) n = (n + 1) % n_tlev - n_tlev; // - n_tlev assures Python-type end-of-array cyclic behaviour works
+          if (rank == 0) n = (n + 1) % n_tlev - n_tlev; // - n_tlev assures Python-type end-of-array cyclic behaviour works
           barrier();
         }
 
@@ -98,52 +92,73 @@ namespace libmpdataxx
         }
   
         /// @brief concurrency-aware 2D summation of array elements
-        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j) // TODO: that's just for 2D
+        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
 	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
           {
-	    (*sumtmp)(c) = blitz::kahan_sum(arr(c, j));
+            if (sum_khn)
+	      (*sumtmp)(c) = blitz::kahan_sum(arr(c, j));
+            else
+	      (*sumtmp)(c) = blitz::sum(arr(c, j));
           }
           barrier();
-          real_t result = blitz::kahan_sum(*sumtmp);
+          real_t result;
+          if (sum_khn)
+            result = blitz::kahan_sum(*sumtmp);
+          else
+            result = blitz::sum(*sumtmp);
           barrier();
           return result;
         }
 
         /// @brief concurrency-aware 2D summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j) // TODO: that's just for 2D
+        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
 	  for (int c = i.first(); c <= i.last(); ++c)
           {
-	    (*sumtmp)(c) = blitz::kahan_sum(arr1(c, j) * arr2(c, j)); 
+            if (sum_khn)
+	      (*sumtmp)(c) = blitz::kahan_sum(arr1(c, j) * arr2(c, j)); 
+            else
+	      (*sumtmp)(c) = blitz::sum(arr1(c, j) * arr2(c, j)); 
           }
           barrier();
-          real_t result = blitz::kahan_sum(*sumtmp);
+          real_t result;
+          if (sum_khn)
+            result = blitz::kahan_sum(*sumtmp);
+          else
+            result = blitz::sum(*sumtmp);
           barrier();
           return result;
         }
         
         /// @brief concurrency-aware 3D summation of array elements
-        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j, const rng_t &k)
+        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j, const rng_t &k, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
 	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
           {
-	    (*sumtmp)(c) = blitz::kahan_sum(arr(c, j, k));
+            if (sum_khn)
+	      (*sumtmp)(c) = blitz::kahan_sum(arr(c, j, k));
+            else
+	      (*sumtmp)(c) = blitz::sum(arr(c, j, k));
           }
           barrier();
-          real_t result = blitz::kahan_sum(*sumtmp);
+          real_t result;
+          if (sum_khn)
+            result = blitz::kahan_sum(*sumtmp);
+          else
+            result = blitz::sum(*sumtmp);
           barrier();
           return result;
         }
 
         /// @brief concurrency-aware 3D summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j, const rng_t &k)
+        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j, const rng_t &k, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
@@ -157,18 +172,18 @@ namespace libmpdataxx
           return result;
         }
 
-        real_t min(const arr_t &arr)
+        real_t min(const int &rank, const arr_t &arr)
         {
-          (*xtmtmp)(rank()) = blitz::min(arr); 
+          (*xtmtmp)(rank) = blitz::min(arr); 
           barrier();
           real_t result = blitz::min(*xtmtmp);
           barrier();
           return result;
         }
 
-        real_t max(const arr_t &arr)
+        real_t max(const int &rank, const arr_t &arr)
         {
-          (*xtmtmp)(rank()) = blitz::max(arr); 
+          (*xtmtmp)(rank) = blitz::max(arr); 
           barrier();
           real_t result = blitz::max(*xtmtmp);
           barrier();

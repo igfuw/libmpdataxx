@@ -11,8 +11,14 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    template <typename real_t>
-    class cyclic_left_1d : public detail::bcond_common<real_t>
+    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int dim>    
+    class bcond<       real_t,         knd,         dir,     n_dims,     dim,
+      typename std::enable_if<
+        knd == cyclic && 
+        dir == left   && 
+        n_dims == 1
+      >::type
+    > : public detail::bcond_common<real_t>
     {
       using parent_t = detail::bcond_common<real_t>;
       using arr_t = blitz::Array<real_t, 1>;
@@ -31,8 +37,14 @@ namespace libmpdataxx
       }
     };
 
-    template <typename real_t>
-    class cyclic_rght_1d : public detail::bcond_common<real_t>
+    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int dim>
+    class bcond<       real_t,         knd,         dir,     n_dims,     dim,
+      typename std::enable_if<
+        knd == cyclic &&
+        dir == rght   &&
+        n_dims == 1
+      >::type
+    > : public detail::bcond_common<real_t>
     {
       using parent_t = detail::bcond_common<real_t>;
       using arr_t = blitz::Array<real_t, 1>;

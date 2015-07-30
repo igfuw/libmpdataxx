@@ -27,10 +27,13 @@ namespace libmpdataxx
       static_assert(parent_t::n_dims < 3, "only 1D and 2D output supported");
 
       std::unique_ptr<Gnuplot> gp;
+      const int precision = 5;
 
       void start(const int nt)
       {
         gp.reset(new Gnuplot());
+        *gp << std::fixed << std::setprecision(precision);
+        // fixed instead of scientific to allow automatic comparison of test results for values near zero
 
         // some common 1D/2D settings
         *gp 
@@ -184,8 +187,10 @@ namespace libmpdataxx
 		<< " binary" << binfmt(this->mem->advectee(0)) 
 		<< " origin=(" << ox << "," << oy << ",0)" 
 		<< " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
-	    gp->sendBinary(this->mem->advectee(var).copy());
-	    if (imagebg) gp->sendBinary(this->mem->advectee(var).copy());
+            auto data = this->mem->advectee(var).copy();
+            data = blitz::rint(data * pow(10, precision)) * pow(10, -precision);
+	    gp->sendBinary(data);
+	    if (imagebg) gp->sendBinary(data);
           }
         }
       }
@@ -234,7 +239,7 @@ namespace libmpdataxx
           gnuplot_surface = true;
       };
 
-      const rt_params_t p; // TODO: that's a copy - convenient but might be memory-consuming, make a struct p.gnupot that would be copied
+      rt_params_t p; // TODO: that's a copy - convenient but might be memory-consuming, make a struct p.gnupot that would be copied
       // TODO: make a gnuplot_params map and copy only this map!
 
       // ctor
@@ -242,7 +247,10 @@ namespace libmpdataxx
 	typename parent_t::ctor_args_t args,
 	const rt_params_t &p
       ) : parent_t(args, p), p(p)
-      {}
+      {
+        if (!this->outdir.empty()) 
+          this->p.gnuplot_output = this->outdir + "/" + p.gnuplot_output; // TODO: get rid of gnuplot_output
+      }
     }; 
   }; // namespace output
 }; // namespace libmpdataxx

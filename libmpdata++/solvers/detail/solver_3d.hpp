@@ -30,11 +30,14 @@ namespace libmpdataxx
       
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
-	rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
+	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
-	void xchng_sclr(typename parent_t::arr_t arr,
-                       rng_t range_i, rng_t range_j, rng_t range_k,
-                       const bool deriv = false) // for a given array
+	void xchng_sclr(typename parent_t::arr_t &arr,
+                       const rng_t &range_i,
+                       const rng_t &range_j,
+                       const rng_t &range_k,
+                       const bool deriv = false
+        ) // for a given array
 	{
           this->mem->barrier();
 	  bcxl->fill_halos_sclr(arr, range_j, range_k, deriv);
@@ -53,12 +56,12 @@ namespace libmpdataxx
         void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec)
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/); 
-          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/, k/*^1*/);
-          bcyl->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/); 
-          bcyr->fill_halos_vctr_alng(arrvec, k/*^1*/, i/*^1*/);
-          bczl->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
-          bczr->fill_halos_vctr_alng(arrvec, i/*^1*/, j/*^1*/);
+          bcxl->fill_halos_vctr_alng(arrvec, j, k); 
+          bcxr->fill_halos_vctr_alng(arrvec, j, k);
+          bcyl->fill_halos_vctr_alng(arrvec, k, i); 
+          bcyr->fill_halos_vctr_alng(arrvec, k, i);
+          bczl->fill_halos_vctr_alng(arrvec, i, j);
+          bczr->fill_halos_vctr_alng(arrvec, i, j);
           this->mem->barrier();
         }
         
@@ -69,26 +72,32 @@ namespace libmpdataxx
           xchng_vctr_alng(this->mem->GC);
  
           // sanity check for non-divergence of the initial Courant number field
-          // TODO: same in 1D and 3D
-          if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
-	    ( 
-              this->mem->GC[0](i-h, j, k) - 
-	      this->mem->GC[0](i+h, j, k)
-            ) + (
-	      this->mem->GC[1](i, j-h, k) - 
-	      this->mem->GC[1](i, j+h, k)
-            ) + (
-	      this->mem->GC[2](i, j, k-h) - 
-	      this->mem->GC[2](i, j, k+h)
-            )
-	  ))) throw std::runtime_error("initial advector field is divergent");
+          // TODO: same in 1D
+          if (!opts::isset(ct_params_t::opts, opts::dfl))
+          {
+            if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
+              ( 
+                this->mem->GC[0](i-h, j, k) - 
+                this->mem->GC[0](i+h, j, k)
+              ) + (
+                this->mem->GC[1](i, j-h, k) - 
+                this->mem->GC[1](i, j+h, k)
+              ) + (
+                this->mem->GC[2](i, j, k-h) - 
+                this->mem->GC[2](i, j, k+h)
+              )
+            ))) throw std::runtime_error("initial advector field is divergent");
+          }
         }
 
         public:
 
         struct ctor_args_t
         {   
+          // <TODO> these should be common for 1D,2D,3D
+          int rank;
           typename parent_t::mem_t *mem;
+          // </TODO>
           typename parent_t::bcp_t 
             &bcxl, &bcxr, 
             &bcyl, &bcyr,
@@ -96,14 +105,20 @@ namespace libmpdataxx
           const rng_t &i, &j, &k; 
         };  
 
+        struct rt_params_t : parent_t::rt_params_t
+        {
+          typename parent_t::real_t di = 0, dj = 0, dk = 0;
+        };
+
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         ) :
 	  parent_t(
+            args.rank,
             args.mem, 
             p,
 	    idx_t<parent_t::n_dims>({args.i, args.j, args.k})
@@ -117,13 +132,17 @@ namespace libmpdataxx
 	  bcyr(std::move(args.bcyr)),
 	  bczl(std::move(args.bczl)),
 	  bczr(std::move(args.bczr))
-	{} 
+	{
+          this->di = p.di;
+          this->dj = p.dj;
+          this->dk = p.dk;
+        } 
 
 	public:
 
 	static void alloc(
           typename parent_t::mem_t *mem,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         )   
         {
           // psi
@@ -162,7 +181,7 @@ namespace libmpdataxx
             )));
 
 	  // allocate Kahan summation temporary vars
-	  if (!opts::isset(ct_params_t::opts, opts::nkh))
+	  if (opts::isset(ct_params_t::opts, opts::khn))
 	    for (int n = 0; n < 3; ++n) 
 	      mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
 	        parent_t::rng_sclr(p.grid_size[0]), 

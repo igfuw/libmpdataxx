@@ -30,9 +30,13 @@ namespace libmpdataxx
       
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr;
 
-	rng_t i, j;
+	const rng_t i, j; // TODO: to be removed
 
-	void xchng_sclr(typename parent_t::arr_t arr, rng_t range_i, rng_t range_j, const bool deriv = false) // for a given array
+	void xchng_sclr(typename parent_t::arr_t &arr,
+                        const rng_t &range_i,
+                        const rng_t &range_j,
+                        const bool deriv = false
+        ) // for a given array
 	{
           this->mem->barrier();
 	  bcxl->fill_halos_sclr(arr, range_j, deriv);
@@ -50,10 +54,10 @@ namespace libmpdataxx
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j/*^1*/);
-          bcxr->fill_halos_vctr_alng(arrvec, j/*^1*/);
-          bcyl->fill_halos_vctr_alng(arrvec, i/*^1*/);
-          bcyr->fill_halos_vctr_alng(arrvec, i/*^1*/);
+          bcxl->fill_halos_vctr_alng(arrvec, j);
+          bcxr->fill_halos_vctr_alng(arrvec, j);
+          bcyl->fill_halos_vctr_alng(arrvec, i);
+          bcyr->fill_halos_vctr_alng(arrvec, i);
           // TODO: open bc nust be last!!!
           this->mem->barrier();
         }
@@ -68,6 +72,7 @@ namespace libmpdataxx
           // sanity check for non-divergence of the initial Courant number field
           // (including compatibility with the initial condition)
           // TODO: same in 1D
+          if (!opts::isset(ct_params_t::opts, opts::dfl))
           {
             typename ct_params_t::real_t max_abs_div = max(abs(
 	      ( 
@@ -87,19 +92,28 @@ namespace libmpdataxx
  
         struct ctor_args_t
         {   
+          // <TODO> these should be common for 1D,2D,3D
+          int rank;
           typename parent_t::mem_t *mem;
+          // </TODO>
           typename parent_t::bcp_t &bcxl, &bcxr, &bcyl, &bcyr; 
           const rng_t &i, &j; 
         };  
+        
+        struct rt_params_t : parent_t::rt_params_t
+        {
+          typename parent_t::real_t di = 0, dj = 0;
+        };
 
         protected:
 
 	// ctor
 	solver(
           ctor_args_t args,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         ) :
 	  parent_t(
+            args.rank,
             args.mem, 
             p, 
             idx_t<parent_t::n_dims>({args.i, args.j})
@@ -110,13 +124,16 @@ namespace libmpdataxx
 	  bcxr(std::move(args.bcxr)), 
 	  bcyl(std::move(args.bcyl)),
 	  bcyr(std::move(args.bcyr))
-	{ }
+	{
+          this->di = p.di;
+          this->dj = p.dj;
+        }
 
         // memory allocation logic using static methods
 
 	public:
 
-	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p) 
+	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p) 
         {
           // psi 
           mem->psi.resize(parent_t::n_eqns);
@@ -145,7 +162,7 @@ namespace libmpdataxx
             )));
 
           // allocate Kahan summation temporary vars
-          if (!opts::isset(ct_params_t::opts, opts::nkh))
+          if (opts::isset(ct_params_t::opts, opts::khn))
 	    for (int n = 0; n < 3; ++n) 
 	      mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
                 parent_t::rng_sclr(p.grid_size[0]), 

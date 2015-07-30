@@ -38,7 +38,7 @@ namespace libmpdataxx
       inline auto frac(
         const nom_t &nom, 
         const den_t &den,
-        typename std::enable_if<!opts::isset(opts, opts::eps)>::type* = 0 // enabled if eps == false
+        typename std::enable_if<opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == true
       ) return_macro(,
         where(den != 0, nom / den, 0) // note: apparently >0 would suffice
       )
@@ -49,7 +49,7 @@ namespace libmpdataxx
       inline auto frac(
         const nom_t &nom, 
         const den_t &den,
-        typename std::enable_if<opts::isset(opts, opts::eps)>::type* = 0 // enabled if eps == true
+        typename std::enable_if<!opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == false
       ) return_macro(,
         nom / (den + blitz::tiny(typename den_t::T_numtype(0))) // note: for negative signal eps -> -eps
       )

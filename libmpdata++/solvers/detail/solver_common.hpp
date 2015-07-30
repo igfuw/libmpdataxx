@@ -46,8 +46,13 @@ namespace libmpdataxx
         using ix = typename ct_params_t::ix;
 
 	protected: 
+        
+        const int rank;
 
-	idx_t<n_dims> ijk;
+        // declared here for output purposes
+        real_t dt, di, dj, dk;
+
+	const idx_t<n_dims> ijk;
 
         long long int timestep = 0;
         std::vector<int> n; 
@@ -61,7 +66,7 @@ namespace libmpdataxx
 	virtual void cycle(int e) final
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
-          if (e == n_eqns - 1) this->mem->cycle(); 
+          if (e == n_eqns - 1) mem->cycle(rank); 
 	}
 
 	virtual void xchng(int e) = 0;
@@ -98,9 +103,6 @@ namespace libmpdataxx
 #if !defined(NDEBUG)
           hook_ante_loop_called = true;
 #endif
-          // set the floating point rounding mode (see rotating cone test with zero background and opts=fct+iga)
-          // doing it here to ensure all threads do the same, and to be able to set it via ct_params_t
-          fesetround(ct_params_t::fp_round_mode);
         }
 
 	public:
@@ -108,10 +110,21 @@ namespace libmpdataxx
         struct rt_params_t 
         {
           std::array<int, n_dims> grid_size;
+          real_t dt=0;
         };
 
 	// ctor
-	solver_common(mem_t *mem, const rt_params_t &p, const decltype(ijk) &ijk) :
+	solver_common(
+          const int &rank, 
+          mem_t *mem, 
+          const rt_params_t &p, 
+          const decltype(ijk) &ijk
+        ) :
+          rank(rank), 
+          dt(p.dt),
+          di(0),
+          dj(0),
+          dk(0),
 	  n(n_eqns, 0), 
           mem(mem),
           ijk(ijk)
@@ -143,12 +156,12 @@ namespace libmpdataxx
           // being generous about out-of-loop barriers 
           if (timestep == 0)
           {
-	    this->mem->barrier();
+	    mem->barrier();
 #if !defined(NDEBUG)
 	    hook_ante_loop_called = false;
 #endif
 	    hook_ante_loop(nt);
-	    this->mem->barrier();
+	    mem->barrier();
           }
 
           // moved here so that if an exception is thrown from hook_ante_loop these do not cause complaints
@@ -163,8 +176,8 @@ namespace libmpdataxx
 	    monitor(float(timestep) / nt);  // TODO: does this value make sanse with repeated advence() calls?
 
             // might be used to implement multi-threaded signal handling
-            this->mem->barrier();
-            if (this->mem->panic) break;
+            mem->barrier();
+            if (mem->panic) break;
 
             // proper solver stuff
             hook_ante_step();
@@ -172,7 +185,11 @@ namespace libmpdataxx
 	    for (int e = 0; e < n_eqns; ++e) scale(e, ct_params_t::hint_scale(e));
 
 	    for (int e = 0; e < n_eqns; ++e) xchng(e);
-	    for (int e = 0; e < n_eqns; ++e) advop(e);
+	    for (int e = 0; e < n_eqns; ++e) 
+            { 
+              advop(e);
+              if (e != n_eqns - 1) mem->barrier();
+            }
 	    for (int e = 0; e < n_eqns; ++e) cycle(e); // note: cycle assumes ascending loop index
 
 	    for (int e = 0; e < n_eqns; ++e) scale(e, -ct_params_t::hint_scale(e));
@@ -181,7 +198,7 @@ namespace libmpdataxx
             hook_post_step();
 	  }   
 
-          this->mem->barrier();
+          mem->barrier();
           // note: hook_post_loop was removed as conficling with multiple-advance()-call logic
         }
 
@@ -190,9 +207,9 @@ namespace libmpdataxx
 	// psi[n] getter - just to shorten the code
         // note that e.g. in hook_post_loop it points rather to 
         // psi^{n+1} than psi^{n} (hence not using the name psi_n)
-	virtual const arr_t &state(const int &e) const final
+	virtual arr_t &state(const int &e) final
 	{
-	  return this->mem->psi[e][n[e]];
+	  return mem->psi[e][n[e]];
 	}
 
         static rng_t rng_vctr(const int &n) { return rng_t(0, n-1)^h^(halo-1); }

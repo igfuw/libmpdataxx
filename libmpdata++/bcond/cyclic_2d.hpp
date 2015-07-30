@@ -11,9 +11,15 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    template<int d, typename real_t>
-    class cyclic_left_2d : public detail::bcond_common<real_t>
-    {
+    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,         knd,         dir,     n_dims,     d,  
+      typename std::enable_if<
+        knd == cyclic &&
+        dir == left &&
+        n_dims == 2
+      >::type
+    > : public detail::bcond_common<real_t>
+    { 
       using parent_t = detail::bcond_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
@@ -47,9 +53,15 @@ namespace libmpdataxx
       }
     };
 
-    template<int d, typename real_t>
-    class cyclic_rght_2d : public detail::bcond_common<real_t>
-    {
+    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,         knd,         dir,     n_dims,     d,  
+      typename std::enable_if<
+        knd == cyclic &&
+        dir == rght &&
+        n_dims == 2
+      >::type
+    > : public detail::bcond_common<real_t>
+    { 
       using parent_t = detail::bcond_common<real_t>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor

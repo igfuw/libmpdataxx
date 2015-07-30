@@ -26,7 +26,6 @@ namespace libmpdataxx
 
 	// member fields
 	arrvec_t<typename parent_t::arr_t> &stash;
-        bool initial_h_non_zero = false;
         typename parent_t::real_t eps;
 
 	virtual void fill_stash() = 0;
@@ -34,10 +33,14 @@ namespace libmpdataxx
 	{
 	  if (ix::vip_den == -1)
 	    this->stash[d](this->ijk) = this->state(e)(this->ijk);
-	  else if (this->initial_h_non_zero)
-	    this->stash[d](this->ijk) = this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk);
+	  else if (eps == 0) // this is the default  
+          {
+            // for those simulations advecting momentum where the division by mass will not cause division by zero
+            // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
+            this->stash[d](this->ijk) = this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk);
+          }
 	  else
-	  {
+	  {  
 	    this->stash[d](this->ijk) = where(
 	      // if
 	      this->state(ix::vip_den)(this->ijk) > eps,
@@ -59,8 +62,12 @@ namespace libmpdataxx
 
 	  if (ix::vip_den == -1) 
 	    this->stash[d](this->ijk) += 3./2 * this->state(e)(this->ijk);
-	  else if (this->initial_h_non_zero)
+	  else if (eps == 0) //this is the default
+          {             
+            // for those simulations advecting momentum where the division by mass will not cause division by zero
+            // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
 	    this->stash[d](this->ijk) += 3./2 * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
+          }
 	  else
 	  {
 	    this->stash[d](this->ijk) += where(
@@ -82,16 +89,12 @@ namespace libmpdataxx
 	void hook_ante_loop(const int nt)
 	{
           // fill Courant numbers with zeros so that the divergence test does no harm
-          if (this->mem->rank() == 0)
+          if (this->rank == 0)
             for (int d=0; d < parent_t::n_dims; ++d) this->mem->GC.at(d) = 0; 
           this->mem->barrier();
 
 	  parent_t::hook_ante_loop(nt);
 	  
-          // set-up initial_h_non_zero
-          if (ct_params_t::ix::vip_den != -1) 
-            initial_h_non_zero = min(this->state(ct_params_t::ix::vip_den)(this->ijk)) > 0;
-
 	  // to make extrapolation possible at the first time-step
 	  fill_stash();
 	}
@@ -120,7 +123,7 @@ namespace libmpdataxx
 	
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename parent_t::real_t vip_eps = blitz::epsilon(typename parent_t::real_t(44));
+          typename parent_t::real_t vip_eps = 0;
         };
 
 	static void alloc(
