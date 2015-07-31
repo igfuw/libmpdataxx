@@ -133,15 +133,13 @@ namespace libmpdataxx
           bcond::drctn_e dir,
           int dim
         >
-        void bcx_set(
-          typename solver_t::bcp_t &bcp, 
-          const std::array<int, solver_t::n_dims> &grid_size
-        ) {
+        void bc_set(typename solver_t::bcp_t &bcp) 
+        {
 	  bcp.reset(
             new bcond::bcond<real_t, type, dir, solver_t::n_dims, dim>(
-	      slab<dim>(grid_size), 
+	      slab<dim>(mem->grid_size), 
 	      solver_t::halo, 
-	      grid_size[0]
+	      mem->grid_size[0]
             )
           );
         }
@@ -154,8 +152,8 @@ namespace libmpdataxx
         {
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
 
-          bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
-	  bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
+          bc_set<bcxl, bcond::left, 0>(bxl);
+	  bc_set<bcxr, bcond::rght, 0>(bxr);
 
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
@@ -190,11 +188,11 @@ namespace libmpdataxx
             {
 	      typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
 
-              bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
-	      bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
+              bc_set<bcxl, bcond::left, 0>(bxl);
+	      bc_set<bcxr, bcond::rght, 0>(bxr);
 
-              bcx_set<bcyl, bcond::left, 1>(byl, grid_size);
-	      bcx_set<bcyr, bcond::rght, 1>(byr, grid_size);
+              bc_set<bcyl, bcond::left, 1>(byl);
+	      bc_set<bcyr, bcond::rght, 1>(byr);
 
               shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
               shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
@@ -232,14 +230,14 @@ namespace libmpdataxx
             {
 	      for (int i2 = 0; i2 < n2; ++i2) 
               {
-                bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
-                bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
+                bc_set<bcxl, bcond::left, 0>(bxl);
+                bc_set<bcxr, bcond::rght, 0>(bxr);
 
-                bcx_set<bcyl, bcond::left, 1>(byl, grid_size);
-                bcx_set<bcyr, bcond::rght, 1>(byr, grid_size);
+                bc_set<bcyl, bcond::left, 1>(byl);
+                bc_set<bcyr, bcond::rght, 1>(byr);
 
-                bcx_set<bczl, bcond::left, 2>(bzl, grid_size);
-                bcx_set<bczr, bcond::rght, 2>(bzr, grid_size);
+                bc_set<bczl, bcond::left, 2>(bzl);
+                bc_set<bczr, bcond::rght, 2>(bzr);
 
                 shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
                 shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1

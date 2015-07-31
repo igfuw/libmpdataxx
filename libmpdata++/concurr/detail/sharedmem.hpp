@@ -67,30 +67,17 @@ namespace libmpdataxx
 
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
-        sharedmem_common(const std::array<int, 1> &grid_size, const int &size)
+        sharedmem_common(const std::array<int, n_dims> &grid_size, const int &size)
           : n(0), grid_size(grid_size) // TODO: is n(0) needed?
         {
-          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
-          //sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));  // TODO: write a different sum that would't use sumtmp
+          if (size > grid_size[0]) 
+            throw std::runtime_error("number of subdomains greater than number of gridpoints");
+
+          if (n_dims != 1) 
+            sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
-        sharedmem_common(const std::array<int, 2> &grid_size, const int &size)
-          : n(0), grid_size(grid_size)
-        {
-          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
-          sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
-          xtmtmp.reset(new blitz::Array<real_t, 1>(size));
-        }
-
-        sharedmem_common(const std::array<int, 3> &grid_size, const int &size)
-          : n(0), grid_size(grid_size)
-        {
-          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
-          sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
-          xtmtmp.reset(new blitz::Array<real_t, 1>(size));
-        }
-  
         /// @brief concurrency-aware 2D summation of array elements
         real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j, const bool sum_khn)
         {
