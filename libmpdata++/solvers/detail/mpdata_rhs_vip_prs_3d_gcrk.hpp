@@ -109,12 +109,14 @@ namespace libmpdataxx
 	      p_err(args.mem->tmp[__FILE__][2])
 	{}
 
-	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
-	{
-	  parent_t::alloc(mem, p);
-	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 1);
-	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, k_iters);
-	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, k_iters);
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const int &n_iters
+        ) {
+	  parent_t::alloc(mem, n_iters);
+	  parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
+	  parent_t::alloc_tmp_sclr(mem, __FILE__, k_iters);
+	  parent_t::alloc_tmp_sclr(mem, __FILE__, k_iters);
 	}
       }; 
     }; // namespace detail

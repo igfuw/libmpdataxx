@@ -238,10 +238,12 @@ namespace libmpdataxx
 	  lap_tmp3(args.mem->tmp[__FILE__][0][7])
 	{} 
 
-	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
-	{
-	  parent_t::alloc(mem, p);
-          parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 8); // (i^hlo,j^hlo)-sized temporary fields
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const int &n_iters
+        ) {
+	  parent_t::alloc(mem, n_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 8); // (i^hlo,j^hlo)-sized temporary fields
         }
       }; 
     }; // namespace detail
