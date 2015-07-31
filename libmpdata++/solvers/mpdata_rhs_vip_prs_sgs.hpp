@@ -177,14 +177,13 @@ namespace libmpdataxx
 
       static void alloc(
         typename parent_t::mem_t *mem, 
-        const std::array<int, ct_params_t::n_dims> &grid_size,
         const int &n_iters
       ) {
-	parent_t::alloc(mem, grid_size, n_iters);
-        parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 3); // unique strain rate tensor elements
+	parent_t::alloc(mem, n_iters);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 3); // unique strain rate tensor elements
         // TODO: do not allocate unnecessary memory when not using pade differencing
-        parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 4);
-        parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 2);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 4);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 2);
       }
 
     };
@@ -362,14 +361,13 @@ namespace libmpdataxx
 
       static void alloc(
         typename parent_t::mem_t *mem,
-        const std::array<int, ct_params_t::n_dims> &grid_size,
         const int &n_iters
       ) {
-	parent_t::alloc(mem, grid_size, n_iters);
-        parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 6); // unique strain rate tensor elements
+	parent_t::alloc(mem, n_iters);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 6); // unique strain rate tensor elements
         // TODO: do not allocate unnecessary memory when not using pade differencing
-        parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 9);
-        parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 2);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 9);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 2);
       }
     };
   }; // namespace solvers

@@ -99,13 +99,12 @@ namespace libmpdataxx
         // memory allocation
 	static void alloc(
           typename parent_t::mem_t *mem, 
-          const std::array<int, ct_params_t::n_dims> &grid_size,
           const int &n_iters
         ) {   
-	  parent_t::alloc(mem, grid_size, n_iters);
+	  parent_t::alloc(mem, n_iters);
 	  for (int n = 0; n < n_tmp(n_iters); ++n)
-	    parent_t::alloc_tmp_vctr(mem, grid_size, __FILE__);
-          parent_t::alloc_tmp_vctr(mem, grid_size, __FILE__); // fluxes
+	    parent_t::alloc_tmp_vctr(mem, __FILE__);
+          parent_t::alloc_tmp_vctr(mem, __FILE__); // fluxes
 	}   
       };
 

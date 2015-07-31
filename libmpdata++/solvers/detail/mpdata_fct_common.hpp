@@ -58,13 +58,12 @@ namespace libmpdataxx
 
 	static void alloc(
           typename parent_t::mem_t *mem, 
-          const std::array<int, ct_params_t::n_dims> &grid_size,
           const int &n_iters
         ) {
-	  parent_t::alloc(mem, grid_size, n_iters);
-	  parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 2); // psi_min and psi_max
-	  parent_t::alloc_tmp_vctr(mem, grid_size, __FILE__);    // GC_mono
-	  parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 2); // beta_up, beta_dn
+	  parent_t::alloc(mem, n_iters);
+	  parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // psi_min and psi_max
+	  parent_t::alloc_tmp_vctr(mem, __FILE__);    // GC_mono
+	  parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // beta_up, beta_dn
 	}
       };
 

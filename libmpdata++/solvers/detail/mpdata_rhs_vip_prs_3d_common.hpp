@@ -240,11 +240,10 @@ namespace libmpdataxx
 
 	static void alloc(
           typename parent_t::mem_t *mem, 
-          const std::array<int, ct_params_t::n_dims> &grid_size,
           const int &n_iters
         ) {
-	  parent_t::alloc(mem, grid_size, n_iters);
-          parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 8); // (i^hlo,j^hlo)-sized temporary fields
+	  parent_t::alloc(mem, n_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 8); // (i^hlo,j^hlo)-sized temporary fields
         }
       }; 
     }; // namespace detail
