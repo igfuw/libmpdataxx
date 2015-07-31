@@ -104,8 +104,25 @@ set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
 
 
 ############################################################################################
+# MPI - detecting if the C++ compiler is actually an MPI wrapper
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} "-show" RESULT_VARIABLE status OUTPUT_VARIABLE output)
+if (status EQUAL 0 AND output MATCHES "mpi") 
+  set(USE_MPI TRUE)
+  set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -DUSE_MPI")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -DUSE_MPI")
+else()
+  set(USE_MPI FALSE)
+endif()
+unset(status)
+unset(output)
+
+############################################################################################
 # Boost libraries
-find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem QUIET)
+set(req_comp thread date_time system iostreams timer filesystem)
+if(USE_MPI)
+  list(APPEND req_comp mpi)
+endif()
+find_package(Boost COMPONENTS ${req_comp} QUIET)
 if(Boost_FOUND)
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
