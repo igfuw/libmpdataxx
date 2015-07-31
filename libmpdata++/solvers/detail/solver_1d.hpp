@@ -122,23 +122,26 @@ namespace libmpdataxx
 
         public:
 
-	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)   
-        {
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const std::array<int, ct_params_t::n_dims> &grid_size,
+          const int &n_iters
+        ) {
           mem->psi.resize(parent_t::n_eqns);
 	  for (int e = 0; e < parent_t::n_eqns; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.grid_size[0]))));
+	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(grid_size[0]))));
     
-	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(p.grid_size[0])))); 
+	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(grid_size[0])))); 
 
           if (opts::isset(ct_params_t::opts, opts::nug))
-	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.grid_size[0]))));
+	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(grid_size[0]))));
 
           // allocate Kahan summation temporary vars
           if (opts::isset(ct_params_t::opts, opts::khn))
             for (int n = 0; n < 3; ++n) 
               mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
-                parent_t::rng_sclr(p.grid_size[0])
+                parent_t::rng_sclr(grid_size[0])
               )));
         } 
 

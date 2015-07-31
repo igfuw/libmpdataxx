@@ -115,10 +115,13 @@ namespace libmpdataxx
 	   pcnd_err(args.mem->tmp[__FILE__][0][4])
 	{}
 
-	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
-	{
-	  parent_t::alloc(mem, p);
-	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 5);
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const std::array<int, ct_params_t::n_dims> &grid_size,
+          const int &n_iters
+        ) {
+	  parent_t::alloc(mem, grid_size, n_iters);
+	  parent_t::alloc_tmp_sclr(mem, grid_size, __FILE__, 5);
 	}
       }; 
     }; // namespcae detail
