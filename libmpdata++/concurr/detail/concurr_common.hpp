@@ -63,31 +63,6 @@ namespace libmpdataxx
           "more boundary conditions than dimensions"
         );
 
-        private:
-
-        // helper methods to define subdomain ranges
-	int min(const int &grid_size, const int &rank, const int &size) 
-	{ 
-	  return rank * grid_size / size; 
-	}
-
-	int max(const int &grid_size, const int &rank, const int &size) 
-	{ 
-          return min(grid_size, rank + 1, size) - 1; 
-	}
-
-        template <int d>
-        rng_t slab(
-          const std::array<int, solver_t::n_dims> &grid_size, 
-          const int &rank = 0, 
-          const int &size = 1
-        ) {
-          return rng_t(
-            min(grid_size[d], rank, size),
-            max(grid_size[d], rank, size)
-          );
-        }
-
 	protected:
 
         // (cannot be nested due to templates)
@@ -137,7 +112,7 @@ namespace libmpdataxx
         {
 	  bcp.reset(
             new bcond::bcond<real_t, type, dir, solver_t::n_dims, dim>(
-	      slab<dim>(mem->grid_size), 
+	      mem->slab(mem->grid_size[dim]), 
 	      solver_t::halo, 
 	      mem->grid_size[0]
             )
@@ -167,7 +142,7 @@ namespace libmpdataxx
 		  mem.get(), 
 		  i0 == 0      ? bxl : shrdl,
 		  i0 == n0 - 1 ? bxr : shrdr,
-		  slab<0>(grid_size, i0, n0)
+		  mem->slab(grid_size[0], i0, n0)
                 }), 
                 p
               )
@@ -205,8 +180,8 @@ namespace libmpdataxx
 		    i0 == 0      ? bxl : shrdl,
 		    i0 == n0 - 1 ? bxr : shrdr,
 		    byl, byr, 
-		    slab<0>(grid_size, i0, n0),  
-                    slab<1>(grid_size, i1, n1)
+		    mem->slab(grid_size[0], i0, n0),  
+                    mem->slab(grid_size[1], i1, n1)
                   }), 
                   p
                 )
@@ -251,9 +226,9 @@ namespace libmpdataxx
 		      i0 == n0 - 1 ? bxr : shrdr,
                       byl, byr, 
                       bzl, bzr, 
-                      slab<0>(grid_size, i0, n0), 
-                      slab<1>(grid_size, i1, n1), 
-                      slab<2>(grid_size, i2, n2)
+                      mem->slab(grid_size[0], i0, n0), 
+                      mem->slab(grid_size[1], i1, n1), 
+                      mem->slab(grid_size[2], i2, n2)
                     }), 
                     p
                   )

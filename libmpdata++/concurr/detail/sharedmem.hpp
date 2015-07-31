@@ -190,6 +190,30 @@ namespace libmpdataxx
           ret->reindexSelf(arg->base());
           return ret;
         }
+
+        private:
+        // helper methods to define subdomain ranges
+        static int min(const int &span, const int &rank, const int &size) 
+        {
+          return rank * span / size; 
+        }
+
+        static int max(const int &span, const int &rank, const int &size) 
+        {
+          return min(span, rank + 1, size) - 1;  
+        }
+
+        public:
+        static rng_t slab(
+          const int &span,
+          const int &rank = 0,  
+          const int &size = 1 
+        ) {
+          return rng_t(
+            min(span, rank, size),
+            max(span, rank, size)
+          );
+        }
       };
 
       template<typename real_t, int n_dims, int n_tlev>
