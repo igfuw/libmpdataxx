@@ -98,7 +98,7 @@ namespace libmpdataxx
 	  solver_t::alloc(mem.get(), p.n_iters);
 
           // allocate per-thread structures
-          init(p, p.grid_size, size); 
+          init(p, mem->grid_size, size); 
         }
 
         private:
@@ -114,7 +114,7 @@ namespace libmpdataxx
             new bcond::bcond<real_t, type, dir, solver_t::n_dims, dim>(
 	      mem->slab(mem->grid_size[dim]), 
 	      solver_t::halo, 
-	      mem->grid_size[0]
+	      mem->grid_size[0].length() // TODO: get it from rt_params...
             )
           );
         }
@@ -122,7 +122,7 @@ namespace libmpdataxx
         // 1D version
         void init(
           const typename solver_t::rt_params_t &p,
-          const std::array<int, 1> &grid_size, const int &n0
+          const std::array<rng_t, 1> &grid_size, const int &n0
         )
         {
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
@@ -154,7 +154,7 @@ namespace libmpdataxx
         // TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
         void init(
           const typename solver_t::rt_params_t &p,
-	  const std::array<int, 2> &grid_size, 
+	  const std::array<rng_t, 2> &grid_size, 
           const int &n0, const int &n1 = 1
         ) {
           for (int i0 = 0; i0 < n0; ++i0) 
@@ -193,7 +193,7 @@ namespace libmpdataxx
         // 3D version
         void init(
           const typename solver_t::rt_params_t &p,
-	  const std::array<int, 3> &grid_size, 
+	  const std::array<rng_t, 3> &grid_size, 
           const int &n0, const int &n1 = 1, const int &n2 = 1
         ) {
           typename solver_t::bcp_t bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;

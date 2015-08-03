@@ -212,8 +212,8 @@ namespace libmpdataxx
 	  return mem->psi[e][n[e]];
 	}
 
-        static rng_t rng_vctr(const int &n) { return rng_t(0, n-1)^h^(halo-1); }
-        static rng_t rng_sclr(const int &n) { return rng_t(0, n-1)^halo; }
+        static rng_t rng_vctr(const rng_t &rng) { return rng^h^(halo-1); }
+        static rng_t rng_sclr(const rng_t &rng) { return rng^halo; }
 
         private:
         void scale(const int &e, const int &exp)
