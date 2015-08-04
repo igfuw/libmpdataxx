@@ -14,6 +14,13 @@
 
 #include <array>
 
+// <MPI>                                                                        
+#if defined(USE_MPI)                                                            
+#  include <boost/mpi/environment.hpp>                                          
+#  include <boost/mpi/communicator.hpp>                                         
+#endif                                                                          
+// </MPI> 
+
 namespace libmpdataxx
 {
   namespace concurr
@@ -71,7 +78,7 @@ namespace libmpdataxx
           : n(0) // TODO: is n(0) needed?
         {
           for (int d = 0; d < n_dims; ++d) 
-            this->grid_size[d] = rng_t(0, grid_size[d]-1);
+            this->grid_size[d] = rng_t(0, grid_size[d]-1), 
 
           if (size > grid_size[0]) 
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
