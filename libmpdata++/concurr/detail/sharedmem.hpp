@@ -36,6 +36,10 @@ namespace libmpdataxx
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; 
         std::unique_ptr<blitz::Array<real_t, 1>> sumtmp;
 
+        protected:
+
+        blitz::TinyVector<int, n_dims> origin;
+
 	public:
 
 	int n = 0;
@@ -71,7 +75,10 @@ namespace libmpdataxx
           : n(0) // TODO: is n(0) needed?
         {
           for (int d = 0; d < n_dims; ++d) 
+          {
             this->grid_size[d] = rng_t(0, grid_size[d]-1);
+            origin[d] = this->grid_size[d].first();
+          }
 
           if (size > grid_size[0]) 
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
@@ -240,7 +247,7 @@ namespace libmpdataxx
           // reindexing so that element 0 is at 0
 	  return this->psi[e][ this->n ](
             this->grid_size[0]
-	  ).reindex({0});
+	  ).reindex(this->origin);
 	}
 
 	blitz::Array<real_t, 1> advector(int d = 0)  
@@ -252,7 +259,7 @@ namespace libmpdataxx
           // (i.e. border between cell 0 and cell 1 is indexed with 0)
 	  return this->GC[d](
             this->grid_size[0]^(-1)^h
-          ).reindex({0});
+          ).reindex(this->origin);
 	}   
 
         blitz::Array<real_t, 1> g_factor()
@@ -264,7 +271,7 @@ namespace libmpdataxx
           // the same logic as in advectee() - see above
           return (*this->G)(
             this->grid_size[0]
-          ).reindex({0});
+          ).reindex(this->origin);
         }
 
       };
@@ -284,7 +291,7 @@ namespace libmpdataxx
 	  return this->psi[e][ this->n ](
 	    this->grid_size[0],
 	    this->grid_size[1]
-	  ).reindex({0, 0});
+	  ).reindex(this->origin);
 	}
 
 	blitz::Array<real_t, 2> advector(int d = 0)  
@@ -295,8 +302,8 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           switch (d)
           { 
-            case 0: return this->GC[d](this->grid_size[0]^(-1)^h, this->grid_size[1]).reindex({0, 0}); 
-            case 1: return this->GC[d](this->grid_size[0], this->grid_size[1]^(-1)^h).reindex({0, 0}); 
+            case 0: return this->GC[d](this->grid_size[0]^(-1)^h, this->grid_size[1]).reindex(this->origin); 
+            case 1: return this->GC[d](this->grid_size[0], this->grid_size[1]^(-1)^h).reindex(this->origin); 
             default: assert(false); throw;
           }
 	}   
@@ -311,7 +318,7 @@ namespace libmpdataxx
           return (*this->G)(
             this->grid_size[0],
             this->grid_size[1]
-          ).reindex({0, 0});
+          ).reindex(this->origin);
         }
 
       };
@@ -332,7 +339,7 @@ namespace libmpdataxx
 	    this->grid_size[0],
 	    this->grid_size[1],
 	    this->grid_size[2]
-	  ).reindex({0, 0, 0});
+	  ).reindex(this->origin);
 	}
 
 	blitz::Array<real_t, 3> advector(int d = 0)  
@@ -345,13 +352,13 @@ namespace libmpdataxx
           { 
             case 0: return this->GC[d](this->grid_size[0]^(-1)^h,
                                        this->grid_size[1],
-                                       this->grid_size[2]).reindex({0, 0, 0});  
+                                       this->grid_size[2]).reindex(this->origin);  
             case 1: return this->GC[d](this->grid_size[0],
                                        this->grid_size[1]^(-1)^h,
-                                       this->grid_size[2]).reindex({0, 0, 0});  
+                                       this->grid_size[2]).reindex(this->origin);  
             case 2: return this->GC[d](this->grid_size[0],
                                        this->grid_size[1],
-                                       this->grid_size[2]^(-1)^h).reindex({0, 0, 0});  
+                                       this->grid_size[2]^(-1)^h).reindex(this->origin);  
             default: assert(false); throw;
           }
 	}   
@@ -367,7 +374,7 @@ namespace libmpdataxx
             this->grid_size[0],
             this->grid_size[1],
             this->grid_size[2]
-          ).reindex({0, 0, 0});
+          ).reindex(this->origin);
         }
 
       };
