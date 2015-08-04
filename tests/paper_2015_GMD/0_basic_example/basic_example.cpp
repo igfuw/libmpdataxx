@@ -44,6 +44,7 @@ int main()
   run.advectee() = -.5 + 1 / (
     pow(dx*(i - (nx-1)/2.), 2) + 1
   );
+std::cerr << "x: " << run.advectee().extent(0) << std::endl;
   // Courant number
   run.advector() = .5;
 

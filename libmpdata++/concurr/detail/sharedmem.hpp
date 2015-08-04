@@ -39,7 +39,7 @@ namespace libmpdataxx
 	public:
 
 	int n = 0;
-        std::array<int, n_dims> grid_size; 
+        std::array<rng_t, n_dims> grid_size; 
         bool panic = false; // for multi-threaded SIGTERM handling
 
         // TODO: these are public because used from outside in alloc - could friendship help?
@@ -68,8 +68,11 @@ namespace libmpdataxx
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
         sharedmem_common(const std::array<int, n_dims> &grid_size, const int &size)
-          : n(0), grid_size(grid_size) // TODO: is n(0) needed?
+          : n(0) // TODO: is n(0) needed?
         {
+          for (int d = 0; d < n_dims; ++d) 
+            this->grid_size[d] = rng_t(0, grid_size[d]-1);
+
           if (size > grid_size[0]) 
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
 
@@ -205,13 +208,13 @@ namespace libmpdataxx
 
         public:
         static rng_t slab(
-          const int &span,
+          const rng_t &span,
           const int &rank = 0,  
           const int &size = 1 
         ) {
           return rng_t(
-            min(span, rank, size),
-            max(span, rank, size)
+            span.first() + min(span.length(), rank, size),
+            span.first() + max(span.length(), rank, size)
           );
         }
       };
@@ -236,7 +239,7 @@ namespace libmpdataxx
           // returning just the domain interior, i.e. without halos
           // reindexing so that element 0 is at 0
 	  return this->psi[e][ this->n ](
-	    rng_t(0, this->grid_size[0]-1)
+            this->grid_size[0]
 	  ).reindex({0});
 	}
 
@@ -248,7 +251,7 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           // (i.e. border between cell 0 and cell 1 is indexed with 0)
 	  return this->GC[d](
-            rng_t(0, this->grid_size[0]-1)^(-1)^h
+            this->grid_size[0]^(-1)^h
           ).reindex({0});
 	}   
 
@@ -260,7 +263,7 @@ namespace libmpdataxx
 
           // the same logic as in advectee() - see above
           return (*this->G)(
-            rng_t(0, this->grid_size[0]-1)
+            this->grid_size[0]
           ).reindex({0});
         }
 
@@ -278,10 +281,10 @@ namespace libmpdataxx
 	{
           assert(this->n < n_tlev);
 
-	  return this->psi[e][ this->n ](idx_t<2>({
-	    rng_t(0, this->grid_size[0]-1),
-	    rng_t(0, this->grid_size[1]-1)
-	  })).reindex({0, 0});
+	  return this->psi[e][ this->n ](
+	    this->grid_size[0],
+	    this->grid_size[1]
+	  ).reindex({0, 0});
 	}
 
 	blitz::Array<real_t, 2> advector(int d = 0)  
@@ -292,8 +295,8 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           switch (d)
           { 
-            case 0: return this->GC[d](rng_t(0, this->grid_size[0]-1)^(-1)^h, rng_t(0, this->grid_size[1]-1)).reindex({0, 0}); 
-            case 1: return this->GC[d](rng_t(0, this->grid_size[0]-1), rng_t(0, this->grid_size[1]-1)^(-1)^h).reindex({0, 0}); 
+            case 0: return this->GC[d](this->grid_size[0]^(-1)^h, this->grid_size[1]).reindex({0, 0}); 
+            case 1: return this->GC[d](this->grid_size[0], this->grid_size[1]^(-1)^h).reindex({0, 0}); 
             default: assert(false); throw;
           }
 	}   
@@ -305,10 +308,10 @@ namespace libmpdataxx
             throw std::runtime_error("g_factor() called with nug option unset?");
 
           // the same logic as in advectee() - see above
-          return (*this->G)(idx_t<2>({
-            rng_t(0, this->grid_size[0]-1),
-            rng_t(0, this->grid_size[1]-1),
-          })).reindex({0, 0});
+          return (*this->G)(
+            this->grid_size[0],
+            this->grid_size[1]
+          ).reindex({0, 0});
         }
 
       };
@@ -325,11 +328,11 @@ namespace libmpdataxx
 	{
           assert(this->n < n_tlev);
 
-	  return this->psi[e][ this->n ](idx_t<3>({
-	    rng_t(0, this->grid_size[0]-1),
-	    rng_t(0, this->grid_size[1]-1),
-	    rng_t(0, this->grid_size[2]-1)
-	  })).reindex({0, 0, 0});
+	  return this->psi[e][ this->n ](
+	    this->grid_size[0],
+	    this->grid_size[1],
+	    this->grid_size[2]
+	  ).reindex({0, 0, 0});
 	}
 
 	blitz::Array<real_t, 3> advector(int d = 0)  
@@ -340,15 +343,15 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           switch (d)
           { 
-            case 0: return this->GC[d](rng_t(0, this->grid_size[0]-1)^(-1)^h,
-                                       rng_t(0, this->grid_size[1]-1),
-                                       rng_t(0, this->grid_size[2]-1)).reindex({0, 0, 0});  
-            case 1: return this->GC[d](rng_t(0, this->grid_size[0]-1),
-                                       rng_t(0, this->grid_size[1]-1)^(-1)^h,
-                                       rng_t(0, this->grid_size[2]-1)).reindex({0, 0, 0});  
-            case 2: return this->GC[d](rng_t(0, this->grid_size[0]-1),
-                                       rng_t(0, this->grid_size[1]-1),
-                                       rng_t(0, this->grid_size[2]-1)^(-1)^h).reindex({0, 0, 0});  
+            case 0: return this->GC[d](this->grid_size[0]^(-1)^h,
+                                       this->grid_size[1],
+                                       this->grid_size[2]).reindex({0, 0, 0});  
+            case 1: return this->GC[d](this->grid_size[0],
+                                       this->grid_size[1]^(-1)^h,
+                                       this->grid_size[2]).reindex({0, 0, 0});  
+            case 2: return this->GC[d](this->grid_size[0],
+                                       this->grid_size[1],
+                                       this->grid_size[2]^(-1)^h).reindex({0, 0, 0});  
             default: assert(false); throw;
           }
 	}   
@@ -360,11 +363,11 @@ namespace libmpdataxx
             throw std::runtime_error("g_factor() called with nug option unset?");
 
           // the same logic as in advectee() - see above
-          return (*this->G)(idx_t<3>({
-            rng_t(0, this->grid_size[0]-1),
-            rng_t(0, this->grid_size[1]-1),
-            rng_t(0, this->grid_size[2]-1)
-          })).reindex({0, 0, 0});
+          return (*this->G)(
+            this->grid_size[0],
+            this->grid_size[1],
+            this->grid_size[2]
+          ).reindex({0, 0, 0});
         }
 
       };
