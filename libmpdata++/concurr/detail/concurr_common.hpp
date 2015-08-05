@@ -111,9 +111,8 @@ namespace libmpdataxx
         void bc_set(typename solver_t::bcp_t &bcp) 
         {
 	  bcp.reset(
-            new bcond::bcond<real_t, type, dir, solver_t::n_dims, dim>(
+            new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
 	      mem->slab(mem->grid_size[dim]), 
-	      solver_t::halo, 
 	      mem->grid_size[0].length() // TODO: get it from rt_params...
             )
           );
@@ -132,8 +131,8 @@ namespace libmpdataxx
 
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
-            shrdl.reset(new bcond::shared<real_t>());
-            shrdr.reset(new bcond::shared<real_t>());
+            shrdl.reset(new bcond::shared<real_t, solver_t::halo>());
+            shrdr.reset(new bcond::shared<real_t, solver_t::halo>());
 
 	    algos.push_back(
               new solver_t(
@@ -169,8 +168,8 @@ namespace libmpdataxx
               bc_set<bcyl, bcond::left, 1>(byl);
 	      bc_set<bcyr, bcond::rght, 1>(byr);
 
-              shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
-              shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
+              shrdl.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
+              shrdr.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
 
               algos.push_back(
                 new solver_t(
@@ -214,8 +213,8 @@ namespace libmpdataxx
                 bc_set<bczl, bcond::left, 2>(bzl);
                 bc_set<bczr, bcond::rght, 2>(bzr);
 
-                shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
-                shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
+                shrdl.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
+                shrdr.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
 
 		algos.push_back(
                   new solver_t(
