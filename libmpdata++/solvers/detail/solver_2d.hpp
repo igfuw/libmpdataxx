@@ -26,17 +26,17 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
-	protected:
-      
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr;
 
+	protected:
+      
 	const rng_t i, j; // TODO: to be removed
 
-	void xchng_sclr(typename parent_t::arr_t &arr,
+	virtual void xchng_sclr(typename parent_t::arr_t &arr,
                         const rng_t &range_i,
                         const rng_t &range_j,
                         const bool deriv = false
-        ) // for a given array
+        ) final // for a given array
 	{
           this->mem->barrier();
 	  bcxl->fill_halos_sclr(arr, range_j, deriv);
@@ -46,7 +46,7 @@ namespace libmpdataxx
           this->mem->barrier();
 	}
 
-	void xchng(int e) 
+	void xchng(int e) final
 	{
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
 	}
@@ -59,6 +59,64 @@ namespace libmpdataxx
           bcyl->fill_halos_vctr_alng(arrvec, i);
           bcyr->fill_halos_vctr_alng(arrvec, i);
           // TODO: open bc nust be last!!!
+          this->mem->barrier();
+        }
+
+        virtual void xchng_vctr_nrml(
+          const arrvec_t<typename parent_t::arr_t> &arrvec, 
+          const rng_t &range_i, 
+          const rng_t &range_j
+        ) final
+        {
+          this->mem->barrier();
+          bcxl->fill_halos_vctr_nrml(arrvec[0], range_i);
+          bcxr->fill_halos_vctr_nrml(arrvec[0], range_i);
+          bcyl->fill_halos_vctr_nrml(arrvec[1], range_j);
+          bcyr->fill_halos_vctr_nrml(arrvec[1], range_j);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_pres(
+          const typename parent_t::arr_t &arr,
+          const rng_t &range_i,
+          const rng_t &range_j
+        ) final
+        {
+          this->mem->barrier();
+          this->bcxl->fill_halos_pres(arr, range_j);
+          this->bcxr->fill_halos_pres(arr, range_j);
+          this->bcyl->fill_halos_pres(arr, range_i);
+          this->bcyr->fill_halos_pres(arr, range_i);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_edges(
+          const typename parent_t::arr_t &arr1,
+          const typename parent_t::arr_t &arr2,
+          const rng_t &range_i,
+          const rng_t &range_j
+        ) final
+        {
+          this->bcxl->set_edge_pres(arr1, range_j);
+          this->bcxr->set_edge_pres(arr1, range_j);
+          this->bcyl->set_edge_pres(arr2, range_i);
+          this->bcyr->set_edge_pres(arr2, range_i);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_edges(
+          const typename parent_t::arr_t &arr1,
+          const typename parent_t::arr_t &arr2,
+          const typename parent_t::arr_t &v1,
+          const typename parent_t::arr_t &v2,
+          const rng_t &range_i,
+          const rng_t &range_j
+        ) final
+        {
+          this->bcxl->set_edge_pres(arr1, v1, range_j);
+          this->bcxr->set_edge_pres(arr1, v1, range_j);
+          this->bcyl->set_edge_pres(arr2, v2, range_i);
+          this->bcyr->set_edge_pres(arr2, v2, range_i);
           this->mem->barrier();
         }
 

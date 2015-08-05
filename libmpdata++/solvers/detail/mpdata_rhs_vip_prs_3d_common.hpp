@@ -58,7 +58,7 @@ namespace libmpdataxx
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy);
           lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz);
-          this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
+          this->xchng_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
           this->xchng_pres(lap_tmp1, i, j, k);
           this->xchng_pres(lap_tmp2, i, j, k);
           this->xchng_pres(lap_tmp3, i, j, k);
@@ -82,7 +82,7 @@ namespace libmpdataxx
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx) - v1(this->ijk);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy) - v2(this->ijk);
           lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz) - v3(this->ijk);
-          this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
+          this->xchng_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
           this->xchng_pres(lap_tmp1, i, j, k);
           this->xchng_pres(lap_tmp2, i, j, k);
           this->xchng_pres(lap_tmp3, i, j, k);
@@ -97,56 +97,6 @@ namespace libmpdataxx
 	  Phi(this->ijk) = real_t(0); // ... but assuming zero perturbation at t=0
 	  this->xchng_sclr(Phi, this->i^halo, this->j^halo, this->k^halo);
 	}
-
-        void xchng_pres(arr_t &arr,
-                        const rng_t &range_i,
-                        const rng_t &range_j,
-                        const rng_t &range_k)
-        {
-          this->mem->barrier();
-          this->bcxl->fill_halos_pres(arr, range_j, range_k);
-          this->bcxr->fill_halos_pres(arr, range_j, range_k);
-          this->bcyl->fill_halos_pres(arr, range_k, range_i);
-          this->bcyr->fill_halos_pres(arr, range_k, range_i);
-          this->bczl->fill_halos_pres(arr, range_i, range_j);
-          this->bczr->fill_halos_pres(arr, range_i, range_j);
-          this->mem->barrier();
-        }
-
-        void set_edges(arr_t &arr1,
-                       arr_t &arr2,
-                       arr_t &arr3,
-                       const rng_t &range_i,
-                       const rng_t &range_j,
-                       const rng_t &range_k)
-        {
-          this->bcxl->set_edge_pres(arr1, range_j, range_k);
-          this->bcxr->set_edge_pres(arr1, range_j, range_k);
-          this->bcyl->set_edge_pres(arr2, range_k, range_i);
-          this->bcyr->set_edge_pres(arr2, range_k, range_i);
-          this->bczl->set_edge_pres(arr3, range_i, range_j);
-          this->bczr->set_edge_pres(arr3, range_i, range_j);
-          this->mem->barrier();
-        }
-        
-        void set_edges(arr_t &arr1,
-                       arr_t &arr2,
-                       arr_t &arr3,
-                       const arr_t &v1,
-                       const arr_t &v2,
-                       const arr_t &v3,
-                       const rng_t &range_i,
-                       const rng_t &range_j,
-                       const rng_t &range_k)
-        {
-          this->bcxl->set_edge_pres(arr1, v1, range_j, range_k);
-          this->bcxr->set_edge_pres(arr1, v1, range_j, range_k);
-          this->bcyl->set_edge_pres(arr2, v2, range_k, range_i);
-          this->bcyr->set_edge_pres(arr2, v2, range_k, range_i);
-          this->bczl->set_edge_pres(arr3, v3, range_i, range_j);
-          this->bczr->set_edge_pres(arr3, v3, range_i, range_j);
-          this->mem->barrier();
-        }
 
 	virtual void pressure_solver_loop_init() = 0;
 	virtual void pressure_solver_loop_body() = 0;
@@ -173,14 +123,14 @@ namespace libmpdataxx
 	    iters++;
           }
 
-	  xchng_pres(this->Phi, i^this->halo, j^this->halo, k^this->halo);
+	  this->xchng_pres(this->Phi, i^this->halo, j^this->halo, k^this->halo);
 
 	  using formulae::nabla::grad;
 	  tmp_u(this->ijk) = - grad<0>(Phi, i, j, k, this->di);
 	  tmp_v(this->ijk) = - grad<1>(Phi, j, k, i, this->dj);
 	  tmp_w(this->ijk) = - grad<2>(Phi, k, i, j, this->dk);
 
-          set_edges(tmp_u, tmp_v, tmp_w, this->state(ix::u), this->state(ix::v), this->state(ix::w), i, j, k);
+          this->xchng_edges(tmp_u, tmp_v, tmp_w, this->state(ix::u), this->state(ix::v), this->state(ix::w), i, j, k);
         }
 
 	void pressure_solver_apply()
