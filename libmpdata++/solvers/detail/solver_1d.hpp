@@ -31,14 +31,6 @@ namespace libmpdataxx
      
 	const rng_t i; //TODO: to be removed
 
-	void xchng(int e) 
-	{
-          this->mem->barrier(); // TODO: implement using the xchng below
-	  bcxl->fill_halos_sclr( this->mem->psi[e][ this->n[e]] );
-	  bcxr->fill_halos_sclr( this->mem->psi[e][ this->n[e]] );
-          this->mem->barrier();
-	}
-
         virtual void xchng_sclr(typename parent_t::arr_t &arr, const bool deriv = false) final // for a given array
         {
           this->mem->barrier();
@@ -46,6 +38,11 @@ namespace libmpdataxx
           bcxr->fill_halos_sclr(arr, deriv);
           this->mem->barrier();
         }
+
+	void xchng(int e) 
+	{
+          xchng_sclr(this->mem->psi[e][ this->n[e]]);
+	}
 
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
