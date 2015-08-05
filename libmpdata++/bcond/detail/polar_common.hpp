@@ -17,10 +17,10 @@ namespace libmpdataxx
     {
       using namespace arakawa_c;
 
-      template <typename real_t>
-      class polar_common : public bcond_common<real_t>
+      template <typename real_t, int halo>
+      class polar_common : public bcond_common<real_t, halo>
       {
-	using parent_t = bcond_common<real_t>;
+	using parent_t = bcond_common<real_t, halo>;
 	using parent_t::parent_t; // inheriting ctor
 
 	protected:
@@ -38,10 +38,9 @@ namespace libmpdataxx
 	// ctor
 	polar_common(
           const rng_t &i, 
-          const int halo, 
           const int grid_size_0
         ) :
-	  parent_t(i, halo, grid_size_0),
+	  parent_t(i, grid_size_0),
 	  pole((grid_size_0 - 1) / 2)
 	{} 
       };

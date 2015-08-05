@@ -19,6 +19,7 @@ namespace libmpdataxx
 
     template<
       typename real_t, 
+      int halo,
       bcond_e knd,
       drctn_e dir, 
       int n_dims,
@@ -30,7 +31,7 @@ namespace libmpdataxx
 
     namespace detail
     {
-      template <typename real_t>
+      template <typename real_t, int halo>
       class bcond_common
       {
 	public:
@@ -126,13 +127,11 @@ namespace libmpdataxx
 	  // vctr
 	  left_halo_vctr, rght_halo_vctr,
 	  left_intr_vctr, rght_intr_vctr;
-	const int halo;
 
 	public:
 
 	// ctor
-	bcond_common(const rng_t &i, const int halo, const int grid_size_0) :
-	  halo(halo),
+	bcond_common(const rng_t &i, const int grid_size_0) :
 	  // sclr
 	  left_edge_sclr(
 	    i.first()

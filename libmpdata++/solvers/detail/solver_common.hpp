@@ -41,7 +41,7 @@ namespace libmpdataxx
 
         typedef typename ct_params_t::real_t real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
-        using bcp_t = std::unique_ptr<bcond::detail::bcond_common<real_t>>;
+        using bcp_t = std::unique_ptr<bcond::detail::bcond_common<real_t, halo>>;
 
         using ix = typename ct_params_t::ix;
 
