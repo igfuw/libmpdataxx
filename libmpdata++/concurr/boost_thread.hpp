@@ -58,14 +58,14 @@ namespace libmpdataxx
 
       public:
 
-      void solve(typename parent_t::real_t)
+      void solve(typename parent_t::real_t tshift)
       {
         boost::thread_group threads;
         for (int i = 0; i < this->algos.size(); ++i) 
         {  
           std::unique_ptr<boost::thread> thp;
           thp.reset(new boost::thread(
-            &solver_t::solve, boost::ref(this->algos[i]), nt
+            &solver_t::solve, boost::ref(this->algos[i]), tshift
           ));
           threads.add_thread(thp.release());
         }
