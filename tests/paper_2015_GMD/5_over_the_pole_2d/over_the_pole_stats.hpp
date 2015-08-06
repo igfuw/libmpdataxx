@@ -16,7 +16,7 @@ struct stats : public parent_t
 
   typename parent_t::arr_t ic, fc, gf;
 
-  real_t last_timestep;
+  int last_timestep;
 
   blitz::Range ii, jj;
  
@@ -42,9 +42,9 @@ struct stats : public parent_t
       ofs << stat_info << stat_val_s << std::endl;
   }
 
-  void hook_ante_loop(const int nt)
+  void hook_ante_loop(const real_t tshift)
   {
-    parent_t::hook_ante_loop(nt);
+    parent_t::hook_ante_loop(tshift);
     if (this->rank != 0) return;
 
     //checking what are the MPDATA options of each test simulation (default / best) 
@@ -52,7 +52,7 @@ struct stats : public parent_t
     if(!ofs.is_open())
       ofs.open("stats_" + this->outdir + ".txt", std::ofstream::out);
 
-    last_timestep = nt;
+    last_timestep = tshift / this->dt;
                                     //nlon
     ii = blitz::Range(0, this->mem->grid_size[0] - 2);  // due to boundary condition type not all points should be evaluated
     jj = blitz::Range(0, this->mem->grid_size[1] - 1);  // when calculating errors
