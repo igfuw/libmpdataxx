@@ -112,10 +112,10 @@ namespace libmpdataxx
           const rng_t &range_j
         ) final
         {
-          this->bcxl->set_edge_vel(arr1, range_j);
-          this->bcxr->set_edge_vel(arr1, range_j);
-          this->bcyl->set_edge_vel(arr2, range_i);
-          this->bcyr->set_edge_vel(arr2, range_i);
+          this->bcxl->save_edge_vel(arr1, range_j);
+          this->bcxr->save_edge_vel(arr1, range_j);
+          this->bcyl->save_edge_vel(arr2, range_i);
+          this->bcyr->save_edge_vel(arr2, range_i);
           this->mem->barrier();
         }
 

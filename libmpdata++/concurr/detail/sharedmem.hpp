@@ -340,10 +340,10 @@ namespace libmpdataxx
             throw std::runtime_error("vab_coeff() called with option vip_vab unset?");
 
           // the same logic as in advectee() - see above
-          return (*this->vab_coeff)(idx_t<2>({
-            rng_t(0, this->grid_size[0]-1),
-            rng_t(0, this->grid_size[1]-1),
-          })).reindex({0, 0});
+          return (*this->vab_coeff)(
+            this->grid_size[0],
+            this->grid_size[1]
+          ).reindex(this->origin);
         }
 	
         blitz::Array<real_t, 2> vab_relaxed_state(int d = 0)  
@@ -353,10 +353,10 @@ namespace libmpdataxx
           if (this->vab_coeff.get() == nullptr) 
             throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
           // the same logic as in advectee() - see above
-	  return this->vab_relax[d](idx_t<2>({
-	    rng_t(0, this->grid_size[0]-1),
-	    rng_t(0, this->grid_size[1]-1)
-	  })).reindex({0, 0});
+	  return this->vab_relax[d](
+	    this->grid_size[0],
+	    this->grid_size[1]
+	  ).reindex(this->origin);
 	}   
 
       };
