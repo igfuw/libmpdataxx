@@ -58,7 +58,7 @@ namespace libmpdataxx
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy);
           lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz);
-          this->xchng_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
+          this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
           this->xchng_pres(lap_tmp1, i, j, k);
           this->xchng_pres(lap_tmp2, i, j, k);
           this->xchng_pres(lap_tmp3, i, j, k);
@@ -82,7 +82,7 @@ namespace libmpdataxx
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx) - v1(this->ijk);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy) - v2(this->ijk);
           lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz) - v3(this->ijk);
-          this->xchng_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
+          this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
           this->xchng_pres(lap_tmp1, i, j, k);
           this->xchng_pres(lap_tmp2, i, j, k);
           this->xchng_pres(lap_tmp3, i, j, k);

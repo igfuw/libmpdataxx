@@ -105,7 +105,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        virtual void xchng_edges(
+        virtual void set_edges(
           const typename parent_t::arr_t &arr1,
           const typename parent_t::arr_t &arr2,
           const typename parent_t::arr_t &arr3,
@@ -123,7 +123,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        virtual void xchng_edges(
+        virtual void set_edges(
           const typename parent_t::arr_t &arr1,
           const typename parent_t::arr_t &arr2,
           const typename parent_t::arr_t &arr3,
