@@ -13,6 +13,7 @@ namespace libmpdataxx
 {
   namespace solvers
   {
+
     // to be specialised
     template <typename ct_params_t, class enableif = void>
     class mpdata_rhs_vip 
@@ -25,10 +26,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 1>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+      
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im;
@@ -82,10 +84,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 2>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im, jm;
@@ -138,6 +141,29 @@ namespace libmpdataxx
 	this->extrp(1, ix::vip_j);
 	this->xchng_sclr(this->stash[1], this->i^this->halo, this->j^this->halo);      // filling halos 
       }
+      
+      void add_absorber() final
+      {
+	  typename ct_params_t::real_t factor = (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl ? 0.5 : 1.);
+          this->state(ix::vip_i)(this->ijk) -= factor * this->dt * 
+            (*this->mem->vab_coeff)(this->ijk) * (this->state(ix::vip_i)(this->ijk) - this->mem->vab_relax[0](this->ijk));
+          this->state(ix::vip_j)(this->ijk) -= factor * this->dt * 
+            (*this->mem->vab_coeff)(this->ijk) * (this->state(ix::vip_j)(this->ijk) - this->mem->vab_relax[1](this->ijk));
+      }
+      
+      void normalize_absorber() final
+      {
+        this->state(ix::vip_i)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+        this->state(ix::vip_j)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+      }
+      
+      void add_relax() final
+      {
+        this->state(ix::vip_i)(this->ijk) +=
+          0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[0](this->ijk);
+        this->state(ix::vip_j)(this->ijk) +=
+          0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[1](this->ijk);
+      }
 
       public:
       
@@ -153,6 +179,26 @@ namespace libmpdataxx
         assert(this->di != 0);
         assert(this->dj != 0);
       }
+      
+      static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)
+      {
+	parent_t::alloc(mem, p);
+
+        // allocate velocity absorber
+        if (static_cast<vip_vab_t>(ct_params_t::vip_vab) != 0)
+        {
+          mem->vab_coeff.reset(mem->old(new typename parent_t::arr_t(
+                  parent_t::rng_sclr(p.grid_size[0]),
+                  parent_t::rng_sclr(p.grid_size[1])
+          )));
+          
+          for (int n = 0; n < ct_params_t::n_dims; ++n)
+            mem->vab_relax.push_back(mem->old(new typename parent_t::arr_t(
+                    parent_t::rng_sclr(p.grid_size[0]),
+                    parent_t::rng_sclr(p.grid_size[1])
+            )));
+        }
+      }
     };
     
     // 3D version
@@ -162,10 +208,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 3>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+      
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im, jm, km;

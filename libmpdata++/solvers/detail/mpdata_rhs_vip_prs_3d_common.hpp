@@ -105,9 +105,9 @@ namespace libmpdataxx
         {
           const auto &i = this->i, &j = this->j, &k = this->k;
 
-	  tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
-	  tmp_v(this->ijk) = this->state(ix::v)(this->ijk);
-	  tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
+	  tmp_u(this->ijk) = this->state(ix::vip_i)(this->ijk);
+	  tmp_v(this->ijk) = this->state(ix::vip_j)(this->ijk);
+	  tmp_w(this->ijk) = this->state(ix::vip_k)(this->ijk);
 
 	  //initial error   
           err(this->ijk) = err_init(Phi, tmp_u, tmp_v, tmp_w, i, j, k,  this->di, this->dj, this->dk);
@@ -130,14 +130,14 @@ namespace libmpdataxx
 	  tmp_v(this->ijk) = - grad<1>(Phi, j, k, i, this->dj);
 	  tmp_w(this->ijk) = - grad<2>(Phi, k, i, j, this->dk);
 
-          this->xchng_edges(tmp_u, tmp_v, tmp_w, this->state(ix::u), this->state(ix::v), this->state(ix::w), i, j, k);
+          this->set_edges(tmp_u, tmp_v, tmp_w, this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), i, j, k);
         }
 
 	void pressure_solver_apply()
 	{
-	  this->state(ix::u)(this->ijk) += tmp_u(this->ijk);
-	  this->state(ix::v)(this->ijk) += tmp_v(this->ijk);
-	  this->state(ix::w)(this->ijk) += tmp_w(this->ijk);
+	  this->state(ix::vip_i)(this->ijk) += tmp_u(this->ijk);
+	  this->state(ix::vip_j)(this->ijk) += tmp_v(this->ijk);
+	  this->state(ix::vip_k)(this->ijk) += tmp_w(this->ijk);
 	}
 
         void hook_ante_loop(const int nt)

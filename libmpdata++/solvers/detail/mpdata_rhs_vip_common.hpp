@@ -13,16 +13,24 @@ namespace libmpdataxx
 {
   namespace solvers
   {
+    enum vip_vab_t
+    {
+      noab,
+      expl,
+      impl
+    };
+
     namespace detail
     {
       // 
       template <class ct_params_t > 
       class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_t>
       {
-	using parent_t = mpdata_rhs<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
 	protected:
+	
+        using parent_t = mpdata_rhs<ct_params_t>;
 
 	// member fields
 	arrvec_t<typename parent_t::arr_t> &stash;
@@ -85,6 +93,9 @@ namespace libmpdataxx
 
 	virtual void extrapolate_in_time() = 0;
 	virtual void interpolate_in_space() = 0;
+	virtual void add_absorber() { throw std::logic_error("absorber not yet implemented in 1d & 3d"); }
+	virtual void add_relax() { throw std::logic_error("absorber not yet implemented in 1d & 3d"); }
+	virtual void normalize_absorber() { throw std::logic_error("absorber not yet implemented in 1d & 3d"); }
 
 	void hook_ante_loop(const int nt)
 	{
@@ -116,8 +127,19 @@ namespace libmpdataxx
 
 	  // intentionally after stash !!!
 	  // (we have to stash data from the current time step before applying any forcings to it)
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) != noab) add_absorber();
 	  parent_t::hook_ante_step(); 
 	}
+	
+        void hook_post_step()
+	{ 
+	  parent_t::hook_post_step(); 
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
+          {
+            add_relax();
+            normalize_absorber();
+          }
+        }
 
 	public:
 	
