@@ -30,7 +30,7 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         // zero flux condition
-        for (int i = this->left_halo_sclr.first(), n = this->halo; i <= this->left_halo_sclr.last(); ++i, --n)
+        for (int i = this->left_halo_sclr.first(), n = halo; i <= this->left_halo_sclr.last(); ++i, --n)
         {
           a(pi<d>(i, j, k)) = a(pi<d>(this->left_edge_sclr + n, j, k));
         }
@@ -60,7 +60,7 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
         // zero velocity condition
-        for (int i = this->left_halo_vctr.first(), n = this->halo; i <= this->left_halo_vctr.last(); ++i, --n)
+        for (int i = this->left_halo_vctr.first(), n = halo; i <= this->left_halo_vctr.last(); ++i, --n)
         {
 	  av[d](pi<d>(i, j, k)) = -av[d](pi<d>(this->left_edge_sclr + n - h, j, k));
         }
