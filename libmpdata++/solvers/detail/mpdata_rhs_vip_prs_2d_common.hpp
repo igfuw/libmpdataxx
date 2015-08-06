@@ -44,7 +44,7 @@ namespace libmpdataxx
         {
           return this->mem->sum(arr1, arr2, i, j, ct_params_t::prs_khn);
         }
-
+      
         auto lap(
           arr_t &arr, 
           const rng_t &i, 
@@ -55,6 +55,11 @@ namespace libmpdataxx
           this->xchng_pres(arr, i, j);
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, dx);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, i, dy);
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
+          {
+            lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+            lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+          }
           this->set_edges(lap_tmp1, lap_tmp2, i, j);
           this->xchng_pres(lap_tmp1, i, j);
           this->xchng_pres(lap_tmp2, i, j);
@@ -74,6 +79,11 @@ namespace libmpdataxx
           this->xchng_pres(arr, i^this->halo, j^this->halo);
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, dx) - v1(this->ijk);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, i, dy) - v2(this->ijk);
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
+          {
+            lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+            lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+          }
           this->set_edges(lap_tmp1, lap_tmp2, i, j);
           this->xchng_pres(lap_tmp1, i, j);
           this->xchng_pres(lap_tmp2, i, j);
@@ -134,8 +144,8 @@ namespace libmpdataxx
         {
           const auto &i = this->i, &j = this->j;
 
-	  tmp_u(this->ijk) = this->state(ix::u)(this->ijk);
-	  tmp_w(this->ijk) = this->state(ix::w)(this->ijk);
+	  tmp_u(this->ijk) = this->state(ix::vip_i)(this->ijk);
+	  tmp_w(this->ijk) = this->state(ix::vip_j)(this->ijk);
 
 	  //initial error   
           err(this->ijk) = err_init(Phi, tmp_u, tmp_w, i, j, this->di, this->dj);
@@ -157,13 +167,13 @@ namespace libmpdataxx
 	  tmp_u(this->ijk) = - grad<0>(Phi, i, j, this->di);
 	  tmp_w(this->ijk) = - grad<1>(Phi, j, i, this->dj);
 
-          set_edges(tmp_u, tmp_w, this->state(ix::u), this->state(ix::w), i, j);
+          set_edges(tmp_u, tmp_w, this->state(ix::vip_i), this->state(ix::vip_j), i, j);
         }
 
 	void pressure_solver_apply()
 	{
-	  this->state(ix::u)(this->ijk) += tmp_u(this->ijk);
-	  this->state(ix::w)(this->ijk) += tmp_w(this->ijk);
+	  this->state(ix::vip_i)(this->ijk) += tmp_u(this->ijk);
+	  this->state(ix::vip_j)(this->ijk) += tmp_w(this->ijk);
 	}
 
         void hook_ante_loop(const int nt)
@@ -184,9 +194,12 @@ namespace libmpdataxx
     
         void hook_post_step()
         {
-          parent_t::hook_post_step(); // forcings
+          // intentionally calling "great-grandparent" i.e. mpdata_rhs hook
+          parent_t::parent_t::parent_t::hook_post_step(); // forcings
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) parent_t::add_relax();
 	  pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
 	  pressure_solver_apply();
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) parent_t::normalize_absorber();
         }
 
 	public:

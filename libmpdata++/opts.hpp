@@ -44,6 +44,7 @@ namespace libmpdataxx
     enum { hint_norhs = 0 };
     struct ix {};
     static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
+    enum { vip_vab = 0};
     enum { prs_k_iters = 4};
     enum { prs_khn = false}; // if true use Kahan summation in the pressure solver
     enum { stress_diff = 0};
