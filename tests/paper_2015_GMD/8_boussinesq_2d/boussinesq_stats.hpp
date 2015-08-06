@@ -27,9 +27,9 @@ struct stats : public parent_t
 
   std::ofstream ofs;
 
-  void hook_ante_loop(const int nt)
+  void hook_ante_loop(const real_t tshift)
   {
-    parent_t::hook_ante_loop(nt);
+    parent_t::hook_ante_loop(tshift);
     if (this->rank != 0) return;
 
     if (!ofs.is_open())

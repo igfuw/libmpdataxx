@@ -166,9 +166,9 @@ namespace libmpdataxx
 	  this->state(ix::w)(this->ijk) += tmp_w(this->ijk);
 	}
 
-        void hook_ante_loop(const int nt)
+        void hook_ante_loop(const real_t tshift)
         {
-          parent_t::hook_ante_loop(nt);
+          parent_t::hook_ante_loop(tshift);
 	  ini_pressure();
  
           // allow pressure_solver_apply at the first time step

@@ -55,6 +55,7 @@ namespace libmpdataxx
 	const idx_t<n_dims> ijk;
 
         long long int timestep = 0;
+        real_t time = 0;
         std::vector<int> n; 
 
         typedef concurr::detail::sharedmem<real_t, n_dims, n_tlev> mem_t; 
@@ -98,7 +99,7 @@ namespace libmpdataxx
 #endif
         }
 
-        virtual void hook_ante_loop(const int nt) 
+        virtual void hook_ante_loop(const real_t tshift) 
         {
 #if !defined(NDEBUG)
           hook_ante_loop_called = true;
@@ -110,7 +111,7 @@ namespace libmpdataxx
         struct rt_params_t 
         {
           std::array<int, n_dims> grid_size;
-          real_t dt=0;
+          real_t dt=1;
         };
 
 	// ctor
@@ -148,10 +149,10 @@ namespace libmpdataxx
 #endif
         }
 
-	virtual void solve(int nt) final
+	virtual void solve(real_t tshift) final
 	{   
           // multiple calls to sovlve() are meant to advance the solution by nt
-          nt += timestep;
+          tshift += time;
 
           // being generous about out-of-loop barriers 
           if (timestep == 0)
@@ -160,7 +161,7 @@ namespace libmpdataxx
 #if !defined(NDEBUG)
 	    hook_ante_loop_called = false;
 #endif
-	    hook_ante_loop(nt);
+	    hook_ante_loop(tshift);
 	    mem->barrier();
           }
 
@@ -170,10 +171,10 @@ namespace libmpdataxx
 	  hook_post_step_called = false;
 #endif
 
-	  while (timestep < nt)
+	  while (time < tshift)
 	  {   
 	    // progress-bar info through thread name (check top -H)
-	    monitor(float(timestep) / nt);  // TODO: does this value make sanse with repeated advence() calls?
+	    monitor(float(time) / tshift);  // TODO: does this value make sanse with repeated advence() calls?
 
             // might be used to implement multi-threaded signal handling
             mem->barrier();
@@ -195,6 +196,7 @@ namespace libmpdataxx
 	    for (int e = 0; e < n_eqns; ++e) scale(e, -ct_params_t::hint_scale(e));
 
             timestep++;
+            time += dt;
             hook_post_step();
 	  }   
 

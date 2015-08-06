@@ -32,14 +32,14 @@ namespace libmpdataxx
         const std::string outdir;
 
 	virtual void record(const int var) {}
-	virtual void start(const int nt) {}
+	virtual void start(const typename parent_t::real_t) {}
 
-	void hook_ante_loop(const int nt) 
+	void hook_ante_loop(const typename parent_t::real_t tshift)
 	{
-	  parent_t::hook_ante_loop(nt);
+	  parent_t::hook_ante_loop(tshift);
 	  if (this->rank == 0) 
           {
-            start(nt);
+            start(tshift);
             record_all();
           }
 	  this->mem->barrier();

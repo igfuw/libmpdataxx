@@ -58,7 +58,7 @@ namespace libmpdataxx
 
       public:
 
-      void solve(int nt)
+      void solve(typename parent_t::real_t)
       {
         boost::thread_group threads;
         for (int i = 0; i < this->algos.size(); ++i) 

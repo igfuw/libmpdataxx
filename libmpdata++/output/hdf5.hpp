@@ -50,7 +50,7 @@ namespace libmpdataxx
       blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, count, offst;
       H5::DSetCreatPropList params;
 
-      void start(const int nt)
+      void start(const typename parent_t::real_t tshift)
       {
         {
           // creating the directory
@@ -114,7 +114,7 @@ namespace libmpdataxx
             // T
             {
               const hsize_t 
-                nt_out = nt / this->outfreq + 1, // incl. t=0
+                nt_out = int(tshift / this->dt) / this->outfreq + 1, // incl. t=0
                 zero = 0,
                 one = 1;
               float dt = this->dt;

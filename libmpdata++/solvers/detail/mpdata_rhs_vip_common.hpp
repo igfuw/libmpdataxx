@@ -86,14 +86,14 @@ namespace libmpdataxx
 	virtual void extrapolate_in_time() = 0;
 	virtual void interpolate_in_space() = 0;
 
-	void hook_ante_loop(const int nt)
+	void hook_ante_loop(const typename parent_t::real_t tshift)
 	{
           // fill Courant numbers with zeros so that the divergence test does no harm
           if (this->rank == 0)
             for (int d=0; d < parent_t::n_dims; ++d) this->mem->GC.at(d) = 0; 
           this->mem->barrier();
 
-	  parent_t::hook_ante_loop(nt);
+	  parent_t::hook_ante_loop(tshift);
 	  
 	  // to make extrapolation possible at the first time-step
 	  fill_stash();
@@ -130,7 +130,6 @@ namespace libmpdataxx
 	  typename parent_t::mem_t *mem, 
 	  const rt_params_t &p
 	) {
-	  // psi[n-1] secret stash for velocity extrapolation in time
 	  parent_t::alloc(mem, p);
 	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, parent_t::n_dims); 
 	}

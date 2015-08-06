@@ -26,8 +26,12 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
+        public:
+        
+        using typename parent_t::real_t;
+
 	protected:
-      
+
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
 	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
@@ -65,9 +69,9 @@ namespace libmpdataxx
           this->mem->barrier();
         }
         
-        void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
+        void hook_ante_loop(const real_t tshift) // TODO: this tshift conflicts in fact with multiple-advance()-call logic!
         {
-          parent_t::hook_ante_loop(nt);
+          parent_t::hook_ante_loop(tshift);
 	  
           xchng_vctr_alng(this->mem->GC);
  
@@ -75,7 +79,7 @@ namespace libmpdataxx
           // TODO: same in 1D
           if (!opts::isset(ct_params_t::opts, opts::dfl))
           {
-            if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
+            if (blitz::epsilon(real_t(44)) < max(abs(
               ( 
                 this->mem->GC[0](i-h, j, k) - 
                 this->mem->GC[0](i+h, j, k)
@@ -107,7 +111,7 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename parent_t::real_t di = 0, dj = 0, dk = 0;
+          real_t di = 0, dj = 0, dk = 0;
         };
 
         protected:

@@ -108,7 +108,7 @@ int main()
     slv.advectee(ix::w) = 0; 
   }
   // integration
-  slv.advance(nt);  
+  slv.advance(nt * p.dt);  
 
   if (min(slv.advectee(ix::tht)) < 300-eps || max(slv.advectee(ix::tht)) > 300.5+eps)
     throw std::runtime_error("too big under- or over-shots :("); 

@@ -96,7 +96,7 @@ void test(const std::string &outdir)
   run.advectee(ix::qx) = 0;
   run.advectee(ix::qy) = 0;
 
-  run.advance(nt);
+  run.advance(p.dt * nt);
 };
 
 int main()

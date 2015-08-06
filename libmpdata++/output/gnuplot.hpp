@@ -29,7 +29,7 @@ namespace libmpdataxx
       std::unique_ptr<Gnuplot> gp;
       const int precision = 5;
 
-      void start(const int nt)
+      void start(const typename parent_t::real_t tshift)
       {
         gp.reset(new Gnuplot());
         *gp << std::fixed << std::setprecision(precision);
@@ -60,7 +60,7 @@ namespace libmpdataxx
         {
           if (p.gnuplot_command == "splot") 
           {
-            *gp << "set yrange [0:" << nt << "]\n"
+            *gp << "set yrange [0:" << int(tshift / this->dt) << "]\n"
 	        << "set xtics out\n"
 	        << "set ytics out\n"
 	        << "set ztics out\n"
@@ -84,7 +84,7 @@ namespace libmpdataxx
              << p.gnuplot_command << " 1/0 notitle" // for the comma below :)
           ;
 
-          for (int t = 0; t <= nt; t+=p.outfreq)
+          for (int t = 0; t <= int(tshift / this->dt); t+=p.outfreq)
           {
 	    for (const auto &v : this->outvars)
             {

@@ -34,10 +34,10 @@ namespace libmpdataxx
 
 	const rng_t im;
 
-	void hook_ante_loop(const int nt)
+	void hook_ante_loop(const typename parent_t::real_t tshift)
 	{
   //  note that it's not needed for upstream
-	  parent_t::hook_ante_loop(nt);
+	  parent_t::hook_ante_loop(tshift);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
 	  {
 	    this->bcxl->fill_halos_sclr(*this->mem->G); // TODO: one xchng call?

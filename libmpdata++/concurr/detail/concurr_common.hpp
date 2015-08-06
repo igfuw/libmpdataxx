@@ -265,11 +265,11 @@ namespace libmpdataxx
           }
         }
 
-        virtual void solve(int nt) = 0;
+        virtual void solve(real_t nt) = 0;
 
         public:
     
-        void advance(int nt) final
+        void advance(real_t nt) final
         {   
           tmr.resume();
           solve(nt);

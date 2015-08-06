@@ -100,9 +100,9 @@ namespace libmpdataxx
 #endif
       }
 
-      void hook_ante_loop(int nt)
+      void hook_ante_loop(typename parent_t::real_t tshift)
       {
-        parent_t::hook_ante_loop(nt);
+        parent_t::hook_ante_loop(tshift);
 
         switch ((rhs_scheme_t)ct_params_t::rhs_scheme)
         {

@@ -17,7 +17,7 @@ namespace libmpdataxx
     {
       virtual 
 //<listing-1>
-      void advance(int) 
+      void advance(real_t) 
 //</listing-1>
       { assert(false); throw; }  
 
