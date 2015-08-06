@@ -28,7 +28,7 @@ before_install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then unset DISPLAY; fi 
 
     # you may not believe it, but GCC (4.8.2) is giving ICEs otherwise!
-    - export make_j="make -j 4"
+    - export make_j="make -j 2"
     - if [[ $CXX == 'g++' ]]; then export make_j="make"; fi
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
