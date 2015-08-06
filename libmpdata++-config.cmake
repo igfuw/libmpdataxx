@@ -105,7 +105,9 @@ set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
 
 ############################################################################################
 # MPI - detecting if the C++ compiler is actually an MPI wrapper
-execute_process(COMMAND ${CMAKE_CXX_COMPILER} "-show" RESULT_VARIABLE status OUTPUT_VARIABLE output)
+set(msg "Detecting if the compiler is an MPI wrapper...")
+message(STATUS "${msg}")
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} "-show" RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_QUIET)
 if (status EQUAL 0 AND output MATCHES "mpi") 
   set(USE_MPI TRUE)
   set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -DUSE_MPI")
@@ -113,6 +115,8 @@ if (status EQUAL 0 AND output MATCHES "mpi")
 else()
   set(USE_MPI FALSE)
 endif()
+message(STATUS "${msg} - ${USE_MPI}")
+unset(msg)
 unset(status)
 unset(output)
 
