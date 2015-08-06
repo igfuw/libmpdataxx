@@ -60,7 +60,7 @@ namespace libmpdataxx
             lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
             lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
           }
-          this->set_edges(lap_tmp1, lap_tmp2, i, j);
+          this->set_edges(lap_tmp1, lap_tmp2, i, j, 0);
           this->xchng_pres(lap_tmp1, i, j);
           this->xchng_pres(lap_tmp2, i, j);
           ,
@@ -84,7 +84,7 @@ namespace libmpdataxx
             lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
             lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
           }
-          this->set_edges(lap_tmp1, lap_tmp2, i, j);
+          this->set_edges(lap_tmp1, lap_tmp2, i, j, -1);
           this->xchng_pres(lap_tmp1, i, j);
           this->xchng_pres(lap_tmp2, i, j);
           ,
@@ -112,29 +112,27 @@ namespace libmpdataxx
         void set_edges(arr_t &arr1,
                        arr_t &arr2,
                        const rng_t &range_i,
-                       const rng_t &range_j
+                       const rng_t &range_j,
+                       int sign
         )
         {
-          this->bcxl->set_edge_pres(arr1, range_j);
-          this->bcxr->set_edge_pres(arr1, range_j);
-          this->bcyl->set_edge_pres(arr2, range_i);
-          this->bcyr->set_edge_pres(arr2, range_i);
+          this->bcxl->set_edge_pres(arr1, range_j, sign);
+          this->bcxr->set_edge_pres(arr1, range_j, sign);
+          this->bcyl->set_edge_pres(arr2, range_i, sign);
+          this->bcyr->set_edge_pres(arr2, range_i, sign);
           this->mem->barrier();
         }
         
-        void set_edges(arr_t &arr1,
-                       arr_t &arr2,
-                       const arr_t &v1,
-                       const arr_t &v2,
-                       const rng_t &range_i,
-                       const rng_t &range_j
+        void save_edges(arr_t &arr1,
+                        arr_t &arr2,
+                        const rng_t &range_i,
+                        const rng_t &range_j
         )
         {
-          this->bcxl->set_edge_pres(arr1, v1, range_j);
-          this->bcxr->set_edge_pres(arr1, v1, range_j);
-          this->bcyl->set_edge_pres(arr2, v2, range_i);
-          this->bcyr->set_edge_pres(arr2, v2, range_i);
-          this->mem->barrier();
+          this->bcxl->save_edge_vel(arr1, range_j);
+          this->bcxr->save_edge_vel(arr1, range_j);
+          this->bcyl->save_edge_vel(arr2, range_i);
+          this->bcyr->save_edge_vel(arr2, range_i);
         }
         
         virtual void pressure_solver_loop_init() = 0;
@@ -166,20 +164,22 @@ namespace libmpdataxx
 	  using formulae::nabla::grad;
 	  tmp_u(this->ijk) = - grad<0>(Phi, i, j, this->di);
 	  tmp_w(this->ijk) = - grad<1>(Phi, j, i, this->dj);
-
-          set_edges(tmp_u, tmp_w, this->state(ix::vip_i), this->state(ix::vip_j), i, j);
         }
 
 	void pressure_solver_apply()
 	{
 	  this->state(ix::vip_i)(this->ijk) += tmp_u(this->ijk);
 	  this->state(ix::vip_j)(this->ijk) += tmp_w(this->ijk);
+          set_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->i, this->j, 1);
 	}
 
         void hook_ante_loop(const int nt)
         {
           parent_t::hook_ante_loop(nt);
 	  ini_pressure();
+          
+          // save initial edge velocities
+          save_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->i, this->j);
  
           // allow pressure_solver_apply at the first time step
           tmp_u(this->ijk) = 0;
