@@ -69,10 +69,10 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_nrml(arrvec[0], range_i);
-          bcxr->fill_halos_vctr_nrml(arrvec[0], range_i);
-          bcyl->fill_halos_vctr_nrml(arrvec[1], range_j);
-          bcyr->fill_halos_vctr_nrml(arrvec[1], range_j);
+          bcyl->fill_halos_vctr_nrml(arrvec[0], range_i);
+          bcyr->fill_halos_vctr_nrml(arrvec[0], range_i);
+          bcxl->fill_halos_vctr_nrml(arrvec[1], range_j);
+          bcxr->fill_halos_vctr_nrml(arrvec[1], range_j);
           this->mem->barrier();
         }
 
