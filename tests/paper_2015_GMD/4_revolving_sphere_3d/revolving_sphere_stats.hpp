@@ -16,13 +16,13 @@ struct stats : public parent_t
 
   typename parent_t::arr_t ic, fc;
 
-  real_t last_timestep;
+  int last_timestep;
 
   std::ofstream ofs;
 
-  void hook_ante_loop(const int nt)
+  void hook_ante_loop(const real_t tshift)
   {
-    parent_t::hook_ante_loop(nt);
+    parent_t::hook_ante_loop(tshift);
     if (this->rank != 0) return;
 
     //checking what are the MPDATA options of each test simulation (iga / fct / ...) 
@@ -30,7 +30,7 @@ struct stats : public parent_t
     if(!ofs.is_open())
       ofs.open("stats_" + this->outdir + ".txt", std::ofstream::out);
 
-    last_timestep = nt;
+    last_timestep = tshift / this->dt;
 
     ic.resize(this->mem->advectee().shape());
     ic = this->mem->advectee();

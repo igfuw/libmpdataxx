@@ -36,9 +36,9 @@ namespace libmpdataxx
       //xdmf writer
       detail::xdmf_writer<parent_t::n_dims> xdmfw;
 
-      void start(const int nt)
+      void start(const typename solver_t::real_t tshift)
       {
-        parent_t::start(nt);
+        parent_t::start(tshift);
 
         // get variable names for xdmf writer setup
         std::vector<std::string> attr_names;

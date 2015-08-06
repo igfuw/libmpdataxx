@@ -38,9 +38,9 @@ namespace libmpdataxx
         {};
       };
 
-      void solve(int nt)
+      void solve(typename parent_t::real_t tshift)
       {
-        this->algos[0].solve(nt);
+        this->algos[0].solve(tshift);
       }
 
       public:

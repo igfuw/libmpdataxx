@@ -24,6 +24,10 @@ namespace libmpdataxx
       > : public solver_common<ct_params_t, n_tlev, minhalo>
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
+        
+        public:
+
+        using typename parent_t::real_t;
 
 	protected:
 
@@ -55,9 +59,9 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
+        void hook_ante_loop(const real_t tshift) // TODO: this tshift conflicts in fact with multiple-advance()-call logic!
         {
-          parent_t::hook_ante_loop(nt);
+          parent_t::hook_ante_loop(tshift);
 	  
           // filling halo in velocity field
           xchng_vctr_alng(this->mem->GC);
@@ -77,7 +81,7 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename parent_t::real_t di = 0;
+          real_t di = 0;
         };
 
         protected:

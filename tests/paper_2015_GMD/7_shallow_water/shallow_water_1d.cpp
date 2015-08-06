@@ -91,7 +91,7 @@ void test(const std::string& outdir)
   run.advectee(ix::qx) = 0;
 
   // integration
-  run.advance(nt); 
+  run.advance(nt * p.dt); 
 }
 
 int main()

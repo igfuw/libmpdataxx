@@ -26,8 +26,12 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
+        public:
+        
+        using typename parent_t::real_t;
+
 	protected:
-      
+
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr;
 
 	const rng_t i, j; // TODO: to be removed
@@ -63,9 +67,9 @@ namespace libmpdataxx
         }
 
         // TODO: ref in argument...
-        void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
+        void hook_ante_loop(const real_t tshift) // TODO: this tshift conflicts in fact with multiple-advance()-call logic!
         {
-          parent_t::hook_ante_loop(nt);
+          parent_t::hook_ante_loop(tshift);
 
           xchng_vctr_alng(this->mem->GC);
 
@@ -74,7 +78,7 @@ namespace libmpdataxx
           // TODO: same in 1D
           if (!opts::isset(ct_params_t::opts, opts::dfl))
           {
-            typename ct_params_t::real_t max_abs_div = max(abs(
+            real_t max_abs_div = max(abs(
 	      ( 
 		this->mem->GC[0](i-h, j  ) - 
 		this->mem->GC[0](i+h, j  )
@@ -83,7 +87,7 @@ namespace libmpdataxx
 		this->mem->GC[1](i,   j+h)
 	      )
 	    ));
-	    if (max_abs_div > blitz::epsilon(typename parent_t::real_t(44))) 
+	    if (max_abs_div > blitz::epsilon(real_t(44))) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
         }
@@ -102,7 +106,7 @@ namespace libmpdataxx
         
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename parent_t::real_t di = 0, dj = 0;
+          real_t di = 0, dj = 0;
         };
 
         protected:

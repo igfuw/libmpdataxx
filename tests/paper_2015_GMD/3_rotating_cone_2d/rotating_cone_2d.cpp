@@ -150,7 +150,7 @@ void test(const std::string filename)
   //       (in context of the advector()'s use of blitz::Array::reindex())
 
   // time stepping
-  run.advance(nt);
+  run.advance(nt * dt);
 }
 
 int main()

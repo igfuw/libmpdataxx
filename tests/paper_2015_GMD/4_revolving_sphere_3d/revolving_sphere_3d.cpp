@@ -102,7 +102,7 @@ void test(const std::string& dir_name)
   slv.advector(z) = omega / sqrt(3) * (-(i * dx - xc) + (j * dy - yc)) * dt / dz;
 
   // time stepping
-  slv.advance(nt);
+  slv.advance(nt * dt);
 }
 
 int main()

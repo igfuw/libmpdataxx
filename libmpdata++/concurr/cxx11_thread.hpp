@@ -99,13 +99,13 @@ namespace libmpdataxx
 
       public:
 
-      void solve(int nt)
+      void solve(typename parent_t::real_t tshift)
       {
         boost::ptr_vector<std::thread> threads(mem_t::size());
         for (int i = 0; i < this->algos.size(); ++i) 
         {  
           threads.push_back(new std::thread(
-            &solver_t::solve, &(this->algos[i]), nt
+            &solver_t::solve, &(this->algos[i]), tshift
           ));
         }
         for (auto &th : threads) th.join();

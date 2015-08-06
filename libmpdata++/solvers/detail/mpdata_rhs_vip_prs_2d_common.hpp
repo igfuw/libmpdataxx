@@ -173,9 +173,9 @@ namespace libmpdataxx
           set_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->i, this->j, 1);
 	}
 
-        void hook_ante_loop(const int nt)
+        void hook_ante_loop(const real_t tshift)
         {
-          parent_t::hook_ante_loop(nt);
+          parent_t::hook_ante_loop(tshift);
 	  ini_pressure();
           
           // save initial edge velocities

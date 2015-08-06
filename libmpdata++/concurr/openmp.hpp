@@ -51,7 +51,7 @@ namespace libmpdataxx
         mem_t(const std::array<int, solver_t::n_dims> &grid_size) : parent_t::mem_t(grid_size, size()) {};
       };
 
-      void solve(int nt)
+      void solve(typename parent_t::real_t tshift)
       {
         int i = 0;
 #pragma omp parallel private(i)
@@ -59,7 +59,7 @@ namespace libmpdataxx
 #if defined(_OPENMP)
           i = omp_get_thread_num();
 #endif
-          this->algos[i].solve(nt);
+          this->algos[i].solve(tshift);
         } 
       }
 
