@@ -180,22 +180,24 @@ namespace libmpdataxx
         assert(this->dj != 0);
       }
       
-      static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)
-      {
-	parent_t::alloc(mem, p);
+      static void alloc(
+        typename parent_t::mem_t *mem, 
+        const int &n_iters
+      ) {
+	parent_t::alloc(mem, n_iters);
 
         // allocate velocity absorber
         if (static_cast<vip_vab_t>(ct_params_t::vip_vab) != 0)
         {
           mem->vab_coeff.reset(mem->old(new typename parent_t::arr_t(
-                  parent_t::rng_sclr(p.grid_size[0]),
-                  parent_t::rng_sclr(p.grid_size[1])
+                  parent_t::rng_sclr(mem->grid_size[0]),
+                  parent_t::rng_sclr(mem->grid_size[1])
           )));
           
           for (int n = 0; n < ct_params_t::n_dims; ++n)
             mem->vab_relax.push_back(mem->old(new typename parent_t::arr_t(
-                    parent_t::rng_sclr(p.grid_size[0]),
-                    parent_t::rng_sclr(p.grid_size[1])
+                    parent_t::rng_sclr(mem->grid_size[0]),
+                    parent_t::rng_sclr(mem->grid_size[1])
             )));
         }
       }

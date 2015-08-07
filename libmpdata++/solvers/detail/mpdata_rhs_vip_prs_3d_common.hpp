@@ -98,56 +98,6 @@ namespace libmpdataxx
 	  this->xchng_sclr(Phi, this->i^halo, this->j^halo, this->k^halo);
 	}
 
-        void xchng_pres(arr_t &arr,
-                        const rng_t &range_i,
-                        const rng_t &range_j,
-                        const rng_t &range_k)
-        {
-          this->mem->barrier();
-          this->bcxl->fill_halos_pres(arr, range_j, range_k);
-          this->bcxr->fill_halos_pres(arr, range_j, range_k);
-          this->bcyl->fill_halos_pres(arr, range_k, range_i);
-          this->bcyr->fill_halos_pres(arr, range_k, range_i);
-          this->bczl->fill_halos_pres(arr, range_i, range_j);
-          this->bczr->fill_halos_pres(arr, range_i, range_j);
-          this->mem->barrier();
-        }
-
-        void set_edges(arr_t &arr1,
-                       arr_t &arr2,
-                       arr_t &arr3,
-                       const rng_t &range_i,
-                       const rng_t &range_j,
-                       const rng_t &range_k)
-        {
-          this->bcxl->set_edge_pres(arr1, range_j, range_k);
-          this->bcxr->set_edge_pres(arr1, range_j, range_k);
-          this->bcyl->set_edge_pres(arr2, range_k, range_i);
-          this->bcyr->set_edge_pres(arr2, range_k, range_i);
-          this->bczl->set_edge_pres(arr3, range_i, range_j);
-          this->bczr->set_edge_pres(arr3, range_i, range_j);
-          this->mem->barrier();
-        }
-        
-        void set_edges(arr_t &arr1,
-                       arr_t &arr2,
-                       arr_t &arr3,
-                       const arr_t &v1,
-                       const arr_t &v2,
-                       const arr_t &v3,
-                       const rng_t &range_i,
-                       const rng_t &range_j,
-                       const rng_t &range_k)
-        {
-          this->bcxl->set_edge_pres(arr1, v1, range_j, range_k);
-          this->bcxr->set_edge_pres(arr1, v1, range_j, range_k);
-          this->bcyl->set_edge_pres(arr2, v2, range_k, range_i);
-          this->bcyr->set_edge_pres(arr2, v2, range_k, range_i);
-          this->bczl->set_edge_pres(arr3, v3, range_i, range_j);
-          this->bczr->set_edge_pres(arr3, v3, range_i, range_j);
-          this->mem->barrier();
-        }
-
 	virtual void pressure_solver_loop_init() = 0;
 	virtual void pressure_solver_loop_body() = 0;
 
@@ -173,14 +123,14 @@ namespace libmpdataxx
 	    iters++;
           }
 
-	  xchng_pres(this->Phi, i^this->halo, j^this->halo, k^this->halo);
+	  this->xchng_pres(this->Phi, i^this->halo, j^this->halo, k^this->halo);
 
 	  using formulae::nabla::grad;
 	  tmp_u(this->ijk) = - grad<0>(Phi, i, j, k, this->di);
 	  tmp_v(this->ijk) = - grad<1>(Phi, j, k, i, this->dj);
 	  tmp_w(this->ijk) = - grad<2>(Phi, k, i, j, this->dk);
 
-          set_edges(tmp_u, tmp_v, tmp_w, this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), i, j, k);
+          this->set_edges(tmp_u, tmp_v, tmp_w, this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), i, j, k);
         }
 
 	void pressure_solver_apply()
@@ -238,10 +188,12 @@ namespace libmpdataxx
 	  lap_tmp3(args.mem->tmp[__FILE__][0][7])
 	{} 
 
-	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
-	{
-	  parent_t::alloc(mem, p);
-          parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 8); // (i^hlo,j^hlo)-sized temporary fields
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const int &n_iters
+        ) {
+	  parent_t::alloc(mem, n_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 8); // (i^hlo,j^hlo)-sized temporary fields
         }
       }; 
     }; // namespace detail

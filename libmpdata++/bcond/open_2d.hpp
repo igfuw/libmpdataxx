@@ -11,16 +11,16 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,         knd,         dir,     n_dims,     d,
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,
       typename std::enable_if<
         knd == open &&
         dir == left &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t>
+    > : public detail::bcond_common<real_t, halo>
     {
-      using parent_t = detail::bcond_common<real_t>;
+      using parent_t = detail::bcond_common<real_t, halo>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -97,16 +97,16 @@ namespace libmpdataxx
       }
     };
 
-    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,         knd,         dir,     n_dims,     d,
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,
       typename std::enable_if<
         knd == open &&
         dir == rght &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t>
+    > : public detail::bcond_common<real_t, halo>
     {
-      using parent_t = detail::bcond_common<real_t>;
+      using parent_t = detail::bcond_common<real_t, halo>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
       

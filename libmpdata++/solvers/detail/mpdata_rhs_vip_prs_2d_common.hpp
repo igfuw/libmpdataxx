@@ -99,42 +99,6 @@ namespace libmpdataxx
 	  this->xchng_pres(Phi, this->i^halo, this->j^halo);
 	}
 	
-        void xchng_pres(arr_t &arr, const rng_t &range_i, const rng_t &range_j)
-        {
-          this->mem->barrier();
-          this->bcxl->fill_halos_pres(arr, range_j);
-          this->bcxr->fill_halos_pres(arr, range_j);
-          this->bcyl->fill_halos_pres(arr, range_i);
-          this->bcyr->fill_halos_pres(arr, range_i);
-          this->mem->barrier();
-        }
-        
-        void set_edges(arr_t &arr1,
-                       arr_t &arr2,
-                       const rng_t &range_i,
-                       const rng_t &range_j,
-                       int sign
-        )
-        {
-          this->bcxl->set_edge_pres(arr1, range_j, sign);
-          this->bcxr->set_edge_pres(arr1, range_j, sign);
-          this->bcyl->set_edge_pres(arr2, range_i, sign);
-          this->bcyr->set_edge_pres(arr2, range_i, sign);
-          this->mem->barrier();
-        }
-        
-        void save_edges(arr_t &arr1,
-                        arr_t &arr2,
-                        const rng_t &range_i,
-                        const rng_t &range_j
-        )
-        {
-          this->bcxl->save_edge_vel(arr1, range_j);
-          this->bcxr->save_edge_vel(arr1, range_j);
-          this->bcyl->save_edge_vel(arr2, range_i);
-          this->bcyr->save_edge_vel(arr2, range_i);
-        }
-        
         virtual void pressure_solver_loop_init() = 0;
         virtual void pressure_solver_loop_body() = 0;
 
@@ -159,7 +123,7 @@ namespace libmpdataxx
 	    iters++;
           }
 
-	  xchng_pres(this->Phi, i^this->halo, j^this->halo);
+	  this->xchng_pres(this->Phi, i^this->halo, j^this->halo);
 
 	  using formulae::nabla::grad;
 	  tmp_u(this->ijk) = - grad<0>(Phi, i, j, this->di);
@@ -170,7 +134,7 @@ namespace libmpdataxx
 	{
 	  this->state(ix::vip_i)(this->ijk) += tmp_u(this->ijk);
 	  this->state(ix::vip_j)(this->ijk) += tmp_w(this->ijk);
-          set_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->i, this->j, 1);
+          this->set_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->i, this->j, 1);
 	}
 
         void hook_ante_loop(const int nt)
@@ -179,7 +143,7 @@ namespace libmpdataxx
 	  ini_pressure();
           
           // save initial edge velocities
-          save_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->i, this->j);
+          this->save_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->i, this->j);
  
           // allow pressure_solver_apply at the first time step
           tmp_u(this->ijk) = 0;
@@ -224,10 +188,12 @@ namespace libmpdataxx
 	  lap_tmp2(args.mem->tmp[__FILE__][0][5])
 	{} 
 
-	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
-	{
-	  parent_t::alloc(mem, p);
-          parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 6); // (i^hlo,j^hlo)-sized temporary fields
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const int &n_iters
+        ) {
+	  parent_t::alloc(mem, n_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 6); // (i^hlo,j^hlo)-sized temporary fields
         }
       }; 
     }; // namespace detail

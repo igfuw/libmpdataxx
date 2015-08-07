@@ -63,31 +63,6 @@ namespace libmpdataxx
           "more boundary conditions than dimensions"
         );
 
-        private:
-
-        // helper methods to define subdomain ranges
-	int min(const int &grid_size, const int &rank, const int &size) 
-	{ 
-	  return rank * grid_size / size; 
-	}
-
-	int max(const int &grid_size, const int &rank, const int &size) 
-	{ 
-          return min(grid_size, rank + 1, size) - 1; 
-	}
-
-        template <int d>
-        rng_t slab(
-          const std::array<int, solver_t::n_dims> &grid_size, 
-          const int &rank = 0, 
-          const int &size = 1
-        ) {
-          return rng_t(
-            min(grid_size[d], rank, size),
-            max(grid_size[d], rank, size)
-          );
-        }
-
 	protected:
 
         // (cannot be nested due to templates)
@@ -120,10 +95,10 @@ namespace libmpdataxx
 	) {
           // allocate the memory to be shared by multiple threads
           mem.reset(mem_p);
-	  solver_t::alloc(mem.get(), p);
+	  solver_t::alloc(mem.get(), p.n_iters);
 
           // allocate per-thread structures
-          init(p, p.grid_size, size); 
+          init(p, mem->grid_size, size); 
         }
 
         private:
@@ -133,15 +108,12 @@ namespace libmpdataxx
           bcond::drctn_e dir,
           int dim
         >
-        void bcx_set(
-          typename solver_t::bcp_t &bcp, 
-          const std::array<int, solver_t::n_dims> &grid_size
-        ) {
+        void bc_set(typename solver_t::bcp_t &bcp) 
+        {
 	  bcp.reset(
-            new bcond::bcond<real_t, type, dir, solver_t::n_dims, dim>(
-	      slab<dim>(grid_size), 
-	      solver_t::halo, 
-	      grid_size[0]
+            new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
+	      mem->slab(mem->grid_size[dim]), 
+	      mem->grid_size[0].length() // TODO: get it from rt_params...
             )
           );
         }
@@ -149,18 +121,18 @@ namespace libmpdataxx
         // 1D version
         void init(
           const typename solver_t::rt_params_t &p,
-          const std::array<int, 1> &grid_size, const int &n0
+          const std::array<rng_t, 1> &grid_size, const int &n0
         )
         {
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
 
-          bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
-	  bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
+          bc_set<bcxl, bcond::left, 0>(bxl);
+	  bc_set<bcxr, bcond::rght, 0>(bxr);
 
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
-            shrdl.reset(new bcond::shared<real_t>());
-            shrdr.reset(new bcond::shared<real_t>());
+            shrdl.reset(new bcond::shared<real_t, solver_t::halo>());
+            shrdr.reset(new bcond::shared<real_t, solver_t::halo>());
 
 	    algos.push_back(
               new solver_t(
@@ -169,7 +141,7 @@ namespace libmpdataxx
 		  mem.get(), 
 		  i0 == 0      ? bxl : shrdl,
 		  i0 == n0 - 1 ? bxr : shrdr,
-		  slab<0>(grid_size, i0, n0)
+		  mem->slab(grid_size[0], i0, n0)
                 }), 
                 p
               )
@@ -181,7 +153,7 @@ namespace libmpdataxx
         // TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
         void init(
           const typename solver_t::rt_params_t &p,
-	  const std::array<int, 2> &grid_size, 
+	  const std::array<rng_t, 2> &grid_size, 
           const int &n0, const int &n1 = 1
         ) {
           for (int i0 = 0; i0 < n0; ++i0) 
@@ -190,14 +162,14 @@ namespace libmpdataxx
             {
 	      typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
 
-              bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
-	      bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
+              bc_set<bcxl, bcond::left, 0>(bxl);
+	      bc_set<bcxr, bcond::rght, 0>(bxr);
 
-              bcx_set<bcyl, bcond::left, 1>(byl, grid_size);
-	      bcx_set<bcyr, bcond::rght, 1>(byr, grid_size);
+              bc_set<bcyl, bcond::left, 1>(byl);
+	      bc_set<bcyr, bcond::rght, 1>(byr);
 
-              shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
-              shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
+              shrdl.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
+              shrdr.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
 
               algos.push_back(
                 new solver_t(
@@ -207,8 +179,8 @@ namespace libmpdataxx
 		    i0 == 0      ? bxl : shrdl,
 		    i0 == n0 - 1 ? bxr : shrdr,
 		    byl, byr, 
-		    slab<0>(grid_size, i0, n0),  
-                    slab<1>(grid_size, i1, n1)
+		    mem->slab(grid_size[0], i0, n0),  
+                    mem->slab(grid_size[1], i1, n1)
                   }), 
                   p
                 )
@@ -220,7 +192,7 @@ namespace libmpdataxx
         // 3D version
         void init(
           const typename solver_t::rt_params_t &p,
-	  const std::array<int, 3> &grid_size, 
+	  const std::array<rng_t, 3> &grid_size, 
           const int &n0, const int &n1 = 1, const int &n2 = 1
         ) {
           typename solver_t::bcp_t bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;
@@ -232,17 +204,17 @@ namespace libmpdataxx
             {
 	      for (int i2 = 0; i2 < n2; ++i2) 
               {
-                bcx_set<bcxl, bcond::left, 0>(bxl, grid_size);
-                bcx_set<bcxr, bcond::rght, 0>(bxr, grid_size);
+                bc_set<bcxl, bcond::left, 0>(bxl);
+                bc_set<bcxr, bcond::rght, 0>(bxr);
 
-                bcx_set<bcyl, bcond::left, 1>(byl, grid_size);
-                bcx_set<bcyr, bcond::rght, 1>(byr, grid_size);
+                bc_set<bcyl, bcond::left, 1>(byl);
+                bc_set<bcyr, bcond::rght, 1>(byr);
 
-                bcx_set<bczl, bcond::left, 2>(bzl, grid_size);
-                bcx_set<bczr, bcond::rght, 2>(bzr, grid_size);
+                bc_set<bczl, bcond::left, 2>(bzl);
+                bc_set<bczr, bcond::rght, 2>(bzr);
 
-                shrdl.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
-                shrdr.reset(new bcond::shared<real_t>()); // TODO: shrdy if n1 != 1
+                shrdl.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
+                shrdr.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
 
 		algos.push_back(
                   new solver_t(
@@ -253,9 +225,9 @@ namespace libmpdataxx
 		      i0 == n0 - 1 ? bxr : shrdr,
                       byl, byr, 
                       bzl, bzr, 
-                      slab<0>(grid_size, i0, n0), 
-                      slab<1>(grid_size, i1, n1), 
-                      slab<2>(grid_size, i2, n2)
+                      mem->slab(grid_size[0], i0, n0), 
+                      mem->slab(grid_size[1], i1, n1), 
+                      mem->slab(grid_size[2], i2, n2)
                     }), 
                     p
                   )

@@ -161,11 +161,13 @@ namespace libmpdataxx
         }
       } 
 
-      static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)
-      {
+      static void alloc(
+        typename parent_t::mem_t *mem, 
+        const int &n_iters
+      ) {
         // TODO: optimise to skip allocs for equations with no rhs
-	parent_t::alloc(mem, p);
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, parent_t::n_eqns); // rhs array for each equation
+	parent_t::alloc(mem, n_iters);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_eqns); // rhs array for each equation
       }
     };
   }; // namespace solvers

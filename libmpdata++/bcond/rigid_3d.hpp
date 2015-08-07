@@ -11,16 +11,16 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,         knd,         dir,     n_dims,     d,  
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,  
       typename std::enable_if<
         knd == rigid &&
         dir == left &&
         n_dims == 3
       >::type
-    > : public detail::bcond_common<real_t>
+    > : public detail::bcond_common<real_t, halo>
     { 
-      using parent_t = detail::bcond_common<real_t>;
+      using parent_t = detail::bcond_common<real_t, halo>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -30,7 +30,7 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         // zero flux condition
-        for (int i = this->left_halo_sclr.first(), n = this->halo; i <= this->left_halo_sclr.last(); ++i, --n)
+        for (int i = this->left_halo_sclr.first(), n = halo; i <= this->left_halo_sclr.last(); ++i, --n)
         {
           a(pi<d>(i, j, k)) = a(pi<d>(this->left_edge_sclr + n, j, k));
         }
@@ -60,7 +60,7 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
         // zero velocity condition
-        for (int i = this->left_halo_vctr.first(), n = this->halo; i <= this->left_halo_vctr.last(); ++i, --n)
+        for (int i = this->left_halo_vctr.first(), n = halo; i <= this->left_halo_vctr.last(); ++i, --n)
         {
 	  av[d](pi<d>(i, j, k)) = -av[d](pi<d>(this->left_edge_sclr + n - h, j, k));
         }
@@ -75,16 +75,16 @@ namespace libmpdataxx
       }
     };
 
-    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,         knd,         dir,     n_dims,     d,  
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,  
       typename std::enable_if<
         knd == rigid &&
         dir == rght &&
         n_dims == 3
       >::type
-    > : public detail::bcond_common<real_t>
+    > : public detail::bcond_common<real_t, halo>
     {
-      using parent_t = detail::bcond_common<real_t>;
+      using parent_t = detail::bcond_common<real_t, halo>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
       

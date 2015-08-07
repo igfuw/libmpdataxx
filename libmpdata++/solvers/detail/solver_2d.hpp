@@ -26,17 +26,17 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
-	protected:
-      
 	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr;
 
+	protected:
+      
 	const rng_t i, j; // TODO: to be removed
 
-	void xchng_sclr(typename parent_t::arr_t &arr,
+	virtual void xchng_sclr(typename parent_t::arr_t &arr,
                         const rng_t &range_i,
                         const rng_t &range_j,
                         const bool deriv = false
-        ) // for a given array
+        ) final // for a given array
 	{
           this->mem->barrier();
 	  bcxl->fill_halos_sclr(arr, range_j, deriv);
@@ -46,7 +46,7 @@ namespace libmpdataxx
           this->mem->barrier();
 	}
 
-	void xchng(int e) 
+	void xchng(int e) final
 	{
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
 	}
@@ -59,6 +59,63 @@ namespace libmpdataxx
           bcyl->fill_halos_vctr_alng(arrvec, i);
           bcyr->fill_halos_vctr_alng(arrvec, i);
           // TODO: open bc nust be last!!!
+          this->mem->barrier();
+        }
+
+        virtual void xchng_vctr_nrml(
+          const arrvec_t<typename parent_t::arr_t> &arrvec, 
+          const rng_t &range_i, 
+          const rng_t &range_j
+        ) final
+        {
+          this->mem->barrier();
+          bcyl->fill_halos_vctr_nrml(arrvec[0], range_i);
+          bcyr->fill_halos_vctr_nrml(arrvec[0], range_i);
+          bcxl->fill_halos_vctr_nrml(arrvec[1], range_j);
+          bcxr->fill_halos_vctr_nrml(arrvec[1], range_j);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_pres(
+          const typename parent_t::arr_t &arr,
+          const rng_t &range_i,
+          const rng_t &range_j
+        ) final
+        {
+          this->mem->barrier();
+          this->bcxl->fill_halos_pres(arr, range_j);
+          this->bcxr->fill_halos_pres(arr, range_j);
+          this->bcyl->fill_halos_pres(arr, range_i);
+          this->bcyr->fill_halos_pres(arr, range_i);
+          this->mem->barrier();
+        }
+
+        virtual void set_edges(
+          const typename parent_t::arr_t &arr1,
+          const typename parent_t::arr_t &arr2,
+          const rng_t &range_i,
+          const rng_t &range_j,
+          const int &sign
+        ) final
+        {
+          this->bcxl->set_edge_pres(arr1, range_j, sign);
+          this->bcxr->set_edge_pres(arr1, range_j, sign);
+          this->bcyl->set_edge_pres(arr2, range_i, sign);
+          this->bcyr->set_edge_pres(arr2, range_i, sign);
+          this->mem->barrier();
+        }
+
+        virtual void save_edges(
+          const typename parent_t::arr_t &arr1,
+          const typename parent_t::arr_t &arr2,
+          const rng_t &range_i,
+          const rng_t &range_j
+        ) final
+        {
+          this->bcxl->save_edge_vel(arr1, range_j);
+          this->bcxr->save_edge_vel(arr1, range_j);
+          this->bcyl->save_edge_vel(arr2, range_i);
+          this->bcyr->save_edge_vel(arr2, range_i);
           this->mem->barrier();
         }
 
@@ -133,40 +190,42 @@ namespace libmpdataxx
 
 	public:
 
-	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p) 
-        {
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const int &n_iters
+        ) {
           // psi 
           mem->psi.resize(parent_t::n_eqns);
 	  for (int e = 0; e < parent_t::n_eqns; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t( 
-                parent_t::rng_sclr(p.grid_size[0]), 
-                parent_t::rng_sclr(p.grid_size[1])
+                parent_t::rng_sclr(mem->grid_size[0]), 
+                parent_t::rng_sclr(mem->grid_size[1])
               )));
 
           // Courant field components (Arakawa-C grid)
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_vctr(p.grid_size[0]), 
-            parent_t::rng_sclr(p.grid_size[1]) 
+            parent_t::rng_vctr(mem->grid_size[0]), 
+            parent_t::rng_sclr(mem->grid_size[1]) 
           )));
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_sclr(p.grid_size[0]), 
-            parent_t::rng_vctr(p.grid_size[1]) 
+            parent_t::rng_sclr(mem->grid_size[0]), 
+            parent_t::rng_vctr(mem->grid_size[1]) 
           )));
  
           // allocate G
           if (opts::isset(ct_params_t::opts, opts::nug))
 	    mem->G.reset(mem->old(new typename parent_t::arr_t(
-                    parent_t::rng_sclr(p.grid_size[0]),
-                    parent_t::rng_sclr(p.grid_size[1])
+                    parent_t::rng_sclr(mem->grid_size[0]),
+                    parent_t::rng_sclr(mem->grid_size[1])
             )));
 
           // allocate Kahan summation temporary vars
           if (opts::isset(ct_params_t::opts, opts::khn))
 	    for (int n = 0; n < 3; ++n) 
 	      mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
-                parent_t::rng_sclr(p.grid_size[0]), 
-                parent_t::rng_sclr(p.grid_size[1])
+                parent_t::rng_sclr(mem->grid_size[0]), 
+                parent_t::rng_sclr(mem->grid_size[1])
               )));
         }
 
@@ -174,32 +233,32 @@ namespace libmpdataxx
 
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
-          typename parent_t::mem_t *mem, const std::array<int, 2> &grid_size,
+          typename parent_t::mem_t *mem,
           const char * __file__
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
           mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_vctr(grid_size[0]), 
-            parent_t::rng_sclr(grid_size[1]) 
+            parent_t::rng_vctr(mem->grid_size[0]), 
+            parent_t::rng_sclr(mem->grid_size[1]) 
           ))); 
           mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_sclr(grid_size[0]), 
-            parent_t::rng_vctr(grid_size[1]) 
+            parent_t::rng_sclr(mem->grid_size[0]), 
+            parent_t::rng_vctr(mem->grid_size[1]) 
           ))); 
         }
 
         // helper method to allocate n_arr scalar temporary arrays 
         static void alloc_tmp_sclr(
-          typename parent_t::mem_t *mem, const std::array<int, 2> &grid_size,
+          typename parent_t::mem_t *mem, 
           const char * __file__, const int n_arr
         )   
         {   
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
-              parent_t::rng_sclr(grid_size[0]),
-              parent_t::rng_sclr(grid_size[1])
+              parent_t::rng_sclr(mem->grid_size[0]),
+              parent_t::rng_sclr(mem->grid_size[1])
             )));
         } 
       };
