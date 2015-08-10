@@ -47,6 +47,8 @@ namespace libmpdataxx
 
 	protected: 
         
+        std::array<std::array<bcp_t, 2>, n_dims> bcs;
+
         const int rank;
 
         // declared here for output purposes
@@ -71,6 +73,12 @@ namespace libmpdataxx
 
 	virtual void xchng(int e) = 0;
         // TODO: implement flagging of valid/invalid halo for optimisations
+
+        void set_bcs(const int d, bcp_t &bcl, bcp_t &bcr)
+        {
+          bcs[d][0] = std::move(bcl);
+          bcs[d][1] = std::move(bcr);
+        }
 
         private:
       
