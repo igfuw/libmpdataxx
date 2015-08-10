@@ -42,31 +42,11 @@ namespace libmpdataxx
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
-	  {
-            this->bcxl->fill_halos_sclr(*this->mem->G, this->j^this->halo, this->k^this->halo); // TODO: one xchng call?
-            this->bcxr->fill_halos_sclr(*this->mem->G, this->j^this->halo, this->k^this->halo);
-            this->bcyl->fill_halos_sclr(*this->mem->G, this->k^this->halo, this->i^this->halo);
-            this->bcyr->fill_halos_sclr(*this->mem->G, this->k^this->halo, this->i^this->halo);
-            this->bczl->fill_halos_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
-            this->bczr->fill_halos_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
-	  }
+            this->xchng_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo, this->k^this->halo);
           
           // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
           // halos for GC_z
-          this->bcyl->fill_halos_vctr_nrml(this->mem->GC[0], this->k^h, this->i^h);
-          this->bcyr->fill_halos_vctr_nrml(this->mem->GC[0], this->k^h, this->i^h);
-          this->bczl->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h, this->j^h);
-          this->bczr->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h, this->j^h);
-
-          this->bcxl->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h, this->k^h);
-          this->bcxr->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h, this->k^h);
-          this->bczl->fill_halos_vctr_nrml(this->mem->GC[1], this->i^h, this->j^h);
-          this->bczr->fill_halos_vctr_nrml(this->mem->GC[1], this->i^h, this->j^h);
-          
-          this->bcxl->fill_halos_vctr_nrml(this->mem->GC[2], this->j^h, this->k^h);
-          this->bcxr->fill_halos_vctr_nrml(this->mem->GC[2], this->j^h, this->k^h);
-          this->bcyl->fill_halos_vctr_nrml(this->mem->GC[2], this->k^h, this->i^h);
-          this->bcyr->fill_halos_vctr_nrml(this->mem->GC[2], this->k^h, this->i^h);
+          this->xchng_vctr_nrml(this->mem->GC, this->i^h, this->j^h, this->k^h);
 	} 
 
 	// method invoked by the solver
@@ -79,14 +59,7 @@ namespace libmpdataxx
 	    if (iter != 0)
 	    {
 	      this->cycle(e);
-	      this->mem->barrier();
-	      this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^this->halo, this->k^this->halo); // TODO: two xchng calls? (without barriers)
-	      this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^this->halo, this->k^this->halo);
-	      this->bcyl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->k^this->halo, this->i^this->halo);
-	      this->bcyr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->k^this->halo, this->i^this->halo);
-	      this->bczl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^this->halo, this->j^this->halo);
-	      this->bczr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^this->halo, this->j^this->halo);
-	      this->mem->barrier();
+              this->xchng(e);
 
 	      // calculating the antidiffusive C 
 	      this->GC_corr(iter)[0](this->im+h, this->j, this->k) = 
@@ -122,22 +95,7 @@ namespace libmpdataxx
 	      // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
 	      // halos for GC_z 
 	      // TODO: document why; is it needed in the last iteration?; what about FCT?
-	      this->mem->barrier();
-	      this->bcyl->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->k^h, this->i^h);
-	      this->bcyr->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->k^h, this->i^h);
-	      this->bczl->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h, this->j^h);
-	      this->bczr->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h, this->j^h);
-
-	      this->bcxl->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h, this->k^h);
-	      this->bcxr->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h, this->k^h);
-	      this->bczl->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->i^h, this->j^h);
-	      this->bczr->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->i^h, this->j^h);
-	      
-	      this->bcxl->fill_halos_vctr_nrml(this->GC_corr(iter)[2], this->j^h, this->k^h);
-	      this->bcxr->fill_halos_vctr_nrml(this->GC_corr(iter)[2], this->j^h, this->k^h);
-	      this->bcyl->fill_halos_vctr_nrml(this->GC_corr(iter)[2], this->k^h, this->i^h);
-	      this->bcyr->fill_halos_vctr_nrml(this->GC_corr(iter)[2], this->k^h, this->i^h);
-	      this->mem->barrier();
+              this->xchng_vctr_nrml(this->GC_corr(iter), this->i^h, this->j^h, this->k^h);
 
 	      this->fct_adjust_antidiff(e, iter);
 

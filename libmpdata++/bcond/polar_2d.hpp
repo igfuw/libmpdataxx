@@ -30,7 +30,7 @@ namespace libmpdataxx
       void fill_halos_sclr(const arr_t &a, const rng_t &j, const bool deriv = false)
       {
 	using namespace idxperm;
-        for (int i = 0; i < this->halo; ++i)
+        for (int i = 0; i < halo; ++i)
         { 
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
@@ -53,7 +53,7 @@ namespace libmpdataxx
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
-        for (int i = 0; i < this->halo; ++i)
+        for (int i = 0; i < halo; ++i)
         { 
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
@@ -88,7 +88,7 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
 
-        for (int i = 0; i < this->halo; ++i)
+        for (int i = 0; i < halo; ++i)
         { 
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
@@ -111,7 +111,7 @@ namespace libmpdataxx
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
-        for (int i = 0; i < this->halo; ++i)
+        for (int i = 0; i < halo; ++i)
         { 
           for (int jj = j.first(); jj <= j.last(); jj++)
           {

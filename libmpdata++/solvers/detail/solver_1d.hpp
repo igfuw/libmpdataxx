@@ -25,10 +25,10 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
-	protected:
-
         typename parent_t::bcp_t bcxl, bcxr;
      
+	protected:
+
 	const rng_t i; //TODO: to be removed
 
         virtual void xchng_sclr(typename parent_t::arr_t &arr, const bool deriv = false) final // for a given array
@@ -39,7 +39,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-	void xchng(int e) 
+	void xchng(int e) final
 	{
           xchng_sclr(this->mem->psi[e][ this->n[e]]);
 	}
