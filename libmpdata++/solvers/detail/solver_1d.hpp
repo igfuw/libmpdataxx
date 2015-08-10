@@ -25,8 +25,6 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
-        typename parent_t::bcp_t bcxl, bcxr;
-     
 	protected:
 
 	const rng_t i; //TODO: to be removed
@@ -34,8 +32,7 @@ namespace libmpdataxx
         virtual void xchng_sclr(typename parent_t::arr_t &arr, const bool deriv = false) final // for a given array
         {
           this->mem->barrier();
-          bcxl->fill_halos_sclr(arr, deriv);
-          bcxr->fill_halos_sclr(arr, deriv);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, deriv);
           this->mem->barrier();
         }
 
@@ -47,8 +44,7 @@ namespace libmpdataxx
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec); 
-          bcxr->fill_halos_vctr_alng(arrvec);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec); 
           this->mem->barrier();
         }
 
@@ -90,11 +86,10 @@ namespace libmpdataxx
             p, 
             idx_t<parent_t::n_dims>(args.i)
           ), 
-          bcxl(std::move(args.bcxl)), 
-          bcxr(std::move(args.bcxr)),
           i(args.i)
 	{
           this->di = p.di;
+          this->set_bcs(0, args.bcxl, args.bcxr);
         }
 
         // memory allocation logic using static methods
