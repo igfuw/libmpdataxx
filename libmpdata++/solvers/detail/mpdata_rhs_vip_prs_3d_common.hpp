@@ -58,7 +58,7 @@ namespace libmpdataxx
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy);
           lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz);
-          this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
+          this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k, 0);
           this->xchng_pres(lap_tmp1, i, j, k);
           this->xchng_pres(lap_tmp2, i, j, k);
           this->xchng_pres(lap_tmp3, i, j, k);
@@ -82,7 +82,7 @@ namespace libmpdataxx
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx) - v1(this->ijk);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy) - v2(this->ijk);
           lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz) - v3(this->ijk);
-          this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k);
+          this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k, -1);
           this->xchng_pres(lap_tmp1, i, j, k);
           this->xchng_pres(lap_tmp2, i, j, k);
           this->xchng_pres(lap_tmp3, i, j, k);
@@ -129,8 +129,6 @@ namespace libmpdataxx
 	  tmp_u(this->ijk) = - grad<0>(Phi, i, j, k, this->di);
 	  tmp_v(this->ijk) = - grad<1>(Phi, j, k, i, this->dj);
 	  tmp_w(this->ijk) = - grad<2>(Phi, k, i, j, this->dk);
-
-          this->set_edges(tmp_u, tmp_v, tmp_w, this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), i, j, k);
         }
 
 	void pressure_solver_apply()
@@ -138,12 +136,16 @@ namespace libmpdataxx
 	  this->state(ix::vip_i)(this->ijk) += tmp_u(this->ijk);
 	  this->state(ix::vip_j)(this->ijk) += tmp_v(this->ijk);
 	  this->state(ix::vip_k)(this->ijk) += tmp_w(this->ijk);
+          this->set_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), this->i, this->j, this->k, 1);
 	}
 
         void hook_ante_loop(const int nt)
         {
           parent_t::hook_ante_loop(nt);
 	  ini_pressure();
+          
+          // save initial edge velocities
+          this->save_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), this->i, this->j, this->k);
  
           // allow pressure_solver_apply at the first time step
           tmp_u(this->ijk) = 0;

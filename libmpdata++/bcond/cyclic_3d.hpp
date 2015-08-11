@@ -37,9 +37,9 @@ namespace libmpdataxx
         fill_halos_sclr(a, j, k);
       }
       
-      void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k) {}
+      void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
       
-      void set_edge_pres(const arr_t &a, const arr_t &b, const rng_t &j, const rng_t &k) {}
+      void set_edge_pres(const arr_t &, const rng_t &, const rng_t &, int) {}
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
@@ -79,9 +79,9 @@ namespace libmpdataxx
         fill_halos_sclr(a, j, k);
       }
       
-      void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k) {}
-
-      void set_edge_pres(const arr_t &a, const arr_t &b, const rng_t &j, const rng_t &k) {}
+      void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
+      
+      void set_edge_pres(const arr_t &, const rng_t &, const rng_t &, int) {}
       
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {

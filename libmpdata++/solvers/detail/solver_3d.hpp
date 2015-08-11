@@ -111,36 +111,34 @@ namespace libmpdataxx
           const typename parent_t::arr_t &arr3,
           const rng_t &range_i,
           const rng_t &range_j,
-          const rng_t &range_k
+          const rng_t &range_k,
+          const int &sign
         ) final
         {
-          this->bcxl->set_edge_pres(arr1, range_j, range_k);
-          this->bcxr->set_edge_pres(arr1, range_j, range_k);
-          this->bcyl->set_edge_pres(arr2, range_k, range_i);
-          this->bcyr->set_edge_pres(arr2, range_k, range_i);
-          this->bczl->set_edge_pres(arr3, range_i, range_j);
-          this->bczr->set_edge_pres(arr3, range_i, range_j);
+          this->bcxl->set_edge_pres(arr1, range_j, range_k, sign);
+          this->bcxr->set_edge_pres(arr1, range_j, range_k, sign);
+          this->bcyl->set_edge_pres(arr2, range_k, range_i, sign);
+          this->bcyr->set_edge_pres(arr2, range_k, range_i, sign);
+          this->bczl->set_edge_pres(arr3, range_i, range_j, sign);
+          this->bczr->set_edge_pres(arr3, range_i, range_j, sign);
           this->mem->barrier();
         }
-
-        virtual void set_edges(
+        
+        virtual void save_edges(
           const typename parent_t::arr_t &arr1,
           const typename parent_t::arr_t &arr2,
           const typename parent_t::arr_t &arr3,
-          const typename parent_t::arr_t &v1,
-          const typename parent_t::arr_t &v2,
-          const typename parent_t::arr_t &v3,
           const rng_t &range_i,
           const rng_t &range_j,
           const rng_t &range_k
         ) final
         {
-          this->bcxl->set_edge_pres(arr1, v1, range_j, range_k);
-          this->bcxr->set_edge_pres(arr1, v1, range_j, range_k);
-          this->bcyl->set_edge_pres(arr2, v2, range_k, range_i);
-          this->bcyr->set_edge_pres(arr2, v2, range_k, range_i);
-          this->bczl->set_edge_pres(arr3, v3, range_i, range_j);
-          this->bczr->set_edge_pres(arr3, v3, range_i, range_j);
+          this->bcxl->save_edge_vel(arr1, range_j, range_k);
+          this->bcxr->save_edge_vel(arr1, range_j, range_k);
+          this->bcyl->save_edge_vel(arr2, range_k, range_i);
+          this->bcyr->save_edge_vel(arr2, range_k, range_i);
+          this->bczl->save_edge_vel(arr3, range_i, range_j);
+          this->bczr->save_edge_vel(arr3, range_i, range_j);
           this->mem->barrier();
         }
         
