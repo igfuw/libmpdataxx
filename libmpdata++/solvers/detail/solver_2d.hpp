@@ -26,8 +26,6 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
-	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr;
-
 	protected:
       
 	const rng_t i, j; // TODO: to be removed
@@ -39,10 +37,8 @@ namespace libmpdataxx
         ) final // for a given array
 	{
           this->mem->barrier();
-	  bcxl->fill_halos_sclr(arr, range_j, deriv);
-	  bcxr->fill_halos_sclr(arr, range_j, deriv);
-	  bcyl->fill_halos_sclr(arr, range_i, deriv);
-	  bcyr->fill_halos_sclr(arr, range_i, deriv);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_j, deriv);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_i, deriv);
           this->mem->barrier();
 	}
 
@@ -54,10 +50,8 @@ namespace libmpdataxx
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j);
-          bcxr->fill_halos_vctr_alng(arrvec, j);
-          bcyl->fill_halos_vctr_alng(arrvec, i);
-          bcyr->fill_halos_vctr_alng(arrvec, i);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i);
           // TODO: open bc nust be last!!!
           this->mem->barrier();
         }
@@ -69,10 +63,8 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          bcyl->fill_halos_vctr_nrml(arrvec[0], range_i);
-          bcyr->fill_halos_vctr_nrml(arrvec[0], range_i);
-          bcxl->fill_halos_vctr_nrml(arrvec[1], range_j);
-          bcxr->fill_halos_vctr_nrml(arrvec[1], range_j);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_i);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j);
           this->mem->barrier();
         }
 
@@ -83,10 +75,8 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          this->bcxl->fill_halos_pres(arr, range_j);
-          this->bcxr->fill_halos_pres(arr, range_j);
-          this->bcyl->fill_halos_pres(arr, range_i);
-          this->bcyr->fill_halos_pres(arr, range_i);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_j);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_i);
           this->mem->barrier();
         }
 
@@ -98,10 +88,8 @@ namespace libmpdataxx
           const int &sign
         ) final
         {
-          this->bcxl->set_edge_pres(arr1, range_j, sign);
-          this->bcxr->set_edge_pres(arr1, range_j, sign);
-          this->bcyl->set_edge_pres(arr2, range_i, sign);
-          this->bcyr->set_edge_pres(arr2, range_i, sign);
+          for (auto &bc : this->bcs[0]) bc->set_edge_pres(arr1, range_j, sign);
+          for (auto &bc : this->bcs[1]) bc->set_edge_pres(arr2, range_i, sign);
           this->mem->barrier();
         }
 
@@ -112,10 +100,8 @@ namespace libmpdataxx
           const rng_t &range_j
         ) final
         {
-          this->bcxl->save_edge_vel(arr1, range_j);
-          this->bcxr->save_edge_vel(arr1, range_j);
-          this->bcyl->save_edge_vel(arr2, range_i);
-          this->bcyr->save_edge_vel(arr2, range_i);
+          for (auto &bc : this->bcs[0]) bc->save_edge_vel(arr1, range_j);
+          for (auto &bc : this->bcs[1]) bc->save_edge_vel(arr2, range_i);
           this->mem->barrier();
         }
 
@@ -176,14 +162,12 @@ namespace libmpdataxx
             idx_t<parent_t::n_dims>({args.i, args.j})
           ),
 	  i(args.i), 
-	  j(args.j),  
-	  bcxl(std::move(args.bcxl)), 
-	  bcxr(std::move(args.bcxr)), 
-	  bcyl(std::move(args.bcyl)),
-	  bcyr(std::move(args.bcyr))
+	  j(args.j)
 	{
           this->di = p.di;
           this->dj = p.dj;
+	  this->set_bcs(0, args.bcxl, args.bcxr); 
+	  this->set_bcs(1, args.bcyl, args.bcyr);
         }
 
         // memory allocation logic using static methods
