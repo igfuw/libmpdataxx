@@ -24,6 +24,7 @@
 #include <libmpdata++/bcond/polar_2d.hpp>
 #include <libmpdata++/bcond/rigid_2d.hpp>
 #include <libmpdata++/bcond/rigid_3d.hpp>
+#include <libmpdata++/bcond/remote_1d.hpp>
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
@@ -110,6 +111,21 @@ namespace libmpdataxx
         >
         void bc_set(typename solver_t::bcp_t &bcp) 
         {
+          // distmem overrides
+	  if (type != bcond::remote && mem->distmem.size() > 1 && dim == 0)
+	  {
+	    if (
+	      // distmem domain interior
+	      (dir == bcond::left && mem->distmem.rank() > 0)
+	      ||
+	      (dir == bcond::rght && mem->distmem.rank() != mem->distmem.size() - 1)
+	      // cyclic condition for distmem domain (note: will not work if a non-cyclic condition is on the other end)
+	      || 
+	      (type == bcond::cyclic)
+	    ) return bc_set<bcond::remote, dir, dim>(bcp);
+	  }
+
+          // bc allocation
 	  bcp.reset(
             new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
 	      mem->slab(mem->grid_size[dim]), 

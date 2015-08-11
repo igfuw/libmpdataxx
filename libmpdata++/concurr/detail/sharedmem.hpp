@@ -11,6 +11,7 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/formulae/arakawa_c.hpp>
+#include <libmpdata++/concurr/detail/distmem.hpp>
 
 #include <array>
 
@@ -46,6 +47,8 @@ namespace libmpdataxx
         std::array<rng_t, n_dims> grid_size; 
         bool panic = false; // for multi-threaded SIGTERM handling
 
+        detail::distmem distmem;
+
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC;
         std::vector<arrvec_t<arr_t>> psi; // TODO: since n_eqns is known, could make it an std::array!
@@ -78,7 +81,11 @@ namespace libmpdataxx
         {
           for (int d = 0; d < n_dims; ++d) 
           {
-            this->grid_size[d] = rng_t(0, grid_size[d]-1);
+            this->grid_size[d] = slab(
+              rng_t(0, grid_size[d]-1),
+              distmem.rank(),
+              distmem.size()
+            );
             origin[d] = this->grid_size[d].first();
           }
 
@@ -259,9 +266,18 @@ namespace libmpdataxx
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
           // (i.e. border between cell 0 and cell 1 is indexed with 0)
+          auto rng = this->grid_size[0]^(-1)^h;
 	  return this->GC[d](
-            this->grid_size[0]^(-1)^h
-          ).reindex(this->origin);
+            this->distmem.size() == 0
+              ? rng
+              : this->distmem.rank() > 0
+                ? rng_t(rng.first()-1, rng.last())
+                : rng_t(rng.first(),   rng.last()+1)
+          ).reindex(
+            this->distmem.rank() > 0
+              ? decltype(this->origin)({this->origin[0] - 1})
+              : this->origin
+          );
 	}   
 
         blitz::Array<real_t, 1> g_factor()
