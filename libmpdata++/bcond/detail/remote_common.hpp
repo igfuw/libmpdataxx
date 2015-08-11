@@ -60,8 +60,8 @@ namespace libmpdataxx
         )
         {
           // checking if the buffers are long enough
-          assert(rng_send.length() == halo == buf_send.n_elements());
-          assert(rng_recv.length() == halo == buf_recv.n_elements());
+          assert(rng_send.length() == halo == buf_send.extent(0));
+          assert(rng_recv.length() == halo == buf_recv.extent(0));
 
           // distinguishing between left and right messages 
           // (important e.g. with 2 procs and cyclic bc)
@@ -95,8 +95,8 @@ namespace libmpdataxx
           // checking debug information
           if (!is_cyclic()) // TODO: info about whole grid size required (as in polar!)
           {
-	    assert(buf_rng.first  %  == rng_recv.first());
-            assert(buf_rng.second %  == rng_recv.last());
+	    assert(buf_rng.first   == rng_recv.first());
+            assert(buf_rng.second  == rng_recv.last());
           }
 #else
           assert(false);
