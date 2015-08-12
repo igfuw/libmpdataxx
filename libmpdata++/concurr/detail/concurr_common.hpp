@@ -125,7 +125,7 @@ namespace libmpdataxx
 	      // cyclic condition for distmem domain (note: will not work if a non-cyclic condition is on the other end)
 	      || 
 	      (type == bcond::cyclic)
-	    ) return bc_set<bcond::remote, dir, dim>(bcp);
+	    ) return bc_set<bcond::remote, dir, dim>(bcp, p);
 	  }
 
           // bc allocation

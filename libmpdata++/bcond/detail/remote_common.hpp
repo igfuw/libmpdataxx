@@ -22,7 +22,8 @@ namespace libmpdataxx
       {
 	using parent_t = detail::bcond_common<real_t, halo>;
 	using arr_t = blitz::Array<real_t, 1>;
-	using parent_t::parent_t; // inheriting ctor
+
+        const int grid_size_0;
 
         // zero-base Blitz++ arrays used as buffers
         arr_t 
@@ -94,17 +95,25 @@ namespace libmpdataxx
 	  boost::mpi::wait_all(reqs.begin(), reqs.end());
 
           // checking debug information
-          if (!is_cyclic) // TODO: info about whole grid size required (as in polar!)
-          {
-	    assert(buf_rng.first   == rng_recv.first());
-            assert(buf_rng.second  == rng_recv.last());
-          }
+	  assert(buf_rng.first  % grid_size_0 == rng_recv.first() % grid_size_0);
+          assert(buf_rng.second % grid_size_0 == rng_recv.last()  % grid_size_0);
 #else
           assert(false);
 #endif
           // writing received data to the array
 	  a(rng_recv) = buf_recv;
         }
+
+        public:
+
+        // ctor                                  
+        remote_common(                                                           
+          const rng_t &i,
+          const int grid_size_0
+        ) :
+          parent_t(i, grid_size_0),
+          grid_size_0(grid_size_0)
+        {} 
       };
     }
   } // namespace bcond
