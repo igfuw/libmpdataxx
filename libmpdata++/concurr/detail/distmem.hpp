@@ -17,7 +17,12 @@ namespace libmpdataxx
       class distmem
       {
 #if defined(USE_MPI)
-        boost::mpi::environment mpienv;
+        // note: this is intentionally left commented out
+        //       as it is not used in libmpdata++, it seems unneeded, and it causes:
+        //       "*** The MPI_Errhandler_set() function was called after MPI_FINALIZE was invoked."
+        //       error if multiple solvers are instantiated 
+        // boost::mpi::environment mpienv; 
+
         boost::mpi::communicator mpicom;
 #endif
 
