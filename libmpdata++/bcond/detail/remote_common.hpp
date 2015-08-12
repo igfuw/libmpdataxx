@@ -46,10 +46,13 @@ namespace libmpdataxx
 #endif
 
         protected:
-
         const bool is_cyclic = 
+#if defined(USE_MPI)
 	  (dir == left && mpicom.rank() == 0) ||
 	  (dir == rght && mpicom.rank() == mpicom.size()-1);
+#else
+          false;
+#endif
 
         void xchng(
           const arr_t &a, 
