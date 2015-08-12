@@ -39,19 +39,17 @@ namespace libmpdataxx
 #  endif
 
         std::array<boost::mpi::request, n_reqs> reqs;
-        int peer = dir == left
+
+        const int peer = dir == left
           ? (mpicom.rank() - 1 + mpicom.size()) % mpicom.size()
           : (mpicom.rank() + 1                ) % mpicom.size();
 #endif
 
         protected:
 
-        bool is_cyclic() const
-        {
-          return 
-            (dir == left && mpicom.rank() == 0) ||
-            (dir == rght && mpicom.rank() == mpicom.size()-1);
-        }
+        const bool is_cyclic = 
+	  (dir == left && mpicom.rank() == 0) ||
+	  (dir == rght && mpicom.rank() == mpicom.size()-1);
 
         void xchng(
           const arr_t &a, 
@@ -93,7 +91,7 @@ namespace libmpdataxx
 	  boost::mpi::wait_all(reqs.begin(), reqs.end());
 
           // checking debug information
-          if (!is_cyclic()) // TODO: info about whole grid size required (as in polar!)
+          if (!is_cyclic) // TODO: info about whole grid size required (as in polar!)
           {
 	    assert(buf_rng.first   == rng_recv.first());
             assert(buf_rng.second  == rng_recv.last());
