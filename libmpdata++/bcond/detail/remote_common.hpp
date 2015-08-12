@@ -62,8 +62,8 @@ namespace libmpdataxx
         )
         {
           // checking if the buffers are long enough
-          assert(rng_send.length() == halo == buf_send.extent(0));
-          assert(rng_recv.length() == halo == buf_recv.extent(0));
+          assert(rng_send.length() == buf_send.extent(0));
+          assert(rng_recv.length() == buf_recv.extent(0));
 
           // distinguishing between left and right messages 
           // (important e.g. with 2 procs and cyclic bc)
