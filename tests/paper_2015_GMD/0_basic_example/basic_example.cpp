@@ -23,7 +23,7 @@ int main()
   
   // concurency choice
   using run_t = concurr::serial<
-    slv_out_t, bcond::cyclic, bcond::cyclic
+    slv_out_t, bcond::open, bcond::open
   >;         //left bcond   //right bcond
 
   // run-time parameters
