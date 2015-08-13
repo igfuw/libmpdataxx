@@ -63,7 +63,7 @@ void test(const std::string filename)
   }
   p.grid_size = {101, 101};
 
-  p.outfreq = nt; 
+  p.outfreq = nt * dt; 
   p.outvars[0].name = "psi";
   {
     std::ostringstream tmp;

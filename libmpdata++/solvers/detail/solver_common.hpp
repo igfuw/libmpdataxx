@@ -196,7 +196,10 @@ namespace libmpdataxx
 	    for (int e = 0; e < n_eqns; ++e) scale(e, -ct_params_t::hint_scale(e));
 
             timestep++;
-            time += dt;
+            if (!ct_params_t::var_dt)
+              time = timestep * dt;
+            else
+              time += dt;
             hook_post_step();
 	  }   
 

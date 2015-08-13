@@ -52,7 +52,7 @@ int main()
   p.di = p.dj = 10.; 
   p.Tht_ref = Tht_ref; 
 
-  p.outfreq = 100; //12;
+  p.outfreq = 100 * p.dt; //12;
   p.outvars = {
 //    {ix::u,   {.name = "u",   .unit = "m/s"}}, 
 //    {ix::w,   {.name = "w",   .unit = "m/s"}}, 

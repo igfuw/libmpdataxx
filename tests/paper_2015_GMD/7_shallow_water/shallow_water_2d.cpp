@@ -68,7 +68,7 @@ void test(const std::string &outdir)
   p.dj = .05;
   p.grid_size = { int(16 / p.di), int(16 / p.dj) };
   p.g = 1;
-  p.outfreq = outfreq;
+  p.outfreq = outfreq * p.dt;
   p.outdir = outdir;
   p.outvars = {
     {ix::h,  {.name="h" , .unit="TODO"}}, 

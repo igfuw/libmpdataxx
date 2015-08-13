@@ -40,19 +40,8 @@ void test(const std::string& dir_name)
       >
     >;
 //</listing-2>
-  typename slv_out_t::rt_params_t p;
-
+  
   // pre instantation
-  p.n_iters = opts_iters;
-  p.grid_size = {nx, nx, nx};
-
-  p.outfreq = nt;
-  p.outvars[0].name = "psi";
-//<listing-3>
-  p.outdir = dir_name;
-//</listing-3>
-
-  // post instantation
   const typename ct_params_t::real_t
     dt = 0.018 * 2 * pi<double>(),
     L = 100,
@@ -65,6 +54,16 @@ void test(const std::string& dir_name)
     x0 = 50 - d,
     y0 = 50 + d,
     z0 = 50 + d;
+  
+  typename slv_out_t::rt_params_t p;
+
+  p.n_iters = opts_iters;
+  p.grid_size = {nx, nx, nx};
+  p.outfreq = nt * dt;
+  p.outvars[0].name = "psi";
+//<listing-3>
+  p.outdir = dir_name;
+//</listing-3>
   
   p.di = dx;
   p.dj = dy;
@@ -82,6 +81,8 @@ void test(const std::string& dir_name)
   blitz::firstIndex i;
   blitz::secondIndex j;
   blitz::thirdIndex k;
+  
+  // post instantation
 
   // sphere shape
   decltype(slv.advectee()) tmp(slv.advectee().extent());

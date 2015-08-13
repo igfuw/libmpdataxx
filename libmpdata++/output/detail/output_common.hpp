@@ -27,8 +27,7 @@ namespace libmpdataxx
 	struct info_t { std::string name, unit; };
 	std::map<int, info_t> outvars;
 
-	const int outfreq;
-	const int outwindow;
+	const typename parent_t::real_t outfreq;
         const std::string outdir;
 
 	virtual void record(const int var) {}
@@ -58,10 +57,9 @@ namespace libmpdataxx
 	  if (this->rank == 0)
 	  {
             // TODO: output of solver statistics every timesteps could probably go here
-            for (int t = 0; t < outwindow; ++t)
-            {
-	      if ((this->timestep - t) % outfreq == 0) record_all();
-            }
+            auto old_time = this->time - this->dt;
+            // record if time and old_time fall into different outfreq length intervals 
+	    if ((std::floor(this->time / outfreq) - std::floor(old_time / outfreq)) == 1) record_all();
           }
 	  
 	  this->mem->barrier(); // waiting for the output to be finished
@@ -71,8 +69,7 @@ namespace libmpdataxx
 
 	struct rt_params_t : parent_t::rt_params_t 
 	{ 
-	  int outfreq = 1; 
-	  int outwindow = 1;
+	  typename parent_t::real_t outfreq = 0; 
 	  std::map<int, info_t> outvars;
           std::string outdir;
           // TODO: pass adiitional info? (command_line, library versions, ...)
@@ -85,17 +82,17 @@ namespace libmpdataxx
 	) :
           parent_t(args, p),
 	  outfreq(p.outfreq), 
-	  outwindow(p.outwindow),
           outvars(p.outvars),
           outdir(p.outdir)
 	{
+          assert(outfreq >= this->dt);
           // default value for outvars
           if (this->outvars.size() == 0 && parent_t::n_eqns == 1)
             outvars = {{0, {.name = "", .unit = ""}}};
           
-          // assign 1 to dt, di, dj, dk for output purposes if they are not defined by the user
+          // assign 1 to di, dj, dk for output purposes if they are not defined by the user
           for (auto ref : 
-                std::vector<std::reference_wrapper<typename parent_t::real_t>>{this->dt, this->di, this->dj, this->dk})
+                std::vector<std::reference_wrapper<typename parent_t::real_t>>{this->di, this->dj, this->dk})
           {
             if (ref.get() == 0)
             {

@@ -75,7 +75,7 @@ void test(const std::string& outdir)
   p.outvars[ix::qx].name = "qx";
   p.outvars[ix::h].name  = "h";
   p.outdir = outdir;
-  p.outfreq = outfreq; 
+  p.outfreq = outfreq * p.dt; 
  
   // instantiation
   concurr::serial<
