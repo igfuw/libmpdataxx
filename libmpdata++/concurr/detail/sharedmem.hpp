@@ -47,7 +47,7 @@ namespace libmpdataxx
         std::array<rng_t, n_dims> grid_size; 
         bool panic = false; // for multi-threaded SIGTERM handling
 
-        detail::distmem distmem;
+        detail::distmem<n_dims> distmem;
 
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC;
@@ -77,7 +77,7 @@ namespace libmpdataxx
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
         sharedmem_common(const std::array<int, n_dims> &grid_size, const int &size)
-          : n(0) // TODO: is n(0) needed?
+          : n(0), distmem(grid_size) // TODO: is n(0) needed?
         {
           for (int d = 0; d < n_dims; ++d) 
           {

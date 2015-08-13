@@ -24,6 +24,7 @@ namespace libmpdataxx
 #endif
       }
 
+      template <int n_dims>
       class distmem
       {
 #if defined(USE_MPI)
@@ -31,6 +32,8 @@ namespace libmpdataxx
 #endif
 
         public:
+
+        std::array<int, n_dims> grid_size;
 
         int rank() 
         { 
@@ -51,7 +54,8 @@ namespace libmpdataxx
         }
 
         // ctor
-        distmem() 
+        distmem(const std::array<int, n_dims> &grid_size) 
+          : grid_size(grid_size)
         {
 #if !defined(USE_MPI)
           if (

@@ -111,8 +111,7 @@ namespace libmpdataxx
           int dim
         >
         void bc_set(
-          typename solver_t::bcp_t &bcp,
-          const typename solver_t::rt_params_t &p
+          typename solver_t::bcp_t &bcp
         ) 
         {
           // distmem overrides
@@ -126,14 +125,14 @@ namespace libmpdataxx
 	      // cyclic condition for distmem domain (note: will not work if a non-cyclic condition is on the other end)
 	      || 
 	      (type == bcond::cyclic)
-	    ) return bc_set<bcond::remote, dir, dim>(bcp, p);
+	    ) return bc_set<bcond::remote, dir, dim>(bcp);
 	  }
 
           // bc allocation
 	  bcp.reset(
             new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
 	      mem->slab(mem->grid_size[dim]), 
-	      p.grid_size[0]
+	      mem->distmem.grid_size[0]
             )
           );
         }
@@ -146,8 +145,8 @@ namespace libmpdataxx
         {
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
 
-          bc_set<bcxl, bcond::left, 0>(bxl, p);
-	  bc_set<bcxr, bcond::rght, 0>(bxr, p);
+          bc_set<bcxl, bcond::left, 0>(bxl);
+	  bc_set<bcxr, bcond::rght, 0>(bxr);
 
 	  for (int i0 = 0; i0 < n0; ++i0) 
           {
@@ -182,11 +181,11 @@ namespace libmpdataxx
             {
 	      typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
 
-              bc_set<bcxl, bcond::left, 0>(bxl, p);
-	      bc_set<bcxr, bcond::rght, 0>(bxr, p);
+              bc_set<bcxl, bcond::left, 0>(bxl);
+	      bc_set<bcxr, bcond::rght, 0>(bxr);
 
-              bc_set<bcyl, bcond::left, 1>(byl, p);
-	      bc_set<bcyr, bcond::rght, 1>(byr, p);
+              bc_set<bcyl, bcond::left, 1>(byl);
+	      bc_set<bcyr, bcond::rght, 1>(byr);
 
               shrdl.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
               shrdr.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
@@ -224,14 +223,14 @@ namespace libmpdataxx
             {
 	      for (int i2 = 0; i2 < n2; ++i2) 
               {
-                bc_set<bcxl, bcond::left, 0>(bxl, p);
-                bc_set<bcxr, bcond::rght, 0>(bxr, p);
+                bc_set<bcxl, bcond::left, 0>(bxl);
+                bc_set<bcxr, bcond::rght, 0>(bxr);
 
-                bc_set<bcyl, bcond::left, 1>(byl, p);
-                bc_set<bcyr, bcond::rght, 1>(byr, p);
+                bc_set<bcyl, bcond::left, 1>(byl);
+                bc_set<bcyr, bcond::rght, 1>(byr);
 
-                bc_set<bczl, bcond::left, 2>(bzl, p);
-                bc_set<bczr, bcond::rght, 2>(bzr, p);
+                bc_set<bczl, bcond::left, 2>(bzl);
+                bc_set<bczr, bcond::rght, 2>(bzr);
 
                 shrdl.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
                 shrdr.reset(new bcond::shared<real_t, solver_t::halo>()); // TODO: shrdy if n1 != 1
