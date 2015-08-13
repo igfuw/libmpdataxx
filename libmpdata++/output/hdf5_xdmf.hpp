@@ -56,7 +56,7 @@ namespace libmpdataxx
       {
         // write xdmf markup
         std::string xmf_name = this->base_name() + ".xmf";
-        xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->dt * this->timestep);
+        xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->time);
 
         // save the xmf filename for temporal write
         timesteps.push_back(xmf_name);
