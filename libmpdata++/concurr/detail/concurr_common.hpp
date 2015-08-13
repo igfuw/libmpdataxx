@@ -25,6 +25,7 @@
 #include <libmpdata++/bcond/rigid_2d.hpp>
 #include <libmpdata++/bcond/rigid_3d.hpp>
 #include <libmpdata++/bcond/remote_1d.hpp>
+#include <libmpdata++/bcond/remote_2d.hpp>
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
