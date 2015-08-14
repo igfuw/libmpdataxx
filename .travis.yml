@@ -61,6 +61,7 @@ install:
 
     # boost
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread-dev libboost-timer-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none']]; then sudo $apt_get_install libboost-mpi-dev; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
 
     # cmake 
