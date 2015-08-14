@@ -8,6 +8,7 @@
 #include <libmpdata++/bcond/detail/bcond_common.hpp>
 
 #if defined(USE_MPI)
+#  include <boost/mpi/communicator.hpp>
 #  include <boost/mpi/nonblocking.hpp>
 #endif
 
