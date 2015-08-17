@@ -17,7 +17,7 @@ namespace libmpdataxx
       namespace 
       {
 #if defined(USE_MPI)
-        // this is a hack to avoid
+        // the anonymous namespace is a hack to avoid
         // "*** The MPI_Errhandler_set() function was called after MPI_FINALIZE was invoked."
         // error if multiple solvers are instantiated 
         boost::mpi::environment mpienv;
@@ -50,6 +50,15 @@ namespace libmpdataxx
           return mpicom.size(); 
 #else
           return 1;
+#endif
+        }
+
+        void barrier()
+        {
+#if defined(USE_MPI)
+          mpicom.barrier();
+#else
+          assert(false);
 #endif
         }
 
