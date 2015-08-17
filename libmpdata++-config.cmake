@@ -147,6 +147,58 @@ endif()
 # HDF5 libraries
 find_package(HDF5 COMPONENTS CXX HL QUIET)
 if(HDF5_FOUND)
+
+  if(USE_MPI AND NOT HDF5_IS_PARALLEL)
+    message(FATAL_ERROR "MPI was enabled for libmpdata++ but not in HDF5.
+
+* To install MPI-enabled HDF5, please try:
+*   Debian/Ubuntu: sudo apt-get install libhdf5-openmpi-dev
+*   Fedora: sudo yum install hdf5-openmpi-devel
+*   Homebrew: brew install hdf5 --with-cxx --with-mpi
+    ") 
+  endif()
+
+  # detecting if HDF5-MPI is usable from C++
+  # see http://lists.hdfgroup.org/pipermail/hdf-forum_lists.hdfgroup.org/2015-June/008600.html
+  # https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
+  if(USE_MPI)
+    set(msg "Checking if MPI-HDF5 is usable from C++...")
+    set(pfx "HDF5/MPI/C++ check")
+    message(STATUS ${msg})
+    execute_process(COMMAND "mktemp" "-d" RESULT_VARIABLE status OUTPUT_VARIABLE tmpdir)
+    if (NOT status EQUAL 0)                                                       
+      message(FATAL_ERROR "${pfx}: mkdtemp failed")                               
+    endif()                                                                       
+    file(WRITE "${tmpdir}/test.cpp" "                                              
+      #include <boost/mpi/environment.hpp>
+      int main() { boost::mpi::environment e; }
+    ")
+    execute_process(
+      COMMAND "${CMAKE_CXX_COMPILER}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES} "test.cpp" 
+      WORKING_DIRECTORY ${tmpdir} 
+      RESULT_VARIABLE status 
+      ERROR_VARIABLE error
+    )
+    if (NOT status EQUAL 0)                                                       
+      message(FATAL_ERROR "${pfx}: compilation failed")                               
+    endif()                                                                       
+    execute_process(
+      COMMAND "./a.out" 
+      WORKING_DIRECTORY ${tmpdir} 
+      RESULT_VARIABLE status
+      ERROR_VARIABLE error
+    )
+    if (NOT status EQUAL 0)                                                       
+      message(FATAL_ERROR "${pfx}: execution failed\n ${error}
+        likely you have to upgrade HDF5, see:
+        - http://lists.hdfgroup.org/pipermail/hdf-forum_lists.hdfgroup.org/2015-June/008600.html
+        - https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
+      ")
+    endif()                                                                       
+    message(STATUS "${msg} - OK")
+  endif() 
+
+  #
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${HDF5_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${HDF5_INCLUDE_DIRS}")
 else()
