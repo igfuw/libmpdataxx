@@ -39,13 +39,11 @@ namespace libmpdataxx
       // member fields
       arrvec_t<typename parent_t::arr_t> &rhs;
 
-//<listing-1>
       virtual void update_rhs(
         arrvec_t<typename parent_t::arr_t> &rhs, 
         const typename parent_t::real_t &dt,
         const int &at
       ) 
-//</listing-1>
       {
         assert(at == n || at == n+1);
 #if !defined(NDEBUG)
@@ -170,5 +168,5 @@ namespace libmpdataxx
         parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_eqns); // rhs array for each equation
       }
     };
-  }; // namespace solvers
-}; // namespace libmpdataxx
+  } // namespace solvers
+} // namespace libmpdataxx

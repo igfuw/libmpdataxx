@@ -154,6 +154,6 @@ namespace libmpdataxx
          + 
          HOT_2<opts BOOST_PP_COMMA() dim>(psi, i, j) * HOT_2_helper<opts BOOST_PP_COMMA() dim>(GC, G, i, j)
       )
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx 
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx 

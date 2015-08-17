@@ -93,6 +93,6 @@ namespace libmpdataxx
 	+
 	(z(i, j, k+1) - z(i, j, k-1)) / hz / 2.
       )
-    }; // namespace nabla_op
-  }; // namespace formulae
-}; // namespace libmpdataxx
+    } // namespace nabla_op
+  } // namespace formulae
+} // namespace libmpdataxx

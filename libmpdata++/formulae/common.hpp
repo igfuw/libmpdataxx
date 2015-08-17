@@ -112,6 +112,5 @@ namespace libmpdataxx
       G(idxperm::pi<d>(i, j, k)) + 0
     )
 
-  }; // namespace formulae
-
-}; // namespace libmpdataxx
+  } // namespace formulae
+} // namespace libmpdataxx

@@ -7,7 +7,7 @@
 
 #include <libmpdata++/solvers/shallow_water.hpp>
 #include <libmpdata++/concurr/serial.hpp>
-#include <libmpdata++/output/hdf5_xdmf.hpp>
+#include <libmpdata++/output/hdf5.hpp>
 using namespace libmpdataxx; 
 
 using real_t = double;
@@ -29,7 +29,6 @@ void test(const std::string& outdir)
 {
   // compile-time parameters
   // enum { hint_noneg = opts::bit(ix::h) };  // TODO: reconsider?
-//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = ::real_t;
@@ -49,7 +48,6 @@ void test(const std::string& outdir)
     // hints
     enum { hint_norhs = opts::bit(ix::h) }; 
   };
-//</listing-1>
 
   const int 
     nt = 300,
@@ -60,10 +58,9 @@ void test(const std::string& outdir)
   // solver choice
   using slv_out_t =
     output::hdf5<
-      shallow_water<ct_params_t>
+      solvers::shallow_water<ct_params_t>
     >;
  
-//<listing-2>
   // run-time parameters
   typename slv_out_t::rt_params_t p;
   p.dt = .01;
@@ -71,7 +68,6 @@ void test(const std::string& outdir)
   p.grid_size = { int(16 / p.di) };
   p.g = 1;
   p.vip_eps = 1e-8; 
-//</listing-2>
   p.outvars[ix::qx].name = "qx";
   p.outvars[ix::h].name  = "h";
   p.outdir = outdir;

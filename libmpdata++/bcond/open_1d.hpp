@@ -76,5 +76,5 @@ namespace libmpdataxx
 	  av[0](rng_t(i, i)) = av[0](this->rght_intr_vctr.first());
       }
     };
-  }; // namespace bcond
-}; // namespace libmpdataxx
+  } // namespace bcond
+} // namespace libmpdataxx

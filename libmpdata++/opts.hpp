@@ -36,7 +36,7 @@ namespace libmpdataxx
       khn = opts::bit(8)  // use Kahan summation algorithm in the donor-cell formulae
     };
 
-  }; // namespace opts
+  } // namespace opts
 
   struct ct_params_default_t
   {
@@ -50,4 +50,4 @@ namespace libmpdataxx
     enum { stress_diff = 0};
   };
 
-}; // namespace libmpdataxx
+} // namespace libmpdataxx

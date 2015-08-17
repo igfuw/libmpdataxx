@@ -123,6 +123,6 @@ namespace libmpdataxx
 	  parent_t::alloc_tmp_sclr(mem, __FILE__, 5);
 	}
       }; 
-    }; // namespcae detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespcae detail
+  } // namespace solvers
+} // namespace libmpdataxx

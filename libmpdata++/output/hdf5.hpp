@@ -10,7 +10,6 @@
 #pragma once
 
 #include <libmpdata++/output/detail/output_common.hpp>
-#include <libmpdata++/output/detail/xdmf_writer.hpp>
 
 #include <boost/filesystem.hpp>
 
@@ -300,5 +299,5 @@ namespace libmpdataxx
           this->outvars[0].name = "psi";
       }
     };
-  }; // namespace output
-}; // namespace libmpdataxx
+  } // namespace output
+} // namespace libmpdataxx

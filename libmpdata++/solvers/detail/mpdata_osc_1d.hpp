@@ -113,6 +113,6 @@ namespace libmpdataxx
 	  im(args.i.first() - 1, args.i.last())
 	{}
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namescpae libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namescpae libmpdataxx

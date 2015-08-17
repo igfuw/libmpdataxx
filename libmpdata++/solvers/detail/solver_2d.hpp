@@ -246,6 +246,6 @@ namespace libmpdataxx
             )));
         } 
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

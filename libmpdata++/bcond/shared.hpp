@@ -40,6 +40,5 @@ namespace libmpdataxx
       // aren't actually used !
       shared() : parent_t(rng_t(0, 2), 2) {} // TODO: bcond_any?
     };
-
-  }; // namespace bcond
-}; // namespace libmpdataxx
+  } // namespace bcond
+} // namespace libmpdataxx

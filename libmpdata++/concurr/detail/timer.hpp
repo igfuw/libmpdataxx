@@ -54,6 +54,6 @@ namespace libmpdataxx
 	  std::cerr << tmp.str() << std::endl;
 	}
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

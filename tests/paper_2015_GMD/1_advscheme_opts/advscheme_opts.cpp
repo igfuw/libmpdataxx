@@ -11,10 +11,8 @@ void test(const std::string filename)
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
-//<listing-1>
     enum { n_dims = 1 };
     enum { n_eqns = 2 };
-//</listing-1>
     enum { opts = opts_arg };
   };
 
@@ -23,7 +21,6 @@ void test(const std::string filename)
   >;
   typename sim_t::rt_params_t p;
 
-//<listing-2>
   int nx = 601, nt = 1200;
   // run-time parameters
   p.grid_size = { nx };
@@ -32,7 +29,6 @@ void test(const std::string filename)
     {0, {.name = "", .unit = "1"}},
     {1, {.name = "", .unit = "1"}}
   };
-//</listing-2>
   p.gnuplot_output = filename; 
   p.gnuplot_command = "plot";
   p.gnuplot_with = "histeps";
@@ -42,7 +38,6 @@ void test(const std::string filename)
   // instantiation
   concurr::serial<sim_t, bcond::cyclic, bcond::cyclic> run(p);
 
-//<listing-3>
   // initial condition
   blitz::firstIndex i;
   run.advectee(0) = where(
@@ -56,7 +51,6 @@ void test(const std::string filename)
     1                      // else
   ); 
   run.advector() = -.75;  // Courant
-//</listing-3>
 
   // integration
   run.advance(nt);
@@ -65,33 +59,23 @@ void test(const std::string filename)
 int main()
 {
   {
-//<listing-4>
     enum { opts = opts::abs };
-//</listing-4>
     test<opts>("out_abs.svg");
   }
   {
-//<listing-5>
     enum { opts = opts::iga };
-//</listing-5>
     test<opts>("out_iga.svg");
   }
   {
-//<listing-6>
     enum { opts = opts::iga | opts::tot };
-//</listing-6>
     test<opts>("out_iga_tot.svg");
   }
   {
-//<listing-7>
     enum { opts = opts::iga | opts::fct };
-//</listing-7>
     test<opts>("out_iga_fct.svg");
   }
   {
-//<listing-8>
     enum { opts = opts::iga | opts::tot | opts::fct };
-//</listing-8>
     test<opts>("out_iga_tot_fct.svg");
   }
 }

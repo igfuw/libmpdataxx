@@ -370,5 +370,5 @@ namespace libmpdataxx
         parent_t::alloc_tmp_sclr(mem, __FILE__, 2);
       }
     };
-  }; // namespace solvers
-}; // namespace libmpdataxx
+  } // namespace solvers
+} // namespace libmpdataxx

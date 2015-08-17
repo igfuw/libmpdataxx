@@ -50,5 +50,5 @@ namespace libmpdataxx
     template<int d>
     inline idx_t<3> pi(const int &i, const int   &j, const rng_t &k) { return pi<d>(rng_t(i,i), rng_t(j,j), k); }
 
-  }; // namespace idxperm
-}; // namespace libmpdataxx
+  } // namespace idxperm
+} // namespace libmpdataxx
