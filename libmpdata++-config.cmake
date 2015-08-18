@@ -184,7 +184,7 @@ if(HDF5_FOUND)
       ERROR_VARIABLE error
     )
     if (NOT status EQUAL 0)                                                       
-      message(FATAL_ERROR "${pfx}: compilation failed")                               
+      message(FATAL_ERROR "${pfx}: compilation failed\n ${error}")                               
     endif()                                                                       
     execute_process(
       COMMAND "./a.out" 
@@ -216,7 +216,7 @@ if(HDF5_FOUND)
       ERROR_VARIABLE error
     )
     if (NOT status EQUAL 0)                                                       
-      message(FATAL_ERROR "TODO: ${status}")
+      message(FATAL_ERROR "TODO: ${status}\n ${error}")
     endif()
     unset(status)
   endif() 
