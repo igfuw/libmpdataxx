@@ -147,6 +147,9 @@ endif()
 # HDF5 libraries
 find_package(HDF5 COMPONENTS CXX HL QUIET)
 if(HDF5_FOUND)
+  if(NOT HDF5_CXX_LIBRARIES)
+    message(FATAL_ERROR "HDF5 installation lacks C++ support.")
+  endif()
 
   if(USE_MPI AND NOT HDF5_IS_PARALLEL)
     message(FATAL_ERROR "MPI was enabled for libmpdata++ but not in HDF5.
