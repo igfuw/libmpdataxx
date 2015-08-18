@@ -21,6 +21,7 @@ set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
 set(libmpdataxx_CXX_FLAGS_DEBUG "")
 set(libmpdataxx_CXX_FLAGS_RELEASE "")
+set(libmpdataxx_MPIRUN "")
 
 
 ############################################################################################
@@ -209,11 +210,11 @@ if(HDF5_FOUND)
     # detecting if ir runs under mpirun (missing libhwloc-plugins issue:
     # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=790540
     # )
-    set(MPIRUN ${CMAKE_CXX_COMPILER})
-    string(REPLACE "mpic++" "mpirun" MPIRUN ${MPIRUN})
-    string(REPLACE "mpicxx" "mpirun" MPIRUN ${MPIRUN})
-    string(REPLACE "mpiXX"  "mpirun" MPIRUN ${MPIRUN})
-    execute_process(COMMAND ${MPIRUN} "./a.out" 
+    set(libmpdataxx_MPIRUN ${CMAKE_CXX_COMPILER})
+    string(REPLACE "mpic++" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
+    string(REPLACE "mpicxx" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
+    string(REPLACE "mpiXX"  "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
+    execute_process(COMMAND ${libmpdataxx_MPIRUN} "./a.out" 
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status
       ERROR_VARIABLE error
