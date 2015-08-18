@@ -158,10 +158,14 @@ if(HDF5_FOUND)
     ") 
   endif()
 
-  # detecting if HDF5-MPI is usable from C++
-  # see http://lists.hdfgroup.org/pipermail/hdf-forum_lists.hdfgroup.org/2015-June/008600.html
-  # https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
+  if(NOT USE_MPI AND HDF5_IS_PARALLEL)
+    message(FATAL_ERROR "MPI was enabled in HDF5 but not in libmpdata++.")
+  endif()
+
   if(USE_MPI)
+    # detecting if HDF5-MPI is usable from C++
+    # see http://lists.hdfgroup.org/pipermail/hdf-forum_lists.hdfgroup.org/2015-June/008600.html
+    # https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
     set(msg "Checking if MPI-HDF5 is usable from C++...")
     set(pfx "HDF5/MPI/C++ check")
     message(STATUS ${msg})
@@ -195,8 +199,28 @@ if(HDF5_FOUND)
         - https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
       ")
     endif()                                                                       
+    unset(pfx)
     message(STATUS "${msg} - OK")
+    unset(msg)
+
+    # detecting if ir runs under mpirun (missing libhwloc-plugins issue:
+    # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=790540
+    # )
+    set(MPIRUN ${CMAKE_CXX_COMPILER})
+    string(REPLACE "mpic++" "mpirun" MPIRUN ${MPIRUN})
+    string(REPLACE "mpicxx" "mpirun" MPIRUN ${MPIRUN})
+    string(REPLACE "mpiXX"  "mpirun" MPIRUN ${MPIRUN})
+    execute_process(COMMAND ${MPIRUN} "./a.out" 
+      WORKING_DIRECTORY ${tmpdir} 
+      RESULT_VARIABLE status
+      ERROR_VARIABLE error
+    )
+    if (NOT status EQUAL 0)                                                       
+      message(FATAL_ERROR "TODO: ${status}")
+    endif()
+    unset(status)
   endif() 
+
 
   #
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${HDF5_LIBRARIES}")
