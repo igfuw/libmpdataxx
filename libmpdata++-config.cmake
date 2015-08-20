@@ -182,7 +182,7 @@ if(HDF5_FOUND)
       int main() { boost::mpi::environment e; }
     ")
     execute_process(
-      COMMAND "${CMAKE_CXX_COMPILER}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES} "test.cpp" 
+      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" ${HDF5_LIBRARIES} ${Boost_LIBRARIES} # the order matters here!
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status 
       ERROR_VARIABLE error
