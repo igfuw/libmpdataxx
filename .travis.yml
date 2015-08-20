@@ -58,7 +58,9 @@ install:
     - if [[ $MPI == 'mpich'   ]]; then sudo $apt_get_install mpich libmpich-dev; fi
     - if [[ $MPI == 'lam'     ]]; then sudo $apt_get_install lam-runtime lam4-dev; fi
     - if [[ $MPI == 'openmpi' ]]; then sudo $apt_get_install openmpi-bin libopenmpi-dev; fi
+
     - if [[ $MPI != 'none'    ]]; then export CXX=mpic++.$MPI ; fi
+    - if [[ $MPI != 'none'    ]]; then export CC=mpicc.$MPI ; fi
 
     # boost
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread-dev libboost-timer-dev; fi
