@@ -24,10 +24,8 @@ void test(const std::string filename)
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
-//<listing-1>
     enum { n_dims = 2 };
     enum { n_eqns = 1 };
-//</listing-1>
     enum { opts = opts_arg };
   };
 
@@ -51,16 +49,7 @@ void test(const std::string filename)
   p.dt = dt;  //to have this->dt in stats 
 
   // pre instantiation
-  switch (opts_iters) // the crazy logic below is just for prettying the listing!
-  {
-    case 3: 
-//<listing-4>
-      p.n_iters = 3;
-//</listing-4>
-      break;
-    default:
-      p.n_iters = opts_iters; 
-  }
+  p.n_iters = opts_iters; 
   p.grid_size = {101, 101};
 
   p.outfreq = nt; 
@@ -101,14 +90,12 @@ void test(const std::string filename)
   p.gnuplot_term = "svg";
   p.gnuplot_title = "notitle";
 
-//<listing-2>
   // instantiation
   concurr::threads<
     slv_out_t, 
     bcond::open, bcond::open,
     bcond::open, bcond::open
   > run(p); 
-//</listing-2>
   {
 
     // constants used in the set-up definition
@@ -120,7 +107,6 @@ void test(const std::string filename)
       xc = .5 * (p.grid_size[x]-1) * dx,
       yc = .5 * (p.grid_size[y]-1) * dy;
 
-//<listing-3>
     // temporary array of the same ...
     decltype(run.advectee())        // type 
       tmp(run.advectee().extent()); // and size 
@@ -144,7 +130,6 @@ void test(const std::string filename)
     // constant-angular-velocity rotational field
     run.advector(x) =  omega * (j * dy - yc) * dt/dx;
     run.advector(y) = -omega * (i * dx - xc) * dt/dy;
-//</listing-3>
   }
   // TODO: an assert confirming that the above did what it should have done
   //       (in context of the advector()'s use of blitz::Array::reindex())

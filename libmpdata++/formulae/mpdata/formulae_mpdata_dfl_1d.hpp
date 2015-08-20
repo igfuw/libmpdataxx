@@ -60,6 +60,6 @@ namespace libmpdataxx
         0.5 *  (psi(i+1) + psi(i)) //to be compatible with iga formulation
       )
       
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx

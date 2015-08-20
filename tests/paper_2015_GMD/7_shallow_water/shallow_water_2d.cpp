@@ -57,7 +57,7 @@ void test(const std::string &outdir)
   // solver choice
   using slv_out_t = 
     output::hdf5_xdmf<
-      shallow_water<ct_params_t>
+      solvers::shallow_water<ct_params_t>
     >;
 
   // run-time parameters

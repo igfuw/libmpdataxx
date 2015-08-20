@@ -54,6 +54,6 @@ namespace libmpdataxx
         ) / 4
       )
 
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx 
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx 

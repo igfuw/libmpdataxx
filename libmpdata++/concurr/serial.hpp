@@ -51,5 +51,5 @@ namespace libmpdataxx
       {}
 
     };
-  }; // namespace concurr
-}; // namespace libmpdataxx
+  } // namespace concurr
+} // namespace libmpdataxx

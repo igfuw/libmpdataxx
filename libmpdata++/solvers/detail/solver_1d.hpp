@@ -156,6 +156,6 @@ namespace libmpdataxx
           alloc_tmp(mem, __file__, n_arr, parent_t::rng_sclr(mem->grid_size[0])); 
         }
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

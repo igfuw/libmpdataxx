@@ -25,5 +25,5 @@ namespace libmpdataxx
       c = (t - sum) - y;
       sum = t;
     }
-  };
-};
+  }
+}

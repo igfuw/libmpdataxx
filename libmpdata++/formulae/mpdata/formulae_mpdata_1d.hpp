@@ -71,6 +71,6 @@ namespace libmpdataxx
         // divergent flow terms
         + DFL<opts>(psi, GC, G, i) //divergent flow correction
       )
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx

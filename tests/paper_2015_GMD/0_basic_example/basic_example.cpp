@@ -1,4 +1,3 @@
-//<listing-1>
 #include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/serial.hpp>
 #include <libmpdata++/output/gnuplot.hpp>
@@ -50,4 +49,3 @@ int main()
   // integration
   run.advance(nt);
 }
-//</listing-1>

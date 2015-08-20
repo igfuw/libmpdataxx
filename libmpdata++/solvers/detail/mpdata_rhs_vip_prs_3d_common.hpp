@@ -196,6 +196,6 @@ namespace libmpdataxx
           parent_t::alloc_tmp_sclr(mem, __FILE__, 8); // (i^hlo,j^hlo)-sized temporary fields
         }
       }; 
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

@@ -363,6 +363,6 @@ namespace libmpdataxx
         + HOT_4<opts BOOST_PP_COMMA() dim>(psi, i, j, k) * HOT_4_helper<opts BOOST_PP_COMMA() dim>(GC, G, i, j, k)
       )
 
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx

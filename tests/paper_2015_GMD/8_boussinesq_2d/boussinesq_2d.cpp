@@ -17,7 +17,6 @@ using namespace libmpdataxx;
 int main() 
 {
   // compile-time parameters
-//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
@@ -30,7 +29,6 @@ int main()
       vip_i=u, vip_j=w, vip_den=-1
     }; };
   }; 
-//</listing-1>
   using ix = typename ct_params_t::ix;
   using real_t = typename ct_params_t::real_t;
 
@@ -79,9 +77,7 @@ int main()
     "300.55 '#FFFF00'"
   ")";
   p.gnuplot_term = "svg";
-//<listing-2>
   p.prs_tol = 1e-7;
-//</listing-2>
   p.grid_size = {nx, ny};
 
   libmpdataxx::concurr::threads<

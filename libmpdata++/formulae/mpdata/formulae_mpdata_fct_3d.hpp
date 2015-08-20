@@ -189,6 +189,6 @@ namespace libmpdataxx
 	  ))
         )
       )
-    }; // namespace mpdata_fct
-  }; // namespace formulae
-}; // namespcae libmpdataxx
+    } // namespace mpdata_fct
+  } // namespace formulae
+} // namespcae libmpdataxx

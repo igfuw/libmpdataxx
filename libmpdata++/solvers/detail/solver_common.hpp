@@ -241,6 +241,6 @@ namespace libmpdataxx
       template<typename ct_params_t, int n_tlev, int minhalo, class enableif = void>
       class solver
       {}; 
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx
