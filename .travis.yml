@@ -84,11 +84,16 @@ install:
 
     # C++ support missing in Debian package, see: 
     #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libhdf5-openmpi-dev; fi 
+
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.15-patch1.tar.bz2; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xjf hdf5-1.8.15-patch1.tar.bz2; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-1.8.15-patch1; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=/usr; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then CFLAGS=-w make; fi 
+
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget https://github.com/live-clones/hdf5/archive/master.tar.gz; fi
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xzf master.tar.gz; fi 
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-master; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then CXXFLAGS=-w CFLAGS=-w ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=/usr; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then make; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo make install; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd ..; fi 
 
@@ -100,7 +105,7 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h; fi
 
     # h5py
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi # TEMP! (disabled for MPI!)
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
 
     # scipy 
