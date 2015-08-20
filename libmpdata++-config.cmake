@@ -214,7 +214,7 @@ if(HDF5_FOUND)
     string(REPLACE "mpic++" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
     string(REPLACE "mpicxx" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
     string(REPLACE "mpiXX"  "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
-    execute_process(COMMAND ${libmpdataxx_MPIRUN} "./a.out" 
+    execute_process(COMMAND ${libmpdataxx_MPIRUN} "-np" "2" "./a.out" 
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status
       ERROR_VARIABLE error
