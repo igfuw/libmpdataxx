@@ -18,10 +18,10 @@ namespace libmpdataxx
         dir == left   && 
         n_dims == 2
       >::type
-    > : public detail::remote_common<real_t, halo, dir>
+    > : public detail::remote_common<real_t, halo, dir, n_dims>
     {
-      using parent_t = detail::remote_common<real_t, halo, dir>;
-      using arr_t = blitz::Array<real_t, 1>;
+      using parent_t = detail::remote_common<real_t, halo, dir, n_dims>;
+      using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
       const int off = this->is_cyclic ? 0 : -1;
@@ -48,10 +48,10 @@ namespace libmpdataxx
         dir == rght   &&
         n_dims == 2
       >::type
-    > : public detail::remote_common<real_t, halo, dir>
+    > : public detail::remote_common<real_t, halo, dir, n_dims>
     {
-      using parent_t = detail::remote_common<real_t, halo, dir>;
-      using arr_t = blitz::Array<real_t, 1>;
+      using parent_t = detail::remote_common<real_t, halo, dir, n_dims>;
+      using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
       const int off = this->is_cyclic ? 0 : 1;

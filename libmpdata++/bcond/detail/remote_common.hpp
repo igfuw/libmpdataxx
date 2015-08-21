@@ -18,11 +18,17 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <typename real_t, int halo, drctn_e dir>
+      template <typename real_t, int halo, drctn_e dir, int n_dims>
       class remote_common : public detail::bcond_common<real_t, halo>
       {
 	using parent_t = detail::bcond_common<real_t, halo>;
-	using arr_t = blitz::Array<real_t, 1>;
+
+        protected:
+
+	using arr_t = blitz::Array<real_t, n_dims>;
+        using idx_t = blitz::RectDomain<n_dims>;
+
+        private:
 
         const int grid_size_0;
 
@@ -58,13 +64,13 @@ namespace libmpdataxx
 
         void xchng(
           const arr_t &a, 
-          const rng_t &rng_send, 
-          const rng_t &rng_recv
+          const idx_t &idx_send, 
+          const idx_t &idx_recv
         )
         {
           // checking if the buffers are long enough
-          assert(rng_send.length() == buf_send.extent(0));
-          assert(rng_recv.length() == buf_recv.extent(0));
+          assert(idx_send[0].length() == buf_send.extent(0));
+          assert(idx_recv[0].length() == buf_recv.extent(0));
 
           // distinguishing between left and right messages 
           // (important e.g. with 2 procs and cyclic bc)
@@ -74,7 +80,7 @@ namespace libmpdataxx
 
           // copying data to be sent 
           // (couldn't sort out how to manage non-zero-base Blitz++ arrays with Boost.MPI)
-	  buf_send = a(rng_send);
+	  buf_send = a(idx_send);
 
 #if defined(USE_MPI)
           // launching async data transfer
@@ -85,8 +91,8 @@ namespace libmpdataxx
 #  if !defined(NDEBUG)
           const int debug = 2;
 	  reqs[2] = mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
-            rng_send.first(), 
-            rng_send.last()
+            idx_send[0].first(), 
+            idx_send[0].last()
           ));
 	  std::pair<int, int> buf_rng; 
 	  reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
@@ -96,13 +102,13 @@ namespace libmpdataxx
 	  boost::mpi::wait_all(reqs.begin(), reqs.end());
 
           // checking debug information
-	  assert(buf_rng.first  % grid_size_0 == rng_recv.first() % grid_size_0);
-          assert(buf_rng.second % grid_size_0 == rng_recv.last()  % grid_size_0);
+	  assert(buf_rng.first  % grid_size_0 == idx_recv[0].first() % grid_size_0);
+          assert(buf_rng.second % grid_size_0 == idx_recv[0].last()  % grid_size_0);
 #else
           assert(false);
 #endif
           // writing received data to the array
-	  a(rng_recv) = buf_recv;
+	  a(idx_recv) = buf_recv;
         }
 
         public:

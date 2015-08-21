@@ -18,10 +18,12 @@ namespace libmpdataxx
         dir == left   && 
         n_dims == 1
       >::type
-    > : public detail::remote_common<real_t, halo, dir>
+    > : public detail::remote_common<real_t, halo, dir, n_dims>
     {
-      using parent_t = detail::remote_common<real_t, halo, dir>;
-      using arr_t = blitz::Array<real_t, 1>;
+      using parent_t = detail::remote_common<real_t, halo, dir, n_dims>;
+      using arr_t = typename parent_t::arr_t;
+      using idx_t = typename parent_t::idx_t;
+      using idx_ctor_arg_t = blitz::TinyVector<rng_t, n_dims>;
       using parent_t::parent_t; // inheriting ctor
 
       const int off = this->is_cyclic ? 0 : -1;
@@ -30,12 +32,12 @@ namespace libmpdataxx
 
       void fill_halos_sclr(const arr_t &a, const bool deriv = false)
       {
-        this->xchng(a, this->left_intr_sclr + off, this->left_halo_sclr);
+        this->xchng(a, idx_t(idx_ctor_arg_t(this->left_intr_sclr + off)), idx_t(idx_ctor_arg_t(this->left_halo_sclr)));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
       {
-        this->xchng(av[0], this->left_intr_vctr + off, this->left_halo_vctr);
+        this->xchng(av[0], idx_t(idx_ctor_arg_t(this->left_intr_vctr + off)), idx_t(idx_ctor_arg_t(this->left_halo_vctr)));
       }
     };
 
@@ -46,10 +48,12 @@ namespace libmpdataxx
         dir == rght   &&
         n_dims == 1
       >::type
-    > : public detail::remote_common<real_t, halo, dir>
+    > : public detail::remote_common<real_t, halo, dir, n_dims>
     {
-      using parent_t = detail::remote_common<real_t, halo, dir>;
-      using arr_t = blitz::Array<real_t, 1>;
+      using parent_t = detail::remote_common<real_t, halo, dir, n_dims>;
+      using arr_t = typename parent_t::arr_t;
+      using idx_t = typename parent_t::idx_t;
+      using idx_ctor_arg_t = blitz::TinyVector<rng_t, n_dims>;
       using parent_t::parent_t; // inheriting ctor
 
       const int off = this->is_cyclic ? 0 : 1;
@@ -58,12 +62,12 @@ namespace libmpdataxx
 
       void fill_halos_sclr(const arr_t &a, const bool deriv = false)
       {
-        this->xchng(a, this->rght_intr_sclr + off, this->rght_halo_sclr);
+        this->xchng(a, idx_t(idx_ctor_arg_t(this->rght_intr_sclr + off)), idx_t(idx_ctor_arg_t(this->rght_halo_sclr)));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
       {
-        this->xchng(av[0], this->rght_intr_vctr + off, this->rght_halo_vctr);
+        this->xchng(av[0], idx_t(idx_ctor_arg_t(this->rght_intr_vctr + off)), idx_t(idx_ctor_arg_t(this->rght_halo_vctr)));
       }
     };
   } // namespace bcond
