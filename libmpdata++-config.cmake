@@ -180,11 +180,16 @@ if(HDF5_FOUND)
     file(WRITE "${tmpdir}/test.cpp" "                                              
       #include <boost/mpi/environment.hpp>
       #include <H5Cpp.h>
+      #if !defined(H5_HAVE_PARALLEL)
+      #  error H5_HAVE_PARALLEL not defined!
+      #endif
       int main() 
       { 
         boost::mpi::environment e; 
-        hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
-        H5Pclose(plist_id);
+	hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);                                
+	H5Pset_fapl_mpio(plist_id, MPI_COMM_WORLD, MPI_INFO_NULL);                  
+	H5::H5File(\"test.h5\", H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);                
+	H5Pclose(plist_id); 
       }
     ")
     execute_process(
@@ -196,6 +201,7 @@ if(HDF5_FOUND)
     if (NOT status EQUAL 0)                                                       
       message(FATAL_ERROR "${pfx}: compilation failed\n ${error}")                               
     endif()                                                                       
+    message(STATUS "${msg} - compilation OK")
     execute_process(
       COMMAND "./a.out" 
       WORKING_DIRECTORY ${tmpdir} 
@@ -209,9 +215,7 @@ if(HDF5_FOUND)
         - https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
       ")
     endif()                                                                       
-    unset(pfx)
-    message(STATUS "${msg} - OK")
-    unset(msg)
+    message(STATUS "${msg} - serial execution OK")
 
     # detecting if ir runs under mpirun (missing libhwloc-plugins issue:
     # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=790540
@@ -228,7 +232,11 @@ if(HDF5_FOUND)
     if (NOT status EQUAL 0)                                                       
       message(FATAL_ERROR "TODO: ${status}\n ${error}")
     endif()
+    message(STATUS "${msg} - parallel execution OK")
+
     unset(status)
+    unset(pfx)
+    unset(msg)
   endif() 
 
 
