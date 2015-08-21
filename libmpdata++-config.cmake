@@ -215,9 +215,9 @@ if(HDF5_FOUND)
         - https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
       ")
     endif()                                                                       
-    message(STATUS "${msg} - serial execution OK")
+    message(STATUS "${msg} - non-mpirun execution OK")
 
-    # detecting if ir runs under mpirun (missing libhwloc-plugins issue:
+    # detecting if it runs under mpirun (missing libhwloc-plugins issue:
     # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=790540
     # )
     set(libmpdataxx_MPIRUN ${CMAKE_CXX_COMPILER})
@@ -232,7 +232,7 @@ if(HDF5_FOUND)
     if (NOT status EQUAL 0)                                                       
       message(FATAL_ERROR "TODO: ${status}\n ${error}")
     endif()
-    message(STATUS "${msg} - parallel execution OK")
+    message(STATUS "${msg} - mpirun execution OK")
 
     unset(status)
     unset(pfx)
