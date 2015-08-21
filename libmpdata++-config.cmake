@@ -179,7 +179,13 @@ if(HDF5_FOUND)
     endif()                                                                       
     file(WRITE "${tmpdir}/test.cpp" "                                              
       #include <boost/mpi/environment.hpp>
-      int main() { boost::mpi::environment e; }
+      #include <H5Cpp.h>
+      int main() 
+      { 
+        boost::mpi::environment e; 
+        hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
+        H5Pclose(plist_id);
+      }
     ")
     execute_process(
       COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" ${HDF5_LIBRARIES} ${Boost_LIBRARIES} # the order matters here!
