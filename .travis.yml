@@ -85,13 +85,13 @@ install:
     # C++ support missing in Debian package, see: 
     #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libhdf5-openmpi-dev; fi 
 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.15-patch1.tar.bz2; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xjf hdf5-1.8.15-patch1.tar.bz2; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-1.8.15-patch1; fi 
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.15-patch1.tar.bz2; fi 
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xjf hdf5-1.8.15-patch1.tar.bz2; fi 
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-1.8.15-patch1; fi 
 
-    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget https://github.com/live-clones/hdf5/archive/master.tar.gz; fi
-    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xzf master.tar.gz; fi 
-    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-master; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget https://github.com/live-clones/hdf5/archive/master.tar.gz; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xzf master.tar.gz; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-master; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then CXXFLAGS=-w CFLAGS=-w ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=/usr; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then make; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo make install; fi 
