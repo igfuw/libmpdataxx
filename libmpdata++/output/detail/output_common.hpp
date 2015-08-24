@@ -27,6 +27,7 @@ namespace libmpdataxx
 	struct info_t { std::string name, unit; };
 	std::map<int, info_t> outvars;
 
+	typename parent_t::real_t prev_time;
 	const typename parent_t::real_t outfreq;
         const std::string outdir;
 
@@ -49,6 +50,12 @@ namespace libmpdataxx
 	  for (const auto &v : outvars) record(v.first);
 	}
 
+	void hook_ante_step()
+        {
+          parent_t::hook_ante_step();
+          prev_time = this->time;
+        }
+
 	void hook_post_step() 
 	{
 	  parent_t::hook_post_step();
@@ -57,9 +64,40 @@ namespace libmpdataxx
 	  if (this->rank == 0)
 	  {
             // TODO: output of solver statistics every timesteps could probably go here
-            auto old_time = this->time - this->dt;
-            // record if time and old_time fall into different outfreq length intervals 
-	    if ((std::floor(this->time / outfreq) - std::floor(old_time / outfreq)) == 1) record_all();
+
+            // assumes that we know what next dt will be !
+            auto next_time = this->time + this->dt;
+
+            // indices of outfreq length intervals into which next, current and previous timesteps fall
+            int next_idx = std::floor(next_time / outfreq);
+            int curr_idx = std::floor(this->time / outfreq);
+            int prev_idx = std::floor(prev_time / outfreq);
+            
+            // to avoid repeated records
+            bool record_all_called = false;
+            
+            // if next and current timestep fall into different intervals
+            if (next_idx > curr_idx) 
+            {
+              auto next_diff = next_time - next_idx * outfreq;
+              auto curr_diff = next_idx * outfreq - this->time;
+
+              // check if current is closer to the interval boundary and if so record it
+              if (curr_diff < next_diff)
+              {
+                record_all();
+                record_all_called = true;
+              }
+            }
+
+            // same logic as above - only for current and previous timestep, skip if record already done
+            if (!record_all_called && curr_idx > prev_idx)
+            {
+              auto curr_diff = this->time - curr_idx * outfreq;
+              auto prev_diff = curr_idx * outfreq - prev_time;
+              
+              if (curr_diff < prev_diff) record_all();
+            }
           }
 	  
 	  this->mem->barrier(); // waiting for the output to be finished
