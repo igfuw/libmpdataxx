@@ -64,6 +64,7 @@ namespace libmpdataxx
           const rng_t &range_k
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k, range_i);
           for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i, range_j);
 
@@ -72,6 +73,7 @@ namespace libmpdataxx
    
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j, range_k);
           for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k, range_i);
+          this->mem->barrier();
         }
 
         virtual void xchng_pres(
