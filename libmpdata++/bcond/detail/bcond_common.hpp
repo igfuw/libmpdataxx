@@ -57,16 +57,14 @@ namespace libmpdataxx
 	  assert(false && "bcond::fill_halos_pres() called!");
 	};
 	
-	// setting to a value
-	virtual void set_edge_pres(const blitz::Array<real_t, 2> &, const rng_t &) 
+	virtual void save_edge_vel(const blitz::Array<real_t, 2> &, const rng_t &) 
 	{
-	  assert(false && "bcond::set_edge_a() called!");
+	  assert(false && "bcond::save_edge_vel() called!");
 	};
 	
-	// setting to a given array
-	virtual void set_edge_pres(const blitz::Array<real_t, 2> &,const blitz::Array<real_t, 2> &, const rng_t &) 
+	virtual void set_edge_pres(const blitz::Array<real_t, 2> &, const rng_t &, int) 
 	{
-	  assert(false && "bcond::set_edge_b() called!");
+	  assert(false && "bcond::set_edge() called!");
 	};
 
 	virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &) 
