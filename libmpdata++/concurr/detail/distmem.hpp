@@ -20,7 +20,9 @@ namespace libmpdataxx
         // the anonymous namespace is a hack to avoid
         // "*** The MPI_Errhandler_set() function was called after MPI_FINALIZE was invoked."
         // error if multiple solvers are instantiated 
-        boost::mpi::environment mpienv;
+        boost::mpi::environment mpienv(boost::mpi::threading::multiple);
+        // TODO: the ``multiple'' threading level could be reduced to single in
+        // case the sharedmem->size() == 1
 #endif
       }
 
