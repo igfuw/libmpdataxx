@@ -168,5 +168,5 @@ namespace libmpdataxx
           a(pi<d>(i, j, k)) = 0; 
       }
     };
-  }; // namespace bcond
-}; // namespace libmpdataxx
+  } // namespace bcond
+} // namespace libmpdataxx

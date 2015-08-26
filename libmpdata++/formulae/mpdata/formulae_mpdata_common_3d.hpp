@@ -70,6 +70,6 @@ namespace libmpdataxx
           ) / 4
       )
 
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespace libmpdataxx
+    } // namespace mpdata
+  } // namespace formulae
+} // namespace libmpdataxx

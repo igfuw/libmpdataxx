@@ -94,5 +94,5 @@ namespace libmpdataxx
         fill_halos_sclr(a, j);
       }
     };
-  }; // namespace bcond
-}; // namespace libmpdataxx
+  } // namespace bcond
+} // namespace libmpdataxx

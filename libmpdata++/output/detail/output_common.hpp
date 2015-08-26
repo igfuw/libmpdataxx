@@ -104,6 +104,6 @@ namespace libmpdataxx
           }
         }
       };
-    }; // namespace detail
-  }; // namespace output
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace output
+} // namespace libmpdataxx

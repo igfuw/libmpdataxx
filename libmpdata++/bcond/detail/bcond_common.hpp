@@ -172,6 +172,6 @@ namespace libmpdataxx
 	  )
 	{} 
       };
-    }; // namespace detail
-  }; // namespace bcond
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace bcond
+} // namespace libmpdataxx

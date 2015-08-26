@@ -95,5 +95,5 @@ namespace libmpdataxx
       using parent_t = detail::mpdata_rhs_vip_prs_2d_pc<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
     };
-  }; // namespace solvers
-}; // namescpae libmpdataxx
+  } // namespace solvers
+} // namescpae libmpdataxx

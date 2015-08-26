@@ -298,5 +298,5 @@ namespace libmpdataxx
         assert(this->dk != 0);
       } 
     }; 
-  }; // namespace solvers
-}; // namespace libmpdataxx
+  } // namespace solvers
+} // namespace libmpdataxx

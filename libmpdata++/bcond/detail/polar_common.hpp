@@ -21,7 +21,6 @@ namespace libmpdataxx
       class polar_common : public bcond_common<real_t, halo>
       {
 	using parent_t = bcond_common<real_t, halo>;
-	using parent_t::parent_t; // inheriting ctor
 
 	protected:
 
@@ -44,6 +43,6 @@ namespace libmpdataxx
 	  pole((grid_size_0 - 1) / 2)
 	{} 
       };
-    }; // namespace detail
-  }; // namespace bcond
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace bcond
+} // namespace libmpdataxx

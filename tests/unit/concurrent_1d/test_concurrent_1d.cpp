@@ -28,14 +28,12 @@ int main()
   std::cerr << "off" << std::endl;
 #endif
 
-//<listing-1>
   struct ct_params_t : ct_params_default_t
   { 
     using real_t = double; 
     enum { n_dims = 1 }; 
     enum { n_eqns = 1 };
   };
-//</listing-1>
 
   const int  
     nx = 100, // if it is less than the number of cores, the default setting will fail
@@ -44,24 +42,16 @@ int main()
   // OpenMP
   std::cerr << "OpenMP run" << std::endl;
   {
-//<listing-2>
     using slv_t = solvers::mpdata<ct_params_t>;
-//</listing-2>
-//<listing-3>
     using slv_out_t = output::hdf5<slv_t>;
-//</listing-3>
-//<listing-4>
     using run_t = concurr::openmp<
       slv_out_t, 
       bcond::cyclic, bcond::cyclic
     >;
-//</listing-4>
-//<listing-5>
     typename slv_out_t::rt_params_t p;
     p.grid_size = { nx };
     p.outdir = "output";
     run_t run(p);
-//</listing-5>
     run.advectee() = 0;
     run.advector() = 0;
     run.advance(nt);

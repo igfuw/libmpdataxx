@@ -151,6 +151,6 @@ namespace libmpdataxx
 	  jm(args.j.first() - 1, args.j.last())
 	{ }
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

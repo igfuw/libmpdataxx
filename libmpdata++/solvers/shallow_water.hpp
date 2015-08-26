@@ -36,135 +36,141 @@
   * h times momentum eq. plus u times mass continuity equation:
   * \f$ \partial_t (uh) + \nabla_z (u \cdot uh) = -g h \nabla_z \eta \f$
   */
-template <typename ct_params_t, class enableif = void>
-class shallow_water 
-{};
-
-template <class ct_params_t>
-class shallow_water_common : public libmpdataxx::solvers::mpdata_rhs_vip<ct_params_t>
+namespace libmpdataxx 
 {
-  using parent_t = libmpdataxx::solvers::mpdata_rhs_vip<ct_params_t>;
-
-  protected:
-
-  // member fields
-  const typename ct_params_t::real_t g;
-
-  // 
-  void update_rhs(
-    libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
-    const typename parent_t::real_t &dt,
-    const int &at
-  ) {
-    parent_t::update_rhs(rhs, dt, at);
-    enum { n = 0 };    // just to make n, n+1 look nice :)
-    assert(
-      this->timestep == 0 && at == n 
-      ||
-      this->timestep  > 0 && at == n+1
-    ); // note: we know only how to calculate R^{n+1}
-       //       thus allowing to treat R^{n+1} as R^{n}
-       //       only in the first timestep
-  }
-
-  void hook_post_step()
+  namespace solvers
   {
-    parent_t::hook_post_step();
-    assert(min(this->state(ct_params_t::ix::h)(this->ijk)) >= 0);  
-//   std::cerr<<min(this->state(ct_params_t::ix::h)(this->ijk))<<std::endl;
-  }
+    template <typename ct_params_t, class enableif = void>
+    class shallow_water 
+    {};
 
-  void hook_ante_step()
-  {
-    parent_t::hook_ante_step();
-    assert(min(this->state(ct_params_t::ix::h)(this->ijk)) >= 0);  
-  }
+    namespace detail
+    {
+      template <class ct_params_t>
+      class shallow_water_common : public mpdata_rhs_vip<ct_params_t>
+      {
+        using parent_t = mpdata_rhs_vip<ct_params_t>;
 
-  public:
+        protected:
 
-  // run-time parameters
-  struct rt_params_t : parent_t::rt_params_t 
-  {   
-    typename parent_t::real_t g = 9.81; // default value 
-  };
+        // member fields
+        const typename ct_params_t::real_t g;
 
-  // ctor
-  shallow_water_common( 
-    typename parent_t::ctor_args_t args, 
-    const rt_params_t &p
-  ) :
-    parent_t(args, p), 
-    g(p.g)
-  {}
-};
+        // 
+        void update_rhs(
+          libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
+          const typename parent_t::real_t &dt,
+          const int &at
+        ) {
+          parent_t::update_rhs(rhs, dt, at);
+          enum { n = 0 };    // just to make n, n+1 look nice :)
+          assert(
+            this->timestep == 0 && at == n 
+            ||
+            this->timestep  > 0 && at == n+1
+          ); // note: we know only how to calculate R^{n+1}
+             //       thus allowing to treat R^{n+1} as R^{n}
+             //       only in the first timestep
+        }
 
-// 1D version
-template <typename ct_params_t>
-class shallow_water<
-  ct_params_t, 
-  typename std::enable_if<ct_params_t::n_dims == 1>::type
-> : public shallow_water_common<ct_params_t>
-{
-  static_assert(ct_params_t::n_eqns == 2, "{qx, h} in 1D");
-  using parent_t = shallow_water_common<ct_params_t>;
-  using parent_t::parent_t; // inheriting ctors
-  using ix = typename ct_params_t::ix;
+        void hook_post_step()
+        {
+          parent_t::hook_post_step();
+          assert(min(this->state(ct_params_t::ix::h)(this->ijk)) >= 0);  
+        }
 
-//<listing-1>
-  void update_rhs(
-    libmpdataxx::arrvec_t<
-      typename parent_t::arr_t
-    > &rhs,
-    const typename parent_t::real_t &dt,
-    const int &at
-  ) {
-    using namespace libmpdataxx::formulae::nabla;
+        void hook_ante_step()
+        {
+          parent_t::hook_ante_step();
+          assert(min(this->state(ct_params_t::ix::h)(this->ijk)) >= 0);  
+        }
 
-    parent_t::update_rhs(rhs, dt, at);
+        public:
 
-    rhs.at(ix::qx)(this->i) -= 
-      this->g 
-      * this->state(ix::h)(this->i) 
-      * grad(this->state(ix::h), this->i, this->di); 
-  }
-//</listing-1>
-};
+        // run-time parameters
+        struct rt_params_t : parent_t::rt_params_t 
+        {   
+          typename parent_t::real_t g = 9.81; // default value 
+        };
 
-// 2D version
-template <typename ct_params_t>
-class shallow_water<
-  ct_params_t, 
-  typename std::enable_if<ct_params_t::n_dims == 2>::type
-> : public shallow_water_common<ct_params_t>
-{
-  static_assert(ct_params_t::n_eqns == 3, "{qx, qy, h} in 2D");
-  using parent_t = shallow_water_common<ct_params_t>;
-  using parent_t::parent_t; // inheriting ctors
-  using ix = typename ct_params_t::ix;
+        // ctor
+        shallow_water_common( 
+          typename parent_t::ctor_args_t args, 
+          const rt_params_t &p
+        ) :
+          parent_t(args, p), 
+          g(p.g)
+        {}
+      };
+    } // namespace detail
 
-  template <int d, class arr_t>
-  void forcings_helper(
-    arr_t rhs, // TODO: ref?
-    const libmpdataxx::rng_t &i,
-    const libmpdataxx::rng_t &j,
-    const typename ct_params_t::real_t &di
-  )
-  {
-    using namespace libmpdataxx::formulae::nabla;
-    rhs(pi<d>(i,j)) -= this->g * this->state(ix::h)(pi<d>(i,j)) * grad<d>(this->state(ix::h), i, j, di); 
-  }
+    // 1D version
+    template <typename ct_params_t>
+    class shallow_water<
+      ct_params_t, 
+      typename std::enable_if<ct_params_t::n_dims == 1>::type
+    > : public detail::shallow_water_common<ct_params_t>
+    {
+      static_assert(ct_params_t::n_eqns == 2, "{qx, h} in 1D");
+      using parent_t = detail::shallow_water_common<ct_params_t>;
+      using parent_t::parent_t; // inheriting ctors
+      using ix = typename ct_params_t::ix;
 
-  /// @brief Shallow Water Equations: Momentum forcings for the X and Y coordinates
-  void update_rhs(
-    libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
-    const typename parent_t::real_t &dt,
-    const int &at
-  ) {
-    //
-    parent_t::update_rhs(rhs, dt, at);
+      void update_rhs(
+        libmpdataxx::arrvec_t<
+          typename parent_t::arr_t
+        > &rhs,
+        const typename parent_t::real_t &dt,
+        const int &at
+      ) {
+        using namespace libmpdataxx::formulae::nabla;
 
-    //
-    forcings_helper<0>(rhs.at(ix::qx), this->i, this->j, this->di);
-    forcings_helper<1>(rhs.at(ix::qy), this->j, this->i, this->dj); 
-  }
-};
+        parent_t::update_rhs(rhs, dt, at);
+
+        rhs.at(ix::qx)(this->i) -= 
+          this->g 
+          * this->state(ix::h)(this->i) 
+          * grad(this->state(ix::h), this->i, this->di); 
+      }
+    };
+
+    // 2D version
+    template <typename ct_params_t>
+    class shallow_water<
+      ct_params_t, 
+      typename std::enable_if<ct_params_t::n_dims == 2>::type
+    > : public detail::shallow_water_common<ct_params_t>
+    {
+      static_assert(ct_params_t::n_eqns == 3, "{qx, qy, h} in 2D");
+      using parent_t = detail::shallow_water_common<ct_params_t>;
+      using parent_t::parent_t; // inheriting ctors
+      using ix = typename ct_params_t::ix;
+
+      template <int d, class arr_t>
+      void forcings_helper(
+        arr_t rhs, // TODO: ref?
+        const libmpdataxx::rng_t &i,
+        const libmpdataxx::rng_t &j,
+        const typename ct_params_t::real_t &di
+      )
+      {
+        using namespace libmpdataxx::formulae::nabla;
+        rhs(pi<d>(i,j)) -= this->g * this->state(ix::h)(pi<d>(i,j)) * grad<d>(this->state(ix::h), i, j, di); 
+      }
+ 
+      /// @brief Shallow Water Equations: Momentum forcings for the X and Y coordinates
+      void update_rhs(
+        libmpdataxx::arrvec_t<typename parent_t::arr_t> &rhs,
+        const typename parent_t::real_t &dt,
+        const int &at
+      ) {
+        //
+        parent_t::update_rhs(rhs, dt, at);
+
+        //
+        forcings_helper<0>(rhs.at(ix::qx), this->i, this->j, this->di);
+        forcings_helper<1>(rhs.at(ix::qy), this->j, this->i, this->dj); 
+      }
+    };
+  } // namespace solvers
+} // namespace libmpdataxx

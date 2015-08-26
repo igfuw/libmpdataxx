@@ -252,5 +252,5 @@ namespace libmpdataxx
           this->p.gnuplot_output = this->outdir + "/" + p.gnuplot_output; // TODO: get rid of gnuplot_output
       }
     }; 
-  }; // namespace output
-}; // namespace libmpdataxx
+  } // namespace output
+} // namespace libmpdataxx

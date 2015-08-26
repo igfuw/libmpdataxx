@@ -87,6 +87,6 @@ namespace libmpdataxx
         / //--------------------------------------- 
         (1 + 1 + 1 + 1)
       )
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx

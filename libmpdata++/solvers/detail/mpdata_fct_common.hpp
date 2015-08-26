@@ -71,6 +71,6 @@ namespace libmpdataxx
       template<typename ct_params_t, int minhalo, class enableif = void> 
       class mpdata_fct
       {}; 
-    }; // namespace detail
-  }; // namespace solvers
-}; // namescpae libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namescpae libmpdataxx

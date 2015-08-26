@@ -75,5 +75,5 @@ namespace libmpdataxx
       ) : parent_t(args, p)
       { }
     };
-  }; // namespace output
-}; // namespace libmpdataxx
+  } // namespace output
+} // namespace libmpdataxx

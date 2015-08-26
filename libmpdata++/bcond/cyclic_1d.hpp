@@ -63,5 +63,5 @@ namespace libmpdataxx
       }
       
     };
-  }; // namespace bcond
-}; // namespace libmpdataxx
+  } // namespace bcond
+} // namespace libmpdataxx

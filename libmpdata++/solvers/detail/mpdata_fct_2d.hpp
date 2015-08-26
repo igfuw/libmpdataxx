@@ -89,6 +89,6 @@ namespace libmpdataxx
 	  this->GC_mono[1]( this->i, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->i);
 	}
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

@@ -11,7 +11,6 @@
 //
 
 #pragma once
-//<listing-1>
 #include <libmpdata++/solvers/mpdata_rhs.hpp>
 
 template <class ct_params_t>
@@ -73,4 +72,3 @@ struct coupled_harmosc : public
   ) : parent_t(args, p), omega(p.omega)
   { assert(omega != 0); }
 };
-//</listing-1>

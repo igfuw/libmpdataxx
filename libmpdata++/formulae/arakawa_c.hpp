@@ -47,5 +47,5 @@ namespace libmpdataxx
         (r + n).last()
       ); 
     } 
-  }; // namespace arakawa_c
-}; // namespace libmpdataxx
+  } // namespace arakawa_c
+} // namespace libmpdataxx

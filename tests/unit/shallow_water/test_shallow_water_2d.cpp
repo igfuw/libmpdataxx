@@ -37,7 +37,7 @@ int main()
 
   // solver & output choice
   using solver_t = output::gnuplot<
-    shallow_water<ct_params_t>
+    solvers::shallow_water<ct_params_t>
   >;
 
   // run-time parameters

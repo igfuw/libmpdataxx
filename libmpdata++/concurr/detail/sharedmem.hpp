@@ -426,6 +426,6 @@ namespace libmpdataxx
 	}   
 
       };
-    }; // namespace detail
-  }; // namespace concurr
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace concurr
+} // namespace libmpdataxx
