@@ -23,6 +23,9 @@ namespace libmpdataxx
       using parent_t = detail::bcond_common<real_t, halo>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
+      
+      // holds saved initial value of edge velocity
+      arr_t edge_velocity;
 
       public:
 
@@ -36,6 +39,29 @@ namespace libmpdataxx
           else
 	    a(pi<d>(i, j, k)) = a(pi<d>(this->left_edge_sclr, j, k));
         }
+      }
+      
+      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        using namespace idxperm;
+        // equivalent to one-sided derivatives at the boundary
+        a(pi<d>(this->left_halo_sclr.last(), j, k)) = 2 * a(pi<d>(this->left_edge_sclr,     j, k))
+                                                        - a(pi<d>(this->left_edge_sclr + 1, j, k));
+      }
+      
+      void save_edge_vel(const arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        using namespace idxperm;
+        auto s = a.shape();
+        s[d] = 1;
+        edge_velocity.resize(s);
+        edge_velocity(pi<d>(0, j, k)) = a(pi<d>(this->left_edge_sclr, j, k));
+      }
+      
+      void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k, int sign)
+      {
+        using namespace idxperm;
+        a(pi<d>(this->left_edge_sclr, j, k)) = sign * edge_velocity(pi<d>(0, j, k));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
@@ -104,6 +130,9 @@ namespace libmpdataxx
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
       
+      // holds saved initial value of edge velocity
+      arr_t edge_velocity;
+      
       public:
 
       void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
@@ -116,6 +145,29 @@ namespace libmpdataxx
           else
 	    a(pi<d>(i, j, k)) = a(pi<d>(this->rght_edge_sclr, j, k));
         }
+      }
+      
+      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        using namespace idxperm;
+        // equivalent to one-sided derivatives at the boundary
+        a(pi<d>(this->rght_halo_sclr.first(), j, k)) = 2 * a(pi<d>(this->rght_edge_sclr,     j, k))
+                                                         - a(pi<d>(this->rght_edge_sclr - 1, j, k));
+      }
+      
+      void save_edge_vel(const arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        using namespace idxperm;
+        auto s = a.shape();
+        s[d] = 1;
+        edge_velocity.resize(s);
+        edge_velocity(pi<d>(0, j, k)) = a(pi<d>(this->rght_edge_sclr, j, k));
+      }
+      
+      void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k, int sign)
+      {
+        using namespace idxperm;
+        a(pi<d>(this->rght_edge_sclr, j, k)) = sign * edge_velocity(pi<d>(0, j, k));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)

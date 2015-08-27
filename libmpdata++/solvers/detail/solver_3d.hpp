@@ -64,6 +64,7 @@ namespace libmpdataxx
           const rng_t &range_k
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k, range_i);
           for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i, range_j);
 
@@ -72,6 +73,7 @@ namespace libmpdataxx
    
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j, range_k);
           for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k, range_i);
+          this->mem->barrier();
         }
 
         virtual void xchng_pres(
@@ -94,30 +96,28 @@ namespace libmpdataxx
           const typename parent_t::arr_t &arr3,
           const rng_t &range_i,
           const rng_t &range_j,
-          const rng_t &range_k
+          const rng_t &range_k,
+          const int &sign
         ) final
         {
-          for (auto &bc : this->bcs[0]) bc->set_edge_pres(arr1, range_j, range_k);
-          for (auto &bc : this->bcs[1]) bc->set_edge_pres(arr2, range_k, range_i);
-          for (auto &bc : this->bcs[2]) bc->set_edge_pres(arr3, range_i, range_j);
+          for (auto &bc : this->bcs[0]) bc->set_edge_pres(arr1, range_j, range_k, sign);
+          for (auto &bc : this->bcs[1]) bc->set_edge_pres(arr2, range_k, range_i, sign);
+          for (auto &bc : this->bcs[2]) bc->set_edge_pres(arr3, range_i, range_j, sign);
           this->mem->barrier();
         }
-
-        virtual void set_edges(
+        
+        virtual void save_edges(
           const typename parent_t::arr_t &arr1,
           const typename parent_t::arr_t &arr2,
           const typename parent_t::arr_t &arr3,
-          const typename parent_t::arr_t &v1,
-          const typename parent_t::arr_t &v2,
-          const typename parent_t::arr_t &v3,
           const rng_t &range_i,
           const rng_t &range_j,
           const rng_t &range_k
         ) final
         {
-          for (auto &bc : this->bcs[0]) bc->set_edge_pres(arr1, v1, range_j, range_k);
-          for (auto &bc : this->bcs[1]) bc->set_edge_pres(arr2, v2, range_k, range_i);
-          for (auto &bc : this->bcs[2]) bc->set_edge_pres(arr3, v3, range_i, range_j);
+          for (auto &bc : this->bcs[0]) bc->save_edge_vel(arr1, range_j, range_k);
+          for (auto &bc : this->bcs[1]) bc->save_edge_vel(arr2, range_k, range_i);
+          for (auto &bc : this->bcs[2]) bc->save_edge_vel(arr3, range_i, range_j);
           this->mem->barrier();
         }
         
