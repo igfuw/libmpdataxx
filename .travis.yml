@@ -82,13 +82,9 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install libhdf5-serial-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install hdf5-tools; fi
 
-    # C++ support missing in Debian package, see: 
+    # C++ support missing in Debian package ...
     #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libhdf5-openmpi-dev; fi 
-
-    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.15-patch1.tar.bz2; fi 
-    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xjf hdf5-1.8.15-patch1.tar.bz2; fi 
-    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-1.8.15-patch1; fi 
-
+    # ... so we are installing it manually:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget https://github.com/live-clones/hdf5/archive/master.tar.gz; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xzf master.tar.gz; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-master; fi 
@@ -104,9 +100,9 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h; fi
 
-    # h5py
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi # TEMP! (disabled for MPI!)
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
+    # h5py (TEMPORARILY using pip with MPI -- see note above)
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' || $MPI != 'none' ]]; then sudo pip install h5py; fi 
 
     # scipy 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-scipy; fi
