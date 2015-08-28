@@ -93,8 +93,15 @@ if(NOT ${IMPORT_SCIPY_EXITCODE} EQUAL 0)
   ")
 endif()
 
-# macro to be used in the subdirectories
+# macros to be used in the subdirectories
 function(libmpdataxx_add_test test)
+  add_executable(${test} ${test}.cpp)
+  target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
+  target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
+  add_test(${test} ${test})
+endfunction()
+
+function(libmpdataxx_add_test_hdf test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
   target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})

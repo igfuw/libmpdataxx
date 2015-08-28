@@ -1,4 +1,4 @@
-libmpdataxx_add_test(revolving_sphere_3d)
+libmpdataxx_add_test_hdf(revolving_sphere_3d)
 
 add_test(revolving_sphere_3d_diff bash -c "
   for dir in basic fct iga iga_fct upwind; do 
