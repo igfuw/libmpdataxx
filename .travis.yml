@@ -115,7 +115,7 @@ script:
     - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - cd ../../..
 
-    # compiling but _not_ running sandbox tests 
+    # compiling all sandbox tests in Release mode
     - cd tests/sandbox
     - mkdir build
     - cd build
@@ -123,7 +123,10 @@ script:
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
     - cmake ..
     - VERBOSE=1 $make_j
+    # running selected sandbox tests in Release mode
+    - OMP_NUM_THREADS=4 make -C convergence_2d_3d test || cat convergence_2d_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
     - cd ../../..
+    
 
     # installing
     - cd libmpdata++/build
