@@ -1,1 +1,2 @@
 libmpdataxx_add_test(convergence_2d)
+libmpdataxx_add_test(convergence_3d)
