@@ -11,7 +11,7 @@ add_test(revolving_sphere_3d_diff bash -c "
     echo   'comparing timestep0000000000.xmf'                                                                          &&
     diff    $dir/timestep0000000000.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                &&
     echo   'comparing timestep0000000556.h5'                                                                           &&
-    h5diff --delta=1e-17 -v $dir/timestep0000000556.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000556.h5 &&
+    h5diff --delta=1e-16 -v $dir/timestep0000000556.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000556.h5 &&
     echo   'comparing timestep0000000556.xmf'                                                                          &&
     diff    $dir/timestep0000000556.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000556.xmf                || exit 1;
   done 
