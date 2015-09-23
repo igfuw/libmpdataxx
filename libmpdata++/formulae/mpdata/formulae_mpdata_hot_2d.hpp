@@ -40,7 +40,7 @@ namespace libmpdataxx
         const rng_t &j
       ) return_macro(,
         (abs(GC[dim](pi<dim>(i+h, j))) - 2 * pow(GC[dim](pi<dim>(i+h, j)), 2) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j)) 
-        / 4 * GC_bar<dim>(GC[dim-1], i, j) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j)
+         * GC_bar<dim>(GC[dim-1], i, j) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j)
       )
 
       template<opts_t opts, int dim, class arr_2d_t>

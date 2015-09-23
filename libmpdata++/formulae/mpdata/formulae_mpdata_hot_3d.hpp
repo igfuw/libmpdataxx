@@ -42,7 +42,7 @@ namespace libmpdataxx
           (
             abs(GC[dim](pi<dim>(i+h, j, k)))
           - 2 * pow(GC[dim](pi<dim>(i+h, j, k)), 2) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j, k)
-          ) / 4 * GC_bar1<dim>(GC[dim+1], i, j, k) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j, k)
+          ) * GC_bar1<dim>(GC[dim+1], i, j, k) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j, k)
       )
 
       template<opts_t opts, int dim, class arr_3d_t>
@@ -56,7 +56,7 @@ namespace libmpdataxx
           (
             abs(GC[dim](pi<dim>(i+h, j, k)))
           - 2 * pow(GC[dim](pi<dim>(i+h, j, k)), 2) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j, k)
-          ) / 4 * GC_bar2<dim>(GC[dim-1], i, j, k) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j, k)
+          ) * GC_bar2<dim>(GC[dim-1], i, j, k) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j, k)
       )
 
       template<opts_t opts, int dim, class arr_3d_t>
@@ -258,22 +258,22 @@ namespace libmpdataxx
       ) return_macro(,
           frac<opts>(
             psi(pi<dim>(i+1, j+1, k+1))
-          + psi(pi<dim>(i, j+1, k+1))
-          + psi(pi<dim>(i+1, j+1, k-1))
-          + psi(pi<dim>(i, j+1, k-1))           
-          - psi(pi<dim>(i, j-1, k-1))
-          - psi(pi<dim>(i+1, j-1, k-1))
-          - psi(pi<dim>(i, j-1, k+1))
+          + psi(pi<dim>(i+1, j-1, k-1))
+          - psi(pi<dim>(i+1, j+1, k-1))
           - psi(pi<dim>(i+1, j-1, k+1))           
+          + psi(pi<dim>(i, j+1, k+1))
+          + psi(pi<dim>(i, j-1, k-1))
+          - psi(pi<dim>(i, j+1, k-1))           
+          - psi(pi<dim>(i, j-1, k+1))
           , //-------------------------
             psi(pi<dim>(i+1, j+1, k+1))
-          + psi(pi<dim>(i, j+1, k+1))
-          + psi(pi<dim>(i+1, j+1, k-1))
-          + psi(pi<dim>(i, j+1, k-1))           
-          + psi(pi<dim>(i, j-1, k-1))
           + psi(pi<dim>(i+1, j-1, k-1))
-          + psi(pi<dim>(i, j-1, k+1))
+          + psi(pi<dim>(i+1, j+1, k-1))
           + psi(pi<dim>(i+1, j-1, k+1))           
+          + psi(pi<dim>(i, j+1, k+1))
+          + psi(pi<dim>(i, j-1, k-1))
+          + psi(pi<dim>(i, j+1, k-1))           
+          + psi(pi<dim>(i, j-1, k+1))
           )
       )
 
@@ -287,22 +287,22 @@ namespace libmpdataxx
       ) return_macro(,
           frac<opts>(
             abs(psi(pi<dim>(i+1, j+1, k+1)))
-          + abs(psi(pi<dim>(i, j+1, k+1)))
-          - abs(psi(pi<dim>(i+1, j+1, k-1)))
-          - abs(psi(pi<dim>(i, j+1, k-1)))          
-          + abs(psi(pi<dim>(i, j-1, k-1)))
           + abs(psi(pi<dim>(i+1, j-1, k-1)))
-          - abs(psi(pi<dim>(i, j-1, k+1)))
+          - abs(psi(pi<dim>(i+1, j+1, k-1)))
           - abs(psi(pi<dim>(i+1, j-1, k+1)))           
+          + abs(psi(pi<dim>(i, j+1, k+1)))
+          + abs(psi(pi<dim>(i, j-1, k-1)))
+          - abs(psi(pi<dim>(i, j+1, k-1)))          
+          - abs(psi(pi<dim>(i, j-1, k+1)))
           , //------------------------------
             abs(psi(pi<dim>(i+1, j+1, k+1)))
-          + abs(psi(pi<dim>(i, j+1, k+1)))
-          + abs(psi(pi<dim>(i+1, j+1, k-1)))
-          + abs(psi(pi<dim>(i, j+1, k-1)))          
-          + abs(psi(pi<dim>(i, j-1, k-1)))
           + abs(psi(pi<dim>(i+1, j-1, k-1)))
-          + abs(psi(pi<dim>(i, j-1, k+1)))
+          + abs(psi(pi<dim>(i+1, j+1, k-1)))
           + abs(psi(pi<dim>(i+1, j-1, k+1)))           
+          + abs(psi(pi<dim>(i, j+1, k+1)))
+          + abs(psi(pi<dim>(i, j-1, k-1)))
+          + abs(psi(pi<dim>(i, j+1, k-1)))          
+          + abs(psi(pi<dim>(i, j-1, k+1)))
           )
       )
 
@@ -318,13 +318,13 @@ namespace libmpdataxx
           ,
           (
             psi(pi<dim>(i+1, j+1, k+1))
-          + psi(pi<dim>(i, j+1, k+1))
-          + psi(pi<dim>(i+1, j+1, k-1))
-          + psi(pi<dim>(i, j+1, k-1))           
-          - psi(pi<dim>(i, j-1, k-1))
-          - psi(pi<dim>(i+1, j-1, k-1))
-          - psi(pi<dim>(i, j-1, k+1))
+          + psi(pi<dim>(i+1, j-1, k-1))
+          - psi(pi<dim>(i+1, j+1, k-1))
           - psi(pi<dim>(i+1, j-1, k+1))
+          + psi(pi<dim>(i, j+1, k+1))
+          + psi(pi<dim>(i, j-1, k-1))           
+          - psi(pi<dim>(i, j+1, k-1))
+          - psi(pi<dim>(i, j-1, k+1))
           )
           / //---------------------------
           (
@@ -362,6 +362,7 @@ namespace libmpdataxx
         + HOT_3<opts BOOST_PP_COMMA() dim>(psi, i, j, k) * HOT_3_helper<opts BOOST_PP_COMMA() dim>(GC, G, i, j, k)
         + HOT_4<opts BOOST_PP_COMMA() dim>(psi, i, j, k) * HOT_4_helper<opts BOOST_PP_COMMA() dim>(GC, G, i, j, k)
       )
+
 
     } // namespace mpdata
   } // namespace formulae

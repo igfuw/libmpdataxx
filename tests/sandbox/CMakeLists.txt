@@ -36,3 +36,4 @@ enable_testing()
 
 add_subdirectory(straka)
 add_subdirectory(turbulence)
+add_subdirectory(convergence_2d_3d)
