@@ -92,10 +92,15 @@ namespace libmpdataxx
 
 	void ini_pressure()
 	{ 
-	  const int halo = parent_t::halo;
-	  // Phi = dt/2 * (Prs-Prs_amb) / rho 
-	  Phi(this->ijk) = real_t(0); // ... but assuming zero perturbation at t=0
-	  this->xchng_sclr(Phi, this->i^halo, this->j^halo, this->k^halo);
+	  Phi(this->ijk) = -0.5 * (pow2(this->state(ix::vip_i)(this->ijk)) +
+                                   pow2(this->state(ix::vip_j)(this->ijk)) +
+                                   pow2(this->state(ix::vip_k)(this->ijk)) );
+
+          auto npoints = ((this->mem->grid_size[0].last() + 1) *
+                          (this->mem->grid_size[1].last() + 1) *
+                          (this->mem->grid_size[2].last() + 1));
+          auto Phi_mean = prs_sum(Phi, this->i, this->j, this->k) / npoints;
+	  Phi(this->ijk) -= Phi_mean;
 	}
 
 	virtual void pressure_solver_loop_init() = 0;
@@ -136,35 +141,51 @@ namespace libmpdataxx
 	  this->state(ix::vip_i)(this->ijk) += tmp_u(this->ijk);
 	  this->state(ix::vip_j)(this->ijk) += tmp_v(this->ijk);
 	  this->state(ix::vip_k)(this->ijk) += tmp_w(this->ijk);
-          this->set_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), this->i, this->j, this->k, 1);
 	}
 
         void hook_ante_loop(const int nt)
         {
-          parent_t::hook_ante_loop(nt);
-	  ini_pressure();
-          
           // save initial edge velocities
           this->save_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), this->i, this->j, this->k);
+	  
+          // correct initial velocity
+	  Phi(this->ijk) = real_t(0);
+	  this->xchng_sclr(Phi, this->i^this->halo, this->j^this->halo, this->k^this->halo);
+	  pressure_solver_update();
+          this->xchng_pres(this->Phi, this->i^this->halo, this->j^this->halo, this->k^this->halo);
+	  using formulae::nabla::grad;
+	  tmp_u(this->ijk) = - grad<0>(Phi, this->i, this->j, this->k, this->di);
+	  tmp_v(this->ijk) = - grad<1>(Phi, this->j, this->k, this->i, this->dj);
+	  tmp_w(this->ijk) = - grad<2>(Phi, this->k, this->i, this->j, this->dk);
+	  pressure_solver_apply();
+          this->set_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), this->i, this->j, this->k, 1);
+	  
+          parent_t::hook_ante_loop(nt);
+          // potential pressure
+          ini_pressure();
  
           // allow pressure_solver_apply at the first time step
-          tmp_u(this->ijk) = 0;
-          tmp_v(this->ijk) = 0;
-          tmp_w(this->ijk) = 0;
+	  this->xchng_pres(this->Phi, this->i^this->halo, this->j^this->halo, this->k^this->halo);
+          this->vip_rhs[0](this->ijk) += - grad<0>(Phi, this->i, this->j, this->k, this->di);
+          this->vip_rhs[1](this->ijk) += - grad<1>(Phi, this->j, this->k, this->i, this->dj);
+          this->vip_rhs[2](this->ijk) += - grad<2>(Phi, this->k, this->i, this->j, this->dk);
         }
 
-        void hook_ante_step()
+        void vip_rhs_impl_fnlz()
         {
-          parent_t::hook_ante_step(); // velocity extrapolation + forcings
-	  pressure_solver_apply(); 
+          this->vip_rhs[0](this->ijk) = -this->state(ix::vip_i)(this->ijk);
+          this->vip_rhs[1](this->ijk) = -this->state(ix::vip_j)(this->ijk);
+          this->vip_rhs[2](this->ijk) = -this->state(ix::vip_k)(this->ijk);
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->add_relax();
+          pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
+          pressure_solver_apply();
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->normalize_absorber();
+          this->set_edges(this->state(ix::vip_i), this->state(ix::vip_j), this->state(ix::vip_k), this->i, this->j, this->k, 1);
+          this->vip_rhs[0](this->ijk) += this->state(ix::vip_i)(this->ijk);
+          this->vip_rhs[1](this->ijk) += this->state(ix::vip_j)(this->ijk);
+          this->vip_rhs[2](this->ijk) += this->state(ix::vip_k)(this->ijk);
         }
-    
-        void hook_post_step()
-        {
-          parent_t::hook_post_step(); // forcings
-	  pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
-	  pressure_solver_apply();
-        }
+
 
 	public:
 

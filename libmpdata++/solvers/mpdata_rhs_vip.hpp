@@ -74,6 +74,7 @@ namespace libmpdataxx
 	im(args.i.first() - 1, args.i.last())
       {
         assert(this->di != 0);
+        this->vip_ixs = {ix::vip_i};
       } 
     };
 
@@ -141,29 +142,6 @@ namespace libmpdataxx
 	this->extrp(1, ix::vip_j);
 	this->xchng_sclr(this->stash[1], this->i^this->halo, this->j^this->halo);      // filling halos 
       }
-      
-      void add_absorber() final
-      {
-	  typename ct_params_t::real_t factor = (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl ? 0.5 : 1.);
-          this->state(ix::vip_i)(this->ijk) -= factor * this->dt * 
-            (*this->mem->vab_coeff)(this->ijk) * (this->state(ix::vip_i)(this->ijk) - this->mem->vab_relax[0](this->ijk));
-          this->state(ix::vip_j)(this->ijk) -= factor * this->dt * 
-            (*this->mem->vab_coeff)(this->ijk) * (this->state(ix::vip_j)(this->ijk) - this->mem->vab_relax[1](this->ijk));
-      }
-      
-      void normalize_absorber() final
-      {
-        this->state(ix::vip_i)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
-        this->state(ix::vip_j)(this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
-      }
-      
-      void add_relax() final
-      {
-        this->state(ix::vip_i)(this->ijk) +=
-          0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[0](this->ijk);
-        this->state(ix::vip_j)(this->ijk) +=
-          0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[1](this->ijk);
-      }
 
       public:
       
@@ -178,6 +156,7 @@ namespace libmpdataxx
       {
         assert(this->di != 0);
         assert(this->dj != 0);
+        this->vip_ixs = {ix::vip_i, ix::vip_j};
       }
       
       static void alloc(
@@ -258,6 +237,7 @@ namespace libmpdataxx
 	intrp<0>(this->stash[0], im, this->j^this->halo, this->k^this->halo, this->di);
 	intrp<1>(this->stash[1], jm, this->k^this->halo, this->i^this->halo, this->dj);
 	intrp<2>(this->stash[2], km, this->i^this->halo, this->j^this->halo, this->dk);
+        this->xchng_vctr_alng(this->mem->GC);
       }
 
       void extrapolate_in_time() final
@@ -282,6 +262,31 @@ namespace libmpdataxx
       }
 
       public:
+      
+      static void alloc(
+        typename parent_t::mem_t *mem, 
+        const int &n_iters
+      ) 
+      {
+	parent_t::alloc(mem, n_iters);
+
+        // allocate velocity absorber
+        if (static_cast<vip_vab_t>(ct_params_t::vip_vab) != 0)
+        {
+          mem->vab_coeff.reset(mem->old(new typename parent_t::arr_t(
+                  parent_t::rng_sclr(mem->grid_size[0]),
+                  parent_t::rng_sclr(mem->grid_size[1]),
+                  parent_t::rng_sclr(mem->grid_size[2])
+          )));
+          
+          for (int n = 0; n < ct_params_t::n_dims; ++n)
+            mem->vab_relax.push_back(mem->old(new typename parent_t::arr_t(
+                    parent_t::rng_sclr(mem->grid_size[0]),
+                    parent_t::rng_sclr(mem->grid_size[1]),
+                    parent_t::rng_sclr(mem->grid_size[2])
+            )));
+        }
+      }
 
       // ctor
       mpdata_rhs_vip(
@@ -296,6 +301,7 @@ namespace libmpdataxx
         assert(this->di != 0);
         assert(this->dj != 0);
         assert(this->dk != 0);
+        this->vip_ixs = {ix::vip_i, ix::vip_j, ix::vip_k};
       } 
     }; 
   } // namespace solvers
