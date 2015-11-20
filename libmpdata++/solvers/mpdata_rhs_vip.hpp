@@ -112,7 +112,7 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / this->di * .5 * (
+	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
 	    psi(pi<d>(i,    j)) + 
 	    psi(pi<d>(i + 1,j))
 	  );
@@ -240,7 +240,7 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / this->di * .5 * (
+	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
 	    psi(pi<d>(i,     j, k)) + 
 	    psi(pi<d>(i + 1, j, k))
 	  );
