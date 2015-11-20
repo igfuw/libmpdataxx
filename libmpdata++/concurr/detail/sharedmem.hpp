@@ -417,12 +417,30 @@ namespace libmpdataxx
         
         blitz::Array<real_t, 3> vab_coefficient()
         {
-          throw std::logic_error("absorber not yet implemented in 3d");
+          // a sanity check
+          if (this->vab_coeff.get() == nullptr) 
+            throw std::runtime_error("vab_coeff() called with option vip_vab unset?");
+
+          // the same logic as in advectee() - see above
+          return (*this->vab_coeff)(
+            this->grid_size[0],
+            this->grid_size[1],
+            this->grid_size[2]
+          ).reindex(this->origin);
         }
 	
         blitz::Array<real_t, 3> vab_relaxed_state(int d = 0)  
 	{   
-          throw std::logic_error("absorber not yet implemented in 3d");
+          assert(d == 0 || d == 1 || d == 2);
+          // a sanity check
+          if (this->vab_coeff.get() == nullptr) 
+            throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
+          // the same logic as in advectee() - see above
+	  return this->vab_relax[d](
+	    this->grid_size[0],
+	    this->grid_size[1],
+            this->grid_size[2]
+	  ).reindex(this->origin);
 	}   
 
       };
