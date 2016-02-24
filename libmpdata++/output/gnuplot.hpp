@@ -138,7 +138,7 @@ namespace libmpdataxx
  
       // helper constructs to make it compilable for both 1D and 2D versions
       std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { throw std::logic_error("binfmt() only for 2D!"); }
-      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a) + " scan=yx "; }
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a.transpose(blitz::secondDim, blitz::firstDim)) + " scan=yx "; }
 
       void record(const int var)
       {
