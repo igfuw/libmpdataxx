@@ -69,6 +69,13 @@ namespace libmpdataxx
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
           a(pi<d>(i, j, k)) = 0; 
       }
+      
+      void zero_vctr_tngtl(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const rng_t &jmh, const rng_t &kmh)
+      {
+	using namespace idxperm;
+        av[d+1](pi<d>(this->left_edge_sclr, jmh, k)) = 0;
+        av[d+2](pi<d>(this->left_edge_sclr, j, kmh)) = 0;
+      }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
@@ -128,6 +135,13 @@ namespace libmpdataxx
         // note intentional sclr
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
           a(pi<d>(i, j, k)) = 0; 
+      }
+      
+      void zero_vctr_tngtl(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const rng_t &jmh, const rng_t &kmh)
+      {
+	using namespace idxperm;
+        av[d+1](pi<d>(this->rght_halo_sclr, jmh, k)) = 0;
+        av[d+2](pi<d>(this->rght_halo_sclr, j, kmh)) = 0;
       }
     };
   } // namespace bcond

@@ -76,6 +76,23 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
+        virtual void zero_vctr_tngtl(
+          const arrvec_t<typename parent_t::arr_t> &arrvec,
+          const rng_t &range_i,
+          const rng_t &range_j,
+          const rng_t &range_k,
+          const rng_t &range_imh,
+          const rng_t &range_jmh,
+          const rng_t &range_kmh
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->zero_vctr_tngtl(arrvec, range_j, range_k, range_jmh, range_kmh);
+          for (auto &bc : this->bcs[1]) bc->zero_vctr_tngtl(arrvec, range_k, range_i, range_kmh, range_imh);
+          for (auto &bc : this->bcs[2]) bc->zero_vctr_tngtl(arrvec, range_i, range_j, range_imh, range_jmh);
+          this->mem->barrier();
+        }
+
         virtual void xchng_pres(
 	  const typename parent_t::arr_t &arr,
 	  const rng_t &range_i,

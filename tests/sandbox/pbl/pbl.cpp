@@ -21,7 +21,7 @@ void test(const std::string &dirname)
   {
     using real_t = double;
     enum { n_dims = 3 };
-    enum { opts = opts::fct | opts::iga};
+    enum { opts = opts::fct | opts::iga | opts::nta};
     enum { n_eqns = 4 };
     enum { rhs_scheme = solvers::trapez };
     enum { vip_vab = solvers::expl };
@@ -110,8 +110,6 @@ void test(const std::string &dirname)
     // enforce cyclic perturbation
     prtrb(nx - 1, j_r, k_r) = prtrb(0, j_r, k_r);
     prtrb(i_r, ny - 1, k_r) = prtrb(i_r, 0, k_r);
-
-    prtrb(i_r, j_r, 0) = 0;
 
     // initial conditions
     slv.advectee(ix::tht) = Tht_e;

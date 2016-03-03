@@ -77,6 +77,11 @@ namespace libmpdataxx
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
 	};
+	
+        virtual void zero_vctr_tngtl(const arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &) 
+	{
+	  assert(false && "bcond::zero_vctr_tngtl() called!");
+	};
 
 	// 3D
 	virtual void fill_halos_sclr(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &, const bool deriv = false) 
@@ -107,6 +112,11 @@ namespace libmpdataxx
 	virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
+	};
+	
+        virtual void zero_vctr_tngtl(const arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &, const rng_t &, const rng_t &) 
+	{
+	  assert(false && "bcond::zero_vctr_tngtl() called!");
 	};
 
 	protected:

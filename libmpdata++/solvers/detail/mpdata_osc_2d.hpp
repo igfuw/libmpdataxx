@@ -90,6 +90,10 @@ namespace libmpdataxx
               assert(std::isfinite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
 
 	      // TODO: shouldn't the above halo-filling be repeated here?
+              
+              // optionally zero tangential antidiffusive velocities
+	      if (opts::isset(ct_params_t::opts, opts::nta))
+                this->zero_vctr_tngtl(this->GC(iter), this->im+h, this->jm+h);
 	    }
 
             // calculation of fluxes
