@@ -93,12 +93,23 @@ if(NOT ${IMPORT_SCIPY_EXITCODE} EQUAL 0)
   ")
 endif()
 
-# macro to be used in the subdirectories
+# macros to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
   target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
   add_test(${test} ${test})
+endfunction()
+
+function(libmpdataxx_add_test_hdf test)
+  add_executable(${test} ${test}.cpp)
+  target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
+  target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
+  if(USE_MPI)
+    add_test(NAME ${test} COMMAND ${libmpdataxx_MPIRUN} "-np" "2" "${CMAKE_CURRENT_BINARY_DIR}/${test}") # TODO: why 2? :)
+  else()
+    add_test(${test} ${test})
+  endif()
 endfunction()
 
 function(libmpdataxx_add_test_gi test)

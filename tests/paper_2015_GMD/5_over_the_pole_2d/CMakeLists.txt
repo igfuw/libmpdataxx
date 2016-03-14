@@ -1,4 +1,4 @@
-libmpdataxx_add_test(over_the_pole_2d)
+libmpdataxx_add_test_hdf(over_the_pole_2d)
 
 add_test(over_the_pole_2d_diff bash -c "
   for dir in best default; do 

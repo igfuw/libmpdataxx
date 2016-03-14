@@ -51,7 +51,11 @@ namespace libmpdataxx
            << "set termoption solid\n"
         ;
 	if (p.gnuplot_xrange == "[*:*]") 
-	   *gp << "set xrange [0:" << this->mem->advectee(0).extent(0)-1 << "]\n";
+	   *gp << "set xrange [" 
+               << this->mem->grid_size[0].first() 
+               << ":" 
+               << this->mem->grid_size[0].last()
+               << "]\n";
 	else 
 	   *gp << "set xrange " << p.gnuplot_xrange << "\n";
 
@@ -79,7 +83,11 @@ namespace libmpdataxx
           else throw std::runtime_error("gnuplot_command must equal plot or splot");
           
           *gp 
-	     << "set output '" << p.gnuplot_output << "'\n"
+	     << "set output '" << p.gnuplot_output;
+          if (this->mem->distmem.size() > 1) 
+            *gp << "." << this->mem->distmem.rank();
+          *gp <<"'\n";
+          *gp 
 	     << "set title '" << p.gnuplot_title << "'\n"
              << p.gnuplot_command << " 1/0 notitle" // for the comma below :)
           ;
@@ -89,7 +97,13 @@ namespace libmpdataxx
 	    for (const auto &v : this->outvars)
             {
 	      *gp << ", '-'";
-              if (p.gnuplot_command == "splot") *gp << " using (((int($0)+1)/2+(int($0)-1)/2)*.5):(" << t << "):1";
+              if (p.gnuplot_command == "splot") 
+              {
+                *gp << " using (((int($0)+1)/2+(int($0)-1)/2)*.5";
+                if (this->mem->distmem.size() > 1)
+                  *gp << "+" << this->mem->grid_size[0].first();
+                *gp << "):(" << t << "):1";
+              }
               *gp << " with " << p.gnuplot_with; // TODO: assert histeps -> emulation
  
               *gp << " lt ";
@@ -148,9 +162,9 @@ namespace libmpdataxx
           {
             // emulating histeps
             decltype(this->mem->advectee(var)) 
-              tmp(2 * this->mem->advectee(var).extent(0));
+              tmp(2 * this->mem->grid_size[0].length());
             for (int i = 0; i < tmp.extent(0); ++i) 
-              tmp(i) = this->mem->advectee(var)(i/2);
+              tmp(i) = this->mem->advectee(var)(this->mem->grid_size[0].first() + i/2);
 	    gp->send(tmp);
           }
           else gp->send(this->mem->advectee(var));
