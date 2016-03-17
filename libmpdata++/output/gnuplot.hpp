@@ -152,7 +152,7 @@ namespace libmpdataxx
  
       // helper constructs to make it compilable for both 1D and 2D versions
       std::string binfmt(blitz::Array<typename parent_t::real_t, 1>) { throw std::logic_error("binfmt() only for 2D!"); }
-      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a) + " scan=yx "; }
+      std::string binfmt(blitz::Array<typename parent_t::real_t, 2> a) { return gp->binfmt(a.transpose(blitz::secondDim, blitz::firstDim)) + " scan=yx "; }
 
       void record(const int var)
       {
@@ -174,7 +174,10 @@ namespace libmpdataxx
         {
           {
             std::ostringstream tmp;
-	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep << "'\n";
+	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep;
+            if (this->mem->distmem.size() > 1) 
+              tmp << "." << this->mem->distmem.rank();
+            tmp << "'\n";
 	    if (p.gnuplot_title == "notitle") 
               tmp << "set title ''\n";
             else
@@ -187,21 +190,24 @@ namespace libmpdataxx
 	    bool imagebg = (p.gnuplot_with == "lines");
             typename parent_t::real_t ox, oy;
             // ox = oy = .5; // old: x = (i+.5) * dx
-            ox = oy = 0;     // new: x =   i    * dx
+            // ox = oy = 0;  // new: x =   i    * dx
+            ox = this->mem->grid_size[0].first();
+            oy = 0; 
+            auto data = this->mem->advectee(var).copy();
+            data.reindexSelf({0,0});
 	    if (imagebg)
 	    {
 	      float zmin, zmax;
 	      int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
 	      if (count != 2) zmin = 0;
-	      *gp << " '-' binary " << binfmt(this->mem->advectee(0))
+	      *gp << " '-' binary " << binfmt(data)
 		  << " origin=(" << ox << "," << oy << "," << zmin << ")"     
 		  << " with image failsafe notitle,";
 	    }
 	    *gp << " '-'" 
-		<< " binary" << binfmt(this->mem->advectee(0)) 
+		<< " binary" << binfmt(data) 
 		<< " origin=(" << ox << "," << oy << ",0)" 
 		<< " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
-            auto data = this->mem->advectee(var).copy();
             data = blitz::rint(data * pow(10, precision)) * pow(10, -precision);
 	    gp->sendBinary(data);
 	    if (imagebg) gp->sendBinary(data);

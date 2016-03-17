@@ -163,7 +163,15 @@ if(HDF5_FOUND)
   endif()
 
   if(NOT USE_MPI AND HDF5_IS_PARALLEL)
-    message(FATAL_ERROR "MPI was enabled in HDF5 but not in libmpdata++.")
+    message(STATUS "MPI was enabled in HDF5 but not in libmpdata++.
+
+* Programs using libmpdata++'s HDF5 output will not compile.
+* To install serial HDF5, please try:
+*   Debian/Ubuntu: sudo apt-get install libhdf5-serial-dev hdf5-tools  (TODO)
+*   Fedora: sudo yum install hdf5-devel                                (TODO)
+*   Homebrew: brew install hdf5 --with-cxx                             (TODO)
+  ")
+
   endif()
 
   if(USE_MPI)

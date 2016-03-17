@@ -39,6 +39,12 @@ namespace libmpdataxx
         using namespace idxperm;
         this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j), pi<d>(this->left_halo_vctr, j));
       }
+
+      // TODO: move to common? (same in cyclic!)
+      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)                 
+      {                                                                         
+        fill_halos_sclr(a, j);                                                  
+      }  
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
@@ -69,6 +75,12 @@ namespace libmpdataxx
         using namespace idxperm;
         this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j), pi<d>(this->rght_halo_vctr, j));
       }
+
+      // TODO: move to common? (same in cyclic!)
+      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)                 
+      {                                                                         
+        fill_halos_sclr(a, j);                                                  
+      }  
     };
   } // namespace bcond
 } // namespace libmpdataxx

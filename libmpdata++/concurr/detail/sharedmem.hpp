@@ -83,8 +83,8 @@ namespace libmpdataxx
           {
             this->grid_size[d] = slab(
               rng_t(0, grid_size[d]-1),
-              distmem.rank(),
-              distmem.size()
+              d == 0 ? distmem.rank() : 0,
+              d == 0 ? distmem.size() : 1
             );
             origin[d] = this->grid_size[d].first();
           }
@@ -233,6 +233,19 @@ namespace libmpdataxx
             span.first() + max(span.length(), rank, size)
           );
         }
+
+        protected:
+
+	rng_t distmem_ext(const rng_t &rng)
+	{
+	  return this->distmem.size() == 0
+	    ? rng
+	    : this->distmem.rank() > 0
+	      ? rng_t(rng.first()-1, rng.last())
+	      : rng_t(rng.first(),   rng.last()+1)
+          ;
+	}
+
       };
 
       template<typename real_t, int n_dims, int n_tlev>
@@ -266,13 +279,8 @@ namespace libmpdataxx
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
           // (i.e. border between cell 0 and cell 1 is indexed with 0)
-          auto rng = this->grid_size[0]^(-1)^h;
 	  return this->GC[d](
-            this->distmem.size() == 0
-              ? rng
-              : this->distmem.rank() > 0
-                ? rng_t(rng.first()-1, rng.last())
-                : rng_t(rng.first(),   rng.last()+1)
+            this->distmem_ext(this->grid_size[0]^(-1)^h)
           ).reindex(
             this->distmem.rank() > 0
               ? decltype(this->origin)({this->origin[0] - 1})
@@ -328,10 +336,25 @@ namespace libmpdataxx
           assert(d == 0 || d== 1);
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
+          auto orgn = this->distmem.rank() > 0
+            ? decltype(this->origin)({
+                this->origin[0] - 1, 
+                this->origin[1]
+              })
+            : this->origin
+          ;
           switch (d)
           { 
-            case 0: return this->GC[d](this->grid_size[0]^(-1)^h, this->grid_size[1]).reindex(this->origin); 
-            case 1: return this->GC[d](this->grid_size[0], this->grid_size[1]^(-1)^h).reindex(this->origin); 
+            case 0: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]^(-1)^h), 
+                this->grid_size[1]
+              ).reindex(orgn); 
+            case 1: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]), 
+                this->grid_size[1]^(-1)^h
+              ).reindex(orgn);
             default: assert(false); throw;
           }
 	}   
@@ -402,6 +425,7 @@ namespace libmpdataxx
           assert(d == 0 || d == 1 || d == 2);
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
+// distmem TODO!
           switch (d)
           { 
             case 0: return this->GC[d](this->grid_size[0]^(-1)^h,

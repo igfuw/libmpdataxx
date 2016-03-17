@@ -32,11 +32,6 @@ namespace libmpdataxx
 
         const int grid_size_0;
 
-        // zero-base Blitz++ arrays used as buffers
-        arr_t 
-          buf_send = arr_t(halo), 
-          buf_recv = arr_t(halo);
-
 #if defined(USE_MPI)
         boost::mpi::communicator mpicom;
 
@@ -68,19 +63,16 @@ namespace libmpdataxx
           const idx_t &idx_recv
         )
         {
-          // checking if the buffers are long enough
-          assert(idx_send[0].length() == buf_send.extent(0));
-          assert(idx_recv[0].length() == buf_recv.extent(0));
-
           // distinguishing between left and right messages 
           // (important e.g. with 2 procs and cyclic bc)
           const int  
             msg_send = dir == left ? left : rght,
             msg_recv = dir == left ? rght : left;
 
-          // copying data to be sent 
-          // (couldn't sort out how to manage non-zero-base Blitz++ arrays with Boost.MPI)
-	  buf_send = a(idx_send);
+          // copying data to be sent (TODO: it doesn't work without copy(), why??)
+	  arr_t 
+            buf_send = a(idx_send).copy(),
+            buf_recv(a(idx_recv).shape());
 
 #if defined(USE_MPI)
           // launching async data transfer
@@ -116,7 +108,7 @@ namespace libmpdataxx
         // ctor                                  
         remote_common(                                                           
           const rng_t &i,
-          const int grid_size_0
+          const int &grid_size_0
         ) :
           parent_t(i, grid_size_0),
           grid_size_0(grid_size_0)

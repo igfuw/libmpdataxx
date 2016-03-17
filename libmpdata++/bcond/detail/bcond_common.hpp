@@ -123,7 +123,7 @@ namespace libmpdataxx
 	public:
 
 	// ctor
-	bcond_common(const rng_t &i, const int grid_size_0) :
+	bcond_common(const rng_t &i, const int &) :
 	  // sclr
 	  left_edge_sclr(
 	    i.first()
@@ -165,6 +165,10 @@ namespace libmpdataxx
 	    (i^h^(-1)).last()
 	  )
 	{} 
+
+        // the one for use in shared
+	bcond_common() 
+        {}
       };
     } // namespace detail
   } // namespace bcond

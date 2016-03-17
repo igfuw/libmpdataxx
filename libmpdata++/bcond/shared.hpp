@@ -35,14 +35,6 @@ namespace libmpdataxx
 
       virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 2> &, const rng_t &) { };
       virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) { };
-      
-      using parent_t = detail::bcond_common<real_t, halo>;
-      using parent_t::parent_t;
-
-      // ctor
-      // parent constructor takes minimal parameters that construct valid member ranges, note that they
-      // aren't actually used !
-      shared() : parent_t(rng_t(0, 2), 2) {} // TODO: bcond_any?
     };
   } // namespace bcond
 } // namespace libmpdataxx

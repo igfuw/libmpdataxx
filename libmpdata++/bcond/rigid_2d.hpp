@@ -21,7 +21,7 @@ namespace libmpdataxx
     > : public detail::bcond_common<real_t, halo>
     { 
       using parent_t = detail::bcond_common<real_t, halo>;
-      using arr_t = blitz::Array<real_t, 2>;
+      using arr_t = blitz::Array<real_t, n_dims>;
       using parent_t::parent_t; // inheriting ctor
 
       public:
@@ -81,7 +81,7 @@ namespace libmpdataxx
     > : public detail::bcond_common<real_t, halo>
     {
       using parent_t = detail::bcond_common<real_t, halo>;
-      using arr_t = blitz::Array<real_t, 2>;
+      using arr_t = blitz::Array<real_t, n_dims>;
       using parent_t::parent_t; // inheriting ctor
       
       public:
