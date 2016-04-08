@@ -63,8 +63,8 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_i);
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h);
           this->mem->barrier();
         }
 

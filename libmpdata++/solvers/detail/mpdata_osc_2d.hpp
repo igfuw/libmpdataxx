@@ -45,7 +45,7 @@ namespace libmpdataxx
             this->xchng_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
           
           // filling Y halos for GC_x, and X halos for GC_y
-          this->xchng_vctr_nrml(this->mem->GC, this->i^h, this->j^h);
+          this->xchng_vctr_nrml(this->mem->GC, this->i, this->j);
 	} 
 
 	// method invoked by the solver
@@ -82,8 +82,11 @@ namespace libmpdataxx
               assert(std::isfinite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
    
 	      // filling Y halos for GC_x, and X halos for GC_y
-	      // TODO: document why; is it needed in the last iteration?; what about FCT?
-              this->xchng_vctr_nrml(this->GC_corr(iter), this->i^h, this->j^h);
+	      // needed for calculation of antidiffusive velocities in the third and subsequent
+              // iterations, also needed for fct but it is done there independently hence
+              // the following check
+              if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
+                this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j);
 
 	      this->fct_adjust_antidiff(e, iter);
               assert(std::isfinite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));

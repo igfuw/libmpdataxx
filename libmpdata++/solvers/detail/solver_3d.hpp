@@ -65,14 +65,14 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k, range_i);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i, range_j);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k^1, range_i^h);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h, range_j^1);
 
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j, range_k);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_i, range_j);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h, range_k^1);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_i^1, range_j^h);
    
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j, range_k);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k, range_i);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j^1, range_k^h);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k^h, range_i^1);
           this->mem->barrier();
         }
 
