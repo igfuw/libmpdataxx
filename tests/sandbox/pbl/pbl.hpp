@@ -21,7 +21,27 @@ class pbl : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 
   private:
   typename parent_t::arr_t &Tht_e, &H, &tmp1, &tmp2;
-  real_t g, Tht_ref;
+  real_t g, Tht_ref, hscale, cdrag;
+
+  void vip_rhs_expl_calc()
+  {
+    parent_t::vip_rhs_expl_calc();
+
+    for (int k = this->k.first(); k <= this->k.last(); ++k)
+    {
+      this->vip_rhs[0](this->i, this->j, k) += - cdrag / hscale * this->dt * sqrt(
+                                                pow2(this->state(ix::vip_i)(this->i, this->j, 0))
+                                              + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
+                                              ) * this->state(ix::vip_i)(this->i, this->j, 0)
+                                                * exp(-this->dj * k / hscale);
+      
+      this->vip_rhs[1](this->i, this->j, k) += - cdrag / hscale * this->dt * sqrt(
+                                                pow2(this->state(ix::vip_i)(this->i, this->j, 0))
+                                              + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
+                                              ) * this->state(ix::vip_j)(this->i, this->j, 0)
+                                                * exp(-this->dj * k / hscale);
+    }
+  }
 
   void update_rhs(
     libmpdataxx::arrvec_t<
@@ -73,7 +93,7 @@ class pbl : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
 
   struct rt_params_t : parent_t::rt_params_t 
   { 
-    real_t g = 10.0, Tht_ref = 0; 
+    real_t g = 10.0, Tht_ref = 0, hscale = 1, cdrag = 0; 
     typename parent_t::arr_t *Tht_e, *H;
   };
 
@@ -87,6 +107,8 @@ class pbl : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
     H(*p.H),
     g(p.g),
     Tht_ref(p.Tht_ref),
+    hscale(p.hscale),
+    cdrag(p.cdrag),
     tmp1(args.mem->tmp[__FILE__][0][0]),
     tmp2(args.mem->tmp[__FILE__][0][1])
   {

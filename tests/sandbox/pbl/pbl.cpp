@@ -43,13 +43,15 @@ void test(const std::string &dirname)
   p.dj = 50;
   p.dk = 30;
   p.Tht_ref = 300;
+ 
+  p.hscale = 25;
+  p.cdrag = 0.1;
 
   // prescribed heat flux
   blitz::Array<double, 3> H(nx, ny, nz);
   {
-    double hscale = 25;
     blitz::thirdIndex k;
-    H = 0.01 * 1. / hscale * exp(- k * p.dk / hscale);
+    H = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
   }
   p.H = new blitz::Array<double, 3>(H.dataFirst(), H.shape(), blitz::neverDeleteData);
 
