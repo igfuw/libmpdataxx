@@ -98,12 +98,16 @@ namespace libmpdataxx
 
         virtual void vip_rhs_impl_init()
         {
-          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
+          for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            for (int d = 0; d < parent_t::n_dims; ++d)
+            if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
             {
               this->vip_rhs[d](this->ijk) = -0.5 * this->dt * 
                 (*this->mem->vab_coeff)(this->ijk) * (this->state(vip_ixs[d])(this->ijk) - this->mem->vab_relax[d](this->ijk));
+            }
+            else
+            {
+              this->vip_rhs[d](this->ijk) = 0.0;
             }
           }
         }
@@ -114,7 +118,7 @@ namespace libmpdataxx
           {
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
-              this->vip_rhs[d](this->ijk) = -this->dt * 
+              this->vip_rhs[d](this->ijk) += -this->dt * 
                 (*this->mem->vab_coeff)(this->ijk) * (this->state(vip_ixs[d])(this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
           }
@@ -138,10 +142,11 @@ namespace libmpdataxx
         }
         
         void vip_rhs_apply()
-        {
+        {    
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             this->state(vip_ixs[d])(this->ijk) += vip_rhs[d](this->ijk);
+            vip_rhs[d](this->ijk) = 0;
           }
         }
 
