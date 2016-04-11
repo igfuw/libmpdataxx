@@ -21,7 +21,6 @@ void test(const std::string &dirname)
   {
     using real_t = double;
     enum { n_dims = 3 };
-    enum { opts = opts::fct | opts::iga | opts::nta};
     enum { n_eqns = 4 };
     enum { rhs_scheme = solvers::trapez };
     enum { vip_vab = solvers::expl };

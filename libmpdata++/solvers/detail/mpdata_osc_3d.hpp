@@ -102,10 +102,6 @@ namespace libmpdataxx
 	      this->fct_adjust_antidiff(e, iter);
 
 	      // TODO: shouldn't the above halo-filling be repeated here?
-              
-              // optionally zero tangential antidiffusive velocities
-	      if (opts::isset(ct_params_t::opts, opts::nta))
-                this->zero_vctr_tngtl(this->GC(iter), this->i, this->j, this->k, this->im+h, this->jm+h, this->km+h);
 	    }
 
             const auto &i(this->i), &j(this->j), &k(this->k);

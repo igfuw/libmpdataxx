@@ -33,8 +33,7 @@ namespace libmpdataxx
       iga = opts::bit(5), // infinite-gauge option
       nug = opts::bit(6), // non-unit G (default G = 1) - see Smolarkiewicz 2006 eq (25) and discussion below for info on G
       dfl = opts::bit(7), // devergent flows
-      khn = opts::bit(8), // use Kahan summation algorithm in the donor-cell formulae
-      nta = opts::bit(9)  // no tangential antidiffusive velocities at rigid boundaries
+      khn = opts::bit(8) // use Kahan summation algorithm in the donor-cell formulae
     };
 
   } // namespace opts
