@@ -41,29 +41,33 @@ void test(const std::string &dirname)
   p.di = 50;
   p.dj = 50;
   p.dk = 30;
+  p.grid_size = {nx, ny, nz};
   p.Tht_ref = 300;
+  p.g = 10;
  
   p.hscale = 25;
   p.cdrag = 0.1;
 
   // prescribed heat flux
-  blitz::Array<double, 3> H(nx, ny, nz);
   {
-    blitz::thirdIndex k;
-    H = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
+    blitz::firstIndex k;
+    p.hflux_profile() = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
   }
-  p.H = new blitz::Array<double, 3>(H.dataFirst(), H.shape(), blitz::neverDeleteData);
 
   double mixed_length = 500;
   double st = 1e-4 / p.g;
 
   // environmental potential temperature profile
-  blitz::Array<double, 3> Tht_e(nx, ny, nz);
   {
-    blitz::thirdIndex k;
-    Tht_e = 300 * where(k * p.dk <= mixed_length, 1, 1 + (k * p.dk - mixed_length) * st);
+    blitz::firstIndex k;
+    p.tht_profile() = 300 * where(k * p.dk <= mixed_length, 1, 1 + (k * p.dk - mixed_length) * st);
   }
-  p.Tht_e = new blitz::Array<double, 3>(Tht_e.dataFirst(), Tht_e.shape(), blitz::neverDeleteData);
+  
+  // absorber profile
+  {
+    blitz::firstIndex k;
+    p.tht_abs_profile() = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
+  }
 
   p.outfreq = 15;
   p.outwindow = 1;
@@ -76,7 +80,6 @@ void test(const std::string &dirname)
   p.outdir = dirname;
 
   p.prs_tol = 1e-6;
-  p.grid_size = {nx, ny, nz};
 
   libmpdataxx::concurr::threads<
     solver_t, 
@@ -113,7 +116,10 @@ void test(const std::string &dirname)
     prtrb(i_r, ny - 1, k_r) = prtrb(i_r, 0, k_r);
 
     // initial conditions
-    slv.advectee(ix::tht) = Tht_e;
+    for (int k = 0; k < nz; ++k)
+    {
+      slv.advectee(ix::tht)(i_r, j_r, k) = p.tht_profile()(k);
+    }
     slv.advectee(ix::w) = 0;
     slv.advectee(ix::tht)(i_r, j_r, k_r) += 0.001 * prtrb(i_r, j_r, k_r);
     slv.advectee(ix::w)(i_r, j_r, k_r) += 0.2 * prtrb(i_r, j_r, k_r);
