@@ -60,11 +60,17 @@ namespace libmpdataxx
             lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
             lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
           }
+          if (this->mem->G)
+          {
+            lap_tmp1(this->ijk) *= (*this->mem->G)(this->ijk);
+            lap_tmp2(this->ijk) *= (*this->mem->G)(this->ijk);
+          }
           this->set_edges(lap_tmp1, lap_tmp2, i, j, 0);
           this->xchng_pres(lap_tmp1, i, j);
           this->xchng_pres(lap_tmp2, i, j);
           ,
           formulae::nabla::div(lap_tmp1, lap_tmp2, i, j, dx, dy)
+          / formulae::G<ct_params_t::opts BOOST_PP_COMMA() 0>(*this->mem->G, i, j) 
         );
         
         auto err_init(
@@ -84,11 +90,17 @@ namespace libmpdataxx
             lap_tmp1(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
             lap_tmp2(this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
           }
+          if (this->mem->G)
+          {
+            lap_tmp1(this->ijk) *= (*this->mem->G)(this->ijk);
+            lap_tmp2(this->ijk) *= (*this->mem->G)(this->ijk);
+          }
           this->set_edges(lap_tmp1, lap_tmp2, i, j, -1);
           this->xchng_pres(lap_tmp1, i, j);
           this->xchng_pres(lap_tmp2, i, j);
           ,
           formulae::nabla::div(lap_tmp1, lap_tmp2, i, j, dx, dy)
+          / formulae::G<ct_params_t::opts BOOST_PP_COMMA() 0>(*this->mem->G, i, j) 
         );
 
 	void ini_pressure()
