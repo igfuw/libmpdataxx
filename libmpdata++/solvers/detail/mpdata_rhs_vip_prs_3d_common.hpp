@@ -58,12 +58,19 @@ namespace libmpdataxx
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy);
           lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz);
+          if (this->mem->G)
+          {
+            lap_tmp1(this->ijk) *= (*this->mem->G)(this->ijk);
+            lap_tmp2(this->ijk) *= (*this->mem->G)(this->ijk);
+            lap_tmp3(this->ijk) *= (*this->mem->G)(this->ijk);
+          }
           this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k, 0);
           this->xchng_pres(lap_tmp1, i, j, k);
           this->xchng_pres(lap_tmp2, i, j, k);
           this->xchng_pres(lap_tmp3, i, j, k);
           ,
           formulae::nabla::div(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k, dx, dy, dz)
+          / formulae::G<ct_params_t::opts BOOST_PP_COMMA() 0>(*this->mem->G, i, j, k)
         );
 
         auto err_init(
@@ -82,12 +89,19 @@ namespace libmpdataxx
           lap_tmp1(this->ijk) = formulae::nabla::grad<0>(arr, i, j, k, dx) - v1(this->ijk);
           lap_tmp2(this->ijk) = formulae::nabla::grad<1>(arr, j, k, i, dy) - v2(this->ijk);
           lap_tmp3(this->ijk) = formulae::nabla::grad<2>(arr, k, i, j, dz) - v3(this->ijk);
+          if (this->mem->G)
+          {
+            lap_tmp1(this->ijk) *= (*this->mem->G)(this->ijk);
+            lap_tmp2(this->ijk) *= (*this->mem->G)(this->ijk);
+            lap_tmp3(this->ijk) *= (*this->mem->G)(this->ijk);
+          }
           this->set_edges(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k, -1);
           this->xchng_pres(lap_tmp1, i, j, k);
           this->xchng_pres(lap_tmp2, i, j, k);
           this->xchng_pres(lap_tmp3, i, j, k);
           ,
           formulae::nabla::div(lap_tmp1, lap_tmp2, lap_tmp3, i, j, k, dx, dy, dz)
+          / formulae::G<ct_params_t::opts BOOST_PP_COMMA() 0>(*this->mem->G, i, j, k)
         );
 
 	void ini_pressure()

@@ -230,7 +230,10 @@ namespace libmpdataxx
 	} 
 	else
 	{ 
-	  assert(false); // TODO (perhaps better change definition of stash?)
+	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+	    (*this->mem->G)(pi<d>(i,     j, k)) * psi(pi<d>(i,     j, k)) +
+	    (*this->mem->G)(pi<d>(i + 1, j, k)) * psi(pi<d>(i + 1, j, k))
+	  );
 	}
       }  
 
