@@ -78,46 +78,36 @@ namespace libmpdataxx
 
         virtual void xchng_pres(
 	  const typename parent_t::arr_t &arr,
-	  const rng_t &range_i,
-	  const rng_t &range_j,
-	  const rng_t &range_k
+	  const idx_t<3> &range_ijk
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_j, range_k);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_k, range_i);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_i, range_j);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk[0], range_ijk[1]);
           this->mem->barrier();
         }
 
         virtual void set_edges(
-          const typename parent_t::arr_t &arr1,
-          const typename parent_t::arr_t &arr2,
-          const typename parent_t::arr_t &arr3,
-          const rng_t &range_i,
-          const rng_t &range_j,
-          const rng_t &range_k,
+          const arrvec_t<typename parent_t::arr_t> &av,
+	  const idx_t<3> &range_ijk,
           const int &sign
         ) final
         {
-          for (auto &bc : this->bcs[0]) bc->set_edge_pres(arr1, range_j, range_k, sign);
-          for (auto &bc : this->bcs[1]) bc->set_edge_pres(arr2, range_k, range_i, sign);
-          for (auto &bc : this->bcs[2]) bc->set_edge_pres(arr3, range_i, range_j, sign);
+          for (auto &bc : this->bcs[0]) bc->set_edge_pres(av[0], range_ijk[1], range_ijk[2], sign);
+          for (auto &bc : this->bcs[1]) bc->set_edge_pres(av[1], range_ijk[2], range_ijk[0], sign);
+          for (auto &bc : this->bcs[2]) bc->set_edge_pres(av[2], range_ijk[0], range_ijk[1], sign);
           this->mem->barrier();
         }
         
         virtual void save_edges(
-          const typename parent_t::arr_t &arr1,
-          const typename parent_t::arr_t &arr2,
-          const typename parent_t::arr_t &arr3,
-          const rng_t &range_i,
-          const rng_t &range_j,
-          const rng_t &range_k
+          const arrvec_t<typename parent_t::arr_t> &av,
+	  const idx_t<3> &range_ijk
         ) final
         {
-          for (auto &bc : this->bcs[0]) bc->save_edge_vel(arr1, range_j, range_k);
-          for (auto &bc : this->bcs[1]) bc->save_edge_vel(arr2, range_k, range_i);
-          for (auto &bc : this->bcs[2]) bc->save_edge_vel(arr3, range_i, range_j);
+          for (auto &bc : this->bcs[0]) bc->save_edge_vel(av[0], range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->save_edge_vel(av[1], range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[2]) bc->save_edge_vel(av[2], range_ijk[0], range_ijk[1]);
           this->mem->barrier();
         }
         
@@ -186,6 +176,7 @@ namespace libmpdataxx
           this->di = p.di;
           this->dj = p.dj;
           this->dk = p.dk;
+          this->dijk = {p.di, p.dj, p.dk};
           this->set_bcs(0, args.bcxl, args.bcxr);
 	  this->set_bcs(1, args.bcyl, args.bcyr);
 	  this->set_bcs(2, args.bczl, args.bczr);

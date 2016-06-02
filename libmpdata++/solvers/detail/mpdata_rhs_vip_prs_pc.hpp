@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_common.hpp>
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_common.hpp>
 
 namespace libmpdataxx
 {
@@ -21,7 +21,7 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t>
-      class mpdata_rhs_vip_prs_2d_pc : public detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>
+      class mpdata_rhs_vip_prs_pc : public detail::mpdata_rhs_vip_prs_common<ct_params_t>
       {
         public:
 	
@@ -29,47 +29,42 @@ namespace libmpdataxx
 
         private:
 
-	using parent_t = detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>;
+	using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
 	const int pc_iters;
 	real_t beta, alpha, tmp_den;
 
-	using arr_2d_t = typename parent_t::arr_t;
-	arr_2d_t p_err, q_err, lap_p_err, lap_q_err;
-	arr_2d_t pcnd_err;
+	typename parent_t::arr_t p_err, q_err, lap_p_err, lap_q_err, pcnd_err;
 
 	void precond()  //Richardson scheme
 	{
-	  const rng_t &i = this->i;
-	  const rng_t &j = this->j;
-
 	  //initail q_err for preconditioner
 	  q_err(this->ijk) = real_t(0);
 
 	  //initail preconditioner error   
-	  this->pcnd_err(this->ijk) = this->lap(this->q_err, i, j, this->di, this->dj) - this->err(this->ijk);
+	  this->pcnd_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk) - this->err(this->ijk);
 	    //TODO does it change with non_const density?
 	  
 	  assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
 	  for (int it=0; it<=pc_iters; it++)
 	  {
 	    q_err(this->ijk)    += real_t(.25) * pcnd_err(this->ijk);
-	    pcnd_err(this->ijk) += real_t(.25) * this->lap(this->pcnd_err, i, j, this->di, this->dj);
+	    pcnd_err(this->ijk) += real_t(.25) * this->lap(this->pcnd_err, this->ijk, this->dijk);
 	  }
 	}
 
-        void pressure_solver_loop_init()
+        void pressure_solver_loop_init() final
         {
 	  precond();
 	  p_err(this->ijk) = q_err(this->ijk);
-	  this->lap_p_err(this->ijk) = this->lap(this->p_err, this->i, this->j, this->di, this->dj);
+	  this->lap_p_err(this->ijk) = this->lap(this->p_err, this->ijk, this->dijk);
         }
 
-        void pressure_solver_loop_body()
+        void pressure_solver_loop_body() final
         {
-          tmp_den = this->prs_sum(lap_p_err, lap_p_err, this->i, this->j);
-          if (tmp_den != 0) beta = -this->prs_sum(this->err, lap_p_err, this->i, this->j) / tmp_den;
+          tmp_den = this->prs_sum(lap_p_err, lap_p_err, this->ijk);
+          if (tmp_den != 0) beta = -this->prs_sum(this->err, lap_p_err, this->ijk) / tmp_den;
  
           this->Phi(this->ijk) += beta * p_err(this->ijk);
           this->err(this->ijk) += beta * lap_p_err(this->ijk);
@@ -83,9 +78,9 @@ namespace libmpdataxx
 
           precond();
 
-          this->lap_q_err(this->ijk) = this->lap(this->q_err, this->i, this->j, this->di, this->dj);
+          this->lap_q_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk);
 
-          if (tmp_den != 0) alpha = -this->prs_sum(lap_q_err, lap_p_err, this->i, this->j) / tmp_den;
+          if (tmp_den != 0) alpha = -this->prs_sum(lap_q_err, lap_p_err, this->ijk) / tmp_den;
 
           p_err(this->ijk) *= alpha;
           p_err(this->ijk) += q_err(this->ijk);  
@@ -99,7 +94,7 @@ namespace libmpdataxx
 	struct rt_params_t : parent_t::rt_params_t { int pc_iters; };
 
 	// ctor
-	mpdata_rhs_vip_prs_2d_pc(
+	mpdata_rhs_vip_prs_pc(
 	  typename parent_t::ctor_args_t args,
 	  const rt_params_t &p
 	) :

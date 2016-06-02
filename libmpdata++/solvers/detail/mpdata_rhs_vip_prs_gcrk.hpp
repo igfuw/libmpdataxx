@@ -11,7 +11,7 @@
   */
 
 #pragma once
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_common.hpp>
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_common.hpp>
 
 namespace libmpdataxx
 {
@@ -20,7 +20,7 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t, int k_iters>
-      class mpdata_rhs_vip_prs_2d_gcrk : public detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>
+      class mpdata_rhs_vip_prs_gcrk : public detail::mpdata_rhs_vip_prs_common<ct_params_t>
       {
         public:
 
@@ -28,7 +28,7 @@ namespace libmpdataxx
 
         private:
 
-	using parent_t = detail::mpdata_rhs_vip_prs_2d_common<ct_params_t>;
+	using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
 	real_t beta;
@@ -36,18 +36,18 @@ namespace libmpdataxx
 	typename parent_t::arr_t lap_err;
 	arrvec_t<typename parent_t::arr_t> p_err, lap_p_err;
 	
-        void pressure_solver_loop_init()
+        void pressure_solver_loop_init() final
         {
 	  p_err[0](this->ijk) = this->err(this->ijk);
-	  lap_p_err[0](this->ijk) = this->lap(p_err[0], this->i, this->j, this->di, this->dj);
+	  lap_p_err[0](this->ijk) = this->lap(p_err[0], this->ijk, this->dijk);
         }
 
-        void pressure_solver_loop_body()
+        void pressure_solver_loop_body() final
         {
           for (int v = 0; v < k_iters; ++v)
           {
-            tmp_den[v] = this->prs_sum(lap_p_err[v], lap_p_err[v], this->i, this->j);
-            if (tmp_den[v] != 0) beta = - this->prs_sum(this->err, lap_p_err[v], this->i, this->j) / tmp_den[v];
+            tmp_den[v] = this->prs_sum(lap_p_err[v], lap_p_err[v], this->ijk);
+            if (tmp_den[v] != 0) beta = - this->prs_sum(this->err, lap_p_err[v], this->ijk) / tmp_den[v];
             this->Phi(this->ijk) += beta * p_err[v](this->ijk);
             this->err(this->ijk) += beta * lap_p_err[v](this->ijk);
 
@@ -58,12 +58,12 @@ namespace libmpdataxx
 
             if (error <= this->err_tol) this->converged = true;
 
-            lap_err(this->ijk) = this->lap(this->err, this->i, this->j, this->di, this->dj);         
+            lap_err(this->ijk) = this->lap(this->err, this->ijk, this->dijk);
 
             for (int l = 0; l <= v; ++l)
             {
               if (tmp_den[l] != 0) 
-                alpha[l] = - this->prs_sum(lap_err, lap_p_err[l], this->i, this->j) / tmp_den[l];
+                alpha[l] = - this->prs_sum(lap_err, lap_p_err[l], this->ijk) / tmp_den[l];
             }
             
             if (v < (k_iters - 1))
@@ -96,7 +96,7 @@ namespace libmpdataxx
 	struct rt_params_t : parent_t::rt_params_t { };
 
 	// ctor
-	mpdata_rhs_vip_prs_2d_gcrk(
+	mpdata_rhs_vip_prs_gcrk(
 	  typename parent_t::ctor_args_t args,
 	  const rt_params_t &p
 	) :

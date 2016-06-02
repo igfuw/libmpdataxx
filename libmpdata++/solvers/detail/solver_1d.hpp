@@ -89,6 +89,7 @@ namespace libmpdataxx
           i(args.i)
 	{
           this->di = p.di;
+          this->dijk = {p.di};
           this->set_bcs(0, args.bcxl, args.bcxr);
         }
 

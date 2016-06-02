@@ -90,17 +90,21 @@ namespace libmpdataxx
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
-        /// @brief concurrency-aware 2D summation of array elements
-        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j, const bool sum_khn)
+        /// @brief concurrency-aware summation of array elements
+        real_t sum(const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
-	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
+	  for (int c = ijk[0].first(); c <= ijk[0].last(); ++c) // TODO: optimise for i.count() == 1
           {
+            auto slice_idx = ijk;
+            slice_idx.lbound(0) = c;
+            slice_idx.ubound(0) = c;
+
             if (sum_khn)
-	      (*sumtmp)(c) = blitz::kahan_sum(arr(c, j));
+	      (*sumtmp)(c) = blitz::kahan_sum(arr(slice_idx));
             else
-	      (*sumtmp)(c) = blitz::sum(arr(c, j));
+	      (*sumtmp)(c) = blitz::sum(arr(slice_idx));
           }
           barrier();
           real_t result;
@@ -112,61 +116,28 @@ namespace libmpdataxx
           return result;
         }
 
-        /// @brief concurrency-aware 2D summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j, const bool sum_khn)
+        /// @brief concurrency-aware summation of a (element-wise) product of two arrays
+        real_t sum(const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
-	  for (int c = i.first(); c <= i.last(); ++c)
+	  for (int c = ijk[0].first(); c <= ijk[0].last(); ++c)
           {
-            if (sum_khn)
-	      (*sumtmp)(c) = blitz::kahan_sum(arr1(c, j) * arr2(c, j)); 
-            else
-	      (*sumtmp)(c) = blitz::sum(arr1(c, j) * arr2(c, j)); 
-          }
-          barrier();
-          real_t result;
-          if (sum_khn)
-            result = blitz::kahan_sum(*sumtmp);
-          else
-            result = blitz::sum(*sumtmp);
-          barrier();
-          return result;
-        }
-        
-        /// @brief concurrency-aware 3D summation of array elements
-        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j, const rng_t &k, const bool sum_khn)
-        {
-	  // doing a two-step sum to reduce numerical error 
-	  // and make parallel results reproducible
-	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
-          {
-            if (sum_khn)
-	      (*sumtmp)(c) = blitz::kahan_sum(arr(c, j, k));
-            else
-	      (*sumtmp)(c) = blitz::sum(arr(c, j, k));
-          }
-          barrier();
-          real_t result;
-          if (sum_khn)
-            result = blitz::kahan_sum(*sumtmp);
-          else
-            result = blitz::sum(*sumtmp);
-          barrier();
-          return result;
-        }
+            auto slice_idx = ijk;
+            slice_idx.lbound(0) = c;
+            slice_idx.ubound(0) = c;
 
-        /// @brief concurrency-aware 3D summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j, const rng_t &k, const bool sum_khn)
-        {
-	  // doing a two-step sum to reduce numerical error 
-	  // and make parallel results reproducible
-	  for (int c = i.first(); c <= i.last(); ++c)
-          {
-	    (*sumtmp)(c) = blitz::kahan_sum(arr1(c, j, k) * arr2(c, j, k)); 
+            if (sum_khn)
+	      (*sumtmp)(c) = blitz::kahan_sum(arr1(slice_idx) * arr2(slice_idx));
+            else
+	      (*sumtmp)(c) = blitz::sum(arr1(slice_idx) * arr2(slice_idx)); 
           }
           barrier();
-          real_t result = blitz::kahan_sum(*sumtmp);
+          real_t result;
+          if (sum_khn)
+            result = blitz::kahan_sum(*sumtmp);
+          else
+            result = blitz::sum(*sumtmp);
           barrier();
           return result;
         }
@@ -193,13 +164,19 @@ namespace libmpdataxx
         // and hence to not use BZ_THREADSAFE
         private:
         boost::ptr_vector<arr_t> tobefreed;
-      
+        
         public:
+        arr_t *never_delete(arr_t *arg)
+        {
+          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData);
+          ret->reindexSelf(arg->base());
+          return ret;
+        }
+
         arr_t *old(arr_t *arg)
         {
           tobefreed.push_back(arg);
-          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData);
-          ret->reindexSelf(arg->base());
+          arr_t *ret = never_delete(arg);
           return ret;
         }
 
