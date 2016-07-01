@@ -33,6 +33,7 @@ namespace libmpdataxx
         using parent_t = mpdata_rhs<ct_params_t>;
 
 	// member fields
+        std::array<int, parent_t::n_dims> vip_ixs;
 	arrvec_t<typename parent_t::arr_t> &stash, &vip_rhs, vips;
         typename parent_t::real_t eps;
 
