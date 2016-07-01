@@ -101,10 +101,14 @@ namespace libmpdataxx
 	  typename parent_t::mem_t *mem, 
 	  const char * __file__, 
 	  const int n_arr,
-	  const rng_t rng
+	  const rng_t rng,
+          std::string name = ""
 	)
 	{
 	  mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
+
+          if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
+
           for (int n = 0; n < n_arr; ++n)
           {
 	    mem->tmp[__file__].back().push_back(

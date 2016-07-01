@@ -38,6 +38,10 @@ namespace libmpdataxx
       virtual 
       blitz::Array<real_t, n_dims> vab_relaxed_state(int d = 0) 
       { assert(false); throw; }
+      
+      virtual 
+      blitz::Array<real_t, n_dims> sclr_array(const std::string &name, int n = 0)
+      { assert(false); throw; }
 
       virtual 
       bool *panic_ptr() 

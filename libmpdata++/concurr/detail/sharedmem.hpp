@@ -57,7 +57,13 @@ namespace libmpdataxx
 	std::unordered_map< 
 	  const char*, // intended for addressing with __FILE__
 	  boost::ptr_vector<arrvec_t<arr_t>>
-	> tmp; 
+	> tmp;
+        
+        // list of temporary fields that can be accessed from outside of concurr
+	std::unordered_map< 
+          std::string,
+          std::pair<const char*, int>
+        > avail_tmp;
 
         virtual void barrier()
         {
@@ -262,7 +268,13 @@ namespace libmpdataxx
 	{   
           throw std::logic_error("absorber not yet implemented in 1d");
 	}   
-
+        
+        blitz::Array<real_t, 1> sclr_array(const std::string& name, int n = 0)
+	{
+          return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
+            this->grid_size[0]
+          ).reindex(this->origin);
+	}
       };
 
       template<typename real_t, int n_tlev>
@@ -335,7 +347,14 @@ namespace libmpdataxx
 	    this->grid_size[1]
 	  ).reindex(this->origin);
 	}   
-
+        
+        blitz::Array<real_t, 2> sclr_array(const std::string& name, int n = 0)
+	{
+          return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
+            this->grid_size[0],
+            this->grid_size[1]
+          ).reindex(this->origin);
+	}
       };
 
       template<typename real_t, int n_tlev>
@@ -391,7 +410,7 @@ namespace libmpdataxx
             this->grid_size[2]
           ).reindex(this->origin);
         }
-        
+
         blitz::Array<real_t, 3> vab_coefficient()
         {
           // a sanity check
@@ -420,6 +439,14 @@ namespace libmpdataxx
 	  ).reindex(this->origin);
 	}   
 
+        blitz::Array<real_t, 3> sclr_array(const std::string& name, int n = 0)
+	{
+          return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
+            this->grid_size[0],
+            this->grid_size[1],
+            this->grid_size[2]
+          ).reindex(this->origin);
+	}
       };
     } // namespace detail
   } // namespace concurr

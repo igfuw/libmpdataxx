@@ -262,7 +262,7 @@ namespace libmpdataxx
 	{
 	  return mem->g_factor();
 	}
-	
+
         typename solver_t::arr_t vab_coefficient() final
 	{
 	  return mem->vab_coefficient();
@@ -271,6 +271,11 @@ namespace libmpdataxx
         typename solver_t::arr_t vab_relaxed_state(int d = 0) final
 	{
 	  return mem->vab_relaxed_state(d);
+	}
+	
+        typename solver_t::arr_t sclr_array(const std::string &name, int n = 0) final
+	{
+	  return mem->sclr_array(name, n);
 	}
 
         bool *panic_ptr() final
