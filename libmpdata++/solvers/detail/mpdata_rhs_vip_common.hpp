@@ -151,9 +151,12 @@ namespace libmpdataxx
 
         virtual void normalize_vip(const arrvec_t<typename parent_t::arr_t> &v)
         {
-          for (int d = 0; d < parent_t::n_dims; ++d)
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
           {
-            v[d](this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+            for (int d = 0; d < parent_t::n_dims; ++d)
+            {
+              v[d](this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+            }
           }
         }
         

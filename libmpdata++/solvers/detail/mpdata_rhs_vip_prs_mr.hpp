@@ -35,11 +35,11 @@ namespace libmpdataxx
 	real_t beta, tmp_den;
 	typename parent_t::arr_t lap_err;
 
-        void pressure_solver_loop_init() final {}
+        void pressure_solver_loop_init(bool simple) final {}
 
-        void pressure_solver_loop_body() final
+        void pressure_solver_loop_body(bool simple) final
         {
-          this->lap_err(this->ijk) = this->lap(this->err, this->ijk, this->dijk); 
+          this->lap_err(this->ijk) = this->lap(this->err, this->ijk, this->dijk, false, simple);
 
           tmp_den = this->prs_sum(this->lap_err, this->lap_err, this->ijk);
           if (tmp_den != 0) beta = - this->prs_sum(this->err, this->lap_err, this->ijk) / tmp_den;

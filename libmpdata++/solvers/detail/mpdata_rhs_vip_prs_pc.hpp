@@ -37,13 +37,13 @@ namespace libmpdataxx
 
 	typename parent_t::arr_t p_err, q_err, lap_p_err, lap_q_err, pcnd_err;
 
-	void precond()  //Richardson scheme
+	void precond(bool simple)  //Richardson scheme
 	{
 	  //initail q_err for preconditioner
 	  q_err(this->ijk) = real_t(0);
 
 	  //initail preconditioner error   
-	  this->pcnd_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk) - this->err(this->ijk);
+	  this->pcnd_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk, false, simple) - this->err(this->ijk);
 	    //TODO does it change with non_const density?
 	  
 	  assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
@@ -54,14 +54,14 @@ namespace libmpdataxx
 	  }
 	}
 
-        void pressure_solver_loop_init() final
+        void pressure_solver_loop_init(bool simple) final
         {
-	  precond();
+	  precond(simple);
 	  p_err(this->ijk) = q_err(this->ijk);
-	  this->lap_p_err(this->ijk) = this->lap(this->p_err, this->ijk, this->dijk);
+	  this->lap_p_err(this->ijk) = this->lap(this->p_err, this->ijk, this->dijk, false, simple);
         }
 
-        void pressure_solver_loop_body() final
+        void pressure_solver_loop_body(bool simple) final
         {
           tmp_den = this->prs_sum(lap_p_err, lap_p_err, this->ijk);
           if (tmp_den != 0) beta = -this->prs_sum(this->err, lap_p_err, this->ijk) / tmp_den;
@@ -78,7 +78,7 @@ namespace libmpdataxx
 
           precond();
 
-          this->lap_q_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk);
+          this->lap_q_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk, false, simple);
 
           if (tmp_den != 0) alpha = -this->prs_sum(lap_q_err, lap_p_err, this->ijk) / tmp_den;
 

@@ -51,7 +51,8 @@ namespace libmpdataxx
           arr_t &arr, 
           const ijk_t &ijk, 
           const std::array<real_t, parent_t::n_dims>& dijk, 
-          bool err_init = false // if true then subtract initial state for error calculation
+          bool err_init, // if true then subtract initial state for error calculation
+          bool simple // if true do not normalize gradients (simple laplacian)
         ) return_macro(
           this->xchng_pres(arr, ijk);
           formulae::nabla::calc_grad<parent_t::n_dims>(lap_tmp, arr, ijk, dijk);
@@ -62,7 +63,7 @@ namespace libmpdataxx
               lap_tmp[d](this->ijk) -= tmp_uvw[d](this->ijk);
             }
           }
-          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->normalize_vip(lap_tmp);
+          if (!simple) this->normalize_vip(lap_tmp);
           this->set_edges(lap_tmp, this->ijk, 0);
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
@@ -86,10 +87,10 @@ namespace libmpdataxx
 	  Phi(this->ijk) -= Phi_mean;
 	}
 
-	virtual void pressure_solver_loop_init() = 0;
-	virtual void pressure_solver_loop_body() = 0;
+	virtual void pressure_solver_loop_init(bool) = 0;
+	virtual void pressure_solver_loop_body(bool) = 0;
 
-	void pressure_solver_update()
+	void pressure_solver_update(bool simple = false)
         {
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
@@ -97,16 +98,16 @@ namespace libmpdataxx
           }
 
 	  //initial error   
-          err(this->ijk) = lap(Phi, this->ijk, this->dijk, true);
+          err(this->ijk) = lap(Phi, this->ijk, this->dijk, true, simple);
 
 	  iters = 0;
           converged = false;
 
-          pressure_solver_loop_init();
+          pressure_solver_loop_init(simple);
 	  //pseudo-time loop
 	  while (!converged)
 	  {
-            pressure_solver_loop_body();
+            pressure_solver_loop_body(simple);
 	    iters++;
           }
 
@@ -132,7 +133,7 @@ namespace libmpdataxx
 	  Phi(this->ijk) = real_t(0);
 	  this->xchng_pres(Phi, this->ijk);
 
-	  pressure_solver_update();
+	  pressure_solver_update(true);
 
           this->xchng_pres(this->Phi, this->ijk);
           formulae::nabla::calc_grad<parent_t::n_dims>(tmp_uvw, Phi, this->ijk, this->dijk);
@@ -162,7 +163,7 @@ namespace libmpdataxx
           if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->add_relax();
           pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
           pressure_solver_apply();
-          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->normalize_vip(this->vips);
+          this->normalize_vip(this->vips);
           this->set_edges(this->vips, this->ijk, 1);
           for (int d = 0; d < parent_t::n_dims; ++d)
           {

@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/detail/boussinesq_expl_2d.hpp>
-#include <libmpdata++/solvers/detail/boussinesq_expl_3d.hpp>
+#include <libmpdata++/solvers/detail/boussinesq_expl.hpp>
+#include <libmpdata++/solvers/detail/boussinesq_impl.hpp>
 
 namespace libmpdataxx
 {
@@ -21,20 +21,20 @@ namespace libmpdataxx
     template<typename ct_params_t>
     class boussinesq<
       ct_params_t,
-      typename std::enable_if<ct_params_t::n_dims == 2>::type
-    > : public detail::boussinesq_expl_2d<ct_params_t>
+      typename std::enable_if<!ct_params_t::impl_tht>::type
+    > : public detail::boussinesq_expl<ct_params_t>
     {
-      using parent_t = detail::boussinesq_expl_2d<ct_params_t>;
+      using parent_t = detail::boussinesq_expl<ct_params_t>;
       using parent_t::parent_t; // inheriting constructors
     };
     
     template<typename ct_params_t>
     class boussinesq<
       ct_params_t,
-      typename std::enable_if<ct_params_t::n_dims == 3>::type
-    > : public detail::boussinesq_expl_3d<ct_params_t>
+      typename std::enable_if<ct_params_t::impl_tht>::type
+    > : public detail::boussinesq_impl<ct_params_t>
     {
-      using parent_t = detail::boussinesq_expl_3d<ct_params_t>;
+      using parent_t = detail::boussinesq_impl<ct_params_t>;
       using parent_t::parent_t; // inheriting constructors
     };
   } // namespace solvers

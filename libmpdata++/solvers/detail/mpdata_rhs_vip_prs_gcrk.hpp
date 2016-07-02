@@ -36,13 +36,13 @@ namespace libmpdataxx
 	typename parent_t::arr_t lap_err;
 	arrvec_t<typename parent_t::arr_t> p_err, lap_p_err;
 	
-        void pressure_solver_loop_init() final
+        void pressure_solver_loop_init(bool simple) final
         {
 	  p_err[0](this->ijk) = this->err(this->ijk);
-	  lap_p_err[0](this->ijk) = this->lap(p_err[0], this->ijk, this->dijk);
+	  lap_p_err[0](this->ijk) = this->lap(p_err[0], this->ijk, this->dijk, false, simple);
         }
 
-        void pressure_solver_loop_body() final
+        void pressure_solver_loop_body(bool simple) final
         {
           for (int v = 0; v < k_iters; ++v)
           {
@@ -58,7 +58,7 @@ namespace libmpdataxx
 
             if (error <= this->err_tol) this->converged = true;
 
-            lap_err(this->ijk) = this->lap(this->err, this->ijk, this->dijk);
+            lap_err(this->ijk) = this->lap(this->err, this->ijk, this->dijk, false, simple);
 
             for (int l = 0; l <= v; ++l)
             {

@@ -23,8 +23,9 @@ void test(const std::string &dirname)
     enum { n_dims = 3 };
     enum { n_eqns = 4 };
     enum { rhs_scheme = solvers::trapez };
-    enum { vip_vab = solvers::expl };
+    enum { vip_vab = solvers::impl };
     enum { prs_scheme = solvers::cr };
+    enum { impl_tht = true };
     struct ix { enum {
       u, v, w, tht,
       vip_i=u, vip_j=v, vip_k=w, vip_den=-1
@@ -44,30 +45,11 @@ void test(const std::string &dirname)
   p.grid_size = {nx, ny, nz};
   p.Tht_ref = 300;
   p.g = 10;
- 
   p.hscale = 25;
   p.cdrag = 0.1;
 
-  // prescribed heat flux
-  {
-    blitz::firstIndex k;
-    p.hflux_profile() = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
-  }
-
   double mixed_length = 500;
   double st = 1e-4 / p.g;
-
-  // environmental potential temperature profile
-  {
-    blitz::firstIndex k;
-    p.tht_profile() = 300 * where(k * p.dk <= mixed_length, 1, 1 + (k * p.dk - mixed_length) * st);
-  }
-  
-  // absorber profile
-  {
-    blitz::firstIndex k;
-    p.tht_abs_profile() = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
-  }
 
   p.outfreq = 15;
   p.outwindow = 1;
@@ -114,24 +96,27 @@ void test(const std::string &dirname)
     // enforce cyclic perturbation
     prtrb(nx - 1, j_r, k_r) = prtrb(0, j_r, k_r);
     prtrb(i_r, ny - 1, k_r) = prtrb(i_r, 0, k_r);
-
+    
     // initial conditions
-    for (int k = 0; k < nz; ++k)
-    {
-      slv.advectee(ix::tht)(i_r, j_r, k) = p.tht_profile()(k);
-    }
-    slv.advectee(ix::w) = 0;
-    slv.advectee(ix::tht)(i_r, j_r, k_r) += 0.001 * prtrb(i_r, j_r, k_r);
-    slv.advectee(ix::w)(i_r, j_r, k_r) += 0.2 * prtrb(i_r, j_r, k_r);
+    slv.advectee(ix::tht)(i_r, j_r, k_r) = 0.001 * prtrb(i_r, j_r, k_r);
+    slv.advectee(ix::w)(i_r, j_r, k_r) = 0.2 * prtrb(i_r, j_r, k_r);
     slv.advectee(ix::u) = 0;
     slv.advectee(ix::v) = 0; 
-   
-    // absorbers
-    blitz::thirdIndex k;
-    slv.vab_coefficient() = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
-    slv.vab_relaxed_state(0) = 0;
-    slv.vab_relaxed_state(1) = 0;
-    slv.vab_relaxed_state(2) = 0;
+
+    {
+      blitz::thirdIndex k;
+      // prescribed heat flux
+      slv.sclr_array("hflux") = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
+      // environmental potential temperature profile
+      slv.sclr_array("tht_e") = 300 * where(k * p.dk <= mixed_length, 1, 1 + (k * p.dk - mixed_length) * st);
+      // tht absorber profile
+      slv.sclr_array("tht_abs") = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
+      // velocity absorbers
+      slv.vab_coefficient()(i_r, j_r, k_r) = slv.sclr_array("tht_abs")(i_r, j_r, k_r);
+      slv.vab_relaxed_state(0) = 0;
+      slv.vab_relaxed_state(1) = 0;
+      slv.vab_relaxed_state(2) = 0;
+    }
   }
 
   slv.advance(nt); 
