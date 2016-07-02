@@ -62,6 +62,7 @@ namespace libmpdataxx
               lap_tmp[d](this->ijk) -= tmp_uvw[d](this->ijk);
             }
           }
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->normalize_vip(lap_tmp);
           this->set_edges(lap_tmp, this->ijk, 0);
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
@@ -161,7 +162,7 @@ namespace libmpdataxx
           if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->add_relax();
           pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
           pressure_solver_apply();
-          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->normalize_absorber();
+          if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->normalize_vip(this->vips);
           this->set_edges(this->vips, this->ijk, 1);
           for (int d = 0; d < parent_t::n_dims; ++d)
           {

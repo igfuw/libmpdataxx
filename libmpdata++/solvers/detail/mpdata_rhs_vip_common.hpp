@@ -101,12 +101,12 @@ namespace libmpdataxx
           {
             if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
             {
-              this->vip_rhs[d](this->ijk) = -0.5 * this->dt * 
+              vip_rhs[d](this->ijk) = -0.5 * this->dt * 
                 (*this->mem->vab_coeff)(this->ijk) * (vips[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
             else
             {
-              this->vip_rhs[d](this->ijk) = 0.0;
+              vip_rhs[d](this->ijk) = 0.0;
             }
           }
         }
@@ -117,7 +117,7 @@ namespace libmpdataxx
           {
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
-              this->vip_rhs[d](this->ijk) += -this->dt * 
+              vip_rhs[d](this->ijk) += -this->dt * 
                 (*this->mem->vab_coeff)(this->ijk) * (vips[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
           }
@@ -129,13 +129,13 @@ namespace libmpdataxx
           {
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
-              this->vip_rhs[d](this->ijk) = -vips[d](this->ijk);
+              vip_rhs[d](this->ijk) = -vips[d](this->ijk);
             }
             add_relax();
-            normalize_absorber();
+            normalize_vip(vips);
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
-              this->vip_rhs[d](this->ijk) += vips[d](this->ijk);
+              vip_rhs[d](this->ijk) += vips[d](this->ijk);
             }
           }
         }
@@ -144,16 +144,16 @@ namespace libmpdataxx
         {    
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            this->vips[d](this->ijk) += vip_rhs[d](this->ijk);
+            vips[d](this->ijk) += vip_rhs[d](this->ijk);
             vip_rhs[d](this->ijk) = 0;
           }
         }
 
-        void normalize_absorber()
+        virtual void normalize_vip(const arrvec_t<typename parent_t::arr_t> &v)
         {
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            this->vips[d](this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+            v[d](this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
           }
         }
         
