@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_common.hpp>
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_common.hpp>
 
 namespace libmpdataxx
 {
@@ -21,7 +21,7 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t>
-      class mpdata_rhs_vip_prs_2d_mr : public mpdata_rhs_vip_prs_2d_common<ct_params_t>
+      class mpdata_rhs_vip_prs_mr : public mpdata_rhs_vip_prs_common<ct_params_t>
       {
         public:
 
@@ -29,20 +29,20 @@ namespace libmpdataxx
 
         private:
 
-	using parent_t = mpdata_rhs_vip_prs_2d_common<ct_params_t>;
+	using parent_t = mpdata_rhs_vip_prs_common<ct_params_t>;
         using ix = typename ct_params_t::ix;
 
 	real_t beta, tmp_den;
 	typename parent_t::arr_t lap_err;
 
-        void pressure_solver_loop_init() {}
+        void pressure_solver_loop_init(bool simple) final {}
 
-        void pressure_solver_loop_body()
+        void pressure_solver_loop_body(bool simple) final
         {
-          this->lap_err(this->i, this->j) = this->lap(this->err, this->i, this->j, this->di, this->dj); 
+          this->lap_err(this->ijk) = this->lap(this->err, this->ijk, this->dijk, false, simple);
 
-          tmp_den = this->prs_sum(this->lap_err, this->lap_err, this->i, this->j);
-          if (tmp_den != 0) beta = - this->prs_sum(this->err, this->lap_err, this->i, this->j) / tmp_den;
+          tmp_den = this->prs_sum(this->lap_err, this->lap_err, this->ijk);
+          if (tmp_den != 0) beta = - this->prs_sum(this->err, this->lap_err, this->ijk) / tmp_den;
 
           this->Phi(this->ijk) += beta * this->err(this->ijk);
           this->err(this->ijk) += beta * this->lap_err(this->ijk);
@@ -60,7 +60,7 @@ namespace libmpdataxx
 	struct rt_params_t : parent_t::rt_params_t { };
 
 	// ctor
-	mpdata_rhs_vip_prs_2d_mr(
+	mpdata_rhs_vip_prs_mr(
 	  typename parent_t::ctor_args_t args,
 	  const rt_params_t &p
 	) :

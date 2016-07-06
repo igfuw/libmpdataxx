@@ -46,7 +46,7 @@ namespace libmpdataxx
           
           // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
           // halos for GC_z
-          this->xchng_vctr_nrml(this->mem->GC, this->i^h, this->j^h, this->k^h);
+          this->xchng_vctr_nrml(this->mem->GC, this->i, this->j, this->k);
 	} 
 
 	// method invoked by the solver
@@ -91,11 +91,13 @@ namespace libmpdataxx
                   this->i,
                   this->j
 	        );
-   
-	      // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
-	      // halos for GC_z 
-	      // TODO: document why; is it needed in the last iteration?; what about FCT?
-              this->xchng_vctr_nrml(this->GC_corr(iter), this->i^h, this->j^h, this->k^h);
+              
+	      // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y halos for GC_z 
+	      // needed for calculation of antidiffusive velocities in the third and subsequent
+              // iterations, also needed for fct but it is done there independently hence
+              // the following check
+              if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
+                this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j, this->k);
 
 	      this->fct_adjust_antidiff(e, iter);
 
@@ -122,7 +124,7 @@ namespace libmpdataxx
               assert(iter == 1); // infinite gauge option uses just one corrective step // TODO: not true?
               this->flux_ptr = &GC;
             }
-
+            
             const auto &flx = (*(this->flux_ptr));
 
             // sanity check for input

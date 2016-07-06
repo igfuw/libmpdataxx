@@ -53,6 +53,7 @@ namespace libmpdataxx
 
         // declared here for output purposes
         real_t dt, di, dj, dk;
+        std::array<real_t, n_dims> dijk;
 
 	const idx_t<n_dims> ijk;
 

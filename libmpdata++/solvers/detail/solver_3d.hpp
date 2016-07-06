@@ -65,59 +65,49 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k, range_i);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i, range_j);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k^1, range_i^h);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h, range_j^1);
 
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j, range_k);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_i, range_j);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h, range_k^1);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_i^1, range_j^h);
    
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j, range_k);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k, range_i);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j^1, range_k^h);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k^h, range_i^1);
           this->mem->barrier();
         }
 
         virtual void xchng_pres(
 	  const typename parent_t::arr_t &arr,
-	  const rng_t &range_i,
-	  const rng_t &range_j,
-	  const rng_t &range_k
+	  const idx_t<3> &range_ijk
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_j, range_k);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_k, range_i);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_i, range_j);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk[0], range_ijk[1]);
           this->mem->barrier();
         }
 
         virtual void set_edges(
-          const typename parent_t::arr_t &arr1,
-          const typename parent_t::arr_t &arr2,
-          const typename parent_t::arr_t &arr3,
-          const rng_t &range_i,
-          const rng_t &range_j,
-          const rng_t &range_k,
+          const arrvec_t<typename parent_t::arr_t> &av,
+	  const idx_t<3> &range_ijk,
           const int &sign
         ) final
         {
-          for (auto &bc : this->bcs[0]) bc->set_edge_pres(arr1, range_j, range_k, sign);
-          for (auto &bc : this->bcs[1]) bc->set_edge_pres(arr2, range_k, range_i, sign);
-          for (auto &bc : this->bcs[2]) bc->set_edge_pres(arr3, range_i, range_j, sign);
+          for (auto &bc : this->bcs[0]) bc->set_edge_pres(av[0], range_ijk[1], range_ijk[2], sign);
+          for (auto &bc : this->bcs[1]) bc->set_edge_pres(av[1], range_ijk[2], range_ijk[0], sign);
+          for (auto &bc : this->bcs[2]) bc->set_edge_pres(av[2], range_ijk[0], range_ijk[1], sign);
           this->mem->barrier();
         }
         
         virtual void save_edges(
-          const typename parent_t::arr_t &arr1,
-          const typename parent_t::arr_t &arr2,
-          const typename parent_t::arr_t &arr3,
-          const rng_t &range_i,
-          const rng_t &range_j,
-          const rng_t &range_k
+          const arrvec_t<typename parent_t::arr_t> &av,
+	  const idx_t<3> &range_ijk
         ) final
         {
-          for (auto &bc : this->bcs[0]) bc->save_edge_vel(arr1, range_j, range_k);
-          for (auto &bc : this->bcs[1]) bc->save_edge_vel(arr2, range_k, range_i);
-          for (auto &bc : this->bcs[2]) bc->save_edge_vel(arr3, range_i, range_j);
+          for (auto &bc : this->bcs[0]) bc->save_edge_vel(av[0], range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->save_edge_vel(av[1], range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[2]) bc->save_edge_vel(av[2], range_ijk[0], range_ijk[1]);
           this->mem->barrier();
         }
         
@@ -186,6 +176,7 @@ namespace libmpdataxx
           this->di = p.di;
           this->dj = p.dj;
           this->dk = p.dk;
+          this->dijk = {p.di, p.dj, p.dk};
           this->set_bcs(0, args.bcxl, args.bcxr);
 	  this->set_bcs(1, args.bcyl, args.bcyr);
 	  this->set_bcs(2, args.bczl, args.bczr);
@@ -270,10 +261,14 @@ namespace libmpdataxx
         // helper method to allocate n_arr scalar temporary arrays 
         static void alloc_tmp_sclr(
           typename parent_t::mem_t *mem,
-          const char * __file__, const int n_arr
+          const char * __file__, const int n_arr,
+          std::string name = ""
         )   
         {   
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+
+          if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
+
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
               parent_t::rng_sclr(mem->grid_size[0]),

@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_gcrk.hpp> 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_3d_gcrk.hpp> 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_mr.hpp> 
-#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_2d_pc.hpp> 
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_gcrk.hpp> 
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_mr.hpp> 
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_pc.hpp> 
 
 namespace libmpdataxx
 {
@@ -30,69 +29,47 @@ namespace libmpdataxx
       static_assert(!std::is_void<enableif>::value, "please specify pressure scheme type !");
     };
 
-    // minimal residual 2D
+    // minimal residual
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)mr && ct_params_t::n_dims == 2>::type
-    > : public detail::mpdata_rhs_vip_prs_2d_mr<ct_params_t>
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)mr>::type
+    > : public detail::mpdata_rhs_vip_prs_mr<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_2d_mr<ct_params_t>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_mr<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
     };
 
-    // conjugate residual 2D
+    // conjugate residual
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr && ct_params_t::n_dims == 2>::type
-    > : public detail::mpdata_rhs_vip_prs_2d_gcrk<ct_params_t, 1>
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr>::type
+    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_2d_gcrk<ct_params_t, 1>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1>; 
       using parent_t::parent_t; // inheriting constructors
     };
     
-    // generalized conjugate residual 2D
+    // generalized conjugate residual
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)gcrk && ct_params_t::n_dims == 2>::type
-    > : public detail::mpdata_rhs_vip_prs_2d_gcrk<ct_params_t, ct_params_t::prs_k_iters>
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)gcrk>::type
+    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_2d_gcrk<ct_params_t, ct_params_t::prs_k_iters>; 
-      using parent_t::parent_t; // inheriting constructors
-    };
-    
-    // conjugate residual 3D
-    template<typename ct_params_t>
-    class mpdata_rhs_vip_prs<
-      ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr && ct_params_t::n_dims == 3>::type
-    > : public detail::mpdata_rhs_vip_prs_3d_gcrk<ct_params_t, 1>
-    {
-      using parent_t = detail::mpdata_rhs_vip_prs_3d_gcrk<ct_params_t, 1>;
+      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters>; 
       using parent_t::parent_t; // inheriting constructors
     };
 
-    // generalized conjugate residual 3D
+    // preconditioned
     template<typename ct_params_t>
     class mpdata_rhs_vip_prs<
       ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)gcrk && ct_params_t::n_dims == 3>::type
-    > : public detail::mpdata_rhs_vip_prs_3d_gcrk<ct_params_t, ct_params_t::prs_k_iters>
+      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)pc>::type
+    > : public detail::mpdata_rhs_vip_prs_pc<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_3d_gcrk<ct_params_t, ct_params_t::prs_k_iters>; 
-      using parent_t::parent_t; // inheriting constructors
-    };
-
-    // preconditioned 2D
-    template<typename ct_params_t>
-    class mpdata_rhs_vip_prs<
-      ct_params_t,
-      typename std::enable_if<(int)ct_params_t::prs_scheme == (int)pc && ct_params_t::n_dims == 2>::type
-    > : public detail::mpdata_rhs_vip_prs_2d_pc<ct_params_t>
-    {
-      using parent_t = detail::mpdata_rhs_vip_prs_2d_pc<ct_params_t>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_pc<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
     };
   } // namespace solvers
