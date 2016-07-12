@@ -201,6 +201,9 @@ namespace libmpdataxx
 	  // intentionally after stash !!!
 	  // (we have to stash data from the current time step before applying any forcings to it)
           vip_rhs_expl_calc();
+          // finish calculating velocity forces before moving on
+          this->mem->barrier();
+
 	  parent_t::hook_ante_step(); 
           vip_rhs_apply();
 	}
