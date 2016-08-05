@@ -124,9 +124,7 @@ namespace libmpdataxx
               ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j)
 	    ));
 
-            std::cout << max_abs_div << std::endl;
-            std::cout << blitz::epsilon(typename parent_t::real_t(44)) << std::endl;
-	    if (max_abs_div > blitz::epsilon(typename parent_t::real_t(44))) 
+	    if (max_abs_div > this->max_abs_div_eps) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
         }

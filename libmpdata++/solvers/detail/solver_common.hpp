@@ -51,8 +51,8 @@ namespace libmpdataxx
 
         const int rank;
 
-        // declared here for output purposes
-        real_t dt, di, dj, dk;
+        // di, dj, dk declared here for output purposes
+        real_t dt, di, dj, dk, max_abs_div_eps;
         std::array<real_t, n_dims> dijk;
 
 	const idx_t<n_dims> ijk;
@@ -119,7 +119,7 @@ namespace libmpdataxx
         struct rt_params_t 
         {
           std::array<int, n_dims> grid_size;
-          real_t dt=0;
+          real_t dt=0, max_abs_div_eps = blitz::epsilon(real_t(44));
         };
 
 	// ctor
@@ -134,6 +134,7 @@ namespace libmpdataxx
           di(0),
           dj(0),
           dk(0),
+          max_abs_div_eps(p.max_abs_div_eps),
 	  n(n_eqns, 0), 
           mem(mem),
           ijk(ijk)
