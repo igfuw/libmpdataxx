@@ -113,15 +113,18 @@ namespace libmpdataxx
           if (!opts::isset(ct_params_t::opts, opts::dfl))
           {
             typename ct_params_t::real_t max_abs_div = max(abs(
-	      ( 
-		this->mem->GC[0](i-h, j  ) - 
-		this->mem->GC[0](i+h, j  )
-	      ) + (
-		this->mem->GC[1](i,   j-h) - 
-		this->mem->GC[1](i,   j+h)
-	      )
+              (
+                ( 
+                  this->mem->GC[0](i-h, j  ) - 
+                  this->mem->GC[0](i+h, j  )
+                ) + (
+                  this->mem->GC[1](i,   j-h) - 
+                  this->mem->GC[1](i,   j+h)
+                )
+              ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j)
 	    ));
-	    if (max_abs_div > blitz::epsilon(typename parent_t::real_t(44))) 
+
+	    if (max_abs_div > this->max_abs_div_eps) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
         }
