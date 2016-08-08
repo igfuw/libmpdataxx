@@ -58,13 +58,13 @@ namespace libmpdataxx
 
         virtual void xchng_vctr_nrml(
           const arrvec_t<typename parent_t::arr_t> &arrvec, 
-          const rng_t &range_i, 
-          const rng_t &range_j
+          const idx_t<2> &range_ijk,
+          const int ext = 0
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h);
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[0]^ext^h);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h);
           this->mem->barrier();
         }
 
