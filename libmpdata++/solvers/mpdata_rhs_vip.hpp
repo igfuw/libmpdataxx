@@ -146,9 +146,9 @@ namespace libmpdataxx
         using namespace libmpdataxx::arakawa_c; 
 
 	this->extrp(0, ix::vip_i);     
-	this->xchng_sclr(this->stash[0], this->i^this->halo, this->j^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[0], this->ijk, this->halo);      // filling halos 
 	this->extrp(1, ix::vip_j);
-	this->xchng_sclr(this->stash[1], this->i^this->halo, this->j^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[1], this->ijk, this->halo);      // filling halos 
       }
 
       public:
@@ -259,20 +259,11 @@ namespace libmpdataxx
         using namespace libmpdataxx::arakawa_c; 
 
 	this->extrp(0, ix::vip_i);     
-	this->xchng_sclr(this->stash[0],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[0], this->ijk, this->halo);      // filling halos
 	this->extrp(1, ix::vip_j);
-	this->xchng_sclr(this->stash[1],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[1], this->ijk, this->halo);      // filling halos
 	this->extrp(2, ix::vip_k);
-	this->xchng_sclr(this->stash[2],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[2], this->ijk, this->halo);      // filling halos
       }
 
       public:

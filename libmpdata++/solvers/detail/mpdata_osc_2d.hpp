@@ -42,7 +42,7 @@ namespace libmpdataxx
           //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
-            this->xchng_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
+            this->xchng_sclr(*this->mem->G, this->ijk, this->halo);
           
           // filling Y halos for GC_x, and X halos for GC_y
           this->xchng_vctr_nrml(this->mem->GC, this->i, this->j);

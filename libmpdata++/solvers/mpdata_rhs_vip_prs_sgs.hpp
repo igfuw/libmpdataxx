@@ -66,7 +66,7 @@ namespace libmpdataxx
 
         for (int m = 0; m < 3; ++m)
         {
-          this->xchng_sclr(wrk[0], this->i, this->j);
+          this->xchng_sclr(wrk[0], this->ijk);
           switch(d)
           {
             case 0 : case 1 :
@@ -98,8 +98,8 @@ namespace libmpdataxx
         const auto &ijk = this->ijk;
 
         // TODO: get rid of superfluous barriers
-        this->xchng_sclr(this->state(ix::vip_i), this->i, this->j);
-        this->xchng_sclr(this->state(ix::vip_j), this->i, this->j);
+        this->xchng_sclr(this->state(ix::vip_i), ijk);
+        this->xchng_sclr(this->state(ix::vip_j), ijk);
 
         // velocity gradient
         drv[0](ijk) = grad<0>(this->state(ix::vip_i), i, j, di);
@@ -120,7 +120,7 @@ namespace libmpdataxx
 
         // TODO: get rid of superfluous barriers
         for (auto& t : tau)
-          this->xchng_sclr(t, this->i, this->j);
+          this->xchng_sclr(t, ijk);
 
         // elements of strain rate tensor divergence
         drv[0](ijk) = grad<0>(tau[0], i, j, di);
@@ -222,7 +222,7 @@ namespace libmpdataxx
 
         for (int m = 0; m < 3; ++m)
         {
-          this->xchng_sclr(wrk[0], this->i, this->j, this->k);
+          this->xchng_sclr(wrk[0], this->ijk);
           switch(d)
           {
             case 0 : case 1 : case 2 :
@@ -259,9 +259,9 @@ namespace libmpdataxx
         const auto &ijk = this->ijk;
 
         // TODO: get rid of superfluous barriers
-        this->xchng_sclr(this->state(ix::vip_i), i, j, k);
-        this->xchng_sclr(this->state(ix::vip_j), i, j, k);
-        this->xchng_sclr(this->state(ix::vip_k), i, j, k);
+        this->xchng_sclr(this->state(ix::vip_i), ijk);
+        this->xchng_sclr(this->state(ix::vip_j), ijk);
+        this->xchng_sclr(this->state(ix::vip_k), ijk);
 
         // velocity gradient
         drv[0](ijk) = grad<0>(this->state(ix::vip_i), i, j, k, di);
@@ -297,7 +297,7 @@ namespace libmpdataxx
 
         // TODO: get rid of superfluous barriers
         for (auto& t : tau)
-          this->xchng_sclr(t, i, j, k);
+          this->xchng_sclr(t, ijk);
 
         // elements of strain rate tensor divergence
         drv[0](ijk) = grad<0>(tau[0], i, j, k, di);

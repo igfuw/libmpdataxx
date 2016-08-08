@@ -31,21 +31,20 @@ namespace libmpdataxx
 	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
 	virtual void xchng_sclr(typename parent_t::arr_t &arr,
-                       const rng_t &range_i,
-                       const rng_t &range_j,
-                       const rng_t &range_k,
+	               const idx_t<3> &range_ijk,
+                       const int ext,
                        const bool deriv = false
         ) final // for a given array
 	{
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_j, range_k, deriv);
-	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_k, range_i, deriv);
-	  for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_i, range_j, deriv);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
+	  for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, range_ijk[1]^ext, deriv);
           this->mem->barrier();
 	}
 	void xchng(int e) final
 	{
-	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
+	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], this->ijk, this->halo);
 	}
 
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
