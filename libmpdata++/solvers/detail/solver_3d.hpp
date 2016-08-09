@@ -32,7 +32,7 @@ namespace libmpdataxx
 
 	virtual void xchng_sclr(typename parent_t::arr_t &arr,
 	               const idx_t<3> &range_ijk,
-                       const int ext,
+                       const int ext = 0,
                        const bool deriv = false
         ) final // for a given array
 	{
