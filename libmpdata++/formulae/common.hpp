@@ -78,6 +78,16 @@ namespace libmpdataxx
     ) {
       return 1; 
     }
+    
+    // ND: G = const = 1
+    template<opts::opts_t opts, class arr_t, class ijk_t>
+    inline int G(
+      const arr_t &G,
+      const ijk_t &,
+      typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
+    ) {
+      return 1; 
+    }
 
     // 1D: G != const
     template<opts::opts_t opts, class arr_t> 
@@ -111,6 +121,15 @@ namespace libmpdataxx
     ) return_macro(,
       G(idxperm::pi<d>(i, j, k)) + 0
     )
-
+    
+    // ND: G != const
+    template<opts::opts_t opts, class arr_t, class ijk_t> 
+    inline auto G(
+      const arr_t &G,
+      const ijk_t &ijk,
+      typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
+    ) return_macro(,
+      G(ijk) + 0
+    )
   } // namespace formulae
 } // namespace libmpdataxx
