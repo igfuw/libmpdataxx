@@ -101,7 +101,7 @@ script:
       VERBOSE=1 $make_j
       OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
       cd ../../..
-    fi
+      fi
 
     # compiling and running selected paper tests in Debug mode
     - if [[ $TEST_SUITE == 'paper']]; then 
@@ -122,7 +122,7 @@ script:
     #- OMP_NUM_THREADS=1 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
       OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
       cd ../../..
-    fi
+      fi
 
     # compiling all sandbox tests in Release mode
     - if [[ $TEST_SUITE == 'sandbox']]; then 
@@ -136,7 +136,7 @@ script:
     # running selected sandbox tests in Release mode
       OMP_NUM_THREADS=4 make -C convergence_2d_3d test || cat convergence_2d_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
       cd ../../..
-    fi
+      fi
 
     - if [[ $TEST_SUITE == 'elliptic_drop']]; then 
       # installing
@@ -153,7 +153,7 @@ script:
       #- ./spreading_drop_2d_el 
       # TODO: make test!
       cd ../../..
-    fi
+      fi
     
 #    # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
 #    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
