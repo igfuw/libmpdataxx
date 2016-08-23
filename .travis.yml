@@ -91,15 +91,15 @@ script:
     - cd ../..
 
     # compiling and running all unit tests in Debug mode
-    - if [[ $TEST_SUITE == 'unit' ]]; then ./.travis_scripts/unit.sh fi
+    - if [[ $TEST_SUITE == 'unit' ]]; then ./.travis_scripts/unit.sh; fi
 
     # compiling and running selected paper tests in Debug mode
-    - if [[ $TEST_SUITE == 'paper' ]]; then ./.travis_scripts/paper.sh fi
+    - if [[ $TEST_SUITE == 'paper' ]]; then ./.travis_scripts/paper.sh; fi
 
     # compiling all sandbox tests in Release mode
-    - if [[ $TEST_SUITE == 'sandbox' ]]; then ./.travis_scripts/sandbox.sh fi
+    - if [[ $TEST_SUITE == 'sandbox' ]]; then ./.travis_scripts/sandbox.sh; fi
 
-    - if [[ $TEST_SUITE == 'elliptic_drop' ]]; then ./.travis_scripts/elliptic_drop.sh fi
+    - if [[ $TEST_SUITE == 'elliptic_drop' ]]; then ./.travis_scripts/elliptic_drop.sh; fi
     
 #    # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
 #    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
