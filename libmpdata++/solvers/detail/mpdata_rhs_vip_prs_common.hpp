@@ -63,6 +63,13 @@ namespace libmpdataxx
               lap_tmp[d](this->ijk) -= tmp_uvw[d](this->ijk);
             }
           }
+          if (this->mem->G)
+          {
+            for (int d = 0; d < parent_t::n_dims; ++d)
+            {
+              lap_tmp[d](this->ijk) *= (*this->mem->G)(this->ijk);
+            }
+          }
           if (!simple) this->normalize_vip(lap_tmp);
           this->set_edges(lap_tmp, this->ijk, 0);
           for (int d = 0; d < parent_t::n_dims; ++d)
@@ -71,6 +78,7 @@ namespace libmpdataxx
           }
           ,
           formulae::nabla::div<parent_t::n_dims>(lap_tmp, ijk, dijk)
+          / formulae::G<ct_params_t::opts>(*this->mem->G, this->ijk)
         )
 
 	void ini_pressure()

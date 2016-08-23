@@ -5,6 +5,11 @@ os:
 compiler:
     - gcc
     - clang
+env:
+    - TEST_SUITE=unit
+    - TEST_SUITE=sandbox
+    - TEST_SUITE=paper
+    - TEST_SUITE=elliptic_drop
 matrix:
     exclude:
         - os: osx
@@ -86,63 +91,83 @@ script:
     - cd ../..
 
     # compiling and running all unit tests in Debug mode
-    - cd tests/unit
-    - mkdir build 
-    - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-    - cmake -DCMAKE_BUILD_TYPE=Debug ../
-    - VERBOSE=1 $make_j
-    - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - cd ../../..
+    - if [[ $TEST_SUITE == 'unit']]; then
+      |
+      cd tests/unit
+      mkdir build 
+      cd build
+      # Travis default is not the packaged one
+      if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi
+      # the one from homebrew
+      if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi
+      cmake -DCMAKE_BUILD_TYPE=Debug ../
+      VERBOSE=1 $make_j
+      # "/" intentional! (just to make cat exit with an error code)
+      OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log /
+      cd ../../..
+      fi
 
     # compiling and running selected paper tests in Debug mode
-    - cd tests/paper_2015_GMD
-    - mkdir build
-    - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-    - cmake -DCMAKE_BUILD_TYPE=Debug ../
-    - VERBOSE=1 make -C 6_coupled_harmosc
-    - OMP_NUM_THREADS=4 make -C 6_coupled_harmosc test || cat 6_coupled_harmosc/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+    - if [[ $TEST_SUITE == 'paper']]; then
+      |
+      cd tests/paper_2015_GMD
+      mkdir build
+      cd build
+      # Travis default is not the packaged one
+      if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi
+      # the one from homebrew
+      if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi
+      cmake -DCMAKE_BUILD_TYPE=Debug ../
+      VERBOSE=1 make -C 6_coupled_harmosc
+      # "/" intentional! (just to make cat exit with an error code)
+      OMP_NUM_THREADS=4 make -C 6_coupled_harmosc test || cat 6_coupled_harmosc/Testing/Temporary/LastTest.log /
 
-    # compiling everything in the Release mode
-    - cmake -DCMAKE_BUILD_TYPE=Release ../
-    - VERBOSE=1 $make_j
+      # compiling everything in the Release mode
+      cmake -DCMAKE_BUILD_TYPE=Release ../
+      VERBOSE=1 $make_j
 
-    # running all paper tests in Release mode 
-    #- OMP_NUM_THREADS=1 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - cd ../../..
+      # running all paper tests in Release mode 
+      #- OMP_NUM_THREADS=1 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+      # "/" intentional! (just to make cat exit with an error code)
+      OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log /
+      cd ../../..
+      fi
 
     # compiling all sandbox tests in Release mode
-    - cd tests/sandbox
-    - mkdir build
-    - cd build
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged one
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-    - cmake ..
-    - VERBOSE=1 $make_j
+    - if [[ $TEST_SUITE == 'sandbox']]; then
+      |
+      cd tests/sandbox
+      mkdir build
+      cd build
+      # Travis default is not the packaged one
+      if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi
+      # the one from homebrew
+      if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi
+      cmake ..
+      VERBOSE=1 $make_j
     # running selected sandbox tests in Release mode
-    - OMP_NUM_THREADS=4 make -C convergence_2d_3d test || cat convergence_2d_3d/Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-    - cd ../../..
-    
+      # "/" intentional! (just to make cat exit with an error code)
+      OMP_NUM_THREADS=4 make -C convergence_2d_3d test || cat convergence_2d_3d/Testing/Temporary/LastTest.log /
+      cd ../../..
+      fi
 
-    # installing
-    - cd libmpdata++/build
-    - sudo make install
-    - cd ../..
-
-    # shallow-water-elliptic-drop
-    - git clone --depth=1 git://github.com/igfuw/shallow-water-elliptic-drop.git
-    - cd shallow-water-elliptic-drop/numerical
-    - mkdir build
-    - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Release #TODO: Debug mode?
-    - make
-    #- ./spreading_drop_2d_el 
-    # TODO: make test!
-    - cd ../../..
+    - if [[ $TEST_SUITE == 'elliptic_drop']]; then
+      |
+      # installing
+      cd libmpdata++/build
+      sudo make install
+      cd ../..
+      # shallow-water-elliptic-drop
+      git clone --depth=1 git://github.com/igfuw/shallow-water-elliptic-drop.git
+      cd shallow-water-elliptic-drop/numerical
+      mkdir build
+      cd build
+      cmake .. -DCMAKE_BUILD_TYPE=Release #TODO: Debug mode?
+      make
+      #- ./spreading_drop_2d_el 
+      # TODO: make test!
+      cd ../../..
+      fi
     
 #    # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
 #    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
