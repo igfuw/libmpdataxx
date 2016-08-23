@@ -91,7 +91,8 @@ script:
     - cd ../..
 
     # compiling and running all unit tests in Debug mode
-    - if [[ $TEST_SUITE == 'unit']]; then 
+    - if [[ $TEST_SUITE == 'unit']]; then
+      |
       cd tests/unit
       mkdir build 
       cd build
@@ -104,7 +105,8 @@ script:
       fi
 
     # compiling and running selected paper tests in Debug mode
-    - if [[ $TEST_SUITE == 'paper']]; then 
+    - if [[ $TEST_SUITE == 'paper']]; then
+      |
       cd tests/paper_2015_GMD
       mkdir build
       cd build
@@ -125,7 +127,8 @@ script:
       fi
 
     # compiling all sandbox tests in Release mode
-    - if [[ $TEST_SUITE == 'sandbox']]; then 
+    - if [[ $TEST_SUITE == 'sandbox']]; then
+      |
       cd tests/sandbox
       mkdir build
       cd build
@@ -138,7 +141,8 @@ script:
       cd ../../..
       fi
 
-    - if [[ $TEST_SUITE == 'elliptic_drop']]; then 
+    - if [[ $TEST_SUITE == 'elliptic_drop']]; then
+      |
       # installing
       cd libmpdata++/build
       sudo make install
