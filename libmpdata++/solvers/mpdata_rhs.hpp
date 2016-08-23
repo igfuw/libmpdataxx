@@ -39,13 +39,11 @@ namespace libmpdataxx
       // member fields
       arrvec_t<typename parent_t::arr_t> &rhs;
 
-//<listing-1>
       virtual void update_rhs(
         arrvec_t<typename parent_t::arr_t> &rhs, 
         const typename parent_t::real_t &dt,
         const int &at
       ) 
-//</listing-1>
       {
         assert(at == n || at == n+1);
 #if !defined(NDEBUG)
@@ -161,12 +159,14 @@ namespace libmpdataxx
         }
       } 
 
-      static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)
-      {
+      static void alloc(
+        typename parent_t::mem_t *mem, 
+        const int &n_iters
+      ) {
         // TODO: optimise to skip allocs for equations with no rhs
-	parent_t::alloc(mem, p);
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, parent_t::n_eqns); // rhs array for each equation
+	parent_t::alloc(mem, n_iters);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_eqns); // rhs array for each equation
       }
     };
-  }; // namespace solvers
-}; // namespace libmpdataxx
+  } // namespace solvers
+} // namespace libmpdataxx

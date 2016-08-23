@@ -202,6 +202,6 @@ namespace libmpdataxx
           // third order terms
         + HOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k)
       )
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx

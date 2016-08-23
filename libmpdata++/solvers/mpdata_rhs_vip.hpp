@@ -13,6 +13,7 @@ namespace libmpdataxx
 {
   namespace solvers
   {
+
     // to be specialised
     template <typename ct_params_t, class enableif = void>
     class mpdata_rhs_vip 
@@ -25,10 +26,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 1>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+      
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im;
@@ -72,6 +74,10 @@ namespace libmpdataxx
 	im(args.i.first() - 1, args.i.last())
       {
         assert(this->di != 0);
+
+        this->vip_ixs = {ix::vip_i};
+
+        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_i))));
       } 
     };
 
@@ -82,10 +88,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 2>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im, jm;
@@ -109,14 +116,17 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / this->di * .5 * (
+	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
 	    psi(pi<d>(i,    j)) + 
 	    psi(pi<d>(i + 1,j))
 	  );
 	} 
 	else
 	{ 
-	  assert(false); // TODO (perhaps better change definition of stash?)
+	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
+	    (*this->mem->G)(pi<d>(i,    j)) * psi(pi<d>(i,    j)) + 
+	    (*this->mem->G)(pi<d>(i + 1,j)) * psi(pi<d>(i + 1,j))
+	  );
 	}
       }  
 
@@ -127,6 +137,8 @@ namespace libmpdataxx
 	intrp<0>(this->stash[0], im, this->j^this->halo, this->di);
 	intrp<1>(this->stash[1], jm, this->i^this->halo, this->dj);
         this->xchng_vctr_alng(this->mem->GC);
+        auto ex = this->halo - 1;
+        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
       }
 
       void extrapolate_in_time() final
@@ -152,6 +164,33 @@ namespace libmpdataxx
       {
         assert(this->di != 0);
         assert(this->dj != 0);
+        
+        this->vip_ixs = {ix::vip_i, ix::vip_j};
+
+        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_i))));
+        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_j))));
+      }
+      
+      static void alloc(
+        typename parent_t::mem_t *mem, 
+        const int &n_iters
+      ) {
+	parent_t::alloc(mem, n_iters);
+
+        // allocate velocity absorber
+        if (static_cast<vip_vab_t>(ct_params_t::vip_vab) != 0)
+        {
+          mem->vab_coeff.reset(mem->old(new typename parent_t::arr_t(
+                  parent_t::rng_sclr(mem->grid_size[0]),
+                  parent_t::rng_sclr(mem->grid_size[1])
+          )));
+          
+          for (int n = 0; n < ct_params_t::n_dims; ++n)
+            mem->vab_relax.push_back(mem->old(new typename parent_t::arr_t(
+                    parent_t::rng_sclr(mem->grid_size[0]),
+                    parent_t::rng_sclr(mem->grid_size[1])
+            )));
+        }
       }
     };
     
@@ -162,10 +201,11 @@ namespace libmpdataxx
       typename std::enable_if<ct_params_t::n_dims == 3>::type
     > : public detail::mpdata_rhs_vip_common<ct_params_t>
     {
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
       using ix = typename ct_params_t::ix;
 
       protected:
+      
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
 
       // member fields
       const rng_t im, jm, km;
@@ -191,7 +231,7 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / this->di * .5 * (
+	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
 	    psi(pi<d>(i,     j, k)) + 
 	    psi(pi<d>(i + 1, j, k))
 	  );
@@ -209,6 +249,9 @@ namespace libmpdataxx
 	intrp<0>(this->stash[0], im, this->j^this->halo, this->k^this->halo, this->di);
 	intrp<1>(this->stash[1], jm, this->k^this->halo, this->i^this->halo, this->dj);
 	intrp<2>(this->stash[2], km, this->i^this->halo, this->j^this->halo, this->dk);
+        this->xchng_vctr_alng(this->mem->GC);
+        auto ex = this->halo - 1;
+        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
       }
 
       void extrapolate_in_time() final
@@ -233,6 +276,31 @@ namespace libmpdataxx
       }
 
       public:
+      
+      static void alloc(
+        typename parent_t::mem_t *mem, 
+        const int &n_iters
+      ) 
+      {
+	parent_t::alloc(mem, n_iters);
+
+        // allocate velocity absorber
+        if (static_cast<vip_vab_t>(ct_params_t::vip_vab) != 0)
+        {
+          mem->vab_coeff.reset(mem->old(new typename parent_t::arr_t(
+                  parent_t::rng_sclr(mem->grid_size[0]),
+                  parent_t::rng_sclr(mem->grid_size[1]),
+                  parent_t::rng_sclr(mem->grid_size[2])
+          )));
+          
+          for (int n = 0; n < ct_params_t::n_dims; ++n)
+            mem->vab_relax.push_back(mem->old(new typename parent_t::arr_t(
+                    parent_t::rng_sclr(mem->grid_size[0]),
+                    parent_t::rng_sclr(mem->grid_size[1]),
+                    parent_t::rng_sclr(mem->grid_size[2])
+            )));
+        }
+      }
 
       // ctor
       mpdata_rhs_vip(
@@ -247,7 +315,13 @@ namespace libmpdataxx
         assert(this->di != 0);
         assert(this->dj != 0);
         assert(this->dk != 0);
+        
+        this->vip_ixs = {ix::vip_i, ix::vip_j, ix::vip_k};
+
+        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_i))));
+        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_j))));
+        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_k))));
       } 
     }; 
-  }; // namespace solvers
-}; // namespace libmpdataxx
+  } // namespace solvers
+} // namespace libmpdataxx

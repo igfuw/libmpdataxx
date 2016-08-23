@@ -56,12 +56,14 @@ namespace libmpdataxx
 	  beta_dn(args.mem->tmp[__FILE__][2][1])
         {}
 
-	static void alloc(typename parent_t::mem_t *mem, const typename parent_t::rt_params_t &p)
-	{
-	  parent_t::alloc(mem, p);
-	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 2); // psi_min and psi_max
-	  parent_t::alloc_tmp_vctr(mem, p.grid_size, __FILE__);    // GC_mono
-	  parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 2); // beta_up, beta_dn
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const int &n_iters
+        ) {
+	  parent_t::alloc(mem, n_iters);
+	  parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // psi_min and psi_max
+	  parent_t::alloc_tmp_vctr(mem, __FILE__);    // GC_mono
+	  parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // beta_up, beta_dn
 	}
       };
 
@@ -69,6 +71,6 @@ namespace libmpdataxx
       template<typename ct_params_t, int minhalo, class enableif = void> 
       class mpdata_fct
       {}; 
-    }; // namespace detail
-  }; // namespace solvers
-}; // namescpae libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namescpae libmpdataxx

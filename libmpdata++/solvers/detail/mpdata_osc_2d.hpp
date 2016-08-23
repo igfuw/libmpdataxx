@@ -42,18 +42,10 @@ namespace libmpdataxx
           //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
-	  {
-	    this->bcxl->fill_halos_sclr(*this->mem->G, this->j^this->halo); // TODO: one xchng call?
-	    this->bcxr->fill_halos_sclr(*this->mem->G, this->j^this->halo);
-	    this->bcyl->fill_halos_sclr(*this->mem->G, this->i^this->halo);
-	    this->bcyr->fill_halos_sclr(*this->mem->G, this->i^this->halo);
-	  }
+            this->xchng_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
           
           // filling Y halos for GC_x, and X halos for GC_y
-          this->bcyl->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h); // TODO: one xchng?
-          this->bcyr->fill_halos_vctr_nrml(this->mem->GC[0], this->i^h);
-          this->bcxl->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h); // TODO: one xchng?
-          this->bcxr->fill_halos_vctr_nrml(this->mem->GC[1], this->j^h);
+          this->xchng_vctr_nrml(this->mem->GC, this->i, this->j);
 	} 
 
 	// method invoked by the solver
@@ -66,12 +58,7 @@ namespace libmpdataxx
 	    if (iter != 0)
 	    {
 	      this->cycle(e);
-	      this->mem->barrier();
-	      this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^this->halo); // TODO: two xchng calls? (without barriers)
-	      this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->j^this->halo);
-	      this->bcyl->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^this->halo);
-	      this->bcyr->fill_halos_sclr(this->mem->psi[e][this->n[e]], this->i^this->halo);
-	      this->mem->barrier();
+              this->xchng(e);
 
 	      // calculating the antidiffusive C 
 	      this->GC_corr(iter)[0](this->im+h, this->j) = 
@@ -95,13 +82,11 @@ namespace libmpdataxx
               assert(std::isfinite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
    
 	      // filling Y halos for GC_x, and X halos for GC_y
-	      // TODO: document why; is it needed in the last iteration?; what about FCT?
-	      this->mem->barrier();
-	      this->bcyl->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h); // TODO: one xchng?
-	      this->bcyr->fill_halos_vctr_nrml(this->GC_corr(iter)[0], this->i^h);
-	      this->bcxl->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h); // TODO: one xchng?
-	      this->bcxr->fill_halos_vctr_nrml(this->GC_corr(iter)[1], this->j^h);
-	      this->mem->barrier();
+	      // needed for calculation of antidiffusive velocities in the third and subsequent
+              // iterations, also needed for fct but it is done there independently hence
+              // the following check
+              if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
+                this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j);
 
 	      this->fct_adjust_antidiff(e, iter);
               assert(std::isfinite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
@@ -169,6 +154,6 @@ namespace libmpdataxx
 	  jm(args.j.first() - 1, args.j.last())
 	{ }
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

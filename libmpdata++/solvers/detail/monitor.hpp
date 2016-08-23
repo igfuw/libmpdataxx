@@ -39,6 +39,6 @@ namespace libmpdataxx
         pthread_setname_np(name);
 #endif
       }
-    };
-  };
-};
+    }
+  }
+}

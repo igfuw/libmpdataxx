@@ -54,6 +54,13 @@ namespace libmpdataxx
 	(i + this->size()) % this->size()
       );  
     }
+    
+    arr_t &operator[](const int i)
+    {   
+      return this->at(
+        (i + this->size()) % this->size()
+      );  
+    }
 
     void push_back(arr_t *arr)
     {
@@ -67,4 +74,4 @@ namespace libmpdataxx
 #endif
     }
   };
-}; // namespace libmpdataxx
+} // namespace libmpdataxx

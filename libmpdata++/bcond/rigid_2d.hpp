@@ -11,16 +11,16 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,         knd,         dir,     n_dims,     d,  
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,  
       typename std::enable_if<
         knd == rigid &&
         dir == left &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t>
+    > : public detail::bcond_common<real_t, halo>
     { 
-      using parent_t = detail::bcond_common<real_t>;
+      using parent_t = detail::bcond_common<real_t, halo>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -30,7 +30,7 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         // zero flux condition
-        for (int i = this->left_halo_sclr.first(), n = this->halo; i <= this->left_halo_sclr.last(); ++i, --n)
+        for (int i = this->left_halo_sclr.first(), n = halo; i <= this->left_halo_sclr.last(); ++i, --n)
         {
           a(pi<d>(i, j)) = a(pi<d>(this->left_edge_sclr + n, j));
         }
@@ -43,24 +43,20 @@ namespace libmpdataxx
         a(pi<d>(this->left_halo_sclr.last(), j)) = 2 * a(pi<d>(this->left_edge_sclr,     j))
                                                      - a(pi<d>(this->left_edge_sclr + 1, j));
       }
-      
-      void set_edge_pres(const arr_t &a, const rng_t &j)
+
+      void save_edge_vel(const arr_t &, const rng_t &) {}
+     
+      void set_edge_pres(const arr_t &a, const rng_t &j, int)
       {
         using namespace idxperm;
         a(pi<d>(this->left_edge_sclr, j)) = 0;
-      }
-      
-      void set_edge_pres(const arr_t &a, const arr_t &b, const rng_t &j)
-      {
-        using namespace idxperm;
-        a(pi<d>(this->left_edge_sclr, j)) = -b(pi<d>(this->left_edge_sclr, j));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
         // zero velocity condition
-        for (int i = this->left_halo_vctr.first(), n = this->halo; i <= this->left_halo_vctr.last(); ++i, --n)
+        for (int i = this->left_halo_vctr.first(), n = halo; i <= this->left_halo_vctr.last(); ++i, --n)
         {
 	  av[d](pi<d>(i, j)) = -av[d](pi<d>(this->left_edge_sclr + n - h, j));
         }
@@ -68,23 +64,21 @@ namespace libmpdataxx
 
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
       {
-        using namespace idxperm;
         // note intentional sclr
-        for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
-          a(pi<d>(i, j)) = 0; 
+        fill_halos_sclr(a, j);
       }
     };
 
-    template <typename real_t, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,         knd,         dir,     n_dims,     d,  
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,  
       typename std::enable_if<
         knd == rigid &&
         dir == rght &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t>
+    > : public detail::bcond_common<real_t, halo>
     {
-      using parent_t = detail::bcond_common<real_t>;
+      using parent_t = detail::bcond_common<real_t, halo>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
       
@@ -108,16 +102,12 @@ namespace libmpdataxx
                                                       - a(pi<d>(this->rght_edge_sclr - 1, j));
       }
       
-      void set_edge_pres(const arr_t &a, const rng_t &j)
+      void save_edge_vel(const arr_t &, const rng_t &) {}
+      
+      void set_edge_pres(const arr_t &a, const rng_t &j, int)
       {
         using namespace idxperm;
         a(pi<d>(this->rght_edge_sclr, j)) = 0;
-      }
-      
-      void set_edge_pres(const arr_t &a, const arr_t &b, const rng_t &j)
-      {
-        using namespace idxperm;
-        a(pi<d>(this->rght_edge_sclr, j)) = -b(pi<d>(this->rght_edge_sclr, j));
       }
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
@@ -132,11 +122,9 @@ namespace libmpdataxx
       
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
       {
-        using namespace idxperm;
         // note intentional sclr
-        for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-          a(pi<d>(i, j)) = 0; 
+        fill_halos_sclr(a, j);
       }
     };
-  }; // namespace bcond
-}; // namespace libmpdataxx
+  } // namespace bcond
+} // namespace libmpdataxx

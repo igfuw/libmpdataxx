@@ -5,7 +5,7 @@ for systems of generalised transport equations
 To get more information on libmpdata++, please check: 
   - http://libmpdataxx.igf.fuw.edu.pl/
   - http://arxiv.org/abs/1407.1309
-  - http://www.geosci-model-dev-discuss.net/7/8179/2014/
+  - http://www.geosci-model-dev.net/8/1005/2015/
 
 In short, libmpdata++ is a header-only C++ library. 
 Compilation of programs that use libmpdata++ requires:

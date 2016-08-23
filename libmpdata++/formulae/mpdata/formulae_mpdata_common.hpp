@@ -63,6 +63,6 @@ namespace libmpdataxx
         nom / (den + blitz::epsilon(typename den_t::T_numtype(0))) 
       )
 
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx

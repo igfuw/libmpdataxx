@@ -46,14 +46,16 @@ namespace libmpdataxx
         {
           attr_names.push_back(v.second.name);
         }
+        
+        if (this->mem->G.get() != nullptr) xdmfw.add_const_attribute("G", this->const_name, this->cshape);
 
-        xdmfw.setup("coord.h5", this->dim_names, attr_names, this->cshape);
+        xdmfw.setup(this->const_name, this->dim_names, attr_names, this->cshape);
       }
 
       void record_all()
       {
         // write xdmf markup
-        std::string xmf_name = this->base_name()+ ".xmf";
+        std::string xmf_name = this->base_name() + ".xmf";
         xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->dt * this->timestep);
 
         // save the xmf filename for temporal write
@@ -73,5 +75,5 @@ namespace libmpdataxx
       ) : parent_t(args, p)
       { }
     };
-  }; // namespace output
-}; // namespace libmpdataxx
+  } // namespace output
+} // namespace libmpdataxx

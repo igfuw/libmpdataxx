@@ -59,8 +59,8 @@ struct stats : public parent_t
       ofs << "max(solution) = " << max(fc)                                                                                    << std::endl;
       ofs << "min(solution) = " << min(fc)                                                                                    << std::endl;
       ofs << "Linf = " << max(abs(fc - ic))                                           /*nx */                                 << std::endl;
-      ofs << "L2 = " << 1.0 / (this->timestep * this->dt) * sqrt(1.0 / pow(this->mem->grid_size[0], 3) * sum(pow2(fc - ic)))  << std::endl;
-      ofs << "L1 = " << 1.0 / (this->timestep * this->dt) *     (1.0 / pow(this->mem->grid_size[0], 3) * sum(abs (fc - ic)))  << std::endl; 
+      ofs << "L2 = " << 1.0 / (this->timestep * this->dt) * sqrt(1.0 / pow(this->mem->grid_size[0].length(), 3) * sum(pow2(fc - ic)))  << std::endl;
+      ofs << "L1 = " << 1.0 / (this->timestep * this->dt) *     (1.0 / pow(this->mem->grid_size[0].length(), 3) * sum(abs (fc - ic)))  << std::endl; 
     }
   }
 };

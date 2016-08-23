@@ -99,12 +99,12 @@ namespace libmpdataxx
         // memory allocation
 	static void alloc(
           typename parent_t::mem_t *mem, 
-          const rt_params_t &p
+          const int &n_iters
         ) {   
-	  parent_t::alloc(mem, p);
-	  for (int n = 0; n < n_tmp(p.n_iters); ++n)
-	    parent_t::alloc_tmp_vctr(mem, p.grid_size, __FILE__);
-          parent_t::alloc_tmp_vctr(mem, p.grid_size, __FILE__); // fluxes
+	  parent_t::alloc(mem, n_iters);
+	  for (int n = 0; n < n_tmp(n_iters); ++n)
+	    parent_t::alloc_tmp_vctr(mem, __FILE__);
+          parent_t::alloc_tmp_vctr(mem, __FILE__); // fluxes
 	}   
       };
 
@@ -112,6 +112,6 @@ namespace libmpdataxx
       template<typename ct_params_t, int minhalo, class enableif = void> 
       class mpdata_osc
       {};
-    }; // namespace detail
-  }; // namespace solvers
-}; // namescpae libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namescpae libmpdataxx

@@ -35,5 +35,5 @@ namespace libmpdataxx
 #else
     boost_thread<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
 #endif
-  }; // namespace concurr
-}; // namespace libmpdataxx
+  } // namespace concurr
+} // namespace libmpdataxx

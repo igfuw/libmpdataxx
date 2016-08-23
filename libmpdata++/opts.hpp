@@ -33,10 +33,10 @@ namespace libmpdataxx
       iga = opts::bit(5), // infinite-gauge option
       nug = opts::bit(6), // non-unit G (default G = 1) - see Smolarkiewicz 2006 eq (25) and discussion below for info on G
       dfl = opts::bit(7), // devergent flows
-      khn = opts::bit(8)  // use Kahan summation algorithm in the donor-cell formulae
+      khn = opts::bit(8) // use Kahan summation algorithm in the donor-cell formulae
     };
 
-  }; // namespace opts
+  } // namespace opts
 
   struct ct_params_default_t
   {
@@ -44,7 +44,11 @@ namespace libmpdataxx
     enum { hint_norhs = 0 };
     struct ix {};
     static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
+    enum { vip_vab = 0};
+    enum { prs_k_iters = 4};
+    enum { prs_khn = false}; // if true use Kahan summation in the pressure solver
     enum { stress_diff = 0};
+    enum { impl_tht = false};
   };
 
-}; // namespace libmpdataxx
+} // namespace libmpdataxx

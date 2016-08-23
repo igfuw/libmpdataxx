@@ -41,16 +41,19 @@ namespace libmpdataxx
 
         typedef typename ct_params_t::real_t real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
-        using bcp_t = std::unique_ptr<bcond::detail::bcond_common<real_t>>;
+        using bcp_t = std::unique_ptr<bcond::detail::bcond_common<real_t, halo>>;
 
         using ix = typename ct_params_t::ix;
 
 	protected: 
         
+        std::array<std::array<bcp_t, 2>, n_dims> bcs;
+
         const int rank;
 
-        // declared here for output purposes
-        real_t dt, di, dj, dk;
+        // di, dj, dk declared here for output purposes
+        real_t dt, di, dj, dk, max_abs_div_eps;
+        std::array<real_t, n_dims> dijk;
 
 	const idx_t<n_dims> ijk;
 
@@ -71,6 +74,12 @@ namespace libmpdataxx
 
 	virtual void xchng(int e) = 0;
         // TODO: implement flagging of valid/invalid halo for optimisations
+
+        void set_bcs(const int &d, bcp_t &bcl, bcp_t &bcr)
+        {
+          bcs[d][0] = std::move(bcl);
+          bcs[d][1] = std::move(bcr);
+        }
 
         private:
       
@@ -110,7 +119,7 @@ namespace libmpdataxx
         struct rt_params_t 
         {
           std::array<int, n_dims> grid_size;
-          real_t dt=0;
+          real_t dt=0, max_abs_div_eps = blitz::epsilon(real_t(44));
         };
 
 	// ctor
@@ -125,6 +134,7 @@ namespace libmpdataxx
           di(0),
           dj(0),
           dk(0),
+          max_abs_div_eps(p.max_abs_div_eps),
 	  n(n_eqns, 0), 
           mem(mem),
           ijk(ijk)
@@ -207,13 +217,13 @@ namespace libmpdataxx
 	// psi[n] getter - just to shorten the code
         // note that e.g. in hook_post_loop it points rather to 
         // psi^{n+1} than psi^{n} (hence not using the name psi_n)
-	virtual const arr_t &state(const int &e) const final
+	virtual arr_t &state(const int &e) final
 	{
 	  return mem->psi[e][n[e]];
 	}
 
-        static rng_t rng_vctr(const int &n) { return rng_t(0, n-1)^h^(halo-1); }
-        static rng_t rng_sclr(const int &n) { return rng_t(0, n-1)^halo; }
+        static rng_t rng_vctr(const rng_t &rng) { return rng^h^(halo-1); }
+        static rng_t rng_sclr(const rng_t &rng) { return rng^halo; }
 
         private:
         void scale(const int &e, const int &exp)
@@ -227,6 +237,6 @@ namespace libmpdataxx
       template<typename ct_params_t, int n_tlev, int minhalo, class enableif = void>
       class solver
       {}; 
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

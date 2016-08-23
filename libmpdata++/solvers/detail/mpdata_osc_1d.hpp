@@ -39,10 +39,7 @@ namespace libmpdataxx
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
-	  {
-	    this->bcxl->fill_halos_sclr(*this->mem->G); // TODO: one xchng call?
-	    this->bcxr->fill_halos_sclr(*this->mem->G);
-	  }
+            this->xchng_sclr(*this->mem->G); 
 	}
 
 	// method invoked by the solver
@@ -55,10 +52,7 @@ namespace libmpdataxx
 	    if (iter != 0) 
 	    {
 	      this->cycle(e); // cycles subdomain's "n", and global "n" if it's the last equation
-	      this->mem->barrier();
-	      this->bcxl->fill_halos_sclr(this->mem->psi[e][this->n[e]]); // TODO: one xchng call?
-	      this->bcxr->fill_halos_sclr(this->mem->psi[e][this->n[e]]);
-	      this->mem->barrier();
+              this->xchng(e);
 
 	      // calculating the antidiffusive C 
 	      this->GC_corr(iter)[0](im+h) = 
@@ -119,6 +113,6 @@ namespace libmpdataxx
 	  im(args.i.first() - 1, args.i.last())
 	{}
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namescpae libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namescpae libmpdataxx

@@ -36,22 +36,34 @@ namespace libmpdataxx
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; 
         std::unique_ptr<blitz::Array<real_t, 1>> sumtmp;
 
+        protected:
+
+        blitz::TinyVector<int, n_dims> origin;
+
 	public:
 
 	int n = 0;
-        std::array<int, n_dims> grid_size; 
+        std::array<rng_t, n_dims> grid_size; 
         bool panic = false; // for multi-threaded SIGTERM handling
 
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC;
         std::vector<arrvec_t<arr_t>> psi; // TODO: since n_eqns is known, could make it an std::array!
 	std::unique_ptr<arr_t> G;
+	std::unique_ptr<arr_t> vab_coeff; // velocity absorber coefficient
+	arrvec_t<arr_t> vab_relax; // velocity absorber relaxed state
         arrvec_t<arr_t> khn_tmp; // Kahan sum for donor-cell
 
 	std::unordered_map< 
 	  const char*, // intended for addressing with __FILE__
 	  boost::ptr_vector<arrvec_t<arr_t>>
-	> tmp; 
+	> tmp;
+        
+        // list of temporary fields that can be accessed from outside of concurr
+	std::unordered_map< 
+          std::string,
+          std::pair<const char*, int>
+        > avail_tmp;
 
         virtual void barrier()
         {
@@ -67,86 +79,71 @@ namespace libmpdataxx
 
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
-        sharedmem_common(const std::array<int, 1> &grid_size, const int &size)
-          : n(0), grid_size(grid_size) // TODO: is n(0) needed?
+        sharedmem_common(const std::array<int, n_dims> &grid_size, const int &size)
+          : n(0) // TODO: is n(0) needed?
         {
-          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
-          //sumtmp.reset(new blitz::Array<real_t, 2>(s0, 1));  // TODO: write a different sum that would't use sumtmp
+          for (int d = 0; d < n_dims; ++d) 
+          {
+            this->grid_size[d] = rng_t(0, grid_size[d]-1);
+            origin[d] = this->grid_size[d].first();
+          }
+
+          if (size > grid_size[0]) 
+            throw std::runtime_error("number of subdomains greater than number of gridpoints");
+
+          if (n_dims != 1) 
+            sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
-        sharedmem_common(const std::array<int, 2> &grid_size, const int &size)
-          : n(0), grid_size(grid_size)
-        {
-          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
-          sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
-          xtmtmp.reset(new blitz::Array<real_t, 1>(size));
-        }
-
-        sharedmem_common(const std::array<int, 3> &grid_size, const int &size)
-          : n(0), grid_size(grid_size)
-        {
-          if (size > grid_size[0]) throw std::runtime_error("number of subdomains greater than number of gridpoints");
-          sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
-          xtmtmp.reset(new blitz::Array<real_t, 1>(size));
-        }
-  
-        /// @brief concurrency-aware 2D summation of array elements
-        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j) // TODO: that's just for 2D
+        /// @brief concurrency-aware summation of array elements
+        real_t sum(const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
-	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
+	  for (int c = ijk[0].first(); c <= ijk[0].last(); ++c) // TODO: optimise for i.count() == 1
           {
-	    (*sumtmp)(c) = blitz::kahan_sum(arr(c, j));
+            auto slice_idx = ijk;
+            slice_idx.lbound(0) = c;
+            slice_idx.ubound(0) = c;
+
+            if (sum_khn)
+	      (*sumtmp)(c) = blitz::kahan_sum(arr(slice_idx));
+            else
+	      (*sumtmp)(c) = blitz::sum(arr(slice_idx));
           }
           barrier();
-          real_t result = blitz::kahan_sum(*sumtmp);
+          real_t result;
+          if (sum_khn)
+            result = blitz::kahan_sum(*sumtmp);
+          else
+            result = blitz::sum(*sumtmp);
           barrier();
           return result;
         }
 
-        /// @brief concurrency-aware 2D summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j) // TODO: that's just for 2D
+        /// @brief concurrency-aware summation of a (element-wise) product of two arrays
+        real_t sum(const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
-	  for (int c = i.first(); c <= i.last(); ++c)
+	  for (int c = ijk[0].first(); c <= ijk[0].last(); ++c)
           {
-	    (*sumtmp)(c) = blitz::kahan_sum(arr1(c, j) * arr2(c, j)); 
-          }
-          barrier();
-          real_t result = blitz::kahan_sum(*sumtmp);
-          barrier();
-          return result;
-        }
-        
-        /// @brief concurrency-aware 3D summation of array elements
-        real_t sum(const arr_t &arr, const rng_t &i, const rng_t &j, const rng_t &k)
-        {
-	  // doing a two-step sum to reduce numerical error 
-	  // and make parallel results reproducible
-	  for (int c = i.first(); c <= i.last(); ++c) // TODO: optimise for i.count() == 1
-          {
-	    (*sumtmp)(c) = blitz::kahan_sum(arr(c, j, k));
-          }
-          barrier();
-          real_t result = blitz::kahan_sum(*sumtmp);
-          barrier();
-          return result;
-        }
+            auto slice_idx = ijk;
+            slice_idx.lbound(0) = c;
+            slice_idx.ubound(0) = c;
 
-        /// @brief concurrency-aware 3D summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const rng_t &i, const rng_t &j, const rng_t &k)
-        {
-	  // doing a two-step sum to reduce numerical error 
-	  // and make parallel results reproducible
-	  for (int c = i.first(); c <= i.last(); ++c)
-          {
-	    (*sumtmp)(c) = blitz::kahan_sum(arr1(c, j, k) * arr2(c, j, k)); 
+            if (sum_khn)
+	      (*sumtmp)(c) = blitz::kahan_sum(arr1(slice_idx) * arr2(slice_idx));
+            else
+	      (*sumtmp)(c) = blitz::sum(arr1(slice_idx) * arr2(slice_idx)); 
           }
           barrier();
-          real_t result = blitz::kahan_sum(*sumtmp);
+          real_t result;
+          if (sum_khn)
+            result = blitz::kahan_sum(*sumtmp);
+          else
+            result = blitz::sum(*sumtmp);
           barrier();
           return result;
         }
@@ -173,14 +170,44 @@ namespace libmpdataxx
         // and hence to not use BZ_THREADSAFE
         private:
         boost::ptr_vector<arr_t> tobefreed;
-      
+        
         public:
-        arr_t *old(arr_t *arg)
+        arr_t *never_delete(arr_t *arg)
         {
-          tobefreed.push_back(arg);
           arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData);
           ret->reindexSelf(arg->base());
           return ret;
+        }
+
+        arr_t *old(arr_t *arg)
+        {
+          tobefreed.push_back(arg);
+          arr_t *ret = never_delete(arg);
+          return ret;
+        }
+
+        private:
+        // helper methods to define subdomain ranges
+        static int min(const int &span, const int &rank, const int &size) 
+        {
+          return rank * span / size; 
+        }
+
+        static int max(const int &span, const int &rank, const int &size) 
+        {
+          return min(span, rank + 1, size) - 1;  
+        }
+
+        public:
+        static rng_t slab(
+          const rng_t &span,
+          const int &rank = 0,  
+          const int &size = 1 
+        ) {
+          return rng_t(
+            span.first() + min(span.length(), rank, size),
+            span.first() + max(span.length(), rank, size)
+          );
         }
       };
 
@@ -204,8 +231,8 @@ namespace libmpdataxx
           // returning just the domain interior, i.e. without halos
           // reindexing so that element 0 is at 0
 	  return this->psi[e][ this->n ](
-	    rng_t(0, this->grid_size[0]-1)
-	  ).reindex({0});
+            this->grid_size[0]
+	  ).reindex(this->origin);
 	}
 
 	blitz::Array<real_t, 1> advector(int d = 0)  
@@ -216,8 +243,8 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           // (i.e. border between cell 0 and cell 1 is indexed with 0)
 	  return this->GC[d](
-            rng_t(0, this->grid_size[0]-1)^(-1)^h
-          ).reindex({0});
+            this->grid_size[0]^(-1)^h
+          ).reindex(this->origin);
 	}   
 
         blitz::Array<real_t, 1> g_factor()
@@ -228,10 +255,26 @@ namespace libmpdataxx
 
           // the same logic as in advectee() - see above
           return (*this->G)(
-            rng_t(0, this->grid_size[0]-1)
-          ).reindex({0});
+            this->grid_size[0]
+          ).reindex(this->origin);
         }
-
+        
+        blitz::Array<real_t, 1> vab_coefficient()
+        {
+          throw std::logic_error("absorber not yet implemented in 1d");
+        }
+	
+        blitz::Array<real_t, 1> vab_relaxed_state(int d = 0)  
+	{   
+          throw std::logic_error("absorber not yet implemented in 1d");
+	}   
+        
+        blitz::Array<real_t, 1> sclr_array(const std::string& name, int n = 0)
+	{
+          return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
+            this->grid_size[0]
+          ).reindex(this->origin);
+	}
       };
 
       template<typename real_t, int n_tlev>
@@ -246,10 +289,10 @@ namespace libmpdataxx
 	{
           assert(this->n < n_tlev);
 
-	  return this->psi[e][ this->n ](idx_t<2>({
-	    rng_t(0, this->grid_size[0]-1),
-	    rng_t(0, this->grid_size[1]-1)
-	  })).reindex({0, 0});
+	  return this->psi[e][ this->n ](
+	    this->grid_size[0],
+	    this->grid_size[1]
+	  ).reindex(this->origin);
 	}
 
 	blitz::Array<real_t, 2> advector(int d = 0)  
@@ -260,8 +303,8 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           switch (d)
           { 
-            case 0: return this->GC[d](rng_t(0, this->grid_size[0]-1)^(-1)^h, rng_t(0, this->grid_size[1]-1)).reindex({0, 0}); 
-            case 1: return this->GC[d](rng_t(0, this->grid_size[0]-1), rng_t(0, this->grid_size[1]-1)^(-1)^h).reindex({0, 0}); 
+            case 0: return this->GC[d](this->grid_size[0]^(-1)^h, this->grid_size[1]).reindex(this->origin); 
+            case 1: return this->GC[d](this->grid_size[0], this->grid_size[1]^(-1)^h).reindex(this->origin); 
             default: assert(false); throw;
           }
 	}   
@@ -273,12 +316,45 @@ namespace libmpdataxx
             throw std::runtime_error("g_factor() called with nug option unset?");
 
           // the same logic as in advectee() - see above
-          return (*this->G)(idx_t<2>({
-            rng_t(0, this->grid_size[0]-1),
-            rng_t(0, this->grid_size[1]-1),
-          })).reindex({0, 0});
+          return (*this->G)(
+            this->grid_size[0],
+            this->grid_size[1]
+          ).reindex(this->origin);
         }
+        
+        blitz::Array<real_t, 2> vab_coefficient()
+        {
+          // a sanity check
+          if (this->vab_coeff.get() == nullptr) 
+            throw std::runtime_error("vab_coeff() called with option vip_vab unset?");
 
+          // the same logic as in advectee() - see above
+          return (*this->vab_coeff)(
+            this->grid_size[0],
+            this->grid_size[1]
+          ).reindex(this->origin);
+        }
+	
+        blitz::Array<real_t, 2> vab_relaxed_state(int d = 0)  
+	{   
+          assert(d == 0 || d== 1);
+          // a sanity check
+          if (this->vab_coeff.get() == nullptr) 
+            throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
+          // the same logic as in advectee() - see above
+	  return this->vab_relax[d](
+	    this->grid_size[0],
+	    this->grid_size[1]
+	  ).reindex(this->origin);
+	}   
+        
+        blitz::Array<real_t, 2> sclr_array(const std::string& name, int n = 0)
+	{
+          return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
+            this->grid_size[0],
+            this->grid_size[1]
+          ).reindex(this->origin);
+	}
       };
 
       template<typename real_t, int n_tlev>
@@ -293,11 +369,11 @@ namespace libmpdataxx
 	{
           assert(this->n < n_tlev);
 
-	  return this->psi[e][ this->n ](idx_t<3>({
-	    rng_t(0, this->grid_size[0]-1),
-	    rng_t(0, this->grid_size[1]-1),
-	    rng_t(0, this->grid_size[2]-1)
-	  })).reindex({0, 0, 0});
+	  return this->psi[e][ this->n ](
+	    this->grid_size[0],
+	    this->grid_size[1],
+	    this->grid_size[2]
+	  ).reindex(this->origin);
 	}
 
 	blitz::Array<real_t, 3> advector(int d = 0)  
@@ -308,15 +384,15 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           switch (d)
           { 
-            case 0: return this->GC[d](rng_t(0, this->grid_size[0]-1)^(-1)^h,
-                                       rng_t(0, this->grid_size[1]-1),
-                                       rng_t(0, this->grid_size[2]-1)).reindex({0, 0, 0});  
-            case 1: return this->GC[d](rng_t(0, this->grid_size[0]-1),
-                                       rng_t(0, this->grid_size[1]-1)^(-1)^h,
-                                       rng_t(0, this->grid_size[2]-1)).reindex({0, 0, 0});  
-            case 2: return this->GC[d](rng_t(0, this->grid_size[0]-1),
-                                       rng_t(0, this->grid_size[1]-1),
-                                       rng_t(0, this->grid_size[2]-1)^(-1)^h).reindex({0, 0, 0});  
+            case 0: return this->GC[d](this->grid_size[0]^(-1)^h,
+                                       this->grid_size[1],
+                                       this->grid_size[2]).reindex(this->origin);  
+            case 1: return this->GC[d](this->grid_size[0],
+                                       this->grid_size[1]^(-1)^h,
+                                       this->grid_size[2]).reindex(this->origin);  
+            case 2: return this->GC[d](this->grid_size[0],
+                                       this->grid_size[1],
+                                       this->grid_size[2]^(-1)^h).reindex(this->origin);  
             default: assert(false); throw;
           }
 	}   
@@ -328,14 +404,50 @@ namespace libmpdataxx
             throw std::runtime_error("g_factor() called with nug option unset?");
 
           // the same logic as in advectee() - see above
-          return (*this->G)(idx_t<3>({
-            rng_t(0, this->grid_size[0]-1),
-            rng_t(0, this->grid_size[1]-1),
-            rng_t(0, this->grid_size[2]-1)
-          })).reindex({0, 0, 0});
+          return (*this->G)(
+            this->grid_size[0],
+            this->grid_size[1],
+            this->grid_size[2]
+          ).reindex(this->origin);
         }
 
+        blitz::Array<real_t, 3> vab_coefficient()
+        {
+          // a sanity check
+          if (this->vab_coeff.get() == nullptr) 
+            throw std::runtime_error("vab_coeff() called with option vip_vab unset?");
+
+          // the same logic as in advectee() - see above
+          return (*this->vab_coeff)(
+            this->grid_size[0],
+            this->grid_size[1],
+            this->grid_size[2]
+          ).reindex(this->origin);
+        }
+	
+        blitz::Array<real_t, 3> vab_relaxed_state(int d = 0)  
+	{   
+          assert(d == 0 || d == 1 || d == 2);
+          // a sanity check
+          if (this->vab_coeff.get() == nullptr) 
+            throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
+          // the same logic as in advectee() - see above
+	  return this->vab_relax[d](
+	    this->grid_size[0],
+	    this->grid_size[1],
+            this->grid_size[2]
+	  ).reindex(this->origin);
+	}   
+
+        blitz::Array<real_t, 3> sclr_array(const std::string& name, int n = 0)
+	{
+          return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
+            this->grid_size[0],
+            this->grid_size[1],
+            this->grid_size[2]
+          ).reindex(this->origin);
+	}
       };
-    }; // namespace detail
-  }; // namespace concurr
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace concurr
+} // namespace libmpdataxx

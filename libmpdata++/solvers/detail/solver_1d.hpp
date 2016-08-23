@@ -27,31 +27,24 @@ namespace libmpdataxx
 
 	protected:
 
-        typename parent_t::bcp_t bcxl, bcxr;
-     
 	const rng_t i; //TODO: to be removed
 
-	void xchng(int e) 
-	{
-          this->mem->barrier(); // TODO: implement using the xchng below
-	  bcxl->fill_halos_sclr( this->mem->psi[e][ this->n[e]] );
-	  bcxr->fill_halos_sclr( this->mem->psi[e][ this->n[e]] );
-          this->mem->barrier();
-	}
-
-        virtual void xchng_sclr(typename parent_t::arr_t arr, const bool deriv = false) final // for a given array
+        virtual void xchng_sclr(typename parent_t::arr_t &arr, const bool deriv = false) final // for a given array
         {
           this->mem->barrier();
-          bcxl->fill_halos_sclr(arr, deriv);
-          bcxr->fill_halos_sclr(arr, deriv);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, deriv);
           this->mem->barrier();
         }
+
+	void xchng(int e) final
+	{
+          xchng_sclr(this->mem->psi[e][ this->n[e]]);
+	}
 
         virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec); 
-          bcxr->fill_halos_vctr_alng(arrvec);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec); 
           this->mem->barrier();
         }
 
@@ -93,11 +86,11 @@ namespace libmpdataxx
             p, 
             idx_t<parent_t::n_dims>(args.i)
           ), 
-          bcxl(std::move(args.bcxl)), 
-          bcxr(std::move(args.bcxr)),
           i(args.i)
 	{
           this->di = p.di;
+          this->dijk = {p.di};
+          this->set_bcs(0, args.bcxl, args.bcxr);
         }
 
         // memory allocation logic using static methods
@@ -108,10 +101,14 @@ namespace libmpdataxx
 	  typename parent_t::mem_t *mem, 
 	  const char * __file__, 
 	  const int n_arr,
-	  const rng_t rng
+	  const rng_t rng,
+          std::string name = ""
 	)
 	{
 	  mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
+
+          if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
+
           for (int n = 0; n < n_arr; ++n)
           {
 	    mem->tmp[__file__].back().push_back(
@@ -122,23 +119,25 @@ namespace libmpdataxx
 
         public:
 
-	static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)   
-        {
+	static void alloc(
+          typename parent_t::mem_t *mem, 
+          const int &n_iters
+        ) {
           mem->psi.resize(parent_t::n_eqns);
 	  for (int e = 0; e < parent_t::n_eqns; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.grid_size[0]))));
+	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(mem->grid_size[0]))));
     
-	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(p.grid_size[0])))); 
+	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0])))); 
 
           if (opts::isset(ct_params_t::opts, opts::nug))
-	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(p.grid_size[0]))));
+	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(mem->grid_size[0]))));
 
           // allocate Kahan summation temporary vars
           if (opts::isset(ct_params_t::opts, opts::khn))
             for (int n = 0; n < 3; ++n) 
               mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
-                parent_t::rng_sclr(p.grid_size[0])
+                parent_t::rng_sclr(mem->grid_size[0])
               )));
         } 
 
@@ -146,22 +145,22 @@ namespace libmpdataxx
 
         // helper method to allocate a vector-component temporary array
         static void alloc_tmp_vctr(
-          typename parent_t::mem_t *mem, const std::array<int, 1> &grid_size, 
+          typename parent_t::mem_t *mem, 
           const char * __file__
         )
         {
-          alloc_tmp(mem, __file__, 1, parent_t::rng_vctr(grid_size[0])); // always one-component vectors
+          alloc_tmp(mem, __file__, 1, parent_t::rng_vctr(mem->grid_size[0])); // always one-component vectors
         }
 
         // helper method to allocate n_arr scalar temporary arrays 
         static void alloc_tmp_sclr(
-          typename parent_t::mem_t *mem, const std::array<int, 1> &grid_size, 
+          typename parent_t::mem_t *mem, 
           const char * __file__, const int n_arr
         )
         {
-          alloc_tmp(mem, __file__, n_arr, parent_t::rng_sclr(grid_size[0])); 
+          alloc_tmp(mem, __file__, n_arr, parent_t::rng_sclr(mem->grid_size[0])); 
         }
       };
-    }; // namespace detail
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

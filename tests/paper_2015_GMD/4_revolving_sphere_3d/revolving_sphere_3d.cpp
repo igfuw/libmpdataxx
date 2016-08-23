@@ -21,9 +21,7 @@ void test(const std::string& dir_name)
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
-//<listing-1>
     enum { n_dims = 3 };
-//</listing-1>
     enum { n_eqns = 1 };
     enum { opts = opts_arg };
   };
@@ -32,14 +30,12 @@ void test(const std::string& dir_name)
   int nx = 59;
 
   using slv_t = solvers::mpdata<ct_params_t>;
-//<listing-2>
   using slv_out_t = 
     stats<
       output::hdf5_xdmf<
         slv_t
       >
     >;
-//</listing-2>
   typename slv_out_t::rt_params_t p;
 
   // pre instantation
@@ -48,9 +44,7 @@ void test(const std::string& dir_name)
 
   p.outfreq = nt;
   p.outvars[0].name = "psi";
-//<listing-3>
   p.outdir = dir_name;
-//</listing-3>
 
   // post instantation
   const typename ct_params_t::real_t

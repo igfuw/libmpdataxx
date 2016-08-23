@@ -48,18 +48,17 @@ void test(const std::string filename)
 
   p.n_iters = opts_iters; 
   p.grid_size = {nlon, nlat};
+  p.max_abs_div_eps = 1e-15;
 
   p.outfreq = nt; 
   p.outvars[0].name = "psi";
   p.outdir = filename;
 
-//<listing-2>
   concurr::threads<
     slv_out_t, 
     bcond::cyclic, bcond::cyclic,
     bcond::polar, bcond::polar
   > run(p); 
-//</listing-2>
   
   typename ct_params_t::real_t
     r = 7 * dlmb,
@@ -89,19 +88,14 @@ void test(const std::string filename)
   
   run.advector(y) = -dlmb * udt * sin(b) * blitz::sin((i) * dlmb)* blitz::cos((j+1) * dphi - pi / 2);
   
-//<listing-3>
   run.g_factor() = dlmb * dphi *
     blitz::cos(dphi * (j + 0.5) - pi / 2);
-//</listing-3>
 
   run.advance(nt);
 }
 
 int main()
 {
-//<listing-1>
-    enum { opts = opts::nug };
-//</listing-1>
   {
     enum { opts = opts::nug | opts::iga | opts::fct };
     const int opts_iters = 2;

@@ -27,38 +27,87 @@ namespace libmpdataxx
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
 	protected:
-      
-	typename parent_t::bcp_t bcxl, bcxr, bcyl, bcyr, bczl, bczr;
 
 	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
 
-	void xchng_sclr(typename parent_t::arr_t arr,
-                       rng_t range_i, rng_t range_j, rng_t range_k,
-                       const bool deriv = false) // for a given array
+	virtual void xchng_sclr(typename parent_t::arr_t &arr,
+                       const rng_t &range_i,
+                       const rng_t &range_j,
+                       const rng_t &range_k,
+                       const bool deriv = false
+        ) final // for a given array
 	{
           this->mem->barrier();
-	  bcxl->fill_halos_sclr(arr, range_j, range_k, deriv);
-	  bcxr->fill_halos_sclr(arr, range_j, range_k, deriv);
-	  bcyl->fill_halos_sclr(arr, range_k, range_i, deriv);
-	  bcyr->fill_halos_sclr(arr, range_k, range_i, deriv);
-	  bczl->fill_halos_sclr(arr, range_i, range_j, deriv);
-	  bczr->fill_halos_sclr(arr, range_i, range_j, deriv);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_j, range_k, deriv);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_k, range_i, deriv);
+	  for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_i, range_j, deriv);
           this->mem->barrier();
 	}
-	void xchng(int e) 
+	void xchng(int e) final
 	{
 	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
 	}
 
-        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec)
+        virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
-          bcxl->fill_halos_vctr_alng(arrvec, j, k); 
-          bcxr->fill_halos_vctr_alng(arrvec, j, k);
-          bcyl->fill_halos_vctr_alng(arrvec, k, i); 
-          bcyr->fill_halos_vctr_alng(arrvec, k, i);
-          bczl->fill_halos_vctr_alng(arrvec, i, j);
-          bczr->fill_halos_vctr_alng(arrvec, i, j);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k); 
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i); 
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i, j);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_vctr_nrml(
+          const arrvec_t<typename parent_t::arr_t> &arrvec,
+          const rng_t &range_i,
+          const rng_t &range_j,
+          const rng_t &range_k
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k^1, range_i^h);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h, range_j^1);
+
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h, range_k^1);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_i^1, range_j^h);
+   
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j^1, range_k^h);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k^h, range_i^1);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_pres(
+	  const typename parent_t::arr_t &arr,
+	  const idx_t<3> &range_ijk
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk[0], range_ijk[1]);
+          this->mem->barrier();
+        }
+
+        virtual void set_edges(
+          const arrvec_t<typename parent_t::arr_t> &av,
+	  const idx_t<3> &range_ijk,
+          const int &sign
+        ) final
+        {
+          for (auto &bc : this->bcs[0]) bc->set_edge_pres(av[0], range_ijk[1], range_ijk[2], sign);
+          for (auto &bc : this->bcs[1]) bc->set_edge_pres(av[1], range_ijk[2], range_ijk[0], sign);
+          for (auto &bc : this->bcs[2]) bc->set_edge_pres(av[2], range_ijk[0], range_ijk[1], sign);
+          this->mem->barrier();
+        }
+        
+        virtual void save_edges(
+          const arrvec_t<typename parent_t::arr_t> &av,
+	  const idx_t<3> &range_ijk
+        ) final
+        {
+          for (auto &bc : this->bcs[0]) bc->save_edge_vel(av[0], range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->save_edge_vel(av[1], range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[2]) bc->save_edge_vel(av[2], range_ijk[0], range_ijk[1]);
           this->mem->barrier();
         }
         
@@ -69,19 +118,26 @@ namespace libmpdataxx
           xchng_vctr_alng(this->mem->GC);
  
           // sanity check for non-divergence of the initial Courant number field
-          // TODO: same in 1D and 3D
-          if (blitz::epsilon(typename parent_t::real_t(44)) < max(abs(
-	    ( 
-              this->mem->GC[0](i-h, j, k) - 
-	      this->mem->GC[0](i+h, j, k)
-            ) + (
-	      this->mem->GC[1](i, j-h, k) - 
-	      this->mem->GC[1](i, j+h, k)
-            ) + (
-	      this->mem->GC[2](i, j, k-h) - 
-	      this->mem->GC[2](i, j, k+h)
-            )
-	  ))) throw std::runtime_error("initial advector field is divergent");
+          // TODO: same in 1D
+          if (!opts::isset(ct_params_t::opts, opts::dfl))
+          {
+            typename ct_params_t::real_t max_abs_div = max(abs(
+              (
+                ( 
+                  this->mem->GC[0](i-h, j, k) - 
+                  this->mem->GC[0](i+h, j, k)
+                ) + (
+                  this->mem->GC[1](i, j-h, k) - 
+                  this->mem->GC[1](i, j+h, k)
+                ) + (
+                  this->mem->GC[2](i, j, k-h) - 
+                  this->mem->GC[2](i, j, k+h)
+                )
+              ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k)
+            ));
+	    if (max_abs_div > this->max_abs_div_eps) 
+	      throw std::runtime_error("initial advector field is divergent");
+          }
         }
 
         public:
@@ -119,24 +175,22 @@ namespace libmpdataxx
           ),
 	  i(args.i), 
           j(args.j), 
-          k(args.k),  
-	  bcxl(std::move(args.bcxl)),
-	  bcxr(std::move(args.bcxr)),
-	  bcyl(std::move(args.bcyl)),
-	  bcyr(std::move(args.bcyr)),
-	  bczl(std::move(args.bczl)),
-	  bczr(std::move(args.bczr))
+          k(args.k)
 	{
           this->di = p.di;
           this->dj = p.dj;
           this->dk = p.dk;
+          this->dijk = {p.di, p.dj, p.dk};
+          this->set_bcs(0, args.bcxl, args.bcxr);
+	  this->set_bcs(1, args.bcyl, args.bcyr);
+	  this->set_bcs(2, args.bczl, args.bczr);
         } 
 
 	public:
 
 	static void alloc(
           typename parent_t::mem_t *mem,
-          const rt_params_t &p
+          const int &n_iters
         )   
         {
           // psi
@@ -144,85 +198,89 @@ namespace libmpdataxx
 	  for (int e = 0; e < parent_t::n_eqns; ++e) // equations
 	    for (int n = 0; n < n_tlev; ++n) // time levels
 	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(
-                parent_t::rng_sclr(p.grid_size[0]),
-                parent_t::rng_sclr(p.grid_size[1]),
-                parent_t::rng_sclr(p.grid_size[2])
+                parent_t::rng_sclr(mem->grid_size[0]),
+                parent_t::rng_sclr(mem->grid_size[1]),
+                parent_t::rng_sclr(mem->grid_size[2])
               ))); 
 
           // Courant field components (Arakawa-C grid)
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_vctr(p.grid_size[0]),
-            parent_t::rng_sclr(p.grid_size[1]),
-            parent_t::rng_sclr(p.grid_size[2])
+            parent_t::rng_vctr(mem->grid_size[0]),
+            parent_t::rng_sclr(mem->grid_size[1]),
+            parent_t::rng_sclr(mem->grid_size[2])
           )));
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(
-            parent_t::rng_sclr(p.grid_size[0]),
-            parent_t::rng_vctr(p.grid_size[1]),
-            parent_t::rng_sclr(p.grid_size[2])
+            parent_t::rng_sclr(mem->grid_size[0]),
+            parent_t::rng_vctr(mem->grid_size[1]),
+            parent_t::rng_sclr(mem->grid_size[2])
           )));
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(
-            parent_t::rng_sclr(p.grid_size[0]),
-            parent_t::rng_sclr(p.grid_size[1]),
-            parent_t::rng_vctr(p.grid_size[2])
+            parent_t::rng_sclr(mem->grid_size[0]),
+            parent_t::rng_sclr(mem->grid_size[1]),
+            parent_t::rng_vctr(mem->grid_size[2])
           )));
 
           // allocate G
           if (opts::isset(ct_params_t::opts, opts::nug))
 	    mem->G.reset(mem->old(new typename parent_t::arr_t(
-                    parent_t::rng_sclr(p.grid_size[0]),
-                    parent_t::rng_sclr(p.grid_size[1]),
-                    parent_t::rng_sclr(p.grid_size[2])
+                    parent_t::rng_sclr(mem->grid_size[0]),
+                    parent_t::rng_sclr(mem->grid_size[1]),
+                    parent_t::rng_sclr(mem->grid_size[2])
             )));
 
 	  // allocate Kahan summation temporary vars
 	  if (opts::isset(ct_params_t::opts, opts::khn))
 	    for (int n = 0; n < 3; ++n) 
 	      mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
-	        parent_t::rng_sclr(p.grid_size[0]), 
-	        parent_t::rng_sclr(p.grid_size[1]),
-	        parent_t::rng_sclr(p.grid_size[2])
+	        parent_t::rng_sclr(mem->grid_size[0]), 
+	        parent_t::rng_sclr(mem->grid_size[1]),
+	        parent_t::rng_sclr(mem->grid_size[2])
 	      )));
         }  
         
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
-          typename parent_t::mem_t *mem, const std::array<int, 3> &grid_size,
+          typename parent_t::mem_t *mem,
           const char * __file__
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
           mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-            parent_t::rng_vctr(grid_size[0]),
-            parent_t::rng_sclr(grid_size[1]),
-            parent_t::rng_sclr(grid_size[2])
+            parent_t::rng_vctr(mem->grid_size[0]),
+            parent_t::rng_sclr(mem->grid_size[1]),
+            parent_t::rng_sclr(mem->grid_size[2])
           ))); 
           mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-            parent_t::rng_sclr(grid_size[0]),
-            parent_t::rng_vctr(grid_size[1]),
-            parent_t::rng_sclr(grid_size[2])
+            parent_t::rng_sclr(mem->grid_size[0]),
+            parent_t::rng_vctr(mem->grid_size[1]),
+            parent_t::rng_sclr(mem->grid_size[2])
           ))); 
           mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-             parent_t::rng_sclr(grid_size[0]),
-             parent_t::rng_sclr(grid_size[1]),
-             parent_t::rng_vctr(grid_size[2])
+             parent_t::rng_sclr(mem->grid_size[0]),
+             parent_t::rng_sclr(mem->grid_size[1]),
+             parent_t::rng_vctr(mem->grid_size[2])
           ))); 
         }
 
         // helper method to allocate n_arr scalar temporary arrays 
         static void alloc_tmp_sclr(
-          typename parent_t::mem_t *mem, const std::array<int, 3> &grid_size,
-          const char * __file__, const int n_arr
+          typename parent_t::mem_t *mem,
+          const char * __file__, const int n_arr,
+          std::string name = ""
         )   
         {   
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+
+          if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
+
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
-              parent_t::rng_sclr(grid_size[0]),
-              parent_t::rng_sclr(grid_size[1]),
-              parent_t::rng_sclr(grid_size[2])
+              parent_t::rng_sclr(mem->grid_size[0]),
+              parent_t::rng_sclr(mem->grid_size[1]),
+              parent_t::rng_sclr(mem->grid_size[2])
             )));
         } 
       };
-    };
-  }; // namespace solvers
-}; // namespace libmpdataxx
+    } // namespace detail
+  } // namespace solvers
+} // namespace libmpdataxx

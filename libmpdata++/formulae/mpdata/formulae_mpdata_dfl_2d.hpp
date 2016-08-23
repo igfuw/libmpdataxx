@@ -89,6 +89,6 @@ namespace libmpdataxx
         0.5 *  (psi(pi<dim>(i+1, j)) + psi(pi<dim>(i, j)))  //to be compatible with iga formulation
       )
       
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx

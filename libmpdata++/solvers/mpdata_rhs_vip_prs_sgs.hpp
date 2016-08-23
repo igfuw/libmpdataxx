@@ -175,13 +175,15 @@ namespace libmpdataxx
           throw std::runtime_error("eta == 0");
       }
 
-      static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
-      {
-	parent_t::alloc(mem, p);
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 3); // unique strain rate tensor elements
+      static void alloc(
+        typename parent_t::mem_t *mem, 
+        const int &n_iters
+      ) {
+	parent_t::alloc(mem, n_iters);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 3); // unique strain rate tensor elements
         // TODO: do not allocate unnecessary memory when not using pade differencing
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 4);
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 2);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 4);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 2);
       }
 
     };
@@ -357,14 +359,16 @@ namespace libmpdataxx
           throw std::runtime_error("eta == 0");
       }
 
-      static void alloc(typename parent_t::mem_t *mem, const rt_params_t &p)
-      {
-	parent_t::alloc(mem, p);
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 6); // unique strain rate tensor elements
+      static void alloc(
+        typename parent_t::mem_t *mem,
+        const int &n_iters
+      ) {
+	parent_t::alloc(mem, n_iters);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 6); // unique strain rate tensor elements
         // TODO: do not allocate unnecessary memory when not using pade differencing
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 9);
-        parent_t::alloc_tmp_sclr(mem, p.grid_size, __FILE__, 2);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 9);
+        parent_t::alloc_tmp_sclr(mem, __FILE__, 2);
       }
     };
-  }; // namespace solvers
-}; // namespace libmpdataxx
+  } // namespace solvers
+} // namespace libmpdataxx

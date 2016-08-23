@@ -130,6 +130,6 @@ namespace libmpdataxx
         // divergent flow correction
         + DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j) 
       ) 
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx 
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx 

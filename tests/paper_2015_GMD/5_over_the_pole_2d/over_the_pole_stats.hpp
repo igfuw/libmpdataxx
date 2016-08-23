@@ -54,8 +54,8 @@ struct stats : public parent_t
 
     last_timestep = nt;
                                     //nlon
-    ii = blitz::Range(0, this->mem->grid_size[0] - 2);  // due to boundary condition type not all points should be evaluated
-    jj = blitz::Range(0, this->mem->grid_size[1] - 1);  // when calculating errors
+    ii = blitz::Range(0, this->mem->grid_size[0].length() - 2);  // due to boundary condition type not all points should be evaluated
+    jj = blitz::Range(0, this->mem->grid_size[1].length() - 1);  // when calculating errors
                                     //nlat
 
     ic.resize(ii, jj);

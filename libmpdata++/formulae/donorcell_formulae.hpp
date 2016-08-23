@@ -158,6 +158,6 @@ namespace libmpdataxx
         }
       }
 
-    }; // namespace donorcell 
-  }; // namespace formulae
-}; // namespace libmpdataxx
+    } // namespace donorcell 
+  } // namespace formulae
+} // namespace libmpdataxx

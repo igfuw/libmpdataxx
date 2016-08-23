@@ -72,12 +72,12 @@ struct stats : public parent_t
       ofs << "max(velocity) = " << max(sqrt(pow(this->mem->advectee(ix::u),2) + pow(this->mem->advectee(ix::w),2))) <<std::endl;
 
       assert(max(abs(
-        this->mem->advectee(ix::tht)(0,                         blitz::Range::all()) - 
-        this->mem->advectee(ix::tht)(this->mem->grid_size[0]-1, blitz::Range::all())
+        this->mem->advectee(ix::tht)(0,                                  blitz::Range::all()) - 
+        this->mem->advectee(ix::tht)(this->mem->grid_size[0].length()-1, blitz::Range::all())
       )) == 0);
       assert(max(abs(
-        this->mem->advectee(ix::tht)(blitz::Range::all(), 0                        ) - 
-        this->mem->advectee(ix::tht)(blitz::Range::all(), this->mem->grid_size[0]-1)
+        this->mem->advectee(ix::tht)(blitz::Range::all(), 0                                 ) - 
+        this->mem->advectee(ix::tht)(blitz::Range::all(), this->mem->grid_size[0].length()-1)
       )) == 0);
 
       error_1 = 

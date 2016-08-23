@@ -40,7 +40,7 @@ namespace libmpdataxx
         const rng_t &j
       ) return_macro(,
         (abs(GC[dim](pi<dim>(i+h, j))) - 2 * pow(GC[dim](pi<dim>(i+h, j)), 2) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j)) 
-        / 4 * GC_bar<dim>(GC[dim-1], i, j) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j)
+         * GC_bar<dim>(GC[dim-1], i, j) / G_at_half<opts BOOST_PP_COMMA() dim>(G, i, j)
       )
 
       template<opts_t opts, int dim, class arr_2d_t>
@@ -154,6 +154,6 @@ namespace libmpdataxx
          + 
          HOT_2<opts BOOST_PP_COMMA() dim>(psi, i, j) * HOT_2_helper<opts BOOST_PP_COMMA() dim>(GC, G, i, j)
       )
-    }; // namespace mpdata
-  }; // namespace formulae
-}; // namespcae libmpdataxx 
+    } // namespace mpdata
+  } // namespace formulae
+} // namespcae libmpdataxx 

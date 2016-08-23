@@ -20,7 +20,6 @@ const int nt = 1400;
 
 int main() 
 {
-//<listing-1>
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
@@ -30,7 +29,6 @@ int main()
       solvers::rhs_scheme_t::trapez };
     struct ix { enum {psi, phi}; };
   };
-//</listing-1>
 
   using real_t = typename ct_params_t::real_t;
 
@@ -42,12 +40,10 @@ int main()
     >;
   typename slv_out_t::rt_params_t p; 
 
-//<listing-2>
   // run-time parameters
   using boost::math::constants::pi;
   p.dt = 1;
   p.omega = 2 * pi<real_t>() / p.dt / 400;
-//</listing-2>
   p.grid_size = {1001};
   p.outfreq = 20; 
 
