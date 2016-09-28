@@ -128,10 +128,7 @@ namespace libmpdataxx
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
               curr_dim.createAttribute("dt", flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &dt);
             }
-            // empty dataset for record_aux_const
-            {
-              (*hdfp).createDataSet("setup", flttype_output, H5::DataSpace(0, &zero));
-            }
+
             // G factor
             if (this->mem->G.get() != nullptr)
             {
@@ -292,9 +289,10 @@ namespace libmpdataxx
       void record_aux_const(const std::string &name, typename solver_t::real_t data)
       {
         assert(this->rank == 0);
+        float data_f(data);
 
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR);; // reopen the const file
-        hdfcp.openDataSet("setup").createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data);
+        hdfcp.openGroup("/").createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data_f);
       }
 
       public:
