@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -e
 cd tests/unit
 mkdir build 
 cd build
