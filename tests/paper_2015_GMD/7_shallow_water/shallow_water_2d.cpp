@@ -70,11 +70,9 @@ void test(const std::string &outdir)
   p.g = 1;
   p.outfreq = outfreq;
   p.outdir = outdir;
-  p.outvars = {
-    {ix::h,  {.name="h" , .unit="TODO"}}, 
-    {ix::qx, {.name="qx", .unit="TODO"}}, 
-    {ix::qy, {.name="qy", .unit="TODO"}}
-  };
+  p.outvars[ix::h].name = "h";
+  p.outvars[ix::qx].name = "qx";
+  p.outvars[ix::qy].name = "qy";
   p.vip_eps = 1e-8;
 
   // instantiation
