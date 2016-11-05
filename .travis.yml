@@ -75,6 +75,7 @@ install:
 
     # scipy 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-scipy; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install scipy; fi 
 
     # matplotlib
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-matplotlib; fi
