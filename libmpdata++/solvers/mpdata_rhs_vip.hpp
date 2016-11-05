@@ -76,8 +76,6 @@ namespace libmpdataxx
         assert(this->di != 0);
 
         this->vip_ixs = {ix::vip_i};
-
-        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_i))));
       } 
     };
 
@@ -166,9 +164,6 @@ namespace libmpdataxx
         assert(this->dj != 0);
         
         this->vip_ixs = {ix::vip_i, ix::vip_j};
-
-        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_i))));
-        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_j))));
       }
       
       static void alloc(
@@ -320,10 +315,6 @@ namespace libmpdataxx
         assert(this->dk != 0);
         
         this->vip_ixs = {ix::vip_i, ix::vip_j, ix::vip_k};
-
-        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_i))));
-        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_j))));
-        this->vips.push_back(this->mem->never_delete(&(this->state(ix::vip_k))));
       } 
     }; 
   } // namespace solvers
