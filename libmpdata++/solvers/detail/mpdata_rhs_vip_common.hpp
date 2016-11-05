@@ -92,11 +92,11 @@ namespace libmpdataxx
           assert(std::isfinite(sum(this->stash[d](this->ijk))));
 	}   
 
-	arrvec_t<typename parent_t::arr_t> vips()
+	arrvec_t<typename parent_t::arr_t>& vips()
         {
-          arrvec_t<typename parent_t::arr_t> ret;
+          static thread_local arrvec_t<typename parent_t::arr_t> ret;
           for (int d = 0; d < parent_t::n_dims; ++d)
-            ret.push_back(this->mem->never_delete(&(this->state(vip_ixs[d]))));
+            ret.insert(ret.begin() + d, this->mem->never_delete(&(this->state(vip_ixs[d]))));
           return ret;
         }
 
