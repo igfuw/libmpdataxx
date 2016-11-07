@@ -34,7 +34,7 @@ namespace libmpdataxx
 
 	// member fields
         std::array<int, parent_t::n_dims> vip_ixs;
-	arrvec_t<typename parent_t::arr_t> &stash, &vip_rhs, vips;
+	arrvec_t<typename parent_t::arr_t> &stash, &vip_rhs;
         typename parent_t::real_t eps;
 
 	virtual void fill_stash() = 0;
@@ -92,6 +92,14 @@ namespace libmpdataxx
           assert(std::isfinite(sum(this->stash[d](this->ijk))));
 	}   
 
+	arrvec_t<typename parent_t::arr_t>& vips()
+        {
+          static thread_local arrvec_t<typename parent_t::arr_t> ret;
+          for (int d = 0; d < parent_t::n_dims; ++d)
+            ret.insert(ret.begin() + d, this->mem->never_delete(&(this->state(vip_ixs[d]))));
+          return ret;
+        }
+
 	virtual void extrapolate_in_time() = 0;
 	virtual void interpolate_in_space() = 0;
 
@@ -102,7 +110,7 @@ namespace libmpdataxx
             if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
             {
               vip_rhs[d](this->ijk) = -0.5 * this->dt * 
-                (*this->mem->vab_coeff)(this->ijk) * (vips[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
+                (*this->mem->vab_coeff)(this->ijk) * (vips()[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
             else
             {
@@ -118,7 +126,7 @@ namespace libmpdataxx
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
               vip_rhs[d](this->ijk) += -this->dt * 
-                (*this->mem->vab_coeff)(this->ijk) * (vips[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
+                (*this->mem->vab_coeff)(this->ijk) * (vips()[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
           }
         }
@@ -129,13 +137,13 @@ namespace libmpdataxx
           {
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
-              vip_rhs[d](this->ijk) = -vips[d](this->ijk);
+              vip_rhs[d](this->ijk) = -vips()[d](this->ijk);
             }
             add_relax();
-            normalize_vip(vips);
+            normalize_vip(vips());
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
-              vip_rhs[d](this->ijk) += vips[d](this->ijk);
+              vip_rhs[d](this->ijk) += vips()[d](this->ijk);
             }
           }
         }
@@ -144,7 +152,7 @@ namespace libmpdataxx
         {    
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            vips[d](this->ijk) += vip_rhs[d](this->ijk);
+            vips()[d](this->ijk) += vip_rhs[d](this->ijk);
             vip_rhs[d](this->ijk) = 0;
           }
         }
@@ -164,7 +172,7 @@ namespace libmpdataxx
         {
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            this->vips[d](this->ijk) +=
+            this->vips()[d](this->ijk) +=
               0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[d](this->ijk);
           }
         }
