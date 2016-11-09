@@ -5,7 +5,7 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 #pragma once
-#include <libmpdata++/solvers/mpdata_rhs_vip_prs.hpp>
+#include <libmpdata++/solvers/mpdata_rhs_vip_prs_sgs.hpp>
 
 namespace libmpdataxx
 {
@@ -14,9 +14,9 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t>
-      class boussinesq_common : public libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>
+      class boussinesq_common : public libmpdataxx::solvers::mpdata_rhs_vip_prs_sgs<ct_params_t>
       {
-        using parent_t = libmpdataxx::solvers::mpdata_rhs_vip_prs<ct_params_t>;
+        using parent_t = libmpdataxx::solvers::mpdata_rhs_vip_prs_sgs<ct_params_t>;
 
         public:
         using real_t = typename ct_params_t::real_t;
@@ -25,6 +25,8 @@ namespace libmpdataxx
         // member fields
         real_t g, Tht_ref;
         typename parent_t::arr_t &tht_e, &tht_abs, &hflux;
+
+        virtual void calc_full_tht(typename parent_t::arr_t&) = 0;
 
         public:
         struct rt_params_t : parent_t::rt_params_t 
@@ -54,7 +56,14 @@ namespace libmpdataxx
           parent_t::alloc(mem, n_iters);
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "tht_e");
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "tht_abs");
-          parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "hflux");
+          if (static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles)
+          {
+            parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "hflux");
+          }
+          else
+          {
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
+          }
         }
       };
     } // namespace detail
