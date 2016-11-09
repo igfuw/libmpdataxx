@@ -42,11 +42,11 @@ namespace libmpdataxx
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
-            this->xchng_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo, this->k^this->halo);
+            this->xchng_sclr(*this->mem->G, this->ijk, this->halo);
           
           // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
           // halos for GC_z
-          this->xchng_vctr_nrml(this->mem->GC, this->i, this->j, this->k);
+          this->xchng_vctr_nrml(this->mem->GC, this->ijk);
 	} 
 
 	// method invoked by the solver
@@ -97,7 +97,7 @@ namespace libmpdataxx
               // iterations, also needed for fct but it is done there independently hence
               // the following check
               if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
-                this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j, this->k);
+                this->xchng_vctr_nrml(this->GC_corr(iter), this->ijk);
 
 	      this->fct_adjust_antidiff(e, iter);
 
