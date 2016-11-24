@@ -100,11 +100,11 @@ namespace libmpdataxx
                    const std::vector<std::string>& attr_names,
                    const blitz::TinyVector<int, dim>& dimensions)
         {
-          top.dimensions = dimensions;
+          top.dimensions = dimensions + 1;
 
           for (const auto& dn : dim_names)
           {
-            geo.coords[dn.first].dimensions = dimensions;
+            geo.coords[dn.first].dimensions = dimensions + 1;
             geo.coords[dn.first].data = hdf_name + ":/" + dn.second;
           }
 
@@ -112,7 +112,7 @@ namespace libmpdataxx
           {
             attribute a;
             a.name = n;
-            a.item.dimensions = dimensions - 1;
+            a.item.dimensions = dimensions;
             attrs.push_back(a);
           }
         }
@@ -123,7 +123,7 @@ namespace libmpdataxx
         {
           attribute a;
           a.name = name;
-          a.item.dimensions = dimensions - 1;
+          a.item.dimensions = dimensions;
           a.item.data = hdf_name + ":/" + a.name;
           c_attrs.push_back(a);
         }

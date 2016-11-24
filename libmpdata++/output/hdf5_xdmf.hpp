@@ -40,29 +40,38 @@ namespace libmpdataxx
       {
         parent_t::start(nt);
 
-        // get variable names for xdmf writer setup
-        std::vector<std::string> attr_names;
-        for (const auto &v : this->outvars)
+#if defined(USE_MPI)
+        if (this->mem->distmem.rank() == 0)
+#endif
         {
-          attr_names.push_back(v.second.name);
-        }
-        
-        if (this->mem->G.get() != nullptr) xdmfw.add_const_attribute("G", this->const_name, this->cshape);
+          // get variable names for xdmf writer setup
+          std::vector<std::string> attr_names;
+          for (const auto &v : this->outvars)
+          {
+            attr_names.push_back(v.second.name);
+          }
+          
+          if (this->mem->G.get() != nullptr) xdmfw.add_const_attribute("G", this->const_name, this->mem->distmem.grid_size.data());
 
-        xdmfw.setup(this->const_name, this->dim_names, attr_names, this->cshape);
+          xdmfw.setup(this->const_name, this->dim_names, attr_names, this->mem->distmem.grid_size.data());
+        }
       }
 
       void record_all()
       {
-        // write xdmf markup
-        std::string xmf_name = this->base_name() + ".xmf";
-        xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->dt * this->timestep);
+#if defined(USE_MPI)
+        if (this->mem->distmem.rank() == 0)
+#endif
+        {
+          // write xdmf markup
+          std::string xmf_name = this->base_name() + ".xmf";
+          xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->dt * this->timestep);
 
-        // save the xmf filename for temporal write
-        timesteps.push_back(xmf_name);
-        // write temporal xmf
-        xdmfw.write_temporal(this->outdir + "/temp.xmf", timesteps);
-
+          // save the xmf filename for temporal write
+          timesteps.push_back(xmf_name);
+          // write temporal xmf
+          xdmfw.write_temporal(this->outdir + "/temp.xmf", timesteps);
+        }
         parent_t::record_all();
       }
 
