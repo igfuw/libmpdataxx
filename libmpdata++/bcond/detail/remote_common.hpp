@@ -94,8 +94,12 @@ namespace libmpdataxx
 	  boost::mpi::wait_all(reqs.begin(), reqs.end());
 
           // checking debug information
-	  assert(buf_rng.first  % grid_size_0 == idx_recv[0].first() % grid_size_0);
-          assert(buf_rng.second % grid_size_0 == idx_recv[0].last()  % grid_size_0);
+          
+          // positive modulo (grid_size_0 - 1)
+          auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
+
+	  assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
+          assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
 #else
           assert(false);
 #endif
