@@ -89,6 +89,10 @@ namespace libmpdataxx
             origin[d] = this->grid_size[d].first();
           }
 
+          std::ostringstream oss;
+          oss << "grid_size[0]: " << this->grid_size[0] << " origin[0]: " << origin[0] << std::endl;
+          std::cerr << oss.str() << std::endl;
+
           if (size > grid_size[0]) 
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
 
@@ -240,9 +244,11 @@ namespace libmpdataxx
 	{
 	  return this->distmem.size() == 0
 	    ? rng
-	    : this->distmem.rank() > 0
-	      ? rng_t(rng.first()-1, rng.last())
-	      : rng_t(rng.first(),   rng.last()+1)
+	    : this->distmem.rank() > 0 && this->distmem.rank() < (this->distmem.size() - 1)
+	      ? rng_t(rng.first()-1, rng.last()+1)
+	      : this->distmem.rank() == 0
+                ? rng_t(rng.first()  ,   rng.last()+1)
+                : rng_t(rng.first()-1,   rng.last()  )
           ;
 	}
 
