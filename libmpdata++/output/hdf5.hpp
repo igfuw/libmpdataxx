@@ -118,7 +118,9 @@ namespace libmpdataxx
 
             if (parent_t::n_dims == 1)
             {
-              chunk[0] = shape[0];
+              // chunk size has to be common to all processes !
+              // TODO: something better ?
+              chunk[0] = this->mem->distmem.grid_size[0] / this->mem->distmem.size();
               count[0] = shape[0];
             }
           }
