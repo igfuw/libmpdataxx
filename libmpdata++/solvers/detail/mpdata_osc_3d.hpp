@@ -36,8 +36,8 @@ namespace libmpdataxx
 
 	// member fields
 	const rng_t im, jm, km;
-
-	void hook_ante_loop(const int nt) 
+  
+	void hook_ante_loop(const typename parent_t::advance_arg_t nt)
 	{   
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);

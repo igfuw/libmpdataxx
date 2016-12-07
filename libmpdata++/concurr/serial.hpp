@@ -38,7 +38,7 @@ namespace libmpdataxx
         {};
       };
 
-      void solve(int nt)
+      void solve(typename parent_t::advance_arg_t nt)
       {
         this->algos[0].solve(nt);
       }
