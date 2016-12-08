@@ -106,7 +106,7 @@ namespace libmpdataxx
         {
           parent_t::vip_rhs_impl_fnlz();
           
-          const auto &w = this->vips[ct_params_t::n_dims - 1];
+          const auto &w = this->vips()[ct_params_t::n_dims - 1];
           this->state(ix::tht)(this->ijk) += - 0.5 * this->dt * w(this->ijk) * this->dtht_e(this->ijk);
           this->rhs.at(ix::tht)(this->ijk) += -w(this->ijk) * this->dtht_e(this->ijk);
         }

@@ -15,7 +15,7 @@ matrix:
         - os: osx
           compiler: gcc
 
-osx_image: xcode611
+osx_image: xcode8
 
 before_install:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
@@ -75,6 +75,7 @@ install:
 
     # scipy 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-scipy; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install scipy; fi 
 
     # matplotlib
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-matplotlib; fi

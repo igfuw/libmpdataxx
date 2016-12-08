@@ -87,7 +87,7 @@ namespace libmpdataxx
           int npoints = 1;
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-	    Phi(this->ijk) -= 0.5 * pow2(this->vips[d](this->ijk));
+	    Phi(this->ijk) -= 0.5 * pow2(this->vips()[d](this->ijk));
             npoints *= (this->mem->grid_size[d].last() + 1);
           }
           
@@ -102,7 +102,7 @@ namespace libmpdataxx
         {
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            tmp_uvw[d](this->ijk) = this->vips[d](this->ijk);
+            tmp_uvw[d](this->ijk) = this->vips()[d](this->ijk);
           }
 
 	  //initial error   
@@ -128,14 +128,14 @@ namespace libmpdataxx
 	{
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-	    this->vips[d](this->ijk) -= tmp_uvw[d](this->ijk);
+	    this->vips()[d](this->ijk) -= tmp_uvw[d](this->ijk);
           }
 	}
 
         void hook_ante_loop(const int nt)
         {
           // save initial edge velocities
-          this->save_edges(this->vips, this->ijk);
+          this->save_edges(this->vips(), this->ijk);
 	  
           // correct initial velocity
 	  Phi(this->ijk) = real_t(0);
@@ -146,7 +146,7 @@ namespace libmpdataxx
           this->xchng_pres(this->Phi, this->ijk);
           formulae::nabla::calc_grad<parent_t::n_dims>(tmp_uvw, Phi, this->ijk, this->dijk);
 	  pressure_solver_apply();
-          this->set_edges(this->vips, this->ijk, 1);
+          this->set_edges(this->vips(), this->ijk, 1);
 	  
           parent_t::hook_ante_loop(nt);
 
@@ -166,16 +166,18 @@ namespace libmpdataxx
         {
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            this->vip_rhs[d](this->ijk) = -this->vips[d](this->ijk);
+            this->vip_rhs[d](this->ijk) = -this->vips()[d](this->ijk);
           }
+
           if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl) this->add_relax();
           pressure_solver_update();   // intentionally after forcings (pressure solver must be used after all known forcings are applied)
           pressure_solver_apply();
-          this->normalize_vip(this->vips);
-          this->set_edges(this->vips, this->ijk, 1);
+          this->normalize_vip(this->vips());
+          this->set_edges(this->vips(), this->ijk, 1);
+
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            this->vip_rhs[d](this->ijk) += this->vips[d](this->ijk);
+            this->vip_rhs[d](this->ijk) += this->vips()[d](this->ijk);
           }
         }
 

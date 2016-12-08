@@ -60,6 +60,7 @@ check_cxx_source_compiles("
 if (NOT CXX11_SUPPORTED)
   message(FATAL_ERROR "C++11 compatibility test failed - please update your compiler or point CMake to another one with -DCMAKE_CXX_COMPILER=...")
 endif()
+unset(CMAKE_REQUIRED_FLAGS)
 
 
 ############################################################################################
