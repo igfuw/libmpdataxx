@@ -12,11 +12,11 @@ namespace libmpdataxx
 {
   namespace concurr
   {
-    template <typename real_t, int n_dims>
+    template <typename real_t, int n_dims, typename advance_arg_t = int>
     struct any
     {
       virtual 
-      void advance(int) 
+      void advance(advance_arg_t) 
       { assert(false); throw; }  
 
       virtual 
