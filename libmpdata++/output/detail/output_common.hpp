@@ -109,15 +109,19 @@ namespace libmpdataxx
 	  {
             //TODO: output of solver statistics every timesteps could probably go here
 
-            if (do_record)
+            if (this->var_dt && do_record)
             {
               record_all();
               do_record = false;
             }
-            //for (int t = 0; t < outwindow; ++t)
-            //{
-            //  if ((this->timestep - t) % outfreq == 0) record_all();
-            //}
+            else if (!this->var_dt)
+            {
+              record_time = this->time;
+              for (int t = 0; t < outwindow; ++t)
+              {
+                if ((this->timestep - t) % static_cast<int>(outfreq) == 0) record_all();
+              }
+            }
           }
 	  
 	  this->mem->barrier(); // waiting for the output to be finished

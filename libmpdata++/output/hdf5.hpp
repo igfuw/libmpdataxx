@@ -119,7 +119,7 @@ namespace libmpdataxx
               float dt = this->dt;
 
               blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
-              coord = this->outfreq * this->dt * blitz::firstIndex();
+              coord = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * blitz::firstIndex();
 
               auto curr_dim = (*hdfp).createDataSet("T", flttype_output, H5::DataSpace(1, &nt_out));
 
