@@ -46,6 +46,10 @@ namespace libmpdataxx
       virtual 
       bool *panic_ptr() 
       { assert(false && "unimplemented!"); throw; }
+      
+      virtual 
+      const real_t time() const
+      { assert(false); throw; }
 
       // dtor
       virtual ~any() {}

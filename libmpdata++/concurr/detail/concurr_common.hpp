@@ -283,6 +283,11 @@ namespace libmpdataxx
         {
           return &this->mem->panic;
         }
+
+        const real_t time() const final
+        {
+          return algos[0].time_();
+        }
       };
     } // namespace detail
   } // namespace concurr
