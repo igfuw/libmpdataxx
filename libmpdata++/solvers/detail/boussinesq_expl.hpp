@@ -81,8 +81,6 @@ namespace libmpdataxx
             case (0):
             {
               rhs.at(ix::tht)(ijk) += this->hflux(ijk) - this->tht_abs(ijk) * (tht(ijk) - this->tht_e(ijk));
-
-              auto buoy_f = this->g * (tht(ijk) - this->tht_e(ijk)) / this->Tht_ref;
               
               if (!buoy_filter)
               {
