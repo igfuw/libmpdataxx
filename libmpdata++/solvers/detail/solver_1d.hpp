@@ -63,9 +63,11 @@ namespace libmpdataxx
           return this->mem->max(this->rank, courant_field(this->ijk));
         }
 
-        void adjust_gc(typename parent_t::real_t dt_ratio) final
+        void scale_gc(const typename parent_t::real_t time,
+                      const typename parent_t::real_t cur_dt,
+                      const typename parent_t::real_t old_dt) final
         {
-          this->mem->GC[0](rng_t(i.first(), i.last()-1)^h) *= dt_ratio;
+          this->mem->GC[0](rng_t(i.first(), i.last()-1)^h) *= cur_dt / old_dt;
           this->xchng_vctr_alng(this->mem->GC);
         }
 

@@ -48,7 +48,7 @@ namespace libmpdataxx
         using advance_arg_t = typename std::conditional<ct_params_t::var_dt, real_t, int>::type;
 
 	protected: 
-        // output common doesnt know about ct_params_t, FIXME
+        // TODO: output common doesnt know about ct_params_t
         bool var_dt = ct_params_t::var_dt;
 
         std::array<std::array<bcp_t, 2>, n_dims> bcs;
@@ -87,14 +87,11 @@ namespace libmpdataxx
         }
 
 	virtual real_t courant_number() = 0;
-        virtual real_t adjust_dt()
-        {
-          auto cfl = courant_number();
-          auto old_dt = dt;
-          dt *= max_courant / cfl;
-          return dt / old_dt;
-        }
-        virtual void adjust_gc(real_t dt_ratio) = 0;
+       
+        // return false if advector does not change in time
+        virtual bool calc_gc(const real_t time, const real_t cur_dt, const real_t old_dt) {return false;}
+
+        virtual void scale_gc(const real_t time, const real_t cur_dt, const real_t old_dt) = 0;
 
         private:
       
@@ -130,6 +127,8 @@ namespace libmpdataxx
         }
 
 	public:
+
+        const real_t time_() const { return time;}
 
         struct rt_params_t 
         {
@@ -178,6 +177,16 @@ namespace libmpdataxx
 	{   
           // multiple calls to sovlve() are meant to advance the solution by nt
           nt += ct_params_t::var_dt ? time : timestep;
+         
+          // adaptive timestepping - for constant in time velocity it suffices
+          // to change the timestep once and do a simple scaling of advector
+          if (ct_params_t::var_dt)
+          {
+            real_t cfl = courant_number();
+            const auto old_dt = dt;
+            dt *= max_courant / cfl;
+            scale_gc(time, dt, old_dt);
+          }
 
           // being generous about out-of-loop barriers 
           if (timestep == 0)
@@ -206,14 +215,25 @@ namespace libmpdataxx
             if (mem->panic) break;
 
             // proper solver stuff
-            if (ct_params_t::var_dt)
+            
+            // for variable in time velocity calculate advector at n+1/2, returns false if
+            // velocity does not change in time
+            bool var_gc = calc_gc(time, dt, dt);
+
+            // for variable in time velocity with adaptive time-stepping modify advector
+            // to keep the Courant number roughly constant
+            if (var_gc && ct_params_t::var_dt)
             {
-              auto r = adjust_dt();
-              adjust_gc(r);
-              this->mem->barrier();
+              real_t cfl = courant_number();
+              do 
+              {
+                const auto old_dt = dt;
+                dt *= max_courant / cfl;
+                calc_gc(time, dt, old_dt);
+                cfl = courant_number();
+              }
+              while (cfl > max_courant);
             }
-            auto cfl = courant_number();
-            if (this->rank == 1) std::cerr << "cfl: " << cfl << std::endl;
 
             hook_ante_step();
 
