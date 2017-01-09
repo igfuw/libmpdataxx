@@ -1,1 +1,0 @@
-libmpdataxx_add_test(var_dt_test)
