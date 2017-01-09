@@ -158,7 +158,7 @@ namespace libmpdataxx
           formulae::nabla::calc_grad<parent_t::n_dims>(tmp_uvw, Phi, this->ijk, this->dijk);
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            this->vip_rhs[d](this->ijk) -= 0.5 * this->dt * tmp_uvw[d](this->ijk);
+            this->vip_rhs[d](this->ijk) -= tmp_uvw[d](this->ijk);
           }
         }
 
@@ -178,6 +178,7 @@ namespace libmpdataxx
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             this->vip_rhs[d](this->ijk) += this->vips()[d](this->ijk);
+            this->vip_rhs[d](this->ijk) /= (0.5 * this->dt);
           }
         }
 
