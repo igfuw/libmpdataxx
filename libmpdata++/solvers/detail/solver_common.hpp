@@ -56,7 +56,7 @@ namespace libmpdataxx
         const int rank;
 
         // di, dj, dk declared here for output purposes
-        real_t dt, di, dj, dk, max_abs_div_eps, max_courant;
+        real_t prev_dt, dt, di, dj, dk, max_abs_div_eps, max_courant;
         std::array<real_t, n_dims> dijk;
 
 	const idx_t<n_dims> ijk;
@@ -89,7 +89,7 @@ namespace libmpdataxx
 	virtual real_t courant_number() = 0;
        
         // return false if advector does not change in time
-        virtual bool calc_gc(const real_t time, const real_t cur_dt, const real_t old_dt) {return false;}
+        virtual bool calc_gc() {return false;}
 
         virtual void scale_gc(const real_t time, const real_t cur_dt, const real_t old_dt) = 0;
 
@@ -144,6 +144,7 @@ namespace libmpdataxx
           const decltype(ijk) &ijk
         ) :
           rank(rank), 
+          prev_dt(p.dt),
           dt(p.dt),
           di(0),
           dj(0),
@@ -183,9 +184,11 @@ namespace libmpdataxx
           if (ct_params_t::var_dt)
           {
             real_t cfl = courant_number();
-            const auto old_dt = dt;
-            dt *= max_courant / cfl;
-            scale_gc(time, dt, old_dt);
+            if (cfl > 0)
+            {
+              dt *= max_courant / cfl;
+              scale_gc(time, dt, prev_dt);
+            }
           }
 
           // being generous about out-of-loop barriers 
@@ -218,21 +221,23 @@ namespace libmpdataxx
             
             // for variable in time velocity calculate advector at n+1/2, returns false if
             // velocity does not change in time
-            bool var_gc = calc_gc(time, dt, dt);
+            bool var_gc = calc_gc();
 
             // for variable in time velocity with adaptive time-stepping modify advector
             // to keep the Courant number roughly constant
             if (var_gc && ct_params_t::var_dt)
             {
               real_t cfl = courant_number();
-              do 
+              if (cfl > 0)
               {
-                const auto old_dt = dt;
-                dt *= max_courant / cfl;
-                calc_gc(time, dt, old_dt);
-                cfl = courant_number();
+                do 
+                {
+                  dt *= max_courant / cfl;
+                  calc_gc();
+                  cfl = courant_number();
+                }
+                while (cfl > max_courant);
               }
-              while (cfl > max_courant);
             }
 
             hook_ante_step();
@@ -251,6 +256,7 @@ namespace libmpdataxx
 
             timestep++;
             time = ct_params_t::var_dt ? time + dt : timestep * dt;
+            prev_dt = dt;
             hook_post_step();
 	  }   
 
