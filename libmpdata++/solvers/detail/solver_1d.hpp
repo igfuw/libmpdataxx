@@ -28,6 +28,7 @@ namespace libmpdataxx
 	protected:
 
 	const rng_t i; //TODO: to be removed
+        typename parent_t::arr_t &courant_field; // TODO: should be in solver common but cannot be allocated there ?
 
         virtual void xchng_sclr(typename parent_t::arr_t &arr, const bool deriv = false) final // for a given array
         {
@@ -48,12 +49,26 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
+        void hook_ante_loop(const typename parent_t::advance_arg_t nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
         {
           parent_t::hook_ante_loop(nt);
 	  
           // filling halo in velocity field
           xchng_vctr_alng(this->mem->GC);
+        }
+	
+        typename parent_t::real_t courant_number() final
+        {
+          courant_field(this->ijk) = 0.5 * (abs(this->mem->GC[0](i+h) + this->mem->GC[0](i-h)));
+          return this->mem->max(this->rank, courant_field(this->ijk));
+        }
+
+        void scale_gc(const typename parent_t::real_t time,
+                      const typename parent_t::real_t cur_dt,
+                      const typename parent_t::real_t old_dt) final
+        {
+          this->mem->GC[0](rng_t(i.first(), i.last()-1)^h) *= cur_dt / old_dt;
+          this->xchng_vctr_alng(this->mem->GC);
         }
 
         public:
@@ -86,7 +101,8 @@ namespace libmpdataxx
             p, 
             idx_t<parent_t::n_dims>(args.i)
           ), 
-          i(args.i)
+          i(args.i),
+          courant_field(args.mem->tmp[__FILE__][0][0])
 	{
           this->di = p.di;
           this->dijk = {p.di};
@@ -139,6 +155,9 @@ namespace libmpdataxx
               mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
                 parent_t::rng_sclr(mem->grid_size[0])
               )));
+
+          // courant field
+          alloc_tmp_sclr(mem, __FILE__, 1);
         } 
 
         protected:

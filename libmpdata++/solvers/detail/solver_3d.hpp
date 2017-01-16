@@ -29,6 +29,7 @@ namespace libmpdataxx
 	protected:
 
 	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
+        typename parent_t::arr_t &courant_field; // TODO:/: should be in solver common but cannot be allocated there ?
 
 	virtual void xchng_sclr(typename parent_t::arr_t &arr,
                        const rng_t &range_i,
@@ -111,7 +112,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
         
-        void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
+        void hook_ante_loop(const typename parent_t::advance_arg_t nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
         {
           parent_t::hook_ante_loop(nt);
 	  
@@ -138,6 +139,27 @@ namespace libmpdataxx
 	    if (max_abs_div > this->max_abs_div_eps) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
+        }
+
+        typename parent_t::real_t courant_number() final
+        {
+          courant_field(this->ijk) =  0.5 * (
+                                               abs(this->mem->GC[0](i+h, j, k) + this->mem->GC[0](i-h, j, k))
+                                             + abs(this->mem->GC[1](i, j+h, k) + this->mem->GC[1](i, j-h, k))
+                                             + abs(this->mem->GC[2](i, j, k+h) + this->mem->GC[2](i, j, k-h))
+                                             ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k);
+          return this->mem->max(this->rank, courant_field(this->ijk));
+        }
+
+        void scale_gc(const typename parent_t::real_t time,
+                      const typename parent_t::real_t cur_dt,
+                      const typename parent_t::real_t old_dt) final
+        {
+          this->mem->GC[0](rng_t(i.first(), i.last()-1)^h, j, k) *= cur_dt / old_dt;
+          this->mem->GC[1](i, rng_t(j.first(), j.last()-1)^h, k) *= cur_dt / old_dt;
+          this->mem->GC[2](i, j, rng_t(k.first(), k.last()-1)^h) *= cur_dt / old_dt;
+          this->xchng_vctr_alng(this->mem->GC);
+          this->xchng_vctr_nrml(this->mem->GC, this->i, this->j, this->k);
         }
 
         public:
@@ -175,7 +197,8 @@ namespace libmpdataxx
           ),
 	  i(args.i), 
           j(args.j), 
-          k(args.k)
+          k(args.k),
+          courant_field(args.mem->tmp[__FILE__][0][0])
 	{
           this->di = p.di;
           this->dj = p.dj;
@@ -236,6 +259,8 @@ namespace libmpdataxx
 	        parent_t::rng_sclr(mem->grid_size[1]),
 	        parent_t::rng_sclr(mem->grid_size[2])
 	      )));
+          // courant field
+          alloc_tmp_sclr(mem, __FILE__, 1);
         }  
         
         // helper method to allocate a temporary space composed of vector-component arrays
