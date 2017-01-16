@@ -80,6 +80,8 @@ namespace libmpdataxx
 	virtual void xchng(int e) = 0;
         // TODO: implement flagging of valid/invalid halo for optimisations
 
+        virtual void xchng_vctr_alng(const arrvec_t<arr_t>&) = 0;
+
         void set_bcs(const int &d, bcp_t &bcl, bcp_t &bcr)
         {
           bcs[d][0] = std::move(bcl);
@@ -124,6 +126,20 @@ namespace libmpdataxx
 #if !defined(NDEBUG)
           hook_ante_loop_called = true;
 #endif
+          // fill halos in velocity field
+          this->xchng_vctr_alng(mem->GC);
+         
+          // adaptive timestepping - for constant in time velocity it suffices
+          // to change the timestep once and do a simple scaling of advector
+          if (ct_params_t::var_dt)
+          {
+            real_t cfl = courant_number();
+            if (cfl > 0)
+            {
+              dt *= max_courant / cfl;
+              scale_gc(time, dt, prev_dt);
+            }
+          }
         }
 
 	public:
@@ -178,18 +194,6 @@ namespace libmpdataxx
 	{   
           // multiple calls to sovlve() are meant to advance the solution by nt
           nt += ct_params_t::var_dt ? time : timestep;
-         
-          // adaptive timestepping - for constant in time velocity it suffices
-          // to change the timestep once and do a simple scaling of advector
-          if (ct_params_t::var_dt)
-          {
-            real_t cfl = courant_number();
-            if (cfl > 0)
-            {
-              dt *= max_courant / cfl;
-              scale_gc(time, dt, prev_dt);
-            }
-          }
 
           // being generous about out-of-loop barriers 
           if (timestep == 0)
