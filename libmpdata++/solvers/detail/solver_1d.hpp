@@ -42,19 +42,11 @@ namespace libmpdataxx
           xchng_sclr(this->mem->psi[e][ this->n[e]]);
 	}
 
-        virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec); 
           this->mem->barrier();
-        }
-
-        void hook_ante_loop(const typename parent_t::advance_arg_t nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
-        {
-          parent_t::hook_ante_loop(nt);
-	  
-          // filling halo in velocity field
-          xchng_vctr_alng(this->mem->GC);
         }
 	
         typename parent_t::real_t courant_number() final

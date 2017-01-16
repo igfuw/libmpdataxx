@@ -49,7 +49,7 @@ namespace libmpdataxx
 	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
 	}
 
-        virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k); 
@@ -115,8 +115,6 @@ namespace libmpdataxx
         void hook_ante_loop(const typename parent_t::advance_arg_t nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
         {
           parent_t::hook_ante_loop(nt);
-	  
-          xchng_vctr_alng(this->mem->GC);
  
           // sanity check for non-divergence of the initial Courant number field
           // TODO: same in 1D
