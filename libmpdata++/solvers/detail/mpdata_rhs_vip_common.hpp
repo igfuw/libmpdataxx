@@ -67,15 +67,17 @@ namespace libmpdataxx
 	{                 // (write the result to stash since we don't need previous state any more)
 	  using namespace arakawa_c;
 
-	  this->stash[d](this->ijk) /= -2.;
+          const auto beta = this->dt / (2 * this->prev_dt);
+
+	  this->stash[d](this->ijk) *= -beta;
 
 	  if (ix::vip_den == -1) 
-	    this->stash[d](this->ijk) += 3./2 * this->state(e)(this->ijk);
+	    this->stash[d](this->ijk) += (1 + beta) * this->state(e)(this->ijk);
 	  else if (eps == 0) //this is the default
           {             
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
-	    this->stash[d](this->ijk) += 3./2 * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
+	    this->stash[d](this->ijk) += (1 + beta) * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
           }
 	  else
 	  {
@@ -83,7 +85,7 @@ namespace libmpdataxx
 	      // if
 	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
-	      3./2 * this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk),
+	      (1 + beta) * this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk),
 	      // else
 	      0   
 	    );  
@@ -109,7 +111,7 @@ namespace libmpdataxx
           {
             if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
             {
-              vip_rhs[d](this->ijk) = -0.5 * this->dt * 
+              vip_rhs[d](this->ijk) = - 
                 (*this->mem->vab_coeff)(this->ijk) * (vips()[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
             else
@@ -125,7 +127,8 @@ namespace libmpdataxx
           {
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
-              vip_rhs[d](this->ijk) += -this->dt * 
+              // factor of 2 because it is multiplied by 0.5 * dt in vip_rhs_apply
+              vip_rhs[d](this->ijk) += -2 * 
                 (*this->mem->vab_coeff)(this->ijk) * (vips()[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
           }
@@ -144,6 +147,7 @@ namespace libmpdataxx
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
               vip_rhs[d](this->ijk) += vips()[d](this->ijk);
+              vip_rhs[d](this->ijk) /= (0.5 * this->dt);
             }
           }
         }
@@ -152,7 +156,7 @@ namespace libmpdataxx
         {    
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            vips()[d](this->ijk) += vip_rhs[d](this->ijk);
+            vips()[d](this->ijk) += 0.5 * this->dt * vip_rhs[d](this->ijk);
             vip_rhs[d](this->ijk) = 0;
           }
         }
@@ -191,8 +195,8 @@ namespace libmpdataxx
           vip_rhs_impl_init();
 	}
 
-	void hook_ante_step()
-	{ 
+        bool calc_gc() final
+        {
 	  //extrapolate velocity field in time (t+1/2)
 	  extrapolate_in_time();
 
@@ -202,6 +206,11 @@ namespace libmpdataxx
           // TODO: why???
 	  this->mem->barrier();
 
+          return true;
+        }
+
+	void hook_ante_step()
+	{ 
 	  // filling the stash with data from current velocity field 
 	  // (so that in the next time step they can be used for extrapolation in time)
 	  fill_stash();

@@ -51,7 +51,7 @@ namespace libmpdataxx
       blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, count, offst;
       H5::DSetCreatPropList params;
 
-      void start(const int nt)
+      void start(const typename parent_t::advance_arg_t nt)
       {
         {
           // creating the directory
@@ -119,7 +119,7 @@ namespace libmpdataxx
               float dt = this->dt;
 
               blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
-              coord = this->outfreq * this->dt * blitz::firstIndex();
+              coord = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * blitz::firstIndex();
 
               auto curr_dim = (*hdfp).createDataSet("T", flttype_output, H5::DataSpace(1, &nt_out));
 
@@ -223,7 +223,7 @@ namespace libmpdataxx
               case 1:
               {
                 space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                vars[v.first].write( &(this->mem->advectee(v.first)(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                vars[v.first].write( &(this->out_data(v.first)(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
                 break;
               }
               case 2:
@@ -236,7 +236,7 @@ namespace libmpdataxx
                 ) {
                   offst[0] = i;
                   space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                  vars[v.first].write( &(this->mem->advectee(v.first)(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                  vars[v.first].write( &(this->out_data(v.first)(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
                 }
                 break;
               }
@@ -256,7 +256,7 @@ namespace libmpdataxx
                     offst[0] = i;
                     offst[1] = j;
                     space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                    vars[v.first].write( &(this->mem->advectee(v.first)(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                    vars[v.first].write( &(this->out_data(v.first)(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
                   }
                 }
                 break;

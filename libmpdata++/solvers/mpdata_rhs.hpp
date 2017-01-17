@@ -98,7 +98,7 @@ namespace libmpdataxx
 #endif
       }
 
-      void hook_ante_loop(int nt)
+      void hook_ante_loop(typename parent_t::advance_arg_t nt)
       {
         parent_t::hook_ante_loop(nt);
 

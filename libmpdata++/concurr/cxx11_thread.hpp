@@ -99,7 +99,7 @@ namespace libmpdataxx
 
       public:
 
-      void solve(int nt)
+      void solve(typename parent_t::advance_arg_t nt)
       {
         boost::ptr_vector<std::thread> threads(mem_t::size());
         for (int i = 0; i < this->algos.size(); ++i) 
