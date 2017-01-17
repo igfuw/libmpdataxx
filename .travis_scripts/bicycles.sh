@@ -1,6 +1,11 @@
 #!/usr/bin/env sh
 set -e
 
+# install libmpata++
+cd libmpdata++/build
+sudo make install
+cd ../..
+
 # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
 if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
 if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 10; fi
