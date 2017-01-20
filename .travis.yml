@@ -112,7 +112,7 @@ script:
     - if [[ $TEST_SUITE == 'bicycles' ]]; then . ./.travis_scripts/bicycles.sh; fi # with '.' to pass env vars
     
     # compiling and running tests from Nair & Jablonowski 2008 MWR paper in Release mode
-    - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then ./.travis_scripts/nair_jablonowski_2008.sh; fi
+    - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then travis_wait ./.travis_scripts/nair_jablonowski_2008.sh; fi
     
 #    # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
 #    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
