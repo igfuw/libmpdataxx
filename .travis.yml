@@ -11,10 +11,14 @@ env:
     - TEST_SUITE=paper
     - TEST_SUITE=elliptic_drop
     - TEST_SUITE=nair_jablonowski
+    - TEST_SUITE=bicycles
 matrix:
     exclude:
         - os: osx
           compiler: gcc
+
+        - compiler: clang
+          env: TEST_SUITE=bicycles # bicycles is not tested on clang yet
 
 osx_image: xcode8
 
@@ -103,6 +107,9 @@ script:
     - if [[ $TEST_SUITE == 'sandbox' ]]; then ./.travis_scripts/sandbox.sh; fi
 
     - if [[ $TEST_SUITE == 'elliptic_drop' ]]; then ./.travis_scripts/elliptic_drop.sh; fi
+
+    # running tests from bicycles in Release mode
+    - if [[ $TEST_SUITE == 'bicycles' ]]; then . ./.travis_scripts/bicycles.sh; fi # with '.' to pass env vars
     
     # compiling and running tests from Nair & Jablonowski 2008 MWR paper in Release mode
     - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then ./.travis_scripts/nair_jablonowski.sh; fi
