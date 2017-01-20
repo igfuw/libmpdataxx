@@ -10,6 +10,7 @@ env:
     - TEST_SUITE=sandbox
     - TEST_SUITE=paper
     - TEST_SUITE=elliptic_drop
+    - TEST_SUITE=nair_jablonowski
 matrix:
     exclude:
         - os: osx
@@ -102,6 +103,9 @@ script:
     - if [[ $TEST_SUITE == 'sandbox' ]]; then ./.travis_scripts/sandbox.sh; fi
 
     - if [[ $TEST_SUITE == 'elliptic_drop' ]]; then ./.travis_scripts/elliptic_drop.sh; fi
+    
+    # compiling and running tests from Nair & Jablonowski 2008 MWR paper in Release mode
+    - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then ./.travis_scripts/nair_jablonowski.sh; fi
     
 #    # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
 #    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
