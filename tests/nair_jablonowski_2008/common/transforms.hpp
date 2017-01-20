@@ -5,7 +5,7 @@
 
 
 using T = double;
-const T pi = boost::math::constants::pi<T>();
+constexpr T pi = boost::math::constants::pi<T>();
 
 // forward transformations
 struct xpf_t

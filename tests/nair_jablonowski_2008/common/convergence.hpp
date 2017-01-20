@@ -11,15 +11,16 @@ struct stat_t
 template <typename Y>
 std::ostream& operator<<(std::ostream &os, const stat_t<Y> &s)
 {
-  auto sw = std::setw(10);
   auto precise = std::setprecision(6);
   auto rough = std::setprecision(2);
+  auto swp = std::setw(10);
+  auto swr = std::setw(6);
   return os << std::fixed << precise
-            << sw << s.L1 << sw << s.L2 << sw << s.Li
+            << swp << s.L1 << swp << s.L2 << swp << s.Li
             << rough
-            << sw << s.ord_L1 << sw << s.ord_L2 << sw << s.ord_Li
+            << swr << s.ord_L1 << swr << s.ord_L2 << swr << s.ord_Li
             << precise
-            << sw << s.min << sw << s.max;
+            << swp << s.min << swp << s.max;
 }
 
 template <typename test_t>
@@ -43,16 +44,16 @@ void convergence(test_t test, const std::string &base_name, const T max_cfl)
     header.L1 = "L1";
     header.L2 = "L2";
     header.Li = "Li";
-    header.ord_L1 = "ord_L1";
-    header.ord_L2 = "ord_L2";
-    header.ord_Li = "ord_Li";
+    header.ord_L1 = "oL1";
+    header.ord_L2 = "oL2";
+    header.ord_Li = "oLi";
     header.min = "min";
     header.max = "max";
 
     std::ofstream stats_ofs("stats_" + base_name + ".txt");
-    stats_ofs << "ny" << " " << header << std::endl;
+    stats_ofs << std::setw(4) << "ny" << " " << header << std::endl;
     for (int i = 0; i < stats.size(); ++i)
     {
-      stats_ofs << nys[i] << " " << stats[i] << std::endl;
+      stats_ofs << std::setw(4) << nys[i] << " " << stats[i] << std::endl;
     }
 }

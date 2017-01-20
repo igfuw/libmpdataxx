@@ -17,6 +17,20 @@
 
 using namespace libmpdataxx;
 
+struct ct_test_params_t
+{
+  // initial vortex position
+  static constexpr T
+    x0 = 3 * pi / 2,
+    y0 = 0,
+  // vortex velocity
+    v0 = 2 * pi / 12,
+  // solid-body rotation velocity
+    u0 = 2 * pi / 12,
+  // solid-body rotation angle
+    a = pi / 2;
+};
+
 template <bool var_dt_arg, int opts_arg, int opts_iters>
 stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
 {
@@ -40,7 +54,7 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
 
   using slv_out_t = 
       output::hdf5_xdmf<
-        moving<ct_params_t>
+        moving<ct_params_t, ct_test_params_t>
     >;
   typename slv_out_t::rt_params_t p;
 
@@ -51,38 +65,24 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
   p.dj = dy;
   p.max_courant = max_cfl;
 
-  p.outfreq = var_dt_arg ? 1 : nt / 12; 
+  p.outfreq = var_dt_arg ? 6 : nt / 2; 
   p.outvars[0].name = "psi";
   p.outdir = dir_name;
- 
-  // initial vortex position
-  T
-    x0 = 3 * pi / 2,
-    y0 = 0,
-  // vortex velocity
-    v0 = 2 * pi / 12,
-  // solid-body rotation velocity
-    u0 = 2 * pi / 12,
-  // solid-body rotation angle
-    a = pi / 2;
-
-  p.a = a;
-  p.x0 = x0;
-  p.y0 = y0;
-  p.u0 = u0;
-  p.v0 = v0;
   
   concurr::threads<
     slv_out_t, 
     bcond::cyclic, bcond::cyclic,
     bcond::polar, bcond::polar
   > run(p); 
+  
+  // to make refering to compile time test params easier
+  using tp = ct_test_params_t;
  
   // initialise coordinate transformations
-  xpf_t xpf{.x0 = x0, .y0 = y0};
-  ypf_t ypf{.x0 = x0, .y0 = y0};
-  ixpf_t ixpf{.x0 = x0, .y0 = y0};
-  iypf_t iypf{.x0 = x0, .y0 = y0};
+  xpf_t xpf{.x0 = tp::x0, .y0 = tp::y0};
+  ypf_t ypf{.x0 = tp::x0, .y0 = tp::y0};
+  ixpf_t ixpf{.x0 = tp::x0, .y0 = tp::y0};
+  iypf_t iypf{.x0 = tp::x0, .y0 = tp::y0};
 
   blitz::firstIndex i;
   blitz::secondIndex j;
@@ -97,10 +97,10 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
 
   // initial conditions
   r = 3 * cos(ypf(X, Y));
-  omg = where(r != 0, v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
+  omg = where(r != 0, tp::v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
 
   run.advectee() = 1 - tanh(r / 5 * sin(xpf(X, Y)));
-  run.g_factor() = dx * dy * blitz::cos(Y);
+  run.g_factor() = blitz::cos(Y) * dx * dy;
   
   // to avoid divergence check
   run.advector(0) = 0;
@@ -113,19 +113,19 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
   decltype(run.advectee()) solution(run.advectee().extent());
 
   xpf.x0 = pi;
-  xpf.y0 = pi / 2 - a;
+  xpf.y0 = pi / 2 - tp::a;
   ypf.x0 = pi;
-  ypf.y0 = pi / 2 - a;
+  ypf.y0 = pi / 2 - tp::a;
 
   ixpf.x0 = pi;
-  ixpf.y0 = pi / 2 - a;
+  ixpf.y0 = pi / 2 - tp::a;
   iypf.x0 = pi;
-  iypf.y0 = pi / 2 - a;
+  iypf.y0 = pi / 2 - tp::a;
 
-  T x = xpf(x0, y0);
-  T y = ypf(x0, y0);
+  T x = xpf(tp::x0, tp::y0);
+  T y = ypf(tp::x0, tp::y0);
 
-  x += u0 * run.time();
+  x += tp::u0 * run.time();
 
   T xc = ixpf(x, y);
   T yc = iypf(x, y);
@@ -135,7 +135,7 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
   ypf.x0 = xc;
   ypf.y0 = yc;
   r = 3 * cos(ypf(X, Y));
-  omg = where(r != 0, v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
+  omg = where(r != 0, tp::v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
   solution = 1 - tanh(r / 5 * sin(xpf(X, Y) - omg * run.time()));
 
   // calculation of stats
@@ -157,12 +157,6 @@ int main()
     const int opts_iters = 2;
     convergence(test<var_dt, opts, opts_iters>, "nug_i2", max_cfl);
   }
-
-  {
-    enum { opts = opts::nug | opts::iga};
-    const int opts_iters = 2;
-    convergence(test<var_dt, opts, opts_iters>, "nug_iga_i2", max_cfl);
-  }
   
   {
     enum { opts = opts::nug | opts::iga | opts::fct};
@@ -171,9 +165,9 @@ int main()
   }
   
   {
-    enum { opts = opts::nug | opts::iga | opts::tot};
-    const int opts_iters = 2;
-    convergence(test<var_dt, opts, opts_iters>, "nug_iga_tot_i2", max_cfl);
+    enum { opts = opts::nug | opts::tot};
+    const int opts_iters = 3;
+    convergence(test<var_dt, opts, opts_iters>, "nug_tot_i3", max_cfl);
   }
   
   {
