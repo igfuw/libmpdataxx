@@ -51,7 +51,7 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
   p.max_abs_div_eps = 1e44; // disable divergence check
   p.max_courant = max_cfl;
 
-  p.outfreq = var_dt_arg ? 1 : nt / 12;
+  p.outfreq = var_dt_arg ? 6 : nt / 2;
   p.outvars[0].name = "psi";
   p.outdir = dir_name;
  
@@ -129,12 +129,6 @@ int main()
     const int opts_iters = 2;
     convergence(test<var_dt, opts, opts_iters>, "nug_i2", max_cfl);
   }
-
-  {
-    enum { opts = opts::nug | opts::iga};
-    const int opts_iters = 2;
-    convergence(test<var_dt, opts, opts_iters>, "nug_iga_i2", max_cfl);
-  }
   
   {
     enum { opts = opts::nug | opts::iga | opts::fct};
@@ -143,9 +137,9 @@ int main()
   }
   
   {
-    enum { opts = opts::nug | opts::iga | opts::tot};
-    const int opts_iters = 2;
-    convergence(test<var_dt, opts, opts_iters>, "nug_iga_tot_i2", max_cfl);
+    enum { opts = opts::nug | opts::tot};
+    const int opts_iters = 3;
+    convergence(test<var_dt, opts, opts_iters>, "nug_tot_i3", max_cfl);
   }
   
   {
