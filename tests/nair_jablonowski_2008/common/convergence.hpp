@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include "transforms.hpp"
 
 template <typename Y = T>
 struct stat_t
