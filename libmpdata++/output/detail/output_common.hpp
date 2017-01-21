@@ -53,6 +53,8 @@ namespace libmpdataxx
               intrp_vars[v.first](this->ijk) = this->mem->advectee(v.first)(this->ijk);
           }
 
+          this->mem->barrier();
+
 	  if (this->rank == 0) 
           {
             record_time = this->time;
