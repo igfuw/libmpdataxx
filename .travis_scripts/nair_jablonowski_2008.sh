@@ -14,9 +14,5 @@ VERBOSE=1 $make_j
 
 # running tests in Release mode 
 # "/" intentional! (just to make cat exit with an error code)
-OMP_NUM_THREADS=4 ctest -V -I 1,3 || cat Testing/Temporary/LastTest.log
-pwd
-ls -l ./stationary/
-ls -l ./stationary/nug_i2_24/
-ls -l ./stationary/nug_i2_96/
+OMP_NUM_THREADS=4 ctest -V -I 1,3 || cat Testing/Temporary/LastTest.log /
 cd ../../..
