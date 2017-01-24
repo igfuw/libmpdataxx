@@ -51,9 +51,8 @@ namespace libmpdataxx
           {
             for (const auto &v : outvars)
               intrp_vars[v.first](this->ijk) = this->mem->advectee(v.first)(this->ijk);
+            this->mem->barrier();
           }
-
-          this->mem->barrier();
 
 	  if (this->rank == 0) 
           {
@@ -81,6 +80,7 @@ namespace libmpdataxx
             int next_idx = std::floor(next_time / outfreq);
             int curr_idx = std::floor(this->time / outfreq);
 
+            do_record = false;
             if (next_idx > curr_idx) 
             {
               do_record = true;
@@ -105,6 +105,7 @@ namespace libmpdataxx
                 intrp_vars[v.first](this->ijk) += (record_time - prev_time) / (this->time - prev_time) *
                                                    this->mem->advectee(v.first)(this->ijk);
               }
+              this->mem->barrier();
           }
 
 	  if (this->rank == 0)
@@ -114,7 +115,6 @@ namespace libmpdataxx
             if (this->var_dt && do_record)
             {
               record_all();
-              do_record = false;
             }
             else if (!this->var_dt)
             {
