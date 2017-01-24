@@ -51,9 +51,8 @@ namespace libmpdataxx
           {
             for (const auto &v : outvars)
               intrp_vars[v.first](this->ijk) = this->mem->advectee(v.first)(this->ijk);
+            this->mem->barrier();
           }
-
-          this->mem->barrier();
 
 	  if (this->rank == 0) 
           {
@@ -105,6 +104,7 @@ namespace libmpdataxx
                 intrp_vars[v.first](this->ijk) += (record_time - prev_time) / (this->time - prev_time) *
                                                    this->mem->advectee(v.first)(this->ijk);
               }
+              this->mem->barrier();
           }
 
 	  if (this->rank == 0)
