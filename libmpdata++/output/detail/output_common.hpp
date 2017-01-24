@@ -80,6 +80,7 @@ namespace libmpdataxx
             int next_idx = std::floor(next_time / outfreq);
             int curr_idx = std::floor(this->time / outfreq);
 
+            do_record = false;
             if (next_idx > curr_idx) 
             {
               do_record = true;
@@ -114,7 +115,6 @@ namespace libmpdataxx
             if (this->var_dt && do_record)
             {
               record_all();
-              do_record = false;
             }
             else if (!this->var_dt)
             {
