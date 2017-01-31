@@ -77,6 +77,11 @@ namespace libmpdataxx
             // lam
             std::getenv("LAMRANK") != NULL
           ) throw std::runtime_error("mpirun environment variable detected but libmpdata++ was compiled with MPI disabled");
+#else
+          if (boost::mpi::environment::thread_level() != boost::mpi::threading::multiple)
+          {
+            throw std::runtime_error("failed to initialise MPI environment with MPI_THREAD_MULTIPLE");
+          }
 #endif
         }
       };
