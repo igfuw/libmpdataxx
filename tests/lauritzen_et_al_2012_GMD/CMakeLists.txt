@@ -35,3 +35,17 @@ endfunction()
 enable_testing()
 
 libmpdataxx_add_test(gmd_2012)
+
+add_test(gmd_2012_stats_and_plots bash -c "
+  for i in nug_i2_120 nug_i2_240 nug_iga_fct_i2_120 nug_iga_fct_i2_240; do 
+    python  ${CMAKE_CURRENT_SOURCE_DIR}/stats_and_plots.py $i;
+  done
+") 
+
+add_test(gmd_2012_stats_diff bash -c "
+  for i in nug_i2_120 nug_i2_240 nug_iga_fct_i2_120 nug_iga_fct_i2_240; do 
+    echo  ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
+    echo  ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
+    zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
+  done
+") 

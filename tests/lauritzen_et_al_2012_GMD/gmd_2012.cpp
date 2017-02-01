@@ -158,13 +158,13 @@ void test(const std::string &base_name, const int ny, const T max_cfl)
 int main()
 {
   const bool var_dt = true;
-  const T max_cfl = 0.99;
+  const T max_cfl = 0.90;
 
-  std::vector<int> nys = {60, 120};
+  std::vector<int> nys = {120, 240};
   {
-    enum { opts = opts::nug  | opts::iga};
+    enum { opts = opts::nug};
     const int opts_iters = 2;
-    for (const auto ny : nys) test<var_dt, opts, opts_iters>("nug_iga_i2", ny, max_cfl);
+    for (const auto ny : nys) test<var_dt, opts, opts_iters>("nug_i2", ny, max_cfl);
   }
   
   {
