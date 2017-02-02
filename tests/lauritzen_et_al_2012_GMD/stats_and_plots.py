@@ -38,17 +38,17 @@ def calc_errors(g, field_data):
 def write_stats(dirname, errors, filament_diags, mixing_diags):
     outfile = open('stats_' + dirname + '.txt', 'w')
 
-    errors_header = '{:6} {:9} {:9} {:9}\n'.format('field', 'L1', 'L2', 'Li')
+    errors_header = '{:6} {:8} {:8} {:8}\n'.format('field', 'L1', 'L2', 'Li')
     outfile.write(errors_header)
     for f in ['gh', 'cb', 'ccb', 'sc']:
-        outfile.write('{:6} {L1:9.3e} {L2:9.3e} {Li:9.3e}\n'.format(f, **errors[f]))
+        outfile.write('{:6} {L1:8.2e} {L2:8.2e} {Li:8.2e}\n'.format(f, **errors[f]))
 
     filaments_header = '\n{:4}  {:6}\n'.format('tau', 'lf')
     outfile.write(filaments_header)
     for tau, lf in filament_diags:
         outfile.write('{:4.2f}  {:5.1f}\n'.format(tau, lf))
 
-    outfile.write('\nlr {:6.4e}\nlu {:6.4e}\nlo {:6.4e}'.format(*mixing_diags))
+    outfile.write('\nlr {:6.3e}\nlu {:6.3e}\nlo {:6.3e}'.format(*mixing_diags))
 
 def main():
     for dirname in argv[1:]:
