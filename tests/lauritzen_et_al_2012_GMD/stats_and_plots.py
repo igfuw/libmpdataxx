@@ -17,7 +17,7 @@ def prepare_data(dirname):
     g = h5py.File(fnames[0], 'r')['G'][:,:]
     for f in fields:
         field_data[f] = {}
-        for i in xrange(len(states)):
+        for i in range(len(states)):
             data_file = h5py.File(fnames[i+1], 'r')
             field_data[f][states[i]] = data_file[f][:,:]
     return (g, field_data)
