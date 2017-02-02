@@ -19,7 +19,7 @@ def line_func(x):
 def root(x, y):
     sqrt_arg = 12 * (125 * y - 52) ** 3 + 29648025 * x ** 2
     if sqrt_arg < 0:
-        print "problem, sqrt_arg < 0"
+        print("problem, sqrt_arg < 0")
     c = 1. / 60 * (65340 * x + 12 * sqrt_arg ** 0.5) ** (1./3)
     root_uc = c + 1. / c * (13. / 75 - 5. / 12 * y)
     return min(max(xmin, root_uc), xmax)
