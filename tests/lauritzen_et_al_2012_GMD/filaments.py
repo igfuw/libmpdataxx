@@ -15,7 +15,7 @@ def calc_filament_diags(g, field_data):
         else:
             lf = 100 * area_h / area_0
         lfs.append(lf)
-    return zip(taus, lfs)
+    return list(zip(taus, lfs))
 
 def plot_filament_diags(dirname, filament_diags, deg):
     plt.clf()

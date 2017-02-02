@@ -34,7 +34,7 @@ def calc_mixing_diags(g, field_data):
     roots = map(root, cb , ccb)
     distances = map(distance, cb, ccb, roots)
     total_area = np.sum(g)
-    gdist = g.flatten() * distances
+    gdist = g.flatten() * list(distances)
 
     eps = 1e-7
     in_convex_hull = (ccb < corr_func(cb) + eps) & (ccb > line_func(cb) - eps)
