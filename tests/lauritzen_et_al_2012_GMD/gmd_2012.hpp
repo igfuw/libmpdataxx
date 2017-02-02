@@ -61,7 +61,6 @@ class gmd_2012 : public libmpdataxx::solvers::mpdata<ct_params_t>
       }
     }
 
-    //this->mem->barrier();
     this->xchng_sclr(gc_node[0], this->i, this->j);
     this->xchng_sclr(gc_node[1], this->i, this->j);
 
@@ -70,34 +69,13 @@ class gmd_2012 : public libmpdataxx::solvers::mpdata<ct_params_t>
     {
       for (int j = this->j.first()-1; j <= this->j.last(); ++j)
       {
-        //const auto x = i * this->di;
-        //const auto y = (j+ 0.5) * this->dj - pi / 2;
-        //auto gc_ij_x = gc_exact(t, x + 0.5 * this->di, y);
-        //auto gc_ij_y = gc_exact(t, x, y + 0.5 * this->dj);
-        //this->mem->GC[0](i+h, j) = gc_ij_x.first;
-        //this->mem->GC[1](i, j+h) = gc_ij_y.second;
-
         this->mem->GC[0](i+h, j) = 0.5 * (gc_node[0](i, j) + gc_node[0](i+1, j));
         this->mem->GC[1](i, j+h) = 0.5 * (gc_node[1](i, j) + gc_node[1](i, j+1));
       }
     }
 
     auto ex = this->halo - 1;
-    //this->xchng_vctr_alng(this->mem->GC);
     this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
-    
-    //auto div = max(abs(
-    //                   ( this->mem->GC[0](this->i+h, this->j) - this->mem->GC[0](this->i-h, this->j)  
-    //                   + this->mem->GC[1](this->i, this->j+h) - this->mem->GC[1](this->i, this->j-h)
-    //                   ) / (*this->mem->G)(this->i, this->j)
-    //                  ));
-
-    //if (this->time == 0)
-    //{
-    //  std::stringstream ss;
-    //  ss << "rank: " << this->rank << " div: " << div << std::endl;
-    //  std::cout << ss.str() << std::endl;
-    //}
 
     return true;
   }
