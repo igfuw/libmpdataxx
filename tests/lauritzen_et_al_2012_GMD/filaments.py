@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib
+matplotlib.use('Pdf')
 import matplotlib.pyplot as plt
 
 def calc_filament_diags(g, field_data):
