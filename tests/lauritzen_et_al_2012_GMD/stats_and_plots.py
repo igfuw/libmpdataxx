@@ -48,7 +48,7 @@ def write_stats(dirname, errors, filament_diags, mixing_diags):
     for tau, lf in filament_diags:
         outfile.write('{:4.2f}  {:5.1f}\n'.format(tau, lf))
 
-    outfile.write('\nlr {:6.3e}\nlu {:6.3e}\nlo {:6.3e}'.format(*mixing_diags))
+    outfile.write('\nlr {:6.2e}\nlu {:6.2e}\nlo {:6.2e}\n'.format(*mixing_diags))
 
 def main():
     for dirname in argv[1:]:
