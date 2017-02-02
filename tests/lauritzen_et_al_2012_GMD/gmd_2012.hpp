@@ -32,11 +32,11 @@ class gmd_2012 : public libmpdataxx::solvers::mpdata<ct_params_t>
     const auto xp = x - 2 * pi * t / tp::T;
 
     return {
-             (   10 * tp::R / tp::T * pow(sin(xp), 2) * sin(2 * y) * cos(pi * t / tp::T)
-               + 2 * pi * tp::R / tp::T * cos(y)
+             (   10 * tp::R / tp::T * std::pow(std::sin(xp), 2) * std::sin(2 * y) * std::cos(pi * t / tp::T)
+               + 2 * pi * tp::R / tp::T * std::cos(y)
              ) * this->dj * this->dt
            ,
-             (   10 * tp::R / tp::T * sin(2 * xp) * pow(cos(y), 2) * cos(pi * t / tp::T)
+             (   10 * tp::R / tp::T * std::sin(2 * xp) * std::pow(std::cos(y), 2) * std::cos(pi * t / tp::T)
              ) * this->di * this->dt
            };
   }

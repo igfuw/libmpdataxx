@@ -31,13 +31,15 @@ struct gauss_t
 {
   T x0, y0;
   static constexpr T b = 5, hmax = 0.95;
-  T xc(const T x, const T y) const { return tp::R * cos(y) * cos(x); }
-  T yc(const T x, const T y) const { return tp::R * cos(y) * sin(x); }
-  T zc(const T x, const T y) const { return tp::R * sin(y); }
+  T xc(const T x, const T y) const { return tp::R * std::cos(y) * std::cos(x); }
+  T yc(const T x, const T y) const { return tp::R * std::cos(y) * std::sin(x); }
+  T zc(const T x, const T y) const { return tp::R * std::sin(y); }
   
   T operator()(const T x, const T y) const
   {
-    return hmax * exp(-b * (pow(xc(x, y) - xc(x0, y0), 2) + pow(yc(x, y) - yc(x0, y0), 2) + pow(zc(x, y) - zc(x0, y0), 2)));
+    return hmax * std::exp(-b * ( std::pow(xc(x, y) - xc(x0, y0), 2)
+                                + std::pow(yc(x, y) - yc(x0, y0), 2)
+                                + std::pow(zc(x, y) - zc(x0, y0), 2)));
   }
   BZ_DECLARE_FUNCTOR2(gauss_t);
 };
@@ -49,8 +51,8 @@ struct bells_t
   static constexpr T r = tp::R / 2, hmax = 1.0, c = 0.9;
   T operator()(const T x, const T y) const
   {
-    T ri = tp::R * acos(sin(y0) * sin(y) + cos(y0) * cos(y) * cos(x - x0));
-    return ri < r ? c * hmax / 2 * (1 + cos(pi * ri / r)) : 0;
+    T ri = tp::R * std::acos(std::sin(y0) * std::sin(y) + std::cos(y0) * std::cos(y) * std::cos(x - x0));
+    return ri < r ? c * hmax / 2 * (1 + std::cos(pi * ri / r)) : 0;
   }
   BZ_DECLARE_FUNCTOR2(bells_t);
 };
@@ -63,10 +65,10 @@ struct scyls_t
   static constexpr T r = tp::R / 2, c = 1.0;
   T operator()(const T x, const T y) const
   {
-    T ri = tp::R * acos(sin(y0) * sin(y) + cos(y0) * cos(y) * cos(x - x0));
-    bool cond1 = ri < r && abs(x - x0) >= r / (6 * tp::R);
+    T ri = tp::R * std::acos(std::sin(y0) * std::sin(y) + std::cos(y0) * std::cos(y) * std::cos(x - x0));
+    bool cond1 = ri < r && std::abs(x - x0) >= r / (6 * tp::R);
     bool cond2 = flip ? (y - y0) < -5. / 12 * r / tp::R : (y - y0) > 5. / 12 * r / tp::R;
-    bool cond3 = ri < r && (abs(x - x0) <  r / (6 * tp::R) && cond2);
+    bool cond3 = ri < r && (std::abs(x - x0) <  r / (6 * tp::R) && cond2);
 
     return cond1 || cond3 ? c : 0;
   }
@@ -144,7 +146,7 @@ void test(const std::string &base_name, const int ny, const T max_cfl)
     run.advectee(1) += bells_t{x0s[m], y0s[m]}(X, Y);
     run.advectee(2) += scyls_t{x0s[m], y0s[m], m > 0}(X, Y);
   }
-  run.advectee(3) = -0.8 * pow(run.advectee(1), 2) + 0.9;
+  run.advectee(3) = -0.8 * blitz::pow(run.advectee(1), 2) + 0.9;
   run.g_factor() = tp::R * blitz::cos(Y) * dx * dy;
   
   // to avoid divergence check
