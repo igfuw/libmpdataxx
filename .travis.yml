@@ -11,7 +11,6 @@ env:
     - TEST_SUITE=paper
     - TEST_SUITE=elliptic_drop
     - TEST_SUITE=nair_jablonowski_2008
-    - TEST_SUITE=lauritzen_et_al_2012_GMD
     - TEST_SUITE=bicycles
 matrix:
     exclude:
@@ -114,9 +113,6 @@ script:
     
     # compiling and running tests from Nair & Jablonowski 2008 MWR paper in Release mode
     - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then ./.travis_scripts/nair_jablonowski_2008.sh; fi
-    
-    # compiling and running tests from Lauritzen et al 2012 GMD paper in Release mode
-    - if [[ $TEST_SUITE == 'lauritzen_et_al_2012_GMD' ]]; then ./.travis_scripts/lauritzen_et_al_2012_GMD.sh; fi
     
 #    # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
 #    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
