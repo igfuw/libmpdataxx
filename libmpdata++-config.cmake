@@ -151,7 +151,7 @@ else()
 * Programs using libmpdata++'s gnuplot-iostream output will not compile.
 * To install gnuplot-iostream, please try:
 *   Debian/Ubuntu: sudo apt-get install libgnuplot-iostream-dev
-*   manual: wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h 
+*   manual: wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h
   ")
 endif()
 
