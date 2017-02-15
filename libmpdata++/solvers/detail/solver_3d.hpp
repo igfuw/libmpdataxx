@@ -139,12 +139,12 @@ namespace libmpdataxx
           }
         }
 
-        typename parent_t::real_t courant_number() final
+        typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           courant_field(this->ijk) =  0.5 * (
-                                               abs(this->mem->GC[0](i+h, j, k) + this->mem->GC[0](i-h, j, k))
-                                             + abs(this->mem->GC[1](i, j+h, k) + this->mem->GC[1](i, j-h, k))
-                                             + abs(this->mem->GC[2](i, j, k+h) + this->mem->GC[2](i, j, k-h))
+                                               abs(arrvec[0](i+h, j, k) + arrvec[0](i-h, j, k))
+                                             + abs(arrvec[1](i, j+h, k) + arrvec[1](i, j-h, k))
+                                             + abs(arrvec[2](i, j, k+h) + arrvec[2](i, j, k-h))
                                              ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k);
           return this->mem->max(this->rank, courant_field(this->ijk));
         }
