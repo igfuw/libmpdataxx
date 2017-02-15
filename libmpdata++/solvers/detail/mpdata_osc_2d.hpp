@@ -65,6 +65,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
 		  this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
 		  this->im, 
                   this->j
@@ -75,12 +77,14 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
 		  this->mem->psi[e][this->n[e]], 
 		  this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
 		  *this->mem->G,
 		  this->jm, 
 		  this->i
 		);
               assert(std::isfinite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
-   
+
 	      // filling Y halos for GC_x, and X halos for GC_y
 	      // needed for calculation of antidiffusive velocities in the third and subsequent
               // iterations, also needed for fct but it is done there independently hence
