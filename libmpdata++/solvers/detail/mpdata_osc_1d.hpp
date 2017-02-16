@@ -58,7 +58,9 @@ namespace libmpdataxx
 	      this->GC_corr(iter)[0](im+h) = 
 		formulae::mpdata::antidiff<ct_params_t::opts>(
 		  this->mem->psi[e][this->n[e]], 
-		  this->GC_unco(iter)[0],
+		  this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
 		  *this->mem->G,
 		  im
 		);
