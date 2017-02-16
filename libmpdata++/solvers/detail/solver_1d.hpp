@@ -48,10 +48,10 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec); 
           this->mem->barrier();
         }
-	
-        typename parent_t::real_t courant_number() final
+
+        typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
-          courant_field(this->ijk) = 0.5 * (abs(this->mem->GC[0](i+h) + this->mem->GC[0](i-h)));
+          courant_field(this->ijk) = 0.5 * (abs(arrvec[0](i+h) + arrvec[0](i-h)));
           return this->mem->max(this->rank, courant_field(this->ijk));
         }
 
