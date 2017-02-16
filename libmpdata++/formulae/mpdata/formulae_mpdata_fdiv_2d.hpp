@@ -218,7 +218,7 @@ namespace libmpdataxx
       )
       
       // nondimensionalised x derivative of flux divergence i.e.
-      // 1 / (G * psi) * dx * d(GC * fdiv)/dx at (i+1/2, j) - positive sign scalar version
+      // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2, j) - positive sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class arrvec_t>
       inline auto ndx_fdiv(
         const arr_2d_t &psi,
@@ -245,7 +245,7 @@ namespace libmpdataxx
       )
       
       // nondimensionalised x derivative of flux divergence i.e.
-      // 1 / (G * psi) * dx * d(GC * fdiv)/dx at (i+1/2, j) - variable sign scalar version
+      // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2, j) - variable sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class arrvec_t>
       inline auto ndx_fdiv(
         const arr_2d_t &psi,
@@ -272,7 +272,7 @@ namespace libmpdataxx
       )
       
       // nondimensionalised x derivative of flux divergence i.e.
-      // 1 / (G * psi) * dx * d(GC * fdiv)/dx at (i+1/2, j) - infinite gauge version
+      // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2, j) - infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class arrvec_t>
       inline auto ndx_fdiv(
         const arr_2d_t &psi,

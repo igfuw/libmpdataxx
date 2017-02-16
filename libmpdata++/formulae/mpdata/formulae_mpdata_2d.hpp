@@ -65,6 +65,8 @@ namespace libmpdataxx
       inline typename arr_2d_t::T_numtype div_3rd(
         const arr_2d_t &psi, 
         const arrvec_t<arr_2d_t> &GC,
+        const arrvec_t<arr_2d_t> &ndt_GC,
+        const arrvec_t<arr_2d_t> &ndtt_GC,
         const arr_2d_t &G, 
         const rng_t &i, 
         const rng_t &j,
