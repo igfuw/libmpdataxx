@@ -66,6 +66,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->im,
                   this->j,
@@ -76,6 +78,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->jm,
                   this->k,
@@ -86,6 +90,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 2>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->km,
                   this->i,
