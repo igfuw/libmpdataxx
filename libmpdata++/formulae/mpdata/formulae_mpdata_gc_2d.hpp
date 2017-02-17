@@ -129,7 +129,7 @@ namespace libmpdataxx
       )
       
       // nondimensionalised tt derivative of GC[0] i.e.
-      // dGC[0]/dtt at (i+1/2, j) - infinite-gauge version
+      // dt^2 * dGC[0]/dtt at (i+1/2, j) - infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t>
       inline auto ndtt_GC0(
         const arr_2d_t &psi, 

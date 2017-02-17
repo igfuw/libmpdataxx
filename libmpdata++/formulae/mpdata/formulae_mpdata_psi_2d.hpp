@@ -241,7 +241,7 @@ namespace libmpdataxx
       )
 
       // nondimensionalised xx derivative of psi i.e.
-      // dx^2/psi * dpsi/dxx at (i+1/2, j) - variable sign scalar version
+      // dx^2/psi * dpsi/dxx at (i+1/2, j) - infinite gauge version
       template<opts_t opts, int dim, class arr_2d_t>
       inline auto ndxx_psi(
         const arr_2d_t &psi,
