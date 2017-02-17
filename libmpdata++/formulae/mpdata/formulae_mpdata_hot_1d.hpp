@@ -26,7 +26,7 @@ namespace libmpdataxx
           3 * GC(i+h) * abs(GC(i+h)) / G_bar_x<opts>(G, i)
           - 2 * pow(GC(i+h), 3) / pow(G_bar_x<opts>(G, i), 2)  
           - GC(i+h)
-        ) / 3
+        ) / 6
       )
 
       // third order terms
