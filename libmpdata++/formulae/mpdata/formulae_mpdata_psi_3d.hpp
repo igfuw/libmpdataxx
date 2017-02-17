@@ -606,6 +606,96 @@ namespace libmpdataxx
             + psi(pi<dim>(i  , j, k-1))            
         ) / 4
       )
+
+      // nondimensionalised yz derivative of psi i.e.
+      // dy*dz/psi * dpsi/dydz at (i+1/2, j, k) - positive sign scalar version
+      template<opts_t opts, int dim, class arr_3d_t>
+      inline auto ndyz_psi(
+        const arr_3d_t &psi,
+        const rng_t &i,
+        const rng_t &j,
+        const rng_t &k,
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
+      ) return_macro(,
+          frac<opts>(
+            psi(pi<dim>(i+1, j+1, k+1))
+          + psi(pi<dim>(i+1, j-1, k-1))
+          - psi(pi<dim>(i+1, j+1, k-1))
+          - psi(pi<dim>(i+1, j-1, k+1))           
+          + psi(pi<dim>(i  , j+1, k+1))
+          + psi(pi<dim>(i  , j-1, k-1))
+          - psi(pi<dim>(i  , j+1, k-1))           
+          - psi(pi<dim>(i  , j-1, k+1))
+          , //-------------------------
+            psi(pi<dim>(i+1, j+1, k+1))
+          + psi(pi<dim>(i+1, j-1, k-1))
+          + psi(pi<dim>(i+1, j+1, k-1))
+          + psi(pi<dim>(i+1, j-1, k+1))           
+          + psi(pi<dim>(i  , j+1, k+1))
+          + psi(pi<dim>(i  , j-1, k-1))
+          + psi(pi<dim>(i  , j+1, k-1))           
+          + psi(pi<dim>(i  , j-1, k+1))
+          )
+      )
+
+      // nondimensionalised yz derivative of psi i.e.
+      // dy*dz/psi * dpsi/dydz at (i+1/2, j, k) - variable sign scalar version
+      template<opts_t opts, int dim, class arr_3d_t>
+      inline auto ndyz_psi(
+        const arr_3d_t &psi,
+        const rng_t &i,
+        const rng_t &j,
+        const rng_t &k,
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
+      ) return_macro(,
+          frac<opts>(
+            abs(psi(pi<dim>(i+1, j+1, k+1)))
+          + abs(psi(pi<dim>(i+1, j-1, k-1)))
+          - abs(psi(pi<dim>(i+1, j+1, k-1)))
+          - abs(psi(pi<dim>(i+1, j-1, k+1)))           
+          + abs(psi(pi<dim>(i  , j+1, k+1)))
+          + abs(psi(pi<dim>(i  , j-1, k-1)))
+          - abs(psi(pi<dim>(i  , j+1, k-1)))          
+          - abs(psi(pi<dim>(i  , j-1, k+1)))
+          , //------------------------------
+            abs(psi(pi<dim>(i+1, j+1, k+1)))
+          + abs(psi(pi<dim>(i+1, j-1, k-1)))
+          + abs(psi(pi<dim>(i+1, j+1, k-1)))
+          + abs(psi(pi<dim>(i+1, j-1, k+1)))           
+          + abs(psi(pi<dim>(i  , j+1, k+1)))
+          + abs(psi(pi<dim>(i  , j-1, k-1)))
+          + abs(psi(pi<dim>(i  , j+1, k-1)))          
+          + abs(psi(pi<dim>(i  , j-1, k+1)))
+          )
+      )
+
+      // nondimensionalised yz derivative of psi i.e.
+      // dy*dz/psi * dpsi/dydz at (i+1/2, j, k) - infinite gauge version
+      template<opts_t opts, int dim, class arr_3d_t>
+      inline auto ndyz_psi(
+        const arr_3d_t &psi,
+        const rng_t &i,
+        const rng_t &j,
+        const rng_t &k,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
+      ) return_macro(
+          static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
+          ,
+          (
+            psi(pi<dim>(i+1, j+1, k+1))
+          + psi(pi<dim>(i+1, j-1, k-1))
+          - psi(pi<dim>(i+1, j+1, k-1))
+          - psi(pi<dim>(i+1, j-1, k+1))
+          + psi(pi<dim>(i  , j+1, k+1))
+          + psi(pi<dim>(i  , j-1, k-1))           
+          - psi(pi<dim>(i  , j+1, k-1))
+          - psi(pi<dim>(i  , j-1, k+1))
+          )
+          / //---------------------------
+          (
+            1 + 1 + 1 + 1 + 1 + 1 + 1 + 1
+          )
+      )
     } // namespace mpdata
   } // namespace formulae
 } // namespcae libmpdataxx 

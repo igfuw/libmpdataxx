@@ -139,7 +139,7 @@ namespace libmpdataxx
           )
           / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k)
           // third order terms
-        + HOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k)
+        + TOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k)
         // divergent flow correction
         //+ DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k) 
       )
