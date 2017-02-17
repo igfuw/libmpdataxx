@@ -7,7 +7,7 @@
 #pragma once
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
-//#include <libmpdata++/formulae/mpdata/formulae_mpdata_dfl_3d.hpp>
+#include <libmpdata++/formulae/mpdata/formulae_mpdata_dfl_3d.hpp>
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_hot_3d.hpp>
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_fdiv_3d.hpp>
 #include <boost/preprocessor/punctuation/comma.hpp>
@@ -141,7 +141,7 @@ namespace libmpdataxx
           // third order terms
         + TOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k)
         // divergent flow correction
-        //+ DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k) 
+        + DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k) 
       )
 
       // antidiffusive velocity - divergence form
