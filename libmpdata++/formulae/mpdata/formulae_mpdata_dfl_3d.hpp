@@ -17,7 +17,7 @@ namespace libmpdataxx
     namespace mpdata 
     {
       // divergent flow correction - no correction
-      template<opts_t opts, int dim, class arr_2d_t>
+      template<opts_t opts, int dim, class arr_3d_t>
       inline auto DFL(
         const arr_3d_t &psi,
         const arrvec_t<arr_3d_t> &GC,
