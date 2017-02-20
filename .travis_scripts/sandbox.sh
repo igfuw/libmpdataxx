@@ -12,5 +12,5 @@ VERBOSE=1 $make_j
 # running selected sandbox tests in Release mode
 # "/" intentional! (just to make cat exit with an error code)
 OMP_NUM_THREADS=4 make -C convergence_2d_3d test || cat convergence_2d_3d/Testing/Temporary/LastTest.log /
-OMP_NUM_THREADS=4 make -C convergence_spacetime test || cat convergence_2d_3d/Testing/Temporary/LastTest.log /
+OMP_NUM_THREADS=4 make -C convergence_spacetime test || cat convergence_spacetime/Testing/Temporary/LastTest.log /
 cd ../../..
