@@ -131,6 +131,8 @@ namespace libmpdataxx
         * ndy_psi<opts BOOST_PP_COMMA() dim>(psi, i, j)
         // third order terms
         + TOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
+        // fourth order terms
+        + FOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
         // divergent flow correction
         + DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j) 
       )
@@ -152,6 +154,8 @@ namespace libmpdataxx
         ,
         div_2nd<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j) +
         div_3rd<opts BOOST_PP_COMMA() dim>(psi, GC, ndt_GC, ndtt_GC, G, i, j)
+        // fourth order terms
+        + FOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
       ) 
     } // namespace mpdata
   } // namespace formulae

@@ -307,6 +307,50 @@ namespace libmpdataxx
 	/ //-------------------------------------------------------------------------------------------
 	(1 + 1 + 1 + 1)
       )
+
+      // nondimensionalised xxx derivative of psi i.e.
+      // dx^3/psi * dpsi/dxxx at (i+1/2, j) - infinite gauge version
+      template<opts_t opts, int dim, class arr_2d_t>
+      inline auto ndxxx_psi(
+        const arr_2d_t &psi,
+        const rng_t &i,
+        const rng_t &j,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
+      ) return_macro(,
+	( psi(pi<dim>(i+2, j)) - 3 * psi(pi<dim>(i+1, j)) + 3 * psi(pi<dim>(i, j)) - psi(pi<dim>(i-1, j)) )
+	/ //-----------------------------------------------------------------------------------------------
+	(1 + 1 + 1 + 1)
+      )
+      
+      // nondimensionalised xxy derivative of psi i.e.
+      // dx^2*dy/psi * dpsi/dxxy at (i+1/2, j) - infinite gauge version
+      template<opts_t opts, int dim, class arr_2d_t>
+      inline auto ndxxy_psi(
+        const arr_2d_t &psi,
+        const rng_t &i,
+        const rng_t &j,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
+      ) return_macro(,
+	(  psi(pi<dim>(i+2, j+1)) - psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) + psi(pi<dim>(i-1, j+1)) 
+	  -psi(pi<dim>(i+2, j-1)) + psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1)) - psi(pi<dim>(i-1, j-1)) )
+	/ //------------------------------------------------------------------------------------------------
+	(1 + 1 + 1 + 1 + 1 + 1 + 1 + 1)
+      )
+      
+      // nondimensionalised xyy derivative of psi i.e.
+      // dx*dy^2/psi * dpsi/dxyy at (i+1/2, j) - infinite gauge version
+      template<opts_t opts, int dim, class arr_2d_t>
+      inline auto ndxyy_psi( // inf. gauge option
+        const arr_2d_t &psi,
+        const rng_t &i,
+        const rng_t &j,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
+      ) return_macro(,
+	( psi(pi<dim>(i+1, j+1)) - 2 * psi(pi<dim>(i+1, j)) + psi(pi<dim>(i+1, j-1))
+         -psi(pi<dim>(i  , j+1)) + 2 * psi(pi<dim>(i  , j)) - psi(pi<dim>(i  , j-1)) )
+	/ //--------------------------------------------------------------------------
+	(1 + 1 + 1 + 1 + 1 + 1)
+      )
     } // namespace mpdata
   } // namespace formulae
 } // namespcae libmpdataxx 
