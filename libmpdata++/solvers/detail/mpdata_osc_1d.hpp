@@ -65,6 +65,15 @@ namespace libmpdataxx
 		  im
 		);
 
+              // needed with the dfl option
+              // if we aren't in the last iteration and fct is not set
+              if (opts::isset(ct_params_t::opts, opts::dfl) &&
+                  iter != (this->n_iters - 1) &&
+                  !opts::isset(ct_params_t::opts, opts::fct))
+              {
+                this->xchng_vctr_alng(this->GC_corr(iter));
+              }
+
 	      this->fct_adjust_antidiff(e, iter); // i.e. calculate GC_mono=GC_mono(GC_corr) in FCT
 	    }
 

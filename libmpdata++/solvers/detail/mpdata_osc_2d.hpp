@@ -90,7 +90,11 @@ namespace libmpdataxx
               // iterations, also needed for fct but it is done there independently hence
               // the following check
               if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
+              {
                 this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j);
+                // if dfl option is set we need to fill these as well
+                if (opts::isset(ct_params_t::opts, opts::dfl)) this->xchng_vctr_alng(this->GC_corr(iter));
+              }
 
 	      this->fct_adjust_antidiff(e, iter);
               assert(std::isfinite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
