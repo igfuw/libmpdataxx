@@ -1,17 +1,11 @@
 language: cpp
 os: 
-    - linux
     - osx
 compiler:
     - gcc
     - clang
 env:
-    - TEST_SUITE=unit
     - TEST_SUITE=sandbox
-    - TEST_SUITE=paper
-    - TEST_SUITE=elliptic_drop
-    - TEST_SUITE=nair_jablonowski_2008
-    - TEST_SUITE=bicycles
 matrix:
     exclude:
         - os: osx
