@@ -30,11 +30,6 @@ class convergence_2d_spacetime : public libmpdataxx::solvers::mpdata<ct_params_t
     using libmpdataxx::opts::isset;
     using libmpdataxx::opts::div_3rd;
     using namespace libmpdataxx::arakawa_c;
-    
-    if (isset(ct_params_t::opts, div_3rd) && this->rank == 0)
-    {
-      std::cout << "opts: " << ct_params_t::opts << " div_3rd: " << div_3rd << std::endl;
-    }
 
     auto t = this->time;
     auto dt = this->dt;
