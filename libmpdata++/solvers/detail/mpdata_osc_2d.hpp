@@ -45,7 +45,8 @@ namespace libmpdataxx
             this->xchng_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
           
           // filling Y halos for GC_x, and X halos for GC_y
-          this->xchng_vctr_nrml(this->mem->GC, this->i, this->j);
+          auto ex = this->halo - 1;
+          this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
 	} 
 
 	// method invoked by the solver
