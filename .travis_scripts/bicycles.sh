@@ -32,7 +32,6 @@ git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
 cd libcloudphxx
 mkdir build 
 cd build
-if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
 if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
 cmake -DCMAKE_BUILD_TYPE=Release ../ 
 make 
