@@ -53,9 +53,9 @@ before_install:
 install:
     # compilers
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.5; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; clang++ -v; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; clang++-3.5 -v; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; ls -l /usr/bin/; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then clang++ -v; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then clang++-3.5 -v; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then ls -l /usr/bin/; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export CXX=clang++-3.5; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then export CXX=g++-6; fi
       #- if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then sudo $apt_get_install g++; fi
