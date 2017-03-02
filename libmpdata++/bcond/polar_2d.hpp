@@ -27,7 +27,7 @@ namespace libmpdataxx
       public:
 
       // method invoked by the solver
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const rng_t &j, const bool deriv = false)
       {
 	using namespace idxperm;
         for (int i = 0; i < halo; ++i)
@@ -44,7 +44,7 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
 	av[d](pi<d>(this->left_halo_vctr.last(), j)) = 0;
@@ -59,7 +59,7 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
         for (int i = 0; i < halo; ++i)
@@ -93,7 +93,7 @@ namespace libmpdataxx
       public:
 
       // method invoked by the solver
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const rng_t &j, const bool deriv = false)
       {
 	using namespace idxperm;
 
@@ -111,7 +111,7 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
 	av[d](pi<d>(this->rght_halo_vctr.first(), j)) = 0;
@@ -126,7 +126,7 @@ namespace libmpdataxx
         }
       }
       
-      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j)
       {
 	using namespace idxperm;
         for (int i = 0; i < halo; ++i)

@@ -26,7 +26,7 @@ namespace libmpdataxx
 
       public:
       
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
         using namespace idxperm;
         // zero flux condition
@@ -36,7 +36,7 @@ namespace libmpdataxx
         }
       }
       
-      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
       {
         using namespace idxperm;
         // equivalent to one-sided derivatives at the boundary
@@ -46,13 +46,13 @@ namespace libmpdataxx
       
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
       
-      void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k, int)
+      void set_edge_pres(arr_t &a, const rng_t &j, const rng_t &k, int)
       {
         using namespace idxperm;
         a(pi<d>(this->left_edge_sclr, j, k)) = 0;
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
 	using namespace idxperm;
         // zero velocity condition
@@ -62,7 +62,7 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)
       {
         // note intentional sclr
         fill_halos_sclr(a, j, k);
@@ -84,7 +84,7 @@ namespace libmpdataxx
       
       public:
       
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
         // zero flux condition
         using namespace idxperm;
@@ -96,7 +96,7 @@ namespace libmpdataxx
       
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
 
-      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
       {
         using namespace idxperm;
         // equivalent to one-sided derivatives at the boundary
@@ -104,13 +104,13 @@ namespace libmpdataxx
                                                          - a(pi<d>(this->rght_edge_sclr - 1, j, k));
       }
       
-      void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k, int)
+      void set_edge_pres(arr_t &a, const rng_t &j, const rng_t &k, int)
       {
         using namespace idxperm;
         a(pi<d>(this->rght_edge_sclr, j, k)) = 0;
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
 	using namespace idxperm;
         // zero velocity condition
@@ -120,7 +120,7 @@ namespace libmpdataxx
         }
       }
       
-      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)
       {
         // note intentional sclr
         fill_halos_sclr(a, j, k);
