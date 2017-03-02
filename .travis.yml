@@ -19,6 +19,12 @@ matrix:
 
         - compiler: clang
           env: TEST_SUITE=bicycles # bicycles is not tested on clang yet
+addons:
+  apt:
+    packages:
+      - g++-6
+    sources: &sources
+      - ubuntu-toolchain-r-test
 
 osx_image: xcode8
 
@@ -49,7 +55,8 @@ before_install:
 install:
     # compilers
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.5; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then sudo $apt_get_install g++; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then export CXX=g++-6; fi
+      #- if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then sudo $apt_get_install g++; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then brew install gcc48; fi   # would need a gcc-compiled boost ... (see note below)
 
     # boost
