@@ -91,7 +91,7 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           (
             6 * abs(GC(pi<dim>(i+h, j))) * pow(GC(pi<dim>(i+h, j)), 2) / pow(G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j), 2)
-            - 3 * pow2(GC(pi<dim>(i+h, j))) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j)
+            - 3 * pow(GC(pi<dim>(i+h, j)), 2) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j)
             - 3 * pow(GC(pi<dim>(i+h, j)), 4) / pow(G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j), 3)
           ) / 2
         );
@@ -124,7 +124,7 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           3 *
           (
-              3 * abs(GC1_bar_xy<dim>(GC[dim-1], i, j)) * pow2(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j)
+              3 * abs(GC1_bar_xy<dim>(GC[dim-1], i, j)) * pow(GC[dim](pi<dim>(i+h, j)), 2) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j)
             + 3 * pow(GC1_bar_xy<dim>(GC[dim-1], i, j), 2) * abs(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j)
             - 2 * abs(GC1_bar_xy<dim>(GC[dim-1], i, j)) * abs(GC[dim](pi<dim>(i+h, j)))
             - 9 * pow(GC1_bar_xy<dim>(GC[dim-1], i, j), 2) * pow(GC[dim](pi<dim>(i+h, j)), 2)
