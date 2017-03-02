@@ -49,87 +49,76 @@ namespace libmpdataxx
       (x + abs(x)) / 2
     )
 
-    // 1D: G = const = 1
-    template<opts::opts_t opts, class arr_t>
-    inline int G(
+    // 1D or ND: G = const = 1
+    template<opts::opts_t opts, class arr_t, class ix_t>
+    inline auto G(
       const arr_t &G,
-      const rng_t &,
+      const ix_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
     ) {
       return 1; 
     }
 
     // 2D: G = const = 1
-    template<opts::opts_t opts, int d, class arr_t>
-    inline int G(
+    template<opts::opts_t opts, int d, class arr_t, class ix_t>
+    inline auto G(
       const arr_t &G,
-      const rng_t &, const rng_t &,
+      const ix_t &, const ix_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
     ) {
       return 1; 
     }
 
     // 3D: G = const = 1
-    template<opts::opts_t opts, int d, class arr_t>
-    inline int G(
+    template<opts::opts_t opts, int d, class arr_t, class ix_t>
+    inline auto G(
       const arr_t &G,
-      const rng_t &, const rng_t &, const rng_t &,
+      const ix_t &, const ix_t &, const ix_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
     ) {
       return 1; 
+    }
+
+    // 1D on ND: G != const
+    template<opts::opts_t opts, class arr_t, class ix_t>
+    inline auto G(
+      const arr_t &G,
+      const ix_t &i,
+      typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
+    ) 
+    {
+      return return_helper<ix_t>(
+        G(i) + 0 // return_macro includes a call to blitz::safeToReturn() which expects an expression as an arg
+      );
     }
     
-    // ND: G = const = 1
-    template<opts::opts_t opts, class arr_t, class ijk_t>
-    inline int G(
-      const arr_t &G,
-      const ijk_t &,
-      typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
-    ) {
-      return 1; 
-    }
-
-    // 1D: G != const
-    template<opts::opts_t opts, class arr_t> 
-    inline auto G(
-      const arr_t &G,
-      const rng_t &i,
-      typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
-    ) return_macro(,
-      G(i) + 0 // return_macro includes a call to blitz::safeToReturn() which expects an expression as an arg
-    )
-
     // 2D: G != const
-    template<opts::opts_t opts, int d, class arr_t> 
+    template<opts::opts_t opts, int d, class arr_t, class ix_t> 
     inline auto G(
       const arr_t &G,
-      const rng_t &i,
-      const rng_t &j,
+      const ix_t &i,
+      const ix_t &j,
       typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
-    ) return_macro(,
-      G(idxperm::pi<d>(i, j)) + 0
     )
+    {
+      return return_helper<ix_t>(
+        G(idxperm::pi<d>(i, j)) + 0
+      );
+    }
     
     // 3D: G != const
-    template<opts::opts_t opts, int d, class arr_t> 
+    template<opts::opts_t opts, int d, class arr_t, class ix_t> 
     inline auto G(
       const arr_t &G,
-      const rng_t &i,
-      const rng_t &j,
-      const rng_t &k,
+      const ix_t &i,
+      const ix_t &j,
+      const ix_t &k,
       typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
-    ) return_macro(,
-      G(idxperm::pi<d>(i, j, k)) + 0
     )
-    
-    // ND: G != const
-    template<opts::opts_t opts, class arr_t, class ijk_t> 
-    inline auto G(
-      const arr_t &G,
-      const ijk_t &ijk,
-      typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
-    ) return_macro(,
-      G(ijk) + 0
-    )
+    {
+      return return_helper<ix_t>(
+        G(idxperm::pi<d>(i, j, k)) + 0
+      );
+    }
   } // namespace formulae
 } // namespace libmpdataxx
