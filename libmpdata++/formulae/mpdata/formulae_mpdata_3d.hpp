@@ -115,54 +115,78 @@ namespace libmpdataxx
 
       // antidiffusive velocity - standard version
       template <opts_t opts, int dim, class arr_3d_t>
-      inline auto antidiff(
+      inline void antidiff(
+        arr_3d_t &res,
         const arr_3d_t &psi,
         const arrvec_t<arr_3d_t> &GC,
         const arrvec_t<arr_3d_t> &ndt_GC, // to have consistent interface with the div_3rd version
         const arrvec_t<arr_3d_t> &ndtt_GC, // ditto
         const arr_3d_t &G,
-        const rng_t &i,
-        const rng_t &j,
-        const rng_t &k,
+        const rng_t &ir,
+        const rng_t &jr,
+        const rng_t &kr,
         typename std::enable_if<!opts::isset(opts, opts::div_2nd) && !opts::isset(opts, opts::div_3rd)>::type* = 0
-      ) return_macro(,
-          // second order terms
-          abs(GC[dim](pi<dim>(i+h, j, k))) / 2
-        * (1 - abs(GC[dim](pi<dim>(i+h, j, k))) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k))
-        * ndx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k)
-        - GC[dim](pi<dim>(i+h, j, k)) / 2
-        * (
-            GC1_bar_xy<dim>(GC[dim+1], i, j, k)
-          * ndy_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k)
-          + GC2_bar_xz<dim>(GC[dim-1], i, j, k)
-          * ndz_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k)
-          )
-          / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k)
-          // third order terms
-        + TOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k)
-        // divergent flow correction
-        + DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k) 
       )
+      {
+        for (int i = ir.first(); i <= ir.last(); ++i)
+        {
+          for (int j = jr.first(); j <= jr.last(); ++j)
+          {
+            for (int k = kr.first(); k <= kr.last(); ++k)
+            {
+              res(pi<dim>(i, j, k)) = 
+                // second order terms
+                abs(GC[dim](pi<dim>(i+h, j, k))) / 2
+              * (1 - abs(GC[dim](pi<dim>(i+h, j, k))) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k))
+              * ndx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k)
+              - GC[dim](pi<dim>(i+h, j, k)) / 2
+              * (
+                  GC1_bar_xy<dim>(GC[dim+1], i, j, k)
+                * ndy_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k)
+                + GC2_bar_xz<dim>(GC[dim-1], i, j, k)
+                * ndz_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k)
+                )
+                / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k)
+                // third order terms
+              + TOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k)
+              // divergent flow correction
+              + DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k);
+            }
+          }
+        }
+      }
 
       // antidiffusive velocity - divergence form
       template <opts_t opts, int dim, class arr_3d_t>
-      inline auto antidiff(
+      inline void antidiff(
+        arr_3d_t &res, 
         const arr_3d_t &psi, 
         const arrvec_t<arr_3d_t> &GC,
         const arrvec_t<arr_3d_t> &ndt_GC,
         const arrvec_t<arr_3d_t> &ndtt_GC,
         const arr_3d_t &G, 
-        const rng_t &i, 
-        const rng_t &j,
-        const rng_t &k,
+        const rng_t &ir, 
+        const rng_t &jr,
+        const rng_t &kr,
         typename std::enable_if<opts::isset(opts, opts::div_2nd)>::type* = 0
-      ) return_macro(
+      )
+      {
         static_assert(!opts::isset(opts, opts::tot), "div_2nd & div_3rd options are incompatible with tot");
         static_assert(!opts::isset(opts, opts::dfl), "div_2nd & div_3rd options are incompatible with dfl");
-        ,
-        div_2nd<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k) +
-        div_3rd<opts BOOST_PP_COMMA() dim>(psi, GC, ndt_GC, ndtt_GC, G, i, j, k)
-      ) 
+
+        for (int i = ir.first(); i <= ir.last(); ++i)
+        {
+          for (int j = jr.first(); j <= jr.last(); ++j)
+          {
+            for (int k = kr.first(); k <= kr.last(); ++k)
+            {
+              res(pi<dim>(i, j, k)) = 
+              div_2nd<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j, k) +
+              div_3rd<opts BOOST_PP_COMMA() dim>(psi, GC, ndt_GC, ndtt_GC, G, i, j, k);
+            }
+          }
+        }
+      } 
     } // namespace mpdata
   } // namespace formulae
 } // namespcae libmpdataxx

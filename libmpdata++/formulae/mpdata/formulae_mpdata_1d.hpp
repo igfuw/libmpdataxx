@@ -103,42 +103,54 @@ namespace libmpdataxx
       
       // antidiffusive velocity - standard version
       template<opts_t opts, class arr_1d_t>
-      inline auto antidiff( // antidiffusive velocity
+      inline void antidiff( // antidiffusive velocity
+        arr_1d_t &res, 
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC, // to have consistent interface with the div_3rd version
         const arrvec_t<arr_1d_t> &ndtt_GC, // ditto
         const arr_1d_t &G,
-        const rng_t &i,
+        const rng_t &ir,
         typename std::enable_if<!opts::isset(opts, opts::div_2nd) && !opts::isset(opts, opts::div_3rd)>::type* = 0
-      ) return_macro(,
-        // second-order terms
-        abs(GC[0](i+h)) / 2
-        * (1 - abs(GC[0](i+h)) / G_bar_x<opts>(G, i))
-        * ndx_psi<opts>(psi, i) 
-        // third-order terms
-        + TOT<opts>(psi, GC[0], G, i) //higher order term
-        // divergent flow terms
-        + DFL<opts>(psi, GC[0], G, i) //divergent flow correction
       )
+      {
+        for (int i = ir.first(); i <= ir.last(); ++i)
+        {
+          res(i) = 
+          // second-order terms
+          abs(GC[0](i+h)) / 2
+          * (1 - abs(GC[0](i+h)) / G_bar_x<opts>(G, i))
+          * ndx_psi<opts>(psi, i) 
+          // third-order terms
+          + TOT<opts>(psi, GC[0], G, i) //higher order term
+          // divergent flow terms
+          + DFL<opts>(psi, GC[0], G, i); //divergent flow correction
+        }
+      }
 
       // antidiffusive velocity - divergence form
       template <opts_t opts, class arr_1d_t>
-      inline auto antidiff(
+      inline void antidiff(
+        arr_1d_t &res,
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC,
         const arrvec_t<arr_1d_t> &ndtt_GC,
         const arr_1d_t &G, 
-        const rng_t &i, 
+        const rng_t &ir, 
         typename std::enable_if<opts::isset(opts, opts::div_2nd)>::type* = 0
-      ) return_macro(
+      )
+      {
         static_assert(!opts::isset(opts, opts::tot), "div_2nd & div_3rd options are incompatible with tot");
         static_assert(!opts::isset(opts, opts::dfl), "div_2nd & div_3rd options are incompatible with dfl");
-        ,
-        div_2nd<opts>(psi, GC, G, i) +
-        div_3rd<opts>(psi, GC, ndt_GC, ndtt_GC, G, i)
-      ) 
+
+        for (int i = ir.first(); i <= ir.last(); ++i)
+        {
+          res(i) = 
+          div_2nd<opts>(psi, GC, G, i) +
+          div_3rd<opts>(psi, GC, ndt_GC, ndtt_GC, G, i);
+        }
+      } 
 
     } // namespace mpdata
   } // namespace formulae

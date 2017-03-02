@@ -62,28 +62,28 @@ namespace libmpdataxx
               this->xchng(e);
 
 	      // calculating the antidiffusive C 
-	      this->GC_corr(iter)[0](this->im+h, this->j) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
-		  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-                  *this->mem->G,
-		  this->im, 
-                  this->j
-		);
+              formulae::mpdata::antidiff<ct_params_t::opts, 0>(
+                this->GC_corr(iter)[0],
+                this->mem->psi[e][this->n[e]], 
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                this->im, 
+                this->j
+              );
               assert(std::isfinite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
 
-	      this->GC_corr(iter)[1](this->i, this->jm+h) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
-		  this->mem->psi[e][this->n[e]], 
-		  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-		  *this->mem->G,
-		  this->jm, 
-		  this->i
-		);
+              formulae::mpdata::antidiff<ct_params_t::opts, 1>(
+                this->GC_corr(iter)[1],
+                this->mem->psi[e][this->n[e]], 
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                this->jm, 
+                this->i
+              );
               assert(std::isfinite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
 
 	      // filling Y halos for GC_x, and X halos for GC_y
