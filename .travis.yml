@@ -2,6 +2,7 @@ language: cpp
 os: 
     - linux
 compiler:
+    - gcc
     - clang
 env:
     - TEST_SUITE=unit
