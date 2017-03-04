@@ -69,14 +69,15 @@ namespace libmpdataxx
       
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto div_3rd(
-        const arr_2d_t &psi, 
+        const arr_2d_t &psi_np1, 
+        const arr_2d_t &psi_n, 
         const arrvec_t<arr_2d_t> &GC,
         const arrvec_t<arr_2d_t> &ndt_GC,
         const arrvec_t<arr_2d_t> &ndtt_GC,
         const arr_2d_t &G, 
         const ix_t &i, 
         const ix_t &j,
-        typename std::enable_if<!opts::isset(opts, opts::div_3rd)>::type* = 0
+        typename std::enable_if<!opts::isset(opts, opts::div_3rd) && !opts::isset(opts, opts::div_3rd_dt)>::type* = 0
       )
       {
         return 0;
@@ -84,7 +85,8 @@ namespace libmpdataxx
       
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto div_3rd(
-        const arr_2d_t &psi, 
+        const arr_2d_t &psi_np1, 
+        const arr_2d_t &psi_n, 
         const arrvec_t<arr_2d_t> &GC,
         const arrvec_t<arr_2d_t> &ndt_GC,
         const arrvec_t<arr_2d_t> &ndtt_GC,
@@ -96,23 +98,59 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           // upwind differencing correction
-          div_3rd_helper<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
+          div_3rd_helper<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
           // spatial terms
           - 1.0 / 24 *
           (
-              4 * GC[dim](pi<dim>(i+h, j)) * ndxx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j)
-            + 2 * ndx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j) * ndx_GC0<dim>(GC[dim], i, j)
-            + 1 * ndxx_GC0<opts BOOST_PP_COMMA() dim>(psi, GC[dim], i, j)
+              4 * GC[dim](pi<dim>(i+h, j)) * ndxx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j)
+            + 2 * ndx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j) * ndx_GC0<dim>(GC[dim], i, j)
+            + 1 * ndxx_GC0<opts BOOST_PP_COMMA() dim>(psi_np1, GC[dim], i, j)
           )
           // mixed terms
-          + 0.5 * abs(GC[dim](pi<dim>(i+h, j))) * ndx_fdiv<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
+          + 0.5 * abs(GC[dim](pi<dim>(i+h, j))) * ndx_fdiv<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
           // temporal terms
           + 1.0 / 24 *
           (
-              - 8 * GC[dim](pi<dim>(i+h, j)) *  nfdiv_fdiv<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
-              + 1 * ndtt_GC0<opts BOOST_PP_COMMA() dim>(psi, ndtt_GC[dim], i, j)
-              + 2 * GC[dim](pi<dim>(i+h, j)) *  nfdiv<opts BOOST_PP_COMMA() dim>(psi, ndt_GC, G, i, j)
-              - 2 * ndt_GC[dim](pi<dim>(i+h, j)) * nfdiv<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
+              - 8 * GC[dim](pi<dim>(i+h, j)) *  nfdiv_fdiv<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+              + 1 * ndtt_GC0<opts BOOST_PP_COMMA() dim>(psi_np1, ndtt_GC[dim], i, j)
+              + 2 * GC[dim](pi<dim>(i+h, j)) *  nfdiv<opts BOOST_PP_COMMA() dim>(psi_np1, ndt_GC, G, i, j)
+              - 2 * ndt_GC[dim](pi<dim>(i+h, j)) * nfdiv<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+          )
+        );
+      }
+      
+      template <opts_t opts, int dim, class arr_2d_t, class ix_t>
+      inline auto div_3rd(
+        const arr_2d_t &psi_np1, 
+        const arr_2d_t &psi_n, 
+        const arrvec_t<arr_2d_t> &GC,
+        const arrvec_t<arr_2d_t> &ndt_GC,
+        const arrvec_t<arr_2d_t> &ndtt_GC,
+        const arr_2d_t &G, 
+        const ix_t &i, 
+        const ix_t &j,
+        typename std::enable_if<opts::isset(opts, opts::div_3rd_dt)>::type* = 0
+      )
+      {
+        return return_helper<ix_t>(
+          // upwind differencing correction
+          div_3rd_helper<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+          // spatial terms
+          - 1.0 / 24 *
+          (
+              4 * GC[dim](pi<dim>(i+h, j)) * ndxx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j)
+            + 2 * ndx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j) * ndx_GC0<dim>(GC[dim], i, j)
+            + 1 * ndxx_GC0<opts BOOST_PP_COMMA() dim>(psi_np1, GC[dim], i, j)
+          )
+          // mixed terms
+          - 0.5 * abs(GC[dim](pi<dim>(i+h, j))) * ndtx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, psi_n, i, j)
+          // temporal terms
+          + 1.0 / 24 *
+          (
+              + 8 * GC[dim](pi<dim>(i+h, j)) *  nfdiv_dt<opts BOOST_PP_COMMA() dim>(psi_np1, psi_n, GC, G, i, j)
+              + 1 * ndtt_GC0<opts BOOST_PP_COMMA() dim>(psi_np1, ndtt_GC[dim], i, j)
+              + 2 * GC[dim](pi<dim>(i+h, j)) *  nfdiv<opts BOOST_PP_COMMA() dim>(psi_np1, ndt_GC, G, i, j)
+              + 2 * ndt_GC[dim](pi<dim>(i+h, j)) * ndt_psi<opts BOOST_PP_COMMA() dim>(psi_np1, psi_n, i, j)
           )
         );
       }
@@ -121,7 +159,8 @@ namespace libmpdataxx
       template <opts_t opts, int dim, class arr_2d_t>
       inline void antidiff(
         arr_2d_t &res, 
-        const arr_2d_t &psi, 
+        const arr_2d_t &psi_np1, 
+        const arr_2d_t &psi_n, 
         const arrvec_t<arr_2d_t> &GC,
         const arrvec_t<arr_2d_t> &ndt_GC, // to have consistent interface with the div_3rd version
         const arrvec_t<arr_2d_t> &ndtt_GC, // ditto
@@ -139,18 +178,18 @@ namespace libmpdataxx
             // second order terms
             abs(GC[dim](pi<dim>(i+h, j))) / 2
             * (1 - abs(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j))
-            * ndx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j) 
+            * ndx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j) 
             - 
             GC[dim](pi<dim>(i+h, j)) 
             * GC1_bar_xy<dim>(GC[dim+1], i, j)
             / (2 * G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j))
-            * ndy_psi<opts BOOST_PP_COMMA() dim>(psi, i, j)
+            * ndy_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j)
             // third order terms
-            + TOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
+            + TOT<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
             //// fourth order terms
-            + FOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
+            + FOT<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
             // divergent flow correction
-            + DFL<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j);
+            + DFL<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j);
           }
         }
       }
@@ -159,7 +198,8 @@ namespace libmpdataxx
       template <opts_t opts, int dim, class arr_2d_t>
       inline void antidiff(
         arr_2d_t &res, 
-        const arr_2d_t &psi, 
+        const arr_2d_t &psi_np1, 
+        const arr_2d_t &psi_n, 
         const arrvec_t<arr_2d_t> &GC,
         const arrvec_t<arr_2d_t> &ndt_GC,
         const arrvec_t<arr_2d_t> &ndtt_GC,
@@ -176,10 +216,10 @@ namespace libmpdataxx
           for (int j = jr.first(); j <= jr.last(); ++j)
           {
             res(pi<dim>(i, j)) = 
-            div_2nd<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j) +
-            div_3rd<opts BOOST_PP_COMMA() dim>(psi, GC, ndt_GC, ndtt_GC, G, i, j)
+            div_2nd<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j) +
+            div_3rd<opts BOOST_PP_COMMA() dim>(psi_np1, psi_n, GC, ndt_GC, ndtt_GC, G, i, j)
             // fourth order terms
-            + FOT<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j);
+            + FOT<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j);
           }
         }
       } 
