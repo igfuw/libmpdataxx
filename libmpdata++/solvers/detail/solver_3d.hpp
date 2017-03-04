@@ -244,7 +244,8 @@ namespace libmpdataxx
 
           // fully third-order accurate mpdata needs also time derivatives of
           // the Courant field
-          if (opts::isset(ct_params_t::opts, opts::div_3rd))
+          if (opts::isset(ct_params_t::opts, opts::div_3rd) ||
+              opts::isset(ct_params_t::opts, opts::div_3rd_dt))
           {
             // TODO: why for (auto f : {mem->ndt_GC, mem->ndtt_GC}) doesn't work ?
             mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t( 

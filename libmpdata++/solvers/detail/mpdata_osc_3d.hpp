@@ -66,6 +66,7 @@ namespace libmpdataxx
               formulae::mpdata::antidiff<ct_params_t::opts, 0>(
                 this->GC_corr(iter)[0],
                 this->mem->psi[e][this->n[e]], 
+                this->mem->psi[e][this->n[e]-1],
                 this->GC_unco(iter),
                 this->mem->ndt_GC,
                 this->mem->ndtt_GC,
@@ -78,6 +79,7 @@ namespace libmpdataxx
               formulae::mpdata::antidiff<ct_params_t::opts, 1>(
                 this->GC_corr(iter)[1],
                 this->mem->psi[e][this->n[e]], 
+                this->mem->psi[e][this->n[e]-1], 
                 this->GC_unco(iter),
                 this->mem->ndt_GC,
                 this->mem->ndtt_GC,
@@ -90,6 +92,7 @@ namespace libmpdataxx
               formulae::mpdata::antidiff<ct_params_t::opts, 2>(
                 this->GC_corr(iter)[2],
                 this->mem->psi[e][this->n[e]], 
+                this->mem->psi[e][this->n[e]-1], 
                 this->GC_unco(iter),
                 this->mem->ndt_GC,
                 this->mem->ndtt_GC,
@@ -98,6 +101,9 @@ namespace libmpdataxx
                 this->i,
                 this->j
               );
+	    
+              if (opts::isset(ct_params_t::opts, opts::div_3rd_dt))
+                this->mem->barrier();
               
 	      // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y halos for GC_z 
 	      // needed for calculation of antidiffusive velocities in the third and subsequent

@@ -36,7 +36,8 @@ namespace libmpdataxx
       khn = opts::bit(8), // use Kahan summation algorithm in the donor-cell formulae
       div_2nd = opts::bit(9),  // second-order MPDATA in divergence form
       div_3rd = opts::bit(10), // third-order correction in divergence form
-      fot = opts::bit(11)  // fourth-order terms
+      div_3rd_dt = opts::bit(11), // third-order correction in divergence form utilising first time derivative
+      fot = opts::bit(12)  // fourth-order terms
     };
 
   } // namespace opts
