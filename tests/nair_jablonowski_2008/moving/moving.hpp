@@ -137,10 +137,10 @@ class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
           ex_node[2](i, j) += gc_ij.first;
           ex_node[3](i, j) += gc_ij.second;
 
-          ex_node[3](i, j) += gc_ij.first;
-          ex_node[4](i, j) += gc_ij.second;
-          ex_node[3](i, j) *= 4;
+          ex_node[4](i, j) += gc_ij.first;
+          ex_node[5](i, j) += gc_ij.second;
           ex_node[4](i, j) *= 4;
+          ex_node[5](i, j) *= 4;
         }
       }
     }
