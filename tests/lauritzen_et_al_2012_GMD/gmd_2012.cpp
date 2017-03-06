@@ -22,6 +22,9 @@ struct ct_test_params_t
   static constexpr ::T
     R = 1,
     T = 5;
+  // calculate advectors at nodal points and then average to staggered positions
+  // or calculate at the staggered positions
+  static constexpr bool node = true;
 };
 // to make refering to compile time test params easier
 using tp = ct_test_params_t;
