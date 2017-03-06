@@ -56,14 +56,14 @@ class gmd_2012 : public libmpdataxx::solvers::mpdata<ct_params_t>
     if (needs_dt)
     {
       res.ndt_gc[0] = (   -10 * tp::R * pi / pow(tp::T, 2) * pow(sin(x1p), 2) * sin(2 * y1) * sin(pi * t / tp::T)
-                      ) * this->dj * this->dt;
+                      ) * this->dj * pow(this->dt, 2);
       res.ndt_gc[1] = (   -10 * tp::R * pi / pow(tp::T, 2) * sin(2 * x2p) * pow(cos(y2), 2) * sin(pi * t / tp::T)
-                      ) * this->di * this->dt;
+                      ) * this->di * pow(this->dt, 2);
       
       res.ndtt_gc[0] = (   -10 * tp::R * pow(pi, 2) / pow(tp::T, 3) * pow(sin(x1p), 2) * sin(2 * y1) * cos(pi * t / tp::T)
-                       ) * this->dj * this->dt;
+                       ) * this->dj * pow(this->dt, 3);
       res.ndtt_gc[1] = (   -10 * tp::R * pow(pi, 2) / pow(tp::T, 3) * sin(2 * x2p) * pow(cos(y2), 2) * cos(pi * t / tp::T)
-                       ) * this->di * this->dt;
+                       ) * this->di * pow(this->dt, 3);
     }
     return res;
   }
