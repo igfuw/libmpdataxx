@@ -29,14 +29,14 @@ namespace libmpdataxx
         template <int nd = ct_params_t::n_dims>
         void calc_dtht_e(typename std::enable_if<nd == 2>::type* = 0)
         {
-          this->xchng_sclr(this->tht_e, this->i, this->j);
+          this->xchng_sclr(this->tht_e, this->ijk);
           this->dtht_e(this->ijk) = formulae::nabla::grad<1>(this->tht_e, this->j, this->i, this->dj);
         }
         
         template <int nd = ct_params_t::n_dims>
         void calc_dtht_e(typename std::enable_if<nd == 3>::type* = 0)
         {
-          this->xchng_sclr(this->tht_e, this->i, this->j, this->k);
+          this->xchng_sclr(this->tht_e, this->ijk);
           this->dtht_e(this->ijk) = formulae::nabla::grad<2>(this->tht_e, this->k, this->i, this->j, this->dk);
         }
 

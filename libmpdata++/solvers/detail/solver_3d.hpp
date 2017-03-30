@@ -32,21 +32,20 @@ namespace libmpdataxx
         typename parent_t::arr_t &courant_field; // TODO:/: should be in solver common but cannot be allocated there ?
 
 	virtual void xchng_sclr(typename parent_t::arr_t &arr,
-                       const rng_t &range_i,
-                       const rng_t &range_j,
-                       const rng_t &range_k,
+	               const idx_t<3> &range_ijk,
+                       const int ext = 0,
                        const bool deriv = false
         ) final // for a given array
 	{
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_j, range_k, deriv);
-	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_k, range_i, deriv);
-	  for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_i, range_j, deriv);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
+	  for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, range_ijk[1]^ext, deriv);
           this->mem->barrier();
 	}
 	void xchng(int e) final
 	{
-	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
+	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], this->ijk, this->halo);
 	}
 
         void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
@@ -60,20 +59,19 @@ namespace libmpdataxx
 
         virtual void xchng_vctr_nrml(
           const arrvec_t<typename parent_t::arr_t> &arrvec,
-          const rng_t &range_i,
-          const rng_t &range_j,
-          const rng_t &range_k
+	  const idx_t<3> &range_ijk,
+          const int ext = 0
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k^1, range_i^h);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h, range_j^1);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[2]^ext^1, range_ijk[0]^ext^h);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[0]^ext^h, range_ijk[1]^ext^1);
 
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h, range_k^1);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_i^1, range_j^h);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[0]^ext^1, range_ijk[1]^ext^h);
    
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j^1, range_k^h);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k^h, range_i^1);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
           this->mem->barrier();
         }
 

@@ -31,7 +31,7 @@ namespace libmpdataxx
         void filter(typename std::enable_if<nd == 2>::type* = 0)
         {
           const auto &i(this->i), &j(this->j);
-          this->xchng_sclr(tmp1, i, j);
+          this->xchng_sclr(tmp1, this->ijk);
           tmp2(i, j) = 0.25 * (tmp1(i, j + 1) + 2 * tmp1(i, j) + tmp1(i, j - 1));
         }
 
@@ -39,7 +39,7 @@ namespace libmpdataxx
         void filter(typename std::enable_if<nd == 3>::type* = 0)
         {
           const auto &i(this->i), &j(this->j), &k(this->k);
-          this->xchng_sclr(tmp1, i, j, k);
+          this->xchng_sclr(tmp1, this->ijk);
           tmp2(i, j, k) = 0.25 * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k + 1));
         }
         

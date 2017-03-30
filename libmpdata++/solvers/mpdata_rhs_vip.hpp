@@ -135,8 +135,7 @@ namespace libmpdataxx
 	intrp<0>(this->stash[0], im, this->j^this->halo, this->di);
 	intrp<1>(this->stash[1], jm, this->i^this->halo, this->dj);
         this->xchng_vctr_alng(this->mem->GC);
-        auto ex = this->halo - 1;
-        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+        this->xchng_vctr_nrml(this->mem->GC, this->ijk, this->halo - 1);
       }
 
       void extrapolate_in_time() final
@@ -144,9 +143,9 @@ namespace libmpdataxx
         using namespace libmpdataxx::arakawa_c; 
 
 	this->extrp(0, ix::vip_i);     
-	this->xchng_sclr(this->stash[0], this->i^this->halo, this->j^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[0], this->ijk, this->halo);      // filling halos 
 	this->extrp(1, ix::vip_j);
-	this->xchng_sclr(this->stash[1], this->i^this->halo, this->j^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[1], this->ijk, this->halo);      // filling halos 
       }
 
       public:
@@ -248,8 +247,7 @@ namespace libmpdataxx
 	intrp<1>(this->stash[1], jm, this->k^this->halo, this->i^this->halo, this->dj);
 	intrp<2>(this->stash[2], km, this->i^this->halo, this->j^this->halo, this->dk);
         this->xchng_vctr_alng(this->mem->GC);
-        auto ex = this->halo - 1;
-        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
+        this->xchng_vctr_nrml(this->mem->GC, this->ijk, this->halo - 1);
       }
 
       void extrapolate_in_time() final
@@ -257,20 +255,11 @@ namespace libmpdataxx
         using namespace libmpdataxx::arakawa_c; 
 
 	this->extrp(0, ix::vip_i);     
-	this->xchng_sclr(this->stash[0],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[0], this->ijk, this->halo);      // filling halos
 	this->extrp(1, ix::vip_j);
-	this->xchng_sclr(this->stash[1],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[1], this->ijk, this->halo);      // filling halos
 	this->extrp(2, ix::vip_k);
-	this->xchng_sclr(this->stash[2],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_sclr(this->stash[2], this->ijk, this->halo);      // filling halos
       }
 
       public:
