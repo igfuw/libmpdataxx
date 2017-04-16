@@ -31,7 +31,7 @@
 
 // C++11 auto return type macro
 #define return_macro(init,expr)          \
-  -> decltype(blitz::safeToReturn(expr)) \
+  noexcept -> decltype(blitz::safeToReturn(expr)) \
 {                                        \
   init                                   \
   return safeToReturn(expr);             \
