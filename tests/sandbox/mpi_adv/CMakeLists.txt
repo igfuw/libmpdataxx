@@ -1,1 +1,2 @@
-libmpdataxx_add_test(mpi_adv)
+add_subdirectory(2D)
+add_subdirectory(3D)
