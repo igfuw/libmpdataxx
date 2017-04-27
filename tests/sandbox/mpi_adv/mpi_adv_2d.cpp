@@ -49,7 +49,7 @@ void test(const std::string filename)
 
   p.outfreq = nt / 8; 
   p.outvars[0].name = "psi";
-  p.outdir = "out";
+  p.outdir = "out_2d";
 
   // instantiation
   concurr::threads<

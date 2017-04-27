@@ -1,1 +1,0 @@
-libmpdataxx_add_test(mpi_adv_3D)
