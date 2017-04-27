@@ -105,4 +105,10 @@ int main()
     enum { opts_iters = 2};
     if (order<opts, opts_iters>() != 3) throw std::runtime_error("iga_tot");
   }
+  
+  {
+    enum { opts = opts::iga | opts::tot | opts::fot};
+    enum { opts_iters = 2};
+    if (order<opts, opts_iters>() != 4) throw std::runtime_error("iga_fot");
+  }
 }

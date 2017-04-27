@@ -46,7 +46,8 @@ namespace libmpdataxx
           
           // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
           // halos for GC_z
-          this->xchng_vctr_nrml(this->mem->GC, this->i, this->j, this->k);
+          auto ex = this->halo - 1;
+          this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
 	} 
 
 	// method invoked by the solver
@@ -66,6 +67,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->im,
                   this->j,
@@ -76,6 +79,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->jm,
                   this->k,
@@ -86,6 +91,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 2>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->km,
                   this->i,
@@ -97,7 +104,11 @@ namespace libmpdataxx
               // iterations, also needed for fct but it is done there independently hence
               // the following check
               if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
+              {
                 this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j, this->k);
+                // if dfl option is set we need to fill these as well
+                if (opts::isset(ct_params_t::opts, opts::dfl)) this->xchng_vctr_alng(this->GC_corr(iter));
+              }
 
 	      this->fct_adjust_antidiff(e, iter);
 

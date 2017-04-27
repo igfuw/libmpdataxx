@@ -88,7 +88,7 @@ namespace libmpdataxx
           bcs[d][1] = std::move(bcr);
         }
 
-	virtual real_t courant_number() = 0;
+	virtual real_t courant_number(const arrvec_t<arr_t>&) = 0;
        
         // return false if advector does not change in time
         virtual bool calc_gc() {return false;}
@@ -133,7 +133,7 @@ namespace libmpdataxx
           // to change the timestep once and do a simple scaling of advector
           if (ct_params_t::var_dt)
           {
-            real_t cfl = courant_number();
+            real_t cfl = courant_number(mem->GC);
             if (cfl > 0)
             {
               dt *= max_courant / cfl;
@@ -231,14 +231,14 @@ namespace libmpdataxx
             // to keep the Courant number roughly constant
             if (var_gc && ct_params_t::var_dt)
             {
-              real_t cfl = courant_number();
+              real_t cfl = courant_number(mem->GC);
               if (cfl > 0)
               {
                 do 
                 {
                   dt *= max_courant / cfl;
                   calc_gc();
-                  cfl = courant_number();
+                  cfl = courant_number(mem->GC);
                 }
                 while (cfl > max_courant);
               }

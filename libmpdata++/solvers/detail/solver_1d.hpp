@@ -48,10 +48,10 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec); 
           this->mem->barrier();
         }
-	
-        typename parent_t::real_t courant_number() final
+
+        typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
-          courant_field(this->ijk) = 0.5 * (abs(this->mem->GC[0](i+h) + this->mem->GC[0](i-h)));
+          courant_field(this->ijk) = 0.5 * (abs(arrvec[0](i+h) + arrvec[0](i-h)));
           return this->mem->max(this->rank, courant_field(this->ijk));
         }
 
@@ -137,6 +137,15 @@ namespace libmpdataxx
 	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(mem->grid_size[0]))));
     
 	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0])))); 
+
+          // fully third-order accurate mpdata needs also time derivatives of
+          // the Courant field
+          if (opts::isset(ct_params_t::opts, opts::div_3rd))
+          {
+            // TODO: why for (auto f : {mem->ndt_GC, mem->ndtt_GC}) doesn't work ?
+	    mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0]))));
+	    mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0]))));
+          }
 
           if (opts::isset(ct_params_t::opts, opts::nug))
 	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(mem->grid_size[0]))));

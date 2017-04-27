@@ -33,7 +33,10 @@ namespace libmpdataxx
       iga = opts::bit(5), // infinite-gauge option
       nug = opts::bit(6), // non-unit G (default G = 1) - see Smolarkiewicz 2006 eq (25) and discussion below for info on G
       dfl = opts::bit(7), // devergent flows
-      khn = opts::bit(8) // use Kahan summation algorithm in the donor-cell formulae
+      khn = opts::bit(8), // use Kahan summation algorithm in the donor-cell formulae
+      div_2nd = opts::bit(9),  // second-order MPDATA in divergence form
+      div_3rd = opts::bit(10), // third-order correction in divergence form
+      fot = opts::bit(11)  // fourth-order terms
     };
 
   } // namespace opts

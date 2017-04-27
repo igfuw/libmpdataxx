@@ -47,7 +47,7 @@ namespace libmpdataxx
         bool panic = false; // for multi-threaded SIGTERM handling
 
         // TODO: these are public because used from outside in alloc - could friendship help?
-	arrvec_t<arr_t> GC;
+	arrvec_t<arr_t> GC, ndt_GC, ndtt_GC;
         std::vector<arrvec_t<arr_t>> psi; // TODO: since n_eqns is known, could make it an std::array!
 	std::unique_ptr<arr_t> G;
 	std::unique_ptr<arr_t> vab_coeff; // velocity absorber coefficient

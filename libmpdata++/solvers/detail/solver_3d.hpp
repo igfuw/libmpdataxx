@@ -139,12 +139,12 @@ namespace libmpdataxx
           }
         }
 
-        typename parent_t::real_t courant_number() final
+        typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           courant_field(this->ijk) =  0.5 * (
-                                               abs(this->mem->GC[0](i+h, j, k) + this->mem->GC[0](i-h, j, k))
-                                             + abs(this->mem->GC[1](i, j+h, k) + this->mem->GC[1](i, j-h, k))
-                                             + abs(this->mem->GC[2](i, j, k+h) + this->mem->GC[2](i, j, k-h))
+                                               abs(arrvec[0](i+h, j, k) + arrvec[0](i-h, j, k))
+                                             + abs(arrvec[1](i, j+h, k) + arrvec[1](i, j-h, k))
+                                             + abs(arrvec[2](i, j, k+h) + arrvec[2](i, j, k-h))
                                              ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k);
           return this->mem->max(this->rank, courant_field(this->ijk));
         }
@@ -157,7 +157,8 @@ namespace libmpdataxx
           this->mem->GC[1](i, rng_t(j.first(), j.last()-1)^h, k) *= cur_dt / old_dt;
           this->mem->GC[2](i, j, rng_t(k.first(), k.last()-1)^h) *= cur_dt / old_dt;
           this->xchng_vctr_alng(this->mem->GC);
-          this->xchng_vctr_nrml(this->mem->GC, this->i, this->j, this->k);
+          auto ex = this->halo - 1;
+          this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
         }
 
         public:
@@ -240,6 +241,44 @@ namespace libmpdataxx
             parent_t::rng_sclr(mem->grid_size[1]),
             parent_t::rng_vctr(mem->grid_size[2])
           )));
+
+          // fully third-order accurate mpdata needs also time derivatives of
+          // the Courant field
+          if (opts::isset(ct_params_t::opts, opts::div_3rd))
+          {
+            // TODO: why for (auto f : {mem->ndt_GC, mem->ndtt_GC}) doesn't work ?
+            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t( 
+              parent_t::rng_vctr(mem->grid_size[0]),
+              parent_t::rng_sclr(mem->grid_size[1]),
+              parent_t::rng_sclr(mem->grid_size[2])
+            )));
+            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
+              parent_t::rng_sclr(mem->grid_size[0]),
+              parent_t::rng_vctr(mem->grid_size[1]),
+              parent_t::rng_sclr(mem->grid_size[2])
+            )));
+            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
+              parent_t::rng_sclr(mem->grid_size[0]),
+              parent_t::rng_sclr(mem->grid_size[1]),
+              parent_t::rng_vctr(mem->grid_size[2])
+            )));
+            
+            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t( 
+              parent_t::rng_vctr(mem->grid_size[0]),
+              parent_t::rng_sclr(mem->grid_size[1]),
+              parent_t::rng_sclr(mem->grid_size[2])
+            )));
+            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
+              parent_t::rng_sclr(mem->grid_size[0]),
+              parent_t::rng_vctr(mem->grid_size[1]),
+              parent_t::rng_sclr(mem->grid_size[2])
+            )));
+            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
+              parent_t::rng_sclr(mem->grid_size[0]),
+              parent_t::rng_sclr(mem->grid_size[1]),
+              parent_t::rng_vctr(mem->grid_size[2])
+            )));
+          }
 
           // allocate G
           if (opts::isset(ct_params_t::opts, opts::nug))
