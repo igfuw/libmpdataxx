@@ -431,18 +431,34 @@ namespace libmpdataxx
           assert(d == 0 || d == 1 || d == 2);
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
-// distmem TODO!
+          auto orgn = this->distmem.rank() > 0
+            ? decltype(this->origin)({
+                this->origin[0] - 1, 
+                this->origin[1],
+                this->origin[2]
+              })
+            : this->origin
+          ;
           switch (d)
           { 
-            case 0: return this->GC[d](this->grid_size[0]^(-1)^h,
-                                       this->grid_size[1],
-                                       this->grid_size[2]).reindex(this->origin);  
-            case 1: return this->GC[d](this->grid_size[0],
-                                       this->grid_size[1]^(-1)^h,
-                                       this->grid_size[2]).reindex(this->origin);  
-            case 2: return this->GC[d](this->grid_size[0],
-                                       this->grid_size[1],
-                                       this->grid_size[2]^(-1)^h).reindex(this->origin);  
+            case 0: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]^(-1)^h),
+                this->grid_size[1],
+                this->grid_size[2]
+              ).reindex(this->origin);  
+            case 1: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]),
+                this->grid_size[1]^(-1)^h,
+                this->grid_size[2]
+              ).reindex(this->origin);  
+            case 2: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]),
+                this->grid_size[1],
+                this->grid_size[2]^(-1)^h
+              ).reindex(this->origin);  
             default: assert(false); throw;
           }
 	}   
