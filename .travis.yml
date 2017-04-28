@@ -24,11 +24,9 @@ env:
 matrix:
     exclude:
         - compiler: clang
-          env: MPI=mpich
+          env: TEST_SUITE=sandbox MPI=openmpi
         - compiler: clang
-          env: MPI=lam
-        - compiler: clang
-          env: MPI=openmpi
+          env: TEST_SUITE=paper MPI=openmpi
         - os: osx
           compiler: gcc
 
