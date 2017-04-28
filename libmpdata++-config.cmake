@@ -171,6 +171,9 @@ if(HDF5_FOUND)
 *   Debian/Ubuntu: sudo apt-get install libhdf5-serial-dev hdf5-tools  (TODO)
 *   Fedora: sudo yum install hdf5-devel                                (TODO)
 *   Homebrew: brew install hdf5 --with-cxx                             (TODO)
+*
+* To enable MPI in libmpdata++ point it to a MPI compiler 
+* with -DCMAKE_CXX_COMPILER=<mpi_compiler>
   ")
 
   endif()
