@@ -12,11 +12,11 @@ namespace libmpdataxx
 {
   namespace concurr
   {
-    template <typename real_t, int n_dims>
+    template <typename real_t, int n_dims, typename advance_arg_t = int>
     struct any
     {
       virtual 
-      void advance(int) 
+      void advance(advance_arg_t) 
       { assert(false); throw; }  
 
       virtual 
@@ -38,10 +38,18 @@ namespace libmpdataxx
       virtual 
       blitz::Array<real_t, n_dims> vab_relaxed_state(int d = 0) 
       { assert(false); throw; }
+      
+      virtual 
+      blitz::Array<real_t, n_dims> sclr_array(const std::string &name, int n = 0)
+      { assert(false); throw; }
 
       virtual 
       bool *panic_ptr() 
       { assert(false && "unimplemented!"); throw; }
+      
+      virtual 
+      const real_t time() const
+      { assert(false); throw; }
 
       // dtor
       virtual ~any() {}

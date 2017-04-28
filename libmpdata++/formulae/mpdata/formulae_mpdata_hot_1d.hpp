@@ -7,6 +7,8 @@
 #pragma once
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
+#include <libmpdata++/formulae/mpdata/formulae_mpdata_psi_1d.hpp>
+#include <libmpdata++/formulae/mpdata/formulae_mpdata_g_1d.hpp>
 
 namespace libmpdataxx
 { 
@@ -14,79 +16,42 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-      // 3rd order term (first term from eq. (36) from @copybrief Smolarkiewicz_and_Margolin_1998)
       template<opts_t opts, class arr_1d_t>
-      inline auto HOT(
-        const arr_1d_t &psi,
-        const arr_1d_t &GC,
-        const arr_1d_t &G,
-        const rng_t &i,
-        typename std::enable_if<!opts::isset(opts, opts::tot)>::type* = 0 
-      ) -> decltype(0)
-      { 
-        return 0; //no Higher Order Terms for second accuracy 
-      }
-
-      template<opts_t opts, class arr_1d_t>
-      inline auto HOT_helper(
+      inline auto ndxx_psi_coeff(
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const rng_t &i
       ) return_macro(,
 	(
-          3 * GC(i+h) * abs(GC(i+h)) / ((formulae::G<opts>(G, i) + formulae::G<opts>(G, i+1)) / 2) 
-          - 2 * pow(GC(i+h), 3) / pow((( formulae::G<opts>(G, i) + formulae::G<opts>(G, i+1)) / 2), 2)  
+          3 * GC(i+h) * abs(GC(i+h)) / G_bar_x<opts>(G, i)
+          - 2 * pow(GC(i+h), 3) / pow(G_bar_x<opts>(G, i), 2)  
           - GC(i+h)
-        ) / 3
+        ) / 6
       )
 
+      // third order terms
       template<opts_t opts, class arr_1d_t>
-      inline auto HOT( // for positive sign signal (so no need for abs())
+      inline auto TOT(
         const arr_1d_t &psi,
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const rng_t &i,
-        typename std::enable_if<opts::isset(opts, opts::tot) && !opts::isset(opts, opts::abs) && !opts::isset(opts, opts::iga)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::tot)>::type* = 0 
       ) return_macro(,
-        HOT_helper<opts>(GC, G, i) 
-        * frac<opts>(
-	    psi(i+2) - psi(i+1) - psi(i) + psi(i-1)
-	    ,//-----------------------------------
-	    psi(i+2) + psi(i+1) + psi(i) + psi(i-1)
-	)
+          ndxx_psi<opts>(psi, i) * ndxx_psi_coeff<opts>(GC, G, i)
       )
-
+      
       template<opts_t opts, class arr_1d_t>
-      inline auto HOT( // for variable sign signal (hence the need for abs())
+      inline typename arr_1d_t::T_numtype TOT(
         const arr_1d_t &psi,
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const rng_t &i,
-        typename std::enable_if<opts::isset(opts, opts::tot) && opts::isset(opts, opts::abs) && !opts::isset(opts, opts::iga)>::type* = 0
-      ) return_macro(,
-        HOT_helper<opts>(GC, G, i)
-        * frac<opts>(
-	    abs(psi(i+2)) - abs(psi(i+1)) - abs(psi(i)) + abs(psi(i-1))
-	    ,//------------------------------------------------------- 
-	    abs(psi(i+2)) + abs(psi(i+1)) + abs(psi(i)) + abs(psi(i-1))
-	)
+        typename std::enable_if<!opts::isset(opts, opts::tot)>::type* = 0 
       )
-
-      template<opts_t opts, class arr_1d_t>
-      inline auto HOT( // for infinite gauge option (sum of psi -> sum of 1) 
-        const arr_1d_t &psi,
-        const arr_1d_t &GC,
-        const arr_1d_t &G,
-        const rng_t &i,
-        typename std::enable_if<opts::isset(opts, opts::tot) && opts::isset(opts, opts::iga)>::type* = 0 
-      ) return_macro(
-        static_assert(!opts::isset(opts, opts::abs), "iga & abs are mutually exclusive");
-        ,
-        HOT_helper<opts>(GC, G, i) 
-        * (psi(i+2) - psi(i+1) - psi(i) + psi(i-1)) 
-        / //--------------------------------------- 
-        (1 + 1 + 1 + 1)
-      )
+      { 
+        return 0;
+      }
     } // namespace mpdata
   } // namespace formulae
 } // namespcae libmpdataxx

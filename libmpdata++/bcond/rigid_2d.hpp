@@ -64,10 +64,8 @@ namespace libmpdataxx
 
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
       {
-        using namespace idxperm;
         // note intentional sclr
-        for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
-          a(pi<d>(i, j)) = 0; 
+        fill_halos_sclr(a, j);
       }
     };
 
@@ -124,10 +122,8 @@ namespace libmpdataxx
       
       void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j)
       {
-        using namespace idxperm;
         // note intentional sclr
-        for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-          a(pi<d>(i, j)) = 0; 
+        fill_halos_sclr(a, j);
       }
     };
   } // namespace bcond

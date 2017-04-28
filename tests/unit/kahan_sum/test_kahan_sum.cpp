@@ -24,10 +24,10 @@ void main_tmpl()
     
     
     // that's why we might need a Kahan sum
-    if (std::abs(blitz::sum(a) - blitz::sum(rev)) < 4e-8) 
+    if (std::abs(blitz::sum(a) - blitz::sum(rev)) < 1e-8) 
       throw std::runtime_error("A");
     // that's to show it works
-    if (std::abs(blitz::kahan_sum(a) - blitz::kahan_sum(rev)) > 4e-8) 
+    if (std::abs(blitz::kahan_sum(a) - blitz::kahan_sum(rev)) > 1e-8) 
       throw std::runtime_error("B");
   }
 }

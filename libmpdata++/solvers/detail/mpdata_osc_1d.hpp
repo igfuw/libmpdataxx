@@ -34,7 +34,7 @@ namespace libmpdataxx
 
 	const rng_t im;
 
-	void hook_ante_loop(const int nt)
+	void hook_ante_loop(const typename parent_t::advance_arg_t nt)
 	{
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
@@ -58,10 +58,21 @@ namespace libmpdataxx
 	      this->GC_corr(iter)[0](im+h) = 
 		formulae::mpdata::antidiff<ct_params_t::opts>(
 		  this->mem->psi[e][this->n[e]], 
-		  this->GC_unco(iter)[0],
+		  this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
 		  *this->mem->G,
 		  im
 		);
+
+              // needed with the dfl option
+              // if we aren't in the last iteration and fct is not set
+              if (opts::isset(ct_params_t::opts, opts::dfl) &&
+                  iter != (this->n_iters - 1) &&
+                  !opts::isset(ct_params_t::opts, opts::fct))
+              {
+                this->xchng_vctr_alng(this->GC_corr(iter));
+              }
 
 	      this->fct_adjust_antidiff(e, iter); // i.e. calculate GC_mono=GC_mono(GC_corr) in FCT
 	    }

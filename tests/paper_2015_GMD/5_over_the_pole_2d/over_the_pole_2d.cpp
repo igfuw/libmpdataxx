@@ -48,6 +48,7 @@ void test(const std::string filename)
 
   p.n_iters = opts_iters; 
   p.grid_size = {nlon, nlat};
+  p.max_abs_div_eps = 1e-15;
 
   p.outfreq = nt; 
   p.outvars[0].name = "psi";

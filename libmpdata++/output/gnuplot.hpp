@@ -29,7 +29,7 @@ namespace libmpdataxx
       std::unique_ptr<Gnuplot> gp;
       const int precision = 5;
 
-      void start(const int nt)
+      void start(const typename parent_t::advance_arg_t nt)
       {
         gp.reset(new Gnuplot());
         *gp << std::fixed << std::setprecision(precision);

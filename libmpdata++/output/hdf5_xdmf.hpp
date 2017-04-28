@@ -36,7 +36,7 @@ namespace libmpdataxx
       //xdmf writer
       detail::xdmf_writer<parent_t::n_dims> xdmfw;
 
-      void start(const int nt)
+      void start(const typename parent_t::advance_arg_t nt)
       {
         parent_t::start(nt);
 
@@ -65,7 +65,7 @@ namespace libmpdataxx
         {
           // write xdmf markup
           std::string xmf_name = this->base_name() + ".xmf";
-          xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->dt * this->timestep);
+          xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->record_time);
 
           // save the xmf filename for temporal write
           timesteps.push_back(xmf_name);

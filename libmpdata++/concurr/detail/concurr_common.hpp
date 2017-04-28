@@ -44,7 +44,7 @@ namespace libmpdataxx
         bcond::bcond_e bcyl, bcond::bcond_e bcyr,
         bcond::bcond_e bczl, bcond::bcond_e bczr
       >
-      class concurr_common : public any<typename solver_t_::real_t, solver_t_::n_dims>
+      class concurr_common : public any<typename solver_t_::real_t, solver_t_::n_dims, typename solver_t_::advance_arg_t>
       {
         public:
 
@@ -83,6 +83,7 @@ namespace libmpdataxx
 	public:
 
         typedef typename solver_t::real_t real_t;
+        using advance_arg_t = typename solver_t::advance_arg_t;
 
         // dtor
 	virtual ~concurr_common()
@@ -257,11 +258,11 @@ namespace libmpdataxx
           }
         }
 
-        virtual void solve(int nt) = 0;
+        virtual void solve(advance_arg_t nt) = 0;
 
         public:
     
-        void advance(int nt) final
+        void advance(advance_arg_t nt) final
         {   
           tmr.resume();
           solve(nt);
@@ -282,7 +283,7 @@ namespace libmpdataxx
 	{
 	  return mem->g_factor();
 	}
-	
+
         typename solver_t::arr_t vab_coefficient() final
 	{
 	  return mem->vab_coefficient();
@@ -292,10 +293,20 @@ namespace libmpdataxx
 	{
 	  return mem->vab_relaxed_state(d);
 	}
+	
+        typename solver_t::arr_t sclr_array(const std::string &name, int n = 0) final
+	{
+	  return mem->sclr_array(name, n);
+	}
 
         bool *panic_ptr() final
         {
           return &this->mem->panic;
+        }
+
+        const real_t time() const final
+        {
+          return algos[0].time_();
         }
       };
     } // namespace detail

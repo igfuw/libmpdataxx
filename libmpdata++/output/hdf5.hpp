@@ -38,6 +38,8 @@ namespace libmpdataxx
       std::unique_ptr<H5::H5File> hdfp;
       std::map<int, std::string> dim_names;
       const std::string const_name = "const.h5";
+      std::string const_file;
+      const hsize_t zero = 0, one = 1;
 
       // HDF types of host data
       const H5::FloatType
@@ -57,7 +59,7 @@ namespace libmpdataxx
       hid_t plist_id;
 #endif
 
-      void start(const int nt)
+      void start(const typename parent_t::advance_arg_t nt)
       {
         std::string const_file = this->outdir + "/" + const_name;
 
@@ -83,7 +85,6 @@ namespace libmpdataxx
         }
 
         {
-
           // creating the dimensions
           // x,y,z
           offst = 0;
@@ -168,20 +169,17 @@ namespace libmpdataxx
             // T
             {
               const hsize_t 
-                nt_out = nt / this->outfreq + 1, // incl. t=0
-                zero = 0,
-                one = 1;
+                nt_out = nt / this->outfreq + 1; // incl. t=0
               float dt = this->dt;
 
               blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
-              coord = this->outfreq * this->dt * blitz::firstIndex();
+              coord = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * blitz::firstIndex();
 
               auto curr_dim = (*hdfp).createDataSet("T", flttype_output, H5::DataSpace(1, &nt_out));
 
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, &nt_out, &zero);
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
-
               curr_dim.createAttribute("dt", flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &dt);
             }
           }
@@ -285,12 +283,7 @@ namespace libmpdataxx
               case 1:
               {
                 space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                vars[v.first].write( 
-                  (this->mem->advectee(v.first).dataFirst()), 
-                  flttype_solver, 
-                  H5::DataSpace(parent_t::n_dims, count.data()), 
-                  space
-                );
+                vars[v.first].write( &(this->out_data(v.first)(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
                 break;
               }
               case 2:
@@ -303,7 +296,7 @@ namespace libmpdataxx
                 ) {
                   offst[0] = i;
                   space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                  vars[v.first].write( &(this->mem->advectee(v.first)(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                  vars[v.first].write( &(this->out_data(v.first)(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
                 }
                 break;
               }
@@ -323,7 +316,7 @@ namespace libmpdataxx
                     offst[0] = i;
                     offst[1] = j;
                     space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                    vars[v.first].write( &(this->mem->advectee(v.first)(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                    vars[v.first].write( &(this->out_data(v.first)(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
                   }
                 }
                 break;
@@ -350,6 +343,16 @@ namespace libmpdataxx
         offst = 0;
         space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space);
+      }
+
+      // has to be called after const file was created (i.e. after start())
+      void record_aux_const(const std::string &name, typename solver_t::real_t data)
+      {
+        assert(this->rank == 0);
+        float data_f(data);
+
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR);; // reopen the const file
+        hdfcp.openGroup("/").createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data_f);
       }
 
       public:

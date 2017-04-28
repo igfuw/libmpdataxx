@@ -14,7 +14,7 @@ namespace libmpdataxx
   {
     using namespace arakawa_c;
 
-    enum bcond_e { null, cyclic, polar, open, rigid, remote }; 
+    enum bcond_e { null, cyclic, polar, open, rigid, remote, custom }; 
     enum drctn_e { left, rght };
 
     template<

@@ -69,6 +69,7 @@ namespace libmpdataxx
 
 	  // fill halos -> mpdata works with halo=1, we need halo=2
           this->xchng_vctr_alng(GC_corr);
+          this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j, this->k);
           
           // calculation of fluxes for betas denominators
           if (opts::isset(ct_params_t::opts, opts::iga))
@@ -83,11 +84,13 @@ namespace libmpdataxx
             this->flux_ptr = &this->flux;
           }
 
+
           const auto &flx = (*(this->flux_ptr));
 
           // calculating betas
           this->beta_up(i1, j1, k1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1, j1, k1);
           this->beta_dn(i1, j1, k1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1, j1, k1);
+        
 
           // should detect the need for ext=1 in hallo-filling above
 	  assert(std::isfinite(sum(this->beta_up(i1, j, k))));
@@ -105,6 +108,7 @@ namespace libmpdataxx
 	  this->GC_mono[1]( this->i, jm+h, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->k, this->i);
 	  this->GC_mono[2]( this->i, this->j, km+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 2>(psi, this->beta_up, this->beta_dn, GC_corr, G, km, this->i, this->j);
         }
+
       };
     } // namespace detail
   } // namespace solvers

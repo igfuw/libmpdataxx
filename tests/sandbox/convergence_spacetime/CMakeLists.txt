@@ -1,0 +1,3 @@
+libmpdataxx_add_test(convergence_1d_spacetime)
+libmpdataxx_add_test(convergence_2d_spacetime)
+libmpdataxx_add_test(convergence_3d_spacetime)

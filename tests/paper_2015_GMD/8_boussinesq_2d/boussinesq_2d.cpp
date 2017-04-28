@@ -90,7 +90,8 @@ int main()
     // initial condition
     blitz::firstIndex i;
     blitz::secondIndex j;
-
+    
+    slv.sclr_array("tht_e") = Tht_ref;
     slv.advectee(ix::tht) = Tht_ref + where(
       // if
       pow(i * p.di - 4    * r0 , 2) + 
