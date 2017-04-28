@@ -52,7 +52,7 @@ namespace libmpdataxx
         a(pi<d>(this->left_edge_sclr, j, k)) = 0;
       }
 
-      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
 	using namespace idxperm;
         // zero velocity condition
@@ -110,7 +110,7 @@ namespace libmpdataxx
         a(pi<d>(this->rght_edge_sclr, j, k)) = 0;
       }
 
-      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
 	using namespace idxperm;
         // zero velocity condition

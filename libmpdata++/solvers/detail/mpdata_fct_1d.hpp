@@ -51,7 +51,7 @@ namespace libmpdataxx
 	  const auto im1 = this->im^1; 
 
 	  // fill halos in GC_corr
-          this->xchng_vctr_alng(GC_corr);
+          this->xchng_vctr_alng(GC_corr, true);
 
           // calculation of fluxes for betas denominators
           if (opts::isset(ct_params_t::opts, opts::iga))

@@ -42,10 +42,10 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
 	using namespace idxperm;
-	av[d](pi<d>(this->left_halo_vctr.last(), j, k)) = 0;
+	if (!ad) av[d](pi<d>(this->left_halo_vctr.last(), j, k)) = 0;
         if (halo > 1)
         {
           for (int jj = j.first(); jj <= j.last(); jj++)
@@ -103,10 +103,10 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
 	using namespace idxperm;
-	av[d](pi<d>(this->rght_halo_vctr.first(), j, k)) = 0;
+	if (!ad) av[d](pi<d>(this->rght_halo_vctr.first(), j, k)) = 0;
         if (halo > 1)
         {
           for (int jj = j.first(); jj <= j.last(); jj++)
