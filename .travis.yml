@@ -6,18 +6,21 @@ compiler:
     - gcc
     - clang
 env:
-    - MPI=none
-    - MPI=openmpi
-# not supported by Boost.MPI in Debian on amd64
+#    - MPI=none
+#    - MPI=openmpi
+# not supported by Boost.MPI in Debian on amd64:
 #    - MPI=lam    
 #    - MPI=mpich  
 
-    - TEST_SUITE=unit
-    - TEST_SUITE=sandbox
-    - TEST_SUITE=paper
-    - TEST_SUITE=elliptic_drop
-    - TEST_SUITE=nair_jablonowski_2008
-    - TEST_SUITE=bicycles
+    - TEST_SUITE=unit MPI=none
+    - TEST_SUITE=sandbox MPI=none
+    - TEST_SUITE=sandbox MPI=openmpi
+    - TEST_SUITE=paper MPI=none
+    - TEST_SUITE=paper MPI=openmpi
+    - TEST_SUITE=elliptic_drop MPI=none
+    - TEST_SUITE=nair_jablonowski_2008 MPI=none
+    - TEST_SUITE=bicycles MPI=none
+
 matrix:
     exclude:
         - compiler: clang
