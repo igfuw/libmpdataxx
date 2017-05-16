@@ -124,12 +124,13 @@ unset(output)
 
 ############################################################################################
 # Boost libraries
+set(Boost_DETAILED_FAILURE_MSG ON)
 set(req_comp thread date_time system iostreams timer filesystem)
 if(USE_MPI)
   list(APPEND req_comp mpi)
   list(APPEND req_comp serialization)
 endif()
-find_package(Boost COMPONENTS ${req_comp} QUIET)
+find_package(Boost COMPONENTS ${req_comp})
 if(Boost_FOUND)
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
