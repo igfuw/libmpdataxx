@@ -62,7 +62,9 @@ before_install:
  
 install:
     # compilers
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.3; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' && $TEST_SUITE != 'elliptic_drop' ]]; then sudo $apt_get_install clang-3.5; fi
+    # elliptic drop test needs clang-3.3, otherwise it doesn't compile due to an error in boost-atomic1.55 (https://svn.boost.org/trac/boost/ticket/9610)
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' && $TEST_SUITE == 'elliptic_drop' ]]; then sudo $apt_get_install clang-3.3; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then sudo $apt_get_install g++; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then brew install gcc48; fi   # would need a gcc-compiled boost ... (see note below)
 

@@ -9,7 +9,7 @@ git clone --depth=1 git://github.com/igfuw/shallow-water-elliptic-drop.git
 cd shallow-water-elliptic-drop/numerical
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-3.3 #TODO: Debug mode?
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=/usr/bin/clang++ #TODO: Debug mode?
 make
 #- ./spreading_drop_2d_el 
 # TODO: make test!
