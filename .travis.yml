@@ -75,7 +75,7 @@ install:
     - if [[ $MPI != 'none'    ]]; then export CC=mpicc.$MPI ; fi
 
     # boost
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libboost-mpi1.55-dev; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
 
