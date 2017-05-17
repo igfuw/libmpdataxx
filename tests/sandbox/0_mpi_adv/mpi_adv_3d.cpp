@@ -98,7 +98,9 @@ void test(const std::string filename)
 
   run.advance(nt);
 
-  std::cout << "L2 error: " << sqrt(sum(pow(solution - run.advectee(), 2))) << std::endl;
+  auto L2_error = sqrt(sum(pow(solution - run.advectee(), 2)));
+  std::cout << "L2 error: " << L2_error << std::endl;
+  if(L2_error > 20.3) throw std::runtime_error("L2 error greater than threshold (20.3)");
 }
 
 int main()

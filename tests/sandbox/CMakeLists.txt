@@ -32,6 +32,17 @@ function(libmpdataxx_add_test test)
   add_test(${test} ${test})
 endfunction()
 
+function(libmpdataxx_add_mpi_test test)
+  # find MPI, this may cause problems if the mpi compiler passed with CMAKE_CXX_COMPILER
+  # is from a different MPI implementation than the MPI_EXEC found here with find_package
+  # TODO: don't search in each test
+  find_package(MPI REQUIRED) 
+  add_executable(${test} ${test}.cpp)
+  target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
+  target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
+  add_test(${test}_mpi ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 -x OMP_NUM_THREADS ${test})
+endfunction()
+
 enable_testing()
 
 add_subdirectory(0_mpi_adv)
