@@ -70,7 +70,7 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then mkdir /tmp/bin; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then printf "#!/bin/sh\nexec /usr/bin/clang++ -DBOOST_HAS_INT128=1 \"\$@\"" > /tmp/bin/clang++; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then chmod +x /tmp/bin/clang++; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export PATH=/tmp/bin/:$PATH; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo ln -sf /tmp/bin/clang++ /usr/bin/clang++; fi
 
     # MPI
     - if [[ $MPI == 'mpich'   ]]; then sudo $apt_get_install mpich libmpich-dev; fi
