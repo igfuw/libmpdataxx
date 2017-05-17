@@ -74,7 +74,7 @@ install:
     # put /usr/bin first to use clang++-3.5 instead of the default 3.4
     #- if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export PATH=/usr/bin:$PATH; fi
 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then CXXFLAGS+= -DBOOST_HAS_INT128=1 ; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then CXXFLAGS=-DBOOST_HAS_INT128=1; fi
 
     # MPI
     - if [[ $MPI == 'mpich'   ]]; then sudo $apt_get_install mpich libmpich-dev; fi
