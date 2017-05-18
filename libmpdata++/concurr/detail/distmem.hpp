@@ -3,6 +3,7 @@
 #if defined(USE_MPI)
 #  include <boost/mpi/environment.hpp>
 #  include <boost/mpi/communicator.hpp>
+#  include <mutex>
 #else
 #  include <cstdlib>
 #endif
@@ -14,17 +15,18 @@ namespace libmpdataxx
   {
     namespace detail
     {
+#if defined(USE_MPI)
       namespace 
       {
-#if defined(USE_MPI)
         // the anonymous namespace is a hack to avoid
         // "*** The MPI_Errhandler_set() function was called after MPI_FINALIZE was invoked."
         // error if multiple solvers are instantiated 
-        boost::mpi::environment mpienv(boost::mpi::threading::multiple);
+        boost::mpi::environment mpienv(boost::mpi::threading::serialized);
         // TODO: the ``multiple'' threading level could be reduced to single in
         // case the sharedmem->size() == 1
-#endif
       }
+      std::mutex mpi_mutex;
+#endif
 
       template <int n_dims>
       class distmem
@@ -40,7 +42,7 @@ namespace libmpdataxx
         int rank() 
         { 
 #if defined(USE_MPI)
-          return mpicom.rank(); 
+          return mpicom.rank();  // is it thread-safe? TODO: init once in ctor?
 #else
           return 0;
 #endif
@@ -49,13 +51,13 @@ namespace libmpdataxx
         int size() 
         {
 #if defined(USE_MPI)
-          return mpicom.size(); 
+          return mpicom.size();   // is it thread-safe? TODO: init once in ctor?
 #else
           return 1;
 #endif
         }
 
-        void barrier()
+        void barrier() // TODO: not thread-safe, problems if called from within a solver. Do not expose to solver?
         {
 #if defined(USE_MPI)
           mpicom.barrier();
@@ -78,9 +80,9 @@ namespace libmpdataxx
             std::getenv("LAMRANK") != NULL
           ) throw std::runtime_error("mpirun environment variable detected but libmpdata++ was compiled with MPI disabled");
 #else
-          if (boost::mpi::environment::thread_level() != boost::mpi::threading::multiple)
+          if (boost::mpi::environment::thread_level() != boost::mpi::threading::serialized)
           {
-            throw std::runtime_error("failed to initialise MPI environment with MPI_THREAD_MULTIPLE");
+            throw std::runtime_error("failed to initialise MPI environment with MPI_THREAD_SERIALIZED");
           }
 #endif
         }

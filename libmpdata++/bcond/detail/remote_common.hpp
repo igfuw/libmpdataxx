@@ -76,22 +76,25 @@ namespace libmpdataxx
 
 #if defined(USE_MPI)
           // launching async data transfer
-	  reqs[0] = mpicom.isend(peer, msg_send, buf_send);
-	  reqs[1] = mpicom.irecv(peer, msg_recv, buf_recv);
+          {
+            std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
+	    reqs[0] = mpicom.isend(peer, msg_send, buf_send);
+	    reqs[1] = mpicom.irecv(peer, msg_recv, buf_recv);
 
-          // sending debug information
+            // sending debug information
 #  if !defined(NDEBUG)
-          const int debug = 2;
-	  reqs[2] = mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
-            idx_send[0].first(), 
-            idx_send[0].last()
-          ));
-	  std::pair<int, int> buf_rng; 
-	  reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
+            const int debug = 2;
+	    reqs[2] = mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
+              idx_send[0].first(), 
+              idx_send[0].last()
+            ));
+	    std::pair<int, int> buf_rng; 
+	    reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
 #  endif
+          }
 
           // waiting for the transfers to finish
-	  boost::mpi::wait_all(reqs.begin(), reqs.end());
+	  boost::mpi::wait_all(reqs.begin(), reqs.end()); // MPI_Waitall is thread-safe?
 
           // checking debug information
           

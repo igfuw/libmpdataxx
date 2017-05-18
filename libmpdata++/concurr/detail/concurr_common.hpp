@@ -130,7 +130,7 @@ namespace libmpdataxx
 	    ) return bc_set<bcond::remote, dir, dim>(bcp);
 	  }
 
-          // bc allocation
+          // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
 	  bcp.reset(
             new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
 	      mem->slab(mem->grid_size[dim]), 
