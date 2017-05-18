@@ -3,7 +3,6 @@ set -e
 cd tests/paper_2015_GMD
 mkdir build
 cd build
-h5diff
 # Travis default is not the packaged one
 if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi
 # the one from homebrew
