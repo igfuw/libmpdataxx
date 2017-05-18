@@ -6,7 +6,7 @@ add_test(shallow_water_1d_diff bash -c "
     echo   'comparing timestep0000000000.h5'                                                                           &&
     h5diff -v $dir/timestep0000000000.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5  &&
     echo   'comparing timestep0000000556.h5'                                                                           &&
-    h5diff --delta=1e-17 -v $dir/timestep0000000300.h5 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000300.h5  || exit 1;
+    h5diff --delta=1e-15 -v $dir/timestep0000000300.h5 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000300.h5  || exit 1;
   done 
 ")
 add_test(shallow_water_1d_plot bash -c "
