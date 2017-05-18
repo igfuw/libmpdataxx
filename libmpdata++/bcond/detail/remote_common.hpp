@@ -75,6 +75,10 @@ namespace libmpdataxx
             buf_recv(a(idx_recv).shape());
 
 #if defined(USE_MPI)
+#  if !defined(NDEBUG)
+          const int debug = 2;
+	  std::pair<int, int> buf_rng; 
+#  endif
           // launching async data transfer
           {
             std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
@@ -83,12 +87,10 @@ namespace libmpdataxx
 
             // sending debug information
 #  if !defined(NDEBUG)
-            const int debug = 2;
 	    reqs[2] = mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
               idx_send[0].first(), 
               idx_send[0].last()
             ));
-	    std::pair<int, int> buf_rng; 
 	    reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
 #  endif
           }
