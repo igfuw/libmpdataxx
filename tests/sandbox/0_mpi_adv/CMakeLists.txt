@@ -1,7 +1,2 @@
-if(USE_MPI)
-  libmpdataxx_add_mpi_test(mpi_adv_2d)
-  libmpdataxx_add_mpi_test(mpi_adv_3d)
-else()
   libmpdataxx_add_test(mpi_adv_2d)
   libmpdataxx_add_test(mpi_adv_3d)
-endif()

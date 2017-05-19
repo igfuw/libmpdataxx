@@ -24,23 +24,16 @@ endif()
 # to make <libmpdata++/...> work
 set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CXX_FLAGS}")
 
-# macro to be used in the subdirectories
+# macros to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
   target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
-  add_test(${test} ${test})
-endfunction()
-
-function(libmpdataxx_add_mpi_test test)
-  # find MPI, this may cause problems if the mpi compiler passed with CMAKE_CXX_COMPILER
-  # is from a different MPI implementation than the MPI_EXEC found here with find_package
-  # TODO: don't search in each test
-  find_package(MPI REQUIRED) 
-  add_executable(${test} ${test}.cpp)
-  target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
-  target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
-  add_test(${test}_mpi ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 -x OMP_NUM_THREADS ${test})
+  if(USE_MPI)
+    add_test(NAME ${test} COMMAND ${libmpdataxx_MPIRUN} "-np" "3" "-x OMP_NUM_THREADS " "${CMAKE_CURRENT_BINARY_DIR}/${test}") # TODO: why 3? :)
+  else()
+    add_test(${test} ${test})
+  endif()
 endfunction()
 
 enable_testing()

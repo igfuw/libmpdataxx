@@ -1,4 +1,4 @@
-libmpdataxx_add_test_hdf(shallow_water_1d)
+libmpdataxx_add_test(shallow_water_1d)
 add_test(shallow_water_1d_diff bash -c "
   for dir in 1d_fct_abs 1d_fct_iga; do 
     echo   'comparing const.h5'                                                                                        &&
@@ -20,7 +20,7 @@ for dir in 1d_fct_abs 1d_fct_iga; do
     zdiff $dir'_stats.txt' ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir'_stats.txt.gz'  || exit 1;
   done
 ") 
-libmpdataxx_add_test_hdf(shallow_water_2d)
+libmpdataxx_add_test(shallow_water_2d)
 add_test(shallow_water_2d_diff bash -c "
   for dir in 2d_fct_abs 2d_fct_iga; do 
     echo   'comparing const.h5'                                                                                        &&
