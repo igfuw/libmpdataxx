@@ -14,19 +14,28 @@ env:
 
     - TEST_SUITE=unit MPI=none
     - TEST_SUITE=sandbox MPI=none
-    - TEST_SUITE=sandbox MPI=openmpi
     - TEST_SUITE=paper MPI=none
-    - TEST_SUITE=paper MPI=openmpi
     - TEST_SUITE=elliptic_drop MPI=none
     - TEST_SUITE=nair_jablonowski_2008 MPI=none
     - TEST_SUITE=bicycles MPI=none
+    - TEST_SUITE=unit MPI=openmpi
+    - TEST_SUITE=sandbox MPI=openmpi
+    - TEST_SUITE=paper MPI=openmpi
+    - TEST_SUITE=elliptic_drop MPI=openmpi
+    - TEST_SUITE=nair_jablonowski_2008 MPI=openmpi
 
 matrix:
     exclude:
         - compiler: clang
+          env: TEST_SUITE=unit MPI=openmpi
+        - compiler: clang
           env: TEST_SUITE=sandbox MPI=openmpi
         - compiler: clang
           env: TEST_SUITE=paper MPI=openmpi
+        - compiler: clang
+          env: TEST_SUITE=elliptic_drop MPI=openmpi
+        - compiler: clang
+          env: TEST_SUITE=nair_jablonowski_2008 MPI=openmpi
         - os: osx
           compiler: gcc
 
