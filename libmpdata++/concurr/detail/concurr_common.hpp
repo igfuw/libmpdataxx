@@ -14,6 +14,10 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <libmpdata++/blitz.hpp>
 
+#include <libmpdata++/concurr/detail/sharedmem.hpp>
+#include <libmpdata++/concurr/detail/timer.hpp>
+#include <libmpdata++/concurr/any.hpp>
+
 #include <libmpdata++/bcond/shared.hpp>
 #include <libmpdata++/bcond/cyclic_1d.hpp>
 #include <libmpdata++/bcond/cyclic_2d.hpp>
@@ -27,10 +31,6 @@
 #include <libmpdata++/bcond/remote_1d.hpp>
 #include <libmpdata++/bcond/remote_2d.hpp>
 #include <libmpdata++/bcond/remote_3d.hpp>
-
-#include <libmpdata++/concurr/detail/sharedmem.hpp>
-#include <libmpdata++/concurr/detail/timer.hpp>
-#include <libmpdata++/concurr/any.hpp>
 
 namespace libmpdataxx
 {
