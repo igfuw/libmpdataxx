@@ -164,17 +164,15 @@ namespace libmpdataxx
           // min across local threads
           (*xtmtmp)(rank) = blitz::min(arr); 
           barrier();
-          real_t result = blitz::min(*xtmtmp);
+          (*xtmtmp)(0) = blitz::min(*xtmtmp);
           barrier();
           // min across mpi processes
 #if defined(USE_MPI)
           if(rank == 0)
-            result = this->distmem.min(result);
+            (*xtmtmp)(0) = this->distmem.min((*xtmtmp)(0));
           barrier();
-          if(rank != 0)
-            result = (*xtmtmp)(0);
 #endif
-          return result;
+          return (*xtmtmp)(0);
         }
 
         real_t max(const int &rank, const arr_t &arr)
@@ -182,20 +180,18 @@ namespace libmpdataxx
           // max across local threads
           (*xtmtmp)(rank) = blitz::max(arr); 
           barrier();
-          real_t result = blitz::max(*xtmtmp);
+          (*xtmtmp)(0) = blitz::max(*xtmtmp);
           barrier();
           // max across mpi processes
 #if defined(USE_MPI)
           if(rank == 0)
-            result = this->distmem.max(result);
+            (*xtmtmp)(0) = this->distmem.max((*xtmtmp)(0));
           barrier();
-          if(rank != 0)
-            result = (*xtmtmp)(0);
 #endif
-          return result;
+          return (*xtmtmp)(0);
         }
 
-        // single-threaded, MPI-aware versions of the above functions
+        // single-threaded, MPI-aware versions of the min and max functions
         real_t min(const arr_t &arr)
         {
           // min across local threads

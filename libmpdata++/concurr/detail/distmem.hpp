@@ -43,8 +43,8 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           real_t res;
-          boost::mpi::reduce(mpicom, val, res, Op(), 0);
-          boost::mpi::broadcast(mpicom, res, 0);
+          std::lock_guard<std::mutex> lock(mpi_mutex);
+          boost::mpi::all_reduce(mpicom, val, res, Op());
           return res;
 #else
           return val;
@@ -95,7 +95,7 @@ namespace libmpdataxx
 
         real_t sum(const real_t &val)
         {
-          return reduce_hlpr<boost::mpi::sum<real_t>>(val);
+          return reduce_hlpr<std::plus<real_t>>(val);
         }
 
         // ctor
