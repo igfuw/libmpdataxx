@@ -108,7 +108,7 @@ namespace libmpdataxx
         }
 
         /// @brief concurrency-aware summation of array elements
-        real_t sum(const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
+        real_t sum(const int &rank, const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
@@ -124,17 +124,24 @@ namespace libmpdataxx
 	      (*sumtmp)(c) = blitz::sum(arr(slice_idx));
           }
           barrier();
-          real_t result;
-          if (sum_khn)
-            result = blitz::kahan_sum(*sumtmp);
-          else
-            result = blitz::sum(*sumtmp);
+          if(rank == 0)
+          {
+            if (sum_khn)
+              (*sumtmp)(0) = blitz::kahan_sum(*sumtmp);
+            else
+              (*sumtmp)(0) = blitz::sum(*sumtmp);
+          }
           barrier();
-          return result;
+#if defined(USE_MPI)
+          if(rank == 0)
+            (*sumtmp)(0) = this->distmem.sum((*sumtmp)(0));
+          barrier();
+#endif
+          return (*sumtmp)(0);
         }
 
         /// @brief concurrency-aware summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
+        real_t sum(const int &rank, const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
@@ -150,13 +157,20 @@ namespace libmpdataxx
 	      (*sumtmp)(c) = blitz::sum(arr1(slice_idx) * arr2(slice_idx)); 
           }
           barrier();
-          real_t result;
-          if (sum_khn)
-            result = blitz::kahan_sum(*sumtmp);
-          else
-            result = blitz::sum(*sumtmp);
+          if(rank == 0)
+          {
+            if (sum_khn)
+              (*sumtmp)(0) = blitz::kahan_sum(*sumtmp);
+            else
+              (*sumtmp)(0) = blitz::sum(*sumtmp);
+          }
           barrier();
-          return result;
+#if defined(USE_MPI)
+          if(rank == 0)
+            (*sumtmp)(0) = this->distmem.sum((*sumtmp)(0));
+          barrier();
+#endif
+          return (*sumtmp)(0);
         }
 
         real_t min(const int &rank, const arr_t &arr)
@@ -164,7 +178,8 @@ namespace libmpdataxx
           // min across local threads
           (*xtmtmp)(rank) = blitz::min(arr); 
           barrier();
-          (*xtmtmp)(0) = blitz::min(*xtmtmp);
+          if(rank == 0)
+            (*xtmtmp)(0) = blitz::min(*xtmtmp);
           barrier();
           // min across mpi processes
 #if defined(USE_MPI)
@@ -180,7 +195,8 @@ namespace libmpdataxx
           // max across local threads
           (*xtmtmp)(rank) = blitz::max(arr); 
           barrier();
-          (*xtmtmp)(0) = blitz::max(*xtmtmp);
+          if(rank == 0)
+            (*xtmtmp)(0) = blitz::max(*xtmtmp);
           barrier();
           // max across mpi processes
 #if defined(USE_MPI)
