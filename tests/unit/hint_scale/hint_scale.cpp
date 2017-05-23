@@ -35,7 +35,7 @@ bool test()
     NAN, NAN, 0, 0, 7.8215e+07,  8.15976e+07, NAN, NAN,
     NAN, NAN, 0, 0, 8.16724e+07, 8.16339e+07, NAN, NAN, 
     NAN, NAN, 0, 0, 8.16638e+07, 8.16339e+07;
-  auto max_init = max(slv.advectee());
+  auto max_init = slv.max();
 
   slv.advector(0) = 
               0.000572957855183631, 0.000286478927591815, -0.000286478927591815, -0.000572957855183631, NAN, NAN, 
@@ -51,10 +51,10 @@ bool test()
   slv.advance(1);
   std::cerr << slv.advectee();
 
-  if (max(slv.advectee()) > max_init)
+  if (slv.max() > max_init)
     throw std::runtime_error("values above initial max!");
 
-  return min(slv.advectee()) >= 0;
+  return slv.min() >= 0;
 }
 
 int main()
