@@ -308,6 +308,11 @@ namespace libmpdataxx
         {
           return algos[0].time_();
         }
+
+	const real_t min(int e = 0) const final
+	{
+	  return mem->min(mem->advectee(e));
+	}
       };
     } // namespace detail
   } // namespace concurr

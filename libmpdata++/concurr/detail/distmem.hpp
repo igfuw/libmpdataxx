@@ -3,6 +3,7 @@
 #if defined(USE_MPI)
 #  include <boost/mpi/environment.hpp>
 #  include <boost/mpi/communicator.hpp>
+#  include <boost/mpi/collectives.hpp>
 #  include <mutex>
 #else
 #  include <cstdlib>
@@ -28,7 +29,7 @@ namespace libmpdataxx
       std::mutex mpi_mutex;
 #endif
 
-      template <int n_dims>
+      template <typename real_t, int n_dims>
       class distmem
       {
 #if defined(USE_MPI)
@@ -63,6 +64,18 @@ namespace libmpdataxx
           mpicom.barrier();
 #else
           assert(false);
+#endif
+        }
+
+        real_t min(const real_t &val)
+        {
+#if defined(USE_MPI)
+          real_t min;
+          boost::mpi::reduce(mpicom, val, min, boost::mpi::minimum<real_t>(), 0);
+          boost::mpi::broadcast(mpicom, min, 0);
+          return min;
+#else
+          return val;
 #endif
         }
 

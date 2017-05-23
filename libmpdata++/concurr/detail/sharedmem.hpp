@@ -47,7 +47,7 @@ namespace libmpdataxx
         std::array<rng_t, n_dims> grid_size; 
         bool panic = false; // for multi-threaded SIGTERM handling
 
-        detail::distmem<n_dims> distmem;
+        detail::distmem<real_t, n_dims> distmem;
 
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC, ndt_GC, ndtt_GC;
@@ -159,12 +159,32 @@ namespace libmpdataxx
           return result;
         }
 
+        // single-threaded version
+        real_t min(const arr_t &arr)
+        {
+          // min across local threads
+          real_t result = blitz::min(arr);
+          // min across mpi processes
+          result = this->distmem.min(result);
+          return result;
+        }
+
+        // multi-threaded version
         real_t min(const int &rank, const arr_t &arr)
         {
+          // min across local threads
           (*xtmtmp)(rank) = blitz::min(arr); 
           barrier();
           real_t result = blitz::min(*xtmtmp);
           barrier();
+          // min across mpi processes
+#if defined(USE_MPI)
+          if(rank == 0)
+            result = this->distmem.min(result);
+          barrier();
+          if(rank != 0)
+            result = (*xtmtmp)(0);
+#endif
           return result;
         }
 
