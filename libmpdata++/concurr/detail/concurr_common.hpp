@@ -313,6 +313,11 @@ namespace libmpdataxx
 	{
 	  return mem->min(mem->advectee(e));
 	}
+
+	const real_t max(int e = 0) const final
+	{
+	  return mem->max(mem->advectee(e));
+	}
       };
     } // namespace detail
   } // namespace concurr

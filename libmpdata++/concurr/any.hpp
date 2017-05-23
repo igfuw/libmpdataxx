@@ -51,9 +51,14 @@ namespace libmpdataxx
       const real_t time() const
       { assert(false); throw; }
       
-      // minimal value of an advectee, mpi-aware
+      // minimum of an advectee, mpi-aware
       virtual 
       const real_t min(int eqn = 0) const
+      { assert(false); throw; }
+      
+      // maximum of an advectee, mpi-aware
+      virtual 
+      const real_t max(int eqn = 0) const
       { assert(false); throw; }
 
       // dtor

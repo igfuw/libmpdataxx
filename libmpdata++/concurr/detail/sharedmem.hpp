@@ -159,17 +159,6 @@ namespace libmpdataxx
           return result;
         }
 
-        // single-threaded version
-        real_t min(const arr_t &arr)
-        {
-          // min across local threads
-          real_t result = blitz::min(arr);
-          // min across mpi processes
-          result = this->distmem.min(result);
-          return result;
-        }
-
-        // multi-threaded version
         real_t min(const int &rank, const arr_t &arr)
         {
           // min across local threads
@@ -190,12 +179,41 @@ namespace libmpdataxx
 
         real_t max(const int &rank, const arr_t &arr)
         {
+          // max across local threads
           (*xtmtmp)(rank) = blitz::max(arr); 
           barrier();
           real_t result = blitz::max(*xtmtmp);
           barrier();
+          // max across mpi processes
+#if defined(USE_MPI)
+          if(rank == 0)
+            result = this->distmem.max(result);
+          barrier();
+          if(rank != 0)
+            result = (*xtmtmp)(0);
+#endif
           return result;
         }
+
+        // single-threaded, MPI-aware versions of the above functions
+        real_t min(const arr_t &arr)
+        {
+          // min across local threads
+          real_t result = blitz::min(arr);
+          // min across mpi processes
+          result = this->distmem.min(result);
+          return result;
+        }
+
+        real_t max(const arr_t &arr)
+        {
+          // min across local threads
+          real_t result = blitz::max(arr);
+          // min across mpi processes
+          result = this->distmem.max(result);
+          return result;
+        }
+
 
         // this hack is introduced to allow to use neverDeleteData
         // and hence to not use BZ_THREADSAFE

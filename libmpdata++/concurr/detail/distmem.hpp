@@ -36,6 +36,22 @@ namespace libmpdataxx
         boost::mpi::communicator mpicom;
 #endif
 
+        private:
+
+        template <typename Op>
+        real_t reduce_hlpr(const real_t &val)
+        {
+#if defined(USE_MPI)
+          real_t res;
+          boost::mpi::reduce(mpicom, val, res, Op(), 0);
+          boost::mpi::broadcast(mpicom, res, 0);
+          return res;
+#else
+          return val;
+#endif
+        }
+
+
         public:
 
         std::array<int, n_dims> grid_size;
@@ -69,14 +85,17 @@ namespace libmpdataxx
 
         real_t min(const real_t &val)
         {
-#if defined(USE_MPI)
-          real_t min;
-          boost::mpi::reduce(mpicom, val, min, boost::mpi::minimum<real_t>(), 0);
-          boost::mpi::broadcast(mpicom, min, 0);
-          return min;
-#else
-          return val;
-#endif
+          return reduce_hlpr<boost::mpi::minimum<real_t>>(val);
+        }
+
+        real_t max(const real_t &val)
+        {
+          return reduce_hlpr<boost::mpi::maximum<real_t>>(val);
+        }
+
+        real_t sum(const real_t &val)
+        {
+          return reduce_hlpr<boost::mpi::sum<real_t>>(val);
         }
 
         // ctor
