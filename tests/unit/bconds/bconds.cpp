@@ -64,20 +64,23 @@ int main()
   std::mt19937 gen(1);
   std::uniform_real_distribution<> dis(-1, 1);
   real_t amp = 1e-6;
-  
+  auto rand = std::bind(dis, gen);
+
   // add random perturbation in the interior
-  for (int i = 1; i < nx - 1; ++i)
+  std::array<decltype(ix::u), 3> velo = {ix::u, ix::v, ix::w};
+  std::for_each(velo.begin(), velo.end(), [&](decltype(ix::u) vel)
   {
-    for (int j = 1; j < ny - 1; ++j)
-    {
-      for (int k = 1; k < nz - 1; ++k)
-      {
-        slv.advectee(ix::u)(i, j, k) += amp * dis(gen);
-        slv.advectee(ix::v)(i, j, k) += amp * dis(gen);
-        slv.advectee(ix::w)(i, j, k) += amp * dis(gen);
-      }
-    }
-  }
+    decltype(slv.advectee(vel)) prtrb(slv.advectee(vel).shape()); // array to store perturbation
+    std::generate(prtrb.begin(), prtrb.end(), [&] () {return amp * rand();}); // fill it, TODO: is it officialy stl compatible?
+    // no perturbation at the edges
+    prtrb(0, blitz::Range::all(), blitz::Range::all()) = 0;
+    prtrb(blitz::Range::all(), 0, blitz::Range::all()) = 0;
+    prtrb(blitz::Range::all(), blitz::Range::all(), 0) = 0;
+    prtrb(nx-1, blitz::Range::all(), blitz::Range::all()) = 0;
+    prtrb(blitz::Range::all(), ny-1, blitz::Range::all()) = 0;
+    prtrb(blitz::Range::all(), blitz::Range::all(), nz-1) = 0;
+    slv.advectee(vel) += prtrb;
+  } );
 
   slv.advance(nt);
 
