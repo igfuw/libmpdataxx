@@ -72,18 +72,19 @@ int main()
   {
     decltype(slv.advectee(vel)) prtrb(slv.advectee(vel).shape()); // array to store perturbation
     std::generate(prtrb.begin(), prtrb.end(), [&] () {return amp * rand();}); // fill it, TODO: is it officialy stl compatible?
-    // no perturbation at the edges
-    prtrb(0, blitz::Range::all(), blitz::Range::all()) = 0;
-    prtrb(blitz::Range::all(), 0, blitz::Range::all()) = 0;
-    prtrb(blitz::Range::all(), blitz::Range::all(), 0) = 0;
-    prtrb(nx-1, blitz::Range::all(), blitz::Range::all()) = 0;
-    prtrb(blitz::Range::all(), ny-1, blitz::Range::all()) = 0;
-    prtrb(blitz::Range::all(), blitz::Range::all(), nz-1) = 0;
+    // no perturbation at the edges, TODO: with MPI this won't work
+    prtrb(0, all, all) = 0;
+    prtrb(all, 0, all) = 0;
+    prtrb(all, all, 0) = 0;
+    prtrb(nx-1, all, all) = 0;
+    prtrb(all, ny-1, all) = 0;
+    prtrb(all, all, nz-1) = 0;
     slv.advectee(vel) += prtrb;
   } );
 
   slv.advance(nt);
 
+  // TODO: with MPI these ranges won't work either
   auto err_cyclic = max(abs(slv.advectee(ix::u)(0, all, all) - slv.advectee(ix::u)(nx - 1, all, all)));
   if (err_cyclic > 1e-10)
   {
