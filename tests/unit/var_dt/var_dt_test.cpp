@@ -53,8 +53,7 @@ T test(int np, T cfl)
     bcond::cyclic, bcond::cyclic
   > run(p); 
 
-  auto initial_profile = [](T x) {return 2 + sin(x);};
-  for (int i = 0; i < np; ++i) run.advectee()(i) = initial_profile(i * dx);
+  run.advectee() = 2. + sin(blitz::tensor::i * dx);
 
   // hack to make initial cfl different than chosen so that update_gc triggers at least once
   // TODO: not
@@ -62,7 +61,7 @@ T test(int np, T cfl)
   run.advance(var_dt_arg ? time : nt);
 
   decltype(run.advectee()) true_solution(run.advectee().shape());
-  for (int i = 0; i < np; ++i) true_solution(i) = initial_profile(i * dx - sin(pi * u_0 * run.time() / tau) * tau / pi);
+  true_solution = 2 + sin(blitz::tensor::i * dx - sin(pi * u_0 * run.time() / tau) * tau / pi);
 
   auto L2 = sqrt(sum(pow2(true_solution - run.advectee())) / sum(pow2(true_solution)));
   return L2;
