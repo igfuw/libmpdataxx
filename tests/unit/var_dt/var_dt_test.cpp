@@ -63,7 +63,7 @@ T test(int np, T cfl)
   decltype(run.advectee()) true_solution(run.advectee().shape());
   true_solution = 2 + sin(blitz::tensor::i * dx - sin(pi * u_0 * run.time() / tau) * tau / pi);
 
-  auto L2 = sqrt(sum(pow2(true_solution - run.advectee())) / sum(pow2(true_solution)));
+  auto L2 = sqrt(sum(pow2(true_solution - run.advectee().reindex(0))) / sum(pow2(true_solution)));
   return L2;
 }
 
