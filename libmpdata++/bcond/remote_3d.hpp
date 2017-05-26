@@ -38,7 +38,10 @@ namespace libmpdataxx
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
         using namespace idxperm;
-        this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
+        if(!this->is_cyclic)
+          this->send(av[0], pi<d>(this->left_intr_vctr + off, j, k));
+        else
+          this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
       }
 
       // TODO: move to common? (same in cyclic!)
@@ -75,7 +78,10 @@ namespace libmpdataxx
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
       {
         using namespace idxperm;
-        this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
+        if(!this->is_cyclic)
+          this->recv(av[0], pi<d>(this->rght_halo_vctr, j, k));
+        else
+          this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
       }
 
       // TODO: move to common? (same in cyclic!)
