@@ -59,7 +59,7 @@ namespace libmpdataxx
                       const typename parent_t::real_t cur_dt,
                       const typename parent_t::real_t old_dt) final
         {
-          this->mem->GC[0](rng_t(i.first(), i.last()-1)+h) *= cur_dt / old_dt;
+          this->mem->GC[0](rng_t(i.first(), i.last()-1)^h) *= cur_dt / old_dt;
           this->xchng_vctr_alng(this->mem->GC);
         }
 
