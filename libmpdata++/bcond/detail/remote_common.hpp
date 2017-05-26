@@ -36,9 +36,9 @@ namespace libmpdataxx
         boost::mpi::communicator mpicom;
 
 #  if defined(NDEBUG)
-        static const int n_reqs = 2; // data
+        static const int n_reqs = 1; // data, reqs for recv only is enough?
 #  else
-        static const int n_reqs = 4; // data + ranges
+        static const int n_reqs = 2; // data + ranges
 #  endif
 
         std::array<boost::mpi::request, n_reqs> reqs;
@@ -57,21 +57,51 @@ namespace libmpdataxx
           false;
 #endif
 
-        void xchng(
+        void send(
           const arr_t &a, 
-          const idx_t &idx_send, 
+          const idx_t &idx_send 
+        )
+        {
+          // distinguishing between left and right messages 
+          // (important e.g. with 2 procs and cyclic bc)
+          const int  
+            msg_send = dir == left ? left : rght;
+
+          // copying data to be sent (TODO: it doesn't work without copy(), why??)
+	  arr_t buf_send = a(idx_send).copy();
+
+#if defined(USE_MPI)
+#  if !defined(NDEBUG)
+          const int debug = 2;
+#  endif
+          // launching async data transfer
+          {
+            std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
+	    mpicom.isend(peer, msg_send, buf_send);
+
+            // sending debug information
+#  if !defined(NDEBUG)
+	    mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
+              idx_send[0].first(), 
+              idx_send[0].last()
+            ));
+#  endif
+#endif
+          }
+        };
+
+        void recv(
+          const arr_t &a, 
           const idx_t &idx_recv
         )
         {
           // distinguishing between left and right messages 
           // (important e.g. with 2 procs and cyclic bc)
           const int  
-            msg_send = dir == left ? left : rght,
             msg_recv = dir == left ? rght : left;
 
-          // copying data to be sent (TODO: it doesn't work without copy(), why??)
+          // copying data to be sent
 	  arr_t 
-            buf_send = a(idx_send).copy(),
             buf_recv(a(idx_recv).shape());
 
 #if defined(USE_MPI)
@@ -82,16 +112,11 @@ namespace libmpdataxx
           // launching async data transfer
           {
             std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
-	    reqs[0] = mpicom.isend(peer, msg_send, buf_send);
-	    reqs[1] = mpicom.irecv(peer, msg_recv, buf_recv);
+	    reqs[0] = mpicom.irecv(peer, msg_recv, buf_recv);
 
             // sending debug information
 #  if !defined(NDEBUG)
-	    reqs[2] = mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
-              idx_send[0].first(), 
-              idx_send[0].last()
-            ));
-	    reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
+	    reqs[1] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
 #  endif
           }
 
@@ -110,6 +135,17 @@ namespace libmpdataxx
 #endif
           // writing received data to the array
 	  a(idx_recv) = buf_recv;
+        }
+
+
+        void xchng(
+          const arr_t &a, 
+          const idx_t &idx_send, 
+          const idx_t &idx_recv
+        )
+        {
+          send(a, idx_send);
+          recv(a, idx_recv);
         }
 
         public:
