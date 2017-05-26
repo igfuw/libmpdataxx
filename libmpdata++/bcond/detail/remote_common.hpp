@@ -36,9 +36,11 @@ namespace libmpdataxx
         boost::mpi::communicator mpicom;
 
 #  if defined(NDEBUG)
-        static const int n_reqs = 1; // data, reqs for recv only is enough?
+        static const int n_reqs = 2; // data, reqs for recv only is enough?
+        static const int n_dbg_reqs = 0;
 #  else
-        static const int n_reqs = 2; // data + ranges
+        static const int n_reqs = 4; // data + ranges
+        static const int n_dbg_reqs = 1;
 #  endif
 
         std::array<boost::mpi::request, n_reqs> reqs;
@@ -46,6 +48,12 @@ namespace libmpdataxx
         const int peer = dir == left
           ? (mpicom.rank() - 1 + mpicom.size()) % mpicom.size()
           : (mpicom.rank() + 1                ) % mpicom.size();
+
+#if defined(USE_MPI)
+#  if !defined(NDEBUG)
+          const int debug = 2;
+	  std::pair<int, int> buf_rng; 
+#  endif
 #endif
 
         protected:
@@ -57,7 +65,7 @@ namespace libmpdataxx
           false;
 #endif
 
-        void send(
+        void send_hlpr(
           const arr_t &a, 
           const idx_t &idx_send 
         )
@@ -71,26 +79,25 @@ namespace libmpdataxx
 	  arr_t buf_send = a(idx_send).copy();
 
 #if defined(USE_MPI)
-#  if !defined(NDEBUG)
-          const int debug = 2;
-#  endif
           // launching async data transfer
           {
             std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
-	    mpicom.isend(peer, msg_send, buf_send);
+	    reqs[0] = mpicom.isend(peer, msg_send, buf_send);
 
             // sending debug information
 #  if !defined(NDEBUG)
-	    mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
+	    reqs[1] = mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
               idx_send[0].first(), 
               idx_send[0].last()
             ));
 #  endif
-#endif
           }
+#else
+          assert(false);
+#endif
         };
 
-        void recv(
+        arr_t recv_hlpr(
           const arr_t &a, 
           const idx_t &idx_recv
         )
@@ -100,25 +107,66 @@ namespace libmpdataxx
           const int  
             msg_recv = dir == left ? rght : left;
 
-          // copying data to be sent
-	  arr_t 
-            buf_recv(a(idx_recv).shape());
+          arr_t 
+             buf_recv(a(idx_recv).shape());
 
-#if defined(USE_MPI)
-#  if !defined(NDEBUG)
-          const int debug = 2;
-	  std::pair<int, int> buf_rng; 
-#  endif
           // launching async data transfer
           {
             std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
-	    reqs[0] = mpicom.irecv(peer, msg_recv, buf_recv);
+	    reqs[2] = mpicom.irecv(peer, msg_recv, buf_recv);
 
             // sending debug information
 #  if !defined(NDEBUG)
-	    reqs[1] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
+	    reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
 #  endif
           }
+          return buf_recv;
+#else
+          assert(false);
+#endif
+        }
+
+        void send(
+          const arr_t &a, 
+          const idx_t &idx_send 
+        )
+        {
+          send_hlpr(a, idx_send);
+
+          // waiting for the transfers to finish
+	  boost::mpi::wait_all(reqs.begin(), reqs.begin() + 1 + n_dbg_reqs); // MPI_Waitall is thread-safe?
+        }
+
+        void recv(
+          const arr_t &a, 
+          const idx_t &idx_recv
+        )
+        {
+          auto buf_recv = recv_hlpr(a, idx_recv);
+
+          // waiting for the transfers to finish
+	  boost::mpi::wait_all(reqs.begin() + 1 + n_dbg_reqs, reqs.end()); // MPI_Waitall is thread-safe?
+
+          // checking debug information
+          
+          // positive modulo (grid_size_0 - 1)
+          auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
+
+	  assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
+          assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
+
+          // writing received data to the array
+	  a(idx_recv) = buf_recv;
+        }
+
+        void xchng(
+          const arr_t &a, 
+          const idx_t &idx_send, 
+          const idx_t &idx_recv
+        )
+        {
+          send_hlpr(a, idx_send);
+          auto buf_recv = recv_hlpr(a, idx_recv);
 
           // waiting for the transfers to finish
 	  boost::mpi::wait_all(reqs.begin(), reqs.end()); // MPI_Waitall is thread-safe?
@@ -130,22 +178,9 @@ namespace libmpdataxx
 
 	  assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
           assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
-#else
-          assert(false);
-#endif
+
           // writing received data to the array
 	  a(idx_recv) = buf_recv;
-        }
-
-
-        void xchng(
-          const arr_t &a, 
-          const idx_t &idx_send, 
-          const idx_t &idx_recv
-        )
-        {
-          send(a, idx_send);
-          recv(a, idx_recv);
         }
 
         public:
