@@ -74,7 +74,7 @@ namespace libmpdataxx
 #endif
         }
 
-        void barrier() // TODO: not thread-safe, problems if called from within a solver. Do not expose to solver?
+        void barrier()
         {
 #if defined(USE_MPI)
           mpicom.barrier();
@@ -85,12 +85,20 @@ namespace libmpdataxx
 
         real_t min(const real_t &val)
         {
+#if defined(USE_MPI)
           return reduce_hlpr<boost::mpi::minimum<real_t>>(val);
+#else
+          return val;
+#endif
         }
 
         real_t max(const real_t &val)
         {
+#if defined(USE_MPI)
           return reduce_hlpr<boost::mpi::maximum<real_t>>(val);
+#else
+          return val;
+#endif
         }
 
         real_t sum(const real_t &val)
