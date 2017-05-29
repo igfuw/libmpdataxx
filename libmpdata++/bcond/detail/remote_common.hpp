@@ -34,7 +34,6 @@ namespace libmpdataxx
 
 #if defined(USE_MPI)
         boost::mpi::communicator mpicom;
-#  endif
 
 #  if defined(NDEBUG)
         static const int n_reqs = 2; // data, reqs for recv only is enough?
@@ -50,7 +49,6 @@ namespace libmpdataxx
           ? (mpicom.rank() - 1 + mpicom.size()) % mpicom.size()
           : (mpicom.rank() + 1                ) % mpicom.size();
 
-#if defined(USE_MPI)
 #  if !defined(NDEBUG)
           const int debug = 2;
 	  std::pair<int, int> buf_rng; 
