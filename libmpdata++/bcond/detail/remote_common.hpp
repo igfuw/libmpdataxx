@@ -113,7 +113,7 @@ namespace libmpdataxx
           // launching async data transfer
           {
             std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
-	    reqs[2] = mpicom.irecv(peer, msg_recv, buf_recv);
+	    reqs[1+n_dbg_reqs] = mpicom.irecv(peer, msg_recv, buf_recv);
 
             // sending debug information
 #  if !defined(NDEBUG)
