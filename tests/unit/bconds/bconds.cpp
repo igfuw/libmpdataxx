@@ -71,12 +71,13 @@ int main()
   std::for_each(velo.begin(), velo.end(), [&](decltype(ix::u) vel)
   {
     decltype(slv.advectee(vel)) prtrb(slv.advectee(vel).shape()); // array to store perturbation
+    prtrb.reindexSelf(slv.advectee().lbound());
     std::generate(prtrb.begin(), prtrb.end(), [&] () {return amp * rand();}); // fill it, TODO: is it officialy stl compatible?
     // no perturbation at the edges, TODO: with MPI this won't work
-    prtrb(0, all, all) = 0;
+    if(slv.advectee(vel).lbound(0) == 0) prtrb(0, all, all) = 0;
     prtrb(all, 0, all) = 0;
     prtrb(all, all, 0) = 0;
-    prtrb(nx-1, all, all) = 0;
+    if(slv.advectee(vel).ubound(0) == nx-1) prtrb(nx-1, all, all) = 0;
     prtrb(all, ny-1, all) = 0;
     prtrb(all, all, nz-1) = 0;
     slv.advectee(vel) += prtrb;
