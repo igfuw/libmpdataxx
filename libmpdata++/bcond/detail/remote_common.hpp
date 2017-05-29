@@ -70,6 +70,7 @@ namespace libmpdataxx
           const idx_t &idx_send 
         )
         {
+#if defined(USE_MPI)
           // distinguishing between left and right messages 
           // (important e.g. with 2 procs and cyclic bc)
           const int  
@@ -78,7 +79,6 @@ namespace libmpdataxx
           // copying data to be sent (TODO: it doesn't work without copy(), why??)
 	  arr_t buf_send = a(idx_send).copy();
 
-#if defined(USE_MPI)
           // launching async data transfer
           {
             std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
@@ -102,6 +102,7 @@ namespace libmpdataxx
           const idx_t &idx_recv
         )
         {
+#if defined(USE_MPI)
           // distinguishing between left and right messages 
           // (important e.g. with 2 procs and cyclic bc)
           const int  
@@ -131,10 +132,14 @@ namespace libmpdataxx
           const idx_t &idx_send 
         )
         {
+#if defined(USE_MPI)
           send_hlpr(a, idx_send);
 
           // waiting for the transfers to finish
 	  boost::mpi::wait_all(reqs.begin(), reqs.begin() + 1 + n_dbg_reqs); // MPI_Waitall is thread-safe?
+#else
+          assert(false);
+#endif
         }
 
         void recv(
@@ -142,6 +147,7 @@ namespace libmpdataxx
           const idx_t &idx_recv
         )
         {
+#if defined(USE_MPI)
           auto buf_recv = recv_hlpr(a, idx_recv);
 
           // waiting for the transfers to finish
@@ -157,6 +163,9 @@ namespace libmpdataxx
 
           // writing received data to the array
 	  a(idx_recv) = buf_recv;
+#else
+          assert(false);
+#endif
         }
 
         void xchng(
@@ -165,6 +174,7 @@ namespace libmpdataxx
           const idx_t &idx_recv
         )
         {
+#if defined(USE_MPI)
           send_hlpr(a, idx_send);
           auto buf_recv = recv_hlpr(a, idx_recv);
 
@@ -181,6 +191,9 @@ namespace libmpdataxx
 
           // writing received data to the array
 	  a(idx_recv) = buf_recv;
+#else
+          assert(false);
+#endif
         }
 
         public:
