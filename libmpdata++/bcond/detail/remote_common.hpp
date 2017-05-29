@@ -34,6 +34,7 @@ namespace libmpdataxx
 
 #if defined(USE_MPI)
         boost::mpi::communicator mpicom;
+#  endif
 
 #  if defined(NDEBUG)
         static const int n_reqs = 2; // data, reqs for recv only is enough?
