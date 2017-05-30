@@ -123,21 +123,23 @@ namespace libmpdataxx
             else
 	      (*sumtmp)(c) = blitz::sum(arr(slice_idx));
           }
-          barrier();
-          if(rank == 0)
+          barrier(); // wait for all threads to calc their part
+          if(rank == 0) 
           {
+            // master thread calculates the sum from this process, stores in shared array
             if (sum_khn)
-              (*sumtmp)(0) = blitz::kahan_sum(*sumtmp);
+              (*sumtmp)(0)= blitz::kahan_sum(*sumtmp);
             else
-              (*sumtmp)(0) = blitz::sum(*sumtmp);
+              (*sumtmp)(0)= blitz::sum(*sumtmp);
+#if defined(USE_MPI)
+            // master thread calculates sum of sums from all processes
+            (*sumtmp)(0) = this->distmem.sum((*sumtmp)(0));
+#endif
           }
           barrier();
-#if defined(USE_MPI)
-          if(rank == 0)
-            (*sumtmp)(0) = this->distmem.sum((*sumtmp)(0));
-          barrier();
-#endif
-          return (*sumtmp)(0);
+          real_t res = (*sumtmp)(0); // propagate the total sum to all threads of the process
+          barrier(); // to avoid sumtmp being overwritten by some other threads' next sum call
+          return res;
         }
 
         /// @brief concurrency-aware summation of a (element-wise) product of two arrays
@@ -156,21 +158,24 @@ namespace libmpdataxx
             else
 	      (*sumtmp)(c) = blitz::sum(arr1(slice_idx) * arr2(slice_idx)); 
           }
-          barrier();
-          if(rank == 0)
+          // TODO: code below same as in the function above
+          barrier(); // wait for all threads to calc their part
+          if(rank == 0) 
           {
+            // master thread calculates the sum from this process, stores in shared array
             if (sum_khn)
-              (*sumtmp)(0) = blitz::kahan_sum(*sumtmp);
+              (*sumtmp)(0)= blitz::kahan_sum(*sumtmp);
             else
-              (*sumtmp)(0) = blitz::sum(*sumtmp);
+              (*sumtmp)(0)= blitz::sum(*sumtmp);
+#if defined(USE_MPI)
+            // master thread calculates sum of sums from all processes
+            (*sumtmp)(0) = this->distmem.sum((*sumtmp)(0));
+#endif
           }
           barrier();
-#if defined(USE_MPI)
-          if(rank == 0)
-            (*sumtmp)(0) = this->distmem.sum((*sumtmp)(0));
-          barrier();
-#endif
-          return (*sumtmp)(0);
+          real_t res = (*sumtmp)(0); // propagate the total sum to all threads of the process
+          barrier(); // to avoid sumtmp being overwritten by some other threads' next sum call
+          return res;
         }
 
         real_t min(const int &rank, const arr_t &arr)
@@ -179,32 +184,37 @@ namespace libmpdataxx
           (*xtmtmp)(rank) = blitz::min(arr); 
           barrier();
           if(rank == 0)
+          {
             (*xtmtmp)(0) = blitz::min(*xtmtmp);
-          barrier();
-          // min across mpi processes
 #if defined(USE_MPI)
-          if(rank == 0)
+            // min across mpi processes
             (*xtmtmp)(0) = this->distmem.min((*xtmtmp)(0));
-          barrier();
 #endif
-          return (*xtmtmp)(0);
+          }
+          barrier();
+          real_t res = (*xtmtmp)(0); // propagate the total min to all threads of the process
+          barrier(); // to avoid xtmtmp being overwritten by some other threads' next sum call
+          return res;
         }
 
+        // TODO: almost the same as min
         real_t max(const int &rank, const arr_t &arr)
         {
           // max across local threads
           (*xtmtmp)(rank) = blitz::max(arr); 
           barrier();
           if(rank == 0)
+          {
             (*xtmtmp)(0) = blitz::max(*xtmtmp);
-          barrier();
-          // max across mpi processes
 #if defined(USE_MPI)
-          if(rank == 0)
+            // max across mpi processes
             (*xtmtmp)(0) = this->distmem.max((*xtmtmp)(0));
-          barrier();
 #endif
-          return (*xtmtmp)(0);
+          }
+          barrier();
+          real_t res = (*xtmtmp)(0); // propagate the total max to all threads of the process
+          barrier(); // to avoid xtmtmp being overwritten by some other threads' next sum call
+          return res;
         }
 
         // single-threaded, MPI-aware versions of the min and max functions
