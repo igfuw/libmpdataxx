@@ -34,6 +34,15 @@ namespace libmpdataxx
         this->xchng(a, pi<d>(this->left_intr_sclr + off, j), pi<d>(this->left_halo_sclr, j));
       }
 
+      void fill_halos_pres(const arr_t &a, const rng_t &j)
+      {
+        fill_halos_sclr(a, j);
+      }
+      
+      void save_edge_vel(const arr_t &, const rng_t &) {}
+
+      void set_edge_pres(const arr_t &, const rng_t &, int) {}
+
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
         using namespace idxperm;
@@ -72,6 +81,15 @@ namespace libmpdataxx
         using namespace idxperm;
         this->xchng(a, pi<d>(this->rght_intr_sclr + off, j), pi<d>(this->rght_halo_sclr, j));
       }
+
+      void fill_halos_pres(const arr_t &a, const rng_t &j)
+      {
+        fill_halos_sclr(a, j);
+      }
+      
+      void save_edge_vel(const arr_t &, const rng_t &) {}
+
+      void set_edge_pres(const arr_t &, const rng_t &, int) {}
 
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
