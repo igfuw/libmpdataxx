@@ -55,7 +55,9 @@ namespace libmpdataxx
         auto s = a.shape();
         s[d] = 1;
         edge_velocity.resize(s);
-        edge_velocity(pi<d>(0, j, k)) = a(pi<d>(this->left_edge_sclr, j, k));
+        edge_velocity.reindexSelf({a.lbound(0), 0, 0});
+        edge_velocity(pi<d>(0, j, k)) = 
+          a(pi<d>(this->left_edge_sclr, j, k));
       }
       
       void set_edge_pres(const arr_t &a, const rng_t &j, const rng_t &k, int sign)
@@ -161,6 +163,7 @@ namespace libmpdataxx
         auto s = a.shape();
         s[d] = 1;
         edge_velocity.resize(s);
+        edge_velocity.reindexSelf({a.lbound(0), 0, 0});
         edge_velocity(pi<d>(0, j, k)) = a(pi<d>(this->rght_edge_sclr, j, k));
       }
       
