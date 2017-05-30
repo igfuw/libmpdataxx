@@ -43,8 +43,8 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           real_t res;
-          std::lock_guard<std::mutex> lock(mpi_mutex);
-          boost::mpi::all_reduce(mpicom, val, res, Op());
+//          std::lock_guard<std::mutex> lock(mpi_mutex);
+          boost::mpi::all_reduce(mpicom, val, res, Op()); // it's thread-safe?
           return res;
 #else
           return val;
