@@ -111,10 +111,13 @@ set(msg "Detecting if the compiler is an MPI wrapper...")
 message(STATUS "${msg}")
 execute_process(COMMAND ${CMAKE_CXX_COMPILER} "-show" RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_QUIET)
 if (status EQUAL 0 AND output MATCHES "mpi") 
-  set(Boost_VERSION 1.55.0)
   set(USE_MPI TRUE)
   set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -DUSE_MPI")
   set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -DUSE_MPI")
+  set(libmpdataxx_MPIRUN ${CMAKE_CXX_COMPILER})
+  string(REPLACE "mpic++" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
+  string(REPLACE "mpicxx" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
+  string(REPLACE "mpiXX"  "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
 else()
   set(USE_MPI FALSE)
 endif()
@@ -130,6 +133,7 @@ set(req_comp thread date_time system iostreams timer filesystem)
 if(USE_MPI)
   list(APPEND req_comp mpi)
   list(APPEND req_comp serialization)
+  set(Boost_VERSION 1.55.0)
 endif()
 find_package(Boost ${Boost_VERSION} COMPONENTS ${req_comp})
 if(Boost_FOUND)
@@ -156,8 +160,9 @@ if(HDF5_FOUND)
   endif()
 
   if(USE_MPI AND NOT HDF5_IS_PARALLEL)
-    message(FATAL_ERROR "MPI was enabled for libmpdata++ but not in HDF5.
+    message(STATUS "MPI was enabled for libmpdata++ but not in HDF5.
 
+* Programs using libmpdata++'s HDF5 output will not compile.
 * To install MPI-enabled HDF5, please try:
 *   Debian/Ubuntu: sudo apt-get install libhdf5-openmpi-dev
 *   Fedora: sudo yum install hdf5-openmpi-devel
@@ -180,7 +185,7 @@ if(HDF5_FOUND)
 
   endif()
 
-  if(USE_MPI)
+  if(USE_MPI AND HDF5_IS_PARALLEL)
     # detecting if HDF5-MPI is usable from C++
     # see http://lists.hdfgroup.org/pipermail/hdf-forum_lists.hdfgroup.org/2015-June/008600.html
     # https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
@@ -234,10 +239,6 @@ if(HDF5_FOUND)
     # detecting if it runs under mpirun (missing libhwloc-plugins issue:
     # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=790540
     # )
-    set(libmpdataxx_MPIRUN ${CMAKE_CXX_COMPILER})
-    string(REPLACE "mpic++" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
-    string(REPLACE "mpicxx" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
-    string(REPLACE "mpiXX"  "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
     execute_process(COMMAND ${libmpdataxx_MPIRUN} "-np" "2" "./a.out" 
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status
