@@ -86,6 +86,11 @@ int order()
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_SERIALIZED);
+#endif
   // mpdata without dfl option set is frist-order accurate for divergent flows
   {
     enum { opts = opts::nug };
@@ -127,4 +132,8 @@ int main()
     enum { opts_iters = 2};
     if (order<opts, opts_iters>() != 3) throw std::runtime_error("iga_div_3rd");
   }
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
+
 }
