@@ -191,8 +191,11 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           // finalize mpi if it was initialized by distmem,
-          // otherwise it would break programs that instantiate many solvers
-          if(!libmpdataxx::concurr::detail::mpi_initialized_before)
+          // otherwise it would break programs that instantiate many solvers;
+          // TODO: MPI standard requires that the same thread that called mpi_init 
+          // calls mpi_finalize, we don't ensure it
+          mem->barrier();
+          if(!libmpdataxx::concurr::detail::mpi_initialized_before && rank == 0)
             MPI::Finalize();
 #endif
 #if !defined(NDEBUG)
