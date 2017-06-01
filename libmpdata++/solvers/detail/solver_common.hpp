@@ -189,6 +189,12 @@ namespace libmpdataxx
         // dtor
         virtual ~solver_common()
         {
+#if defined(USE_MPI)
+          // finalize mpi if it was initialized by distmem,
+          // otherwise it would break programs that instantiate many solvers
+          if(!libmpdataxx::concurr::detail::mpi_initialized_before)
+            MPI::Finalize();
+#endif
 #if !defined(NDEBUG)
 	  assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
 	  assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");

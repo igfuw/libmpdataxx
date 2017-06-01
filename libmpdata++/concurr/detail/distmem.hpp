@@ -1,7 +1,6 @@
 #pragma once
 
 #if defined(USE_MPI)
-#  include <boost/mpi/environment.hpp>
 #  include <boost/mpi/communicator.hpp>
 #  include <boost/mpi/collectives.hpp>
 #  include <mutex>
@@ -17,16 +16,8 @@ namespace libmpdataxx
     namespace detail
     {
 #if defined(USE_MPI)
-      namespace 
-      {
-        // the anonymous namespace is a hack to avoid
-        // "*** The MPI_Errhandler_set() function was called after MPI_FINALIZE was invoked."
-        // error if multiple solvers are instantiated 
-        boost::mpi::environment mpienv(boost::mpi::threading::serialized);
-        // TODO: the ``multiple'' threading level could be reduced to single in
-        // case the sharedmem->size() == 1
-      }
       std::mutex mpi_mutex;
+      bool mpi_initialized_before = true; // flag if MPI was initialized before distmem ctor
 #endif
 
       template <typename real_t, int n_dims>
@@ -120,6 +111,14 @@ namespace libmpdataxx
             std::getenv("LAMRANK") != NULL
           ) throw std::runtime_error("mpirun environment variable detected but libmpdata++ was compiled with MPI disabled");
 #else
+          // init mpi here, since distmem is constructed before hdf5
+          // will be finalized in slvr_common dtor, since distmem is destructed before hdf5;
+          // boost::mpi::enviro being global var caused deadlocks when freeing memory
+          if(!MPI::Is_initialized())
+          {
+            mpi_initialized_before = false;
+            MPI::Init_thread(MPI_THREAD_SERIALIZED);
+          }
           if (boost::mpi::environment::thread_level() != boost::mpi::threading::serialized)
           {
             throw std::runtime_error("failed to initialise MPI environment with MPI_THREAD_SERIALIZED");
