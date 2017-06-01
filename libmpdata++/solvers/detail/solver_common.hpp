@@ -194,8 +194,7 @@ namespace libmpdataxx
           // otherwise it would break programs that instantiate many solvers;
           // TODO: MPI standard requires that the same thread that called mpi_init 
           // calls mpi_finalize, we don't ensure it
-          mem->barrier();
-          if(!libmpdataxx::concurr::detail::mpi_initialized_before && rank == 0)
+          if(!libmpdataxx::concurr::detail::mpi_initialized_before && rank==0) 
             MPI::Finalize();
 #endif
 #if !defined(NDEBUG)
