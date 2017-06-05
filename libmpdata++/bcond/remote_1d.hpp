@@ -73,7 +73,7 @@ namespace libmpdataxx
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
       {
         if(!this->is_cyclic) 
-          this->xchng(av[0], idx_t(idx_ctor_arg_t((this->rght_intr_vctr + off)^h)^(-1)), idx_t(idx_ctor_arg_t(this->rght_halo_vctr))); 
+          this->xchng(av[0], idx_t(idx_ctor_arg_t(((this->rght_intr_vctr + off)^h)^(-1))), idx_t(idx_ctor_arg_t(this->rght_halo_vctr))); 
         else
           this->xchng(av[0], idx_t(idx_ctor_arg_t(this->rght_intr_vctr + off)), idx_t(idx_ctor_arg_t(this->rght_halo_vctr))); 
       }
