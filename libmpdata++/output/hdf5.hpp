@@ -283,7 +283,7 @@ namespace libmpdataxx
               case 1:
               {
                 space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                vars[v.first].write( &(this->out_data(v.first)(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                vars[v.first].write( &(this->out_data(v.first)(this->mem->grid_size[0].first())), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
                 break;
               }
               case 2:
