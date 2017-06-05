@@ -79,6 +79,7 @@ namespace libmpdataxx
 	  arr_t buf_send = a(idx_send).copy();
 
           // launching async data transfer
+          if(buf_send.size()!=0)
           {
             std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
 	    reqs[0] = mpicom.isend(peer, msg_send, buf_send);
@@ -111,6 +112,7 @@ namespace libmpdataxx
              buf_recv(a(idx_recv).shape());
 
           // launching async data transfer
+          if(buf_recv.size()!=0)
           {
             std::lock_guard<std::mutex> lock(libmpdataxx::concurr::detail::mpi_mutex);
 	    reqs[1+n_dbg_reqs] = mpicom.irecv(peer, msg_recv, buf_recv);

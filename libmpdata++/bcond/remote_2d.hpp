@@ -47,7 +47,8 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         if(!this->is_cyclic) 
-          this->send(av[0], pi<d>(this->left_intr_vctr + off, j));
+          // receive the halo without the rightmost column, which was caluclated by this process
+          this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j), pi<d>((this->left_halo_vctr^h)^(-1), j));
         else
           this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j), pi<d>(this->left_halo_vctr, j));
       }
@@ -95,7 +96,8 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         if(!this->is_cyclic)
-          this->recv(av[0], pi<d>(this->rght_halo_vctr, j));
+          // don't send the first column to the right of the domain, it will be calculated and sent here by the process to the right
+          this->xchng(av[0], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j), pi<d>(this->rght_halo_vctr, j));
         else
           this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j), pi<d>(this->rght_halo_vctr, j));
       }
