@@ -20,9 +20,8 @@ env:
     - TEST_SUITE=bicycles MPI=none
     - TEST_SUITE=unit MPI=openmpi
     - TEST_SUITE=sandbox MPI=openmpi
-#    MPI paper tests are disabled due to difficulties 
-#    with file comparison/plotting from files; TODO: fix them
-#    - TEST_SUITE=paper MPI=openmpi
+# MPI paper tests don't do file comparison and plotting; TODO: fix them
+    - TEST_SUITE=paper MPI=openmpi
     - TEST_SUITE=elliptic_drop MPI=openmpi
     - TEST_SUITE=nair_jablonowski_2008 MPI=openmpi
 

@@ -17,22 +17,24 @@ add_test(over_the_pole_2d_diff bash -c "
   done 
 ")
 
-add_test(over_the_pole_2d_stats_diff bash -c "
-  for i in best default; do 
-    echo  ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
-    echo  ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
-    zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
-  done
-") 
-
-if(NOT $ENV{DISPLAY} STREQUAL "")
-  add_test(over_the_pole_2d_plot bash -c "
+if(NOT USE_MPI)
+  add_test(over_the_pole_2d_stats_diff bash -c "
     for i in best default; do 
-      pvpython ${CMAKE_CURRENT_SOURCE_DIR}/plot.py ${CMAKE_CURRENT_BINARY_DIR}/$i/timestep0000005120.xmf;
+      echo  ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
+      echo  ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
+      zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
     done
-  ")
-else()
-  message(STATUS "Skipping Paraview-based test (DISPLAY not set)")
+  ") 
+  
+  if(NOT $ENV{DISPLAY} STREQUAL "")
+    add_test(over_the_pole_2d_plot bash -c "
+      for i in best default; do 
+        pvpython ${CMAKE_CURRENT_SOURCE_DIR}/plot.py ${CMAKE_CURRENT_BINARY_DIR}/$i/timestep0000005120.xmf;
+      done
+    ")
+  else()
+    message(STATUS "Skipping Paraview-based test (DISPLAY not set)")
+  endif()
 endif()
 #TODO: see https://public.kitware.com/Bug/view.php?id=13825
 #set_tests_properties(revolving_sphere_3d_plot PROPERTIES SKIP_RETURN_CODE 44) 
