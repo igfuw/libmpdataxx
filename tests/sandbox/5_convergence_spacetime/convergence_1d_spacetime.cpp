@@ -56,6 +56,7 @@ double test(int np)
 
   decltype(run.advectee()) true_solution(run.advectee().shape());
   true_solution = (2 + sin(i * dx) * sin(time));
+  true_solution.reindexSelf(run.advectee().lbound());
   
   run.g_factor() = exp(cos(i * dx));
 

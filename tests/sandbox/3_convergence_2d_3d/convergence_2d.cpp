@@ -56,6 +56,7 @@ T test(int np)
 
   decltype(run.advectee()) true_solution(run.advectee().shape());
   true_solution = run.advectee();
+  true_solution.reindexSelf(run.advectee().lbound());
 
   run.advector(0) = 1.0 * dt/dx;
   run.advector(1) = 2.0 * dt/dy;
