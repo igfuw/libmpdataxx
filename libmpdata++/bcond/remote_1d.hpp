@@ -38,8 +38,13 @@ namespace libmpdataxx
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
       {
         if(!this->is_cyclic) 
-          // processes fill vectors to the left of their domain
-          this->xchng(av[0], idx_t(idx_ctor_arg_t(this->left_intr_vctr + off)), idx_t(idx_ctor_arg_t((this->left_halo_vctr^h)^(-1)))); 
+        {
+          if(halo == 1)
+            this->send(av[0], idx_t(idx_ctor_arg_t(this->left_intr_vctr + off))); 
+          else
+            // processes fill vectors to the left of their domain
+            this->xchng(av[0], idx_t(idx_ctor_arg_t(this->left_intr_vctr + off)), idx_t(idx_ctor_arg_t((this->left_halo_vctr^h)^(-1)))); 
+        }
         else 
           // cyclic should communicate both ways 
           this->xchng(av[0], idx_t(idx_ctor_arg_t(this->left_intr_vctr + off)), idx_t(idx_ctor_arg_t(this->left_halo_vctr))); 
@@ -73,7 +78,12 @@ namespace libmpdataxx
       void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
       {
         if(!this->is_cyclic) 
-          this->xchng(av[0], idx_t(idx_ctor_arg_t(((this->rght_intr_vctr + off)^h)^(-1))), idx_t(idx_ctor_arg_t(this->rght_halo_vctr))); 
+        {
+          if(halo == 1)
+            this->recv(av[0],  idx_t(idx_ctor_arg_t(this->rght_halo_vctr))); 
+          else
+            this->xchng(av[0], idx_t(idx_ctor_arg_t(((this->rght_intr_vctr + off)^h)^(-1))), idx_t(idx_ctor_arg_t(this->rght_halo_vctr))); 
+        }
         else
           this->xchng(av[0], idx_t(idx_ctor_arg_t(this->rght_intr_vctr + off)), idx_t(idx_ctor_arg_t(this->rght_halo_vctr))); 
       }

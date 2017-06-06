@@ -49,8 +49,13 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         if(!this->is_cyclic)
-          // see remote_2d
-          this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k));
+        {
+          if(halo == 1)
+            // see remote_2d
+            this->send(av[0], pi<d>(this->left_intr_vctr + off, j, k));
+          else
+            this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k));
+        }
         else
           this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
       }
@@ -100,7 +105,12 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         if(!this->is_cyclic)
-          this->xchng(av[0], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
+        {
+          if(halo == 1)
+            this->recv(av[0], pi<d>(this->rght_halo_vctr, j, k));
+          else
+            this->xchng(av[0], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
+        }
         else
           this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
       }
