@@ -38,7 +38,7 @@ void test(double coeff, int nt, double tol, const std::string& name)
   p.di = p.dj = 1; 
 
   p.prs_tol = 1e-6;
-  p.grid_size = {4, 4};
+  p.grid_size = {12, 4};
 
   libmpdataxx::concurr::serial<
     slv_t, 
