@@ -86,10 +86,16 @@ bool check(T cfl)
 
 int main()
 {
+#if defined(USE_MPI)
+    MPI::Init_thread(MPI_THREAD_SERIALIZED);
+#endif
     enum { opts = 0 };
     enum { opts_iters = 2};
 
     if (!check<opts, opts_iters>(0.1)) throw std::runtime_error("0.1");
     if (!check<opts, opts_iters>(0.5)) throw std::runtime_error("0.5");
     if (!check<opts, opts_iters>(0.9)) throw std::runtime_error("0.9");
+#if defined(USE_MPI)
+    MPI::Finalize();
+#endif
 }
