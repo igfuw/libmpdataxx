@@ -21,6 +21,7 @@ if [[ $MPI != 'none' ]]; then OMP_NUM_THREADS=2 make -C git_revision test || cat
 if [[ $MPI != 'none' ]]; then OMP_NUM_THREADS=2 make -C var_dt test || cat var_dt/Testing/Temporary/LastTest.log /; fi
 # on MPI run absorber and bconds in release mode
 cmake -DCMAKE_BUILD_TYPE=Release ../
+if [[ $MPI != 'none' ]]; then VERBOSE=1 make -C absorber /; fi
 if [[ $MPI != 'none' ]]; then VERBOSE=1 make -C bconds /; fi
 if [[ $MPI != 'none' ]]; then make -C absorber test || cat absorber/Testing/Temporary/LastTest.log /; fi
 if [[ $MPI != 'none' ]]; then OMP_NUM_THREADS=2 make -C bconds test || cat bconds/Testing/Temporary/LastTest.log /; fi
