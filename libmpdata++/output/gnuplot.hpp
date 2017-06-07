@@ -167,7 +167,7 @@ namespace libmpdataxx
               tmp(i) = this->mem->advectee(var)(this->mem->grid_size[0].first() + i/2);
 	    gp->send(tmp);
           }
-          else gp->send(this->mem->advectee(var));
+          else gp->send(this->mem->advectee(var).reindex({0}));
         }
 
         if (parent_t::n_dims == 2) // known at compile time
