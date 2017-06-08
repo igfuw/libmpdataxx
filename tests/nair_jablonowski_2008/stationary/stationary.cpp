@@ -75,6 +75,35 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
 
   blitz::firstIndex i;
   blitz::secondIndex j;
+ 
+  // initial conditions
+  {
+    // coordinates
+    decltype(run.advector(0)) X(run.advector(0).extent()), Y(run.advector(0).extent());
+    X = i * dx;
+    Y = (j + 0.5) * dy - pi / 2;
+
+    // helper arrays
+    decltype(run.advector(0)) r(run.advector(0).extent()), omg(run.advector(0).extent());
+
+    r = 3 * cos(ypf(X + 0.5 * dx, Y));
+    omg = where(r != 0, v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
+    run.advector(0) = omg * (sin(y0) - cos(y0) * cos(X + 0.5 * dx - x0) * tan(Y)) * dt / dx * dx * dy * cos(Y);
+  }
+
+  {
+    // coordinates
+    decltype(run.advector(1)) X(run.advector(1).extent()), Y(run.advector(1).extent());
+    X = i * dx;
+    Y = (j + 0.5) * dy - pi / 2;
+
+    // helper arrays
+    decltype(run.advector(1)) r(run.advector(1).extent()), omg(run.advector(1).extent());
+
+    r = 3 * cos(ypf(X, Y + 0.5 * dy));
+    omg = where(r != 0, v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
+    run.advector(1) = omg * cos(y0) * sin(X - x0) *  dt / dy * dx * dy * cos(Y + 0.5 * dy);
+  }
 
   // coordinates
   decltype(run.advectee()) X(run.advectee().extent()), Y(run.advectee().extent());
@@ -83,19 +112,6 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
 
   // helper arrays
   decltype(run.advectee()) r(run.advectee().extent()), omg(run.advectee().extent());
- 
-  // initial conditions
-  {
-    r = 3 * cos(ypf(X + 0.5 * dx, Y));
-    omg = where(r != 0, v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
-    run.advector(0) = omg * (sin(y0) - cos(y0) * cos(X + 0.5 * dx - x0) * tan(Y)) * dt / dx * dx * dy * cos(Y);
-  }
-
-  {
-    r = 3 * cos(ypf(X, Y + 0.5 * dy));
-    omg = where(r != 0, v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
-    run.advector(1) = omg * cos(y0) * sin(X - x0) * dt / dy * dx * dy * cos(Y + 0.5 * dy);
-  }
   
   r = 3 * cos(ypf(X, Y));
   omg = where(r != 0, v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
