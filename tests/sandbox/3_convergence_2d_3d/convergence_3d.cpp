@@ -76,6 +76,7 @@ int order()
 {
     auto err_coarse = test<opts_arg, opts_iters>(17);
     auto err_fine = test<opts_arg, opts_iters>(33);
+    std::cout << "err_coarse: " << err_coarse << " err_fine: " << err_fine << std::endl;
     return std::round(std::log2(err_coarse / err_fine));
 }
 
