@@ -74,8 +74,8 @@ T test(int np)
 template <int opts_arg, int opts_iters>
 int order()
 {
-    auto err_coarse = test<opts_arg, opts_iters>(17);
-    auto err_fine = test<opts_arg, opts_iters>(33);
+    auto err_coarse = test<opts_arg, opts_iters>(25);
+    auto err_fine = test<opts_arg, opts_iters>(49);
     std::cout << "err_coarse: " << err_coarse << " err_fine: " << err_fine << std::endl;
     return std::round(std::log2(err_coarse / err_fine));
 }
