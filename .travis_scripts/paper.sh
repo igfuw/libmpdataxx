@@ -19,5 +19,12 @@ VERBOSE=1 $make_j
 # running all paper tests in Release mode 
 #- OMP_NUM_THREADS=1 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
 # "/" intentional! (just to make cat exit with an error code)
-OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log /
+if [[ $MPI == 'none' ]]; then OMP_NUM_THREADS=4 make test || cat Testing/Temporary/LastTest.log /; fi
+
+# some tests take too long with mpi, so we skip them
+if [[ $MPI != 'none' ]]; then OMP_NUM_THREADS=2 make -C 0_basic_example test || cat Testing/Temporary/LastTest.log /; fi
+if [[ $MPI != 'none' ]]; then OMP_NUM_THREADS=2 make -C 1_advscheme_opts test || cat Testing/Temporary/LastTest.log /; fi
+if [[ $MPI != 'none' ]]; then OMP_NUM_THREADS=2 make -C 6_coupled_harmosc test || cat Testing/Temporary/LastTest.log /; fi
+if [[ $MPI != 'none' ]]; then OMP_NUM_THREADS=2 make -C 7_shallow_water test || cat Testing/Temporary/LastTest.log /; fi
+if [[ $MPI != 'none' ]]; then OMP_NUM_THREADS=2 make -C 8_boussinesq_2d test || cat Testing/Temporary/LastTest.log /; fi
 cd ../../..
