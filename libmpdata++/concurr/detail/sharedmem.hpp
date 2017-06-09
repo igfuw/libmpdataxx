@@ -14,6 +14,7 @@
 #include <libmpdata++/concurr/detail/distmem.hpp>
 
 #include <array>
+#include <numeric>
 
 namespace libmpdataxx
 {
@@ -321,6 +322,41 @@ namespace libmpdataxx
 	  ).reindex(this->origin);
 	}
 
+        const blitz::Array<real_t, 1> advectee_global(int e = 0)
+        {   
+          if(this->distmem.size() > 1)
+          {
+// TODO: move some of that to distmem...
+// TODO: a lot of common code betwee 1,2 and 3 dimensions...
+
+            // a vector of number of elements to be sent by each non-root process
+            std::vector<int> sizes(this->distmem.size());
+            std::iota(sizes.begin(), sizes.end(), 0); // fill with 1,2,3,...
+            for(auto &size : sizes) { size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length();}
+            // calc displacement
+            std::vector<int> displ(sizes.size());
+            std::partial_sum(sizes.begin(), sizes.end(), displ.begin()); 
+            std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
+            // a vector that will store the received data, relevant only on process rank=0
+            std::vector<real_t> out_values(this->distmem.grid_size[0]);
+            // create an array that will store advectee to be sent in a contiguous memory block
+            std::vector<real_t> in_values_vec(advectee(e).size());
+            std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
+
+#if defined(USE_MPI)
+            // gather the data from all processes on rank=0
+            boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
+         
+            blitz::Array<real_t, 1> res(out_values.data(), blitz::shape(this->distmem.grid_size[0]), blitz::neverDeleteData);
+            // send the result to other processes
+            boost::mpi::broadcast(this->distmem.mpicom, res, 0);
+#endif
+            return res;
+          }
+          else
+            return advectee(e);
+        }  
+
 	blitz::Array<real_t, 1> advector(int d = 0)  
 	{   
           using namespace arakawa_c;
@@ -480,6 +516,47 @@ namespace libmpdataxx
 	    this->grid_size[2]
 	  ).reindex(this->origin);
 	}
+
+        const blitz::Array<real_t, 3> advectee_global(int e = 0)
+        {   
+          if(this->distmem.size() > 1)
+          {
+// TODO: move some of that to distmem...
+// TODO: a lot of common code betwee 1,2 and 3 dimensions...
+
+            // a vector of number of elements to be sent by each non-root process
+            std::vector<int> sizes(this->distmem.size());
+            std::iota(sizes.begin(), sizes.end(), 0); // fill with 1,2,3,...
+            for(auto &size : sizes) 
+            { 
+              size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length()
+                      * this->grid_size[1] * this->grid_size[2];
+            }
+            // calc displacement
+            std::vector<int> displ(sizes.size());
+            std::partial_sum(sizes.begin(), sizes.end(), displ.begin()); 
+            std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
+            // a vector that will store the received data, relevant only on process rank=0
+            std::vector<real_t> out_values(this->distmem.grid_size[0] * this->grid_size[1] * this->grid_size[2]);
+            // create an array that will store advectee to be sent in a contiguous memory block
+            std::vector<real_t> in_values_vec(advectee(e).size());
+            std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
+
+#if defined(USE_MPI)
+            // gather the data from all processes on rank=0
+            boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
+         
+            blitz::Array<real_t, 3> res(out_values.data(), blitz::shape(
+              this->distmem.grid_size[0], this->grid_size[1], this->grid_size[2]),
+              blitz::neverDeleteData);
+            // send the result to other processes
+            boost::mpi::broadcast(this->distmem.mpicom, res, 0);
+#endif
+            return res;
+          }
+          else
+            return advectee(e);
+        }  
 
 	blitz::Array<real_t, 3> advector(int d = 0)  
 	{   

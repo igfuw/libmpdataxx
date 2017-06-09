@@ -24,6 +24,10 @@ namespace libmpdataxx
       { assert(false); throw; }
 
       virtual 
+      const blitz::Array<real_t, n_dims> advectee_global(int eqn = 0)
+      { assert(false); throw; }
+
+      virtual 
       blitz::Array<real_t, n_dims> advector(int dim = 0) 
       { assert(false); throw; }
 

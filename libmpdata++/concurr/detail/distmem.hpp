@@ -24,6 +24,7 @@ namespace libmpdataxx
       class distmem
       {
 #if defined(USE_MPI)
+public: // TODO: just a temp measure, make it private again
         boost::mpi::communicator mpicom;
 #endif
 
