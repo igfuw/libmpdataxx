@@ -530,14 +530,14 @@ namespace libmpdataxx
             for(auto &size : sizes) 
             { 
               size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length()
-                      * this->grid_size[1] * this->grid_size[2];
+                      * this->grid_size[1].length() * this->grid_size[2].length();
             }
             // calc displacement
             std::vector<int> displ(sizes.size());
             std::partial_sum(sizes.begin(), sizes.end(), displ.begin()); 
             std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
             // a vector that will store the received data, relevant only on process rank=0
-            std::vector<real_t> out_values(this->distmem.grid_size[0] * this->grid_size[1] * this->grid_size[2]);
+            std::vector<real_t> out_values(this->distmem.grid_size[0] * this->grid_size[1].length() * this->grid_size[2].length());
             // create an array that will store advectee to be sent in a contiguous memory block
             std::vector<real_t> in_values_vec(advectee(e).size());
             std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
@@ -547,7 +547,7 @@ namespace libmpdataxx
             boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
          
             blitz::Array<real_t, 3> res(out_values.data(), blitz::shape(
-              this->distmem.grid_size[0], this->grid_size[1], this->grid_size[2]),
+              this->distmem.grid_size[0], this->grid_size[1].length(), this->grid_size[2].length()),
               blitz::neverDeleteData);
             // send the result to other processes
             boost::mpi::broadcast(this->distmem.mpicom, res, 0);
