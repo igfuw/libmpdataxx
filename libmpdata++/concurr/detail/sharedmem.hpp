@@ -545,12 +545,12 @@ namespace libmpdataxx
 #if defined(USE_MPI)
             // gather the data from all processes on rank=0
             boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
+            // send the result to other processes
+            boost::mpi::broadcast(this->distmem.mpicom, out_values, 0);
          
             blitz::Array<real_t, 3> res(out_values.data(), blitz::shape(
               this->distmem.grid_size[0], this->grid_size[1].length(), this->grid_size[2].length()),
               blitz::neverDeleteData);
-            // send the result to other processes
-            boost::mpi::broadcast(this->distmem.mpicom, res, 0);
 #endif
             return res;
           }
