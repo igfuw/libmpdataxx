@@ -28,13 +28,13 @@ class pbl : public libmpdataxx::solvers::boussinesq<ct_params_t>
 
     for (int k = this->k.first(); k <= this->k.last(); ++k)
     {
-      this->vip_rhs[0](this->i, this->j, k) += - cdrag / hscale * this->dt * sqrt(
+      this->vip_rhs[0](this->i, this->j, k) += - 2 * cdrag / hscale * sqrt(
                                                 pow2(this->state(ix::vip_i)(this->i, this->j, 0))
                                               + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
                                               ) * this->state(ix::vip_i)(this->i, this->j, 0)
                                                 * exp(-this->dj * k / hscale);
       
-      this->vip_rhs[1](this->i, this->j, k) += - cdrag / hscale * this->dt * sqrt(
+      this->vip_rhs[1](this->i, this->j, k) += - 2 * cdrag / hscale * sqrt(
                                                 pow2(this->state(ix::vip_i)(this->i, this->j, 0))
                                               + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
                                               ) * this->state(ix::vip_j)(this->i, this->j, 0)

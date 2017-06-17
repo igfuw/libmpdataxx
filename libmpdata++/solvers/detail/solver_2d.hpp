@@ -29,6 +29,7 @@ namespace libmpdataxx
 	protected:
       
 	const rng_t i, j; // TODO: to be removed
+        typename parent_t::arr_t &courant_field; // TODO: should be in solver common but cannot be allocated there ?
 
 	virtual void xchng_sclr(typename parent_t::arr_t &arr,
                         const idx_t<2> &range_ijk,
@@ -47,7 +48,7 @@ namespace libmpdataxx
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], this->ijk, this->halo);
 	}
 
-        virtual void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j);
@@ -101,11 +102,9 @@ namespace libmpdataxx
         }
 
         // TODO: ref in argument...
-        void hook_ante_loop(const int nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
+        void hook_ante_loop(const typename parent_t::advance_arg_t nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
         {
           parent_t::hook_ante_loop(nt);
-
-          xchng_vctr_alng(this->mem->GC);
 
           // sanity check for non-divergence of the initial Courant number field
           // (including compatibility with the initial condition)
@@ -127,6 +126,26 @@ namespace libmpdataxx
 	    if (max_abs_div > this->max_abs_div_eps) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
+        }
+
+        typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        {
+          courant_field(this->ijk) = 0.5 * (
+                                             abs(arrvec[0](i+h, j) + arrvec[0](i-h, j))
+                                           + abs(arrvec[1](i, j+h) + arrvec[1](i, j-h))
+                                           ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j);
+          return this->mem->max(this->rank, courant_field(this->ijk));
+        }
+        
+        void scale_gc(const typename parent_t::real_t time,
+                      const typename parent_t::real_t cur_dt,
+                      const typename parent_t::real_t old_dt) final
+        {
+          this->mem->GC[0](rng_t(i.first(), i.last()-1)^h, j) *= cur_dt / old_dt;
+          this->mem->GC[1](i, rng_t(j.first(), j.last()-1)^h) *= cur_dt / old_dt;
+          this->xchng_vctr_alng(this->mem->GC);
+          auto ex = this->halo - 1;
+          this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
         }
 
         public:
@@ -160,7 +179,8 @@ namespace libmpdataxx
             idx_t<parent_t::n_dims>({args.i, args.j})
           ),
 	  i(args.i), 
-	  j(args.j)
+	  j(args.j),
+          courant_field(args.mem->tmp[__FILE__][0][0])
 	{
           this->di = p.di;
           this->dj = p.dj;
@@ -195,6 +215,29 @@ namespace libmpdataxx
             parent_t::rng_sclr(mem->grid_size[0]), 
             parent_t::rng_vctr(mem->grid_size[1]) 
           )));
+
+          // fully third-order accurate mpdata needs also time derivatives of
+          // the Courant field
+          if (opts::isset(ct_params_t::opts, opts::div_3rd))
+          {
+            // TODO: why for (auto f : {mem->ndt_GC, mem->ndtt_GC}) doesn't work ?
+            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t( 
+              parent_t::rng_vctr(mem->grid_size[0]), 
+              parent_t::rng_sclr(mem->grid_size[1]) 
+            )));
+            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t( 
+              parent_t::rng_sclr(mem->grid_size[0]), 
+              parent_t::rng_vctr(mem->grid_size[1]) 
+            )));
+            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t( 
+              parent_t::rng_vctr(mem->grid_size[0]), 
+              parent_t::rng_sclr(mem->grid_size[1]) 
+            )));
+            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t( 
+              parent_t::rng_sclr(mem->grid_size[0]), 
+              parent_t::rng_vctr(mem->grid_size[1]) 
+            )));
+          }
  
           // allocate G
           if (opts::isset(ct_params_t::opts, opts::nug))
@@ -210,6 +253,8 @@ namespace libmpdataxx
                 parent_t::rng_sclr(mem->grid_size[0]), 
                 parent_t::rng_sclr(mem->grid_size[1])
               )));
+          // courant field
+          alloc_tmp_sclr(mem, __FILE__, 1);
         }
 
         protected:

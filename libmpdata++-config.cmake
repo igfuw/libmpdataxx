@@ -60,6 +60,7 @@ check_cxx_source_compiles("
 if (NOT CXX11_SUPPORTED)
   message(FATAL_ERROR "C++11 compatibility test failed - please update your compiler or point CMake to another one with -DCMAKE_CXX_COMPILER=...")
 endif()
+unset(CMAKE_REQUIRED_FLAGS)
 
 
 ############################################################################################
@@ -150,7 +151,7 @@ else()
 * Programs using libmpdata++'s gnuplot-iostream output will not compile.
 * To install gnuplot-iostream, please try:
 *   Debian/Ubuntu: sudo apt-get install libgnuplot-iostream-dev
-*   manual: wget -O /usr/local/include/gnuplot-iostream.h http://gitorious.org/gnuplot-iostream/gnuplot-iostream/raw/gnuplot-iostream.h 
+*   manual: wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h
   ")
 endif()
 

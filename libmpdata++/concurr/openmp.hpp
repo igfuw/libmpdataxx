@@ -51,7 +51,7 @@ namespace libmpdataxx
         mem_t(const std::array<int, solver_t::n_dims> &grid_size) : parent_t::mem_t(grid_size, size()) {};
       };
 
-      void solve(int nt)
+      void solve(typename parent_t::advance_arg_t nt)
       {
         int i = 0;
 #pragma omp parallel private(i)

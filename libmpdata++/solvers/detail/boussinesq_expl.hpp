@@ -46,6 +46,24 @@ namespace libmpdataxx
           this->xchng_sclr(tmp1, this->ijk);
           tmp2(i, j, k) = 0.25 * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k + 1));
         }
+        
+        // helpers for buoyancy forces
+        template<class ijk_t>
+        inline auto buoy_at_0(const ijk_t &ijk)
+        return_macro(,
+          this->g * (this->state(ix::tht)(ijk) - this->tht_e(ijk)) / this->Tht_ref
+        )
+        
+        template<class ijk_t>
+        inline auto buoy_at_1(const ijk_t &ijk)
+        return_macro(,
+          this->g * (
+              (  this->state(ix::tht)(ijk)
+               + 0.5 * this->dt * this->hflux(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
+              / (1 + 0.5 * this->dt * this->tht_abs(ijk))
+              - this->tht_e(ijk)
+            ) / this->Tht_ref
+        )
 
         void calc_full_tht(typename parent_t::arr_t &full_tht) final
         {
@@ -72,16 +90,14 @@ namespace libmpdataxx
             case (0):
             {
               rhs.at(ix::tht)(ijk) += this->hflux(ijk) - this->tht_abs(ijk) * (tht(ijk) - this->tht_e(ijk));
-
-              auto buoy_f = this->g * (tht(ijk) - this->tht_e(ijk)) / this->Tht_ref;
               
               if (!buoy_filter)
               {
-                rhs.at(ix_w)(ijk) += buoy_f;
+                rhs.at(ix_w)(ijk) += buoy_at_0(ijk);
               }
               else
               {
-                tmp1(ijk) = buoy_f;
+                tmp1(ijk) = buoy_at_0(ijk);
                 filter();
                 rhs.at(ix_w)(ijk) += (tmp2)(ijk);
               }
@@ -94,20 +110,14 @@ namespace libmpdataxx
                 / (1 + 0.5 * this->dt * this->tht_abs(ijk))
                 - this->tht_e(ijk)
               );
-              
-              auto buoy_f = this->g * (
-                  (tht(ijk) + 0.5 * this->dt * this->hflux(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
-                  / (1 + 0.5 * this->dt * this->tht_abs(ijk))
-                  - this->tht_e(ijk)
-                ) / this->Tht_ref;
 
               if (!buoy_filter)
               {
-                rhs.at(ix_w)(ijk) += buoy_f;
+                rhs.at(ix_w)(ijk) += buoy_at_1(ijk);
               }
               else
               {
-                tmp1(ijk) = buoy_f;
+                tmp1(ijk) = buoy_at_1(ijk);
                 filter();
                 rhs.at(ix_w)(ijk) += (tmp2)(ijk);
               }

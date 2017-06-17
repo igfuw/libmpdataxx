@@ -36,8 +36,8 @@ namespace libmpdataxx
 
 	// member fields
 	const rng_t im, jm, km;
-
-	void hook_ante_loop(const int nt) 
+  
+	void hook_ante_loop(const typename parent_t::advance_arg_t nt)
 	{   
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
@@ -46,7 +46,8 @@ namespace libmpdataxx
           
           // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
           // halos for GC_z
-          this->xchng_vctr_nrml(this->mem->GC, this->ijk);
+          auto ex = this->halo - 1;
+          this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
 	} 
 
 	// method invoked by the solver
@@ -66,6 +67,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->im,
                   this->j,
@@ -76,6 +79,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->jm,
                   this->k,
@@ -86,6 +91,8 @@ namespace libmpdataxx
 		formulae::mpdata::antidiff<ct_params_t::opts, 2>(
                   this->mem->psi[e][this->n[e]], 
                   this->GC_unco(iter),
+                  this->mem->ndt_GC,
+                  this->mem->ndtt_GC,
                   *this->mem->G,
                   this->km,
                   this->i,
@@ -97,7 +104,11 @@ namespace libmpdataxx
               // iterations, also needed for fct but it is done there independently hence
               // the following check
               if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
+              {
                 this->xchng_vctr_nrml(this->GC_corr(iter), this->ijk);
+                // if dfl option is set we need to fill these as well
+                if (opts::isset(ct_params_t::opts, opts::dfl)) this->xchng_vctr_alng(this->GC_corr(iter));
+              }
 
 	      this->fct_adjust_antidiff(e, iter);
 

@@ -33,8 +33,8 @@ namespace libmpdataxx
         const arr_1d_t &psi,    //to have the same arguments as in iga option
         const arr_1d_t &GC,
         const arr_1d_t &G,
-        const rng_t &i,         //has not been derived for tot yet
-        typename std::enable_if<!opts::isset(opts, opts::tot) && opts::isset(opts, opts::dfl) && !opts::isset(opts, opts::iga)>::type* = 0 
+        const rng_t &i,
+        typename std::enable_if<opts::isset(opts, opts::dfl) && !opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
         - 0.5 * GC(i+h) 
         / 
@@ -48,8 +48,8 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const arr_1d_t &GC,
         const arr_1d_t &G,
-        const rng_t &i,         //has not been derived for tot yet
-        typename std::enable_if<!opts::isset(opts, opts::tot) && opts::isset(opts, opts::dfl) && opts::isset(opts, opts::iga)>::type* = 0 
+        const rng_t &i,
+        typename std::enable_if<opts::isset(opts, opts::dfl) && opts::isset(opts, opts::iga)>::type* = 0 
       ) return_macro(,
         - 0.5 * GC(i+h) 
         / 
