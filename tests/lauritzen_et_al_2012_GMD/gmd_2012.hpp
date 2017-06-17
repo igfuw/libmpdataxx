@@ -61,8 +61,8 @@ class gmd_2012 : public libmpdataxx::solvers::mpdata<ct_params_t>
       }
     }
 
-    this->xchng_sclr(gc_node[0], this->i, this->j);
-    this->xchng_sclr(gc_node[1], this->i, this->j);
+    this->xchng_sclr(gc_node[0], this->ijk);
+    this->xchng_sclr(gc_node[1], this->ijk);
 
     // calculate staggered advectors
     for (int i = this->i.first()-1; i <= this->i.last(); ++i)
@@ -75,7 +75,7 @@ class gmd_2012 : public libmpdataxx::solvers::mpdata<ct_params_t>
     }
 
     auto ex = this->halo - 1;
-    this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+    this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
 
     return true;
   }

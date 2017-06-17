@@ -109,7 +109,7 @@ class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
 
     auto ex = this->halo - 1;
     this->xchng_vctr_alng(this->mem->GC);
-    this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+    this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
 
     return true;
   }
