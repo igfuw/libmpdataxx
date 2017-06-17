@@ -156,7 +156,7 @@ namespace libmpdataxx
           this->mem->GC[2](i, j, rng_t(k.first(), k.last()-1)^h) *= cur_dt / old_dt;
           this->xchng_vctr_alng(this->mem->GC);
           auto ex = this->halo - 1;
-          this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
+          this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
         }
 
         public:
