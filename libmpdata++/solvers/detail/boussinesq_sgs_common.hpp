@@ -53,18 +53,21 @@ namespace libmpdataxx
          
           for (auto& g : grad_tht)
           {
-            g(this->ijk) *= this->k_m(this->ijk) / prandtl_num;
-            this->xchng_sclr(g, this->ijk);
+            g(this->ijk) *= -this->k_m(this->ijk) / prandtl_num;
           }
+
+          for (int d = 0; d < ct_params_t::n_dims; ++d)
+          {
+            // surface indices
+            auto ij = this->ijk;
+            ij.lbound(ct_params_t::n_dims - 1) = 0;
+            ij.ubound(ct_params_t::n_dims - 1) = 0;
+            grad_tht[d](ij) = (d == ct_params_t::n_dims - 1) ? hflux_surfc : 0;
+            this->xchng_sclr(grad_tht[d], this->ijk);
+          }
+
           // hack, convinient place to update the heat_flux
           this->hflux(this->ijk) = formulae::nabla::div<parent_t::n_dims>(grad_tht, this->ijk, this->dijk);
-          
-          // surface indices
-          auto ij = this->ijk;
-          ij.lbound(ct_params_t::n_dims - 1) = 0;
-          ij.ubound(ct_params_t::n_dims - 1) = 0;
-
-          this->hflux(ij) = hflux_surfc;
         }
 
         //template<bool is_smg = (ct_params_t::sgs_scheme == smg)>
