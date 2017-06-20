@@ -130,7 +130,6 @@ namespace libmpdataxx
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, &nt_out, &zero);
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
-              curr_dim.createAttribute("dt", flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &dt);
             }
 
             // G factor
