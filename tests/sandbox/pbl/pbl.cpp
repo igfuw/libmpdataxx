@@ -25,6 +25,8 @@ void test(const std::string &dirname)
     enum { rhs_scheme = solvers::trapez };
     enum { vip_vab = solvers::impl };
     enum { prs_scheme = solvers::cr };
+    enum { sgs_diff = solvers::normal };
+    enum { sgs_scheme = solvers::smg };
     enum { impl_tht = true };
     struct ix { enum {
       u, v, w, tht,
@@ -47,6 +49,12 @@ void test(const std::string &dirname)
   p.g = 10;
   p.hscale = 25;
   p.cdrag = 0.1;
+
+  //p.buoy_filter = true;
+
+  p.smg_c = 0.165;
+  p.prandtl_num = 0.42;
+  p.hflux_surfc = 0.01;
 
   double mixed_length = 500;
   double st = 1e-4 / p.g;
@@ -73,7 +81,7 @@ void test(const std::string &dirname)
   {
     // random distribution
     std::random_device rd;
-    auto seed = rd();
+    auto seed = 44;
     std::mt19937 gen(seed);
     std::uniform_real_distribution<> dis(-0.5, 0.5);
 
@@ -106,11 +114,14 @@ void test(const std::string &dirname)
     {
       blitz::thirdIndex k;
       // prescribed heat flux
-      slv.sclr_array("hflux") = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
+      //slv.sclr_array("hflux") = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
       // environmental potential temperature profile
       slv.sclr_array("tht_e") = 300 * where(k * p.dk <= mixed_length, 1, 1 + (k * p.dk - mixed_length) * st);
       // tht absorber profile
       slv.sclr_array("tht_abs") = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
+
+      auto dlta = (p.di + p.dj + p.dk) / 3;
+      slv.sclr_array("mix_len") = min(k * p.dk * 0.845, dlta); 
       // velocity absorbers
       slv.vab_coefficient()(i_r, j_r, k_r) = slv.sclr_array("tht_abs")(i_r, j_r, k_r);
       slv.vab_relaxed_state(0) = 0;
