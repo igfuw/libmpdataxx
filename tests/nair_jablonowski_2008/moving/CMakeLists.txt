@@ -1,7 +1,7 @@
 libmpdataxx_add_test(moving)
 set(comp_body "
     echo   'comparing const.h5'                                                                                         &&
-    h5diff -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5                             &&
+    h5diff --delta=1e-17 -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5               &&
     echo   'comparing temp.xmf'                                                                                         &&
     diff    $dir/temp.xmf                 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                             &&
     echo   'comparing timestep0000000000.h5'                                                                            &&
