@@ -42,7 +42,8 @@ namespace libmpdataxx
 
           this->k_m(this->ijk) = where(
                                        rcdsn_num(this->ijk) / prandtl_num < 0,
-                                       pow(this->smg_c * mix_len(this->ijk), 2) * sqrt(tdef_sq(this->ijk) * (1 - rcdsn_num(this->ijk))),
+                                       pow(this->smg_c * mix_len(this->ijk), 2)
+                                       * sqrt(tdef_sq(this->ijk) * (1 - rcdsn_num(this->ijk) / prandtl_num)),
                                        0
                                       );
 
