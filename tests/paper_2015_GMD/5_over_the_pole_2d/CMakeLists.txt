@@ -11,7 +11,7 @@ add_test(over_the_pole_2d_diff bash -c "
     echo   'comparing timestep0000000000.xmf'                                                                              &&
     diff    $dir/timestep0000000000.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                  &&
     echo   'comparing timestep0000005120.h5'                                                                               &&
-    h5diff --relative=1e-15 -v $dir/timestep0000005120.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000005120.h5  &&
+    h5diff --relative=2e-7 -v $dir/timestep0000005120.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000005120.h5   &&
     echo   'comparing timestep0000005120.xmf'                                                                              &&
     diff    $dir/timestep0000005120.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000005120.xmf || exit 1;
   done 
