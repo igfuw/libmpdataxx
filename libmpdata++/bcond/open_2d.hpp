@@ -64,7 +64,7 @@ namespace libmpdataxx
         a(pi<d>(this->left_edge_sclr, j)) = sign * edge_velocity(pi<d>(0, j));
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const real_t)
       {
 	using namespace idxperm;
 	const int i = this->left_edge_sclr;
@@ -150,7 +150,7 @@ namespace libmpdataxx
         a(pi<d>(this->rght_edge_sclr, j)) = sign * edge_velocity(pi<d>(0, j));
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const real_t)
       {
 	using namespace idxperm;
 	const int i = this->rght_edge_sclr;

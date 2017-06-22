@@ -32,7 +32,7 @@ namespace libmpdataxx
           this->calc_full_tht(full_tht);
 
           this->xchng_sclr(full_tht, this->ijk);
-          formulae::nabla::calc_grad<parent_t::n_dims>(grad_tht, this->full_tht, this->ijk, this->dijk);
+          formulae::nabla::calc_grad<parent_t::n_dims, true>(grad_tht, this->full_tht, this->ijk, this->dijk);
           
           tdef_sq(this->ijk) = formulae::stress::calc_tdef_sq<ct_params_t::n_dims>(this->tau, this->ijk);
 
@@ -46,29 +46,44 @@ namespace libmpdataxx
                                        * sqrt(tdef_sq(this->ijk) * (1 - rcdsn_num(this->ijk) / prandtl_num)),
                                        0
                                       );
+          
+          this->xchng_sclr(this->k_m, this->ijk);
 
           for (auto& t : this->tau)
           {
             t(this->ijk) *= this->k_m(this->ijk);
           }
          
-          for (auto& g : grad_tht)
-          {
-            g(this->ijk) *= -this->k_m(this->ijk) / prandtl_num;
-          }
+          //for (auto& g : grad_tht)
+          //{
+          //  g(this->ijk) *= this->k_m(this->ijk) / prandtl_num;
+          //}
+          
+          grad_tht[0](this->i + h, this->j, this->k) *= 0.5 *
+                             (this->k_m(this->i + 1, this->j, this->k) + this->k_m(this->i, this->j, this->k)) /
+                             prandtl_num;
+          
+          grad_tht[1](this->i, this->j + h, this->k) *= 0.5 *
+                             (this->k_m(this->i, this->j + 1, this->k) + this->k_m(this->i, this->j, this->k)) /
+                             prandtl_num;
+          
+          grad_tht[2](this->i, this->j, this->k + h) *= 0.5 *
+                             (this->k_m(this->i, this->j, this->k + 1) + this->k_m(this->i, this->j, this->k)) /
+                             prandtl_num;
 
-          for (int d = 0; d < ct_params_t::n_dims; ++d)
-          {
-            // surface indices
-            auto ij = this->ijk;
-            ij.lbound(ct_params_t::n_dims - 1) = 0;
-            ij.ubound(ct_params_t::n_dims - 1) = 0;
-            grad_tht[d](ij) = (d == ct_params_t::n_dims - 1) ? hflux_surfc : 0;
-            this->xchng_sclr(grad_tht[d], this->ijk);
-          }
+          //for (int d = 0; d < ct_params_t::n_dims; ++d)
+          //{
+          //  // surface indices
+          //  auto ij = this->ijk;
+          //  ij.lbound(ct_params_t::n_dims - 1) = 0;
+          //  ij.ubound(ct_params_t::n_dims - 1) = 0;
+          //  grad_tht[d](ij) = (d == ct_params_t::n_dims - 1) ? -hflux_surfc : 0;
+          //  this->xchng_sclr(grad_tht[d], this->ijk);
+          //}
 
+          this->xchng_vctr_alng(grad_tht, -hflux_surfc);
           // hack, convinient place to update the heat_flux
-          this->hflux(this->ijk) = formulae::nabla::div<parent_t::n_dims>(grad_tht, this->ijk, this->dijk);
+          this->hflux(this->ijk) = formulae::nabla::div_cmpct<parent_t::n_dims>(grad_tht, this->ijk, this->dijk);
         }
 
         //template<bool is_smg = (ct_params_t::sgs_scheme == smg)>
@@ -109,7 +124,7 @@ namespace libmpdataxx
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // full_tht
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // tdef_sq
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len");
-          parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_dims); // grad_tht
+          parent_t::alloc_tmp_vctr(mem, __FILE__); // grad_tht
         }
       };
     } // namespace detail

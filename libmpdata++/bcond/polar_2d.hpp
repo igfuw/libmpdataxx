@@ -44,7 +44,7 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const real_t)
       {
 	using namespace idxperm;
 	av[d](pi<d>(this->left_halo_vctr.last(), j)) = 0;
@@ -111,7 +111,7 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const real_t)
       {
 	using namespace idxperm;
 	av[d](pi<d>(this->rght_halo_vctr.first(), j)) = 0;

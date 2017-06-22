@@ -52,13 +52,13 @@ namespace libmpdataxx
         a(pi<d>(this->left_edge_sclr, j, k)) = 0;
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const real_t flux)
       {
 	using namespace idxperm;
         // zero velocity condition
         for (int i = this->left_halo_vctr.first(), n = halo; i <= this->left_halo_vctr.last(); ++i, --n)
         {
-	  av[d](pi<d>(i, j, k)) = -av[d](pi<d>(this->left_edge_sclr + n - h, j, k));
+	  av[d](pi<d>(i, j, k)) = 2 * flux -av[d](pi<d>(this->left_edge_sclr + n - h, j, k));
         }
       }
 
@@ -110,13 +110,13 @@ namespace libmpdataxx
         a(pi<d>(this->rght_edge_sclr, j, k)) = 0;
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const real_t flux)
       {
 	using namespace idxperm;
         // zero velocity condition
         for (int i = this->rght_halo_vctr.first(), n = 1; i <= this->rght_halo_vctr.last(); ++i, ++n)
         {
-	  av[d](pi<d>(i, j, k)) = -av[d](pi<d>(this->rght_edge_sclr - n + h, j, k));
+	  av[d](pi<d>(i, j, k)) = 2 * flux -av[d](pi<d>(this->rght_edge_sclr - n + h, j, k));
         }
       }
       
