@@ -14,6 +14,8 @@ namespace libmpdataxx
   {
     namespace stress
     {
+      using arakawa_c::h;
+
       // velocity gradient
       // 2D version
       template <int nd, class arrvec_t, class ijk_t, class dijk_t>
@@ -79,6 +81,66 @@ namespace libmpdataxx
         tau[5](ijk) = 2 * vg[8](ijk);
       }
       
+      template <int nd, class arrvec_t, class ijk_t, class ijkm_t, class dijk_t>
+      inline void calc_deform_cmpct(arrvec_t &tau,
+                                    const arrvec_t &v,
+                                    const ijk_t &ijk,
+                                    const ijkm_t &ijkm,
+                                    const dijk_t &dijk,
+                                    typename std::enable_if<nd == 3>::type* = 0)
+      {
+        tau[0](ijkm[0] + h, ijk[1], ijk[2])
+        =
+        (v[0](ijkm[0] + 1, ijk[1], ijk[2]) - v[0](ijkm[0], ijk[1], ijk[2])) / dijk[0];
+
+        tau[1](ijkm[0] + h, ijkm[1] + h, ijk[2])
+        =
+        0.5 *
+        (
+          ( v[0](ijkm[0], ijkm[1] + 1, ijk[2]) - v[0](ijkm[0], ijkm[1], ijk[2]) 
+          + v[0](ijkm[0] + 1, ijkm[1] + 1, ijk[2]) - v[0](ijkm[0] + 1, ijkm[1], ijk[2])
+          ) / dijk[1]
+          +
+          ( v[1](ijkm[0] + 1, ijkm[1], ijk[2]) - v[1](ijkm[0], ijkm[1], ijk[2]) 
+          + v[1](ijkm[0] + 1, ijkm[1] + 1, ijk[2]) - v[1](ijkm[0], ijkm[1] + 1, ijk[2])
+          ) / dijk[0]
+        );
+        
+        tau[2](ijkm[0] + h, ijk[1], ijkm[2] + h)
+        =
+        0.5 *
+        (
+          ( v[0](ijkm[0], ijk[1], ijkm[2] + 1) - v[0](ijkm[0], ijk[1], ijkm[2])
+          + v[0](ijkm[0] + 1, ijk[1], ijkm[2] + 1) - v[0](ijkm[0] + 1, ijk[1], ijkm[2])
+          ) / dijk[2]
+          +
+          ( v[2](ijkm[0] + 1, ijk[1], ijkm[2]) - v[2](ijkm[0], ijk[1], ijkm[2]) 
+          + v[2](ijkm[0] + 1, ijk[1], ijkm[2] + 1) - v[2](ijkm[0], ijk[1], ijkm[2] + 1)
+          ) / dijk[0]
+        );
+        
+        tau[3](ijk[0], ijkm[1] + h, ijk[2])
+        =
+        (v[1](ijk[0], ijkm[1] + 1, ijk[2]) - v[1](ijk[0], ijkm[1], ijk[2])) / dijk[1];
+        
+        tau[4](ijk[0], ijkm[1] + h, ijkm[2] + h)
+        =
+        0.5 *
+        (
+          ( v[1](ijk[0], ijkm[1], ijkm[2] + 1) - v[1](ijk[0], ijkm[1], ijkm[2])
+          + v[1](ijk[0], ijkm[1] + 1, ijkm[2] + 1) - v[1](ijk[0], ijkm[1] + 1, ijkm[2])
+          ) / dijk[2]
+          +
+          ( v[2](ijk[0], ijkm[1] + 1, ijkm[2]) - v[2](ijk[0], ijkm[1], ijkm[2]) 
+          + v[2](ijk[0], ijkm[1] + 1, ijkm[2] + 1) - v[2](ijk[0], ijkm[1], ijkm[2] + 1)
+          ) / dijk[1]
+        );
+        
+        tau[5](ijk[0], ijk[1], ijkm[2] + h)
+        =
+        (v[2](ijk[0], ijk[1], ijkm[2] + 1) - v[2](ijk[0], ijk[1], ijkm[2])) / dijk[2];
+      }
+      
       // Total deformation
 
       // 2D version
@@ -104,6 +166,33 @@ namespace libmpdataxx
           pow2(tau[3](ijk)) / 2 +
           pow2(tau[4](ijk)) +
           pow2(tau[5](ijk)) / 2
+      )
+      
+      // 3D version
+      template <int nd, class arrvec_t, class ijk_t>
+      inline auto calc_tdef_sq_cmpct(
+	const arrvec_t &tau,
+        const ijk_t &ijk,
+        typename std::enable_if<nd == 3>::type* = 0
+      ) return_macro(
+        ,
+          pow2(tau[0](ijk[0] + h, ijk[1], ijk[2]) + tau[0](ijk[0] - h, ijk[1], ijk[2])) / 8
+          +
+          pow2( tau[1](ijk[0] + h, ijk[1] + h, ijk[2]) + tau[1](ijk[0] - h, ijk[1] + h, ijk[2]) 
+              + tau[1](ijk[0] + h, ijk[1] - h, ijk[2]) + tau[1](ijk[0] - h, ijk[1] - h, ijk[2])
+              ) / 16
+          +
+          pow2( tau[2](ijk[0] + h, ijk[1], ijk[2] + h) + tau[2](ijk[0] - h, ijk[1], ijk[2] + h) 
+              + tau[2](ijk[0] + h, ijk[1], ijk[2] - h) + tau[2](ijk[0] - h, ijk[1], ijk[2] - h)
+              ) / 16
+          +
+          pow2(tau[3](ijk[0], ijk[1] + h, ijk[2]) + tau[3](ijk[0], ijk[1] - h, ijk[2])) / 8
+          +
+          pow2( tau[4](ijk[0], ijk[1] + h, ijk[2] + h) + tau[4](ijk[0], ijk[1] - h, ijk[2] + h) 
+              + tau[4](ijk[0], ijk[1] + h, ijk[2] - h) + tau[4](ijk[0], ijk[1] - h, ijk[2] - h)
+              ) / 16
+          +
+          pow2(tau[5](ijk[0], ijk[1], ijk[2] + h) + tau[5](ijk[0], ijk[1], ijk[2] - h)) / 8
       )
       
       // calculate elements of stress tensor divergence
@@ -141,6 +230,62 @@ namespace libmpdataxx
         sdiv[6](ijk) = formulae::nabla::grad<2>(tau[2], ijk[2], ijk[0], ijk[1], dijk[2]);
         sdiv[7](ijk) = formulae::nabla::grad<2>(tau[4], ijk[2], ijk[0], ijk[1], dijk[2]);
         sdiv[8](ijk) = formulae::nabla::grad<2>(tau[5], ijk[2], ijk[0], ijk[1], dijk[2]);
+      }
+      
+      template <int nd, class arrvec_t, class ijk_t, class dijk_t, class real_t>
+      inline void calc_stress_rhs_cmpct(arrvec_t &rhs,
+                                        const arrvec_t &tau,
+                                        const ijk_t &ijk,
+                                        const dijk_t &dijk,
+                                        real_t coeff,
+                                        typename std::enable_if<nd == 3>::type* = 0)
+      {
+        rhs[0](ijk)
+        =
+        coeff *
+        (
+          (tau[0](ijk[0] + h, ijk[1], ijk[2]) - tau[0](ijk[0] - h, ijk[1], ijk[2])) / dijk[0]
+          + 0.5 * 
+          ( tau[1](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[1](ijk[0] + h, ijk[1] - h, ijk[2])
+          + tau[1](ijk[0] - h, ijk[1] + h, ijk[2]) - tau[1](ijk[0] - h, ijk[1] - h, ijk[2])
+          ) / dijk[1]
+          + 0.5 * 
+          ( tau[2](ijk[0] + h, ijk[1], ijk[2] + h) - tau[2](ijk[0] + h, ijk[1], ijk[2] - h)
+          + tau[2](ijk[0] - h, ijk[1], ijk[2] + h) - tau[2](ijk[0] - h, ijk[1], ijk[2] - h)
+          ) / dijk[2]
+        );
+        
+        rhs[1](ijk)
+        =
+        coeff *
+        (
+          0.5 * 
+          ( tau[1](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[1](ijk[0] - h, ijk[1] + h, ijk[2])
+          + tau[1](ijk[0] + h, ijk[1] - h, ijk[2]) - tau[1](ijk[0] - h, ijk[1] - h, ijk[2])
+          ) / dijk[0]
+          +
+          (tau[3](ijk[0], ijk[1] + h, ijk[2]) - tau[3](ijk[0], ijk[1] - h, ijk[2])) / dijk[1]
+          + 0.5 * 
+          ( tau[4](ijk[0], ijk[1] + h, ijk[2] + h) - tau[4](ijk[0], ijk[1] + h, ijk[2] - h)
+          + tau[4](ijk[0], ijk[1] - h, ijk[2] + h) - tau[4](ijk[0], ijk[1] - h, ijk[2] - h)
+          ) / dijk[2]
+        );
+        
+        rhs[2](ijk)
+        =
+        coeff *
+        (
+          0.5 * 
+          ( tau[2](ijk[0] + h, ijk[1], ijk[2] + h) - tau[2](ijk[0] - h, ijk[1], ijk[2] + h)
+          + tau[2](ijk[0] + h, ijk[1], ijk[2] - h) - tau[2](ijk[0] - h, ijk[1], ijk[2] - h)
+          ) / dijk[0]
+          + 0.5 * 
+          ( tau[4](ijk[0], ijk[1] + h, ijk[2] + h) - tau[4](ijk[0], ijk[1] - h, ijk[2] + h)
+          + tau[4](ijk[0], ijk[1] + h, ijk[2] - h) - tau[4](ijk[0], ijk[1] - h, ijk[2] - h)
+          ) / dijk[1]
+          +
+          (tau[5](ijk[0], ijk[1], ijk[2] + h) - tau[3](ijk[0], ijk[1], ijk[2] - h)) / dijk[2]
+        );
       }
 
       // Pade correction

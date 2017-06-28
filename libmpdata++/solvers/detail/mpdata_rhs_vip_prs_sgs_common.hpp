@@ -27,7 +27,8 @@ namespace libmpdataxx
     enum stress_diff_t
     {
       normal,
-      pade
+      pade,
+      compact
     };
 
     namespace detail
@@ -43,6 +44,8 @@ namespace libmpdataxx
         arrvec_t<typename parent_t::arr_t> &tau;
         arrvec_t<typename parent_t::arr_t> &drv;
         arrvec_t<typename parent_t::arr_t> &wrk;
+
+        std::array<rng_t, ct_params_t::n_dims> ijkm;
 
         virtual void multiply_sgs_visc() = 0;
 
@@ -73,39 +76,47 @@ namespace libmpdataxx
           for (auto& vip : this->vips())
             this->xchng_sclr(vip, this->ijk);
 
-          // calculate velocity gradient tensor
-          formulae::stress::calc_vgrad<ct_params_t::n_dims>(drv, this->vips(), this->ijk, this->dijk);
+          formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
 
-          // optionally correct derivatives using Pade scheme
-          if ((stress_diff_t)ct_params_t::stress_diff == pade)
-          {
-            for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
-              pade_deriv(d);
-          }
-          
-          // calculate independent components of deformation tensor
-          formulae::stress::calc_deform<ct_params_t::n_dims>(tau, drv, this->ijk);
-         
           // multiply deformation tensor by sgs viscosity to obtain stress tensor
           multiply_sgs_visc();
           
-          // TODO: get rid of superfluous barriers
-          for (auto& t : tau)
-          {
-            this->xchng_sclr(t, this->ijk);
-          }
-          // calculate elements of stress tensor divergence
-          formulae::stress::calc_stress_div<ct_params_t::n_dims>(drv, tau, this->ijk, this->dijk);
-
-          // optionally correct derivatives using Pade scheme
-          if ((stress_diff_t)ct_params_t::stress_diff == pade)
-          {
-            for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
-              pade_deriv(d);
-          }
-
           // update forces
-          formulae::stress::calc_stress_rhs<ct_params_t::n_dims>(this->vip_rhs, drv, this->ijk, this->dt);
+          formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims>(this->vip_rhs, tau, this->ijk, this->dijk, this->dt);
+
+          //// calculate velocity gradient tensor
+          //formulae::stress::calc_vgrad<ct_params_t::n_dims>(drv, this->vips(), this->ijk, this->dijk);
+
+          //// optionally correct derivatives using Pade scheme
+          //if ((stress_diff_t)ct_params_t::stress_diff == pade)
+          //{
+          //  for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
+          //    pade_deriv(d);
+          //}
+          //
+          //// calculate independent components of deformation tensor
+          //formulae::stress::calc_deform<ct_params_t::n_dims>(tau, drv, this->ijk);
+         
+          //// multiply deformation tensor by sgs viscosity to obtain stress tensor
+          //multiply_sgs_visc();
+          //
+          //// TODO: get rid of superfluous barriers
+          //for (auto& t : tau)
+          //{
+          //  this->xchng_sclr(t, this->ijk);
+          //}
+          //// calculate elements of stress tensor divergence
+          //formulae::stress::calc_stress_div<ct_params_t::n_dims>(drv, tau, this->ijk, this->dijk);
+
+          //// optionally correct derivatives using Pade scheme
+          //if ((stress_diff_t)ct_params_t::stress_diff == pade)
+          //{
+          //  for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
+          //    pade_deriv(d);
+          //}
+
+          //// update forces
+          //formulae::stress::calc_stress_rhs<ct_params_t::n_dims>(this->vip_rhs, drv, this->ijk, this->dt);
         }
 
         public:
@@ -124,14 +135,43 @@ namespace libmpdataxx
           tau(args.mem->tmp[__FILE__][0]),
           drv(args.mem->tmp[__FILE__][1]),
           wrk(args.mem->tmp[__FILE__][2])
-        {}
+        {
+          for (int d = 0; d < ct_params_t::n_dims; ++d)
+          {
+            ijkm[d] = rng_t(this->ijk[d].first() - 1, this->ijk[d].last());
+          }
+        }
 
         static void alloc(
           typename parent_t::mem_t *mem, 
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
-          parent_t::alloc_tmp_sclr(mem, __FILE__, 3 * (ct_params_t::n_dims - 1)); // unique strain rate tensor elements
+          // no staggering for non-compact differencing  
+          if (ct_params_t::stress_diff != compact)
+          {
+            parent_t::alloc_tmp_sclr(mem, __FILE__, 3 * (ct_params_t::n_dims - 1)); // unique strain rate tensor elements
+          }
+          else
+          {
+            if (ct_params_t::n_dims == 2)
+            {
+              parent_t::alloc_tmp_stgr(mem,
+                                       __FILE__,
+                                       3, // unique strain rate tensor elements
+                                       {{true, false}, {true, true}, {false, true}}
+                                      );
+            }
+            else
+            {
+              parent_t::alloc_tmp_stgr(mem,
+                                       __FILE__,
+                                       6, // unique strain rate tensor elements
+                                       {{true, false, false}, {true, true, false}, {true, false, true},
+                                        {false, true, false}, {false, true, true}, {false, false, true}}
+                                      );
+            }
+          }
           // TODO: do not allocate unnecessary memory when not using pade differencing
           parent_t::alloc_tmp_sclr(mem, __FILE__, std::pow(static_cast<int>(ct_params_t::n_dims), 2));
           parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // wrk

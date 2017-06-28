@@ -298,28 +298,32 @@ namespace libmpdataxx
           alloc_tmp_sclr(mem, __FILE__, 1);
         }  
         
+        // helper method to allocate a temporary space composed of arbitrarily staggered arrays
+        static void alloc_tmp_stgr(
+          typename parent_t::mem_t *mem,
+          const char * __file__,
+          const int n_arr,
+          const std::vector<std::array<bool, 3>> &stgr
+        )
+        {
+          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+          for (int n = 0; n < n_arr; ++n)
+          {
+            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
+              stgr[n][0] ? parent_t::rng_vctr(mem->grid_size[0]) : parent_t::rng_sclr(mem->grid_size[0]),
+              stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) : parent_t::rng_sclr(mem->grid_size[1]),
+              stgr[n][2] ? parent_t::rng_vctr(mem->grid_size[2]) : parent_t::rng_sclr(mem->grid_size[2])
+            ))); 
+          }
+        }
+        
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
           typename parent_t::mem_t *mem,
           const char * __file__
         )
         {
-          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
-          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-            parent_t::rng_vctr(mem->grid_size[0]),
-            parent_t::rng_sclr(mem->grid_size[1]),
-            parent_t::rng_sclr(mem->grid_size[2])
-          ))); 
-          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-            parent_t::rng_sclr(mem->grid_size[0]),
-            parent_t::rng_vctr(mem->grid_size[1]),
-            parent_t::rng_sclr(mem->grid_size[2])
-          ))); 
-          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-             parent_t::rng_sclr(mem->grid_size[0]),
-             parent_t::rng_sclr(mem->grid_size[1]),
-             parent_t::rng_vctr(mem->grid_size[2])
-          ))); 
+          alloc_tmp_stgr(mem, __file__, 3, {{true, false, false}, {false, true, false}, {false, false, true}});
         }
 
         // helper method to allocate n_arr scalar temporary arrays 

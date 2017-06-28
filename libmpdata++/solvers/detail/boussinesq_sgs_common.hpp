@@ -34,9 +34,12 @@ namespace libmpdataxx
           this->xchng_sclr(full_tht, this->ijk);
           formulae::nabla::calc_grad<parent_t::n_dims, true>(grad_tht, this->full_tht, this->ijk, this->dijk);
           
-          tdef_sq(this->ijk) = formulae::stress::calc_tdef_sq<ct_params_t::n_dims>(this->tau, this->ijk);
+          tdef_sq(this->ijk) = formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk);
 
-          rcdsn_num(this->ijk) = this->g * grad_tht[ct_params_t::n_dims - 1](this->ijk) / (this->Tht_ref * tdef_sq(this->ijk));
+          rcdsn_num(this->ijk) = this->g * 0.5 * (
+                                             grad_tht[ct_params_t::n_dims - 1](this->i, this->j, this->k - h)
+                                           + grad_tht[ct_params_t::n_dims - 1](this->i, this->j, this->k + h)
+                                           ) / (this->Tht_ref * tdef_sq(this->ijk));
 
           //auto dlta = std::accumulate(this->dijk.begin(), this->dijk.end(), 0.) / 3;
 
@@ -49,10 +52,34 @@ namespace libmpdataxx
           
           this->xchng_sclr(this->k_m, this->ijk);
 
-          for (auto& t : this->tau)
-          {
-            t(this->ijk) *= this->k_m(this->ijk);
-          }
+          const auto &i(this->i), &j(this->j), &k(this->k);
+          const auto &im(this->im), &jm(this->jm), &km(this->km);
+          const auto &ii = this->rank == 0 ? im : i;
+
+          this->tau[0](ii + h, j, k) *= 0.5 * 
+                             (this->k_m(ii + 1, j, k) + this->k_m(ii, j, k));
+          
+          this->tau[1](ii + h, jm + h, k) *= 0.25 * 
+                             (this->k_m(ii + 1, jm, k) + this->k_m(ii, jm, k) +
+                             this->k_m(ii + 1, jm + 1, k) + this->k_m(ii, jm + 1, k));
+          
+          this->tau[2](ii + h, j, km + h) *= 0.25 * 
+                             (this->k_m(ii + 1, j, km) + this->k_m(ii, j, km) +
+                             this->k_m(ii + 1, j, km + 1) + this->k_m(ii, j, km + 1));
+          
+          this->tau[3](i, jm + h, k) *= 0.5 * 
+                             (this->k_m(i, jm + 1, k) + this->k_m(i, jm, k));
+          
+          this->tau[4](i, jm + h, km + h) *= 0.25 * 
+                             (this->k_m(i, jm, km + 1) + this->k_m(i, jm, km) +
+                             this->k_m(i, jm + 1, km + 1) + this->k_m(i, jm + 1, km));
+
+          this->tau[5](i, j, km + h) *= 0.5 * 
+                             (this->k_m(i, j, km + 1) + this->k_m(i, j, km));
+          //for (auto& t : this->tau)
+          //{
+          //  t(this->ijk) *= this->k_m(this->ijk);
+          //}
          
           //for (auto& g : grad_tht)
           //{
