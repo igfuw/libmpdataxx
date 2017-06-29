@@ -50,7 +50,7 @@ namespace libmpdataxx
                                        0
                                       );
           
-          this->xchng_sclr(this->k_m, this->ijk);
+          this->xchng_sclr(this->k_m, this->ijk, 1);
 
           const auto &i(this->i), &j(this->j), &k(this->k);
           const auto &im(this->im), &jm(this->jm), &km(this->km);

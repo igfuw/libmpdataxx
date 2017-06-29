@@ -74,7 +74,7 @@ namespace libmpdataxx
 
           // TODO: get rid of superfluous barriers
           for (auto& vip : this->vips())
-            this->xchng_sclr(vip, this->ijk);
+            this->xchng_sclr(vip, this->ijk, 1);
 
           formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
 
