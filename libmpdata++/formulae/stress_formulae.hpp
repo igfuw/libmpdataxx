@@ -91,7 +91,7 @@ namespace libmpdataxx
       {
         tau[0](ijkm[0] + h, ijk[1], ijk[2])
         =
-        (v[0](ijkm[0] + 1, ijk[1], ijk[2]) - v[0](ijkm[0], ijk[1], ijk[2])) / dijk[0];
+        2 * (v[0](ijkm[0] + 1, ijk[1], ijk[2]) - v[0](ijkm[0], ijk[1], ijk[2])) / dijk[0];
 
         tau[1](ijkm[0] + h, ijkm[1] + h, ijk[2])
         =
@@ -121,7 +121,7 @@ namespace libmpdataxx
         
         tau[3](ijk[0], ijkm[1] + h, ijk[2])
         =
-        (v[1](ijk[0], ijkm[1] + 1, ijk[2]) - v[1](ijk[0], ijkm[1], ijk[2])) / dijk[1];
+        2 * (v[1](ijk[0], ijkm[1] + 1, ijk[2]) - v[1](ijk[0], ijkm[1], ijk[2])) / dijk[1];
         
         tau[4](ijk[0], ijkm[1] + h, ijkm[2] + h)
         =
@@ -138,7 +138,7 @@ namespace libmpdataxx
         
         tau[5](ijk[0], ijk[1], ijkm[2] + h)
         =
-        (v[2](ijk[0], ijk[1], ijkm[2] + 1) - v[2](ijk[0], ijk[1], ijkm[2])) / dijk[2];
+        2 * (v[2](ijk[0], ijk[1], ijkm[2] + 1) - v[2](ijk[0], ijk[1], ijkm[2])) / dijk[2];
       }
       
       // Total deformation
@@ -241,7 +241,7 @@ namespace libmpdataxx
                                         typename std::enable_if<nd == 3>::type* = 0)
       {
         rhs[0](ijk)
-        =
+        +=
         coeff *
         (
           (tau[0](ijk[0] + h, ijk[1], ijk[2]) - tau[0](ijk[0] - h, ijk[1], ijk[2])) / dijk[0]
@@ -256,7 +256,7 @@ namespace libmpdataxx
         );
         
         rhs[1](ijk)
-        =
+        +=
         coeff *
         (
           0.5 * 
@@ -272,7 +272,7 @@ namespace libmpdataxx
         );
         
         rhs[2](ijk)
-        =
+        +=
         coeff *
         (
           0.5 * 
@@ -284,7 +284,7 @@ namespace libmpdataxx
           + tau[4](ijk[0], ijk[1] + h, ijk[2] - h) - tau[4](ijk[0], ijk[1] - h, ijk[2] - h)
           ) / dijk[1]
           +
-          (tau[5](ijk[0], ijk[1], ijk[2] + h) - tau[3](ijk[0], ijk[1], ijk[2] - h)) / dijk[2]
+          (tau[5](ijk[0], ijk[1], ijk[2] + h) - tau[5](ijk[0], ijk[1], ijk[2] - h)) / dijk[2]
         );
       }
 
