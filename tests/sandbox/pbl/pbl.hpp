@@ -30,7 +30,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     parent_t::multiply_sgs_visc();
     if (this->timestep % static_cast<int>(this->outfreq) == 0)
     {
-      tke(this->ijk) = pow2(this->k_m(this->ijk)) / (this->c_m * this->mix_len(this->ijk));
+      tke(this->ijk) = pow2(this->k_m(this->ijk) / (this->c_m * this->mix_len(this->ijk)));
       this->mem->barrier();
       if (this->rank == 0)
       {
