@@ -28,11 +28,16 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
   void multiply_sgs_visc()
   {
     parent_t::multiply_sgs_visc();
-    tke(this->ijk) = pow2(this->k_m) / (this->c_m * this->mix_len(this->ijk));
-    if (this->rank == 0 && (this->timestep % static_cast<int>(this->outfreq) == 0))
+    if (this->timestep % static_cast<int>(this->outfreq) == 0)
     {
-      this->record_aux("tke", &(this->tke(0, 0, 0)));
-      this->record_aux("p", &(this->Phi(0, 0, 0)));
+      tke(this->ijk) = pow2(this->k_m) / (this->c_m * this->mix_len(this->ijk));
+      this->mem->barrier();
+      if (this->rank == 0)
+      {
+        this->record_aux("tke", &(this->tke(0, 0, 0)));
+        this->record_aux("p", &(this->Phi(0, 0, 0)));
+      }
+      this->mem->barrier();
     }
   }
 
