@@ -31,8 +31,8 @@ namespace libmpdataxx
         {
           this->calc_full_tht(full_tht);
 
-          this->xchng_sclr(full_tht, this->ijk);
-          formulae::nabla::calc_grad<parent_t::n_dims, true>(grad_tht, this->full_tht, this->ijk, this->dijk);
+          this->xchng_pres(full_tht, this->ijk);
+          formulae::nabla::calc_grad_cmpct<parent_t::n_dims>(grad_tht, this->full_tht, this->ijk, this->ijkm, this->dijk);
           
           tdef_sq(this->ijk) = formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk);
 

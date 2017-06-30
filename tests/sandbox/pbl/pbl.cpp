@@ -9,7 +9,6 @@
 #include <cmath>
 #include "pbl.hpp"
 #include <libmpdata++/concurr/threads.hpp>
-#include <libmpdata++/output/hdf5_xdmf.hpp>
 
 using namespace libmpdataxx;
 
@@ -25,7 +24,7 @@ void test(const std::string &dirname)
     enum { rhs_scheme = solvers::trapez };
     enum { vip_vab = solvers::impl };
     enum { prs_scheme = solvers::cr };
-    enum { sgs_diff = solvers::normal };
+    enum { sgs_diff = solvers::compact };
     enum { sgs_scheme = solvers::smg };
     enum { impl_tht = true };
     struct ix { enum {
@@ -36,7 +35,7 @@ void test(const std::string &dirname)
 
   using ix = typename ct_params_t::ix;
 
-  using solver_t = output::hdf5_xdmf<pbl<ct_params_t>>;
+  using solver_t = pbl<ct_params_t>;
 
   solver_t::rt_params_t p;
   p.n_iters = 2;
@@ -121,7 +120,7 @@ void test(const std::string &dirname)
       slv.sclr_array("tht_abs") = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
 
       auto dlta = (p.di + p.dj + p.dk) / 3;
-      slv.sclr_array("mix_len") = min(k * p.dk * 0.845, dlta); 
+      slv.sclr_array("mix_len") = min(max(k, 1) * p.dk * 0.845, dlta); 
       // velocity absorbers
       slv.vab_coefficient()(i_r, j_r, k_r) = slv.sclr_array("tht_abs")(i_r, j_r, k_r);
       slv.vab_relaxed_state(0) = 0;

@@ -53,7 +53,8 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k, flux); 
           for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i, flux); 
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i, j, flux);
+          this->bcs[2][0]->fill_halos_vctr_alng(arrvec, i, j, flux);
+          this->bcs[2][1]->fill_halos_vctr_alng(arrvec, i, j, 0);
           this->mem->barrier();
         }
 

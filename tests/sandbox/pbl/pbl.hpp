@@ -8,12 +8,13 @@
 #pragma once
 
 #include <libmpdata++/solvers/boussinesq.hpp>
+#include <libmpdata++/output/hdf5_xdmf.hpp>
 #include <cmath>
 
 template <class ct_params_t>
-class pbl : public libmpdataxx::solvers::boussinesq<ct_params_t>
+class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussinesq<ct_params_t>>
 {
-  using parent_t = libmpdataxx::solvers::boussinesq<ct_params_t>;
+  using parent_t = libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussinesq<ct_params_t>>;
   using ix = typename ct_params_t::ix;
 
   public:
@@ -21,6 +22,17 @@ class pbl : public libmpdataxx::solvers::boussinesq<ct_params_t>
 
   private:
   real_t hscale, cdrag;
+
+
+  void multiply_sgs_visc()
+  {
+    parent_t::multiply_sgs_visc();
+    if (this->rank == 0 && (this->timestep % static_cast<int>(this->outfreq) == 0))
+    {
+      this->record_aux("tke", &(this->k_m(0, 0, 0)));
+      this->record_aux("p", &(this->Phi(0, 0, 0)));
+    }
+  }
 
   void vip_rhs_expl_calc()
   {
