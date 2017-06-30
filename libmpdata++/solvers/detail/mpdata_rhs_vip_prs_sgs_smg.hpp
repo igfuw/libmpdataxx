@@ -21,7 +21,7 @@ namespace libmpdataxx
 
         protected:
         
-	typename parent_t::real_t smg_c;
+	typename parent_t::real_t smg_c, c_m;
         typename parent_t::arr_t &k_m;
 
         void multiply_sgs_visc()
@@ -39,7 +39,7 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename ct_params_t::real_t smg_c = 0.15;
+          typename ct_params_t::real_t smg_c = 0.15, c_m;
         };
 
 	// ctor
@@ -49,6 +49,7 @@ namespace libmpdataxx
 	) :
 	  parent_t(args, p),
           smg_c(p.smg_c),
+          c_m(p.c_m),
           k_m(args.mem->tmp[__FILE__][0][0])
 	{
           if (smg_c == 0) throw std::runtime_error("smg_c == 0");

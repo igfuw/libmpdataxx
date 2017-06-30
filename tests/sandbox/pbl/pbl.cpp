@@ -51,6 +51,7 @@ void test(const std::string &dirname)
 
   //p.buoy_filter = true;
 
+  p.c_m = 0.0856;
   p.smg_c = 0.165;
   p.prandtl_num = 0.42;
   p.hflux_surfc = 0.01;
