@@ -34,8 +34,8 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
       this->mem->barrier();
       if (this->rank == 0)
       {
-        this->record_aux("tke", &(this->tke(0, 0, 0)));
-        this->record_aux("p", &(this->Phi(0, 0, 0)));
+        this->record_aux_dsc("tke", this->tke);
+        this->record_aux_dsc("p", this->Phi);
       }
       this->mem->barrier();
     }

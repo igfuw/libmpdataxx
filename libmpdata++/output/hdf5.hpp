@@ -217,53 +217,59 @@ namespace libmpdataxx
             );
 	    // TODO: units attribute
 
-            H5::DataSpace space = vars[v.first].getSpace();
-            switch (int(solver_t::n_dims))
-            {
-              case 1:
-              {
-                space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                vars[v.first].write( &(this->out_data(v.first)(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
-                break;
-              }
-              case 2:
-              {
-                // halos present -> data not contiguous -> looping over the major rank
-	        assert(this->mem->grid_size[0].stride() == 1);
-	        for (auto i  = this->mem->grid_size[0].first(); 
-                          i <= this->mem->grid_size[0].last(); 
-                          i += this->mem->grid_size[0].stride()
-                ) {
-                  offst[0] = i;
-                  space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                  vars[v.first].write( &(this->out_data(v.first)(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
-                }
-                break;
-              }
-              case 3:
-              {
-                // halos present -> data not contiguous -> looping over the major rank
-	        assert(this->mem->grid_size[0].stride() == 1);
-	        for (auto i  = this->mem->grid_size[0].first(); 
-                          i <= this->mem->grid_size[0].last(); 
-                          i += this->mem->grid_size[0].stride()
-                ) {
-	          assert(this->mem->grid_size[1].stride() == 1);
-	          for (auto j  = this->mem->grid_size[1].first(); 
-                            j <= this->mem->grid_size[1].last(); 
-                            j += this->mem->grid_size[1].stride()
-                  ) {
-                    offst[0] = i;
-                    offst[1] = j;
-                    space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                    vars[v.first].write( &(this->out_data(v.first)(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
-                  }
-                }
-                break;
-              }
-              default: assert(false); // TODO: 1D version
-            }
+            record_dsc_helper(vars[v.first], this->out_data(v.first));
           }
+        }
+      }
+      
+      void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
+      {
+        H5::DataSpace space = dset.getSpace();
+
+        switch (int(solver_t::n_dims))
+        {
+          case 1:
+          {
+            space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
+            dset.write( &(arr(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+            break;
+          }
+          case 2:
+          {
+            // halos present -> data not contiguous -> looping over the major rank
+            assert(this->mem->grid_size[0].stride() == 1);
+            for (auto i  = this->mem->grid_size[0].first(); 
+                      i <= this->mem->grid_size[0].last(); 
+                      i += this->mem->grid_size[0].stride()
+            ) {
+              offst[0] = i;
+              space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
+              dset.write( &(arr(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+            }
+            break;
+          }
+          case 3:
+          {
+            // halos present -> data not contiguous -> looping over the major rank
+            assert(this->mem->grid_size[0].stride() == 1);
+            for (auto i  = this->mem->grid_size[0].first(); 
+                      i <= this->mem->grid_size[0].last(); 
+                      i += this->mem->grid_size[0].stride()
+            ) {
+              assert(this->mem->grid_size[1].stride() == 1);
+              for (auto j  = this->mem->grid_size[1].first(); 
+                        j <= this->mem->grid_size[1].last(); 
+                        j += this->mem->grid_size[1].stride()
+              ) {
+                offst[0] = i;
+                offst[1] = j;
+                space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
+                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+              }
+            }
+            break;
+          }
+          default: assert(false);
         }
       }
 
@@ -283,6 +289,21 @@ namespace libmpdataxx
         offst = 0;
         space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space);
+      }
+      
+      // for discontiguous array with halos
+      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr)
+      {
+        assert(this->rank == 0);
+        
+        auto aux = (*hdfp).createDataSet(
+          name,
+          flttype_output,
+          H5::DataSpace(parent_t::n_dims, shape.data()),
+          params
+        );
+        
+        record_dsc_helper(aux, arr);
       }
 
       // has to be called after const file was created (i.e. after start())
