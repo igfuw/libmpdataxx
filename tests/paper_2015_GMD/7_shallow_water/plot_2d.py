@@ -28,9 +28,8 @@ def reading_modeloutput(dir, time):
     f_crd = h5py.File(dir+ "/const.h5", "r")
     time_model = np.array(f_crd["T"])
     assert(time in time_model),"time level not in model output"
-    dt = round(f_crd["T"].attrs["dt"][0], 4)
-    # TODO dx should be written somewhere                    
-    dir_model["dx"] = round(np.array(f_crd["X"])[1,0]-np.array(f_crd["X"])[0,0], 4)
+    dt = round(f_crd["advection"].attrs["dt"][0], 4)
+    dir_model["dx"] = f_crd["advection"].attrs["di"][0]
     f_out = h5py.File(dir+"/timestep0000000" + str(int(time/dt))+ '.h5', "r")
     dir_model["h"] = np.array(f_out["h"])
     dir_model["qx"] = np.array(f_out["qx"])

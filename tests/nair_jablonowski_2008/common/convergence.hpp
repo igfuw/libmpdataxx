@@ -7,6 +7,7 @@ template <typename Y = T>
 struct stat_t
 {
   Y min, max, L1, L2, Li, ord_L1, ord_L2, ord_Li;
+  stat_t() : ord_L1{0}, ord_L2{0}, ord_Li{0} {}
 };
 
 template <typename Y>
