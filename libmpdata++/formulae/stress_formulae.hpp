@@ -176,23 +176,17 @@ namespace libmpdataxx
         typename std::enable_if<nd == 3>::type* = 0
       ) return_macro(
         ,
-          pow2(tau[0](ijk[0] + h, ijk[1], ijk[2]) + tau[0](ijk[0] - h, ijk[1], ijk[2])) / 8
-          +
-          pow2( tau[1](ijk[0] + h, ijk[1] + h, ijk[2]) + tau[1](ijk[0] - h, ijk[1] + h, ijk[2]) 
-              + tau[1](ijk[0] + h, ijk[1] - h, ijk[2]) + tau[1](ijk[0] - h, ijk[1] - h, ijk[2])
-              ) / 16
-          +
-          pow2( tau[2](ijk[0] + h, ijk[1], ijk[2] + h) + tau[2](ijk[0] - h, ijk[1], ijk[2] + h) 
-              + tau[2](ijk[0] + h, ijk[1], ijk[2] - h) + tau[2](ijk[0] - h, ijk[1], ijk[2] - h)
-              ) / 16
-          +
-          pow2(tau[3](ijk[0], ijk[1] + h, ijk[2]) + tau[3](ijk[0], ijk[1] - h, ijk[2])) / 8
-          +
-          pow2( tau[4](ijk[0], ijk[1] + h, ijk[2] + h) + tau[4](ijk[0], ijk[1] - h, ijk[2] + h) 
-              + tau[4](ijk[0], ijk[1] + h, ijk[2] - h) + tau[4](ijk[0], ijk[1] - h, ijk[2] - h)
-              ) / 16
-          +
-          pow2(tau[5](ijk[0], ijk[1], ijk[2] + h) + tau[5](ijk[0], ijk[1], ijk[2] - h)) / 8
+          (
+            pow2(tau[0](ijk[0] + h, ijk[1], ijk[2])) + pow2(tau[0](ijk[0] - h, ijk[1], ijk[2]))
+          + pow2(tau[1](ijk[0] + h, ijk[1] + h, ijk[2])) + pow2(tau[1](ijk[0] - h, ijk[1] + h, ijk[2]))
+          + pow2(tau[1](ijk[0] + h, ijk[1] - h, ijk[2])) + pow2(tau[1](ijk[0] - h, ijk[1] - h, ijk[2]))
+          + pow2(tau[2](ijk[0] + h, ijk[1], ijk[2] + h)) + pow2(tau[2](ijk[0] - h, ijk[1], ijk[2] + h))
+          + pow2(tau[2](ijk[0] + h, ijk[1], ijk[2] - h)) + pow2(tau[2](ijk[0] - h, ijk[1], ijk[2] - h))
+          + pow2(tau[3](ijk[0], ijk[1] + h, ijk[2])) + pow2(tau[3](ijk[0], ijk[1] - h, ijk[2]))
+          + pow2(tau[4](ijk[0], ijk[1] + h, ijk[2] + h)) + pow2(tau[4](ijk[0], ijk[1] - h, ijk[2] + h))
+          + pow2(tau[4](ijk[0], ijk[1] + h, ijk[2] - h)) + pow2(tau[4](ijk[0], ijk[1] - h, ijk[2] - h))
+          + pow2(tau[5](ijk[0], ijk[1], ijk[2] + h)) + pow2(tau[5](ijk[0], ijk[1], ijk[2] - h))
+          ) / 4
       )
       
       // calculate elements of stress tensor divergence
