@@ -82,7 +82,7 @@ namespace libmpdataxx
           multiply_sgs_visc();
           
           // update forces
-          formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims>(this->vip_rhs, tau, this->ijk, this->dijk, this->dt);
+          formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims>(this->vip_rhs, tau, this->ijk, this->dijk, 2.0);
 
           //// calculate velocity gradient tensor
           //formulae::stress::calc_vgrad<ct_params_t::n_dims>(drv, this->vips(), this->ijk, this->dijk);
