@@ -34,77 +34,81 @@ namespace libmpdataxx
       template <typename real_t, int halo>
       class bcond_common
       {
+        using arr_1d_t = blitz::Array<real_t, 1>;
+        using arr_2d_t = blitz::Array<real_t, 2>;
+        using arr_3d_t = blitz::Array<real_t, 3>;
+
 	public:
 
 	// 1D
-	virtual void fill_halos_sclr(const blitz::Array<real_t, 1> &, const bool deriv = false) 
+	virtual void fill_halos_sclr(const arr_1d_t &, const bool deriv = false) 
 	{ 
 	  assert(false && "bcond::fill_halos_sclr() called!"); 
 	};
 
-	virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 1>> &, const real_t) 
+	virtual void fill_halos_vctr_alng(const arrvec_t<arr_1d_t> &) 
 	{ 
 	  assert(false && "bcond::fill_halos_vctr() called!"); 
 	};
 
 	// 2D
-	virtual void fill_halos_sclr(const blitz::Array<real_t, 2> &, const rng_t &, const bool deriv = false) 
+	virtual void fill_halos_sclr(const arr_2d_t &, const rng_t &, const bool deriv = false) 
 	{
 	  assert(false && "bcond::fill_halos_sclr() called!");
 	};
 	
-	virtual void fill_halos_pres(const blitz::Array<real_t, 2> &, const rng_t &)
+	virtual void fill_halos_pres(const arr_2d_t &, const rng_t &)
 	{
 	  assert(false && "bcond::fill_halos_pres() called!");
 	};
 	
-	virtual void save_edge_vel(const blitz::Array<real_t, 2> &, const rng_t &) 
+	virtual void save_edge_vel(const arr_2d_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::save_edge_vel() called!");
 	};
 	
-	virtual void set_edge_pres(const blitz::Array<real_t, 2> &, const rng_t &, int) 
+	virtual void set_edge_pres(const arr_2d_t &, const rng_t &, int) 
 	{
 	  assert(false && "bcond::set_edge() called!");
 	};
 
-	virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &, const real_t) 
+	virtual void fill_halos_vctr_alng(const arrvec_t<arr_2d_t> &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_alng() called!");
 	};
 
-	virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 2> &, const rng_t &) 
+	virtual void fill_halos_vctr_nrml(const arr_2d_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
 	};
 
 	// 3D
-	virtual void fill_halos_sclr(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &, const bool deriv = false) 
+	virtual void fill_halos_sclr(const arr_3d_t &, const rng_t &, const rng_t &, const bool deriv = false) 
 	{
 	  assert(false && "bcond::fill_halos_sclr() called!");
 	};
 	
-        virtual void fill_halos_pres(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &)
+        virtual void fill_halos_pres(const arr_3d_t &, const rng_t &, const rng_t &)
 	{
 	  assert(false && "bcond::fill_halos_pres() called!");
 	};
 	
-        virtual void save_edge_vel(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
+        virtual void save_edge_vel(const arr_3d_t &, const rng_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::save_edge_vel() called!");
 	};
 	
-	virtual void set_edge_pres(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &, int)
+	virtual void set_edge_pres(const arr_3d_t &, const rng_t &, const rng_t &, int)
 	{
 	  assert(false && "bcond::set_edge() called!");
 	};
 
-	virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &, const real_t) 
+	virtual void fill_halos_vctr_alng(const arrvec_t<arr_3d_t> &, const rng_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr() called!");
 	};
 
-	virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
+	virtual void fill_halos_vctr_nrml(const arr_3d_t &, const rng_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
 	};

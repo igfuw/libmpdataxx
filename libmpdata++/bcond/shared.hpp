@@ -29,9 +29,9 @@ namespace libmpdataxx
       virtual void set_edge_pres(const blitz::Array<real_t, 2> &, const rng_t &, int) { };
       virtual void set_edge_pres(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &, int) { };
 
-      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 1>> &, const real_t) { };
-      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &, const real_t) { };
-      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &, const real_t) { }; 
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 1>> &) { };
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &) { };
+      virtual void fill_halos_vctr_alng(const arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &) { }; 
 
       virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 2> &, const rng_t &) { };
       virtual void fill_halos_vctr_nrml(const blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) { };

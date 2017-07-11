@@ -41,7 +41,7 @@ namespace libmpdataxx
 
       void set_edge_pres(const arr_t &, const rng_t &, int) {}
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const real_t)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
         av[d](pi<d>(this->left_halo_vctr, j)) = av[d](pi<d>(this->rght_intr_vctr, j));
@@ -83,7 +83,7 @@ namespace libmpdataxx
 
       void set_edge_pres(const arr_t &, const rng_t &, int) {}
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const real_t)
+      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j)
       {
 	using namespace idxperm;
         av[d](pi<d>(this->rght_halo_vctr, j)) = av[d](pi<d>(this->left_intr_vctr, j));
