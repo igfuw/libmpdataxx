@@ -280,7 +280,8 @@ namespace libmpdataxx
         static void alloc_tmp_sclr(
           typename parent_t::mem_t *mem, 
           const char * __file__, const int n_arr,
-          std::string name = ""
+          std::string name = "",
+          bool srfc = false
         )   
         {   
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
@@ -290,7 +291,7 @@ namespace libmpdataxx
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
               parent_t::rng_sclr(mem->grid_size[0]),
-              parent_t::rng_sclr(mem->grid_size[1])
+              srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[1])
             )));
         } 
       };
