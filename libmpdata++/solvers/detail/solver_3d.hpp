@@ -48,13 +48,12 @@ namespace libmpdataxx
 	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], this->ijk, this->halo);
 	}
 
-        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec, const typename parent_t::real_t flux = 0) final
+        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k, flux); 
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i, flux); 
-          this->bcs[2][0]->fill_halos_vctr_alng(arrvec, i, j, flux);
-          this->bcs[2][1]->fill_halos_vctr_alng(arrvec, i, j, 0);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k); 
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i); 
+          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i, j);
           this->mem->barrier();
         }
 
