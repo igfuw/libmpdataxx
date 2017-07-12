@@ -14,7 +14,7 @@ using namespace libmpdataxx;
 
 void test(const std::string &dirname)
 {
-  const int nx = 65, ny = 65, nz = 51, nt = 1500;
+  const int nx = 65, ny = 65, nz = 51, nt = 1501;
 
   struct ct_params_t : ct_params_default_t
   {
@@ -54,12 +54,12 @@ void test(const std::string &dirname)
   p.c_m = 0.0856;
   p.smg_c = 0.165;
   p.prandtl_num = 0.42;
-  p.hflux_surfc = 0.01;
+  p.hflux_const = 0.01;
 
   double mixed_length = 500;
   double st = 1e-4 / p.g;
 
-  p.outfreq = 15;
+  p.outfreq = 150;
   p.outwindow = 1;
   p.outvars = {
     {ix::u,   {.name = "u",   .unit = "m/s"}}, 
@@ -75,7 +75,7 @@ void test(const std::string &dirname)
     solver_t, 
     bcond::cyclic, bcond::cyclic,
     bcond::cyclic, bcond::cyclic,
-    bcond::rigid, bcond::rigid
+    bcond::gndsky, bcond::gndsky
   > slv(p);
 
   {
