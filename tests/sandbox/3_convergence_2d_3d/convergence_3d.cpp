@@ -57,9 +57,7 @@ T test(int np)
 
   run.advectee() = 2 + sin(2 * pi * i * dx) * sin(2 * pi * j * dy) * sin(2 * pi * k * dz);
 
-  decltype(run.advectee()) true_solution(run.advectee().shape());
-  true_solution = run.advectee();
-  true_solution.reindexSelf(run.advectee().lbound());
+  auto true_solution = run.advectee_global();
 
   run.advector(0) = 1.0 * dt/dx;
   run.advector(1) = 2.0 * dt/dy;
@@ -67,15 +65,15 @@ T test(int np)
 
   run.advance(nt);
 
-  auto L2_error = sqrt(sum(pow2(run.advectee() - true_solution)) / (np * np * np)) / time;
+  auto L2_error = sqrt(sum(pow2(run.advectee_global() - true_solution)) / (np * np * np)) / time;
   return L2_error;
 }
 
 template <int opts_arg, int opts_iters>
 int order()
 {
-    auto err_coarse = test<opts_arg, opts_iters>(25);
-    auto err_fine = test<opts_arg, opts_iters>(49);
+    auto err_coarse = test<opts_arg, opts_iters>(17);
+    auto err_fine = test<opts_arg, opts_iters>(33);
     std::cout << "err_coarse: " << err_coarse << " err_fine: " << err_fine << std::endl;
     return std::round(std::log2(err_coarse / err_fine));
 }

@@ -54,16 +54,14 @@ T test(int np)
 
   run.advectee() = 2 + sin(2 * pi * i * dx) * sin(2 * pi * j * dy);
 
-  decltype(run.advectee()) true_solution(run.advectee().shape());
-  true_solution = run.advectee();
-  true_solution.reindexSelf(run.advectee().lbound());
+  auto true_solution = run.advectee_global(); 
 
   run.advector(0) = 1.0 * dt/dx;
   run.advector(1) = 2.0 * dt/dy;
 
   run.advance(nt);
 
-  auto L2_error = sqrt(sum(pow2(run.advectee() - true_solution)) / (np * np)) / time;
+  auto L2_error = sqrt(sum(pow2(run.advectee_global() - true_solution)) / (np * np)) / time;
   return L2_error;
 }
 
