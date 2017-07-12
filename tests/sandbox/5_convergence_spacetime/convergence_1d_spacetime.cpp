@@ -60,7 +60,7 @@ double test(int np)
 //  true_solution.reindexSelf(run.advectee().lbound());
   
   run.g_factor() = exp(cos(i * dx));
-  g_factor_global() = exp(cos(i * dx));
+  g_factor_global = exp(cos(i * dx));
 
   run.advance(nt);
 
