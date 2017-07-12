@@ -92,8 +92,16 @@ namespace libmpdataxx
         tau[0](ijkm[0] + h, ijk[1], ijk[2])
         =
         2 * (v[0](ijkm[0] + 1, ijk[1], ijk[2]) - v[0](ijkm[0], ijk[1], ijk[2])) / dijk[0];
+        
+        tau[1](ijk[0], ijkm[1] + h, ijk[2])
+        =
+        2 * (v[1](ijk[0], ijkm[1] + 1, ijk[2]) - v[1](ijk[0], ijkm[1], ijk[2])) / dijk[1];
+        
+        tau[2](ijk[0], ijk[1], ijkm[2] + h)
+        =
+        2 * (v[2](ijk[0], ijk[1], ijkm[2] + 1) - v[2](ijk[0], ijk[1], ijkm[2])) / dijk[2];
 
-        tau[1](ijkm[0] + h, ijkm[1] + h, ijk[2])
+        tau[3](ijkm[0] + h, ijkm[1] + h, ijk[2])
         =
         0.5 *
         (
@@ -106,7 +114,7 @@ namespace libmpdataxx
           ) / dijk[0]
         );
         
-        tau[2](ijkm[0] + h, ijk[1], ijkm[2] + h)
+        tau[4](ijkm[0] + h, ijk[1], ijkm[2] + h)
         =
         0.5 *
         (
@@ -119,11 +127,7 @@ namespace libmpdataxx
           ) / dijk[0]
         );
         
-        tau[3](ijk[0], ijkm[1] + h, ijk[2])
-        =
-        2 * (v[1](ijk[0], ijkm[1] + 1, ijk[2]) - v[1](ijk[0], ijkm[1], ijk[2])) / dijk[1];
-        
-        tau[4](ijk[0], ijkm[1] + h, ijkm[2] + h)
+        tau[5](ijk[0], ijkm[1] + h, ijkm[2] + h)
         =
         0.5 *
         (
@@ -136,9 +140,6 @@ namespace libmpdataxx
           ) / dijk[1]
         );
         
-        tau[5](ijk[0], ijk[1], ijkm[2] + h)
-        =
-        2 * (v[2](ijk[0], ijk[1], ijkm[2] + 1) - v[2](ijk[0], ijk[1], ijkm[2])) / dijk[2];
       }
       
       // Total deformation
@@ -178,14 +179,14 @@ namespace libmpdataxx
         ,
           (
             pow2(tau[0](ijk[0] + h, ijk[1], ijk[2])) + pow2(tau[0](ijk[0] - h, ijk[1], ijk[2]))
-          + pow2(tau[1](ijk[0] + h, ijk[1] + h, ijk[2])) + pow2(tau[1](ijk[0] - h, ijk[1] + h, ijk[2]))
-          + pow2(tau[1](ijk[0] + h, ijk[1] - h, ijk[2])) + pow2(tau[1](ijk[0] - h, ijk[1] - h, ijk[2]))
-          + pow2(tau[2](ijk[0] + h, ijk[1], ijk[2] + h)) + pow2(tau[2](ijk[0] - h, ijk[1], ijk[2] + h))
-          + pow2(tau[2](ijk[0] + h, ijk[1], ijk[2] - h)) + pow2(tau[2](ijk[0] - h, ijk[1], ijk[2] - h))
-          + pow2(tau[3](ijk[0], ijk[1] + h, ijk[2])) + pow2(tau[3](ijk[0], ijk[1] - h, ijk[2]))
-          + pow2(tau[4](ijk[0], ijk[1] + h, ijk[2] + h)) + pow2(tau[4](ijk[0], ijk[1] - h, ijk[2] + h))
-          + pow2(tau[4](ijk[0], ijk[1] + h, ijk[2] - h)) + pow2(tau[4](ijk[0], ijk[1] - h, ijk[2] - h))
-          + pow2(tau[5](ijk[0], ijk[1], ijk[2] + h)) + pow2(tau[5](ijk[0], ijk[1], ijk[2] - h))
+          + pow2(tau[1](ijk[0], ijk[1] + h, ijk[2])) + pow2(tau[1](ijk[0], ijk[1] - h, ijk[2]))
+          + pow2(tau[2](ijk[0], ijk[1], ijk[2] + h)) + pow2(tau[2](ijk[0], ijk[1], ijk[2] - h))
+          + pow2(tau[3](ijk[0] + h, ijk[1] + h, ijk[2])) + pow2(tau[3](ijk[0] - h, ijk[1] + h, ijk[2]))
+          + pow2(tau[3](ijk[0] + h, ijk[1] - h, ijk[2])) + pow2(tau[3](ijk[0] - h, ijk[1] - h, ijk[2]))
+          + pow2(tau[4](ijk[0] + h, ijk[1], ijk[2] + h)) + pow2(tau[4](ijk[0] - h, ijk[1], ijk[2] + h))
+          + pow2(tau[4](ijk[0] + h, ijk[1], ijk[2] - h)) + pow2(tau[4](ijk[0] - h, ijk[1], ijk[2] - h))
+          + pow2(tau[5](ijk[0], ijk[1] + h, ijk[2] + h)) + pow2(tau[5](ijk[0], ijk[1] - h, ijk[2] + h))
+          + pow2(tau[5](ijk[0], ijk[1] + h, ijk[2] - h)) + pow2(tau[5](ijk[0], ijk[1] - h, ijk[2] - h))
           ) / 4
       )
       
@@ -240,12 +241,12 @@ namespace libmpdataxx
         (
           (tau[0](ijk[0] + h, ijk[1], ijk[2]) - tau[0](ijk[0] - h, ijk[1], ijk[2])) / dijk[0]
           + 0.5 * 
-          ( tau[1](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[1](ijk[0] + h, ijk[1] - h, ijk[2])
-          + tau[1](ijk[0] - h, ijk[1] + h, ijk[2]) - tau[1](ijk[0] - h, ijk[1] - h, ijk[2])
+          ( tau[3](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] + h, ijk[1] - h, ijk[2])
+          + tau[3](ijk[0] - h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] - h, ijk[2])
           ) / dijk[1]
           + 0.5 * 
-          ( tau[2](ijk[0] + h, ijk[1], ijk[2] + h) - tau[2](ijk[0] + h, ijk[1], ijk[2] - h)
-          + tau[2](ijk[0] - h, ijk[1], ijk[2] + h) - tau[2](ijk[0] - h, ijk[1], ijk[2] - h)
+          ( tau[4](ijk[0] + h, ijk[1], ijk[2] + h) - tau[4](ijk[0] + h, ijk[1], ijk[2] - h)
+          + tau[4](ijk[0] - h, ijk[1], ijk[2] + h) - tau[4](ijk[0] - h, ijk[1], ijk[2] - h)
           ) / dijk[2]
         );
         
@@ -254,14 +255,14 @@ namespace libmpdataxx
         coeff *
         (
           0.5 * 
-          ( tau[1](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[1](ijk[0] - h, ijk[1] + h, ijk[2])
-          + tau[1](ijk[0] + h, ijk[1] - h, ijk[2]) - tau[1](ijk[0] - h, ijk[1] - h, ijk[2])
+          ( tau[3](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] + h, ijk[2])
+          + tau[3](ijk[0] + h, ijk[1] - h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] - h, ijk[2])
           ) / dijk[0]
           +
-          (tau[3](ijk[0], ijk[1] + h, ijk[2]) - tau[3](ijk[0], ijk[1] - h, ijk[2])) / dijk[1]
+          (tau[1](ijk[0], ijk[1] + h, ijk[2]) - tau[1](ijk[0], ijk[1] - h, ijk[2])) / dijk[1]
           + 0.5 * 
-          ( tau[4](ijk[0], ijk[1] + h, ijk[2] + h) - tau[4](ijk[0], ijk[1] + h, ijk[2] - h)
-          + tau[4](ijk[0], ijk[1] - h, ijk[2] + h) - tau[4](ijk[0], ijk[1] - h, ijk[2] - h)
+          ( tau[5](ijk[0], ijk[1] + h, ijk[2] + h) - tau[5](ijk[0], ijk[1] + h, ijk[2] - h)
+          + tau[5](ijk[0], ijk[1] - h, ijk[2] + h) - tau[5](ijk[0], ijk[1] - h, ijk[2] - h)
           ) / dijk[2]
         );
         
@@ -270,15 +271,15 @@ namespace libmpdataxx
         coeff *
         (
           0.5 * 
-          ( tau[2](ijk[0] + h, ijk[1], ijk[2] + h) - tau[2](ijk[0] - h, ijk[1], ijk[2] + h)
-          + tau[2](ijk[0] + h, ijk[1], ijk[2] - h) - tau[2](ijk[0] - h, ijk[1], ijk[2] - h)
+          ( tau[4](ijk[0] + h, ijk[1], ijk[2] + h) - tau[4](ijk[0] - h, ijk[1], ijk[2] + h)
+          + tau[4](ijk[0] + h, ijk[1], ijk[2] - h) - tau[4](ijk[0] - h, ijk[1], ijk[2] - h)
           ) / dijk[0]
           + 0.5 * 
-          ( tau[4](ijk[0], ijk[1] + h, ijk[2] + h) - tau[4](ijk[0], ijk[1] - h, ijk[2] + h)
-          + tau[4](ijk[0], ijk[1] + h, ijk[2] - h) - tau[4](ijk[0], ijk[1] - h, ijk[2] - h)
+          ( tau[5](ijk[0], ijk[1] + h, ijk[2] + h) - tau[5](ijk[0], ijk[1] - h, ijk[2] + h)
+          + tau[5](ijk[0], ijk[1] + h, ijk[2] - h) - tau[5](ijk[0], ijk[1] - h, ijk[2] - h)
           ) / dijk[1]
           +
-          (tau[5](ijk[0], ijk[1], ijk[2] + h) - tau[5](ijk[0], ijk[1], ijk[2] - h)) / dijk[2]
+          (tau[2](ijk[0], ijk[1], ijk[2] + h) - tau[2](ijk[0], ijk[1], ijk[2] - h)) / dijk[2]
         );
       }
 
