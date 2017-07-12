@@ -324,6 +324,7 @@ namespace libmpdataxx
 
         const blitz::Array<real_t, 1> advectee_global(int e = 0)
         {   
+#if defined(USE_MPI)
           if(this->distmem.size() > 1)
           {
 // TODO: move some of that to distmem...
@@ -343,17 +344,16 @@ namespace libmpdataxx
             std::vector<real_t> in_values_vec(advectee(e).size());
             std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
 
-#if defined(USE_MPI)
             // gather the data from all processes on rank=0
             boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
          
             blitz::Array<real_t, 1> res(out_values.data(), blitz::shape(this->distmem.grid_size[0]), blitz::duplicateData);
             // send the result to other processes
             boost::mpi::broadcast(this->distmem.mpicom, res, 0);
-#endif
             return res;
           }
           else
+#endif
             return advectee(e);
         }  
 
@@ -423,6 +423,7 @@ namespace libmpdataxx
 
         const blitz::Array<real_t, 2> advectee_global(int e = 0)
         {   
+#if defined(USE_MPI)
           if(this->distmem.size() > 1)
           {
 // TODO: move some of that to distmem...
@@ -446,7 +447,6 @@ namespace libmpdataxx
             std::vector<real_t> in_values_vec(advectee(e).size());
             std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
 
-#if defined(USE_MPI)
             // gather the data from all processes on rank=0
             boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
             // send the result to other processes
@@ -455,10 +455,10 @@ namespace libmpdataxx
             blitz::Array<real_t, 2> res(out_values.data(), blitz::shape(
               this->distmem.grid_size[0], this->grid_size[1].length()),
               blitz::duplicateData);
-#endif
             return res;
           }
           else
+#endif
             return advectee(e);
         }  
 
@@ -560,6 +560,7 @@ namespace libmpdataxx
 
         const blitz::Array<real_t, 3> advectee_global(int e = 0)
         {   
+#if defined(USE_MPI)
           if(this->distmem.size() > 1)
           {
 // TODO: move some of that to distmem...
@@ -583,7 +584,6 @@ namespace libmpdataxx
             std::vector<real_t> in_values_vec(advectee(e).size());
             std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
 
-#if defined(USE_MPI)
             // gather the data from all processes on rank=0
             boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
             // send the result to other processes
@@ -592,10 +592,10 @@ namespace libmpdataxx
             blitz::Array<real_t, 3> res(out_values.data(), blitz::shape(
               this->distmem.grid_size[0], this->grid_size[1].length(), this->grid_size[2].length()),
               blitz::duplicateData);
-#endif
             return res;
           }
           else
+#endif
             return advectee(e);
         }  
 
