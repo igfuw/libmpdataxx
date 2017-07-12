@@ -14,7 +14,7 @@ namespace libmpdataxx
   {
     using namespace arakawa_c;
 
-    enum bcond_e { null, cyclic, polar, open, rigid, custom }; 
+    enum bcond_e { null, cyclic, polar, open, rigid, gndsky, custom }; 
     enum drctn_e { left, rght };
 
     template<
@@ -106,6 +106,24 @@ namespace libmpdataxx
 	virtual void fill_halos_vctr_alng(const arrvec_t<arr_3d_t> &, const rng_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr() called!");
+	};
+        
+        virtual void fill_halos_vctr_gndsky(const arrvec_t<arr_3d_t> &,
+                                            const arr_3d_t &,
+                                            const rng_t &,
+                                            const rng_t &,
+                                            const int offset = 0)
+	{
+	  assert(false && "bcond::fill_halos_vctr_gndsky() called!");
+	};
+        
+        virtual void fill_halos_tnsr_gndsky(const arrvec_t<arr_3d_t> &,
+                                            const arr_3d_t &,
+                                            const rng_t &,
+                                            const rng_t &,
+                                            const real_t)
+	{
+	  assert(false && "bcond::fill_halos_tnsr_gndsky() called!");
 	};
 
 	virtual void fill_halos_vctr_nrml(const arr_3d_t &, const rng_t &, const rng_t &) 
