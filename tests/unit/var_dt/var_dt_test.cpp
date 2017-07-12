@@ -60,11 +60,10 @@ T test(int np, T cfl)
   //run.advector(0) = cfl * 0.5;
   run.advance(var_dt_arg ? time : nt);
 
-  decltype(run.advectee()) true_solution(run.advectee().shape());
-  true_solution.reindexSelf(run.advectee().lbound());
+  decltype(run.advectee()) true_solution(run.advectee_global().shape());
   true_solution = 2 + sin(blitz::tensor::i * dx - sin(pi * u_0 * run.time() / tau) * tau / pi);
 
-  auto L2 = sqrt(sum(pow2(true_solution - run.advectee())) / sum(pow2(true_solution)));
+  auto L2 = sqrt(sum(pow2(true_solution - run.advectee_global())) / sum(pow2(true_solution)));
   return L2;
 }
 

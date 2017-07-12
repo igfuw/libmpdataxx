@@ -59,16 +59,19 @@ double test(int np)
   blitz::firstIndex i;
   blitz::secondIndex j;
 
-  decltype(run.advectee()) true_solution(run.advectee().shape());
+  decltype(run.advectee()) true_solution(run.advectee_global().shape());
+  decltype(run.advectee()) g_factor_global(true_solution.shape());
   true_solution = (2 + sin(i * dx) * sin(time)) * (2 + sin(j * dy) * sin(time));
-  true_solution.reindexSelf(run.advectee().lbound());
+  
+//  true_solution.reindexSelf(run.advectee().lbound());
   
   run.g_factor() = exp(cos(i * dx) + cos(j * dy));
+  g_factor_global = exp(cos(i * dx) + cos(j * dy));
 
   run.advance(nt);
 
-  auto L2_error = sqrt(sum(run.g_factor() * pow2(run.advectee() - true_solution)))
-                  / sqrt(sum(run.g_factor() *  pow2(true_solution)));
+  auto L2_error = sqrt(sum(g_factor_global * pow2(run.advectee_global() - true_solution)))
+                  / sqrt(sum(g_factor_global() *  pow2(true_solution)));
   return L2_error;
 }
 

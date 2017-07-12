@@ -75,8 +75,7 @@ void test(const std::string filename)
     1.
   );
 
-  decltype(run.advectee()) solution(run.advectee().shape());
-  solution.reindexSelf(run.advectee().lbound());
+  decltype(run.advectee()) solution(run.advectee_global().shape());
 
   T disp = std::fmod(time, 4.0);
   
@@ -92,7 +91,7 @@ void test(const std::string filename)
 
   run.advance(nt);
 
-  auto L2_error = sqrt(sum(pow(solution - run.advectee(), 2)));
+  auto L2_error = sqrt(sum(pow(solution - run.advectee_global(), 2)));
   std::cout << "L2 error: " << L2_error << std::endl;
   if(L2_error > 4.82) throw std::runtime_error("L2 error greater than threshold (4.82)");
 }
