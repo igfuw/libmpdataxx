@@ -44,6 +44,7 @@ namespace libmpdataxx
         arrvec_t<typename parent_t::arr_t> &tau;
         arrvec_t<typename parent_t::arr_t> &drv;
         arrvec_t<typename parent_t::arr_t> &wrk;
+        arrvec_t<typename parent_t::arr_t> &tau_srfc;
 
         std::array<rng_t, ct_params_t::n_dims> ijkm;
 
@@ -70,13 +71,45 @@ namespace libmpdataxx
         void vip_rhs_expl_calc()
         {
           parent_t::vip_rhs_expl_calc();
+
           using ix = typename ct_params_t::ix;
+          using namespace arakawa_c;
 
           // TODO: get rid of superfluous barriers
           for (auto& vip : this->vips())
             this->xchng_sclr(vip, this->ijk, 1);
 
+          // surface indices
+          auto ij = this->ijk;
+          ij.lbound(ct_params_t::n_dims - 1) = 0;
+          ij.ubound(ct_params_t::n_dims - 1) = 0;
+         
+          // using tau[0] as a temporary array for surface stress
+          tau[0](ij) = 0;
+          for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
+          {
+            tau[0](ij) += pow2(this->vips()[d](ij));
+          }
+          tau[0](ij) = sqrt(tau[0](ij));
+
+          this->xchng_sclr(tau[0], ij);
+          
+          // to include halos  
+          for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
+          {
+            ij.expand(d, 1);
+          }
+
+          for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
+          {
+            tau_srfc[d](ij) = 0.1 * tau[0](ij) * this->vips()[d](ij);
+          }
+          this->mem->barrier();
+
           formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
+
+          this->xchng_tnsr_diag_gndsky(tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
+          this->xchng_tnsr_offdiag_gndsky(tau, tau_srfc, this->ijk, this->ijkm);
 
           // multiply deformation tensor by sgs viscosity to obtain stress tensor
           multiply_sgs_visc();
@@ -134,12 +167,23 @@ namespace libmpdataxx
           parent_t(args, p),
           tau(args.mem->tmp[__FILE__][0]),
           drv(args.mem->tmp[__FILE__][1]),
-          wrk(args.mem->tmp[__FILE__][2])
+          wrk(args.mem->tmp[__FILE__][2]),
+          tau_srfc(args.mem->tmp[__FILE__][3])
         {
           for (int d = 0; d < ct_params_t::n_dims; ++d)
           {
             ijkm[d] = rng_t(this->ijk[d].first() - 1, this->ijk[d].last());
           }
+
+          //for (auto & t : tau_srfc)
+          //{
+          //  auto s = t.shape();
+          //  s[2] = 1;
+          //  t.resize(s);
+          //  auto b = t.base();
+          //  b[2] = 0;
+          //  t.reindexSelf(b);
+          //}
         }
 
         static void alloc(
@@ -175,6 +219,8 @@ namespace libmpdataxx
           // TODO: do not allocate unnecessary memory when not using pade differencing
           parent_t::alloc_tmp_sclr(mem, __FILE__, std::pow(static_cast<int>(ct_params_t::n_dims), 2));
           parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // wrk
+          //parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // tau_srfc
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 2, "", true); // tau_srfc
         }
       };
     } // namespace detail
