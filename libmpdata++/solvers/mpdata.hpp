@@ -18,6 +18,8 @@ namespace libmpdataxx
 {
   namespace solvers
   {
+    struct mpdata_family_tag {};
+
     // the mpdata class
     template<typename ct_params_t, int minhalo = 0, class enableif = void> 
     class mpdata
@@ -32,6 +34,9 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_osc<ct_params_t, minhalo>; 
       using parent_t::parent_t; // inheriting constructors
+
+      protected:
+      using solver_family = mpdata_family_tag;
     };
 
     // non-oscillatory version
@@ -43,6 +48,9 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_fct<ct_params_t, minhalo>; 
       using parent_t::parent_t; // inheriting constructors
+      
+      protected:
+      using solver_family = mpdata_family_tag;
     };
   } // namespace solvers
 } // namescpae libmpdataxx

@@ -3,7 +3,7 @@ libmpdataxx_add_test(stationary)
 add_test(stationary_diff bash -c "
   for dir in nug_i2_96 nug_iga_fct_i2_96 nug_tot_i3_96 nug_iga_tot_fct_i2_96; do 
     echo   'comparing const.h5'                                                                                         &&
-    h5diff -v -d 1e-9 $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/const.h5                                  &&
+    h5diff --delta=1e-17 -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5               &&
     echo   'comparing temp.xmf'                                                                                         &&
     diff    $dir/temp.xmf                 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                             &&
     echo   'comparing timestep0000000000.h5'                                                                            &&
