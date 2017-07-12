@@ -71,7 +71,7 @@ double test(int np)
   run.advance(nt);
 
   auto L2_error = sqrt(sum(g_factor_global * pow2(run.advectee_global() - true_solution)))
-                  / sqrt(sum(g_factor_global() *  pow2(true_solution)));
+                  / sqrt(sum(g_factor_global *  pow2(true_solution)));
   return L2_error;
 }
 
