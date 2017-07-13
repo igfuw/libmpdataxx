@@ -159,7 +159,7 @@ namespace libmpdataxx
         // ctor
         mpdata_rhs_vip_prs_sgs_common(
           typename parent_t::ctor_args_t args,
-          const rt_params_t &p
+          const typename parent_t::rt_params_t &p
         ) :
           parent_t(args, p),
           tau(args.mem->tmp[__FILE__][0]),
