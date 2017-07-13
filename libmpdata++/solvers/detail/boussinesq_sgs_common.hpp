@@ -62,46 +62,18 @@ namespace libmpdataxx
           
           this->xchng_sclr(this->k_m, this->ijk, 1);
 
-          const auto &i(this->i), &j(this->j), &k(this->k);
-          const auto &im(this->im), &jm(this->jm), &km(this->km);
-          const auto &ii = this->rank == 0 ? im : i;
+          // havo to use modified ijkm due to shared-memory parallelisation, otherwise overlapping ranges
+          // would lead to double multiplications
+          // TODO: better way ?
+          auto ijkm_aux = this->ijkm;
+          if (this->rank > 0)
+            ijkm_aux[0] = this->ijk[0];
 
-          this->tau[0](ii + h, j, k) *= 0.5 * 
-                             (this->k_m(ii + 1, j, k) + this->k_m(ii, j, k));
-          
-          this->tau[1](i, jm + h, k) *= 0.5 * 
-                             (this->k_m(i, jm + 1, k) + this->k_m(i, jm, k));
-          
-          this->tau[2](i, j, km + h) *= 0.5 * 
-                             (this->k_m(i, j, km + 1) + this->k_m(i, j, km));
-          
-          this->tau[3](ii + h, jm + h, k) *= 0.25 * 
-                             (this->k_m(ii + 1, jm, k) + this->k_m(ii, jm, k) +
-                             this->k_m(ii + 1, jm + 1, k) + this->k_m(ii, jm + 1, k));
-          
-          this->tau[4](ii + h, j, km + h) *= 0.25 * 
-                             (this->k_m(ii + 1, j, km) + this->k_m(ii, j, km) +
-                             this->k_m(ii + 1, j, km + 1) + this->k_m(ii, j, km + 1));
-          
-          
-          this->tau[5](i, jm + h, km + h) *= 0.25 * 
-                             (this->k_m(i, jm, km + 1) + this->k_m(i, jm, km) +
-                             this->k_m(i, jm + 1, km + 1) + this->k_m(i, jm + 1, km));
-
+          formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims>(this->tau, 1.0, this->k_m, ijkm_aux);
 
           this->xchng_tnsr_offdiag_gndsky(this->tau, this->tau_srfc, this->ijk, this->ijkm);
-          
-          grad_tht[0](this->i + h, this->j, this->k) *= 0.5 *
-                             (this->k_m(this->i + 1, this->j, this->k) + this->k_m(this->i, this->j, this->k)) /
-                             prandtl_num;
-          
-          grad_tht[1](this->i, this->j + h, this->k) *= 0.5 *
-                             (this->k_m(this->i, this->j + 1, this->k) + this->k_m(this->i, this->j, this->k)) /
-                             prandtl_num;
-          
-          grad_tht[2](this->i, this->j, this->k + h) *= 0.5 *
-                             (this->k_m(this->i, this->j, this->k + 1) + this->k_m(this->i, this->j, this->k)) /
-                             prandtl_num;
+
+          formulae::stress::multiply_vctr_cmpct<ct_params_t::n_dims>(grad_tht, 1.0 / prandtl_num, this->k_m, this->ijk);
 
           this->xchng_vctr_gndsky(grad_tht, hflux_srfc, this->ijk);
           // hack, convinient place to update the heat_flux

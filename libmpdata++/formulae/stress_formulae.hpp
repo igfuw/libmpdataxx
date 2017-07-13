@@ -81,6 +81,92 @@ namespace libmpdataxx
         tau[5](ijk) = 2 * vg[8](ijk);
       }
       
+      // calculate elements of stress tensor divergence
+      // 2D version
+      template <int nd, class arrvec_t, class ijk_t, class dijk_t>
+      inline void calc_stress_div(arrvec_t &sdiv,
+                                  const arrvec_t &tau,
+                                  const ijk_t &ijk,
+                                  const dijk_t &dijk,
+                                  typename std::enable_if<nd == 2>::type* = 0)
+      {
+        sdiv[0](ijk) = formulae::nabla::grad<0>(tau[0], ijk[0], ijk[1], dijk[0]);
+        sdiv[1](ijk) = formulae::nabla::grad<0>(tau[1], ijk[0], ijk[1], dijk[0]);
+
+        sdiv[2](ijk) = formulae::nabla::grad<1>(tau[1], ijk[1], ijk[0], dijk[1]);
+        sdiv[3](ijk) = formulae::nabla::grad<1>(tau[2], ijk[1], ijk[0], dijk[1]);
+      }
+      
+      // 3D version
+      template <int nd, class arrvec_t, class ijk_t, class dijk_t>
+      inline void calc_stress_div(arrvec_t &sdiv,
+                                  const arrvec_t &tau,
+                                  const ijk_t &ijk,
+                                  const dijk_t &dijk,
+                                  typename std::enable_if<nd == 3>::type* = 0)
+      {
+        sdiv[0](ijk) = formulae::nabla::grad<0>(tau[0], ijk[0], ijk[1], ijk[2], dijk[0]);
+        sdiv[1](ijk) = formulae::nabla::grad<0>(tau[1], ijk[0], ijk[1], ijk[2], dijk[0]);
+        sdiv[2](ijk) = formulae::nabla::grad<0>(tau[2], ijk[0], ijk[1], ijk[2], dijk[0]);
+
+        sdiv[3](ijk) = formulae::nabla::grad<1>(tau[1], ijk[1], ijk[2], ijk[0], dijk[1]);
+        sdiv[4](ijk) = formulae::nabla::grad<1>(tau[3], ijk[1], ijk[2], ijk[0], dijk[1]);
+        sdiv[5](ijk) = formulae::nabla::grad<1>(tau[4], ijk[1], ijk[2], ijk[0], dijk[1]);
+
+        sdiv[6](ijk) = formulae::nabla::grad<2>(tau[2], ijk[2], ijk[0], ijk[1], dijk[2]);
+        sdiv[7](ijk) = formulae::nabla::grad<2>(tau[4], ijk[2], ijk[0], ijk[1], dijk[2]);
+        sdiv[8](ijk) = formulae::nabla::grad<2>(tau[5], ijk[2], ijk[0], ijk[1], dijk[2]);
+      }
+      
+
+      // add stress forces
+      // 2D version
+      template <int nd, class arrvec_t, class ijk_t, class real_t>
+      inline void calc_stress_rhs(arrvec_t &rhs, const arrvec_t &drv, ijk_t &ijk, real_t coeff, typename std::enable_if<nd == 2>::type* = 0)
+      {
+        rhs[0](ijk) += coeff * (drv[0](ijk) + drv[2](ijk));
+        rhs[1](ijk) += coeff * (drv[1](ijk) + drv[3](ijk));
+      }
+      
+      // 3D version
+      template <int nd, class arrvec_t, class ijk_t, class real_t>
+      inline void calc_stress_rhs(arrvec_t &rhs, const arrvec_t &drv, ijk_t &ijk, real_t coeff, typename std::enable_if<nd == 3>::type* = 0)
+      {
+        rhs[0](ijk) += coeff * (drv[0](ijk) + drv[3](ijk) + drv[6](ijk));
+        rhs[1](ijk) += coeff * (drv[1](ijk) + drv[4](ijk) + drv[7](ijk));
+        rhs[2](ijk) += coeff * (drv[2](ijk) + drv[5](ijk) + drv[8](ijk));
+      }
+      
+      // Total deformation
+      // 2D version
+      template <int nd, class arrvec_t, class ijk_t>
+      inline auto calc_tdef_sq(
+	const arrvec_t &tau,
+        const ijk_t &ijk,
+        typename std::enable_if<nd == 2>::type* = 0
+      ) return_macro(,
+	  pow2(tau[0](ijk)) / 2 + pow2(tau[1](ijk)) + pow2(tau[2](ijk)) / 2
+      )
+      
+      // 3D version
+      template <int nd, class arrvec_t, class ijk_t>
+      inline auto calc_tdef_sq(
+	const arrvec_t &tau,
+        const ijk_t &ijk,
+        typename std::enable_if<nd == 3>::type* = 0
+      ) return_macro(,
+          pow2(tau[0](ijk)) / 2 + 
+          pow2(tau[1](ijk)) +
+          pow2(tau[2](ijk)) +
+          pow2(tau[3](ijk)) / 2 +
+          pow2(tau[4](ijk)) +
+          pow2(tau[5](ijk)) / 2
+      )
+      
+      // Compact formulation
+
+      // calculates unique deformation tensor components
+      // 3D version
       template <int nd, class arrvec_t, class ijk_t, class ijkm_t, class dijk_t>
       inline void calc_deform_cmpct(arrvec_t &tau,
                                     const arrvec_t &v,
@@ -139,36 +225,9 @@ namespace libmpdataxx
           + v[2](ijk[0], ijkm[1] + 1, ijkm[2] + 1) - v[2](ijk[0], ijkm[1], ijkm[2] + 1)
           ) / dijk[1]
         );
-        
       }
       
       // Total deformation
-
-      // 2D version
-      template <int nd, class arrvec_t, class ijk_t>
-      inline auto calc_tdef_sq(
-	const arrvec_t &tau,
-        const ijk_t &ijk,
-        typename std::enable_if<nd == 2>::type* = 0
-      ) return_macro(,
-	  pow2(tau[0](ijk)) / 2 + pow2(tau[1](ijk)) + pow2(tau[2](ijk)) / 2
-      )
-      
-      // 3D version
-      template <int nd, class arrvec_t, class ijk_t>
-      inline auto calc_tdef_sq(
-	const arrvec_t &tau,
-        const ijk_t &ijk,
-        typename std::enable_if<nd == 3>::type* = 0
-      ) return_macro(,
-          pow2(tau[0](ijk)) / 2 + 
-          pow2(tau[1](ijk)) +
-          pow2(tau[2](ijk)) +
-          pow2(tau[3](ijk)) / 2 +
-          pow2(tau[4](ijk)) +
-          pow2(tau[5](ijk)) / 2
-      )
-      
       // 3D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq_cmpct(
@@ -189,44 +248,80 @@ namespace libmpdataxx
           + pow2(tau[5](ijk[0], ijk[1] + h, ijk[2] - h)) + pow2(tau[5](ijk[0], ijk[1] - h, ijk[2] - h))
           ) / 4
       )
-      
-      // calculate elements of stress tensor divergence
-      // 2D version
-      template <int nd, class arrvec_t, class ijk_t, class dijk_t>
-      inline void calc_stress_div(arrvec_t &sdiv,
-                                  const arrvec_t &tau,
-                                  const ijk_t &ijk,
-                                  const dijk_t &dijk,
-                                  typename std::enable_if<nd == 2>::type* = 0)
+     
+      // multiplication of compact vector components by constant molecular viscosity
+      template <int nd, class arrvec_t, class real_t, class ijk_t>
+      inline void multiply_vctr_cmpct(const arrvec_t &av,
+                                     real_t coeff,
+                                     const ijk_t &ijk,
+                                     typename std::enable_if<nd == 3>::type* = 0)
       {
-        sdiv[0](ijk) = formulae::nabla::grad<0>(tau[0], ijk[0], ijk[1], dijk[0]);
-        sdiv[1](ijk) = formulae::nabla::grad<0>(tau[1], ijk[0], ijk[1], dijk[0]);
+        av[0](ijk[0] + h, ijk[1], ijk[2]) *= coeff;
+        av[1](ijk[0], ijk[1] + h, ijk[2]) *= coeff;
+        av[2](ijk[0], ijk[1], ijk[2] + h) *= coeff;
+      }
 
-        sdiv[2](ijk) = formulae::nabla::grad<1>(tau[1], ijk[1], ijk[0], dijk[1]);
-        sdiv[3](ijk) = formulae::nabla::grad<1>(tau[2], ijk[1], ijk[0], dijk[1]);
+      // multiplication of compact vector components by variable eddy viscosity
+      template <int nd, class arrvec_t, class real_t, class arr_t, class ijk_t>
+      inline void multiply_vctr_cmpct(const arrvec_t &av,
+                                      real_t coeff,
+                                      const arr_t & k_m,
+                                      const ijk_t &ijk,
+                                      typename std::enable_if<nd == 3>::type* = 0)
+      {
+        av[0](ijk[0] + h, ijk[1], ijk[2]) *= coeff * 0.5 * 
+                           (k_m(ijk[0] + 1, ijk[1], ijk[2]) + k_m(ijk[0], ijk[1], ijk[2]));
+        
+        av[1](ijk[0], ijk[1] + h, ijk[2]) *= coeff * 0.5 * 
+                           (k_m(ijk[0], ijk[1] + 1, ijk[2]) + k_m(ijk[0], ijk[1], ijk[2]));
+        
+        av[2](ijk[0], ijk[1], ijk[2] + h) *= coeff * 0.5 * 
+                           (k_m(ijk[0], ijk[1], ijk[2] + 1) + k_m(ijk[0], ijk[1], ijk[2]));
       }
       
+      // multiplication of compact tensor components by constant molecular viscosity
+      template <int nd, class arrvec_t, class real_t, class ijk_t>
+      inline void multiply_tnsr_cmpct(const arrvec_t &av,
+                                      const real_t coeff,
+                                      const ijk_t &ijk,
+                                      typename std::enable_if<nd == 3>::type* = 0)
+      {
+        multiply_vctr_cmpct<nd>(av, 1.0, ijk);
+        av[3](ijk[0] + h, ijk[1] + h, ijk[2]) *= coeff;
+        av[4](ijk[0] + h, ijk[1], ijk[2] + h) *= coeff;
+        av[5](ijk[0], ijk[1] + h, ijk[2] + h) *= coeff;
+      }
+
+      // multiplication of compact tensor components by variable eddy viscosity
+      template <int nd, class arrvec_t, class real_t, class arr_t, class ijk_t>
+      inline void multiply_tnsr_cmpct(const arrvec_t &av,
+                                      const real_t coeff,
+                                      const arr_t &k_m,
+                                      const ijk_t &ijk,
+                                      typename std::enable_if<nd == 3>::type* = 0)
+      {
+        multiply_vctr_cmpct<nd>(av, coeff, k_m, ijk);
+        av[3](ijk[0] + h, ijk[1] + h, ijk[2]) *= coeff * 0.25 * ( k_m(ijk[0] + 1, ijk[1]    , ijk[2])
+                                                                + k_m(ijk[0]    , ijk[1]    , ijk[2])
+                                                                + k_m(ijk[0] + 1, ijk[1] + 1, ijk[2])
+                                                                + k_m(ijk[0]    , ijk[2] + 1, ijk[2])
+                                                        );
+        
+        av[4](ijk[0] + h, ijk[1], ijk[2] + h) *= coeff * 0.25 * ( k_m(ijk[0] + 1, ijk[1], ijk[2]    )
+                                                                + k_m(ijk[0]    , ijk[1], ijk[2]    )
+                                                                + k_m(ijk[0] + 1, ijk[1], ijk[2] + 1)
+                                                                + k_m(ijk[0]    , ijk[1], ijk[2] + 1)
+                                                        );
+
+        av[5](ijk[0], ijk[1] + h, ijk[2] + h) *= coeff * 0.25 * ( k_m(ijk[0], ijk[1]    , ijk[2] + 1)
+                                                                + k_m(ijk[0], ijk[1]    , ijk[2]    )
+                                                                + k_m(ijk[0], ijk[1] + 1, ijk[2] + 1)
+                                                                + k_m(ijk[0], ijk[1] + 1, ijk[2]    )
+                                                        );
+      }
+      
+      // add stress forces
       // 3D version
-      template <int nd, class arrvec_t, class ijk_t, class dijk_t>
-      inline void calc_stress_div(arrvec_t &sdiv,
-                                  const arrvec_t &tau,
-                                  const ijk_t &ijk,
-                                  const dijk_t &dijk,
-                                  typename std::enable_if<nd == 3>::type* = 0)
-      {
-        sdiv[0](ijk) = formulae::nabla::grad<0>(tau[0], ijk[0], ijk[1], ijk[2], dijk[0]);
-        sdiv[1](ijk) = formulae::nabla::grad<0>(tau[1], ijk[0], ijk[1], ijk[2], dijk[0]);
-        sdiv[2](ijk) = formulae::nabla::grad<0>(tau[2], ijk[0], ijk[1], ijk[2], dijk[0]);
-
-        sdiv[3](ijk) = formulae::nabla::grad<1>(tau[1], ijk[1], ijk[2], ijk[0], dijk[1]);
-        sdiv[4](ijk) = formulae::nabla::grad<1>(tau[3], ijk[1], ijk[2], ijk[0], dijk[1]);
-        sdiv[5](ijk) = formulae::nabla::grad<1>(tau[4], ijk[1], ijk[2], ijk[0], dijk[1]);
-
-        sdiv[6](ijk) = formulae::nabla::grad<2>(tau[2], ijk[2], ijk[0], ijk[1], dijk[2]);
-        sdiv[7](ijk) = formulae::nabla::grad<2>(tau[4], ijk[2], ijk[0], ijk[1], dijk[2]);
-        sdiv[8](ijk) = formulae::nabla::grad<2>(tau[5], ijk[2], ijk[0], ijk[1], dijk[2]);
-      }
-      
       template <int nd, class arrvec_t, class ijk_t, class dijk_t, class real_t>
       inline void calc_stress_rhs_cmpct(arrvec_t &rhs,
                                         const arrvec_t &tau,
@@ -349,23 +444,6 @@ namespace libmpdataxx
         }
       }
 
-      // add stress forces
-      // 2D version
-      template <int nd, class arrvec_t, class ijk_t, class real_t>
-      inline void calc_stress_rhs(arrvec_t &rhs, const arrvec_t &drv, ijk_t &ijk, real_t coeff, typename std::enable_if<nd == 2>::type* = 0)
-      {
-        rhs[0](ijk) += coeff * (drv[0](ijk) + drv[2](ijk));
-        rhs[1](ijk) += coeff * (drv[1](ijk) + drv[3](ijk));
-      }
-      
-      // 3D version
-      template <int nd, class arrvec_t, class ijk_t, class real_t>
-      inline void calc_stress_rhs(arrvec_t &rhs, const arrvec_t &drv, ijk_t &ijk, real_t coeff, typename std::enable_if<nd == 3>::type* = 0)
-      {
-        rhs[0](ijk) += coeff * (drv[0](ijk) + drv[3](ijk) + drv[6](ijk));
-        rhs[1](ijk) += coeff * (drv[1](ijk) + drv[4](ijk) + drv[7](ijk));
-        rhs[2](ijk) += coeff * (drv[2](ijk) + drv[5](ijk) + drv[8](ijk));
-      }
     } // namespace stress
   } // namespace formulae
 } // namespace libmpdataxx
