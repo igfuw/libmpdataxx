@@ -78,86 +78,83 @@ namespace libmpdataxx
           // TODO: get rid of superfluous barriers
           for (auto& vip : this->vips())
             this->xchng_sclr(vip, this->ijk, 1);
-
-          // surface indices
-          auto ij = this->ijk;
-          ij.lbound(ct_params_t::n_dims - 1) = 0;
-          ij.ubound(ct_params_t::n_dims - 1) = 0;
-         
-          // using tau[0] as a temporary array for surface stress
-          tau[0](ij) = 0;
-          for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
-          {
-            tau[0](ij) += pow2(this->vips()[d](ij));
-          }
-          tau[0](ij) = sqrt(tau[0](ij));
-
-          this->xchng_sclr(tau[0], ij);
           
-          // to include halos  
-          for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
+          if (ct_params_t::stress_diff == compact)
           {
-            ij.expand(d, 1);
-          }
+            // surface indices
+            auto ij = this->ijk;
+            ij.lbound(ct_params_t::n_dims - 1) = 0;
+            ij.ubound(ct_params_t::n_dims - 1) = 0;
+           
+            // using tau[0] as a temporary array for surface stress
+            tau[0](ij) = 0;
+            for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
+            {
+              tau[0](ij) += pow2(this->vips()[d](ij));
+            }
+            tau[0](ij) = sqrt(tau[0](ij));
 
-          for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
+            this->xchng_sclr(tau[0], ij);
+            
+            // to include halos  
+            for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
+            {
+              ij.expand(d, 1);
+            }
+
+            for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
+            {
+              tau_srfc[d](ij) = 0.1 * tau[0](ij) * this->vips()[d](ij);
+            }
+            this->mem->barrier();
+
+            formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
+
+            this->xchng_tnsr_diag_gndsky(tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
+            this->xchng_tnsr_offdiag_gndsky(tau, tau_srfc, this->ijk, this->ijkm);
+            
+            // update forces
+            formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims>(this->vip_rhs, tau, this->ijk, this->dijk, 2.0);
+          }
+          else
           {
-            tau_srfc[d](ij) = 0.1 * tau[0](ij) * this->vips()[d](ij);
+            // calculate velocity gradient tensor
+            formulae::stress::calc_vgrad<ct_params_t::n_dims>(drv, this->vips(), this->ijk, this->dijk);
+
+            // optionally correct derivatives using Pade scheme
+            if ((stress_diff_t)ct_params_t::stress_diff == pade)
+            {
+              for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
+                pade_deriv(d);
+            }
+            
+            // calculate independent components of deformation tensor
+            formulae::stress::calc_deform<ct_params_t::n_dims>(tau, drv, this->ijk);
+            
+            // multiply deformation tensor by sgs viscosity to obtain stress tensor
+            multiply_sgs_visc();
+            
+            // TODO: get rid of superfluous barriers
+            for (auto& t : tau)
+            {
+              this->xchng_sclr(t, this->ijk);
+            }
+            // calculate elements of stress tensor divergence
+            formulae::stress::calc_stress_div<ct_params_t::n_dims>(drv, tau, this->ijk, this->dijk);
+
+            // optionally correct derivatives using Pade scheme
+            if ((stress_diff_t)ct_params_t::stress_diff == pade)
+            {
+              for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
+                pade_deriv(d);
+            }
+
+            // update forces
+            formulae::stress::calc_stress_rhs<ct_params_t::n_dims>(this->vip_rhs, drv, this->ijk, this->dt);
           }
-          this->mem->barrier();
-
-          formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
-
-          this->xchng_tnsr_diag_gndsky(tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
-          this->xchng_tnsr_offdiag_gndsky(tau, tau_srfc, this->ijk, this->ijkm);
-
-          // multiply deformation tensor by sgs viscosity to obtain stress tensor
-          multiply_sgs_visc();
-          
-          // update forces
-          formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims>(this->vip_rhs, tau, this->ijk, this->dijk, 2.0);
-
-          //// calculate velocity gradient tensor
-          //formulae::stress::calc_vgrad<ct_params_t::n_dims>(drv, this->vips(), this->ijk, this->dijk);
-
-          //// optionally correct derivatives using Pade scheme
-          //if ((stress_diff_t)ct_params_t::stress_diff == pade)
-          //{
-          //  for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
-          //    pade_deriv(d);
-          //}
-          //
-          //// calculate independent components of deformation tensor
-          //formulae::stress::calc_deform<ct_params_t::n_dims>(tau, drv, this->ijk);
-         
-          //// multiply deformation tensor by sgs viscosity to obtain stress tensor
-          //multiply_sgs_visc();
-          //
-          //// TODO: get rid of superfluous barriers
-          //for (auto& t : tau)
-          //{
-          //  this->xchng_sclr(t, this->ijk);
-          //}
-          //// calculate elements of stress tensor divergence
-          //formulae::stress::calc_stress_div<ct_params_t::n_dims>(drv, tau, this->ijk, this->dijk);
-
-          //// optionally correct derivatives using Pade scheme
-          //if ((stress_diff_t)ct_params_t::stress_diff == pade)
-          //{
-          //  for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
-          //    pade_deriv(d);
-          //}
-
-          //// update forces
-          //formulae::stress::calc_stress_rhs<ct_params_t::n_dims>(this->vip_rhs, drv, this->ijk, this->dt);
         }
 
         public:
-
-        struct rt_params_t : parent_t::rt_params_t
-        {
-          typename ct_params_t::real_t eta = 0;
-        };
 
         // ctor
         mpdata_rhs_vip_prs_sgs_common(
@@ -174,16 +171,6 @@ namespace libmpdataxx
           {
             ijkm[d] = rng_t(this->ijk[d].first() - 1, this->ijk[d].last());
           }
-
-          //for (auto & t : tau_srfc)
-          //{
-          //  auto s = t.shape();
-          //  s[2] = 1;
-          //  t.resize(s);
-          //  auto b = t.base();
-          //  b[2] = 0;
-          //  t.reindexSelf(b);
-          //}
         }
 
         static void alloc(
@@ -219,7 +206,6 @@ namespace libmpdataxx
           // TODO: do not allocate unnecessary memory when not using pade differencing
           parent_t::alloc_tmp_sclr(mem, __FILE__, std::pow(static_cast<int>(ct_params_t::n_dims), 2));
           parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // wrk
-          //parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // tau_srfc
           parent_t::alloc_tmp_sclr(mem, __FILE__, 2, "", true); // tau_srfc
         }
       };
