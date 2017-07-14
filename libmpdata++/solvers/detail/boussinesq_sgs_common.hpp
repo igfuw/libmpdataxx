@@ -29,6 +29,9 @@ namespace libmpdataxx
 
         void multiply_sgs_visc()
         {
+//          static_assert(ct_params_t::stress_diff == compact,
+//                        "boussinesq with smagorinsky model requires compact sgs formulation");
+
           // surface indices
           auto ij = this->ijk;
           ij.lbound(ct_params_t::n_dims - 1) = 0;
@@ -71,11 +74,11 @@ namespace libmpdataxx
 
           formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims>(this->tau, 1.0, this->k_m, ijkm_aux);
 
-          this->xchng_tnsr_offdiag_gndsky(this->tau, this->tau_srfc, this->ijk, this->ijkm);
+          this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
 
           formulae::stress::multiply_vctr_cmpct<ct_params_t::n_dims>(grad_tht, 1.0 / prandtl_num, this->k_m, this->ijk);
 
-          this->xchng_vctr_gndsky(grad_tht, hflux_srfc, this->ijk);
+          this->xchng_sgs_vctr(grad_tht, hflux_srfc, this->ijk);
           // hack, convinient place to update the heat_flux
           this->hflux(this->ijk) = formulae::nabla::div_cmpct<parent_t::n_dims>(grad_tht, this->ijk, this->dijk);
         }

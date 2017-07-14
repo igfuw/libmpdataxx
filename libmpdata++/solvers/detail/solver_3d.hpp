@@ -57,53 +57,54 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 	
-        virtual void xchng_vctr_gndsky(const arrvec_t<typename parent_t::arr_t> &av,
+        virtual void xchng_sgs_vctr(const arrvec_t<typename parent_t::arr_t> &av,
                        const typename parent_t::arr_t &b, 
 	               const idx_t<3> &range_ijk
         ) final
 	{
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_gndsky(av, b, range_ijk[1], range_ijk[2]);
-	  for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_gndsky(av, b, range_ijk[2], range_ijk[0]);
-	  for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_gndsky(av, b, range_ijk[0], range_ijk[1]);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_vctr(av, b, range_ijk[1], range_ijk[2]);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_vctr(av, b, range_ijk[2], range_ijk[0]);
+	  for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_vctr(av, b, range_ijk[0], range_ijk[1]);
           this->mem->barrier();
 	}
         
-        virtual void xchng_tnsr_diag_gndsky(const arrvec_t<typename parent_t::arr_t> &av,
+        virtual void xchng_sgs_tnsr_diag(const arrvec_t<typename parent_t::arr_t> &av,
                        const typename parent_t::arr_t &w,
 	               const idx_t<3> &range_ijk
         ) final
 	{
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_tnsr_gndsky(av, w, range_ijk[1], range_ijk[2], this->dijk[0]);
-	  for (auto &bc : this->bcs[1]) bc->fill_halos_tnsr_gndsky(av, w, range_ijk[2], range_ijk[0], this->dijk[1]);
-	  for (auto &bc : this->bcs[2]) bc->fill_halos_tnsr_gndsky(av, w, range_ijk[0], range_ijk[1], this->dijk[2]);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_tnsr(av, w, range_ijk[1], range_ijk[2], this->dijk[0]);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_tnsr(av, w, range_ijk[2], range_ijk[0], this->dijk[1]);
+	  for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_tnsr(av, w, range_ijk[0], range_ijk[1], this->dijk[2]);
           this->mem->barrier();
 	}
         
-        virtual void xchng_tnsr_offdiag_gndsky(const arrvec_t<typename parent_t::arr_t> &av,
+        virtual void xchng_sgs_tnsr_offdiag(const arrvec_t<typename parent_t::arr_t> &av,
                        const arrvec_t<typename parent_t::arr_t> &bv, 
 	               const idx_t<3> &range_ijk,
 	               const std::array<rng_t, 3> &range_ijkm
         ) final
 	{
+          // off-diagonal components of stress tensor are treated the same as a vector
           this->mem->barrier();
           for (auto &bc : this->bcs[0])
           {
-            bc->fill_halos_vctr_gndsky(av, bv[0], range_ijkm[1], range_ijk[2]^1, 3);
-            bc->fill_halos_vctr_gndsky(av, bv[1], range_ijk[1]^1, range_ijkm[2], 4);
+            bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[1], range_ijk[2]^1, 3);
+            bc->fill_halos_sgs_vctr(av, bv[1], range_ijk[1]^1, range_ijkm[2], 4);
           }
 
 	  for (auto &bc : this->bcs[1])
           {
-            bc->fill_halos_vctr_gndsky(av, bv[0], range_ijk[2]^1, range_ijkm[0], 2);
-            bc->fill_halos_vctr_gndsky(av, bv[1], range_ijkm[2], range_ijk[0]^1, 4);
+            bc->fill_halos_sgs_vctr(av, bv[0], range_ijk[2]^1, range_ijkm[0], 2);
+            bc->fill_halos_sgs_vctr(av, bv[1], range_ijkm[2], range_ijk[0]^1, 4);
           }
 
 	  for (auto &bc : this->bcs[2])
           {
-            bc->fill_halos_vctr_gndsky(av, bv[0], range_ijkm[0], range_ijk[1]^1, 2);
-            bc->fill_halos_vctr_gndsky(av, bv[1], range_ijk[0]^1, range_ijkm[1], 3);
+            bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[0], range_ijk[1]^1, 2);
+            bc->fill_halos_sgs_vctr(av, bv[1], range_ijk[0]^1, range_ijkm[1], 3);
           }
           this->mem->barrier();
 	}

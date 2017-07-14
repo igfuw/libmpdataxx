@@ -47,12 +47,12 @@ namespace libmpdataxx
         av[d](pi<d>(this->left_halo_vctr, j, k)) = av[d](pi<d>(this->rght_intr_vctr, j, k));
       }
       
-      void fill_halos_vctr_gndsky(const arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
+      void fill_halos_sgs_vctr(const arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {
         fill_halos_vctr_alng(av, j, k);
       }
       
-      void fill_halos_tnsr_gndsky(const arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
+      void fill_halos_sgs_tnsr(const arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
       {
         fill_halos_vctr_alng(av, j, k);
       }

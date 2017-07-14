@@ -108,22 +108,22 @@ namespace libmpdataxx
 	  assert(false && "bcond::fill_halos_vctr() called!");
 	};
         
-        virtual void fill_halos_vctr_gndsky(const arrvec_t<arr_3d_t> &,
+        virtual void fill_halos_sgs_vctr(const arrvec_t<arr_3d_t> &,
                                             const arr_3d_t &,
                                             const rng_t &,
                                             const rng_t &,
                                             const int offset = 0)
 	{
-	  assert(false && "bcond::fill_halos_vctr_gndsky() called!");
+	  assert(false && "bcond::fill_halos_sgs_vctr() called!");
 	};
         
-        virtual void fill_halos_tnsr_gndsky(const arrvec_t<arr_3d_t> &,
+        virtual void fill_halos_sgs_tnsr(const arrvec_t<arr_3d_t> &,
                                             const arr_3d_t &,
                                             const rng_t &,
                                             const rng_t &,
                                             const real_t)
 	{
-	  assert(false && "bcond::fill_halos_tnsr_gndsky() called!");
+	  assert(false && "bcond::fill_halos_sgs_tnsr called!");
 	};
 
 	virtual void fill_halos_vctr_nrml(const arr_3d_t &, const rng_t &, const rng_t &) 

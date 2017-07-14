@@ -110,8 +110,11 @@ namespace libmpdataxx
 
             formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
 
-            this->xchng_tnsr_diag_gndsky(tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
-            this->xchng_tnsr_offdiag_gndsky(tau, tau_srfc, this->ijk, this->ijkm);
+            this->xchng_sgs_tnsr_diag(tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
+            this->xchng_sgs_tnsr_offdiag(tau, tau_srfc, this->ijk, this->ijkm);
+            
+            // multiply deformation tensor by sgs viscosity to obtain stress tensor
+            multiply_sgs_visc();
             
             // update forces
             formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims>(this->vip_rhs, tau, this->ijk, this->dijk, 2.0);

@@ -27,7 +27,7 @@ namespace libmpdataxx
 
       public:
       
-      void fill_halos_vctr_gndsky(const arrvec_t<arr_t> &av, const arr_t &b, const rng_t &j, const rng_t &k, const int offset = 0)
+      void fill_halos_sgs_vctr(const arrvec_t<arr_t> &av, const arr_t &b, const rng_t &j, const rng_t &k, const int offset = 0)
       {
         using namespace idxperm;
         // fill halos for a staggered field based on prescribed values on the ground (b array)
@@ -36,7 +36,7 @@ namespace libmpdataxx
         a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * b(pi<d>(this->left_edge_sclr, j, k)) - a(pi<d>(this->left_edge_sclr + h, j, k));
       }
       
-      void fill_halos_tnsr_gndsky(const arrvec_t<arr_t> &av, const arr_t &u, const rng_t &j, const rng_t &k, const real_t di)
+      void fill_halos_sgs_tnsr(const arrvec_t<arr_t> &av, const arr_t &u, const rng_t &j, const rng_t &k, const real_t di)
       {
         using namespace idxperm;
         const auto &a = av[d];
@@ -63,7 +63,7 @@ namespace libmpdataxx
       
       public:
 
-      void fill_halos_vctr_gndsky(const arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
+      void fill_halos_sgs_vctr(const arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {
         // fill halos for a staggered field so that it has zero value on tke sky edge
         // that is 0.5 * (a(sky-h) + a(sky+h)) = 0
@@ -72,7 +72,7 @@ namespace libmpdataxx
         a(pi<d>(this->rght_edge_sclr + h, j, k)) = - a(pi<d>(this->rght_edge_sclr - h, j, k));
       }
       
-      void fill_halos_tnsr_gndsky(const arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const real_t di)
+      void fill_halos_sgs_tnsr(const arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const real_t di)
       {
         using namespace idxperm;
         const auto &a = av[d];
