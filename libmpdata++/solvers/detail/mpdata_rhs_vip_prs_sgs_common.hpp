@@ -153,7 +153,7 @@ namespace libmpdataxx
             }
 
             // update forces
-            formulae::stress::calc_stress_rhs<ct_params_t::n_dims>(this->vip_rhs, drv, this->ijk, this->dt);
+            formulae::stress::calc_stress_rhs<ct_params_t::n_dims>(this->vip_rhs, drv, this->ijk, 2.0);
           }
         }
 
