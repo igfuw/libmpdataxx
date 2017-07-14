@@ -160,6 +160,7 @@ namespace libmpdataxx
           if (ct_params_t::stress_diff != compact)
           {
             parent_t::alloc_tmp_sclr(mem, __FILE__, 3 * (ct_params_t::n_dims - 1)); // unique strain rate tensor elements
+            parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_dims, "", true); // unstaggered tau_srfc
           }
           else
           {
@@ -184,7 +185,6 @@ namespace libmpdataxx
             }
           }
           // TODO: do not allocate unnecessary memory when not using pade differencing
-          parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_dims, "", true); // unstaggered tau_srfc
           parent_t::alloc_tmp_sclr(mem, __FILE__, std::pow(static_cast<int>(ct_params_t::n_dims), 2)); // drv
           parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // wrk
         }

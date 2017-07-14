@@ -175,9 +175,9 @@ namespace libmpdataxx
                                   const ijkm_t &ijkm,
                                   typename std::enable_if<nd == 2>::type* = 0)
       {
-        tau[2](ijkm[0] + h, ijk[1]) = cdrag * 0.25 * 
-                                      abs((v[0](ijkm[0] + 1, ijk[1]) + v[0](ijkm[0], ijk[1]))) *
-                                      (v[0](ijkm[0] + 1, ijk[1]) + v[0](ijkm[0], ijk[1]));
+        tau[0](ijkm[0] + h, 0) = cdrag * 0.25 * 
+                                 abs((v[0](ijkm[0] + 1, 0) + v[0](ijkm[0], 0))) *
+                                 (v[0](ijkm[0] + 1, 0) + v[0](ijkm[0], 0));
       }
 
       // 3D version
@@ -189,14 +189,14 @@ namespace libmpdataxx
                                   const ijkm_t &ijkm,
                                   typename std::enable_if<nd == 3>::type* = 0)
       {
-        tau[4](ijkm[0] + h, ijk[1], ijk[2]) = cdrag * 0.25 * sqrt(
-                                                pow2((v[0](ijkm[0] + 1, ijk[1], ijk[2]) + v[0](ijkm[0], ijk[1], ijk[2])))
-                                              + pow2((v[1](ijkm[0] + 1, ijk[1], ijk[2]) + v[1](ijkm[0], ijk[1], ijk[2])))
-                                              ) * (v[0](ijkm[0] + 1, ijk[1], ijk[2]) + v[0](ijkm[0], ijk[1], ijk[2]));
-        tau[5](ijk[0], ijkm[1] + h, ijk[2]) = cdrag * 0.25 * sqrt(
-                                                pow2((v[0](ijk[0], ijkm[1] + 1, ijk[2]) + v[0](ijk[0], ijkm[1], ijk[2])))
-                                              + pow2((v[1](ijk[0], ijkm[1] + 1, ijk[2]) + v[1](ijk[0], ijkm[1], ijk[2])))
-                                              ) * (v[1](ijk[0], ijkm[1] + 1, ijk[2]) + v[1](ijk[0], ijkm[1], ijk[2]));
+        tau[0](ijkm[0] + h, ijk[1], 0) = cdrag * 0.25 * sqrt(
+                                                pow2((v[0](ijkm[0] + 1, ijk[1], 0) + v[0](ijkm[0], ijk[1], 0)))
+                                              + pow2((v[1](ijkm[0] + 1, ijk[1], 0) + v[1](ijkm[0], ijk[1], 0)))
+                                              ) * (v[0](ijkm[0] + 1, ijk[1], 0) + v[0](ijkm[0], ijk[1], 0));
+        tau[1](ijk[0], ijkm[1] + h, 0) = cdrag * 0.25 * sqrt(
+                                                pow2((v[0](ijk[0], ijkm[1] + 1, 0) + v[0](ijk[0], ijkm[1], 0)))
+                                              + pow2((v[1](ijk[0], ijkm[1] + 1, 0) + v[1](ijk[0], ijkm[1], 0)))
+                                              ) * (v[1](ijk[0], ijkm[1] + 1, 0) + v[1](ijk[0], ijkm[1], 0));
       }
 
       // calculates unique deformation tensor components
