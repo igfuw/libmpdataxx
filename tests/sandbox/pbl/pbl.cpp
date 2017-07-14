@@ -24,7 +24,7 @@ void test(const std::string &dirname)
     enum { rhs_scheme = solvers::trapez };
     enum { vip_vab = solvers::impl };
     enum { prs_scheme = solvers::cr };
-    enum { sgs_diff = solvers::compact };
+    enum { stress_diff = solvers::compact };
     enum { sgs_scheme = solvers::smg };
     enum { impl_tht = true };
     struct ix { enum {

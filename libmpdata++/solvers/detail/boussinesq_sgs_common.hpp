@@ -29,8 +29,8 @@ namespace libmpdataxx
 
         void multiply_sgs_visc()
         {
-//          static_assert(ct_params_t::stress_diff == compact,
-//                        "boussinesq with smagorinsky model requires compact sgs formulation");
+          static_assert(ct_params_t::stress_diff == compact,
+                        "boussinesq with smagorinsky model requires compact sgs formulation");
 
           // surface indices
           auto ij = this->ijk;
