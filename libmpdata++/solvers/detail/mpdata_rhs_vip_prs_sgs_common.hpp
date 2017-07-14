@@ -193,7 +193,7 @@ namespace libmpdataxx
               parent_t::alloc_tmp_stgr(mem,
                                        __FILE__,
                                        3, // unique strain rate tensor elements
-                                       {{true, false}, {true, true}, {false, true}}
+                                       {{true, false}, {false, true}, {true, true}}
                                       );
             }
             else
@@ -201,8 +201,8 @@ namespace libmpdataxx
               parent_t::alloc_tmp_stgr(mem,
                                        __FILE__,
                                        6, // unique strain rate tensor elements
-                                       {{true, false, false}, {true, true, false}, {true, false, true},
-                                        {false, true, false}, {false, true, true}, {false, false, true}}
+                                       {{true, false, false}, {false, true, false}, {false, false, true},
+                                        {true, true, false}, {true, false, true}, {false, true, true}}
                                       );
             }
           }
