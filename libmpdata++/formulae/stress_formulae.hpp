@@ -166,6 +166,37 @@ namespace libmpdataxx
       // Compact formulation
 
       // calculates unique deformation tensor components
+      // 2D version
+      template <int nd, class arrvec_t, class ijk_t, class ijkm_t, class dijk_t>
+      inline void calc_deform_cmpct(arrvec_t &tau,
+                                    const arrvec_t &v,
+                                    const ijk_t &ijk,
+                                    const ijkm_t &ijkm,
+                                    const dijk_t &dijk,
+                                    typename std::enable_if<nd == 2>::type* = 0)
+      {
+        tau[0](ijkm[0] + h, ijk[1])
+        =
+        2 * (v[0](ijkm[0] + 1, ijk[1]) - v[0](ijkm[0], ijk[1])) / dijk[0];
+        
+        tau[1](ijk[0], ijkm[1] + h)
+        =
+        2 * (v[1](ijk[0], ijkm[1] + 1) - v[1](ijk[0], ijkm[1])) / dijk[1];
+
+        tau[2](ijkm[0] + h, ijkm[1] + h)
+        =
+        0.5 *
+        (
+          ( v[0](ijkm[0], ijkm[1] + 1) - v[0](ijkm[0], ijkm[1]) 
+          + v[0](ijkm[0] + 1, ijkm[1] + 1) - v[0](ijkm[0] + 1, ijkm[1])
+          ) / dijk[1]
+          +
+          ( v[1](ijkm[0] + 1, ijkm[1]) - v[1](ijkm[0], ijkm[1]) 
+          + v[1](ijkm[0] + 1, ijkm[1] + 1) - v[1](ijkm[0], ijkm[1] + 1)
+          ) / dijk[0]
+        );
+      }
+
       // 3D version
       template <int nd, class arrvec_t, class ijk_t, class ijkm_t, class dijk_t>
       inline void calc_deform_cmpct(arrvec_t &tau,
@@ -228,6 +259,22 @@ namespace libmpdataxx
       }
       
       // Total deformation
+      // 2D version
+      template <int nd, class arrvec_t, class ijk_t>
+      inline auto calc_tdef_sq_cmpct(
+	const arrvec_t &tau,
+        const ijk_t &ijk,
+        typename std::enable_if<nd == 2>::type* = 0
+      ) return_macro(
+        ,
+          (
+            pow2(tau[0](ijk[0] + h, ijk[1])) + pow2(tau[0](ijk[0] - h, ijk[1]))
+          + pow2(tau[1](ijk[0], ijk[1] + h)) + pow2(tau[1](ijk[0], ijk[1] - h))
+          + pow2(tau[2](ijk[0] + h, ijk[1] + h)) + pow2(tau[2](ijk[0] - h, ijk[1] + h))
+          + pow2(tau[2](ijk[0] + h, ijk[1] - h)) + pow2(tau[2](ijk[0] - h, ijk[1] - h))
+          ) / 4
+      )
+
       // 3D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq_cmpct(
@@ -250,6 +297,18 @@ namespace libmpdataxx
       )
      
       // multiplication of compact vector components by constant molecular viscosity
+      // 2D version
+      template <int nd, class arrvec_t, class real_t, class ijk_t>
+      inline void multiply_vctr_cmpct(const arrvec_t &av,
+                                     real_t coeff,
+                                     const ijk_t &ijk,
+                                     typename std::enable_if<nd == 2>::type* = 0)
+      {
+        av[0](ijk[0] + h, ijk[1]) *= coeff;
+        av[1](ijk[0], ijk[1] + h) *= coeff;
+      }
+
+      // 3D version
       template <int nd, class arrvec_t, class real_t, class ijk_t>
       inline void multiply_vctr_cmpct(const arrvec_t &av,
                                      real_t coeff,
@@ -262,6 +321,22 @@ namespace libmpdataxx
       }
 
       // multiplication of compact vector components by variable eddy viscosity
+      // 2D version
+      template <int nd, class arrvec_t, class real_t, class arr_t, class ijk_t>
+      inline void multiply_vctr_cmpct(const arrvec_t &av,
+                                      real_t coeff,
+                                      const arr_t & k_m,
+                                      const ijk_t &ijk,
+                                      typename std::enable_if<nd == 2>::type* = 0)
+      {
+        av[0](ijk[0] + h, ijk[1]) *= coeff * 0.5 * 
+                           (k_m(ijk[0] + 1, ijk[1]) + k_m(ijk[0], ijk[1]));
+        
+        av[1](ijk[0], ijk[1] + h) *= coeff * 0.5 * 
+                           (k_m(ijk[0], ijk[1] + 1) + k_m(ijk[0], ijk[1]));
+      }
+
+      // 3D version
       template <int nd, class arrvec_t, class real_t, class arr_t, class ijk_t>
       inline void multiply_vctr_cmpct(const arrvec_t &av,
                                       real_t coeff,
@@ -280,6 +355,17 @@ namespace libmpdataxx
       }
       
       // multiplication of compact tensor components by constant molecular viscosity
+      // 2D version
+      template <int nd, class arrvec_t, class real_t, class ijk_t>
+      inline void multiply_tnsr_cmpct(const arrvec_t &av,
+                                      const real_t coeff,
+                                      const ijk_t &ijk,
+                                      typename std::enable_if<nd == 2>::type* = 0)
+      {
+        multiply_vctr_cmpct<nd>(av, 1.0, ijk);
+        av[2](ijk[0] + h, ijk[1] + h) *= coeff;
+      }
+
       template <int nd, class arrvec_t, class real_t, class ijk_t>
       inline void multiply_tnsr_cmpct(const arrvec_t &av,
                                       const real_t coeff,
@@ -293,6 +379,23 @@ namespace libmpdataxx
       }
 
       // multiplication of compact tensor components by variable eddy viscosity
+      // 2D version
+      template <int nd, class arrvec_t, class real_t, class arr_t, class ijk_t>
+      inline void multiply_tnsr_cmpct(const arrvec_t &av,
+                                      const real_t coeff,
+                                      const arr_t &k_m,
+                                      const ijk_t &ijk,
+                                      typename std::enable_if<nd == 2>::type* = 0)
+      {
+        multiply_vctr_cmpct<nd>(av, coeff, k_m, ijk);
+        av[2](ijk[0] + h, ijk[1] + h) *= coeff * 0.25 * ( k_m(ijk[0] + 1, ijk[1]    )
+                                                        + k_m(ijk[0]    , ijk[1]    )
+                                                        + k_m(ijk[0] + 1, ijk[1] + 1)
+                                                        + k_m(ijk[0]    , ijk[2] + 1)
+                                                        );
+      }
+
+      // 3D version
       template <int nd, class arrvec_t, class real_t, class arr_t, class ijk_t>
       inline void multiply_tnsr_cmpct(const arrvec_t &av,
                                       const real_t coeff,
@@ -321,6 +424,39 @@ namespace libmpdataxx
       }
       
       // add stress forces
+      // 2D version
+      template <int nd, class arrvec_t, class ijk_t, class dijk_t, class real_t>
+      inline void calc_stress_rhs_cmpct(arrvec_t &rhs,
+                                        const arrvec_t &tau,
+                                        const ijk_t &ijk,
+                                        const dijk_t &dijk,
+                                        real_t coeff,
+                                        typename std::enable_if<nd == 2>::type* = 0)
+      {
+        rhs[0](ijk)
+        +=
+        coeff *
+        (
+          (tau[0](ijk[0] + h, ijk[1]) - tau[0](ijk[0] - h, ijk[1])) / dijk[0]
+          + 0.5 * 
+          ( tau[2](ijk[0] + h, ijk[1] + h) - tau[2](ijk[0] + h, ijk[1] - h)
+          + tau[2](ijk[0] - h, ijk[1] + h) - tau[2](ijk[0] - h, ijk[1] - h)
+          ) / dijk[1]
+        );
+        
+        rhs[1](ijk)
+        +=
+        coeff *
+        (
+          0.5 * 
+          ( tau[2](ijk[0] + h, ijk[1] + h) - tau[2](ijk[0] - h, ijk[1] + h)
+          + tau[2](ijk[0] + h, ijk[1] - h) - tau[2](ijk[0] - h, ijk[1] - h)
+          ) / dijk[0]
+          +
+          (tau[1](ijk[0], ijk[1] + h) - tau[1](ijk[0], ijk[1] - h)) / dijk[1]
+        );
+      }
+
       // 3D version
       template <int nd, class arrvec_t, class ijk_t, class dijk_t, class real_t>
       inline void calc_stress_rhs_cmpct(arrvec_t &rhs,
