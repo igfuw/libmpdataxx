@@ -56,6 +56,42 @@ namespace libmpdataxx
           // TODO: open bc nust be last!!!
           this->mem->barrier();
         }
+        
+        virtual void xchng_sgs_vctr(const arrvec_t<typename parent_t::arr_t> &av,
+                            const typename parent_t::arr_t &b,
+                            const idx_t<2> &range_ijk
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_vctr(av, b, range_ijk[1]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_vctr(av, b, range_ijk[0]);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_sgs_tnsr_diag(const arrvec_t<typename parent_t::arr_t> &av,
+                                         const typename parent_t::arr_t &w,
+	                                 const idx_t<2> &range_ijk
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_tnsr(av, w, range_ijk[1], this->dijk[0]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_tnsr(av, w, range_ijk[0], this->dijk[1]);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_sgs_tnsr_offdiag(const arrvec_t<typename parent_t::arr_t> &av,
+                                            const arrvec_t<typename parent_t::arr_t> &bv, 
+	                                    const idx_t<2> &range_ijk,
+	                                    const std::array<rng_t, 2> &range_ijkm
+        ) final
+        {
+
+          // off-diagonal components of stress tensor are treated the same as a vector
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[1], 2);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[0], 1);
+          this->mem->barrier();
+        }
 
         virtual void xchng_vctr_nrml(
           const arrvec_t<typename parent_t::arr_t> &arrvec, 
@@ -259,21 +295,31 @@ namespace libmpdataxx
 
         protected:
 
+        // helper method to allocate a temporary space composed of arbitrarily staggered arrays
+        static void alloc_tmp_stgr(
+          typename parent_t::mem_t *mem,
+          const char * __file__,
+          const int n_arr,
+          const std::vector<std::vector<bool>> &stgr
+        )
+        {
+          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+          for (int n = 0; n < n_arr; ++n)
+          {
+            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
+              stgr[n][0] ? parent_t::rng_vctr(mem->grid_size[0]) : parent_t::rng_sclr(mem->grid_size[0]),
+              stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) : parent_t::rng_sclr(mem->grid_size[1])
+            ))); 
+          }
+        }
+        
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
           typename parent_t::mem_t *mem,
           const char * __file__
         )
         {
-          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
-          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_vctr(mem->grid_size[0]), 
-            parent_t::rng_sclr(mem->grid_size[1]) 
-          ))); 
-          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_sclr(mem->grid_size[0]), 
-            parent_t::rng_vctr(mem->grid_size[1]) 
-          ))); 
+          alloc_tmp_stgr(mem, __file__, 2, {{true, false}, {false, true}});
         }
 
         // helper method to allocate n_arr scalar temporary arrays 

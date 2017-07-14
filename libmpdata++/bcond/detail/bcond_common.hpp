@@ -34,6 +34,8 @@ namespace libmpdataxx
       template <typename real_t, int halo>
       class bcond_common
       {
+        protected:
+
         using arr_1d_t = blitz::Array<real_t, 1>;
         using arr_2d_t = blitz::Array<real_t, 2>;
         using arr_3d_t = blitz::Array<real_t, 3>;
@@ -75,6 +77,16 @@ namespace libmpdataxx
 	virtual void fill_halos_vctr_alng(const arrvec_t<arr_2d_t> &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_alng() called!");
+	};
+        
+        virtual void fill_halos_sgs_vctr(const arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const int offset = 0)
+	{
+	  assert(false && "bcond::fill_halos_sgs_vctr() called!");
+	};
+        
+        virtual void fill_halos_sgs_tnsr(const arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const real_t)
+	{
+	  assert(false && "bcond::fill_halos_sgs_tnsr called!");
 	};
 
 	virtual void fill_halos_vctr_nrml(const arr_2d_t &, const rng_t &) 

@@ -58,8 +58,8 @@ namespace libmpdataxx
         }
 	
         virtual void xchng_sgs_vctr(const arrvec_t<typename parent_t::arr_t> &av,
-                       const typename parent_t::arr_t &b, 
-	               const idx_t<3> &range_ijk
+                                    const typename parent_t::arr_t &b, 
+	                            const idx_t<3> &range_ijk
         ) final
 	{
           this->mem->barrier();
@@ -70,8 +70,8 @@ namespace libmpdataxx
 	}
         
         virtual void xchng_sgs_tnsr_diag(const arrvec_t<typename parent_t::arr_t> &av,
-                       const typename parent_t::arr_t &w,
-	               const idx_t<3> &range_ijk
+                                         const typename parent_t::arr_t &w,
+	                                 const idx_t<3> &range_ijk
         ) final
 	{
           this->mem->barrier();
@@ -82,9 +82,9 @@ namespace libmpdataxx
 	}
         
         virtual void xchng_sgs_tnsr_offdiag(const arrvec_t<typename parent_t::arr_t> &av,
-                       const arrvec_t<typename parent_t::arr_t> &bv, 
-	               const idx_t<3> &range_ijk,
-	               const std::array<rng_t, 3> &range_ijkm
+                                            const arrvec_t<typename parent_t::arr_t> &bv, 
+	                                    const idx_t<3> &range_ijk,
+	                                    const std::array<rng_t, 3> &range_ijkm
         ) final
 	{
           // off-diagonal components of stress tensor are treated the same as a vector
@@ -355,7 +355,7 @@ namespace libmpdataxx
           typename parent_t::mem_t *mem,
           const char * __file__,
           const int n_arr,
-          const std::vector<std::array<bool, 3>> &stgr
+          const std::vector<std::vector<bool>> &stgr
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
