@@ -362,7 +362,7 @@ namespace libmpdataxx
                                       const ijk_t &ijk,
                                       typename std::enable_if<nd == 2>::type* = 0)
       {
-        multiply_vctr_cmpct<nd>(av, 1.0, ijk);
+        multiply_vctr_cmpct<nd>(av, coeff, ijk);
         av[2](ijk[0] + h, ijk[1] + h) *= coeff;
       }
 
