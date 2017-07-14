@@ -42,9 +42,9 @@ namespace libmpdataxx
 
         // member fields
         arrvec_t<typename parent_t::arr_t> &tau;
+        arrvec_t<typename parent_t::arr_t> &tau_srfc;
         arrvec_t<typename parent_t::arr_t> &drv;
         arrvec_t<typename parent_t::arr_t> &wrk;
-        arrvec_t<typename parent_t::arr_t> &tau_srfc;
 
         std::array<rng_t, ct_params_t::n_dims> ijkm;
 
@@ -81,32 +81,7 @@ namespace libmpdataxx
           
           if (ct_params_t::stress_diff == compact)
           {
-            // surface indices
-            auto ij = this->ijk;
-            ij.lbound(ct_params_t::n_dims - 1) = 0;
-            ij.ubound(ct_params_t::n_dims - 1) = 0;
-           
-            // using tau[0] as a temporary array for surface stress
-            tau[0](ij) = 0;
-            for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
-            {
-              tau[0](ij) += pow2(this->vips()[d](ij));
-            }
-            tau[0](ij) = sqrt(tau[0](ij));
-
-            this->xchng_sclr(tau[0], ij);
-            
-            // to include halos  
-            for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
-            {
-              ij.expand(d, 1);
-            }
-
-            for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
-            {
-              tau_srfc[d](ij) = 0.1 * tau[0](ij) * this->vips()[d](ij);
-            }
-            this->mem->barrier();
+            formulae::stress::calc_drag_cmpct<ct_params_t::n_dims>(tau_srfc, this->vips(), 0.1, this->ijk, ijkm);
 
             formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
 
@@ -166,9 +141,9 @@ namespace libmpdataxx
         ) :
           parent_t(args, p),
           tau(args.mem->tmp[__FILE__][0]),
-          drv(args.mem->tmp[__FILE__][1]),
-          wrk(args.mem->tmp[__FILE__][2]),
-          tau_srfc(args.mem->tmp[__FILE__][3])
+          tau_srfc(args.mem->tmp[__FILE__][1]),
+          drv(args.mem->tmp[__FILE__][2]),
+          wrk(args.mem->tmp[__FILE__][3])
         {
           for (int d = 0; d < ct_params_t::n_dims; ++d)
           {
@@ -195,6 +170,7 @@ namespace libmpdataxx
                                        3, // unique strain rate tensor elements
                                        {{true, false}, {false, true}, {true, true}}
                                       );
+              parent_t::alloc_tmp_stgr(mem, __FILE__, 1, {{true, false}}, true); // tau_srfc
             }
             else
             {
@@ -204,12 +180,13 @@ namespace libmpdataxx
                                        {{true, false, false}, {false, true, false}, {false, false, true},
                                         {true, true, false}, {true, false, true}, {false, true, true}}
                                       );
+              parent_t::alloc_tmp_stgr(mem, __FILE__, 2, {{true, false, false}, {false, true, false}}, true); // tau_srfc
             }
           }
           // TODO: do not allocate unnecessary memory when not using pade differencing
-          parent_t::alloc_tmp_sclr(mem, __FILE__, std::pow(static_cast<int>(ct_params_t::n_dims), 2));
+          parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_dims, "", true); // unstaggered tau_srfc
+          parent_t::alloc_tmp_sclr(mem, __FILE__, std::pow(static_cast<int>(ct_params_t::n_dims), 2)); // drv
           parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // wrk
-          parent_t::alloc_tmp_sclr(mem, __FILE__, 2, "", true); // tau_srfc
         }
       };
     } // namespace detail

@@ -164,6 +164,40 @@ namespace libmpdataxx
       )
       
       // Compact formulation
+      
+      // surface stress
+      // 2D version
+      template <int nd, class arrvec_t, class real_t, class ijk_t, class ijkm_t>
+      inline void calc_drag_cmpct(arrvec_t &tau,
+                                  const arrvec_t &v,
+                                  real_t cdrag,
+                                  const ijk_t &ijk,
+                                  const ijkm_t &ijkm,
+                                  typename std::enable_if<nd == 2>::type* = 0)
+      {
+        tau[2](ijkm[0] + h, ijk[1]) = cdrag * 0.25 * 
+                                      abs((v[0](ijkm[0] + 1, ijk[1]) + v[0](ijkm[0], ijk[1]))) *
+                                      (v[0](ijkm[0] + 1, ijk[1]) + v[0](ijkm[0], ijk[1]));
+      }
+
+      // 3D version
+      template <int nd, class arrvec_t, class real_t, class ijk_t, class ijkm_t>
+      inline void calc_drag_cmpct(arrvec_t &tau,
+                                  const arrvec_t &v,
+                                  real_t cdrag,
+                                  const ijk_t &ijk,
+                                  const ijkm_t &ijkm,
+                                  typename std::enable_if<nd == 3>::type* = 0)
+      {
+        tau[4](ijkm[0] + h, ijk[1], ijk[2]) = cdrag * 0.25 * sqrt(
+                                                pow2((v[0](ijkm[0] + 1, ijk[1], ijk[2]) + v[0](ijkm[0], ijk[1], ijk[2])))
+                                              + pow2((v[1](ijkm[0] + 1, ijk[1], ijk[2]) + v[1](ijkm[0], ijk[1], ijk[2])))
+                                              ) * (v[0](ijkm[0] + 1, ijk[1], ijk[2]) + v[0](ijkm[0], ijk[1], ijk[2]));
+        tau[5](ijk[0], ijkm[1] + h, ijk[2]) = cdrag * 0.25 * sqrt(
+                                                pow2((v[0](ijk[0], ijkm[1] + 1, ijk[2]) + v[0](ijk[0], ijkm[1], ijk[2])))
+                                              + pow2((v[1](ijk[0], ijkm[1] + 1, ijk[2]) + v[1](ijk[0], ijkm[1], ijk[2])))
+                                              ) * (v[1](ijk[0], ijkm[1] + 1, ijk[2]) + v[1](ijk[0], ijkm[1], ijk[2]));
+      }
 
       // calculates unique deformation tensor components
       // 2D version

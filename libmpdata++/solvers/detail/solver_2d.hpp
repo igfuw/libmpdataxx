@@ -300,7 +300,8 @@ namespace libmpdataxx
           typename parent_t::mem_t *mem,
           const char * __file__,
           const int n_arr,
-          const std::vector<std::vector<bool>> &stgr
+          const std::vector<std::vector<bool>> &stgr,
+          bool srfc = false
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
@@ -308,7 +309,9 @@ namespace libmpdataxx
           {
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
               stgr[n][0] ? parent_t::rng_vctr(mem->grid_size[0]) : parent_t::rng_sclr(mem->grid_size[0]),
-              stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) : parent_t::rng_sclr(mem->grid_size[1])
+              srfc ? rng_t(0, 0) :
+                stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) :
+                  parent_t::rng_sclr(mem->grid_size[1])
             ))); 
           }
         }
