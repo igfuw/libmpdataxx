@@ -114,7 +114,7 @@ void test(const std::string &dirname)
     {
       blitz::thirdIndex k;
       // prescribed heat flux
-      //slv.sclr_array("hflux") = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
+      //slv.sclr_array("hflux_frc") = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
       // environmental potential temperature profile
       slv.sclr_array("tht_e") = 300 * where(k * p.dk <= mixed_length, 1, 1 + (k * p.dk - mixed_length) * st);
       // tht absorber profile

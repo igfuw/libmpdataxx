@@ -59,7 +59,7 @@ namespace libmpdataxx
         return_macro(,
           this->g * (
               (  this->state(ix::tht)(ijk)
-               + 0.5 * this->dt * this->hflux(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
+               + 0.5 * this->dt * this->hflux_frc(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
               / (1 + 0.5 * this->dt * this->tht_abs(ijk))
               - this->tht_e(ijk)
             ) / this->Tht_ref
@@ -89,7 +89,7 @@ namespace libmpdataxx
           {
             case (0):
             {
-              rhs.at(ix::tht)(ijk) += this->hflux(ijk) - this->tht_abs(ijk) * (tht(ijk) - this->tht_e(ijk));
+              rhs.at(ix::tht)(ijk) += this->hflux_frc(ijk) - this->tht_abs(ijk) * (tht(ijk) - this->tht_e(ijk));
               
               if (!buoy_filter)
               {
@@ -105,8 +105,8 @@ namespace libmpdataxx
             }
             case (1):
             {
-              rhs.at(ix::tht)(ijk) += this->hflux(ijk) - this->tht_abs(ijk) * (
-                (tht(ijk) + 0.5 * this->dt * this->hflux(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
+              rhs.at(ix::tht)(ijk) += this->hflux_frc(ijk) - this->tht_abs(ijk) * (
+                (tht(ijk) + 0.5 * this->dt * this->hflux_frc(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
                 / (1 + 0.5 * this->dt * this->tht_abs(ijk))
                 - this->tht_e(ijk)
               );

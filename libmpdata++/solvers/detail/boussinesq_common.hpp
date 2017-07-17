@@ -24,7 +24,7 @@ namespace libmpdataxx
         protected:
         // member fields
         real_t g, Tht_ref;
-        typename parent_t::arr_t &tht_e, &tht_abs, &hflux;
+        typename parent_t::arr_t &tht_e, &tht_abs, &hflux_frc;
 
         virtual void calc_full_tht(typename parent_t::arr_t&) = 0;
 
@@ -44,10 +44,10 @@ namespace libmpdataxx
           Tht_ref(p.Tht_ref),
           tht_e(args.mem->tmp[__FILE__][0][0]),
           tht_abs(args.mem->tmp[__FILE__][1][0]),
-          hflux(args.mem->tmp[__FILE__][2][0])
+          hflux_frc(args.mem->tmp[__FILE__][2][0])
         {
           assert(Tht_ref != 0);
-          hflux(this->ijk) = 0;
+          hflux_frc(this->ijk) = 0;
           tht_abs(this->ijk) = 0;
         }
 
@@ -58,11 +58,11 @@ namespace libmpdataxx
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "tht_abs");
           if (static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles)
           {
-            parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "hflux");
+            parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "hflux_frc");
           }
           else
           {
-          parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
+            parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // hflux_frc
           }
         }
       };

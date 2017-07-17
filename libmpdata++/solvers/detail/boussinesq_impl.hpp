@@ -95,14 +95,14 @@ namespace libmpdataxx
           {
             case (0):
             {
-              rhs.at(ix::tht)(ijk) += -w(ijk) * this->dtht_e(ijk) + this->hflux(ijk) - this->tht_abs(ijk) * tht(ijk);
+              rhs.at(ix::tht)(ijk) += -w(ijk) * this->dtht_e(ijk) + this->hflux_frc(ijk) - this->tht_abs(ijk) * tht(ijk);
 
               rhs.at(ix_w)(ijk) += this->g * tht(ijk) / this->Tht_ref;
               break;
             }
             case (1):
             {
-              rhs.at(ix::tht)(ijk) += (this->hflux(ijk) - this->tht_abs(ijk) * tht(ijk))
+              rhs.at(ix::tht)(ijk) += (this->hflux_frc(ijk) - this->tht_abs(ijk) * tht(ijk))
                                       / (1 + 0.5 * this->dt * this->tht_abs(ijk));
 
               rhs.at(ix_w)(ijk) += this->g * (tht(ijk) + 0.5 * this->dt * rhs.at(ix::tht)(ijk)) / this->Tht_ref;

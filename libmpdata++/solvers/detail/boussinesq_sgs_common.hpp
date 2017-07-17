@@ -79,8 +79,8 @@ namespace libmpdataxx
           formulae::stress::multiply_vctr_cmpct<ct_params_t::n_dims>(grad_tht, 1.0 / prandtl_num, this->k_m, this->ijk);
 
           this->xchng_sgs_vctr(grad_tht, hflux_srfc, this->ijk);
-          // hack, convinient place to update the heat_flux
-          this->hflux(this->ijk) = formulae::nabla::div_cmpct<parent_t::n_dims>(grad_tht, this->ijk, this->dijk);
+          // hack, convinient place to update the heat flux forcing
+          this->hflux_frc(this->ijk) = formulae::nabla::div_cmpct<parent_t::n_dims>(grad_tht, this->ijk, this->dijk);
         }
 
         public:
