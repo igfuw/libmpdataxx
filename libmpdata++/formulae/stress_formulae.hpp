@@ -425,7 +425,7 @@ namespace libmpdataxx
         av[2](ijk[0] + h, ijk[1] + h) *= coeff * 0.25 * ( k_m(ijk[0] + 1, ijk[1]    )
                                                         + k_m(ijk[0]    , ijk[1]    )
                                                         + k_m(ijk[0] + 1, ijk[1] + 1)
-                                                        + k_m(ijk[0]    , ijk[2] + 1)
+                                                        + k_m(ijk[0]    , ijk[1] + 1)
                                                         );
       }
 
