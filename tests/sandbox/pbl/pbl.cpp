@@ -12,6 +12,26 @@
 
 using namespace libmpdataxx;
 
+struct smg_tag {};
+struct iles_tag {};
+
+// set parameters specific to the sgs model
+
+// iles
+template <typename params_t>
+void set_sgs_specific(params_t &p, iles_tag) {}
+
+// smagorinsky
+template <typename params_t>
+void set_sgs_specific(params_t &p, smg_tag)
+{
+  p.c_m = 0.0856;
+  p.smg_c = 0.165;
+  p.prandtl_num = 0.42;
+  p.hflux_const = 0.01;
+}
+
+template <typename sgs_t>
 void test(const std::string &dirname)
 {
   const int nx = 65, ny = 65, nz = 51, nt = 1501;
@@ -25,7 +45,7 @@ void test(const std::string &dirname)
     enum { vip_vab = solvers::impl };
     enum { prs_scheme = solvers::cr };
     enum { stress_diff = solvers::compact };
-    enum { sgs_scheme = solvers::smg };
+    enum { sgs_scheme = std::is_same<sgs_t, smg_tag>::value ? solvers::smg : solvers::iles};
     enum { impl_tht = true };
     struct ix { enum {
       u, v, w, tht,
@@ -37,24 +57,20 @@ void test(const std::string &dirname)
 
   using solver_t = pbl<ct_params_t>;
 
-  solver_t::rt_params_t p;
+  typename solver_t::rt_params_t p;
   p.n_iters = 2;
   p.dt = 10;
   p.di = 50;
   p.dj = 50;
   p.dk = 30;
   p.grid_size = {nx, ny, nz};
+  p.prs_tol = 1e-6;
   p.Tht_ref = 300;
   p.g = 10;
   p.hscale = 25;
   p.cdrag = 0.1;
-
-  //p.buoy_filter = true;
-
-  p.c_m = 0.0856;
-  p.smg_c = 0.165;
-  p.prandtl_num = 0.42;
-  p.hflux_const = 0.01;
+  
+  set_sgs_specific(p, sgs_t{});
 
   double mixed_length = 500;
   double st = 1e-4 / p.g;
@@ -68,8 +84,6 @@ void test(const std::string &dirname)
     {ix::tht,   {.name = "tht",   .unit = "K"}}, 
   };
   p.outdir = dirname;
-
-  p.prs_tol = 1e-6;
 
   libmpdataxx::concurr::threads<
     solver_t, 
@@ -113,20 +127,28 @@ void test(const std::string &dirname)
 
     {
       blitz::thirdIndex k;
-      // prescribed heat flux
-      //slv.sclr_array("hflux_frc") = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
       // environmental potential temperature profile
       slv.sclr_array("tht_e") = 300 * where(k * p.dk <= mixed_length, 1, 1 + (k * p.dk - mixed_length) * st);
       // tht absorber profile
       slv.sclr_array("tht_abs") = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
-
-      auto dlta = (p.di + p.dj + p.dk) / 3;
-      slv.sclr_array("mix_len") = min(max(k, 1) * p.dk * 0.845, dlta); 
+      
       // velocity absorbers
       slv.vab_coefficient()(i_r, j_r, k_r) = slv.sclr_array("tht_abs")(i_r, j_r, k_r);
       slv.vab_relaxed_state(0) = 0;
       slv.vab_relaxed_state(1) = 0;
       slv.vab_relaxed_state(2) = 0;
+      
+      if (std::is_same<sgs_t, iles_tag>::value)
+      {
+        // iles prescribed heat flux forcing
+        slv.sclr_array("hflux_frc") = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
+      }
+      else
+      {
+        auto dlta = (p.di + p.dj + p.dk) / 3;
+        // smagorinsky mixing length
+        slv.sclr_array("mix_len") = min(max(k, 1) * p.dk * 0.845, dlta); 
+      }
     }
   }
 
@@ -135,5 +157,6 @@ void test(const std::string &dirname)
 
 int main()
 {
-  test("out_pbl");
+  test<iles_tag>("out_pbl_iles");
+  test<smg_tag>("out_pbl_smg");
 }

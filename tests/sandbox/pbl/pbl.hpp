@@ -24,20 +24,13 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
   real_t hscale, cdrag;
   typename parent_t::arr_t &tke;
 
-
   void multiply_sgs_visc()
   {
     parent_t::multiply_sgs_visc();
-    if (this->timestep % static_cast<int>(this->outfreq) == 0)
+
+    if (this->timestep % static_cast<int>(this->outfreq) == 0 && ct_params_t::sgs_scheme == libmpdataxx::solvers::smg)
     {
       tke(this->ijk) = pow2(this->k_m(this->ijk) / (this->c_m * this->mix_len(this->ijk)));
-      this->mem->barrier();
-      if (this->rank == 0)
-      {
-        this->record_aux_dsc("tke", this->tke);
-        this->record_aux_dsc("p", this->Phi);
-      }
-      this->mem->barrier();
     }
   }
 
@@ -45,19 +38,36 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
   {
     parent_t::vip_rhs_expl_calc();
 
-    for (int k = this->k.first(); k <= this->k.last(); ++k)
+    if (ct_params_t::sgs_scheme == libmpdataxx::solvers::iles)
     {
-      this->vip_rhs[0](this->i, this->j, k) += - 2 * cdrag / hscale * sqrt(
-                                                pow2(this->state(ix::vip_i)(this->i, this->j, 0))
-                                              + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
-                                              ) * this->state(ix::vip_i)(this->i, this->j, 0)
-                                                * exp(-this->dj * k / hscale);
-      
-      this->vip_rhs[1](this->i, this->j, k) += - 2 * cdrag / hscale * sqrt(
-                                                pow2(this->state(ix::vip_i)(this->i, this->j, 0))
-                                              + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
-                                              ) * this->state(ix::vip_j)(this->i, this->j, 0)
-                                                * exp(-this->dj * k / hscale);
+      for (int k = this->k.first(); k <= this->k.last(); ++k)
+      {
+        this->vip_rhs[0](this->i, this->j, k) += - 2 * cdrag / hscale * sqrt(
+                                                  pow2(this->state(ix::vip_i)(this->i, this->j, 0))
+                                                + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
+                                                ) * this->state(ix::vip_i)(this->i, this->j, 0)
+                                                  * exp(-this->dj * k / hscale);
+        
+        this->vip_rhs[1](this->i, this->j, k) += - 2 * cdrag / hscale * sqrt(
+                                                  pow2(this->state(ix::vip_i)(this->i, this->j, 0))
+                                                + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
+                                                ) * this->state(ix::vip_j)(this->i, this->j, 0)
+                                                  * exp(-this->dj * k / hscale);
+      }
+    }
+    
+    if (this->timestep % static_cast<int>(this->outfreq) == 0)
+    {
+      this->mem->barrier();
+      if (this->rank == 0)
+      {
+        if (ct_params_t::sgs_scheme == libmpdataxx::solvers::smg)
+        {
+          this->record_aux_dsc("tke", this->tke);
+        }
+        this->record_aux_dsc("p", this->Phi);
+      }
+      this->mem->barrier();
     }
   }
 
