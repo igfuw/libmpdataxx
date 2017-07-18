@@ -16,6 +16,21 @@ namespace libmpdataxx
 {
   namespace solvers
   {
+    enum sgs_scheme_t
+    {
+      iles,
+      dns,
+      smg
+    };
+
+    const std::map<sgs_scheme_t, std::string> sgs2string = {
+      {iles, "iles"},
+      {dns , "dns" },
+      {smg , "smg" }
+    };
+
+    struct mpdata_rhs_vip_prs_sgs_family_tag {};
+
     template<typename ct_params_t, class enableif = void> 
     class mpdata_rhs_vip_prs_sgs;
 
@@ -29,7 +44,7 @@ namespace libmpdataxx
       using parent_t::parent_t; // inheriting constructors
     };
     
-    template<typename ct_params_t>
+    template <class ct_params_t>
     class mpdata_rhs_vip_prs_sgs<
       ct_params_t,
       typename std::enable_if<(int)ct_params_t::sgs_scheme == (int)dns>::type

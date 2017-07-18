@@ -10,6 +10,7 @@
 #pragma once
 
 #include <libmpdata++/output/detail/output_common.hpp>
+#include <libmpdata++/solvers/mpdata_rhs_vip_prs_sgs.hpp> // includes all of the param2str maps
 
 #include <boost/filesystem.hpp>
 
@@ -60,6 +61,9 @@ namespace libmpdataxx
           // creating the const file
           const_file = this->outdir + "/" + const_name;
           hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC));
+          
+          // save selected compile and runtime parameters, the choice depends on the solver family
+          record_params(*hdfp, typename parent_t::solver_family{});
 
           // creating the dimensions
           // x,y,z
@@ -126,7 +130,6 @@ namespace libmpdataxx
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, &nt_out, &zero);
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
-              curr_dim.createAttribute("dt", flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &dt);
             }
 
             // G factor
@@ -314,6 +317,104 @@ namespace libmpdataxx
 
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR);; // reopen the const file
         hdfcp.openGroup("/").createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data_f);
+      }
+
+      // parameters saved for pure advection solvers
+      void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_family_tag)
+      {
+        assert(this->rank == 0);
+        hdfcp.createGroup("advection");
+        const auto &group = hdfcp.openGroup("advection");
+        {
+          const auto opts_str = opts::opts_string(parent_t::ct_params_t_::opts);
+          const auto type = H5::StrType(H5::PredType::C_S1, opts_str.size());
+          group.createAttribute("opts", type, H5::DataSpace(1, &one)).write(type, opts_str.data());
+        }
+        {
+          const auto type = flttype_solver;
+          group.createAttribute("dt", type, H5::DataSpace(1, &one)).write(type, &this->dt);
+          const auto names = std::vector<std::string>{"di", "dj", "dk"};
+          for (int d = 0; d < parent_t::n_dims; ++d)
+          {
+            group.createAttribute(names[d], type, H5::DataSpace(1, &one)).write(type, &this->dijk[d]);
+          }
+        }
+        {
+          const auto type = H5::PredType::NATIVE_HBOOL;
+          const auto data = parent_t::ct_params_t_::var_dt;
+          group.createAttribute("var_dt", type, H5::DataSpace(1, &one)).write(type, &data);
+        }
+        if (parent_t::ct_params_t_::var_dt)
+        {
+          const auto type = flttype_solver;
+          group.createAttribute("max_courant", type, H5::DataSpace(1, &one)).write(type, &this->max_courant);
+        }
+        {
+          const auto type = H5::PredType::NATIVE_INT;
+          const auto data = this->n_iters;
+          group.createAttribute("n_iters", type, H5::DataSpace(1, &one)).write(type, &data);
+        }
+      }
+      
+      // as above but for solvers with rhs
+      void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_family_tag)
+      {
+        record_params(hdfcp, typename solvers::mpdata_family_tag{});
+
+        hdfcp.createGroup("rhs");
+        const auto &group = hdfcp.openGroup("rhs");
+        const auto scheme_str = solvers::scheme2string.at(static_cast<solvers::rhs_scheme_t>(parent_t::ct_params_t_::rhs_scheme));
+        const auto type = H5::StrType(H5::PredType::C_S1, scheme_str.size());
+        group.createAttribute("rhs_scheme", type, H5::DataSpace(1, &one)).write(type, scheme_str.data());
+      }
+      
+      // as above but for solvers with velocities
+      void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_family_tag)
+      {
+        record_params(hdfcp, typename solvers::mpdata_rhs_family_tag{});
+        
+        hdfcp.createGroup("vip");
+        const auto &group = hdfcp.openGroup("vip");
+        const auto vab_str = solvers::vab2string.at(static_cast<solvers::vip_vab_t>(parent_t::ct_params_t_::vip_vab));
+        const auto type = H5::StrType(H5::PredType::C_S1, vab_str.size());
+        group.createAttribute("vip_abs", type, H5::DataSpace(1, &one)).write(type, vab_str.data());
+      }
+      
+      // as above but for solvers with pressure equation
+      void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_prs_family_tag)
+      {
+        record_params(hdfcp, typename solvers::mpdata_rhs_vip_family_tag{});
+        
+        hdfcp.createGroup("prs");
+        const auto &group = hdfcp.openGroup("prs");
+        {
+          const auto prs_scheme_str = solvers::prs2string.at(static_cast<solvers::prs_scheme_t>(parent_t::ct_params_t_::prs_scheme));
+          const auto type = H5::StrType(H5::PredType::C_S1, prs_scheme_str.size());
+          group.createAttribute("prs_scheme", type, H5::DataSpace(1, &one)).write(type, prs_scheme_str.data());
+        }
+        {
+          const auto type = flttype_solver;
+          group.createAttribute("prs_tol", type, H5::DataSpace(1, &one)).write(type, &this->prs_tol);
+        }
+      }
+      
+      // as above but for solvers with subgrid model
+      void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_family_tag)
+      {
+        record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_family_tag{});
+        
+        hdfcp.createGroup("sgs");
+        const auto &group = hdfcp.openGroup("sgs");
+        {
+          const auto sgs_scheme_str = solvers::sgs2string.at(static_cast<solvers::sgs_scheme_t>(parent_t::ct_params_t_::sgs_scheme));
+          const auto type = H5::StrType(H5::PredType::C_S1, sgs_scheme_str.size());
+          group.createAttribute("sgs_scheme", type, H5::DataSpace(1, &one)).write(type, sgs_scheme_str.data());
+        }
+        {
+          const auto sdiff_str = solvers::sdiff2string.at(static_cast<solvers::stress_diff_t>(parent_t::ct_params_t_::stress_diff));
+          const auto type = H5::StrType(H5::PredType::C_S1, sdiff_str.size());
+          group.createAttribute("stress_diff", type, H5::DataSpace(1, &one)).write(type, sdiff_str.data());
+        }
       }
 
       public:

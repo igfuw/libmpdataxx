@@ -17,18 +17,17 @@ namespace libmpdataxx
 {
   namespace solvers
   {
-    enum sgs_scheme_t
-    {
-      iles,
-      dns,
-      smg
-    };
-
     enum stress_diff_t
     {
       normal,
       pade,
       compact
+    };
+
+    const std::map<stress_diff_t, std::string> sdiff2string = {
+      {normal , "normal" },
+      {pade   , "pade"   },
+      {compact, "compact"}
     };
 
     namespace detail

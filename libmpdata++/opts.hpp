@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <map>
+
 namespace libmpdataxx
 {
   namespace opts
@@ -37,6 +39,35 @@ namespace libmpdataxx
       div_2nd = opts::bit(9),  // second-order MPDATA in divergence form
       div_3rd = opts::bit(10), // third-order correction in divergence form
       fot = opts::bit(11)  // fourth-order terms
+    };
+
+    const std::map<decltype(fct), std::string> opt2name {
+      {fct, "fct"},
+      {abs, "abs"},
+      {tot, "tot"},
+      {pfc, "pfc"},
+      {npa, "npa"},
+      {iga, "iga"},
+      {nug, "nug"},
+      {dfl, "dfl"},
+      {khn, "khn"},
+      {div_2nd, "div_2nd"},
+      {div_3rd, "div_3rd"},
+      {fot, "fot"}
+    };
+
+    std::string opts_string(opts_t opts)
+    {
+      std::string ret;
+      const auto opt_order = {nug, iga, abs, dfl, div_2nd, tot, div_3rd, fot, fct, pfc, npa, khn};
+      for (const auto &o : opt_order)
+      {
+        if (isset(opts, o))
+        {
+          ret += '|' + opt2name.at(o);
+        }
+      }
+      return ret.size() > 0 ? ret.substr(1) : "0";
     };
 
   } // namespace opts
