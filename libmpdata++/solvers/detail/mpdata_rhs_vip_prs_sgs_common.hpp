@@ -47,6 +47,7 @@ namespace libmpdataxx
         arrvec_t<typename parent_t::arr_t> &wrk;
 
         std::array<rng_t, ct_params_t::n_dims> ijkm;
+        typename parent_t::real_t cdrag;
 
         virtual void multiply_sgs_visc() = 0;
 
@@ -81,7 +82,7 @@ namespace libmpdataxx
           
           if (ct_params_t::stress_diff == compact)
           {
-            formulae::stress::calc_drag_cmpct<ct_params_t::n_dims>(tau_srfc, this->vips(), 0.1, this->ijk, ijkm);
+            formulae::stress::calc_drag_cmpct<ct_params_t::n_dims>(tau_srfc, this->vips(), cdrag, this->ijk, ijkm);
 
             formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
 
@@ -134,16 +135,22 @@ namespace libmpdataxx
 
         public:
 
+        struct rt_params_t : parent_t::rt_params_t 
+        { 
+          typename parent_t::real_t cdrag = 0; 
+        };
+
         // ctor
         mpdata_rhs_vip_prs_sgs_common(
           typename parent_t::ctor_args_t args,
-          const typename parent_t::rt_params_t &p
+          const rt_params_t &p
         ) :
           parent_t(args, p),
           tau(args.mem->tmp[__FILE__][0]),
           tau_srfc(args.mem->tmp[__FILE__][1]),
           drv(args.mem->tmp[__FILE__][2]),
-          wrk(args.mem->tmp[__FILE__][3])
+          wrk(args.mem->tmp[__FILE__][3]),
+          cdrag(p.cdrag)
         {
           for (int d = 0; d < ct_params_t::n_dims; ++d)
           {
