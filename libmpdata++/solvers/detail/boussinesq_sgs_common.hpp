@@ -27,6 +27,25 @@ namespace libmpdataxx
         typename parent_t::arr_t &rcdsn_num, &full_tht, &tdef_sq, &mix_len, &hflux_srfc;
         arrvec_t<typename parent_t::arr_t> &grad_tht;
 
+        template <int nd = ct_params_t::n_dims> 
+        void calc_rcdsn_num(typename std::enable_if<nd == 2>::type* = 0)
+        {
+          rcdsn_num(this->ijk) = this->g * 0.5 * (
+                                             grad_tht[ct_params_t::n_dims - 1](this->i, this->j - h)
+                                           + grad_tht[ct_params_t::n_dims - 1](this->i, this->j + h)
+                                           ) / (this->Tht_ref * tdef_sq(this->ijk));
+        }
+
+        template <int nd = ct_params_t::n_dims> 
+        void calc_rcdsn_num(typename std::enable_if<nd == 3>::type* = 0)
+        {
+          rcdsn_num(this->ijk) = this->g * 0.5 * (
+                                             grad_tht[ct_params_t::n_dims - 1](this->i, this->j, this->k - h)
+                                           + grad_tht[ct_params_t::n_dims - 1](this->i, this->j, this->k + h)
+                                           ) / (this->Tht_ref * tdef_sq(this->ijk));
+        }
+
+
         void multiply_sgs_visc()
         {
           static_assert(ct_params_t::stress_diff == compact,
@@ -45,10 +64,7 @@ namespace libmpdataxx
           
           tdef_sq(this->ijk) = formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk);
 
-          rcdsn_num(this->ijk) = this->g * 0.5 * (
-                                             grad_tht[ct_params_t::n_dims - 1](this->i, this->j, this->k - h)
-                                           + grad_tht[ct_params_t::n_dims - 1](this->i, this->j, this->k + h)
-                                           ) / (this->Tht_ref * tdef_sq(this->ijk));
+          calc_rcdsn_num();
 
           this->k_m(this->ijk) = where(
                                        rcdsn_num(this->ijk) / prandtl_num < 0,

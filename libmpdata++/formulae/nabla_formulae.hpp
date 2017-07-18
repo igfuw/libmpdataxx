@@ -151,6 +151,14 @@ namespace libmpdataxx
         }
       }
       
+      // 2D version
+      template <int nd, class arrvec_t, class arr_t, class ijk_t, class ijkm_t, class dijk_t>
+      inline void calc_grad_cmpct(arrvec_t v, arr_t a, ijk_t ijk, ijkm_t ijkm, dijk_t dijk, typename std::enable_if<nd == 2>::type* = 0)
+      {
+        v[0](ijkm[0] + h, ijk[1]) = formulae::nabla::grad_cmpct<0>(a, ijkm[0], ijk[1], dijk[0]);
+        v[1](ijk[0], ijkm[1] + h) = formulae::nabla::grad_cmpct<1>(a, ijkm[1], ijk[0], dijk[1]);
+      }
+
       // 3D version
       template <int nd, class arrvec_t, class arr_t, class ijk_t, class ijkm_t, class dijk_t>
       inline void calc_grad_cmpct(arrvec_t v, arr_t a, ijk_t ijk, ijkm_t ijkm, dijk_t dijk, typename std::enable_if<nd == 3>::type* = 0)
