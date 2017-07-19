@@ -26,12 +26,24 @@ namespace libmpdataxx
 
         void multiply_sgs_visc()
         {
-          auto dlta = std::accumulate(this->dijk.begin(), this->dijk.end(), 0.) / 3;
-          k_m(this->ijk) = pow(smg_c * dlta, 2) *  formulae::stress::calc_tdef_sq<ct_params_t::n_dims>(this->tau, this->ijk);
+          const auto dlta = std::accumulate(this->dijk.begin(), this->dijk.end(), 0.) / 3;
 
-          for (auto& t : this->tau)
+          if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
-            t(this->ijk) *= k_m(this->ijk);
+            k_m(this->ijk) = pow(smg_c * dlta, 2) * formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk);
+
+            formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims>(this->tau, 1.0, this->k_m, this->ijk);
+            this->xchng_sgs_tnsr_diag(this->tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
+            this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
+          }
+          else
+          {
+            k_m(this->ijk) = pow(smg_c * dlta, 2) *  formulae::stress::calc_tdef_sq<ct_params_t::n_dims>(this->tau, this->ijk);
+
+            for (auto& t : this->tau)
+            {
+              t(this->ijk) *= k_m(this->ijk);
+            }
           }
         }
 
@@ -39,7 +51,7 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename ct_params_t::real_t smg_c = 0.15, c_m;
+          typename ct_params_t::real_t smg_c, c_m;
         };
 
 	// ctor
