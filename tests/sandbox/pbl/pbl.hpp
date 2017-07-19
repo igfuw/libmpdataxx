@@ -28,7 +28,8 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
   {
     parent_t::multiply_sgs_visc();
 
-    if (this->timestep % static_cast<int>(this->outfreq) == 0 && ct_params_t::sgs_scheme == libmpdataxx::solvers::smg)
+    if (this->timestep % static_cast<int>(this->outfreq) == 0 &&
+        static_cast<libmpdataxx::solvers::sgs_scheme_t>(ct_params_t::sgs_scheme) == libmpdataxx::solvers::smg)
     {
       tke(this->ijk) = pow2(this->k_m(this->ijk) / (this->c_m * this->mix_len(this->ijk)));
     }
@@ -38,7 +39,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
   {
     parent_t::vip_rhs_expl_calc();
 
-    if (ct_params_t::sgs_scheme == libmpdataxx::solvers::iles)
+    if (static_cast<libmpdataxx::solvers::sgs_scheme_t>(ct_params_t::sgs_scheme) == libmpdataxx::solvers::iles)
     {
       for (int k = this->k.first(); k <= this->k.last(); ++k)
       {
@@ -61,7 +62,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
       this->mem->barrier();
       if (this->rank == 0)
       {
-        if (ct_params_t::sgs_scheme == libmpdataxx::solvers::smg)
+        if (static_cast<libmpdataxx::solvers::sgs_scheme_t>(ct_params_t::sgs_scheme) == libmpdataxx::solvers::smg)
         {
           this->record_aux_dsc("tke", this->tke);
         }

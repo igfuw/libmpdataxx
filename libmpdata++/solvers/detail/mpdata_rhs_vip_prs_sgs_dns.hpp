@@ -25,7 +25,7 @@ namespace libmpdataxx
 
         void multiply_sgs_visc() final
         {
-          if (ct_params_t::stress_diff == compact)
+          if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
             formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims>(this->tau, eta, this->ijk);
 

@@ -79,7 +79,7 @@ namespace libmpdataxx
           for (auto& vip : this->vips())
             this->xchng_sclr(vip, this->ijk, 1);
           
-          if (ct_params_t::stress_diff == compact)
+          if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
             formulae::stress::calc_drag_cmpct<ct_params_t::n_dims>(tau_srfc, this->vips(), cdrag, this->ijk, ijkm);
 
@@ -163,7 +163,7 @@ namespace libmpdataxx
         ) {
           parent_t::alloc(mem, n_iters);
           // no staggering for non-compact differencing  
-          if (ct_params_t::stress_diff != compact)
+          if (static_cast<stress_diff_t>(ct_params_t::stress_diff) != compact)
           {
             parent_t::alloc_tmp_sclr(mem, __FILE__, 3 * (ct_params_t::n_dims - 1)); // unique strain rate tensor elements
             parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_dims, "", true); // unstaggered tau_srfc

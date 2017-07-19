@@ -15,11 +15,11 @@ namespace libmpdataxx
     {
       template <class ct_params_t>
       class boussinesq_expl : public
-                              std::conditional<ct_params_t::sgs_scheme == iles,
+                              std::conditional<static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles,
                                                boussinesq_common<ct_params_t>,
                                                boussinesq_sgs_common<ct_params_t>>::type
       {
-        using parent_t = typename std::conditional<ct_params_t::sgs_scheme == iles,
+        using parent_t = typename std::conditional<static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles,
                                                    boussinesq_common<ct_params_t>,
                                                    boussinesq_sgs_common<ct_params_t>>::type;
         public:
