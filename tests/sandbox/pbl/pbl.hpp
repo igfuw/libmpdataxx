@@ -59,6 +59,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     
     if (this->timestep % static_cast<int>(this->outfreq) == 0)
     {
+      if (this->rank == 0) std::cout << this->timestep << std::endl;
       this->mem->barrier();
       if (this->rank == 0)
       {
