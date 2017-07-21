@@ -17,6 +17,8 @@ matrix:
     exclude:
         - os: osx
           compiler: gcc
+        
+        - os: osx
           env: TEST_SUITE=pbl # pbl not tested on osx
 
         - compiler: clang
