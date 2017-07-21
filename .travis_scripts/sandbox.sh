@@ -14,5 +14,4 @@ VERBOSE=1 $make_j
 OMP_NUM_THREADS=4 ctest -R tgv_2d || cat Testing/Temporary/LastTest.log /
 OMP_NUM_THREADS=4 make -C convergence_2d_3d test || cat convergence_2d_3d/Testing/Temporary/LastTest.log /
 if [[ $TRAVIS_OS_NAME == 'linux' ]]; then OMP_NUM_THREADS=4 make -C convergence_spacetime test || cat convergence_spacetime/Testing/Temporary/LastTest.log /; fi
-OMP_NUM_THREADS=4 ctest -V -R pbl || cat /Testing/Temporary/LastTest.log /
 cd ../../..
