@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/bash
 set -e
 cd tests/sandbox
 mkdir build
