@@ -119,7 +119,7 @@ script:
     - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then ./.travis_scripts/nair_jablonowski_2008.sh; fi
     
     # running pbl tests in Release mode
-    - if [[ $TEST_SUITE == 'pbl' ]]; then ./.travis_scripts/pbl.sh; fi
+    - if [[ $TEST_SUITE == 'pbl' ]]; then . ./.travis_scripts/pbl.sh; fi
     
 #    # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
 #    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
