@@ -32,9 +32,9 @@ void set_sgs_specific(params_t &p, smg_tag)
 }
 
 template <typename sgs_t>
-void test(const std::string &dirname)
+void test(const std::string &dirname, const int nt)
 {
-  const int nx = 65, ny = 65, nz = 51, nt = 1501;
+  const int nx = 65, ny = 65, nz = 51;
 
   struct ct_params_t : ct_params_default_t
   {
