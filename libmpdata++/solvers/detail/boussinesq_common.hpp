@@ -23,7 +23,7 @@ namespace libmpdataxx
 
         protected:
         // member fields
-        real_t g, Tht_ref;
+        real_t g, Tht_ref, hflux_const;
         typename parent_t::arr_t &tht_e, &tht_abs, &hflux_frc;
 
         virtual void calc_full_tht(typename parent_t::arr_t&) = 0;
@@ -31,7 +31,7 @@ namespace libmpdataxx
         public:
         struct rt_params_t : parent_t::rt_params_t 
         { 
-          real_t g = 9.81, Tht_ref = 0; 
+          real_t g = 9.81, Tht_ref = 0, hflux_const = 0;
         };
 
         // ctor
@@ -42,6 +42,7 @@ namespace libmpdataxx
           parent_t(args, p),
           g(p.g),
           Tht_ref(p.Tht_ref),
+          hflux_const(p.hflux_const),
           tht_e(args.mem->tmp[__FILE__][0][0]),
           tht_abs(args.mem->tmp[__FILE__][1][0]),
           hflux_frc(args.mem->tmp[__FILE__][2][0])

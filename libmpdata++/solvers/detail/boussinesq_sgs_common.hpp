@@ -23,7 +23,7 @@ namespace libmpdataxx
 
         protected:
         // member fields
-        real_t prandtl_num, hflux_const;
+        real_t prandtl_num;
         typename parent_t::arr_t &rcdsn_num, &full_tht, &tdef_sq, &mix_len, &hflux_srfc;
         arrvec_t<typename parent_t::arr_t> &grad_tht;
 
@@ -55,7 +55,7 @@ namespace libmpdataxx
           auto ij = this->ijk;
           ij.lbound(ct_params_t::n_dims - 1) = 0;
           ij.ubound(ct_params_t::n_dims - 1) = 0;
-          this->hflux_srfc(ij) = -hflux_const;
+          this->hflux_srfc(ij) = -this->hflux_const;
 
           this->calc_full_tht(full_tht);
 
@@ -102,7 +102,7 @@ namespace libmpdataxx
         public:
         struct rt_params_t : parent_t::rt_params_t 
         { 
-          real_t prandtl_num = 0, hflux_const = 0; 
+          real_t prandtl_num = 0;
         };
 
         // ctor
@@ -112,7 +112,6 @@ namespace libmpdataxx
         ) :
           parent_t(args, p),
           prandtl_num(p.prandtl_num),
-          hflux_const(p.hflux_const),
           rcdsn_num(args.mem->tmp[__FILE__][0][0]),
           full_tht(args.mem->tmp[__FILE__][1][0]),
           tdef_sq(args.mem->tmp[__FILE__][2][0]),
