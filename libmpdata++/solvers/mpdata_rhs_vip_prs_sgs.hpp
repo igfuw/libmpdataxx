@@ -30,6 +30,8 @@ namespace libmpdataxx
     };
 
     struct mpdata_rhs_vip_prs_sgs_family_tag {};
+    struct mpdata_rhs_vip_prs_sgs_dns_family_tag {};
+    struct mpdata_rhs_vip_prs_sgs_smg_family_tag {};
 
     template<typename ct_params_t, class enableif = void> 
     class mpdata_rhs_vip_prs_sgs;
@@ -52,6 +54,9 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_rhs_vip_prs_sgs_dns<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
+
+      protected:
+      using solver_family = mpdata_rhs_vip_prs_sgs_dns_family_tag;
     };
     
     template<typename ct_params_t>
@@ -62,6 +67,9 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_rhs_vip_prs_sgs_smg<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
+      
+      protected:
+      using solver_family = mpdata_rhs_vip_prs_sgs_smg_family_tag;
     };
   } // namespace solvers
 } // namespace libmpdataxx
