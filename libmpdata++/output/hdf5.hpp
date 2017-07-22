@@ -418,6 +418,7 @@ namespace libmpdataxx
           const auto type = flttype_solver;
           group.createAttribute("g", type, H5::DataSpace(1, &one)).write(type, &this->g);
           group.createAttribute("Tht_ref", type, H5::DataSpace(1, &one)).write(type, &this->Tht_ref);
+          group.createAttribute("hflux_const", type, H5::DataSpace(1, &one)).write(type, &this->hflux_const);
         }
         {
           auto dset = group.createDataSet("tht_e", flttype_output, H5::DataSpace(parent_t::n_dims, shape.data()));
