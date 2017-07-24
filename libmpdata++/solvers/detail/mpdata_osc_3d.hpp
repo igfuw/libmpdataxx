@@ -63,41 +63,41 @@ namespace libmpdataxx
               this->xchng(e);
 
 	      // calculating the antidiffusive C 
-	      this->GC_corr(iter)[0](this->im+h, this->j, this->k) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-                  *this->mem->G,
-                  this->im,
-                  this->j,
-                  this->k
-		);
+              formulae::mpdata::antidiff<ct_params_t::opts, 0>(
+                this->GC_corr(iter)[0],
+                this->mem->psi[e][this->n[e]], 
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                this->im,
+                this->j,
+                this->k
+              );
 
-	      this->GC_corr(iter)[1](this->i, this->jm+h, this->k) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-                  *this->mem->G,
-                  this->jm,
-                  this->k,
-                  this->i
-	        );
-	      
-	      this->GC_corr(iter)[2](this->i, this->j, this->km+h) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 2>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-                  *this->mem->G,
-                  this->km,
-                  this->i,
-                  this->j
-	        );
+              formulae::mpdata::antidiff<ct_params_t::opts, 1>(
+                this->GC_corr(iter)[1],
+                this->mem->psi[e][this->n[e]], 
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                this->jm,
+                this->k,
+                this->i
+              );
+            
+              formulae::mpdata::antidiff<ct_params_t::opts, 2>(
+                this->GC_corr(iter)[2],
+                this->mem->psi[e][this->n[e]], 
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                this->km,
+                this->i,
+                this->j
+              );
               
 	      // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y halos for GC_z 
 	      // needed for calculation of antidiffusive velocities in the third and subsequent

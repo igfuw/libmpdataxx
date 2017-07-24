@@ -42,6 +42,19 @@ namespace libmpdataxx
   template <int n_dims> using idx_t = blitz::RectDomain<n_dims>;
   using rng_t = blitz::Range;
 
+  // non-int ix_t means either rng_t or idx_t
+  template <class ix_t, class expr_t>
+  inline auto return_helper(const expr_t &expr, typename std::enable_if<!std::is_same<ix_t, int>::value>::type* = 0)
+  {
+    return safeToReturn(expr);
+  }
+
+  template <class ix_t, class expr_t>
+  inline auto return_helper(const expr_t &expr, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
+  {
+    return expr;
+  }
+
   // Boost ptr_vector 
   template <class arr_t>
   struct arrvec_t : boost::ptr_vector<arr_t> 
@@ -75,3 +88,4 @@ namespace libmpdataxx
     }
   };
 } // namespace libmpdataxx
+

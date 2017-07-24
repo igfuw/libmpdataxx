@@ -55,15 +55,15 @@ namespace libmpdataxx
               this->xchng(e);
 
 	      // calculating the antidiffusive C 
-	      this->GC_corr(iter)[0](im+h) = 
-		formulae::mpdata::antidiff<ct_params_t::opts>(
-		  this->mem->psi[e][this->n[e]], 
-		  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-		  *this->mem->G,
-		  im
-		);
+              formulae::mpdata::antidiff<ct_params_t::opts>(
+                this->GC_corr(iter)[0],
+                this->mem->psi[e][this->n[e]], 
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                im
+              );
 
               // needed with the dfl option
               // if we aren't in the last iteration and fct is not set
