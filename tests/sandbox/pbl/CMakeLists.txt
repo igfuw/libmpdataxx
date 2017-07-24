@@ -46,7 +46,7 @@ add_test(pbl_iles_travis_diff bash -c "
     echo   'comparing timestep0000000000.xmf'                                                                          &&
     diff    $dir/timestep0000000000.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                &&
     echo   'comparing timestep0000000600.h5'                                                                           &&
-    h5diff --delta=5e-7 -v $dir/timestep0000000600.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000600.h5  &&
+    h5diff --delta=1e-6 -v $dir/timestep0000000600.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000600.h5  &&
     echo   'comparing timestep0000000600.xmf'                                                                          &&
     diff    $dir/timestep0000000600.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000600.xmf                || exit 1;
 ")
@@ -62,7 +62,7 @@ add_test(pbl_smg_travis_diff bash -c "
     echo   'comparing timestep0000000000.xmf'                                                                          &&
     diff    $dir/timestep0000000000.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                &&
     echo   'comparing timestep0000000600.h5'                                                                           &&
-    h5diff --delta=5e-7 -v $dir/timestep0000000600.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000600.h5  &&
+    h5diff --delta=1e-6 -v $dir/timestep0000000600.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000600.h5  &&
     echo   'comparing timestep0000000600.xmf'                                                                          &&
     diff    $dir/timestep0000000600.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000600.xmf                || exit 1;
 ")
