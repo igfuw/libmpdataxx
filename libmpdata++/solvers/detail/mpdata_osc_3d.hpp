@@ -48,6 +48,25 @@ namespace libmpdataxx
           // halos for GC_z
           auto ex = this->halo - 1;
           this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
+         
+          // set time derivatives of GC to zero
+          // needed for stationary flows prescribed using the advector method
+          if (opts::isset(ct_params_t::opts, opts::div_3rd_dt) || opts::isset(ct_params_t::opts, opts::div_3rd))
+          {
+            this->mem->ndt_GC[0](this->im + h, this->j, this->k) = 0;
+            this->mem->ndt_GC[1](this->i, this->jm + h, this->k) = 0;
+            this->mem->ndt_GC[2](this->i, this->j, this->km + h) = 0;
+            
+            this->mem->ndtt_GC[0](this->im + h, this->j, this->k) = 0;
+            this->mem->ndtt_GC[1](this->i, this->jm + h, this->k) = 0;
+            this->mem->ndtt_GC[2](this->i, this->j, this->km + h) = 0;
+
+            this->xchng_vctr_alng(this->mem->ndt_GC);
+            this->xchng_vctr_alng(this->mem->ndtt_GC);
+
+            this->xchng_vctr_nrml(this->mem->ndt_GC, this->i^ex, this->j^ex, this->k^ex);
+            this->xchng_vctr_nrml(this->mem->ndtt_GC, this->i^ex, this->j^ex, this->k^ex);
+          }
 	} 
 
 	// method invoked by the solver
