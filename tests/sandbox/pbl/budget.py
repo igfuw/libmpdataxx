@@ -64,7 +64,7 @@ else:
     de += 2.0 / dt * p
 tke_t_aux = np.mean(dw * de, axis = (0, 1))
 tke_t = np.zeros(nz)
-for k in xrange(1, nz - 1):
+for k in range(1, nz - 1):
     tke_t[k] = (tke_t_aux[k + 1] - tke_t_aux[k - 1]) / (2 * dz)
 tke_t[0] = (tke_t_aux[1] - tke_t_aux[0]) / dz
 tke_t[nz - 1] = (tke_t_aux[nz - 1] - tke_t_aux[nz - 2]) / dz
@@ -108,7 +108,7 @@ if subgrid:
 axarr.plot(inb, Z, 'k:', lw = 1, label = 'I')
 axarr.set_ylabel("$z / z_i$", fontsize = 20)
 axarr.set_xlim([-0.8, 1])
-axarr.set_xticks([-0.8 + 0.2 * i for i in xrange(10)])
+axarr.set_xticks([-0.8 + 0.2 * i for i in range(10)])
 axarr.set_ylim([0, 1.3])
 axarr.legend(fontsize = 20, edgecolor = 'k')
 
