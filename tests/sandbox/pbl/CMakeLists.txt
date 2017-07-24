@@ -23,6 +23,18 @@ add_test(pbl_iles_travis_prof_diff
 add_test(pbl_smg_travis_prof_diff
         zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/profiles_pbl_smg_travis.txt.gz profiles_pbl_smg_travis.txt)
 
+add_test(pbl_iles_travis_budget bash -c "
+    python  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_iles_travis
+")
+add_test(pbl_smg_travis_budget bash -c "
+    python  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_smg_travis
+")
+
+add_test(pbl_iles_travis_budget_diff
+        zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/budget_pbl_iles_travis.txt.gz budget_pbl_iles_travis.txt)
+add_test(pbl_smg_travis_budget_diff
+        zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/budget_pbl_smg_travis.txt.gz budget_pbl_smg_travis.txt)
+
 add_test(pbl_iles_travis_diff bash -c "
     dir=out_pbl_iles_travis
     echo   'comparing const.h5'                                                                                        &&
