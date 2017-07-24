@@ -110,6 +110,6 @@ axarr.set_ylabel("$z / z_i$", fontsize = 20)
 axarr.set_xlim([-0.8, 1])
 axarr.set_xticks([-0.8 + 0.2 * i for i in range(10)])
 axarr.set_ylim([0, 1.3])
-axarr.legend(fontsize = 20, edgecolor = 'k')
+axarr.legend(fontsize = 20)
 
 plt.savefig('budget_' + outname + '.pdf')
