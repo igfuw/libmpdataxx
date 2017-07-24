@@ -20,7 +20,16 @@ namespace libmpdataxx
       cr, // conjugate residual
       gcrk, // generalized conjugate residual (restarted after k steps)
       pc  // preconditioned
-    };  
+    };
+
+    const std::map<prs_scheme_t, std::string> prs2string = {
+      {mr, "mr"},
+      {cr, "cr"},
+      {gcrk, "gcrk"},
+      {pc, "pc"}
+    };
+
+    struct mpdata_rhs_vip_prs_family_tag {};
 
     // the mpdata class
     template<typename ct_params_t, class enableif = void> 
@@ -38,6 +47,9 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_rhs_vip_prs_mr<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
+
+      protected:
+      using solver_family = mpdata_rhs_vip_prs_family_tag;
     };
 
     // conjugate residual
@@ -49,6 +61,9 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1>; 
       using parent_t::parent_t; // inheriting constructors
+      
+      protected:
+      using solver_family = mpdata_rhs_vip_prs_family_tag;
     };
     
     // generalized conjugate residual
@@ -60,6 +75,9 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters>; 
       using parent_t::parent_t; // inheriting constructors
+      
+      protected:
+      using solver_family = mpdata_rhs_vip_prs_family_tag;
     };
 
     // preconditioned
@@ -71,6 +89,9 @@ namespace libmpdataxx
     {
       using parent_t = detail::mpdata_rhs_vip_prs_pc<ct_params_t>; 
       using parent_t::parent_t; // inheriting constructors
+      
+      protected:
+      using solver_family = mpdata_rhs_vip_prs_family_tag;
     };
   } // namespace solvers
 } // namescpae libmpdataxx

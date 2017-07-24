@@ -23,6 +23,14 @@ namespace libmpdataxx
       trapez   // paraphrase of trapezoidal rule:         psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1 
     };
 
+    const std::map<rhs_scheme_t, std::string> scheme2string {
+      {euler_a, "euler_a"},
+      {euler_b, "euler_b"},
+      {trapez , "trapez"},
+    };
+    
+    struct mpdata_rhs_family_tag {};
+
     template <class ct_params_t>
     class mpdata_rhs : public mpdata<ct_params_t>
     {
@@ -35,6 +43,7 @@ namespace libmpdataxx
 #endif
 
       protected:
+      using solver_family = mpdata_rhs_family_tag;
 
       // member fields
       arrvec_t<typename parent_t::arr_t> &rhs;

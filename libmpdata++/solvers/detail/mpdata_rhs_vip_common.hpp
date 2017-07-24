@@ -20,6 +20,14 @@ namespace libmpdataxx
       impl
     };
 
+    const std::map<vip_vab_t, std::string> vab2string {
+      {noab, "noab"},
+      {expl, "expl"},
+      {impl, "impl"},
+    };
+
+    struct mpdata_rhs_vip_family_tag {};
+
     namespace detail
     {
       // 
