@@ -55,9 +55,8 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == false
       )
       {
-        // FIXME
         return return_helper<ix_t>(
-          nom / (den + blitz::tiny(0.)) // note: for negative signal eps -> -eps
+          nom / (den + blitz::tiny(typename real_t_helper<ix_t, nom_t>::type(0.))) // note: for negative signal eps -> -eps
         );
       }
 
