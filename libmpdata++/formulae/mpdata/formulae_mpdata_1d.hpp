@@ -36,7 +36,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_3rd_helper(
+      inline auto div_3rd_upwind(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -51,7 +51,7 @@ namespace libmpdataxx
       }
 
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_3rd_helper(
+      inline auto div_3rd_upwind(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -89,7 +89,7 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           // upwind differencing correction
-          div_3rd_helper<opts>(psi, GC, G, i)
+          div_3rd_upwind<opts>(psi, GC, G, i)
           // spatial terms
           - 1.0 / 24 *
           (
