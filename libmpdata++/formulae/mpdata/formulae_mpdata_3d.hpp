@@ -71,6 +71,26 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, class arr_3d_t, class ix_t>
+      inline auto div_3rd_spatial(
+        const arr_3d_t &psi, 
+        const arrvec_t<arr_3d_t> &GC,
+        const arr_3d_t &G, 
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k
+      )
+      {
+        return return_helper<ix_t>(
+          - 1.0 / 24 *
+          (
+              4 * GC[dim](pi<dim>(i+h, j, k)) * ndxx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k)
+            + 2 * ndx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k) * ndx_GC0<dim>(GC[dim], i, j, k)
+            + 1 * ndxx_GC0<opts BOOST_PP_COMMA() dim>(psi, GC[dim], i, j, k)
+          )
+        );
+      }
+      
+      template <opts_t opts, int dim, class arr_3d_t, class ix_t>
       inline auto div_3rd(
         const arr_3d_t &psi_np1, 
         const arr_3d_t &psi_n, 
@@ -105,12 +125,7 @@ namespace libmpdataxx
           // upwind differencing correction
           div_3rd_upwind<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j, k)
           // spatial terms
-          - 1.0 / 24 *
-          (
-              4 * GC[dim](pi<dim>(i+h, j, k)) * ndxx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j, k)
-            + 2 * ndx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j, k) * ndx_GC0<dim>(GC[dim], i, j, k)
-            + 1 * ndxx_GC0<opts BOOST_PP_COMMA() dim>(psi_np1, GC[dim], i, j, k)
-          )
+          + div_3rd_spatial<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j, k)
           // mixed terms
           + 0.5 * abs(GC[dim](pi<dim>(i+h, j, k))) * ndx_fdiv<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j, k)
           // temporal terms
@@ -142,12 +157,7 @@ namespace libmpdataxx
           // upwind differencing correction
           div_3rd_upwind<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j, k)
           // spatial terms
-          - 1.0 / 24 *
-          (
-              4 * GC[dim](pi<dim>(i+h, j, k)) * ndxx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j, k)
-            + 2 * ndx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j, k) * ndx_GC0<dim>(GC[dim], i, j, k)
-            + 1 * ndxx_GC0<opts BOOST_PP_COMMA() dim>(psi_np1, GC[dim], i, j, k)
-          )
+          + div_3rd_spatial<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j, k)
           // mixed terms
           - 0.5 * abs(GC[dim](pi<dim>(i+h, j, k))) * ndtx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, psi_n, i, j, k)
           // temporal terms

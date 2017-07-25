@@ -63,6 +63,24 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, class arr_1d_t, class ix_t>
+      inline auto div_3rd_spatial(
+        const arr_1d_t &psi, 
+        const arrvec_t<arr_1d_t> &GC,
+        const arr_1d_t &G, 
+        const ix_t &i
+      )
+      {
+        return return_helper<ix_t>(
+          - 1.0 / 24 *
+          (
+              4 * GC[0](i+h) * ndxx_psi<opts>(psi, i)
+            + 2 * ndx_psi<opts>(psi, i) * ndx_GC0(GC[0], i)
+            + 1 * ndxx_GC0<opts>(psi, GC[0], i)
+          )
+        );
+      }
+      
+      template <opts_t opts, class arr_1d_t, class ix_t>
       inline auto div_3rd(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
@@ -91,12 +109,7 @@ namespace libmpdataxx
           // upwind differencing correction
           div_3rd_upwind<opts>(psi, GC, G, i)
           // spatial terms
-          - 1.0 / 24 *
-          (
-              4 * GC[0](i+h) * ndxx_psi<opts>(psi, i)
-            + 2 * ndx_psi<opts>(psi, i) * ndx_GC0(GC[0], i)
-            + 1 * ndxx_GC0<opts>(psi, GC[0], i)
-          )
+          + div_3rd_spatial<opts>(psi, GC, G, i)
           // mixed terms
           + 0.5 * abs(GC[0](i+h)) * ndx_fdiv<opts>(psi, GC, G, i)
           // temporal terms
