@@ -21,12 +21,25 @@ namespace libmpdataxx
       smg,
       tke
     };
+    
+    const std::map<sgs_scheme_t, std::string> sgs2string = {
+      {dns, "dns"},
+      {smg, "smg"},
+      {tke, "tke"},
+    };
 
     enum stress_diff_t
     {
       normal,
       pade
     };
+    
+    const std::map<stress_diff_t, std::string> sdiff2string = {
+      {normal, "normal"},
+      {pade,   "pade"  },
+    };
+
+    struct mpdata_rhs_vip_prs_sgs_family_tag {};
 
     // to be specialised
     template <class ct_params_t, class enableif = void>
