@@ -25,7 +25,7 @@ set(libmpdataxx_CXX_FLAGS_RELEASE "")
 
 ############################################################################################
 # debug mode compiler flags
-set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++11 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++14 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
 
 
 ############################################################################################
@@ -35,7 +35,7 @@ if(
   CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
   CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
 )
-  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++11 -DNDEBUG -Ofast -march=native")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++14 -DNDEBUG -Ofast -march=native")
 
   # preventing Kahan summation from being optimised out
   if (
@@ -48,17 +48,18 @@ endif()
 
 
 ############################################################################################
-# C++11
+# C++14
 include(CheckCXXSourceCompiles)
-set(CMAKE_REQUIRED_FLAGS "-std=c++11")
+set(CMAKE_REQUIRED_FLAGS "-std=c++14")
 check_cxx_source_compiles("
   #include <type_traits>
+  auto f() { return 1;}
   template <bool a, class b> using ei=std::enable_if<a,b>; 
   struct a {a(int){}};struct b:a {using a::a;};  
   int main(){b i(1);}
-" CXX11_SUPPORTED)
-if (NOT CXX11_SUPPORTED)
-  message(FATAL_ERROR "C++11 compatibility test failed - please update your compiler or point CMake to another one with -DCMAKE_CXX_COMPILER=...")
+" CXX14_SUPPORTED)
+if (NOT CXX14_SUPPORTED)
+  message(FATAL_ERROR "C++14 compatibility test failed - please update your compiler or point CMake to another one with -DCMAKE_CXX_COMPILER=...")
 endif()
 unset(CMAKE_REQUIRED_FLAGS)
 

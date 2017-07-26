@@ -42,10 +42,10 @@ namespace libmpdataxx
           xchng_sclr(this->mem->psi[e][ this->n[e]]);
 	}
 
-        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec); 
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, ad); 
           this->mem->barrier();
         }
 
@@ -140,7 +140,8 @@ namespace libmpdataxx
 
           // fully third-order accurate mpdata needs also time derivatives of
           // the Courant field
-          if (opts::isset(ct_params_t::opts, opts::div_3rd))
+          if (opts::isset(ct_params_t::opts, opts::div_3rd) ||
+              opts::isset(ct_params_t::opts, opts::div_3rd_dt))
           {
             // TODO: why for (auto f : {mem->ndt_GC, mem->ndtt_GC}) doesn't work ?
 	    mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0]))));

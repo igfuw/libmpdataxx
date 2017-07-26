@@ -23,9 +23,12 @@ class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
 
   using tp = ct_test_params_t;
 
+  static constexpr bool needs_dt = libmpdataxx::opts::isset(ct_params_t::opts, libmpdataxx::opts::div_3rd) ||
+                                   libmpdataxx::opts::isset(ct_params_t::opts, libmpdataxx::opts::div_3rd_dt);
+
   real_t xc, yc;
 
-  libmpdataxx::arrvec_t<typename parent_t::arr_t> &gc_node;
+  libmpdataxx::arrvec_t<typename parent_t::arr_t> &ex_node;
 
   xpf_t xpf;
   ixpf_t ixpf;
@@ -78,6 +81,42 @@ class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
     using namespace libmpdataxx::arakawa_c;
 
     auto t = this->time;
+
+    if (needs_dt)
+    {
+      update_vortex_centre(t - 0.5 * this->dt);
+      for (int i = this->i.first(); i <= this->i.last(); ++i)
+      {
+        for (int j = this->j.first(); j <= this->j.last(); ++j)
+        {
+          const auto x = i * this->di;
+          const auto y = (j+ 0.5) * this->dj - pi / 2;
+
+          auto gc_ij = gc_exact(x, y);
+
+          ex_node[2](i, j) = -gc_ij.first;
+          ex_node[3](i, j) = -gc_ij.second;
+          ex_node[4](i, j) = gc_ij.first;
+          ex_node[5](i, j) = gc_ij.second;
+        }
+      }
+      
+      update_vortex_centre(t);
+      for (int i = this->i.first(); i <= this->i.last(); ++i)
+      {
+        for (int j = this->j.first(); j <= this->j.last(); ++j)
+        {
+          const auto x = i * this->di;
+          const auto y = (j+ 0.5) * this->dj - pi / 2;
+
+          auto gc_ij = gc_exact(x, y);
+
+          ex_node[4](i, j) -= 2 * gc_ij.first;
+          ex_node[5](i, j) -= 2 * gc_ij.second;
+        }
+      }
+    }
+
     update_vortex_centre(t + 0.5 * this->dt);
 
     // calculate exact advectors at grid points
@@ -90,26 +129,57 @@ class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
 
         auto gc_ij = gc_exact(x, y);
 
-        gc_node[0](i, j) = gc_ij.first;
-        gc_node[1](i, j) = gc_ij.second;
+        ex_node[0](i, j) = gc_ij.first;
+        ex_node[1](i, j) = gc_ij.second;
+
+        if (needs_dt)
+        {
+          ex_node[2](i, j) += gc_ij.first;
+          ex_node[3](i, j) += gc_ij.second;
+
+          ex_node[4](i, j) += gc_ij.first;
+          ex_node[5](i, j) += gc_ij.second;
+          ex_node[4](i, j) *= 4;
+          ex_node[5](i, j) *= 4;
+        }
       }
     }
 
-    this->mem->barrier();
+    for (int d = 0; d < 2; ++d)
+    {
+      this->xchng_sclr(ex_node[d], this->i, this->j);
+      if (needs_dt)
+      {
+        this->xchng_sclr(ex_node[2 + d], this->i, this->j);
+        this->xchng_sclr(ex_node[4 + d], this->i, this->j);
+      }
+    }
 
     // calculate staggered advectors
-    for (int i = this->i.first(); i <= this->i.last(); ++i)
+    auto ex = this->halo - 1;
+    for (int i = this->i.first()-1-ex; i <= this->i.last()+ex; ++i)
     {
-      for (int j = this->j.first(); j <= this->j.last(); ++j)
+      for (int j = this->j.first()-1-ex; j <= this->j.last()+ex; ++j)
       {
-        this->mem->GC[0](i+h, j) = 0.5 * (gc_node[0](i, j) + gc_node[0](i+1, j));
-        this->mem->GC[1](i, j+h) = 0.5 * (gc_node[1](i, j) + gc_node[1](i, j+1));
+        this->mem->GC[0](i+h, j) = 0.5 * (ex_node[0](i, j) + ex_node[0](i+1, j));
+        this->mem->GC[1](i, j+h) = 0.5 * (ex_node[1](i, j) + ex_node[1](i, j+1));
+        if (needs_dt)
+        {
+          this->mem->ndt_GC[0](i+h, j) = 0.5 * (ex_node[2](i, j) + ex_node[2](i+1, j));
+          this->mem->ndt_GC[1](i, j+h) = 0.5 * (ex_node[3](i, j) + ex_node[3](i, j+1));
+
+          this->mem->ndtt_GC[0](i+h, j) = 0.5 * (ex_node[4](i, j) + ex_node[4](i+1, j));
+          this->mem->ndtt_GC[1](i, j+h) = 0.5 * (ex_node[5](i, j) + ex_node[5](i, j+1));
+        }
       }
     }
 
-    auto ex = this->halo - 1;
-    this->xchng_vctr_alng(this->mem->GC);
     this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+    if (needs_dt)
+    {
+      this->xchng_vctr_nrml(this->mem->ndt_GC, this->i^ex, this->j^ex);
+      this->xchng_vctr_nrml(this->mem->ndtt_GC, this->i^ex, this->j^ex);
+    }
 
     return true;
   }
@@ -122,7 +192,7 @@ class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
     const typename parent_t::rt_params_t &p
   ) :
     parent_t(args, p),
-    gc_node(args.mem->tmp[__FILE__][0]),
+    ex_node(args.mem->tmp[__FILE__][0]),
     xpf{tp::x0, tp::y0},
     ypf{tp::x0, tp::y0}
   {}
@@ -132,6 +202,6 @@ class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
     const int &n_iters
   ) {
     parent_t::alloc(mem, n_iters);
-    parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // gc_node
+    parent_t::alloc_tmp_sclr(mem, __FILE__, needs_dt ? 6 : 2); // ex_node
   }
 };
