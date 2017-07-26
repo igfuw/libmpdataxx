@@ -81,6 +81,7 @@ namespace libmpdataxx
     static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
     enum { var_dt = false};
     enum { vip_vab = 0};
+    enum { prs_ord = 2};
     enum { prs_k_iters = 4};
     enum { prs_khn = false}; // if true use Kahan summation in the pressure solver
     enum { stress_diff = 0};
