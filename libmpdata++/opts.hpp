@@ -85,6 +85,7 @@ namespace libmpdataxx
     enum { prs_khn = false}; // if true use Kahan summation in the pressure solver
     enum { stress_diff = 0};
     enum { impl_tht = false};
+    enum { sptl_intrp = 0}; // spatial interpolation of velocities
   };
 
 } // namespace libmpdataxx

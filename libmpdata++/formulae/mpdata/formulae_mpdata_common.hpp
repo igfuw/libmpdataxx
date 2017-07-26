@@ -15,6 +15,17 @@
 
 namespace libmpdataxx
 { 
+  // in namespace solvers to be consistent with other options
+  namespace solvers
+  {
+    enum sptl_intrp_t
+    { 
+      exact,
+      aver2,
+      aver4,
+    };
+  }
+
   namespace formulae 
   { 
     namespace mpdata 

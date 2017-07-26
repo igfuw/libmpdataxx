@@ -82,7 +82,7 @@ namespace libmpdataxx
               this->xchng(e);
 
 	      // calculating the antidiffusive C 
-              formulae::mpdata::antidiff<ct_params_t::opts, 0>(
+              formulae::mpdata::antidiff<ct_params_t::opts, 0, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
                 this->GC_corr(iter)[0],
                 this->mem->psi[e][this->n[e]], 
                 this->mem->psi[e][this->n[e]-1],
@@ -95,7 +95,7 @@ namespace libmpdataxx
                 this->k
               );
 
-              formulae::mpdata::antidiff<ct_params_t::opts, 1>(
+              formulae::mpdata::antidiff<ct_params_t::opts, 1, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
                 this->GC_corr(iter)[1],
                 this->mem->psi[e][this->n[e]], 
                 this->mem->psi[e][this->n[e]-1], 
@@ -108,7 +108,7 @@ namespace libmpdataxx
                 this->i
               );
             
-              formulae::mpdata::antidiff<ct_params_t::opts, 2>(
+              formulae::mpdata::antidiff<ct_params_t::opts, 2, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
                 this->GC_corr(iter)[2],
                 this->mem->psi[e][this->n[e]], 
                 this->mem->psi[e][this->n[e]-1], 
