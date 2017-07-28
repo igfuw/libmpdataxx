@@ -3,8 +3,6 @@ set -e
 cd tests/nair_jablonowski_2008
 mkdir build
 cd build
-# Travis default is not the packaged one
-if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi
 # the one from homebrew
 if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi
 

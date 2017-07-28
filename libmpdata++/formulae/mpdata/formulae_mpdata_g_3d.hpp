@@ -21,85 +21,96 @@ namespace libmpdataxx
     namespace mpdata 
     {
       // interpolation of G to (i+1/2, j, k) - general case
-      template<opts_t opts, int dim, class arr_3d_t>
+      template<opts_t opts, int dim, class arr_3d_t, class ix_t>
       inline auto G_bar_x(
         const arr_3d_t &G,
-        const rng_t &i,
-        const rng_t &j,
-        const rng_t &k,
+        const ix_t &i,
+        const ix_t &j,
+        const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
-      ) return_macro(,
+      )
+      {
+        return return_helper<ix_t>(
           (
             formulae::G<opts, dim>(G, i+1, j, k)
           + formulae::G<opts, dim>(G, i  , j, k)
           ) / 2
-      )
+        );
+      }
 
       // interpolation of G to (i+1/2, j, k) - constant G version
-      template<opts_t opts, int dim, class arr_3d_t>
-      inline typename arr_3d_t::T_numtype G_bar_x( 
+      template<opts_t opts, int dim, class arr_3d_t, class ix_t>
+      inline auto G_bar_x( 
         const arr_3d_t &G,
-        const rng_t &i,
-        const rng_t &j,
-        const rng_t &k,
+        const ix_t &i,
+        const ix_t &j,
+        const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
-      ) {
+      )
+      {
           return 1;
       }
       
       // interpolation of G to (i+1/2, j+1/2, k) - general case
-      template<opts_t opts, int dim, class arr_3d_t>
+      template<opts_t opts, int dim, class arr_3d_t, class ix_t>
       inline auto G_bar_xy(
         const arr_3d_t &G,
-        const rng_t &i,
-        const rng_t &j,
-        const rng_t &k,
+        const ix_t &i,
+        const ix_t &j,
+        const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
-      ) return_macro(,
-        (
-          formulae::G<opts, dim>(G, i  , j  , k) +
-          formulae::G<opts, dim>(G, i  , j+1, k) +
-          formulae::G<opts, dim>(G, i+1, j  , k) +
-          formulae::G<opts, dim>(G, i+1, j+1, k)
-        ) / 4
       )
+      {
+        return return_helper<ix_t>(
+          (
+            formulae::G<opts, dim>(G, i  , j  , k) +
+            formulae::G<opts, dim>(G, i  , j+1, k) +
+            formulae::G<opts, dim>(G, i+1, j  , k) +
+            formulae::G<opts, dim>(G, i+1, j+1, k)
+          ) / 4
+        );
+      }
       
       // interpolation of G to (i+1/2, j+1/2, k) - constant G version
-      template<opts_t opts, int dim, class arr_3d_t>
-      inline typename arr_3d_t::T_numtype G_bar_xy(
+      template<opts_t opts, int dim, class arr_3d_t, class ix_t>
+      inline auto G_bar_xy(
         const arr_3d_t &G,
-        const rng_t &i,
-        const rng_t &j,
-        const rng_t &k,
+        const ix_t &i,
+        const ix_t &j,
+        const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
-      ) {
+      )
+      {
         return 1;
       }
       
       // interpolation of G to (i+1/2, j, k+1/2) - general case
-      template<opts_t opts, int dim, class arr_3d_t>
+      template<opts_t opts, int dim, class arr_3d_t, class ix_t>
       inline auto G_bar_xz(
         const arr_3d_t &G,
-        const rng_t &i,
-        const rng_t &j,
-        const rng_t &k,
+        const ix_t &i,
+        const ix_t &j,
+        const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
-      ) return_macro(,
-        (
-          formulae::G<opts, dim>(G, i  , j, k  ) +
-          formulae::G<opts, dim>(G, i  , j, k+1) +
-          formulae::G<opts, dim>(G, i+1, j, k  ) +
-          formulae::G<opts, dim>(G, i+1, j, k+1)
-        ) / 4
       )
+      {
+        return return_helper<ix_t>(
+          (
+            formulae::G<opts, dim>(G, i  , j, k  ) +
+            formulae::G<opts, dim>(G, i  , j, k+1) +
+            formulae::G<opts, dim>(G, i+1, j, k  ) +
+            formulae::G<opts, dim>(G, i+1, j, k+1)
+          ) / 4
+        );
+      }
       
       // interpolation of G to (i+1/2, j, k+1/2) - constant G version
-      template<opts_t opts, int dim, class arr_3d_t>
-      inline typename arr_3d_t::T_numtype G_bar_xz(
+      template<opts_t opts, int dim, class arr_3d_t, class ix_t>
+      inline auto G_bar_xz(
         const arr_3d_t &G,
-        const rng_t &i,
-        const rng_t &j,
-        const rng_t &k,
+        const ix_t &i,
+        const ix_t &j,
+        const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
       ) {
         return 1;

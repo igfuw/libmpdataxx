@@ -48,7 +48,7 @@ namespace libmpdataxx
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
 	}
 
-        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j);
@@ -58,7 +58,7 @@ namespace libmpdataxx
         }
 
         virtual void xchng_vctr_nrml(
-          const arrvec_t<typename parent_t::arr_t> &arrvec, 
+          arrvec_t<typename parent_t::arr_t> &arrvec, 
           const rng_t &range_i, 
           const rng_t &range_j
         ) final
@@ -70,7 +70,7 @@ namespace libmpdataxx
         }
 
         virtual void xchng_pres(
-          const typename parent_t::arr_t &arr,
+          typename parent_t::arr_t &arr,
           const idx_t<2> &range_ijk
         ) final
         {
@@ -81,7 +81,7 @@ namespace libmpdataxx
         }
 
         virtual void set_edges(
-          const arrvec_t<typename parent_t::arr_t> &av,
+          arrvec_t<typename parent_t::arr_t> &av,
           const idx_t<2> &range_ijk,
           const int &sign
         ) final
