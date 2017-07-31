@@ -22,7 +22,7 @@ namespace libmpdataxx
       // flux divergence i.e. 
       // 1 / G * dx * d(GC * psi)/dx at (i)
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto fdiv_centre(
+      forceinline_macro auto fdiv_centre(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -40,7 +40,7 @@ namespace libmpdataxx
       // nondimensionalised flux divergence i.e. 
       // 1 / (G * psi) * dx * d(GC * psi)/dx at (i+1/2) - positive sign scalar version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv(
+      forceinline_macro auto nfdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -65,7 +65,7 @@ namespace libmpdataxx
       // nondimensionalised flux divergence i.e. 
       // 1 / (G * psi) * dx * d(GC * psi)/dx at (i+1/2) - variable sign scalar version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv(
+      forceinline_macro auto nfdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -90,7 +90,7 @@ namespace libmpdataxx
       // nondimensionalised flux divergence i.e. 
       // 1 / (G * psi) * dx * d(GC * psi)/dx at (i+1/2) - infinite gauge version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv(
+      forceinline_macro auto nfdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -109,7 +109,7 @@ namespace libmpdataxx
       // nondimensionalised divergence of flux divergence flux i.e.
       // 1 / (G * psi) * dx * d(GC * fdiv)/dx at (i+1/2) - positive sign scalar version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_fdiv(
+      forceinline_macro auto nfdiv_fdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -136,7 +136,7 @@ namespace libmpdataxx
       // nondimensionalised divergence of flux divergence flux i.e.
       // 1 / (G * psi) * dx * d(GC * fdiv)/dx at (i+1/2) - variable sign scalar version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_fdiv(
+      forceinline_macro auto nfdiv_fdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -163,7 +163,7 @@ namespace libmpdataxx
       // nondimensionalised divergence of flux divergence flux i.e.
       // 1 / (G * psi) * dx * d(GC * fdiv)/dx at (i+1/2) - infinite gauge version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_fdiv(
+      forceinline_macro auto nfdiv_fdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -182,7 +182,7 @@ namespace libmpdataxx
       // nondimensionalised x derivative of flux divergence i.e.
       // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2) - positive sign scalar version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto ndx_fdiv(
+      forceinline_macro auto ndx_fdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -207,7 +207,7 @@ namespace libmpdataxx
       // nondimensionalised x derivative of flux divergence i.e.
       // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2) - variable sign scalar version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto ndx_fdiv(
+      forceinline_macro auto ndx_fdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,
@@ -232,7 +232,7 @@ namespace libmpdataxx
       // nondimensionalised x derivative of flux divergence i.e.
       // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2) - infinite gauge version
       template <opts_t opts, class arr_1d_t, class ix_t, class arrvec_t>
-      inline auto ndx_fdiv(
+      forceinline_macro auto ndx_fdiv(
         const arr_1d_t &psi,
         const arrvec_t &GC, 
         const arr_1d_t &G,

@@ -19,7 +19,7 @@ namespace libmpdataxx
     {
       // first come helpers for divergence form of antidiffusive velocity
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_2nd(
+      forceinline_macro auto div_2nd(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -36,7 +36,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_3rd_helper(
+      forceinline_macro auto div_3rd_helper(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -51,7 +51,7 @@ namespace libmpdataxx
       }
 
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_3rd_helper(
+      forceinline_macro auto div_3rd_helper(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -63,7 +63,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC,
@@ -77,7 +77,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC,
