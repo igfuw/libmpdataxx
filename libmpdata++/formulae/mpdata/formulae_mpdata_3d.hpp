@@ -20,7 +20,7 @@ namespace libmpdataxx
     {
       // first come helpers for divergence form of antidiffusive velocity
       template <opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto div_2nd(
+      forceinline_macro auto div_2nd(
         const arr_3d_t &psi, 
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G, 
@@ -40,7 +40,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto div_3rd_upwind(
+      forceinline_macro auto div_3rd_upwind(
         const arr_3d_t &psi, 
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G, 
@@ -57,7 +57,7 @@ namespace libmpdataxx
       }
 
       template <opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto div_3rd_upwind(
+      forceinline_macro auto div_3rd_upwind(
         const arr_3d_t &psi, 
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G, 
@@ -71,7 +71,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_3d_t &psi, 
         const arrvec_t<arr_3d_t> &GC,
         const ix_t &i, 
@@ -86,7 +86,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_3d_t &psi, 
         const arrvec_t<arr_3d_t> &GC,
         const ix_t &i, 
@@ -101,7 +101,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_3d_t &psi, 
         const arrvec_t<arr_3d_t> &GC,
         const ix_t &i, 
@@ -114,7 +114,7 @@ namespace libmpdataxx
       }
 
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
-      inline auto div_3rd_spatial(
+      forceinline_macro auto div_3rd_spatial(
         const arr_3d_t &psi, 
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G, 
@@ -134,7 +134,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_3d_t &psi_np1, 
         const arr_3d_t &psi_n, 
         const arrvec_t<arr_3d_t> &GC,
@@ -151,7 +151,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_3d_t &psi_np1, 
         const arr_3d_t &psi_n, 
         const arrvec_t<arr_3d_t> &GC,
@@ -183,7 +183,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_3d_t &psi_np1, 
         const arr_3d_t &psi_n, 
         const arrvec_t<arr_3d_t> &GC,
