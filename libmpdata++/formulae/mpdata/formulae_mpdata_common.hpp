@@ -83,7 +83,12 @@ namespace libmpdataxx
           nom / (den + blitz::epsilon(typename real_t_helper<ix_t, nom_t>::type(0.)))
         );
       }
-
+      
+      template<class arg_t>
+      inline auto fct_where(bool c, arg_t a, arg_t b)
+      {
+        return c ? a : b;
+      }
     } // namespace mpdata
   } // namespace formulae
 } // namespcae libmpdataxx

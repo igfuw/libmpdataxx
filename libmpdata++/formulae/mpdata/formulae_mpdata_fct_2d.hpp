@@ -121,84 +121,98 @@ namespace libmpdataxx
         }
       } 
 
-      template <opts_t opts, int d, class arr_2d_t, class ix_t>
+      template <opts_t opts, int d, class arr_2d_t>
       inline auto GC_mono( //for variable-sign signal and no infinite gauge option
+        arrvec_t<arr_2d_t> &GC_m,
         const arr_2d_t &psi,
         const arr_2d_t &beta_up,
         const arr_2d_t &beta_dn,
         const arrvec_t<arr_2d_t> &GC_corr,
         const arr_2d_t &G,
-        const ix_t &i,
-        const ix_t &j,
+        const rng_t &ir,
+        const rng_t &jr,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
       {
-        return return_helper<ix_t>(
-          GC_corr[d]( pi<d>(i+h, j) ) * where(
-            // if
-            GC_corr[d]( pi<d>(i+h, j) ) > 0,
-            // then
-            where(
+        using std::min;
+        for (int i = ir.first(); i <= ir.last(); ++i)
+        {
+          for (int j = jr.first(); j <= jr.last(); ++j)
+          {
+            GC_m[d]( pi<d>(i+h, j) ) =
+            GC_corr[d]( pi<d>(i+h, j) ) * fct_where(
               // if
-              psi(pi<d>(i, j)) > 0,
+              GC_corr[d]( pi<d>(i+h, j) ) > 0,
               // then
-              min(1, min(
-                beta_dn(pi<d>(i,     j)),
-                beta_up(pi<d>(i + 1, j)) 
-              )),
+              fct_where(
+                // if
+                psi(pi<d>(i, j)) > 0,
+                // then
+                min(1., min(
+                  beta_dn(pi<d>(i,     j)),
+                  beta_up(pi<d>(i + 1, j)) 
+                )),
+                // else
+                min(1., min(
+                  beta_up(pi<d>(i,     j)),
+                  beta_dn(pi<d>(i + 1, j))
+                ))
+              ),
               // else
-              min(1, min(
-                beta_up(pi<d>(i,     j)),
-                beta_dn(pi<d>(i + 1, j))
-              ))
-            ),
-            // else
-            where(
-              // if
-              psi(pi<d>(i+1, j)) > 0,
-              // then
-              min(1, min(
-                beta_up(pi<d>(i,     j)),
-                beta_dn(pi<d>(i + 1, j))
-              )),
-              // else
-              min(1, min(
-                beta_dn(pi<d>(i,     j)),
-                beta_up(pi<d>(i + 1, j))
-              ))
-            )
-          )
-        );
+              fct_where(
+                // if
+                psi(pi<d>(i+1, j)) > 0,
+                // then
+                min(1., min(
+                  beta_up(pi<d>(i,     j)),
+                  beta_dn(pi<d>(i + 1, j))
+                )),
+                // else
+                min(1., min(
+                  beta_dn(pi<d>(i,     j)),
+                  beta_up(pi<d>(i + 1, j))
+                ))
+              )
+            );
+          }
+        }
       } 
 
-      template <opts_t opts, int d, class arr_2d_t, class ix_t>
+      template <opts_t opts, int d, class arr_2d_t>
       inline auto GC_mono( //for infinite gauge option or positive-sign signal
+        arrvec_t<arr_2d_t> &GC_m,
         const arr_2d_t &psi,
         const arr_2d_t &beta_up,
         const arr_2d_t &beta_dn,
         const arrvec_t<arr_2d_t> &GC_corr,
         const arr_2d_t &G,
-        const ix_t &i,
-        const ix_t &j,
+        const rng_t &ir,
+        const rng_t &jr,
         typename std::enable_if<opts::isset(opts, opts::iga) || !opts::isset(opts, opts::abs)>::type* = 0
       )
       {
-        return return_helper<ix_t>(
-          GC_corr[d]( pi<d>(i+h, j) ) * where(
-            // if
-            GC_corr[d]( pi<d>(i+h, j) ) > 0, 
-            // then
-            min(1, min(
-              beta_dn(pi<d>(i,     j)),
-              beta_up(pi<d>(i + 1, j))
-            )),
-            // else
-            min(1, min(
-              beta_up(pi<d>(i,     j)),
-              beta_dn(pi<d>(i + 1, j))
-            ))
-          )
-        );
+        using std::min;
+        for (int i = ir.first(); i <= ir.last(); ++i)
+        {
+          for (int j = jr.first(); j <= jr.last(); ++j)
+          {
+            GC_m[d]( pi<d>(i+h, j) ) =
+            GC_corr[d]( pi<d>(i+h, j) ) * fct_where(
+              // if
+              GC_corr[d]( pi<d>(i+h, j) ) > 0, 
+              // then
+              min(1., min(
+                beta_dn(pi<d>(i,     j)),
+                beta_up(pi<d>(i + 1, j))
+              )),
+              // else
+              min(1., min(
+                beta_up(pi<d>(i,     j)),
+                beta_dn(pi<d>(i + 1, j))
+              ))
+            );
+          }
+        }
       }
     } // namespace mpdata_fct
   } // namespace formulae

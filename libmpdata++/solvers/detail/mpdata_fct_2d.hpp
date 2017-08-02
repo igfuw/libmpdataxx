@@ -86,8 +86,8 @@ namespace libmpdataxx
           this->beta_barrier(iter);
 
 	  // calculating the monotonic corrective velocity
-	  this->GC_mono[0]( im+h, this->j ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j);
-	  this->GC_mono[1]( this->i, jm+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->i);
+	  formulae::mpdata::GC_mono<ct_params_t::opts, 0>(this->GC_mono, psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j);
+	  formulae::mpdata::GC_mono<ct_params_t::opts, 1>(this->GC_mono, psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->i);
 	}
       };
     } // namespace detail
