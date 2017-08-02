@@ -322,7 +322,7 @@ namespace libmpdataxx
       // nondimensionalised flux divergence of time derivative of psi i.e. 
       // 1 / (G * psi) * (dx * d(GC * dpsi/dt)/dx + dy * d(GC * dpsi/dt)/dy) at (i+1/2, j) - positive sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class arrvec_t, class ix_t>
-      inline auto nfdiv_dt(
+      forceinline_macro auto nfdiv_dt(
         const arr_2d_t &psi_np1,
         const arr_2d_t &psi_n,
         const arrvec_t &GC, 
@@ -363,7 +363,7 @@ namespace libmpdataxx
       // nondimensionalised flux divergence of time derivative of psi i.e. 
       // 1 / (G * psi) * (dx * d(GC * dpsi/dt)/dx + dy * d(GC * dpsi/dt)/dy) at (i+1/2, j) - variable sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class arrvec_t, class ix_t>
-      inline auto nfdiv_dt(
+      forceinline_macro auto nfdiv_dt(
         const arr_2d_t &psi_np1,
         const arr_2d_t &psi_n,
         const arrvec_t &GC, 
@@ -404,7 +404,7 @@ namespace libmpdataxx
       // nondimensionalised flux divergence of time derivative of psi i.e. 
       // 1 / (G * psi) * (dx * d(GC * dpsi/dt)/dx + dy * d(GC * dpsi/dt)/dy) at (i+1/2, j) - infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class arrvec_t, class ix_t>
-      inline auto nfdiv_dt(
+      forceinline_macro auto nfdiv_dt(
         const arr_2d_t &psi_np1,
         const arr_2d_t &psi_n,
         const arrvec_t &GC, 

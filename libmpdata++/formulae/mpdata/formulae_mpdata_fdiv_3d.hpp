@@ -422,7 +422,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * dpsi/dt)/dx + dy * d(GC * dpsi/dt)/dy + dz * d(GC * dpsi/dt)/dz) at (i+1/2, j, k)
       // positive sign scalar version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_dt(
+      forceinline_macro auto nfdiv_dt(
         const arr_3d_t &psi_np1,
         const arr_3d_t &psi_n,
         const arrvec_t &GC, 
@@ -481,7 +481,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * dpsi/dt)/dx + dy * d(GC * dpsi/dt)/dy + dz * d(GC * dpsi/dt)/dz) at (i+1/2, j, k)
       // variable sign scalar version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_dt(
+      forceinline_macro auto nfdiv_dt(
         const arr_3d_t &psi_np1,
         const arr_3d_t &psi_n,
         const arrvec_t &GC, 
@@ -540,7 +540,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * dpsi/dt)/dx + dy * d(GC * dpsi/dt)/dy + dz * d(GC * dpsi/dt)/dz) at (i+1/2, j, k)
       // infinite gauge version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_dt(
+      forceinline_macro auto nfdiv_dt(
         const arr_3d_t &psi_np1,
         const arr_3d_t &psi_n,
         const arrvec_t &GC, 
