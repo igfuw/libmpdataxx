@@ -14,40 +14,48 @@ namespace libmpdataxx
   namespace formulae
   {
     // nprt: implemented using min
-    template<opts::opts_t opts, class arr_t>
+    template<opts::opts_t opts, class ix_t, class arr_t>
     inline auto negpart(
       const arr_t &x,
       typename std::enable_if<!opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == false
-    ) return_macro(,
-      min(0, x)
     )
+    {
+      using std::min;
+      return return_helper<ix_t>(min(0., x));
+    }
 
     // nprt: implemented using abs
-    template<opts::opts_t opts, class arr_t>
+    template<opts::opts_t opts, class ix_t, class arr_t>
     inline auto negpart(
       const arr_t &x,
       typename std::enable_if<opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == true
-    ) return_macro(,
-      (x - abs(x)) / 2
     )
+    {
+      using std::abs;
+      return return_helper<ix_t>((x - abs(x)) / 2);
+    }
 
     // pprt: implemented using max
-    template<opts::opts_t opts, class arr_t>
+    template<opts::opts_t opts, class ix_t, class arr_t>
     inline auto pospart(
       const arr_t &x,
       typename std::enable_if<!opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == false
-    ) return_macro(,
-      max(0, x)
     )
+    {
+      using std::max;
+      return return_helper<ix_t>(max(0., x));
+    }
 
     // pprt: implemented using abx
-    template<opts::opts_t opts, class arr_t>
+    template<opts::opts_t opts, class ix_t, class arr_t>
     inline auto pospart(
       const arr_t &x,
       typename std::enable_if<opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == true
-    ) return_macro(,
-      (x + abs(x)) / 2
     )
+    {
+      using std::abs;
+      return return_helper<ix_t>((x + abs(x)) / 2);
+    }
 
     // 1D or ND: G = const = 1
     template<opts::opts_t opts, class arr_t, class ix_t>

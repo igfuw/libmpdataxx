@@ -73,8 +73,8 @@ namespace libmpdataxx
           const auto &flx = (*(this->flux_ptr));
 
           // calculating betas
-          this->beta_up(i1, j1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1, j1);
-          this->beta_dn(i1, j1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1, j1);
+          formulae::mpdata::beta_up<ct_params_t::opts>(this->beta_up, psi, this->psi_max, flx, G, i1, j1);
+          formulae::mpdata::beta_dn<ct_params_t::opts>(this->beta_dn, psi, this->psi_min, flx, G, i1, j1);
 
           // should detect the need for ext=1 halo-filling above (TODO: double check)
 	  assert(std::isfinite(sum(this->beta_up(i1, this->j))));

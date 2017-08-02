@@ -73,13 +73,16 @@ namespace libmpdataxx
       }
 
       // a bigger-epsilon version for FCT (used regardless of opts::eps setting)
-      template<class nom_t, class den_t>
+      template<class ix_t, class nom_t, class den_t>
       inline auto fct_frac(
         const nom_t &nom, 
         const den_t &den
-      ) return_macro(,
-        nom / (den + blitz::epsilon(typename den_t::T_numtype(0))) 
       )
+      {
+        return return_helper<ix_t>(
+          nom / (den + blitz::epsilon(typename real_t_helper<ix_t, nom_t>::type(0.)))
+        );
+      }
 
     } // namespace mpdata
   } // namespace formulae
