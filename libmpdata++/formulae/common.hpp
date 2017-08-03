@@ -15,56 +15,56 @@ namespace libmpdataxx
   {
     // overloads of abs/min/max/where that pick out the correct version based on ix_t
     template<class ix_t, class arg_t>
-    inline auto abs(const arg_t &a, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
+    forceinline_macro auto abs(const arg_t &a, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
     {
       return std::abs(a);
     }
     
     template<class ix_t, class arg_t>
-    inline auto abs(const arg_t &a, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
+    forceinline_macro auto abs(const arg_t &a, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
     {
       return blitz::abs(a);
     }
 
     template<class ix_t, class arg_t>
-    inline auto min(const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
+    forceinline_macro auto min(const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
     {
       return std::min(a, b);
     }
     
     template<class ix_t, class a_t, class b_t>
-    inline auto min(const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
+    forceinline_macro auto min(const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
     {
       return blitz::min(a, b);
     }
 
     template<class ix_t, class arg_t>
-    inline auto max(const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
+    forceinline_macro auto max(const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
     {
       return std::max(a, b);
     }
     
     template<class ix_t, class a_t, class b_t>
-    inline auto max(const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
+    forceinline_macro auto max(const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
     {
       return blitz::max(a, b);
     }
       
     template<class ix_t, class arg_t>
-    inline auto where(bool c, const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)   
+    forceinline_macro auto where(bool c, const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)   
     {
       return c ? a : b;
     }
     
     template<class ix_t, class c_t, class a_t, class b_t>
-    inline auto where(c_t c, const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)  
+    forceinline_macro auto where(c_t c, const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)  
     {
       return blitz::where(c, a, b);
     }
 
     // nprt: implemented using min
     template<opts::opts_t opts, class ix_t, class arr_t>
-    inline auto negpart(
+    forceinline_macro auto negpart(
       const arr_t &x,
       typename std::enable_if<!opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == false
     )
@@ -74,7 +74,7 @@ namespace libmpdataxx
 
     // nprt: implemented using abs
     template<opts::opts_t opts, class ix_t, class arr_t>
-    inline auto negpart(
+    forceinline_macro auto negpart(
       const arr_t &x,
       typename std::enable_if<opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == true
     )
@@ -84,7 +84,7 @@ namespace libmpdataxx
 
     // pprt: implemented using max
     template<opts::opts_t opts, class ix_t, class arr_t>
-    inline auto pospart(
+    forceinline_macro auto pospart(
       const arr_t &x,
       typename std::enable_if<!opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == false
     )
@@ -94,7 +94,7 @@ namespace libmpdataxx
 
     // pprt: implemented using abx
     template<opts::opts_t opts, class ix_t, class arr_t>
-    inline auto pospart(
+    forceinline_macro auto pospart(
       const arr_t &x,
       typename std::enable_if<opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == true
     )

@@ -50,7 +50,7 @@ namespace libmpdataxx
 
       // frac: implemented using blitz::where()
       template<opts_t opts, class nom_t, class den_t>
-      inline auto frac(
+      forceinline_macro auto frac(
         const nom_t &nom, 
         const den_t &den,
         typename std::enable_if<opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == true
@@ -61,7 +61,7 @@ namespace libmpdataxx
       // frac: implemented as suggested in MPDATA papers
       //       if den == 0, then adding a smallest representable positive number
       template<opts_t opts, class ix_t, class nom_t, class den_t>
-      inline auto frac(
+      forceinline_macro auto frac(
         const nom_t &nom, 
         const den_t &den,
         typename std::enable_if<!opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == false
@@ -74,7 +74,7 @@ namespace libmpdataxx
 
       // a bigger-epsilon version for FCT (used regardless of opts::eps setting)
       template<class ix_t, class nom_t, class den_t>
-      inline auto fct_frac(
+      forceinline_macro auto fct_frac(
         const nom_t &nom, 
         const den_t &den
       )

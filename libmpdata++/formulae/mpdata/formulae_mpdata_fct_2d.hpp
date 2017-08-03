@@ -19,7 +19,7 @@ namespace libmpdataxx
  
       //see Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
       template <opts_t opts, class arr_2d_t, class ix_t>
-      inline auto beta_up_nominator(
+      forceinline_macro auto beta_up_nominator(
         const arr_2d_t &psi,
         const arr_2d_t &psi_max,
         const arr_2d_t &G,
@@ -39,7 +39,7 @@ namespace libmpdataxx
       }
 
       template <opts_t opts, class arr_2d_t, class flx_t>
-      inline void beta_up(
+      forceinline_macro void beta_up(
         arr_2d_t &b,
         const arr_2d_t &psi,
         const arr_2d_t &psi_max, // from before the first iteration
@@ -69,7 +69,7 @@ namespace libmpdataxx
       } 
 
       template <opts_t opts, class arr_2d_t, class ix_t>
-      inline auto beta_dn_nominator(
+      forceinline_macro auto beta_dn_nominator(
         const arr_2d_t &psi, 
         const arr_2d_t &psi_min,
         const arr_2d_t &G, 
@@ -90,7 +90,7 @@ namespace libmpdataxx
       } 
 
       template <opts_t opts, class arr_2d_t, class flx_t>
-      inline auto beta_dn(
+      forceinline_macro auto beta_dn(
         arr_2d_t &b, 
         const arr_2d_t &psi, 
         const arr_2d_t &psi_min, // from before the first iteration
@@ -120,7 +120,7 @@ namespace libmpdataxx
       } 
 
       template <opts_t opts, int d, class arr_2d_t>
-      inline auto GC_mono( //for variable-sign signal and no infinite gauge option
+      forceinline_macro auto GC_mono( //for variable-sign signal and no infinite gauge option
         arrvec_t<arr_2d_t> &GC_m,
         const arr_2d_t &psi,
         const arr_2d_t &beta_up,
@@ -177,7 +177,7 @@ namespace libmpdataxx
       } 
 
       template <opts_t opts, int d, class arr_2d_t>
-      inline auto GC_mono( //for infinite gauge option or positive-sign signal
+      forceinline_macro auto GC_mono( //for infinite gauge option or positive-sign signal
         arrvec_t<arr_2d_t> &GC_m,
         const arr_2d_t &psi,
         const arr_2d_t &beta_up,
