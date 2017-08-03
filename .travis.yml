@@ -102,7 +102,9 @@ install:
     
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /opt/python/; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /opt/python/2.7.13/; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /opt/python/2.7.13/lib/; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PYTHON_LIBRARY="/opt/python/2.7.13/lib"; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PYTHON_INCLUDE_DIR="/opt/python/2.7.13/include"; fi
 
     # make Python 3 the default if requested
     - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
