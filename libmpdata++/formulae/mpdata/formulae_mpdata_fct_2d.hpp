@@ -27,10 +27,9 @@ namespace libmpdataxx
         const ix_t &j
       )
       {
-        using std::max;
         return return_helper<ix_t>(
           (  
-            max(max(max(max(max(psi_max(i, j), 
+            max<ix_t>(max<ix_t>(max<ix_t>(max<ix_t>(max<ix_t>(psi_max(i, j),
                                     psi(i, j+1)),
                       psi(i-1, j)), psi(i, j  )), psi(i+1, j)),
                                     psi(i, j-1)
@@ -78,11 +77,10 @@ namespace libmpdataxx
         const ix_t &j 
       )
       {
-        using std::min;
         return return_helper<ix_t>(
           (
             psi(i, j)
-            - min(min(min(min(min( psi_min(i,j), 
+            - min<ix_t>(min<ix_t>(min<ix_t>(min<ix_t>(min<ix_t>( psi_min(i,j), 
                                        psi(i, j+1)),
                          psi(i-1, j)), psi(i, j  )), psi(i+1, j)),
                                        psi(i, j-1)
@@ -134,41 +132,41 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
       {
-        using std::min;
+        using ix_t = int;
         for (int i = ir.first(); i <= ir.last(); ++i)
         {
           for (int j = jr.first(); j <= jr.last(); ++j)
           {
             GC_m[d]( pi<d>(i+h, j) ) =
-            GC_corr[d]( pi<d>(i+h, j) ) * fct_where(
+            GC_corr[d]( pi<d>(i+h, j) ) * where<ix_t>(
               // if
               GC_corr[d]( pi<d>(i+h, j) ) > 0,
               // then
-              fct_where(
+              where<ix_t>(
                 // if
                 psi(pi<d>(i, j)) > 0,
                 // then
-                min(1., min(
+                min<ix_t>(1., min<ix_t>(
                   beta_dn(pi<d>(i,     j)),
                   beta_up(pi<d>(i + 1, j)) 
                 )),
                 // else
-                min(1., min(
+                min<ix_t>(1., min<ix_t>(
                   beta_up(pi<d>(i,     j)),
                   beta_dn(pi<d>(i + 1, j))
                 ))
               ),
               // else
-              fct_where(
+              where<ix_t>(
                 // if
                 psi(pi<d>(i+1, j)) > 0,
                 // then
-                min(1., min(
+                min<ix_t>(1., min<ix_t>(
                   beta_up(pi<d>(i,     j)),
                   beta_dn(pi<d>(i + 1, j))
                 )),
                 // else
-                min(1., min(
+                min<ix_t>(1., min<ix_t>(
                   beta_dn(pi<d>(i,     j)),
                   beta_up(pi<d>(i + 1, j))
                 ))
@@ -191,22 +189,22 @@ namespace libmpdataxx
         typename std::enable_if<opts::isset(opts, opts::iga) || !opts::isset(opts, opts::abs)>::type* = 0
       )
       {
-        using std::min;
+        using ix_t = int;
         for (int i = ir.first(); i <= ir.last(); ++i)
         {
           for (int j = jr.first(); j <= jr.last(); ++j)
           {
             GC_m[d]( pi<d>(i+h, j) ) =
-            GC_corr[d]( pi<d>(i+h, j) ) * fct_where(
+            GC_corr[d]( pi<d>(i+h, j) ) * where<ix_t>(
               // if
               GC_corr[d]( pi<d>(i+h, j) ) > 0, 
               // then
-              min(1., min(
+              min<ix_t>(1., min<ix_t>(
                 beta_dn(pi<d>(i,     j)),
                 beta_up(pi<d>(i + 1, j))
               )),
               // else
-              min(1., min(
+              min<ix_t>(1., min<ix_t>(
                 beta_up(pi<d>(i,     j)),
                 beta_dn(pi<d>(i + 1, j))
               ))
