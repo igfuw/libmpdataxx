@@ -100,11 +100,13 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-matplotlib; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install matplotlib; fi
     
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /opt/python/; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /opt/python/2.7.13/; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /opt/python/2.7.13/lib/; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PYTHON_LIBRARY="/opt/python/2.7.13/lib"; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PYTHON_INCLUDE_DIR="/opt/python/2.7.13/include"; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then which python; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then python --version; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /usr/lib/; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /usr/bin; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l //usr/include; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PYTHON_LIBRARY="/usr/lib/python2.7"; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PYTHON_INCLUDE_DIR="/usr/include/python2.7/"; fi
 
     # make Python 3 the default if requested
     - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
