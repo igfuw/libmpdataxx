@@ -32,6 +32,8 @@ addons:
 osx_image: xcode8
 
 before_install:
+# to avoid python lib/interpreter mismatch; https://github.com/travis-ci/travis-ci/issues/5326
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
@@ -99,14 +101,6 @@ install:
     # matplotlib
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-matplotlib; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install matplotlib; fi
-    
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then which python; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then python --version; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /usr/lib/; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l /usr/bin; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ls -l //usr/include; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PYTHON_LIBRARY="/usr/lib/python2.7"; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PYTHON_INCLUDE_DIR="/usr/include/python2.7/"; fi
 
     # make Python 3 the default if requested
     - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
