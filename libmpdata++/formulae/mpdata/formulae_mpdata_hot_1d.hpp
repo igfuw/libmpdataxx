@@ -17,7 +17,7 @@ namespace libmpdataxx
     namespace mpdata 
     {
       template<opts_t opts, class arr_1d_t, class ix_t>
-      inline auto ndxx_psi_coeff(
+      forceinline_macro auto ndxx_psi_coeff(
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const ix_t &i
@@ -34,7 +34,7 @@ namespace libmpdataxx
 
       // third order terms
       template<opts_t opts, class arr_1d_t, class ix_t>
-      inline auto TOT(
+      forceinline_macro auto TOT(
         const arr_1d_t &psi,
         const arr_1d_t &GC,
         const arr_1d_t &G,
@@ -48,7 +48,7 @@ namespace libmpdataxx
       }
       
       template<opts_t opts, class arr_1d_t, class ix_t>
-      inline auto TOT(
+      forceinline_macro auto TOT(
         const arr_1d_t &psi,
         const arr_1d_t &GC,
         const arr_1d_t &G,

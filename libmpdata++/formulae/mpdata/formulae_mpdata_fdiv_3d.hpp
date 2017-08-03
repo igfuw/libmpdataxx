@@ -26,7 +26,7 @@ namespace libmpdataxx
       // flux divergence i.e. 
       // 1 / G * (dx * d(GC * psi)/dx + dy * d(GC * psi)/dy + dz * d(GC * psi)/dz) at (i, j, k)
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto fdiv_centre(
+      forceinline_macro auto fdiv_centre(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -52,7 +52,7 @@ namespace libmpdataxx
       // flux divergence i.e. 
       // 1 / G * (dx * d(GC * psi)/dx + dy * d(GC * psi)/dy + dz * d(GC * psi)/dz) at (i+1/2, j+1/2, k)
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto fdiv_corner_xy(
+      forceinline_macro auto fdiv_corner_xy(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -78,7 +78,7 @@ namespace libmpdataxx
       // flux divergence i.e. 
       // 1 / G * (dx * d(GC * psi)/dx + dy * d(GC * psi)/dy + dz * d(GC * psi)/dz) at (i+1/2, j, k+1/2)
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto fdiv_corner_xz(
+      forceinline_macro auto fdiv_corner_xz(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -105,7 +105,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * psi)/dx + dy * d(GC * psi)/dy + dz * d(GC * psi)/dz) at (i+1/2, j, k)
       // positive sign scalar version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv(
+      forceinline_macro auto nfdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -147,7 +147,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * psi)/dx + dy * d(GC * psi)/dy + dz * d(GC * psi)/dz) at (i+1/2, j, k)
       // variable sign scalar version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv(
+      forceinline_macro auto nfdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -189,7 +189,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * psi)/dx + dy * d(GC * psi)/dy + dz * d(GC * psi)/dz) at (i+1/2, j, k)
       // infinite gauge version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv(
+      forceinline_macro auto nfdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -217,7 +217,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * fdiv)/dx + dy * d(GC * fdiv)/dy + dz * d(GC * fdiv)/dz) at (i+1/2, j, k)
       // positive sign scalar version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_fdiv(
+      forceinline_macro auto nfdiv_fdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -261,7 +261,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * fdiv)/dx + dy * d(GC * fdiv)/dy + dz * d(GC * fdiv)/dz) at (i+1/2, j, k)
       // variable sign scalar version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_fdiv(
+      forceinline_macro auto nfdiv_fdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -305,7 +305,7 @@ namespace libmpdataxx
       // 1 / (G * psi) * (dx * d(GC * fdiv)/dx + dy * d(GC * fdiv)/dy + dz * d(GC * fdiv)/dz) at (i+1/2, j, k)
       // infinite gauge version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto nfdiv_fdiv(
+      forceinline_macro auto nfdiv_fdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -332,7 +332,7 @@ namespace libmpdataxx
       // nondimensionalised x derivative of flux divergence i.e.
       // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2, j, k) - positive sign scalar version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto ndx_fdiv(
+      forceinline_macro auto ndx_fdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -367,7 +367,7 @@ namespace libmpdataxx
       // nondimensionalised x derivative of flux divergence i.e.
       // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2, j, k) - variable sign scalar version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto ndx_fdiv(
+      forceinline_macro auto ndx_fdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,
@@ -402,7 +402,7 @@ namespace libmpdataxx
       // nondimensionalised x derivative of flux divergence i.e.
       // 1 / (G * psi) * dx * d(fdiv)/dx at (i+1/2, j, k) - infinite gauge version
       template <opts_t opts, int dim, class arr_3d_t, class ix_t, class arrvec_t>
-      inline auto ndx_fdiv(
+      forceinline_macro auto ndx_fdiv(
         const arr_3d_t &psi,
         const arrvec_t &GC, 
         const arr_3d_t &G,

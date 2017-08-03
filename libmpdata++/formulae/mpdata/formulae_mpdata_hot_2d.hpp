@@ -19,7 +19,7 @@ namespace libmpdataxx
     namespace mpdata 
     {
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto ndxx_psi_coeff(
+      forceinline_macro auto ndxx_psi_coeff(
         const arr_2d_t &GC,
         const arr_2d_t &G,
         const ix_t &i,
@@ -36,7 +36,7 @@ namespace libmpdataxx
       }
 
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto ndxy_psi_coeff(
+      forceinline_macro auto ndxy_psi_coeff(
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
         const ix_t &i,
@@ -51,7 +51,7 @@ namespace libmpdataxx
       
       // third order terms
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto TOT(
+      forceinline_macro auto TOT(
         const arr_2d_t &psi,
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
@@ -68,7 +68,7 @@ namespace libmpdataxx
       }
 
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto TOT(
+      forceinline_macro auto TOT(
         const arr_2d_t &psi,
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
@@ -81,7 +81,7 @@ namespace libmpdataxx
       }
 
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto ndxxx_psi_coeff(
+      forceinline_macro auto ndxxx_psi_coeff(
         const arr_2d_t &GC,
         const arr_2d_t &G,
         const ix_t &i,
@@ -98,7 +98,7 @@ namespace libmpdataxx
       }
       
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto ndxxy_psi_coeff(
+      forceinline_macro auto ndxxy_psi_coeff(
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
         const ix_t &i,
@@ -114,7 +114,7 @@ namespace libmpdataxx
       }
       
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto ndxyy_psi_coeff(
+      forceinline_macro auto ndxyy_psi_coeff(
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
         const ix_t &i,
@@ -135,7 +135,7 @@ namespace libmpdataxx
       
       // fourth order terms
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto FOT(
+      forceinline_macro auto FOT(
         const arr_2d_t &psi,
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
@@ -157,7 +157,7 @@ namespace libmpdataxx
       }
 
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto FOT(
+      forceinline_macro auto FOT(
         const arr_2d_t &psi,
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
