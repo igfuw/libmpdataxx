@@ -151,7 +151,7 @@ namespace libmpdataxx
                  beta_dn(i + 1)
                )), 
                // else
-               min<ix_t>(1., min(
+               min<ix_t>(1., min<ix_t>(
                  beta_dn(i   ), 
                  beta_up(i + 1)
                ))  
