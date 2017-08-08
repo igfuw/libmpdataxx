@@ -146,12 +146,12 @@ namespace libmpdataxx
                 // if
                 psi(pi<d>(i, j)) > 0,
                 // then
-                min<ix_t>(1., min<ix_t>(
+                min<ix_t>(1, min<ix_t>(
                   beta_dn(pi<d>(i,     j)),
                   beta_up(pi<d>(i + 1, j)) 
                 )),
                 // else
-                min<ix_t>(1., min<ix_t>(
+                min<ix_t>(1, min<ix_t>(
                   beta_up(pi<d>(i,     j)),
                   beta_dn(pi<d>(i + 1, j))
                 ))
@@ -161,12 +161,12 @@ namespace libmpdataxx
                 // if
                 psi(pi<d>(i+1, j)) > 0,
                 // then
-                min<ix_t>(1., min<ix_t>(
+                min<ix_t>(1, min<ix_t>(
                   beta_up(pi<d>(i,     j)),
                   beta_dn(pi<d>(i + 1, j))
                 )),
                 // else
-                min<ix_t>(1., min<ix_t>(
+                min<ix_t>(1, min<ix_t>(
                   beta_dn(pi<d>(i,     j)),
                   beta_up(pi<d>(i + 1, j))
                 ))
@@ -199,12 +199,12 @@ namespace libmpdataxx
               // if
               GC_corr[d]( pi<d>(i+h, j) ) > 0, 
               // then
-              min<ix_t>(1., min<ix_t>(
+              min<ix_t>(1, min<ix_t>(
                 beta_dn(pi<d>(i,     j)),
                 beta_up(pi<d>(i + 1, j))
               )),
               // else
-              min<ix_t>(1., min<ix_t>(
+              min<ix_t>(1, min<ix_t>(
                 beta_up(pi<d>(i,     j)),
                 beta_dn(pi<d>(i + 1, j))
               ))

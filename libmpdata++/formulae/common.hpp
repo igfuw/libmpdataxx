@@ -71,7 +71,7 @@ namespace libmpdataxx
       typename std::enable_if<!opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == false
     )
     {
-      return return_helper<ix_t>(min<ix_t>(0., x));
+      return return_helper<ix_t>(min<ix_t>(0, x));
     }
 
     // nprt: implemented using abs
@@ -91,7 +91,7 @@ namespace libmpdataxx
       typename std::enable_if<!opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == false
     )
     {
-      return return_helper<ix_t>(max<ix_t>(0., x));
+      return return_helper<ix_t>(max<ix_t>(0, x));
     }
 
     // pprt: implemented using abx
