@@ -26,10 +26,11 @@ namespace libmpdataxx
       return blitz::abs(a);
     }
 
-    template<class ix_t, class arg_t>
-    forceinline_macro auto min(const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
+    template<class ix_t, class a_t, class b_t>
+    forceinline_macro auto min(const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
     {
-      return std::min(a, b);
+      using cm_t = typename std::common_type<a_t, b_t>::type;
+      return std::min(static_cast<cm_t>(a), static_cast<cm_t>(b));
     }
     
     template<class ix_t, class a_t, class b_t>
@@ -38,10 +39,11 @@ namespace libmpdataxx
       return blitz::min(a, b);
     }
 
-    template<class ix_t, class arg_t>
-    forceinline_macro auto max(const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
+    template<class ix_t, class a_t, class b_t>
+    forceinline_macro auto max(const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
     {
-      return std::max(a, b);
+      using cm_t = typename std::common_type<a_t, b_t>::type;
+      return std::max(static_cast<cm_t>(a), static_cast<cm_t>(b));
     }
     
     template<class ix_t, class a_t, class b_t>
