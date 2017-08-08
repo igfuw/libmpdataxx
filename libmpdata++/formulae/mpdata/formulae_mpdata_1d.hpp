@@ -112,7 +112,7 @@ namespace libmpdataxx
           (
               4 * GC[0](i+h) * ndxx_psi<opts>(psi, i)
             + 2 * ndx_psi<opts>(psi, i) * ndx_GC0(GC[0], i)
-            + div_3rd_spatial_helper<opts BOOST_PP_COMMA() sptl_intrp>(psi, GC, i)
+            + div_3rd_spatial_helper<opts, sptl_intrp>(psi, GC, i)
           )
         );
       }
@@ -146,7 +146,7 @@ namespace libmpdataxx
           // upwind differencing correction
           div_3rd_upwind<opts>(psi, GC, G, i)
           // spatial terms
-          + div_3rd_spatial<opts BOOST_PP_COMMA() sptl_intrp>(psi, GC, G, i)
+          + div_3rd_spatial<opts, sptl_intrp>(psi, GC, G, i)
           // mixed terms
           + 0.5 * abs(GC[0](i+h)) * ndx_fdiv<opts>(psi, GC, G, i)
           // temporal terms
@@ -207,7 +207,7 @@ namespace libmpdataxx
         {
           res(i) = 
           div_2nd<opts>(psi, GC, G, i) +
-          div_3rd<opts BOOST_PP_COMMA() sptl_intrp>(psi, GC, ndt_GC, ndtt_GC, G, i);
+          div_3rd<opts, sptl_intrp>(psi, GC, ndt_GC, ndtt_GC, G, i);
         }
       } 
 

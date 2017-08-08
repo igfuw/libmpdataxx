@@ -35,11 +35,11 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            GC[dim](pi<dim>(i+h,   j)) * psi_bar_x<opts BOOST_PP_COMMA() dim>(psi, i  , j  )
-          - GC[dim](pi<dim>(i-h,   j)) * psi_bar_x<opts BOOST_PP_COMMA() dim>(psi, i-1, j  )
-          + GC[dim+1](pi<dim>(i, j+h)) * psi_bar_y<opts BOOST_PP_COMMA() dim>(psi, i  , j  )
-          - GC[dim+1](pi<dim>(i, j-h)) * psi_bar_y<opts BOOST_PP_COMMA() dim>(psi, i  , j-1)
-          ) / formulae::G<opts BOOST_PP_COMMA() dim>(G, i, j)
+            GC[dim](pi<dim>(i+h,   j)) * psi_bar_x<opts, dim>(psi, i  , j  )
+          - GC[dim](pi<dim>(i-h,   j)) * psi_bar_x<opts, dim>(psi, i-1, j  )
+          + GC[dim+1](pi<dim>(i, j+h)) * psi_bar_y<opts, dim>(psi, i  , j  )
+          - GC[dim+1](pi<dim>(i, j-h)) * psi_bar_y<opts, dim>(psi, i  , j-1)
+          ) / formulae::G<opts, dim>(G, i, j)
         );
       }
       
@@ -56,12 +56,12 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-              GC0_bar_xy<dim>(GC[dim], i+1, j  ) * psi_bar_y<opts BOOST_PP_COMMA() dim>(psi, i+1, j)
-            - GC0_bar_xy<dim>(GC[dim], i  , j  ) * psi_bar_y<opts BOOST_PP_COMMA() dim>(psi, i  , j)
+              GC0_bar_xy<dim>(GC[dim], i+1, j  ) * psi_bar_y<opts, dim>(psi, i+1, j)
+            - GC0_bar_xy<dim>(GC[dim], i  , j  ) * psi_bar_y<opts, dim>(psi, i  , j)
               
-            + GC1_bar_xy<dim>(GC[dim+1], i, j+1) * psi_bar_x<opts BOOST_PP_COMMA() dim>(psi, i, j+1)
-            - GC1_bar_xy<dim>(GC[dim+1], i, j  ) * psi_bar_x<opts BOOST_PP_COMMA() dim>(psi, i, j  )
-          ) / G_bar_xy<opts BOOST_PP_COMMA() dim>(G, i, j)
+            + GC1_bar_xy<dim>(GC[dim+1], i, j+1) * psi_bar_x<opts, dim>(psi, i, j+1)
+            - GC1_bar_xy<dim>(GC[dim+1], i, j  ) * psi_bar_x<opts, dim>(psi, i, j  )
+          ) / G_bar_xy<opts, dim>(G, i, j)
         );
       }
       
@@ -82,10 +82,10 @@ namespace libmpdataxx
           frac<opts, ix_t>(
             GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * psi(pi<dim>(i+1, j))
           - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * psi(pi<dim>(i  , j))
-          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi, i, j  )
-          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi, i, j-1)
+          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * psi_bar_xy<opts, dim>(psi, i, j  )
+          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * psi_bar_xy<opts, dim>(psi, i, j-1)
           ,
-            G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) * (
+            G_bar_x<opts, dim>(G, i, j) * (
               psi(pi<dim>(i+1, j  ))
             + psi(pi<dim>(i  , j  ))
             + psi(pi<dim>(i  , j+1))
@@ -114,10 +114,10 @@ namespace libmpdataxx
           frac<opts, ix_t>(
             GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * abs(psi(pi<dim>(i+1, j)))
           - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * abs(psi(pi<dim>(i  , j)))
-          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi, i, j  )
-          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi, i, j-1)
+          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * psi_bar_xy<opts, dim>(psi, i, j  )
+          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * psi_bar_xy<opts, dim>(psi, i, j-1)
           ,
-            G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) * (
+            G_bar_x<opts, dim>(G, i, j) * (
               abs(psi(pi<dim>(i+1, j  )))
             + abs(psi(pi<dim>(i  , j  )))
             + abs(psi(pi<dim>(i  , j+1)))
@@ -145,9 +145,9 @@ namespace libmpdataxx
           (
             GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * psi(pi<dim>(i+1, j))
           - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * psi(pi<dim>(i  , j))
-          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi, i, j  )
-          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi, i, j-1)
-          ) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j)
+          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * psi_bar_xy<opts, dim>(psi, i, j  )
+          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * psi_bar_xy<opts, dim>(psi, i, j-1)
+          ) / G_bar_x<opts, dim>(G, i, j)
         );
       }
      
@@ -166,12 +166,12 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           8 *
           frac<opts, ix_t>(
-            GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i+1, j)
-          - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i  , j)
-          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * fdiv_corner_xy<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j  )
-          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * fdiv_corner_xy<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j-1)
+            GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * fdiv_centre<opts, dim>(psi, GC, G, i+1, j)
+          - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * fdiv_centre<opts, dim>(psi, GC, G, i  , j)
+          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * fdiv_corner_xy<opts, dim>(psi, GC, G, i, j  )
+          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * fdiv_corner_xy<opts, dim>(psi, GC, G, i, j-1)
           ,
-            G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) * (
+            G_bar_x<opts, dim>(G, i, j) * (
               psi(pi<dim>(i+2,   j)) +
               psi(pi<dim>(i+1,   j)) +
               psi(pi<dim>(i  ,   j)) +
@@ -200,12 +200,12 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           8 *
           frac<opts, ix_t>(
-            GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i+1, j)
-          - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i  , j)
-          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * fdiv_corner_xy<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j  )
-          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * fdiv_corner_xy<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j-1)
+            GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * fdiv_centre<opts, dim>(psi, GC, G, i+1, j)
+          - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * fdiv_centre<opts, dim>(psi, GC, G, i  , j)
+          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * fdiv_corner_xy<opts, dim>(psi, GC, G, i, j  )
+          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * fdiv_corner_xy<opts, dim>(psi, GC, G, i, j-1)
           ,
-            G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) * (
+            G_bar_x<opts, dim>(G, i, j) * (
               abs(psi(pi<dim>(i+2,   j))) +
               abs(psi(pi<dim>(i+1,   j))) +
               abs(psi(pi<dim>(i  ,   j))) +
@@ -233,11 +233,11 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i+1, j)
-          - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i  , j)
-          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * fdiv_corner_xy<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j  )
-          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * fdiv_corner_xy<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j-1)
-          ) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j)
+            GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * fdiv_centre<opts, dim>(psi, GC, G, i+1, j)
+          - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * fdiv_centre<opts, dim>(psi, GC, G, i  , j)
+          + GC1_bar_x<dim>(GC[dim+1], i  , j  ) * fdiv_corner_xy<opts, dim>(psi, GC, G, i, j  )
+          - GC1_bar_x<dim>(GC[dim+1], i  , j-1) * fdiv_corner_xy<opts, dim>(psi, GC, G, i, j-1)
+          ) / G_bar_x<opts, dim>(G, i, j)
         );
       }
       
@@ -256,8 +256,8 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           8 * 
           frac<opts, ix_t>(
-            fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i+1, j)
-          - fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i  , j)
+            fdiv_centre<opts, dim>(psi, GC, G, i+1, j)
+          - fdiv_centre<opts, dim>(psi, GC, G, i  , j)
           ,
             psi(pi<dim>(i+2,   j)) +
             psi(pi<dim>(i+1,   j)) +
@@ -286,8 +286,8 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           8 * 
           frac<opts, ix_t>(
-            fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i+1, j)
-          - fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i  , j)
+            fdiv_centre<opts, dim>(psi, GC, G, i+1, j)
+          - fdiv_centre<opts, dim>(psi, GC, G, i  , j)
           ,
             abs(psi(pi<dim>(i+2, j  ))) +
             abs(psi(pi<dim>(i+1, j  ))) +
@@ -314,8 +314,8 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-            fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i+1, j)
-          - fdiv_centre<opts BOOST_PP_COMMA() dim>(psi, GC, G, i  , j)
+            fdiv_centre<opts, dim>(psi, GC, G, i+1, j)
+          - fdiv_centre<opts, dim>(psi, GC, G, i  , j)
         );
       }
 
@@ -338,11 +338,11 @@ namespace libmpdataxx
             GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * (psi_np1(pi<dim>(i+1, j)) - psi_n(pi<dim>(i+1, j)))
           - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * (psi_np1(pi<dim>(i  , j)) - psi_n(pi<dim>(i  , j)))
           + GC1_bar_x<dim>(GC[dim+1], i  , j  ) *
-            (psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_np1, i, j) - psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_n, i, j))
+            (psi_bar_xy<opts, dim>(psi_np1, i, j) - psi_bar_xy<opts, dim>(psi_n, i, j))
           - GC1_bar_x<dim>(GC[dim+1], i  , j-1) *
-            (psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_np1, i, j-1) - psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_n, i, j-1))
+            (psi_bar_xy<opts, dim>(psi_np1, i, j-1) - psi_bar_xy<opts, dim>(psi_n, i, j-1))
           ,
-            G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) * (
+            G_bar_x<opts, dim>(G, i, j) * (
               psi_np1(pi<dim>(i+1, j  ))
             + psi_np1(pi<dim>(i  , j  ))
             + psi_np1(pi<dim>(i  , j+1))
@@ -379,11 +379,11 @@ namespace libmpdataxx
             GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * (abs(psi_np1(pi<dim>(i+1, j))) - abs(psi_n(pi<dim>(i+1, j))))
           - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * (abs(psi_np1(pi<dim>(i  , j))) - abs(psi_n(pi<dim>(i  , j))))
           + GC1_bar_x<dim>(GC[dim+1], i  , j  ) *
-            (psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_np1, i, j) - psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_n, i, j))
+            (psi_bar_xy<opts, dim>(psi_np1, i, j) - psi_bar_xy<opts, dim>(psi_n, i, j))
           - GC1_bar_x<dim>(GC[dim+1], i  , j-1) *
-            (psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_np1, i, j-1) - psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_n, i, j-1))
+            (psi_bar_xy<opts, dim>(psi_np1, i, j-1) - psi_bar_xy<opts, dim>(psi_n, i, j-1))
           ,
-            G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) * (
+            G_bar_x<opts, dim>(G, i, j) * (
               abs(psi_np1(pi<dim>(i+1, j  )))
             + abs(psi_np1(pi<dim>(i  , j  )))
             + abs(psi_np1(pi<dim>(i  , j+1)))
@@ -419,10 +419,10 @@ namespace libmpdataxx
             GC0_bar_x<dim>(GC[dim]  , i+1, j  ) * (psi_np1(pi<dim>(i+1, j)) - psi_n(pi<dim>(i+1, j)))
           - GC0_bar_x<dim>(GC[dim]  , i  , j  ) * (psi_np1(pi<dim>(i  , j)) - psi_n(pi<dim>(i  , j)))
           + GC1_bar_x<dim>(GC[dim+1], i  , j  ) *
-            (psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_np1, i, j) - psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_n, i, j))
+            (psi_bar_xy<opts, dim>(psi_np1, i, j) - psi_bar_xy<opts, dim>(psi_n, i, j))
           - GC1_bar_x<dim>(GC[dim+1], i  , j-1) *
-            (psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_np1, i, j-1) - psi_bar_xy<opts BOOST_PP_COMMA() dim>(psi_n, i, j-1))
-          ) /  G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j)
+            (psi_bar_xy<opts, dim>(psi_np1, i, j-1) - psi_bar_xy<opts, dim>(psi_n, i, j-1))
+          ) /  G_bar_x<opts, dim>(G, i, j)
         );
       }
 

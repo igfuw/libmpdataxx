@@ -34,7 +34,7 @@ namespace libmpdataxx
                       psi(i-1, j)), psi(i, j  )), psi(i+1, j)),
                                     psi(i, j-1)
              ) - psi(i, j)
-          ) * formulae::G<opts BOOST_PP_COMMA() 0>(G, i, j) //to make beta up dimensionless when transporting mixing ratios with momentum
+          ) * formulae::G<opts, 0>(G, i, j) //to make beta up dimensionless when transporting mixing ratios with momentum
         );
       }
 
@@ -58,11 +58,11 @@ namespace libmpdataxx
             fct_frac<ix_t>(
               beta_up_nominator<opts>(psi, psi_max, G, i, j)
               , // -----------------------------------------------------------
-              ( pospart<opts BOOST_PP_COMMA() ix_t>(flx[0](i-h, j))
-              - negpart<opts BOOST_PP_COMMA() ix_t>(flx[0](i+h, j)) )  // additional parenthesis so that we first sum
+              ( pospart<opts, ix_t>(flx[0](i-h, j))
+              - negpart<opts, ix_t>(flx[0](i+h, j)) )  // additional parenthesis so that we first sum
               +                                                        // fluxes in separate dimensions 
-              ( pospart<opts BOOST_PP_COMMA() ix_t>(flx[1](i, j-h))    // could be important for accuracy if one of them
-              - negpart<opts BOOST_PP_COMMA() ix_t>(flx[1](i, j+h)) )  // is of different magnitude than the other
+              ( pospart<opts, ix_t>(flx[1](i, j-h))    // could be important for accuracy if one of them
+              - negpart<opts, ix_t>(flx[1](i, j+h)) )  // is of different magnitude than the other
             );
           }
         }
@@ -85,7 +85,7 @@ namespace libmpdataxx
                          psi(i-1, j)), psi(i, j  )), psi(i+1, j)),
                                        psi(i, j-1)
             )
-          ) * formulae::G<opts BOOST_PP_COMMA() 0>(G, i, j)  //see beta_up_nominator
+          ) * formulae::G<opts, 0>(G, i, j)  //see beta_up_nominator
         );
       } 
 
@@ -109,11 +109,11 @@ namespace libmpdataxx
             fct_frac<ix_t>(
               beta_dn_nominator<opts>(psi, psi_min, G, i, j)
               , // ---------------------------------------------------------
-              ( pospart<opts BOOST_PP_COMMA() ix_t>(flx[0](i+h, j))
-              - negpart<opts BOOST_PP_COMMA() ix_t>(flx[0](i-h, j)) )  //see note in positive sign beta up
+              ( pospart<opts, ix_t>(flx[0](i+h, j))
+              - negpart<opts, ix_t>(flx[0](i-h, j)) )  //see note in positive sign beta up
               +
-              ( pospart<opts BOOST_PP_COMMA() ix_t>(flx[1](i, j+h))
-              - negpart<opts BOOST_PP_COMMA() ix_t>(flx[1](i, j-h)) )
+              ( pospart<opts, ix_t>(flx[1](i, j+h))
+              - negpart<opts, ix_t>(flx[1](i, j-h)) )
             );
           }
         }
