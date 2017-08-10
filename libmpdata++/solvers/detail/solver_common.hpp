@@ -194,6 +194,7 @@ namespace libmpdataxx
 	virtual void solve(advance_arg_t nt) final
 	{   
           // multiple calls to sovlve() are meant to advance the solution by nt
+          // TODO: does it really work with var_dt ? we do not advance by time exactly ...
           nt += ct_params_t::var_dt ? time : timestep;
 
           // being generous about out-of-loop barriers 
@@ -212,8 +213,9 @@ namespace libmpdataxx
 	  hook_ante_step_called = false;
 	  hook_post_step_called = false;
 #endif
-
-	  while (ct_params_t::var_dt ? time < nt : timestep < nt)
+          // higher-order temporal interpolation for output requires doing a few additional steps
+          int additional_steps = ct_params_t::out_intrp_ord;
+	  while (ct_params_t::var_dt ? (time < nt || additional_steps > 0) : timestep < nt)
 	  {   
 	    // progress-bar info through thread name (check top -H)
 	    monitor(float(ct_params_t::var_dt ? time : timestep) / nt);  // TODO: does this value make sanse with repeated advence() calls?
@@ -263,6 +265,8 @@ namespace libmpdataxx
             time = ct_params_t::var_dt ? time + dt : timestep * dt;
             prev_dt = dt;
             hook_post_step();
+
+            if (time >= nt) additional_steps--;
 	  }   
 
           mem->barrier();
