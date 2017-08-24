@@ -101,7 +101,6 @@ namespace libmpdataxx
       typename std::enable_if<opts::isset(opts, opts::npa)>::type* = 0 // enabled if npa == true
     )
     {
-      using std::abs;
       return return_helper<ix_t>((x + abs<ix_t>(x)) / 2);
     }
 
