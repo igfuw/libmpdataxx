@@ -1,65 +1,45 @@
 import h5py
 import numpy as np
-from sys import argv
-import os
+import os, sys
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), '../mp3_paper_JCP/python_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), '../mp3_paper_JCP/reversing_deform'))
+from mixing import calc_mixing_diags
+from helpers import prepare_data, calc_convergence
+from filaments import calc_filament_diags
 
-from filaments import calc_filament_diags, plot_filament_diags
-from mixing import calc_mixing_diags, plot_mixing
+def solution(geo_data, field_data, field, ny):
+    key = list(field_data[ny].keys())[0]
+    return field_data[ny][key]['0.0'][field]
 
-def prepare_data(dirname):
-    fnames = sorted(filter(lambda s : s.endswith('.h5'), os.listdir(dirname)))
-    fnames = [dirname + '/' + name for name in fnames]
-    
-    fields = ['gh', 'cb', 'sc', 'ccb']
-    states = ['initial', 'halfway', 'final']
-
-    field_data = {}
-    g = h5py.File(fnames[0], 'r')['G'][:,:]
-    for f in fields:
-        field_data[f] = {}
-        for i in range(len(states)):
-            data_file = h5py.File(fnames[i+1], 'r')
-            field_data[f][states[i]] = data_file[f][:,:]
-    return (g, field_data)
-
-def calc_errors(g, field_data):
-    norms = [
-             ('L1', lambda i, f : np.sum(g * abs(f - i)) / np.sum(g * np.abs(i))),
-             ('L2', lambda i, f : np.sqrt(np.sum(g * (f - i) ** 2) / np.sum(g * i ** 2))),
-             ('Li', lambda i, f : np.max(np.abs(f - i)) / np.max(np.abs(i)))
-            ]
-    errors = {}
-    for f in field_data.keys():
-        errors[f] = {}
-        for n_name, n_func in norms:
-            errors[f][n_name] = n_func(field_data[f]['initial'], field_data[f]['final'])
-    return errors
-
-def write_stats(dirname, errors, filament_diags, mixing_diags):
-    outfile = open('stats_' + dirname + '.txt', 'w')
+def write_stats(conv, mixing_diags, filament_diags, opt, ny):
+    outfile = open('stats_' + '_'.join(opt.decode('ASCII').split('|')) + '_i2_' + str(ny) + '.txt', 'w')
 
     errors_header = '{:6} {:8} {:8} {:8}\n'.format('field', 'L1', 'L2', 'Li')
     outfile.write(errors_header)
-    for f in ['gh', 'cb', 'ccb', 'sc']:
-        outfile.write('{:6} {L1:8.2e} {L2:8.2e} {Li:8.2e}\n'.format(f, **errors[f]))
+
+    for field in ['gh', 'cb', 'ccb', 'sc']:
+        errs = {}
+        for norm in ['L1', 'L2', 'Li']:
+            errs[norm] = conv[opt][norm][field][ny]
+        outfile.write('{:6} {L1:8.2e} {L2:8.2e} {Li:8.2e}\n'.format(field, **errs))
 
     filaments_header = '\n{:4}  {:6}\n'.format('tau', 'lf')
     outfile.write(filaments_header)
-    for tau, lf in filament_diags:
+    for tau, lf in filament_diags[ny][opt]:
         outfile.write('{:4.2f}  {:5.1f}\n'.format(tau, lf))
 
-    outfile.write('\nlr {:6.2e}\nlu {:6.2e}\nlo {:6.2e}\n'.format(*mixing_diags))
+    outfile.write('\nlr {:6.2e}\nlu {:6.2e}\nlo {:6.2e}\n'.format(*mixing_diags[ny][opt]))
 
 def main():
-    for dirname in argv[1:]:
-        g, field_data = prepare_data(dirname)
-        errors = calc_errors(g, field_data)
-        filament_diags = calc_filament_diags(g, field_data)
-        mixing_diags = calc_mixing_diags(g, field_data)
+    geo_data, field_data = prepare_data(sys.argv[1:])
+    conv = calc_convergence(geo_data, field_data, '5.0', solution)
+    
+    nys = [120, 240]
 
-        deg = str(180. / g.shape[1])
-        plot_filament_diags(dirname, filament_diags, deg)
-        plot_mixing(dirname, field_data, deg)
-        write_stats(dirname, errors, filament_diags, mixing_diags)
-
+    mixing_diags = calc_mixing_diags(geo_data, field_data, nys)
+    filament_diags = calc_filament_diags(geo_data, field_data, nys)
+    
+    for ny in nys:
+        for opt in conv.keys():
+            write_stats(conv, mixing_diags, filament_diags, opt, ny)
 main()
