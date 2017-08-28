@@ -283,7 +283,7 @@ namespace libmpdataxx
           {
             for (int k = kr.first(); k <= kr.last(); ++k)
             {
-              res(pi<dim>(i, j, k)) = 
+              res(pi<dim>(i + h, j, k)) = 
               div_2nd<opts, dim>(psi_np1, GC, G, i, j, k) +
               div_3rd<opts, dim, sptl_intrp>(psi_np1, psi_n, GC, ndt_GC, ndtt_GC, G, i, j, k);
             }

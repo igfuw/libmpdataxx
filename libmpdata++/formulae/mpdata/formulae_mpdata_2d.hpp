@@ -264,7 +264,7 @@ namespace libmpdataxx
         {
           for (int j = jr.first(); j <= jr.last(); ++j)
           {
-            res(pi<dim>(i, j)) = 
+            res(pi<dim>(i + h, j)) = 
             div_2nd<opts, dim>(psi_np1, GC, G, i, j) +
             div_3rd<opts, dim, sptl_intrp>(psi_np1, psi_n, GC, ndt_GC, ndtt_GC, G, i, j)
             // fourth order terms

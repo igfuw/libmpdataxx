@@ -205,7 +205,7 @@ namespace libmpdataxx
 
         for (int i = ir.first(); i <= ir.last(); ++i)
         {
-          res(i) = 
+          res(i + h) = 
           div_2nd<opts>(psi, GC, G, i) +
           div_3rd<opts, sptl_intrp>(psi, GC, ndt_GC, ndtt_GC, G, i);
         }
