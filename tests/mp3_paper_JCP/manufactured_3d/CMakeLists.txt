@@ -1,0 +1,1 @@
+libmpdataxx_add_test(manufactured_3d)
