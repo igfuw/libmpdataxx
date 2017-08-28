@@ -40,6 +40,18 @@ namespace libmpdataxx
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
             this->xchng_sclr(*this->mem->G); 
+
+          // set time derivatives of GC to zero
+          // needed for stationary flows prescribed using the advector method
+          if (opts::isset(ct_params_t::opts, opts::div_3rd_dt) || opts::isset(ct_params_t::opts, opts::div_3rd))
+          {
+            this->mem->ndt_GC[0](this->im + h) = 0;
+            
+            this->mem->ndtt_GC[0](this->im + h) = 0;
+
+            this->xchng_vctr_alng(this->mem->ndt_GC);
+            this->xchng_vctr_alng(this->mem->ndtt_GC);
+          }
 	}
 
 	// method invoked by the solver
@@ -55,7 +67,7 @@ namespace libmpdataxx
               this->xchng(e);
 
 	      // calculating the antidiffusive C 
-              formulae::mpdata::antidiff<ct_params_t::opts>(
+              formulae::mpdata::antidiff<ct_params_t::opts, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
                 this->GC_corr(iter)[0],
                 this->mem->psi[e][this->n[e]], 
                 this->GC_unco(iter),

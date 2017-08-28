@@ -28,6 +28,13 @@
 
 //////////////////////////////////////////////////////////
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/predef.h>
+
+#if BOOST_COMP_GNUC || BOOST_COMP_CLANG
+  #define forceinline_macro inline __attribute__((always_inline))
+#else
+  #define forceinline_macro inline
+#endif
 
 // C++11 auto return type macro
 #define return_macro(init,expr)          \
@@ -44,13 +51,13 @@ namespace libmpdataxx
 
   // non-int ix_t means either rng_t or idx_t
   template <class ix_t, class expr_t>
-  inline auto return_helper(const expr_t &expr, typename std::enable_if<!std::is_same<ix_t, int>::value>::type* = 0)
+  forceinline_macro auto return_helper(const expr_t &expr, typename std::enable_if<!std::is_same<ix_t, int>::value>::type* = 0)
   {
     return safeToReturn(expr);
   }
 
   template <class ix_t, class expr_t>
-  inline auto return_helper(const expr_t &expr, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
+  forceinline_macro auto return_helper(const expr_t &expr, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
   {
     return expr;
   }

@@ -19,7 +19,7 @@ namespace libmpdataxx
     namespace mpdata
     {
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto ndxx_psi_coeff(
+      forceinline_macro auto ndxx_psi_coeff(
         const arr_3d_t &GC,
         const arr_3d_t &G,
         const ix_t &i,
@@ -29,15 +29,15 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            3 * GC(pi<dim>(i+h, j, k)) * abs(GC(pi<dim>(i+h, j, k))) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k)
-          - 2 * pow(GC(pi<dim>(i+h, j, k)), 3) / pow(G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k), 2)
+            3 * GC(pi<dim>(i+h, j, k)) * abs(GC(pi<dim>(i+h, j, k))) / G_bar_x<opts, dim>(G, i, j, k)
+          - 2 * pow(GC(pi<dim>(i+h, j, k)), 3) / pow(G_bar_x<opts, dim>(G, i, j, k), 2)
           - GC(pi<dim>(i+h, j, k))
           ) / 6
         );
       }
 
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto ndxy_psi_coeff(
+      forceinline_macro auto ndxy_psi_coeff(
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G,
         const ix_t &i,
@@ -48,13 +48,13 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           (
             abs(GC[dim](pi<dim>(i+h, j, k)))
-          - 2 * pow(GC[dim](pi<dim>(i+h, j, k)), 2) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k)
-          ) * GC1_bar_xy<dim>(GC[dim+1], i, j, k) / (2 * G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k))
+          - 2 * pow(GC[dim](pi<dim>(i+h, j, k)), 2) / G_bar_x<opts, dim>(G, i, j, k)
+          ) * GC1_bar_xy<dim>(GC[dim+1], i, j, k) / (2 * G_bar_x<opts, dim>(G, i, j, k))
         );
       }
 
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto ndxz_psi_coeff(
+      forceinline_macro auto ndxz_psi_coeff(
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G,
         const ix_t &i,
@@ -65,13 +65,13 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           (
             abs(GC[dim](pi<dim>(i+h, j, k)))
-          - 2 * pow(GC[dim](pi<dim>(i+h, j, k)), 2) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k)
-          ) * GC2_bar_xz<dim>(GC[dim-1], i, j, k) / (2 * G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k))
+          - 2 * pow(GC[dim](pi<dim>(i+h, j, k)), 2) / G_bar_x<opts, dim>(G, i, j, k)
+          ) * GC2_bar_xz<dim>(GC[dim-1], i, j, k) / (2 * G_bar_x<opts, dim>(G, i, j, k))
         );
       }
 
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto ndyz_psi_coeff(
+      forceinline_macro auto ndyz_psi_coeff(
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G,
         const ix_t &i,
@@ -81,13 +81,13 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           -2 * GC[dim](pi<dim>(i+h, j, k)) * GC1_bar_xy<dim>(GC[dim+1], i, j, k) * GC2_bar_xz<dim>(GC[dim-1], i, j, k) / 3
-             / pow(G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j, k), 2)
+             / pow(G_bar_x<opts, dim>(G, i, j, k), 2)
         );
       }
 
       // third order terms
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto TOT(
+      forceinline_macro auto TOT(
         const arr_3d_t &psi,
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G,
@@ -98,18 +98,18 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          ndxx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k) * ndxx_psi_coeff<opts BOOST_PP_COMMA() dim>(GC[dim], G, i, j, k)
+          ndxx_psi<opts, dim>(psi, i, j, k) * ndxx_psi_coeff<opts, dim>(GC[dim], G, i, j, k)
           + 
-          ndxy_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k) * ndxy_psi_coeff<opts BOOST_PP_COMMA() dim>(GC, G, i, j, k)
+          ndxy_psi<opts, dim>(psi, i, j, k) * ndxy_psi_coeff<opts, dim>(GC, G, i, j, k)
           + 
-          ndxz_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k) * ndxz_psi_coeff<opts BOOST_PP_COMMA() dim>(GC, G, i, j, k)
+          ndxz_psi<opts, dim>(psi, i, j, k) * ndxz_psi_coeff<opts, dim>(GC, G, i, j, k)
           + 
-          ndyz_psi<opts BOOST_PP_COMMA() dim>(psi, i, j, k) * ndyz_psi_coeff<opts BOOST_PP_COMMA() dim>(GC, G, i, j, k)
+          ndyz_psi<opts, dim>(psi, i, j, k) * ndyz_psi_coeff<opts, dim>(GC, G, i, j, k)
         );
       }
 
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto TOT(
+      forceinline_macro auto TOT(
         const arr_3d_t &psi,
         const arrvec_t<arr_3d_t> &GC,
         const arr_3d_t &G,

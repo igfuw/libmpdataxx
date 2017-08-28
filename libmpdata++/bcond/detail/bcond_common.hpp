@@ -42,7 +42,7 @@ namespace libmpdataxx
 	  assert(false && "bcond::fill_halos_sclr() called!"); 
 	};
 
-	virtual void fill_halos_vctr_alng(arrvec_t<blitz::Array<real_t, 1>> &) 
+	virtual void fill_halos_vctr_alng(arrvec_t<blitz::Array<real_t, 1>> &, const bool ad = false)
 	{ 
 	  assert(false && "bcond::fill_halos_vctr() called!"); 
 	};
@@ -68,7 +68,7 @@ namespace libmpdataxx
 	  assert(false && "bcond::set_edge() called!");
 	};
 
-	virtual void fill_halos_vctr_alng(arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &) 
+	virtual void fill_halos_vctr_alng(arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &, const bool ad = false) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_alng() called!");
 	};
@@ -99,7 +99,7 @@ namespace libmpdataxx
 	  assert(false && "bcond::set_edge() called!");
 	};
 
-	virtual void fill_halos_vctr_alng(arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &) 
+	virtual void fill_halos_vctr_alng(arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &, const bool ad = false) 
 	{
 	  assert(false && "bcond::fill_halos_vctr() called!");
 	};

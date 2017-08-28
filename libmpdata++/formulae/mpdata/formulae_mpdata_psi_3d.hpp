@@ -788,6 +788,154 @@ namespace libmpdataxx
             )
         );
       }
+      
+      // nondimensionalised tx derivative of psi i.e.
+      // dx*dt/psi * dpsi/dtx at (i+1/2, j, k) - positive sign scalar version  
+      template<opts_t opts, int d, class arr_3d_t, class ix_t>
+      inline auto ndtx_psi(
+        const arr_3d_t &psi_np1, 
+        const arr_3d_t &psi_n, 
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k,
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
+      )
+      {
+        return return_helper<ix_t>(
+          4 *
+          frac<opts, ix_t>(
+              psi_np1(pi<d>(i+1, j, k))
+            - psi_n(pi<d>(i+1, j, k))
+            - psi_np1(pi<d>(i  , j, k))
+            + psi_n(pi<d>(i  , j, k))
+            ,
+              psi_np1(pi<d>(i+1, j, k))
+            + psi_n(pi<d>(i+1, j, k))
+            + psi_np1(pi<d>(i  , j, k))
+            + psi_n(pi<d>(i  , j, k))
+          )
+        );
+      }
+      
+      // nondimensionalised tx derivative of psi i.e.
+      // dx*dt/psi * dpsi/dtx at (i+1/2, j, k) - variable sign scalar version  
+      template<opts_t opts, int d, class arr_3d_t, class ix_t>
+      inline auto ndtx_psi(
+        const arr_3d_t &psi_np1, 
+        const arr_3d_t &psi_n, 
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k,
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
+      )
+      {
+        return return_helper<ix_t>(
+          4 *
+          frac<opts, ix_t>(
+              abs(psi_np1(pi<d>(i+1, j, k)))
+            - abs(psi_n(pi<d>(i+1, j, k)))
+            - abs(psi_np1(pi<d>(i  , j, k)))
+            + abs(psi_n(pi<d>(i  , j, k)))
+            ,
+              abs(psi_np1(pi<d>(i+1, j, k)))
+            + abs(psi_n(pi<d>(i+1, j, k)))
+            + abs(psi_np1(pi<d>(i  , j, k)))
+            + abs(psi_n(pi<d>(i  , j, k)))
+          )
+        );
+      }
+      
+      // nondimensionalised tx derivative of psi i.e.
+      // dx*dt/psi * dpsi/dtx at (i+1/2, j, k) - infinite gauge version
+      template<opts_t opts, int d, class arr_3d_t, class ix_t>
+      inline auto ndtx_psi(
+        const arr_3d_t &psi_np1, 
+        const arr_3d_t &psi_n, 
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
+      )
+      {
+        static_assert(!opts::isset(opts, opts::abs), "abs & iga options are mutually exclusive");
+        return return_helper<ix_t>(
+          psi_np1(pi<d>(i+1, j, k)) - psi_n(pi<d>(i+1, j, k)) - psi_np1(pi<d>(i, j, k)) + psi_n(pi<d>(i, j, k))
+        );
+      }
+      
+      // nondimensionalised t derivative of psi i.e.
+      // dt/psi * dpsi/dt at (i+1/2, j, k) - positive sign scalar version  
+      template<opts_t opts, int d, class arr_3d_t, class ix_t>
+      inline auto ndt_psi(
+        const arr_3d_t &psi_np1, 
+        const arr_3d_t &psi_n, 
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k,
+        typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
+      )
+      {
+        return return_helper<ix_t>(
+          2 *
+          frac<opts, ix_t>(
+              psi_np1(pi<d>(i+1, j, k))
+            - psi_n(pi<d>(i+1, j, k))
+            + psi_np1(pi<d>(i  , j, k))
+            - psi_n(pi<d>(i  , j, k))
+            ,
+              psi_np1(pi<d>(i+1, j, k))
+            + psi_n(pi<d>(i+1, j, k))
+            + psi_np1(pi<d>(i  , j, k))
+            + psi_n(pi<d>(i  , j, k))
+          )
+        );
+      }
+      
+      // nondimensionalised t derivative of psi i.e.
+      // dt/psi * dpsi/dt at (i+1/2, j, k) - variable sign scalar version  
+      template<opts_t opts, int d, class arr_3d_t, class ix_t>
+      inline auto ndt_psi(
+        const arr_3d_t &psi_np1, 
+        const arr_3d_t &psi_n, 
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k,
+        typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
+      )
+      {
+        return return_helper<ix_t>(
+          2 *
+          frac<opts, ix_t>(
+              abs(psi_np1(pi<d>(i+1, j, k)))
+            - abs(psi_n(pi<d>(i+1, j, k)))
+            + abs(psi_np1(pi<d>(i  , j, k)))
+            - abs(psi_n(pi<d>(i  , j, k)))
+            ,
+              abs(psi_np1(pi<d>(i+1, j, k)))
+            + abs(psi_n(pi<d>(i+1, j, k)))
+            + abs(psi_np1(pi<d>(i  , j, k)))
+            + abs(psi_n(pi<d>(i  , j, k)))
+          )
+        );
+      }
+      
+      // nondimensionalised tx derivative of psi i.e.
+      // dt/psi * dpsi/dt at (i+1/2, j, k) - infinite gauge version
+      template<opts_t opts, int d, class arr_3d_t, class ix_t>
+      inline auto ndt_psi(
+        const arr_3d_t &psi_np1, 
+        const arr_3d_t &psi_n, 
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k,
+        typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
+      )
+      {
+        static_assert(!opts::isset(opts, opts::abs), "abs & iga options are mutually exclusive");
+        return return_helper<ix_t>(
+          0.5 * (psi_np1(pi<d>(i+1, j, k)) - psi_n(pi<d>(i+1, j, k)) + psi_np1(pi<d>(i, j, k)) - psi_n(pi<d>(i, j, k)))
+        );
+      }
     } // namespace mpdata
   } // namespace formulae
 } // namespcae libmpdataxx 

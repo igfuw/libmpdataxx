@@ -44,7 +44,7 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           - 0.25 * GC[dim](pi<dim>(i+h, j)) 
           /
-          G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) 
+          G_bar_x<opts, dim>(G, i, j) 
           * 
           (
             (
@@ -76,7 +76,7 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           - 0.25 * GC[dim](pi<dim>(i+h, j)) 
           /
-          G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) 
+          G_bar_x<opts, dim>(G, i, j) 
           * 
           (
             (
@@ -91,7 +91,7 @@ namespace libmpdataxx
               GC[dim-1](pi<dim>(i,   j-h))
             )
           )
-          * psi_bar_x<opts BOOST_PP_COMMA() dim>(psi, i, j) 
+          * psi_bar_x<opts, dim>(psi, i, j) 
         );
       }
     } // namespace mpdata

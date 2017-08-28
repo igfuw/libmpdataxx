@@ -15,6 +15,17 @@
 
 namespace libmpdataxx
 { 
+  // in namespace solvers to be consistent with other options
+  namespace solvers
+  {
+    enum sptl_intrp_t
+    { 
+      exact,
+      aver2,
+      aver4,
+    };
+  }
+
   namespace formulae 
   { 
     namespace mpdata 
@@ -29,16 +40,17 @@ namespace libmpdataxx
       constexpr const int halo(const opts_t &opts) 
       {
         return (
-          opts::isset(opts, opts::tot) || // see psi 2-nd derivatives in eq. (36) in PKS & LGM 1998
-          opts::isset(opts, opts::dfl) || // see +3/2 in eq. (30) in PKS & LGM 1998
-          opts::isset(opts, opts::div_2nd) || 
-          opts::isset(opts, opts::div_3rd)
+          opts::isset(opts, opts::tot)        || // see psi 2-nd derivatives in eq. (36) in PKS & LGM 1998
+          opts::isset(opts, opts::dfl)        || // see +3/2 in eq. (30) in PKS & LGM 1998
+          opts::isset(opts, opts::div_2nd)    || 
+          opts::isset(opts, opts::div_3rd)    ||
+          opts::isset(opts, opts::div_3rd_dt)
         ) ? 2 : 1; 
       }
 
       // frac: implemented using blitz::where()
       template<opts_t opts, class nom_t, class den_t>
-      inline auto frac(
+      forceinline_macro auto frac(
         const nom_t &nom, 
         const den_t &den,
         typename std::enable_if<opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == true
@@ -49,7 +61,7 @@ namespace libmpdataxx
       // frac: implemented as suggested in MPDATA papers
       //       if den == 0, then adding a smallest representable positive number
       template<opts_t opts, class ix_t, class nom_t, class den_t>
-      inline auto frac(
+      forceinline_macro auto frac(
         const nom_t &nom, 
         const den_t &den,
         typename std::enable_if<!opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == false
@@ -61,14 +73,16 @@ namespace libmpdataxx
       }
 
       // a bigger-epsilon version for FCT (used regardless of opts::eps setting)
-      template<class nom_t, class den_t>
-      inline auto fct_frac(
+      template<class ix_t, class nom_t, class den_t>
+      forceinline_macro auto fct_frac(
         const nom_t &nom, 
         const den_t &den
-      ) return_macro(,
-        nom / (den + blitz::epsilon(typename den_t::T_numtype(0))) 
       )
-
+      {
+        return return_helper<ix_t>(
+          nom / (den + blitz::epsilon(typename real_t_helper<ix_t, nom_t>::type(0.)))
+        );
+      }
     } // namespace mpdata
   } // namespace formulae
 } // namespcae libmpdataxx

@@ -31,7 +31,7 @@ namespace libmpdataxx
 	a(this->left_halo_sclr) = a(this->rght_intr_sclr);
       }
 
-      void fill_halos_vctr_alng(arrvec_t<arr_t> &av)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const bool ad = false)
       {
 	av[0](this->left_halo_vctr) = av[0](this->rght_intr_vctr);
       }
@@ -57,7 +57,7 @@ namespace libmpdataxx
 	a(this->rght_halo_sclr) = a(this->left_intr_sclr);
       }
 
-      void fill_halos_vctr_alng(arrvec_t<arr_t> &av)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const bool ad = false)
       {
 	av[0](this->rght_halo_vctr) = av[0](this->left_intr_vctr);
       }

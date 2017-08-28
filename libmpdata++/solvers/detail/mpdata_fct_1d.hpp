@@ -51,7 +51,7 @@ namespace libmpdataxx
 	  const auto im1 = this->im^1; 
 
 	  // fill halos in GC_corr
-          this->xchng_vctr_alng(GC_corr);
+          this->xchng_vctr_alng(GC_corr, true);
 
           // calculation of fluxes for betas denominators
           if (opts::isset(ct_params_t::opts, opts::iga))
@@ -70,16 +70,14 @@ namespace libmpdataxx
           assert(std::isfinite(sum(flx[0](i1^h))));
 
           // calculating betas
-          this->beta_up(i1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1);
-          this->beta_dn(i1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1);
+          formulae::mpdata::beta_up<ct_params_t::opts>(this->beta_up, psi, this->psi_max, flx, G, i1);
+          formulae::mpdata::beta_dn<ct_params_t::opts>(this->beta_dn, psi, this->psi_min, flx, G, i1);
 	  
           // assuring flx, psi_min and psi_max are not overwritten
           this->beta_barrier(iter);
 
 	  // calculating the monotonic corrective velocity
-	  this->GC_mono[d]( this->im+h ) = formulae::mpdata::GC_mono<ct_params_t::opts>(
-	    psi, this->beta_up, this->beta_dn, GC_corr[d], G, im
-	  );
+	  formulae::mpdata::GC_mono<ct_params_t::opts>(this->GC_mono[d], psi, this->beta_up, this->beta_dn, GC_corr[d], G, im);
 	}
       };
     } // namespace detail
