@@ -14,7 +14,7 @@ int main()
   const bool var_dt = true;
   const T max_cfl = 0.8;
 
-  std::vector<int> nys = {120, 240, 480};
+  std::vector<int> nys = {60, 120, 240, 480};
 
   if (FULL_SIM)
   {
@@ -36,7 +36,7 @@ int main()
     }
     
     {
-      enum { opts = opts::nug | opts::abs | opts::dfl | opts::tot};
+      enum { opts = opts::nug | opts::abs | opts::tot};
       const int opts_iters = 3;
       test<var_dt, opts, opts_iters>("Mp3cc", ny, max_cfl);
     }

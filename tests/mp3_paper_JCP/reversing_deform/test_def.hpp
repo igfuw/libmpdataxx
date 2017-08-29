@@ -112,7 +112,7 @@ void test(const std::string &base_name, const int ny, const T max_cfl)
   p.outvars[1].name = "cb";
   p.outvars[2].name = "sc";
   p.outvars[3].name = "ccb";
-  p.outdir = dir_name;
+  p.outdir = "out_" + dir_name;
   
   concurr::threads<
     slv_out_t, 

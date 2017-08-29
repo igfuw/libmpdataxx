@@ -31,7 +31,7 @@ int main()
     }
     
     {
-      enum { opts = opts::nug | opts::abs | opts::dfl | opts::tot};
+      enum { opts = opts::nug | opts::abs | opts::tot};
       const int opts_iters = 3;
       test<var_dt, opts, opts_iters>("Mp3cc", ny, max_cfl);
     }
