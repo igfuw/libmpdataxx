@@ -28,8 +28,6 @@ def main():
     save_conv(geo_data, conv, 'Moving vortices', norm, field, stat_file)
 
     for opt in conv.keys():
-        print 'opt: ', opt
-        print sorted(conv[opt][norm][field].items())
         nys, errs = zip(*sorted(conv[opt][norm][field].items()))
         plot_data.append((nys, errs, opt))
 
