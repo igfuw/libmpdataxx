@@ -1,9 +1,9 @@
 import numpy as np
+from helpers import set_rc_params
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 from matplotlib.ticker import FormatStrFormatter
 import os
-from helpers import set_rc_params
 
 def panel_plot(plot_data, fname = 'panel.pdf'):
     set_rc_params(tickfs = 30)

@@ -1,7 +1,7 @@
 import numpy as np
+from helpers import nested_dict, opt2lab, set_rc_params
 import matplotlib
 import matplotlib.pyplot as plt
-from helpers import nested_dict, opt2lab, set_rc_params
 
 def corr_func(x):
     return -0.8 * x ** 2 + 0.9

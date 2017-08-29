@@ -1,9 +1,9 @@
 import numpy as np
+from helpers import set_rc_params
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 from matplotlib.ticker import FormatStrFormatter
 import os
-from helpers import set_rc_params
 from analytical_formulae import asolution, pi
 
 xlevels = np.linspace(0, 2 * pi, 17)
