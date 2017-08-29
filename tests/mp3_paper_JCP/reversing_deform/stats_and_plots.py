@@ -3,7 +3,7 @@ import numpy as np
 import os, sys
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), '../python_scripts'))
 import matplotlib.pyplot as plt
-from helpers import prepare_data, calc_convergence
+from helpers import prepare_data, calc_convergence, save_conv
 from conv_plot import conv_plot
 from panel_plot import panel_plot
 from time import clock
@@ -27,6 +27,9 @@ def main():
         nys, errs = zip(*sorted(conv[opt][norm]['gh'].items()))
         plot_data.append((nys, errs, opt))
 
+    stat_file = open('reversing_deform_conv.txt', 'w')
+    save_conv(geo_data, conv, 'Reversing deformational flow', norm, field, stat_file)
+
     ord_data = []
     ord2 = lambda n : 1.5e-1 * (n / 120.) ** (-2)
     ny2 = np.array([400, 1000])
@@ -38,9 +41,9 @@ def main():
     nyt = 640
     ord_data.append((ny3, ord3(ny3), nyt, ord3(nyt+20), '3rd order', -115 - 180 / np.pi * np.arctan(-3)))
 
-    conv_plot(plot_data, ord_data)
+    conv_plot(plot_data, ord_data, fname = 'reversing_deform_conv.pdf')
 
-    panel_plot(field_data[120]['nug|iga|div_2nd|div_3rd|fct']['2.5'])
+    panel_plot(field_data[120]['nug|iga|div_2nd|div_3rd|fct']['2.5'], fname = 'reversing_deform_panel.pdf')
     
     mixing_diags = calc_mixing_diags(geo_data, field_data, nys = [240])
     print mixing_diags

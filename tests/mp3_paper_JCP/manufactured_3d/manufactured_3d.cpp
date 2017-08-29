@@ -40,7 +40,7 @@ void test(const int np, const std::string &name)
   p.max_courant = 0.5;
 
   p.outfreq = 1.0;
-  p.outdir = name + "_" + std::to_string(np);
+  p.outdir = "out_" + name + "_" + std::to_string(np);
 
   concurr::threads<
     slv_t, 
@@ -63,14 +63,6 @@ void test(const int np, const std::string &name)
   run.g_factor() = exp(cos(i * dx) + cos(j * dy) + cos(k * dz));
 
   run.advance(time);
-
-  decltype(run.advectee()) true_solution(run.advectee().shape());
-  true_solution = (2 + sin(i * dx) * sin(run.time())) * (2 + sin(j * dy) * sin(run.time())) * (2 + sin(k * dz) * sin(run.time()));
-
-  auto L2_error = sqrt(sum(run.g_factor() * pow2(run.advectee() - true_solution)))
-                  / sqrt(sum(run.g_factor() *  pow2(true_solution)));
-
-  std::cout << np << ' ' << L2_error << std::endl;
 }
 
 int main()
@@ -87,13 +79,13 @@ int main()
     {
       enum { opts = opts::nug | opts::tot | opts::dfl};
       enum { opts_iters = 3};
-      test<opts, opts_iters>(np, "mp3cc");
+      test<opts, opts_iters>(np, "Mp3cc");
     }
     
     {
       enum { opts = opts::nug | opts::div_2nd | opts::div_3rd};
       enum { opts_iters = 2};
-      test<opts, opts_iters>(np, "mp3");
+      test<opts, opts_iters>(np, "Mp3");
     }
   }
 }

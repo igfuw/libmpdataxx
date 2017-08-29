@@ -60,7 +60,7 @@ void test(const std::string &base_name, const int ny, const T max_cfl)
 
   p.outfreq = var_dt_arg ? 0.25 : nt / 48; 
   p.outvars[0].name = "psi";
-  p.outdir = dir_name;
+  p.outdir = out + '_' + dir_name;
   
   concurr::threads<
     slv_out_t, 

@@ -1,0 +1,8 @@
+Reversing deformational flow: convergence in the L2 error norm
+
+  N       Mp3     Mp3cc     Mg2No     Mg3No
+ 60  3.23e-01  3.29e-01  2.80e-01  2.67e-01
+120  1.18e-01  1.22e-01  1.08e-01  9.86e-02
+240  2.35e-02  2.47e-02  2.98e-02  2.18e-02
+480  3.27e-03  3.58e-03  6.56e-03  3.19e-03
+960  4.15e-04  4.66e-04  1.56e-03  4.39e-04

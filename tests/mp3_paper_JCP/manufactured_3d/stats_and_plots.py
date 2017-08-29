@@ -3,12 +3,8 @@ import numpy as np
 import os, sys
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), '../python_scripts'))
 import matplotlib.pyplot as plt
-from helpers import prepare_data, calc_convergence
+from helpers import prepare_data, calc_convergence, opt2lab, nested_dict, save_conv
 from conv_plot import conv_plot
-from collections import defaultdict
-
-# https://stackoverflow.com/questions/5369723/multi-level-defaultdict-with-variable-depth/8702435#8702435
-nested_dict = lambda: defaultdict(nested_dict)
 
 def solution(geo_data, field_data, field, ny):
     time = 1.0
@@ -29,6 +25,10 @@ def main():
     plot_data = []
     norm = 'L2'
     field = 'psi'
+
+    stat_file = open('manufactured_3d_conv.txt', 'w')
+    save_conv(geo_data, conv, 'Manufactured solution in 3D', norm, field, stat_file)
+
     for opt in conv.keys():
         #print 'opt: ', opt
         nys, errs = zip(*sorted(conv[opt][norm][field].items()))
@@ -45,6 +45,6 @@ def main():
     nyt = 70
     ord_data.append((ny3, ord3(ny3), nyt, ord3(nyt+4), '3rd order', -110 - 180 / np.pi * np.arctan(-3)))
 
-    conv_plot(plot_data, ord_data)
+    conv_plot(plot_data, ord_data, fname = 'manufactured_3d_conv.pdf')
 
 main()

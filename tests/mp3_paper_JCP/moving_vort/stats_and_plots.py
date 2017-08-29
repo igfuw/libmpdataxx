@@ -3,7 +3,7 @@ import numpy as np
 import os, sys
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), '../python_scripts'))
 import matplotlib.pyplot as plt
-from helpers import prepare_data, calc_convergence
+from helpers import prepare_data, calc_convergence, save_conv
 from conv_plot import conv_plot
 from time import clock
 from analytical_formulae import asolution, pi
@@ -25,6 +25,9 @@ def main():
     norm = 'L2'
     field = 'psi'
 
+    stat_file = open('moving_vort_conv.txt', 'w')
+    save_conv(geo_data, conv, 'Moving vortices', norm, field, stat_file)
+
     for opt in conv.keys():
         print 'opt: ', opt
         print sorted(conv[opt][norm][field].items())
@@ -42,8 +45,8 @@ def main():
     nyt = 480
     ord_data.append((ny3, ord3(ny3), nyt, ord3(nyt+20), '3rd order', -113 - 180 / pi * np.arctan(-3)))
 
-    conv_plot(plot_data, ord_data)
+    conv_plot(plot_data, ord_data, fname = 'moving_vort_conv.pdf')
 
-    panel_plot(geo_data, field_data, opt = 'nug|abs|div_2nd|div_3rd', time = '12.0', ny = 192, fname = 'panel.pdf')
+    panel_plot(geo_data, field_data, opt = 'nug|abs|div_2nd|div_3rd', time = '12.0', ny = 192, fname = 'moving_vort_panel.pdf')
 
 main()

@@ -17,7 +17,9 @@ endif()
 # to make <libmpdata++/...> work
 set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CXX_FLAGS}")
 
-set(FULL_SIM "false")
+if (NOT FULL_SIM)
+  set(FULL_SIM "false")
+endif()
 
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
