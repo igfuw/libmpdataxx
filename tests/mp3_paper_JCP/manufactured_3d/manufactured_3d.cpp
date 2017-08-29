@@ -67,12 +67,7 @@ void test(const int np, const std::string &name)
 
 int main()
 {
-  std::vector<int> nps = {9, 17, 33, 65};
-
-  if (FULL_SIM)
-  {
-    nps.push_back(129);
-  }
+  std::vector<int> nps = {9, 17, 33, 65, 129};
 
   for (const auto np : nps)
   {
