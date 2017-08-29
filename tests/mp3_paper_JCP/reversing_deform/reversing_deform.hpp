@@ -1,10 +1,3 @@
-/** 
- * @file
- * @copyright University of Warsaw
- * @section LICENSE
- * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- */
-
 #pragma once
 #include <libmpdata++/solvers/mpdata.hpp>
 

@@ -1,11 +1,4 @@
-if(APPLE)
-  # needed for the XCode clang to be identified as AppleClang and not Clang
-  cmake_minimum_required(VERSION 3.0) 
-else()
-  # needed for the OpenMP test to work in C++-only project 
-  # (see http://public.kitware.com/Bug/view.php?id=11910)
-  cmake_minimum_required(VERSION 2.8.8) 
-endif()
+cmake_minimum_required(VERSION 3.1)
 
 project(libmpdata++-tests-mp3_paper_JCP CXX)
 
@@ -24,11 +17,14 @@ endif()
 # to make <libmpdata++/...> work
 set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CXX_FLAGS}")
 
+set(FULL_SIM "false")
+
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
   target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
+  target_compile_definitions(${test} PRIVATE FULL_SIM=${FULL_SIM})
   add_test(${test} ${test})
 endfunction()
 

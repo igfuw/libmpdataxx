@@ -1,11 +1,3 @@
-/* 
- * @file
- * @copyright University of Warsaw
- * @section LICENSE
- * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- *
- */
-
 #include <cmath>
 #include <boost/math/constants/constants.hpp>
 #include <libmpdata++/solvers/mpdata.hpp>
@@ -83,7 +75,13 @@ void test(const int np, const std::string &name)
 
 int main()
 {
-  std::vector<int> nps = {9, 17, 33, 65, 129};
+  std::vector<int> nps = {9, 17, 33, 65};
+
+  if (FULL_SIM)
+  {
+    nps.push_back(129);
+  }
+
   for (const auto np : nps)
   {
     {

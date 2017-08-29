@@ -30,7 +30,7 @@ def main():
     norm = 'L2'
     field = 'psi'
     for opt in conv.keys():
-        print 'opt: ', opt
+        #print 'opt: ', opt
         nys, errs = zip(*sorted(conv[opt][norm][field].items()))
         plot_data.append((nys, errs, opt))
 
