@@ -107,7 +107,7 @@ void test(const std::string &base_name, const int ny, const T max_cfl)
   p.dj = dy;
   p.max_courant = max_cfl;
 
-  p.outfreq = var_dt_arg ? tp::T / 50 : nt / 50; 
+  p.outfreq = var_dt_arg ? tp::T / 2 : nt / 2; 
   p.outvars[0].name = "gh";
   p.outvars[1].name = "cb";
   p.outvars[2].name = "sc";

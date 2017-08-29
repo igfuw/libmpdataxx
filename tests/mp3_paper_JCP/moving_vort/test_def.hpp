@@ -58,7 +58,7 @@ void test(const std::string &base_name, const int ny, const T max_cfl)
   p.dj = dy;
   p.max_courant = max_cfl;
 
-  p.outfreq = var_dt_arg ? 0.25 : nt / 48; 
+  p.outfreq = var_dt_arg ? 12.0 : nt;
   p.outvars[0].name = "psi";
   p.outdir = "out_" + dir_name;
   
