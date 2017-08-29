@@ -1,8 +1,8 @@
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 from matplotlib.ticker import FormatStrFormatter
-import matplotlib as mpl
 import os
 from helpers import set_rc_params, opt2lab, lab2pos
 
@@ -10,13 +10,8 @@ def conv_plot(plot_data, ord_data, fname = 'fig.pdf'):
     set_rc_params()
     fs = 45
 
-
     lab2ls = {'Mp3' : 'ks-', 'Mp3cc' : 'bo-', 'Mg3No' : 'gD-', 'Mg2No' : 'r^-'}
     lab2dsh = {'Mp3' : [], 'Mp3cc' : [6, 1], 'Mg3No' : [1, 1], 'Mg2No' : [6, 1, 1 ,1]}
-
-    #mpl.rcParams['font.family'] = 'jsMath-cmr10'
-    #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-    #mpl.rc('text.latex', preamble=r'\usepackage{lmodern}')
 
     fig, axarr = plt.subplots(1, 1, figsize=(14,12))
     
@@ -31,14 +26,12 @@ def conv_plot(plot_data, ord_data, fname = 'fig.pdf'):
     
     for x, y, x0, y0, t, a in ord_data:
         axarr.loglog(x, y, color = 'gray', lw = 6)
-        #a = a * 12 / 15.
         axarr.text(x0, y0, t, rotation = a, size = 28, backgroundcolor = 'w', zorder=2.1)
 
     axarr.xaxis.set_ticks(plot_data[0][0])
     axarr.xaxis.set_tick_params(direction = 'in')
     axarr.yaxis.set_tick_params(direction = 'in')
     axarr.minorticks_off()
-
 
     axarr.get_xaxis().set_major_formatter(ScalarFormatter())
 

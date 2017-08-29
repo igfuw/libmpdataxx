@@ -2,7 +2,6 @@ import h5py
 import numpy as np
 import os, sys
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), '../python_scripts'))
-import matplotlib.pyplot as plt
 from helpers import prepare_data, calc_convergence, opt2lab, nested_dict, save_conv
 from conv_plot import conv_plot
 

@@ -2,8 +2,9 @@ import h5py
 import numpy as np
 from sys import argv
 import os
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 from collections import defaultdict
 
 # https://stackoverflow.com/questions/5369723/multi-level-defaultdict-with-variable-depth/8702435#8702435
