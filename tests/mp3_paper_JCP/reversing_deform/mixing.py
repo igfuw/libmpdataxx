@@ -1,5 +1,5 @@
 import numpy as np
-from helpers import nested_dict, opt2lab, set_rc_params
+from helpers import nested_dict, opt2lab, lab2pos, set_rc_params
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -29,6 +29,24 @@ def distance(x, y, root):
     yr = corr_func(root)
     return (((x - xr) / (xmax - xmin)) ** 2 + ((y - yr) / (ymax - ymin)) ** 2) ** 0.5
 
+def save_mixing_diags(mixing_diags, ny, stat_file):
+    ordered_opts = list(range(len(mixing_diags[ny].keys())))
+    for opt in mixing_diags[ny].keys():
+        ordered_opts[lab2pos[opt2lab[opt]]] = opt
+    
+    stat_file.write('Reversing deformational flow: mixing diagnostics for the N = {} ({} degree interval) simulations\n\n'
+                    .format(ny, 180. / ny))
+    stat_file.write('  ')
+    for opt in ordered_opts:
+        stat_file.write('{:>10}'.format(opt2lab[opt]))
+    stat_file.write('\n')
+    md_names = ['lr', 'lu', 'lo']
+    for i in range(len(md_names)):
+        stat_file.write('{:>2}'.format(md_names[i]))
+        for opt in ordered_opts:
+            stat_file.write('{:10.2e}'.format(mixing_diags[ny][opt][i]))
+        stat_file.write('\n')
+
 def calc_mixing_diags(geo_data, field_data, nys):
     mixing_diags = nested_dict()
 
@@ -53,7 +71,7 @@ def calc_mixing_diags(geo_data, field_data, nys):
             mixing_diags[ny][opt] = (lr, lu, lo)
     return mixing_diags
 
-def plot_mixing(field_data, mixing_diags, ny):
+def plot_mixing(field_data, mixing_diags, ny, fname = 'mixing.pdf'):
     set_rc_params()
     matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
 
@@ -136,4 +154,4 @@ def plot_mixing(field_data, mixing_diags, ny):
                         multialignment = 'left'
                        )
     plt.tight_layout(pad=1., w_pad=5., h_pad=1)
-    plt.savefig('mixing.pdf')
+    plt.savefig(fname)

@@ -8,6 +8,6 @@ if(FULL_SIM STREQUAL "true")
   ")
 else()
   add_test(reversing_deform_conv_diff bash -c "
-    diff <(head -n 6 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/reversing_deform_conv.txt) ${CMAKE_CURRENT_BINARY_DIR}/reversing_deform_conv.txt;
+    diff <(head -n 7 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/reversing_deform_conv.txt) ${CMAKE_CURRENT_BINARY_DIR}/reversing_deform_conv.txt;
   ")
 endif()

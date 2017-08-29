@@ -6,10 +6,10 @@ from helpers import prepare_data, calc_convergence, save_conv
 from conv_plot import conv_plot
 from panel_plot import panel_plot
 from time import clock
-from mixing import calc_mixing_diags, plot_mixing
+from mixing import calc_mixing_diags, save_mixing_diags, plot_mixing
 
 def solution(geo_data, field_data, field, ny):
-    key = field_data[ny].keys()[0]
+    key = list(field_data[ny].keys())[0]
     return field_data[ny][key]['0.0'][field]
 
 def main():
@@ -21,13 +21,12 @@ def main():
     field = 'gh'
 
     for opt in conv.keys():
-        print 'opt: ', opt
-        print sorted(conv[opt][norm][field].items())
         nys, errs = zip(*sorted(conv[opt][norm]['gh'].items()))
         plot_data.append((nys, errs, opt))
 
     stat_file = open('reversing_deform_conv.txt', 'w')
     save_conv(geo_data, conv, 'Reversing deformational flow', norm, field, stat_file)
+    stat_file.close()
 
     ord_data = []
     ord2 = lambda n : 1.5e-1 * (n / 120.) ** (-2)
@@ -43,9 +42,14 @@ def main():
     conv_plot(plot_data, ord_data, fname = 'reversing_deform_conv.pdf')
 
     panel_plot(field_data[120]['nug|iga|div_2nd|div_3rd|fct']['2.5'], fname = 'reversing_deform_panel.pdf')
-    
-    mixing_diags = calc_mixing_diags(geo_data, field_data, nys = [240])
-    print mixing_diags
-    plot_mixing(field_data, mixing_diags, ny = 240)
+   
+    mixing_ny = 240
+    mixing_diags = calc_mixing_diags(geo_data, field_data, nys = [mixing_ny])
+
+    stat_file = open('reversing_deform_mixing.txt', 'w')
+    save_mixing_diags(mixing_diags, mixing_ny, stat_file)
+    stat_file.close()
+
+    plot_mixing(field_data, mixing_diags, mixing_ny, fname = 'reversing_deform_mixing.pdf')
 
 main()
