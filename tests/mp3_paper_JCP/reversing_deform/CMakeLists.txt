@@ -20,42 +20,42 @@ add_test(reversing_deform_mixing_diff bash -c "
 
 add_test(reversing_deform_diff_120 bash -c "
   for dir in out_Mg3No_120; do 
-    echo   'comparing const.h5'                                                                                         &&
-    h5diff --delta=1e-15 -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5               &&
-    echo   'comparing temp.xmf'                                                                                         &&
-    diff    $dir/temp.xmf                 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                             &&
-    echo   'comparing timestep0000000000.h5'                                                                            &&
-    h5diff -v $dir/timestep0000000000.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5                &&
-    echo   'comparing timestep0000000000.xmf'                                                                           &&
-    diff    $dir/timestep0000000000.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf               &&
-    echo   'comparing timestep0000000454.h5'                                                                            &&
-    h5diff --delta=1e-18 -v $dir/timestep0000000454.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000454.h5  &&
-    echo   'comparing timestep0000000454.xmf'                                                                           &&
-    diff    $dir/timestep0000000454.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000454.xmf               &&
-    echo   'comparing timestep0000000908.h5'                                                                            &&
-    h5diff --delta=1e-18 -v $dir/timestep0000000908.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.h5  &&
-    echo   'comparing timestep0000000908.xmf'                                                                           &&
+    echo   'comparing const.h5'                                                                                           &&
+    h5diff --relative=1e-8 -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5               &&
+    echo   'comparing temp.xmf'                                                                                           &&
+    diff    $dir/temp.xmf                 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                               &&
+    echo   'comparing timestep0000000000.h5'                                                                              &&
+    h5diff --relative=1e-8 -v $dir/timestep0000000000.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5  &&
+    echo   'comparing timestep0000000000.xmf'                                                                             &&
+    diff    $dir/timestep0000000000.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                 &&
+    echo   'comparing timestep0000000454.h5'                                                                              &&
+    h5diff --relative=1e-5 -v $dir/timestep0000000454.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000454.h5  &&
+    echo   'comparing timestep0000000454.xmf'                                                                             &&
+    diff    $dir/timestep0000000454.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000454.xmf                 &&
+    echo   'comparing timestep0000000908.h5'                                                                              &&
+    h5diff --relative=1e-5 -v $dir/timestep0000000908.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.h5  &&
+    echo   'comparing timestep0000000908.xmf'                                                                             &&
     diff    $dir/timestep0000000908.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.xmf || exit 1;
   done 
 ")
 
 add_test(reversing_deform_diff_240 bash -c "
   for dir in out_Mp3_240 out_Mp3cc_240 out_Mg2No_240 out_Mg3No_240; do 
-    echo   'comparing const.h5'                                                                                         &&
-    h5diff --delta=1e-15 -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5               &&
-    echo   'comparing temp.xmf'                                                                                         &&
-    diff    $dir/temp.xmf                 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                             &&
-    echo   'comparing timestep0000000000.h5'                                                                            &&
-    h5diff -v $dir/timestep0000000000.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5                &&
-    echo   'comparing timestep0000000000.xmf'                                                                           &&
-    diff    $dir/timestep0000000000.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf               &&
-    echo   'comparing timestep0000000908.h5'                                                                            &&
-    h5diff --delta=1e-18 -v $dir/timestep0000000908.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.h5  &&
-    echo   'comparing timestep0000000908.xmf'                                                                           &&
-    diff    $dir/timestep0000000908.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.xmf               &&
-    echo   'comparing timestep0000001816.h5'                                                                            &&
-    h5diff --delta=1e-18 -v $dir/timestep0000001816.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000001816.h5  &&
-    echo   'comparing timestep0000001816.xmf'                                                                           &&
+    echo   'comparing const.h5'                                                                                           &&
+    h5diff --relative=1e-8 -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5               &&
+    echo   'comparing temp.xmf'                                                                                           &&
+    diff    $dir/temp.xmf                 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                               &&
+    echo   'comparing timestep0000000000.h5'                                                                              &&
+    h5diff --relative=1e-8 -v $dir/timestep0000000000.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5  &&
+    echo   'comparing timestep0000000000.xmf'                                                                             &&
+    diff    $dir/timestep0000000000.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                 &&
+    echo   'comparing timestep0000000908.h5'                                                                              &&
+    h5diff --relative=1e-5 -v $dir/timestep0000000908.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.h5  &&
+    echo   'comparing timestep0000000908.xmf'                                                                             &&
+    diff    $dir/timestep0000000908.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.xmf                 &&
+    echo   'comparing timestep0000001816.h5'                                                                              &&
+    h5diff --relative=1e-5 -v $dir/timestep0000001816.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000001816.h5  &&
+    echo   'comparing timestep0000001816.xmf'                                                                             &&
     diff    $dir/timestep0000001816.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000001816.xmf || exit 1;
   done 
 ")
