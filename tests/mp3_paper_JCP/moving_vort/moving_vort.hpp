@@ -1,16 +1,9 @@
-/** 
- * @file
- * @copyright University of Warsaw
- * @section LICENSE
- * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- */
-
 #pragma once
 #include <libmpdata++/solvers/mpdata.hpp>
-#include "../common/transforms.hpp"
+#include "transforms.hpp"
 
 template <class ct_params_t, class ct_test_params_t>
-class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
+class moving_vort : public libmpdataxx::solvers::mpdata<ct_params_t>
 {
   using parent_t = libmpdataxx::solvers::mpdata<ct_params_t>;
   using parent_t::parent_t;
@@ -187,7 +180,7 @@ class moving : public libmpdataxx::solvers::mpdata<ct_params_t>
   public:
 
   // ctor
-  moving( 
+  moving_vort( 
     typename parent_t::ctor_args_t args, 
     const typename parent_t::rt_params_t &p
   ) :
