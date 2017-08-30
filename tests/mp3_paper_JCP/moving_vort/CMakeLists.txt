@@ -24,7 +24,7 @@ add_test(moving_vort_diff bash -c "
     echo   'comparing timestep0000000000.xmf'                                                                             &&
     diff    $dir/timestep0000000000.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                 &&
     echo   'comparing timestep0000047421.h5'                                                                              &&
-    h5diff --relative=2e-4 -v $dir/timestep0000047421.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000047421.h5  &&
+    h5diff --relative=1e-5 -v $dir/timestep0000047421.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000047421.h5  &&
     echo   'comparing timestep0000047421.xmf'                                                                             &&
     diff    $dir/timestep0000047421.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000047421.xmf || exit 1;
   done 

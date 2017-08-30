@@ -29,11 +29,11 @@ add_test(reversing_deform_diff_120 bash -c "
     echo   'comparing timestep0000000000.xmf'                                                                             &&
     diff    $dir/timestep0000000000.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                 &&
     echo   'comparing timestep0000000454.h5'                                                                              &&
-    h5diff --relative=2e-4 -v $dir/timestep0000000454.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000454.h5  &&
+    h5diff --relative=2e-3 -v $dir/timestep0000000454.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000454.h5  &&
     echo   'comparing timestep0000000454.xmf'                                                                             &&
     diff    $dir/timestep0000000454.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000454.xmf                 &&
     echo   'comparing timestep0000000908.h5'                                                                              &&
-    h5diff --relative=2e-4 -v $dir/timestep0000000908.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.h5  &&
+    h5diff --relative=2e-3 -v $dir/timestep0000000908.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.h5  &&
     echo   'comparing timestep0000000908.xmf'                                                                             &&
     diff    $dir/timestep0000000908.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.xmf || exit 1;
   done 
@@ -50,11 +50,11 @@ add_test(reversing_deform_diff_240 bash -c "
     echo   'comparing timestep0000000000.xmf'                                                                             &&
     diff    $dir/timestep0000000000.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                 &&
     echo   'comparing timestep0000000908.h5'                                                                              &&
-    h5diff --relative=2e-4 -v $dir/timestep0000000908.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.h5  &&
+    h5diff --relative=2e-3 -v $dir/timestep0000000908.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.h5  &&
     echo   'comparing timestep0000000908.xmf'                                                                             &&
     diff    $dir/timestep0000000908.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000908.xmf                 &&
     echo   'comparing timestep0000001816.h5'                                                                              &&
-    h5diff --relative=2e-4 -v $dir/timestep0000001816.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000001816.h5  &&
+    h5diff --relative=2e-3 -v $dir/timestep0000001816.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000001816.h5  &&
     echo   'comparing timestep0000001816.xmf'                                                                             &&
     diff    $dir/timestep0000001816.xmf   ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000001816.xmf || exit 1;
   done 
