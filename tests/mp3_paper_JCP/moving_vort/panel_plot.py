@@ -104,4 +104,4 @@ def panel_plot(geo_data, field_data, opt, time, ny, fname):
     cb4.ax.set_yticklabels(ticklabs,ha='right')
     cb4.ax.yaxis.set_tick_params(pad=50) 
     plt.tight_layout(pad=1., w_pad=5., h_pad=1)
-    plt.savefig('panel.pdf', transparent = True)
+    plt.savefig(fname, transparent = True)
