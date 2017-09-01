@@ -22,6 +22,7 @@
 #include <libmpdata++/bcond/open_2d.hpp>
 #include <libmpdata++/bcond/open_3d.hpp>
 #include <libmpdata++/bcond/polar_2d.hpp>
+#include <libmpdata++/bcond/polar_3d.hpp>
 #include <libmpdata++/bcond/rigid_2d.hpp>
 #include <libmpdata++/bcond/rigid_3d.hpp>
 #include <libmpdata++/bcond/gndsky_3d.hpp>

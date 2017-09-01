@@ -26,8 +26,8 @@ namespace libmpdataxx
       inline auto F(
 	const T1 &psi_l, const T2 &psi_r, const T3 &GC
       ) return_macro(, 
-        pospart<opts>(GC) * psi_l +
-        negpart<opts>(GC) * psi_r
+        pospart<opts BOOST_PP_COMMA() rng_t>(GC) * psi_l +
+        negpart<opts BOOST_PP_COMMA() rng_t>(GC) * psi_r
       ) 
 
       template <opts_t opts, class arr_1d_t>

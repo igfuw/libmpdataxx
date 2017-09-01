@@ -43,23 +43,23 @@ namespace libmpdataxx
 	public:
 
 	// 1D
-	virtual void fill_halos_sclr(const arr_1d_t &, const bool deriv = false) 
+	virtual void fill_halos_sclr(arr_1d_t &, const bool deriv = false) 
 	{ 
 	  assert(false && "bcond::fill_halos_sclr() called!"); 
 	};
 
-	virtual void fill_halos_vctr_alng(const arrvec_t<arr_1d_t> &) 
+	virtual void fill_halos_vctr_alng(arrvec_t<arr_1d_t> &, const bool ad = false)
 	{ 
 	  assert(false && "bcond::fill_halos_vctr() called!"); 
 	};
 
 	// 2D
-	virtual void fill_halos_sclr(const arr_2d_t &, const rng_t &, const bool deriv = false) 
+	virtual void fill_halos_sclr(arr_2d_t &, const rng_t &, const bool deriv = false) 
 	{
 	  assert(false && "bcond::fill_halos_sclr() called!");
 	};
 	
-	virtual void fill_halos_pres(const arr_2d_t &, const rng_t &)
+	virtual void fill_halos_pres(arr_2d_t &, const rng_t &)
 	{
 	  assert(false && "bcond::fill_halos_pres() called!");
 	};
@@ -69,38 +69,38 @@ namespace libmpdataxx
 	  assert(false && "bcond::save_edge_vel() called!");
 	};
 	
-	virtual void set_edge_pres(const arr_2d_t &, const rng_t &, int) 
+	virtual void set_edge_pres(arr_2d_t &, const rng_t &, int) 
 	{
 	  assert(false && "bcond::set_edge() called!");
 	};
 
-	virtual void fill_halos_vctr_alng(const arrvec_t<arr_2d_t> &, const rng_t &) 
+	virtual void fill_halos_vctr_alng(arrvec_t<arr_2d_t> &, const rng_t &, const bool ad = false)
 	{
 	  assert(false && "bcond::fill_halos_vctr_alng() called!");
 	};
         
-        virtual void fill_halos_sgs_vctr(const arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const int offset = 0)
+        virtual void fill_halos_sgs_vctr(arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const int offset = 0)
 	{
 	  assert(false && "bcond::fill_halos_sgs_vctr() called!");
 	};
         
-        virtual void fill_halos_sgs_tnsr(const arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const real_t)
+        virtual void fill_halos_sgs_tnsr(arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const real_t)
 	{
 	  assert(false && "bcond::fill_halos_sgs_tnsr called!");
 	};
 
-	virtual void fill_halos_vctr_nrml(const arr_2d_t &, const rng_t &) 
+	virtual void fill_halos_vctr_nrml(arr_2d_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
 	};
 
 	// 3D
-	virtual void fill_halos_sclr(const arr_3d_t &, const rng_t &, const rng_t &, const bool deriv = false) 
+	virtual void fill_halos_sclr(arr_3d_t &, const rng_t &, const rng_t &, const bool deriv = false) 
 	{
 	  assert(false && "bcond::fill_halos_sclr() called!");
 	};
 	
-        virtual void fill_halos_pres(const arr_3d_t &, const rng_t &, const rng_t &)
+        virtual void fill_halos_pres(arr_3d_t &, const rng_t &, const rng_t &)
 	{
 	  assert(false && "bcond::fill_halos_pres() called!");
 	};
@@ -110,12 +110,12 @@ namespace libmpdataxx
 	  assert(false && "bcond::save_edge_vel() called!");
 	};
 	
-	virtual void set_edge_pres(const arr_3d_t &, const rng_t &, const rng_t &, int)
+	virtual void set_edge_pres(arr_3d_t &, const rng_t &, const rng_t &, int)
 	{
 	  assert(false && "bcond::set_edge() called!");
 	};
 
-	virtual void fill_halos_vctr_alng(const arrvec_t<arr_3d_t> &, const rng_t &, const rng_t &) 
+	virtual void fill_halos_vctr_alng(arrvec_t<arr_3d_t> &, const rng_t &, const rng_t &, const bool ad = false)
 	{
 	  assert(false && "bcond::fill_halos_vctr() called!");
 	};
@@ -138,7 +138,7 @@ namespace libmpdataxx
 	  assert(false && "bcond::fill_halos_sgs_tnsr called!");
 	};
 
-	virtual void fill_halos_vctr_nrml(const arr_3d_t &, const rng_t &, const rng_t &) 
+	virtual void fill_halos_vctr_nrml(arr_3d_t &, const rng_t &, const rng_t &) 
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
 	};

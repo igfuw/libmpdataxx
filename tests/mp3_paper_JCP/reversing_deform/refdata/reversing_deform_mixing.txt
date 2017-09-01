@@ -1,0 +1,6 @@
+Reversing deformational flow: mixing diagnostics for the N = 240 (0.75 degree interval) simulations
+
+         Mp3     Mp3cc     Mg2No     Mg3No
+lr  1.28e-03  1.64e-03  8.85e-04  7.56e-04
+lu  2.00e-04  3.46e-04  2.77e-04  2.32e-04
+lo  6.99e-04  7.14e-04  0.00e+00  0.00e+00

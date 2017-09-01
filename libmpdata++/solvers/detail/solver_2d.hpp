@@ -48,11 +48,11 @@ namespace libmpdataxx
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], this->ijk, this->halo);
 	}
 
-        void xchng_vctr_alng(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, ad);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i, ad);
           // TODO: open bc nust be last!!!
           this->mem->barrier();
         }
@@ -106,7 +106,7 @@ namespace libmpdataxx
         }
 
         virtual void xchng_pres(
-          const typename parent_t::arr_t &arr,
+          typename parent_t::arr_t &arr,
           const idx_t<2> &range_ijk
         ) final
         {
@@ -117,7 +117,7 @@ namespace libmpdataxx
         }
 
         virtual void set_edges(
-          const arrvec_t<typename parent_t::arr_t> &av,
+          arrvec_t<typename parent_t::arr_t> &av,
           const idx_t<2> &range_ijk,
           const int &sign
         ) final
@@ -254,7 +254,8 @@ namespace libmpdataxx
 
           // fully third-order accurate mpdata needs also time derivatives of
           // the Courant field
-          if (opts::isset(ct_params_t::opts, opts::div_3rd))
+          if (opts::isset(ct_params_t::opts, opts::div_3rd) ||
+              opts::isset(ct_params_t::opts, opts::div_3rd_dt))
           {
             // TODO: why for (auto f : {mem->ndt_GC, mem->ndtt_GC}) doesn't work ?
             mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t( 

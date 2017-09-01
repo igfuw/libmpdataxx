@@ -38,7 +38,8 @@ namespace libmpdataxx
       khn = opts::bit(8), // use Kahan summation algorithm in the donor-cell formulae
       div_2nd = opts::bit(9),  // second-order MPDATA in divergence form
       div_3rd = opts::bit(10), // third-order correction in divergence form
-      fot = opts::bit(11)  // fourth-order terms
+      div_3rd_dt = opts::bit(11), // third-order correction in divergence form utilising first time derivative
+      fot = opts::bit(12)  // fourth-order terms
     };
 
     const std::map<decltype(fct), std::string> opt2name {
@@ -85,6 +86,10 @@ namespace libmpdataxx
     enum { sgs_scheme = 0}; // iles
     enum { stress_diff = 0};
     enum { impl_tht = false};
+    enum { sptl_intrp = 0}; // spatial interpolation of velocities
+    enum { out_intrp_ord = 1};  // order of temporal interpolation for output
+                                // order > 1 is mostly useful for convergence tests as it can result
+                                // in negative field values
   };
 
 } // namespace libmpdataxx

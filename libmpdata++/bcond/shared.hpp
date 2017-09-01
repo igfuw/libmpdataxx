@@ -22,31 +22,31 @@ namespace libmpdataxx
       using arr_2d_t = typename parent_t::arr_2d_t;
       using arr_3d_t = typename parent_t::arr_3d_t;
 
-      virtual void fill_halos_sclr(const arr_1d_t &, const bool) { };
-      virtual void fill_halos_sclr(const arr_2d_t &, const rng_t &, const bool) { };
-      virtual void fill_halos_sclr(const arr_3d_t &, const rng_t &, const rng_t &, const bool) { };
+      virtual void fill_halos_sclr(arr_1d_t &, const bool) { };
+      virtual void fill_halos_sclr(arr_2d_t &, const rng_t &, const bool) { };
+      virtual void fill_halos_sclr(arr_3d_t &, const rng_t &, const rng_t &, const bool) { };
 
-      virtual void fill_halos_pres(const arr_2d_t &, const rng_t &) { };
-      virtual void fill_halos_pres(const arr_3d_t &, const rng_t &, const rng_t &) { };
+      virtual void fill_halos_pres(arr_2d_t &, const rng_t &) { };
+      virtual void fill_halos_pres(arr_3d_t &, const rng_t &, const rng_t &) { };
       
       virtual void save_edge_vel(const arr_2d_t &, const rng_t &) { };
       virtual void save_edge_vel(const arr_3d_t &, const rng_t &, const rng_t &) { };
 
-      virtual void set_edge_pres(const arr_2d_t &, const rng_t &, int) { };
-      virtual void set_edge_pres(const arr_3d_t &, const rng_t &, const rng_t &, int) { };
+      virtual void set_edge_pres(arr_2d_t &, const rng_t &, int) { };
+      virtual void set_edge_pres(arr_3d_t &, const rng_t &, const rng_t &, int) { };
 
-      virtual void fill_halos_vctr_alng(const arrvec_t<arr_1d_t> &) { };
-      virtual void fill_halos_vctr_alng(const arrvec_t<arr_2d_t> &, const rng_t &) { };
-      virtual void fill_halos_vctr_alng(const arrvec_t<arr_3d_t> &, const rng_t &, const rng_t &) { }; 
+      virtual void fill_halos_vctr_alng(arrvec_t<arr_1d_t> &, const bool) { };
+      virtual void fill_halos_vctr_alng(arrvec_t<arr_2d_t> &, const rng_t &, const bool) { };
+      virtual void fill_halos_vctr_alng(arrvec_t<arr_3d_t> &, const rng_t &, const rng_t &, const bool) { }; 
       
-      virtual void fill_halos_sgs_vctr(const arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const int offset = 0) { };
-      virtual void fill_halos_sgs_vctr(const arrvec_t<arr_3d_t> &, const arr_3d_t &, const rng_t &, const rng_t &, const int offset = 0) { };
+      virtual void fill_halos_vctr_nrml(arr_2d_t &, const rng_t &) { };
+      virtual void fill_halos_vctr_nrml(arr_3d_t &, const rng_t &, const rng_t &) { };
       
-      virtual void fill_halos_sgs_tnsr(const arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const real_t) { };
-      virtual void fill_halos_sgs_tnsr(const arrvec_t<arr_3d_t> &, const arr_3d_t &, const rng_t &, const rng_t &, const real_t) { };
-
-      virtual void fill_halos_vctr_nrml(const arr_2d_t &, const rng_t &) { };
-      virtual void fill_halos_vctr_nrml(const arr_3d_t &, const rng_t &, const rng_t &) { };
+      virtual void fill_halos_sgs_vctr(arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const int offset = 0) { };
+      virtual void fill_halos_sgs_vctr(arrvec_t<arr_3d_t> &, const arr_3d_t &, const rng_t &, const rng_t &, const int offset = 0) { };
+      
+      virtual void fill_halos_sgs_tnsr(arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const real_t) { };
+      virtual void fill_halos_sgs_tnsr(arrvec_t<arr_3d_t> &, const arr_3d_t &, const rng_t &, const rng_t &, const real_t) { };
 
       using parent_t::parent_t;
       // ctor

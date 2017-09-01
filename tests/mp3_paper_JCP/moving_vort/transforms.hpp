@@ -3,7 +3,6 @@
 #include <boost/math/constants/constants.hpp>
 #include <blitz/array.h>
 
-
 using T = double;
 constexpr T pi = boost::math::constants::pi<T>();
 
