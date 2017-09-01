@@ -134,11 +134,11 @@ class reversing_deform : public libmpdataxx::solvers::mpdata<ct_params_t>
 
     for (int d = 0; d < 2; ++d)
     {
-      this->xchng_sclr(ex_node[d], this->i, this->j);
+      this->xchng_sclr(ex_node[d], this->ijk);
       if (needs_dt)
       {
-        this->xchng_sclr(ex_node[2 + d], this->i, this->j);
-        this->xchng_sclr(ex_node[4 + d], this->i, this->j);
+        this->xchng_sclr(ex_node[2 + d], this->ijk);
+        this->xchng_sclr(ex_node[4 + d], this->ijk);
       }
     }
 

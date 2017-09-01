@@ -61,10 +61,9 @@ namespace libmpdataxx
             this->xchng_vctr_alng(this->mem->ndt_GC);
             this->xchng_vctr_alng(this->mem->ndtt_GC);
 
-            this->xchng_vctr_nrml(this->mem->ndt_GC, this->i^ex, this->j^ex);
-            this->xchng_vctr_nrml(this->mem->ndtt_GC, this->i^ex, this->j^ex);
+            this->xchng_vctr_nrml(this->mem->ndt_GC, this->ijk, ex);
+            this->xchng_vctr_nrml(this->mem->ndtt_GC, this->ijk, ex);
           }
->>>>>>> master
 	} 
 
 	// method invoked by the solver

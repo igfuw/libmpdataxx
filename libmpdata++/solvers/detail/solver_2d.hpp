@@ -57,7 +57,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
         
-        virtual void xchng_sgs_vctr(const arrvec_t<typename parent_t::arr_t> &av,
+        virtual void xchng_sgs_vctr(arrvec_t<typename parent_t::arr_t> &av,
                             const typename parent_t::arr_t &b,
                             const idx_t<2> &range_ijk
         ) final
@@ -68,7 +68,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        virtual void xchng_sgs_tnsr_diag(const arrvec_t<typename parent_t::arr_t> &av,
+        virtual void xchng_sgs_tnsr_diag(arrvec_t<typename parent_t::arr_t> &av,
                                          const typename parent_t::arr_t &w,
 	                                 const idx_t<2> &range_ijk
         ) final
@@ -79,7 +79,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        virtual void xchng_sgs_tnsr_offdiag(const arrvec_t<typename parent_t::arr_t> &av,
+        virtual void xchng_sgs_tnsr_offdiag(arrvec_t<typename parent_t::arr_t> &av,
                                             const arrvec_t<typename parent_t::arr_t> &bv, 
 	                                    const idx_t<2> &range_ijk,
 	                                    const std::array<rng_t, 2> &range_ijkm
@@ -94,7 +94,7 @@ namespace libmpdataxx
         }
 
         virtual void xchng_vctr_nrml(
-          const arrvec_t<typename parent_t::arr_t> &arrvec, 
+          arrvec_t<typename parent_t::arr_t> &arrvec, 
           const idx_t<2> &range_ijk,
           const int ext = 0
         ) final
