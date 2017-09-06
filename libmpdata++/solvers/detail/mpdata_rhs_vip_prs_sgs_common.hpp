@@ -42,6 +42,7 @@ namespace libmpdataxx
         // member fields
         arrvec_t<typename parent_t::arr_t> &tau;
         arrvec_t<typename parent_t::arr_t> &tau_srfc;
+        typename parent_t::arr_t           &div;
         arrvec_t<typename parent_t::arr_t> &drv;
         arrvec_t<typename parent_t::arr_t> &wrk;
 
@@ -81,7 +82,18 @@ namespace libmpdataxx
           
           if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
-            formulae::stress::calc_drag_cmpct<ct_params_t::n_dims>(tau_srfc, this->vips(), cdrag, this->ijk, ijkm);
+            formulae::stress::calc_drag_cmpct<ct_params_t::n_dims, ct_params_t::opts>(tau_srfc,
+                                                                                      this->vips(),
+                                                                                      *this->mem->G,
+                                                                                      cdrag,
+                                                                                      this->ijk,
+                                                                                      ijkm);
+
+            if (this->mem->G)
+            {
+              formulae::stress::calc_div_cmpct<ct_params_t::n_dims>(div, this->vips(), *this->mem->G, this->ijk, this->dijk);
+              this->xchng_sgs_div(div, this->ijk);
+            }
 
             formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
 
@@ -147,8 +159,9 @@ namespace libmpdataxx
           parent_t(args, p),
           tau(args.mem->tmp[__FILE__][0]),
           tau_srfc(args.mem->tmp[__FILE__][1]),
-          drv(args.mem->tmp[__FILE__][2]),
-          wrk(args.mem->tmp[__FILE__][3]),
+          div(args.mem->tmp[__FILE__][2][0]),
+          drv(args.mem->tmp[__FILE__][3]),
+          wrk(args.mem->tmp[__FILE__][4]),
           cdrag(p.cdrag)
         {
           for (int d = 0; d < ct_params_t::n_dims; ++d)
@@ -189,6 +202,14 @@ namespace libmpdataxx
                                       );
               parent_t::alloc_tmp_stgr(mem, __FILE__, 2, {{true, false, false}, {false, true, false}}, true); // tau_srfc
             }
+          }
+          if (ct_params_t::n_dims == 2)
+          {
+            parent_t::alloc_tmp_stgr(mem, __FILE__, 1, {{false, true}}); // div
+          }
+          else
+          {
+            parent_t::alloc_tmp_stgr(mem, __FILE__, 1, {{false, false, true}}); // div
           }
           // TODO: do not allocate unnecessary memory when not using pade differencing
           parent_t::alloc_tmp_sclr(mem, __FILE__, std::pow(static_cast<int>(ct_params_t::n_dims), 2)); // drv

@@ -26,7 +26,14 @@ namespace libmpdataxx
       using parent_t::parent_t; // inheriting ctor
 
       public:
-      
+
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        using namespace idxperm;
+        a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * a(pi<d>(this->left_edge_sclr + h, j, k))
+                                                     - a(pi<d>(this->left_edge_sclr + 1 + h, j, k));
+      }
+
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &b, const rng_t &j, const rng_t &k, const int offset = 0)
       {
         using namespace idxperm;
@@ -62,6 +69,13 @@ namespace libmpdataxx
       using parent_t::parent_t; // inheriting ctor
       
       public:
+
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        using namespace idxperm;
+        a(pi<d>(this->rght_edge_sclr + h, j, k)) = 2 * a(pi<d>(this->rght_edge_sclr - h, j, k))
+                                                   -   a(pi<d>(this->rght_edge_sclr - 1 - h, j, k));
+      }
 
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {

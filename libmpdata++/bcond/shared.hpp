@@ -42,6 +42,9 @@ namespace libmpdataxx
       virtual void fill_halos_vctr_nrml(arr_2d_t &, const rng_t &) { };
       virtual void fill_halos_vctr_nrml(arr_3d_t &, const rng_t &, const rng_t &) { };
       
+      virtual void fill_halos_sgs_div(arr_2d_t &, const rng_t &) { };
+      virtual void fill_halos_sgs_div(arr_3d_t &, const rng_t &, const rng_t &) { };
+      
       virtual void fill_halos_sgs_vctr(arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const int offset = 0) { };
       virtual void fill_halos_sgs_vctr(arrvec_t<arr_3d_t> &, const arr_3d_t &, const rng_t &, const rng_t &, const int offset = 0) { };
       

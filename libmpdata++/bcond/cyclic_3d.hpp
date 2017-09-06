@@ -47,6 +47,11 @@ namespace libmpdataxx
         av[d](pi<d>(this->left_halo_vctr, j, k)) = av[d](pi<d>(this->rght_intr_vctr, j, k));
       }
       
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
+      }
+      
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {
 	using namespace idxperm;
@@ -99,6 +104,11 @@ namespace libmpdataxx
       {
 	using namespace idxperm;
         av[d](pi<d>(this->rght_halo_vctr, j, k)) = av[d](pi<d>(this->left_intr_vctr, j, k));
+      }
+      
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
       }
       
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)

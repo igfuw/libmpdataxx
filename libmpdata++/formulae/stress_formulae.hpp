@@ -15,6 +15,7 @@ namespace libmpdataxx
     namespace stress
     {
       using arakawa_c::h;
+      using opts::opts_t;
 
       // velocity gradient
       // 2D version
@@ -167,24 +168,29 @@ namespace libmpdataxx
       
       // surface stress
       // 2D version
-      template <int nd, class arrvec_t, class real_t, class ijk_t, class ijkm_t>
+      template <int nd, opts_t opts, class arr_t, class arrvec_t, class real_t, class ijk_t, class ijkm_t>
       inline void calc_drag_cmpct(arrvec_t &tau,
                                   const arrvec_t &v,
-                                  real_t cdrag,
+                                  const arr_t &rho,
+                                  const real_t cdrag,
                                   const ijk_t &ijk,
                                   const ijkm_t &ijkm,
                                   typename std::enable_if<nd == 2>::type* = 0)
       {
         tau[0](ijkm[0] + h, 0) = cdrag * 0.25 * 
                                  abs((v[0](ijkm[0] + 1, 0) + v[0](ijkm[0], 0))) *
-                                 (v[0](ijkm[0] + 1, 0) + v[0](ijkm[0], 0));
+                                 (v[0](ijkm[0] + 1, 0) + v[0](ijkm[0], 0)) *
+                                 (  G<opts, nd>(rho, ijkm[0] + 1, rng_t(0, 0))
+                                  + G<opts, nd>(rho, ijkm[0]    , rng_t(0, 0)) );
+
       }
 
       // 3D version
-      template <int nd, class arrvec_t, class real_t, class ijk_t, class ijkm_t>
+      template <int nd, opts_t opts, class arr_t, class arrvec_t, class real_t, class ijk_t, class ijkm_t>
       inline void calc_drag_cmpct(arrvec_t &tau,
                                   const arrvec_t &v,
-                                  real_t cdrag,
+                                  const arr_t &rho,
+                                  const real_t cdrag,
                                   const ijk_t &ijk,
                                   const ijkm_t &ijkm,
                                   typename std::enable_if<nd == 3>::type* = 0)
@@ -192,11 +198,47 @@ namespace libmpdataxx
         tau[0](ijkm[0] + h, ijk[1], 0) = cdrag * 0.25 * sqrt(
                                                 pow2((v[0](ijkm[0] + 1, ijk[1], 0) + v[0](ijkm[0], ijk[1], 0)))
                                               + pow2((v[1](ijkm[0] + 1, ijk[1], 0) + v[1](ijkm[0], ijk[1], 0)))
-                                              ) * (v[0](ijkm[0] + 1, ijk[1], 0) + v[0](ijkm[0], ijk[1], 0));
+                                              ) *
+                                         (v[0](ijkm[0] + 1, ijk[1], 0) + v[0](ijkm[0], ijk[1], 0)) *
+                                         (  G<opts, nd>(rho, ijkm[0] + 1, ijk[1], rng_t(0, 0))
+                                          + G<opts, nd>(rho, ijkm[0]    , ijk[1], rng_t(0, 0)) );
+
         tau[1](ijk[0], ijkm[1] + h, 0) = cdrag * 0.25 * sqrt(
                                                 pow2((v[0](ijk[0], ijkm[1] + 1, 0) + v[0](ijk[0], ijkm[1], 0)))
                                               + pow2((v[1](ijk[0], ijkm[1] + 1, 0) + v[1](ijk[0], ijkm[1], 0)))
-                                              ) * (v[1](ijk[0], ijkm[1] + 1, 0) + v[1](ijk[0], ijkm[1], 0));
+                                              ) *
+                                         (v[1](ijk[0], ijkm[1] + 1, 0) + v[1](ijk[0], ijkm[1], 0)) *
+                                         (  G<opts, nd>(rho, ijk[0], ijkm[1] + 1, rng_t(0, 0))
+                                          + G<opts, nd>(rho, ijk[0], ijkm[1]    , rng_t(0, 0)) );
+      }
+      
+      // velocity divergence
+      // 2D version
+      template <int nd, class arr_t, class arrvec_t, class ijk_t, class dijk_t>
+      inline void calc_div_cmpct(arr_t &div,
+                                  const arrvec_t &v,
+                                  const arr_t &rho,
+                                  const ijk_t &ijk,
+                                  const dijk_t &dijk,
+                                  typename std::enable_if<nd == 2>::type* = 0)
+      {
+        div(ijk[0], ijk[1] + h) = - (v[1](ijk[0], ijk[1] + 1) + v[1](ijk[0], ijk[1])) *
+                                    (rho(ijk[0], ijk[1] + 1) - rho(ijk[0], ijk[1])) /
+                                    (dijk[1] * (rho(ijk[0], ijk[1] + 1) + rho(ijk[0], ijk[1])));
+      }
+      
+      // 3D version
+      template <int nd, class arr_t, class arrvec_t, class ijk_t, class dijk_t>
+      inline void calc_div_cmpct(arr_t &div,
+                                  const arrvec_t &v,
+                                  const arr_t &rho,
+                                  const ijk_t &ijk,
+                                  const dijk_t &dijk,
+                                  typename std::enable_if<nd == 3>::type* = 0)
+      {
+        div(ijk[0], ijk[1], ijk[2] + h) = - (v[2](ijk[0], ijk[1], ijk[2] + 1) + v[2](ijk[0], ijk[1], ijk[2])) *
+                                            (rho(ijk[0], ijk[1], ijk[2] + 1) - rho(ijk[0], ijk[1], ijk[2])) /
+                                            (dijk[2] * (rho(ijk[0], ijk[1], ijk[2] + 1) + rho(ijk[0], ijk[1], ijk[2])));
       }
 
       // calculates unique deformation tensor components

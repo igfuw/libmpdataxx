@@ -79,6 +79,11 @@ namespace libmpdataxx
 	  assert(false && "bcond::fill_halos_vctr_alng() called!");
 	};
         
+        virtual void fill_halos_sgs_div(arr_2d_t &, const rng_t &)
+	{
+	  assert(false && "bcond::fill_halos_sgs_div() called!");
+	};
+
         virtual void fill_halos_sgs_vctr(arrvec_t<arr_2d_t> &, const arr_2d_t &, const rng_t &, const int offset = 0)
 	{
 	  assert(false && "bcond::fill_halos_sgs_vctr() called!");
@@ -118,6 +123,11 @@ namespace libmpdataxx
 	virtual void fill_halos_vctr_alng(arrvec_t<arr_3d_t> &, const rng_t &, const rng_t &, const bool ad = false)
 	{
 	  assert(false && "bcond::fill_halos_vctr() called!");
+	};
+	
+	virtual void fill_halos_sgs_div(arr_3d_t &, const rng_t &, const rng_t &) 
+	{
+	  assert(false && "bcond::fill_halos_sgs_div() called!");
 	};
         
         virtual void fill_halos_sgs_vctr(arrvec_t<arr_3d_t> &,
