@@ -215,7 +215,7 @@ namespace libmpdataxx
       // velocity divergence
       // 2D version
       template <int nd, class arr_t, class arrvec_t, class ijk_t, class dijk_t>
-      inline void calc_div_cmpct(arr_t &div,
+      inline void calc_wind_div_cmpct(arr_t &div,
                                   const arrvec_t &v,
                                   const arr_t &rho,
                                   const ijk_t &ijk,
@@ -229,7 +229,7 @@ namespace libmpdataxx
       
       // 3D version
       template <int nd, class arr_t, class arrvec_t, class ijk_t, class dijk_t>
-      inline void calc_div_cmpct(arr_t &div,
+      inline void calc_wind_div_cmpct(arr_t &div,
                                   const arrvec_t &v,
                                   const arr_t &rho,
                                   const ijk_t &ijk,
