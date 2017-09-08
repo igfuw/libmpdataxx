@@ -29,7 +29,7 @@ namespace libmpdataxx
           {
             formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims>(this->tau, eta, this->ijk);
 
-            this->xchng_sgs_tnsr_diag(this->tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
+            this->xchng_sgs_tnsr_diag(this->tau, this->vips()[ct_params_t::n_dims - 1], this->vip_div, this->ijk);
             this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
           }
           else

@@ -19,7 +19,10 @@ struct iles_tag {};
 
 // iles
 template <typename params_t>
-void set_sgs_specific(params_t &p, iles_tag) {}
+void set_sgs_specific(params_t &p, iles_tag)
+{
+  p.iles_cdrag = 0.1;
+}
 
 // smagorinsky
 template <typename params_t>
@@ -28,6 +31,7 @@ void set_sgs_specific(params_t &p, smg_tag)
   p.c_m = 0.0856;
   p.smg_c = 0.165;
   p.prandtl_num = 0.42;
+  p.cdrag = 0.0;
 }
 
 template <typename sgs_t>
@@ -68,7 +72,6 @@ void test(const std::string &dirname, const int nt)
   p.g = 10;
   p.hflux_const = 0.01;
   p.hscale = 25;
-  p.cdrag = 0.1;
   
   set_sgs_specific(p, sgs_t{});
 

@@ -94,17 +94,28 @@ namespace libmpdataxx
               formulae::stress::calc_vip_div_cmpct<ct_params_t::n_dims>(vip_div, this->vips(), *this->mem->G, this->ijk, this->dijk);
               this->xchng_sgs_div(vip_div, this->ijk);
             }
+            else
+            {
+              // TODO: do not use vip_div when G == 1
+              vip_div(this->ijk) = 0;
+              this->xchng_sgs_div(vip_div, this->ijk);
+            }
 
-            formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), this->ijk, ijkm, this->dijk);
+            formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), vip_div, this->ijk, ijkm, this->dijk);
 
-            this->xchng_sgs_tnsr_diag(tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
+            this->xchng_sgs_tnsr_diag(tau, this->vips()[ct_params_t::n_dims - 1], vip_div, this->ijk);
             this->xchng_sgs_tnsr_offdiag(tau, tau_srfc, this->ijk, this->ijkm);
             
             // multiply deformation tensor by sgs viscosity to obtain stress tensor
             multiply_sgs_visc();
             
             // update forces
-            formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims>(this->vip_rhs, tau, this->ijk, this->dijk, 2.0);
+            formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims, ct_params_t::opts>(this->vip_rhs,
+                                                                                            tau,
+                                                                                            *this->mem->G,
+                                                                                            this->ijk,
+                                                                                            this->dijk,
+                                                                                            2.0);
           }
           else
           {

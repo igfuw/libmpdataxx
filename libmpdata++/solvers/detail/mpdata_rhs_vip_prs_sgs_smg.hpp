@@ -32,8 +32,13 @@ namespace libmpdataxx
           {
             k_m(this->ijk) = pow(smg_c * dlta, 2) * formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk);
 
-            formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims>(this->tau, 1.0, this->k_m, this->ijk);
-            this->xchng_sgs_tnsr_diag(this->tau, this->vips()[ct_params_t::n_dims - 1], this->ijk);
+            formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims, ct_params_t::opts>(this->tau,
+                                                                                          1.0,
+                                                                                          this->k_m,
+                                                                                          *this->mem->G,
+                                                                                          this->ijk);
+
+            this->xchng_sgs_tnsr_diag(this->tau, this->vips()[ct_params_t::n_dims - 1], this->vip_div, this->ijk);
             this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
           }
           else

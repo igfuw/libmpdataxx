@@ -81,12 +81,13 @@ namespace libmpdataxx
 
         virtual void xchng_sgs_tnsr_diag(arrvec_t<typename parent_t::arr_t> &av,
                                          const typename parent_t::arr_t &w,
+                                         const typename parent_t::arr_t &vip_div,
 	                                 const idx_t<2> &range_ijk
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_tnsr(av, w, range_ijk[1], this->dijk[0]);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_tnsr(av, w, range_ijk[0], this->dijk[1]);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_tnsr(av, w, vip_div, range_ijk[1], this->dijk[0]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_tnsr(av, w, vip_div, range_ijk[0], this->dijk[1]);
           this->mem->barrier();
         }
 

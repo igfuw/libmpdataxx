@@ -21,7 +21,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
   using real_t = typename ct_params_t::real_t;
 
   private:
-  real_t hscale, cdrag;
+  real_t hscale, iles_cdrag;
   typename parent_t::arr_t &tke;
 
   void multiply_sgs_visc()
@@ -43,13 +43,13 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     {
       for (int k = this->k.first(); k <= this->k.last(); ++k)
       {
-        this->vip_rhs[0](this->i, this->j, k) += - 2 * cdrag / hscale * sqrt(
+        this->vip_rhs[0](this->i, this->j, k) += - 2 * iles_cdrag / hscale * sqrt(
                                                   pow2(this->state(ix::vip_i)(this->i, this->j, 0))
                                                 + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
                                                 ) * this->state(ix::vip_i)(this->i, this->j, 0)
                                                   * exp(-this->dj * k / hscale);
         
-        this->vip_rhs[1](this->i, this->j, k) += - 2 * cdrag / hscale * sqrt(
+        this->vip_rhs[1](this->i, this->j, k) += - 2 * iles_cdrag / hscale * sqrt(
                                                   pow2(this->state(ix::vip_i)(this->i, this->j, 0))
                                                 + pow2(this->state(ix::vip_j)(this->i, this->j, 0))
                                                 ) * this->state(ix::vip_j)(this->i, this->j, 0)
@@ -77,7 +77,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
 
   struct rt_params_t : parent_t::rt_params_t 
   { 
-    real_t hscale = 1, cdrag = 0; 
+    real_t hscale = 1, iles_cdrag = 0; 
   };
 
   // ctor
@@ -87,7 +87,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
   ) :
     parent_t(args, p),
     hscale(p.hscale),
-    cdrag(p.cdrag),
+    iles_cdrag(p.iles_cdrag),
     tke(args.mem->tmp[__FILE__][0][0])
   {}
 

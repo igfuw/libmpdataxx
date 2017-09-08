@@ -104,51 +104,27 @@ namespace libmpdataxx
       // helper function to calculate gradient components of a scalar field
       
       // 1D version
-      template <int nd, bool cmpct = false, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
+      template <int nd, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline void calc_grad(arrvec_t v, arr_t a, ijk_t ijk, dijk_t dijk, typename std::enable_if<nd == 1>::type* = 0)
       {
-        if (!cmpct)
-        {
-          v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], dijk[0]);
-        }
-        else
-        {
-          v[0](ijk[0] + h) = formulae::nabla::grad_cmpct<0>(a, ijk[0], dijk[0]);
-        }
+        v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], dijk[0]);
       }
 
       // 2D version
-      template <int nd, bool cmpct = false, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
+      template <int nd, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline void calc_grad(arrvec_t v, arr_t a, ijk_t ijk, dijk_t dijk, typename std::enable_if<nd == 2>::type* = 0)
       {
-        if (!cmpct)
-        {
-          v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], ijk[1], dijk[0]);
-          v[1](ijk) = formulae::nabla::grad<1>(a, ijk[1], ijk[0], dijk[1]);
-        }
-        else
-        {
-          v[0](ijk[0] + h, ijk[1]) = formulae::nabla::grad_cmpct<0>(a, ijk[0], ijk[1], dijk[0]);
-          v[1](ijk[0], ijk[1] + h) = formulae::nabla::grad_cmpct<1>(a, ijk[1], ijk[0], dijk[1]);
-        }
+        v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], ijk[1], dijk[0]);
+        v[1](ijk) = formulae::nabla::grad<1>(a, ijk[1], ijk[0], dijk[1]);
       }
 
       // 3D version
-      template <int nd, bool cmpct = false, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
+      template <int nd, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline void calc_grad(arrvec_t v, arr_t a, ijk_t ijk, dijk_t dijk, typename std::enable_if<nd == 3>::type* = 0)
       {
-        if (!cmpct)
-        {
-          v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], ijk[1], ijk[2], dijk[0]);
-          v[1](ijk) = formulae::nabla::grad<1>(a, ijk[1], ijk[2], ijk[0], dijk[1]);
-          v[2](ijk) = formulae::nabla::grad<2>(a, ijk[2], ijk[0], ijk[1], dijk[2]);
-        }
-        else
-        {
-          v[0](ijk[0] + h, ijk[1], ijk[2]) = formulae::nabla::grad_cmpct<0>(a, ijk[0], ijk[1], ijk[2], dijk[0]);
-          v[1](ijk[0], ijk[1] + h, ijk[2]) = formulae::nabla::grad_cmpct<1>(a, ijk[1], ijk[2], ijk[0], dijk[1]);
-          v[2](ijk[0], ijk[1], ijk[2]+ h ) = formulae::nabla::grad_cmpct<2>(a, ijk[2], ijk[0], ijk[1], dijk[2]);
-        }
+        v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], ijk[1], ijk[2], dijk[0]);
+        v[1](ijk) = formulae::nabla::grad<1>(a, ijk[1], ijk[2], ijk[0], dijk[1]);
+        v[2](ijk) = formulae::nabla::grad<2>(a, ijk[2], ijk[0], ijk[1], dijk[2]);
       }
       
       // 2D version
@@ -196,34 +172,6 @@ namespace libmpdataxx
 	(v[1](ijk[0], ijk[1]+1, ijk[2]) - v[1](ijk[0], ijk[1]-1, ijk[2])) / dijk[1] / 2.
 	+
 	(v[2](ijk[0], ijk[1], ijk[2]+1) - v[2](ijk[0], ijk[1], ijk[2]-1)) / dijk[2] / 2.
-      )
-      
-      // 2D version
-      template <int nd, class arrvec_t, class ijk_t, class dijk_t>
-      inline auto div_cmpct(
-	const arrvec_t &v, // vector field
-	const ijk_t &ijk,
-	const dijk_t dijk,
-        typename std::enable_if<nd == 2>::type* = 0
-      ) return_macro(,
-	(v[0](ijk[0]+h, ijk[1]) - v[0](ijk[0]-h, ijk[1])) / dijk[0]
-	+
-	(v[1](ijk[0], ijk[1]+h) - v[1](ijk[0], ijk[1]-h)) / dijk[1]
-      )
-      
-      // 3D version
-      template <int nd, class arrvec_t, class ijk_t, class dijk_t>
-      inline auto div_cmpct(
-	const arrvec_t &v, // vector field
-	const ijk_t &ijk,
-	const dijk_t dijk,
-        typename std::enable_if<nd == 3>::type* = 0
-      ) return_macro(,
-	(v[0](ijk[0]+h, ijk[1], ijk[2]) - v[0](ijk[0]-h, ijk[1], ijk[2])) / dijk[0]
-	+
-	(v[1](ijk[0], ijk[1]+h, ijk[2]) - v[1](ijk[0], ijk[1]-h, ijk[2])) / dijk[1]
-	+
-	(v[2](ijk[0], ijk[1], ijk[2]+h) - v[2](ijk[0], ijk[1], ijk[2]-h)) / dijk[2]
       )
     } // namespace nabla_op
   } // namespace formulae

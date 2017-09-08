@@ -59,7 +59,7 @@ namespace libmpdataxx
         av[d + offset](pi<d>(this->left_halo_vctr, j, k)) = av[d + offset](pi<d>(this->rght_intr_vctr, j, k));
       }
       
-      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
       {
         fill_halos_vctr_alng(av, j, k);
       }
@@ -118,7 +118,7 @@ namespace libmpdataxx
         av[d + offset](pi<d>(this->rght_halo_vctr, j, k)) = av[d + offset](pi<d>(this->left_intr_vctr, j, k));
       }
       
-      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
       {
         fill_halos_vctr_alng(av, j, k);
       }

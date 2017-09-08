@@ -43,14 +43,16 @@ namespace libmpdataxx
         a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * b(pi<d>(this->left_edge_sclr, j, k)) - a(pi<d>(this->left_edge_sclr + h, j, k));
       }
       
-      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &u, const rng_t &j, const rng_t &k, const real_t di)
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &u, const arr_t &div, const rng_t &j, const rng_t &k, const real_t di)
       {
         using namespace idxperm;
         const auto &a = av[d];
-        a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * ( 3 * u(pi<d>(this->left_edge_sclr + 1, j, k))
-                                                       - 2 * u(pi<d>(this->left_edge_sclr, j, k)) 
-                                                       -     u(pi<d>(this->left_edge_sclr + 2, j, k)) 
-                                                       ) / di;
+        a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * ( ( 3 * u(pi<d>(this->left_edge_sclr + 1, j, k))
+                                                         - 2 * u(pi<d>(this->left_edge_sclr, j, k)) 
+                                                         -     u(pi<d>(this->left_edge_sclr + 2, j, k)) 
+                                                         ) / di
+                                                       - div(pi<d>(this->left_edge_sclr - h, j, k))
+                                                       );
       }
     };
 
@@ -86,7 +88,7 @@ namespace libmpdataxx
         a(pi<d>(this->rght_edge_sclr + h, j, k)) = - a(pi<d>(this->rght_edge_sclr - h, j, k));
       }
       
-      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const real_t di)
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t di)
       {
         using namespace idxperm;
         const auto &a = av[d];
