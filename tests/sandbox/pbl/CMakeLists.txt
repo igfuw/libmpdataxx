@@ -8,6 +8,13 @@ add_test(pbl_smg_profiles bash -c "
     python  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_smg
 ")
 
+add_test(pbl_iles_budget bash -c "
+    python  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_iles
+")
+add_test(pbl_smg_budget bash -c "
+    python  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_smg
+")
+
 libmpdataxx_add_test_travis(pbl_smg_travis)
 libmpdataxx_add_test_travis(pbl_iles_travis)
 
