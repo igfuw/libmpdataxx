@@ -30,9 +30,15 @@ namespace libmpdataxx
 
     namespace detail
     {
-      // 
-      template <class ct_params_t > 
-      class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_t>
+      // override default interpolation in ct_params for vip
+      template <class ct_params_t> 
+      struct ct_params_vip_default_t : ct_params_t
+      {
+        enum {splt_intrp = aver2};
+      };
+
+      template <class ct_params_t> 
+      class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_vip_default_t<ct_params_t>>
       {
         using ix = typename ct_params_t::ix;
 
