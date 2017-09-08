@@ -20,7 +20,7 @@ namespace libmpdataxx
     {
       // first come helpers for divergence form of antidiffusive velocity
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto div_2nd(
+      forceinline_macro auto div_2nd(
         const arr_2d_t &psi, 
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G, 
@@ -31,15 +31,15 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           // second order terms
           abs(GC[dim](pi<dim>(i+h, j))) / 2
-          * ndx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j) 
+          * ndx_psi<opts, dim>(psi, i, j) 
           - 
           GC[dim](pi<dim>(i+h, j)) / 2
-          * nfdiv<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)
+          * nfdiv<opts, dim>(psi, GC, G, i, j)
         );
       }
       
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto div_3rd_upwind(
+      forceinline_macro auto div_3rd_upwind(
         const arr_2d_t &psi, 
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G, 
@@ -49,13 +49,13 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          abs(div_2nd<opts BOOST_PP_COMMA() dim>(psi, GC, G, i, j)) / 2
-          * ndx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j) 
+          abs(div_2nd<opts, dim>(psi, GC, G, i, j)) / 2
+          * ndx_psi<opts, dim>(psi, i, j) 
         );
       }
 
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto div_3rd_upwind(
+      forceinline_macro auto div_3rd_upwind(
         const arr_2d_t &psi, 
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G, 
@@ -68,7 +68,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_2d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_2d_t &psi, 
         const arrvec_t<arr_2d_t> &GC,
         const ix_t &i, 
@@ -77,12 +77,12 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          ndxx_GC0<opts BOOST_PP_COMMA() dim>(psi, GC[dim], i, j)
+          ndxx_GC0<opts, dim>(psi, GC[dim], i, j)
         );
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_2d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_2d_t &psi, 
         const arrvec_t<arr_2d_t> &GC,
         const ix_t &i, 
@@ -91,12 +91,12 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          4 * ndxx_GC0<opts BOOST_PP_COMMA() dim>(psi, GC[dim], i, j)
+          4 * ndxx_GC0<opts, dim>(psi, GC[dim], i, j)
         );
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_2d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_2d_t &psi, 
         const arrvec_t<arr_2d_t> &GC,
         const ix_t &i, 
@@ -108,7 +108,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_2d_t, class ix_t>
-      inline auto div_3rd_spatial(
+      forceinline_macro auto div_3rd_spatial(
         const arr_2d_t &psi, 
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G, 
@@ -119,15 +119,15 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           - 1.0 / 24 *
           (
-              4 * GC[dim](pi<dim>(i+h, j)) * ndxx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j)
-            + 2 * ndx_psi<opts BOOST_PP_COMMA() dim>(psi, i, j) * ndx_GC0<dim>(GC[dim], i, j)
-            + div_3rd_spatial_helper<opts BOOST_PP_COMMA() dim BOOST_PP_COMMA() sptl_intrp>(psi, GC, i, j)
+              4 * GC[dim](pi<dim>(i+h, j)) * ndxx_psi<opts, dim>(psi, i, j)
+            + 2 * ndx_psi<opts, dim>(psi, i, j) * ndx_GC0<dim>(GC[dim], i, j)
+            + div_3rd_spatial_helper<opts, dim, sptl_intrp>(psi, GC, i, j)
           )
         );
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_2d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_2d_t &psi_np1, 
         const arr_2d_t &psi_n, 
         const arrvec_t<arr_2d_t> &GC,
@@ -143,7 +143,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_2d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_2d_t &psi_np1, 
         const arr_2d_t &psi_n, 
         const arrvec_t<arr_2d_t> &GC,
@@ -157,24 +157,24 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           // upwind differencing correction
-          div_3rd_upwind<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+          div_3rd_upwind<opts, dim>(psi_np1, GC, G, i, j)
           // spatial terms
-          + div_3rd_spatial<opts BOOST_PP_COMMA() dim BOOST_PP_COMMA() sptl_intrp>(psi_np1, GC, G, i, j)
+          + div_3rd_spatial<opts, dim, sptl_intrp>(psi_np1, GC, G, i, j)
           // mixed terms
-          + 0.5 * abs(GC[dim](pi<dim>(i+h, j))) * ndx_fdiv<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+          + 0.5 * abs(GC[dim](pi<dim>(i+h, j))) * ndx_fdiv<opts, dim>(psi_np1, GC, G, i, j)
           // temporal terms
           + 1.0 / 24 *
           (
-              - 8 * GC[dim](pi<dim>(i+h, j)) *  nfdiv_fdiv<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
-              + 1 * ndtt_GC0<opts BOOST_PP_COMMA() dim>(psi_np1, ndtt_GC[dim], i, j)
-              + 2 * GC[dim](pi<dim>(i+h, j)) *  nfdiv<opts BOOST_PP_COMMA() dim>(psi_np1, ndt_GC, G, i, j)
-              - 2 * ndt_GC[dim](pi<dim>(i+h, j)) * nfdiv<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+              - 8 * GC[dim](pi<dim>(i+h, j)) *  nfdiv_fdiv<opts, dim>(psi_np1, GC, G, i, j)
+              + 1 * ndtt_GC0<opts, dim>(psi_np1, ndtt_GC[dim], i, j)
+              + 2 * GC[dim](pi<dim>(i+h, j)) *  nfdiv<opts, dim>(psi_np1, ndt_GC, G, i, j)
+              - 2 * ndt_GC[dim](pi<dim>(i+h, j)) * nfdiv<opts, dim>(psi_np1, GC, G, i, j)
           )
         );
       }
       
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_2d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_2d_t &psi_np1, 
         const arr_2d_t &psi_n, 
         const arrvec_t<arr_2d_t> &GC,
@@ -188,18 +188,18 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           // upwind differencing correction
-          div_3rd_upwind<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+          div_3rd_upwind<opts, dim>(psi_np1, GC, G, i, j)
           // spatial terms
-          + div_3rd_spatial<opts BOOST_PP_COMMA() dim BOOST_PP_COMMA() sptl_intrp>(psi_np1, GC, G, i, j)
+          + div_3rd_spatial<opts, dim, sptl_intrp>(psi_np1, GC, G, i, j)
           // mixed terms
-          - 0.5 * abs(GC[dim](pi<dim>(i+h, j))) * ndtx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, psi_n, i, j)
+          - 0.5 * abs(GC[dim](pi<dim>(i+h, j))) * ndtx_psi<opts, dim>(psi_np1, psi_n, i, j)
           // temporal terms
           + 1.0 / 24 *
           (
-              + 8 * GC[dim](pi<dim>(i+h, j)) *  nfdiv_dt<opts BOOST_PP_COMMA() dim>(psi_np1, psi_n, GC, G, i, j)
-              + 1 * ndtt_GC0<opts BOOST_PP_COMMA() dim>(psi_np1, ndtt_GC[dim], i, j)
-              + 2 * GC[dim](pi<dim>(i+h, j)) *  nfdiv<opts BOOST_PP_COMMA() dim>(psi_np1, ndt_GC, G, i, j)
-              + 2 * ndt_GC[dim](pi<dim>(i+h, j)) * ndt_psi<opts BOOST_PP_COMMA() dim>(psi_np1, psi_n, i, j)
+              + 8 * GC[dim](pi<dim>(i+h, j)) *  nfdiv_dt<opts, dim>(psi_np1, psi_n, GC, G, i, j)
+              + 1 * ndtt_GC0<opts, dim>(psi_np1, ndtt_GC[dim], i, j)
+              + 2 * GC[dim](pi<dim>(i+h, j)) *  nfdiv<opts, dim>(psi_np1, ndt_GC, G, i, j)
+              + 2 * ndt_GC[dim](pi<dim>(i+h, j)) * ndt_psi<opts, dim>(psi_np1, psi_n, i, j)
           )
         );
       }
@@ -226,19 +226,19 @@ namespace libmpdataxx
             res(pi<dim>(i, j)) = 
             // second order terms
             abs(GC[dim](pi<dim>(i+h, j))) / 2
-            * (1 - abs(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j))
-            * ndx_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j) 
+            * (1 - abs(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts, dim>(G, i, j))
+            * ndx_psi<opts, dim>(psi_np1, i, j) 
             - 
             GC[dim](pi<dim>(i+h, j)) 
             * GC1_bar_xy<dim>(GC[dim+1], i, j)
-            / (2 * G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j))
-            * ndy_psi<opts BOOST_PP_COMMA() dim>(psi_np1, i, j)
+            / (2 * G_bar_x<opts, dim>(G, i, j))
+            * ndy_psi<opts, dim>(psi_np1, i, j)
             // third order terms
-            + TOT<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+            + TOT<opts, dim>(psi_np1, GC, G, i, j)
             //// fourth order terms
-            + FOT<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j)
+            + FOT<opts, dim>(psi_np1, GC, G, i, j)
             // divergent flow correction
-            + DFL<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j);
+            + DFL<opts, dim>(psi_np1, GC, G, i, j);
           }
         }
       }
@@ -264,11 +264,11 @@ namespace libmpdataxx
         {
           for (int j = jr.first(); j <= jr.last(); ++j)
           {
-            res(pi<dim>(i, j)) = 
-            div_2nd<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j) +
-            div_3rd<opts BOOST_PP_COMMA() dim BOOST_PP_COMMA() sptl_intrp>(psi_np1, psi_n, GC, ndt_GC, ndtt_GC, G, i, j)
+            res(pi<dim>(i + h, j)) = 
+            div_2nd<opts, dim>(psi_np1, GC, G, i, j) +
+            div_3rd<opts, dim, sptl_intrp>(psi_np1, psi_n, GC, ndt_GC, ndtt_GC, G, i, j)
             // fourth order terms
-            + FOT<opts BOOST_PP_COMMA() dim>(psi_np1, GC, G, i, j);
+            + FOT<opts, dim>(psi_np1, GC, G, i, j);
           }
         }
       } 

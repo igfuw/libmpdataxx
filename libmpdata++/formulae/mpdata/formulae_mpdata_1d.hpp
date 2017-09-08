@@ -19,7 +19,7 @@ namespace libmpdataxx
     {
       // first come helpers for divergence form of antidiffusive velocity
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_2nd(
+      forceinline_macro auto div_2nd(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -36,7 +36,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_3rd_upwind(
+      forceinline_macro auto div_3rd_upwind(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -51,7 +51,7 @@ namespace libmpdataxx
       }
 
       template <opts_t opts, class arr_1d_t, class ix_t>
-      inline auto div_3rd_upwind(
+      forceinline_macro auto div_3rd_upwind(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -63,7 +63,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const ix_t &i,
@@ -76,7 +76,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const ix_t &i,
@@ -89,7 +89,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
-      inline auto div_3rd_spatial_helper(
+      forceinline_macro auto div_3rd_spatial_helper(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const ix_t &i,
@@ -100,7 +100,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
-      inline auto div_3rd_spatial(
+      forceinline_macro auto div_3rd_spatial(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arr_1d_t &G, 
@@ -112,13 +112,13 @@ namespace libmpdataxx
           (
               4 * GC[0](i+h) * ndxx_psi<opts>(psi, i)
             + 2 * ndx_psi<opts>(psi, i) * ndx_GC0(GC[0], i)
-            + div_3rd_spatial_helper<opts BOOST_PP_COMMA() sptl_intrp>(psi, GC, i)
+            + div_3rd_spatial_helper<opts, sptl_intrp>(psi, GC, i)
           )
         );
       }
       
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC,
@@ -132,7 +132,7 @@ namespace libmpdataxx
       }
       
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
-      inline auto div_3rd(
+      forceinline_macro auto div_3rd(
         const arr_1d_t &psi, 
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC,
@@ -146,7 +146,7 @@ namespace libmpdataxx
           // upwind differencing correction
           div_3rd_upwind<opts>(psi, GC, G, i)
           // spatial terms
-          + div_3rd_spatial<opts BOOST_PP_COMMA() sptl_intrp>(psi, GC, G, i)
+          + div_3rd_spatial<opts, sptl_intrp>(psi, GC, G, i)
           // mixed terms
           + 0.5 * abs(GC[0](i+h)) * ndx_fdiv<opts>(psi, GC, G, i)
           // temporal terms
@@ -205,9 +205,9 @@ namespace libmpdataxx
 
         for (int i = ir.first(); i <= ir.last(); ++i)
         {
-          res(i) = 
+          res(i + h) = 
           div_2nd<opts>(psi, GC, G, i) +
-          div_3rd<opts BOOST_PP_COMMA() sptl_intrp>(psi, GC, ndt_GC, ndtt_GC, G, i);
+          div_3rd<opts, sptl_intrp>(psi, GC, ndt_GC, ndtt_GC, G, i);
         }
       } 
 

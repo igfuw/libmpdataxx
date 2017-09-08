@@ -27,13 +27,14 @@ namespace libmpdataxx
 	struct info_t { std::string name, unit; };
 	std::map<int, info_t> outvars;
 
-        bool do_record = false;
-	typename parent_t::real_t prev_time, record_time;
+        int do_record_cnt = 0;
+	typename parent_t::real_t record_time;
 	const typename parent_t::advance_arg_t outfreq;
 	const int outwindow;
         const std::string outdir;
 
         arrvec_t<typename parent_t::arr_t> &intrp_vars;
+        std::array<typename parent_t::real_t, parent_t::ct_params_t_::out_intrp_ord> intrp_times;
 
 	virtual void record(const int var) {}
 	virtual void start(const typename parent_t::advance_arg_t nt) {}
@@ -74,19 +75,28 @@ namespace libmpdataxx
          
           if (this->var_dt)
           {
-            prev_time = this->time;
+            static_assert(parent_t::ct_params_t_::out_intrp_ord == 1 ||
+                          parent_t::ct_params_t_::out_intrp_ord == 2 ,
+                          "only 1st and 2nd order temporal interpolation for output implemented");
+
             auto next_time = this->time + this->dt;
 
             int next_idx = std::floor(next_time / outfreq);
             int curr_idx = std::floor(this->time / outfreq);
 
-            do_record = false;
-            if (next_idx > curr_idx) 
+            do_record_cnt = (do_record_cnt > 0 ? do_record_cnt - 1 : 0);
+            if (next_idx > curr_idx || do_record_cnt > 0) 
             {
-              do_record = true;
-              record_time = next_idx * outfreq;
+              if (do_record_cnt == 0)
+              {
+                do_record_cnt = parent_t::ct_params_t_::out_intrp_ord;
+                record_time = next_idx * outfreq;
+              }
+
+              int inc_ix = parent_t::ct_params_t_::out_intrp_ord - do_record_cnt;
+              intrp_times[inc_ix] = this->time;
               for (const auto &v : outvars)
-                intrp_vars[v.first](this->ijk) = this->mem->advectee(v.first)(this->ijk);
+                intrp_vars[v.first + inc_ix * parent_t::n_eqns](this->ijk) = this->mem->advectee(v.first)(this->ijk);
             }
           }
         }
@@ -97,13 +107,40 @@ namespace libmpdataxx
 
 	  this->mem->barrier(); // waiting for all threads befor doing global output
 
-          if (this->var_dt && do_record)
+          if (this->var_dt && do_record_cnt == 1)
           {
               for (const auto &v : outvars)
               {
-                intrp_vars[v.first](this->ijk) *= (this->time - record_time) / (this->time - prev_time);
-                intrp_vars[v.first](this->ijk) += (record_time - prev_time) / (this->time - prev_time) *
-                                                   this->mem->advectee(v.first)(this->ijk);
+                switch (parent_t::ct_params_t_::out_intrp_ord)
+                {
+                  case 1:
+                  {
+                    auto t0 = intrp_times[0];
+                    auto t1 = this->time;
+                    auto t = record_time;
+                    intrp_vars[v.first](this->ijk) *= (t1 - t) / (t1 - t0);
+                    intrp_vars[v.first](this->ijk) += (t - t0) / (t1 - t0) *
+                                                       this->mem->advectee(v.first)(this->ijk);
+                    break;
+                  }
+
+                  case 2:
+                  {
+                    auto t0 = intrp_times[0];
+                    auto t1 = intrp_times[1];
+                    auto t2 = this->time;
+                    auto t = record_time;
+                    const auto & y0 = intrp_vars[v.first](this->ijk);
+                    const auto & y1 = intrp_vars[v.first + parent_t::n_eqns](this->ijk);
+                    const auto & y2 = this->mem->advectee(v.first)(this->ijk);
+                    
+                    intrp_vars[v.first](this->ijk) = y0 +
+                                                     (y1 - y0) / (t1 - t0) * (t - t0) +
+                                                     ( (y2 - y1) / ((t2 - t1) * (t2 - t0)) 
+                                                     - (y1 - y0) / ((t1 - t0) * (t2 - t0)) ) * (t - t0) * (t - t1);
+                    break;
+                  }
+                }
               }
               this->mem->barrier();
           }
@@ -112,7 +149,7 @@ namespace libmpdataxx
 	  {
             //TODO: output of solver statistics every timesteps could probably go here
 
-            if (this->var_dt && do_record)
+            if (this->var_dt && do_record_cnt == 1)
             {
               record_all();
             }
@@ -171,7 +208,7 @@ namespace libmpdataxx
         {
           parent_t::alloc(mem, n_iters);
           // TODO: only allocate for outvars !
-          parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_eqns);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::ct_params_t_::out_intrp_ord * parent_t::n_eqns);
         }
       };
     } // namespace detail

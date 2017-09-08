@@ -1,10 +1,3 @@
-/** 
- * @file
- * @copyright University of Warsaw
- * @section LICENSE
- * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- */
-
 #pragma once
 #include <libmpdata++/solvers/mpdata.hpp>
 
@@ -12,7 +5,7 @@ using T = double;
 constexpr T pi = boost::math::constants::pi<T>();
 
 template <class ct_params_t, class ct_test_params_t>
-class gmd_2012 : public libmpdataxx::solvers::mpdata<ct_params_t>
+class reversing_deform : public libmpdataxx::solvers::mpdata<ct_params_t>
 {
   using parent_t = libmpdataxx::solvers::mpdata<ct_params_t>;
   using parent_t::parent_t;
@@ -188,7 +181,7 @@ class gmd_2012 : public libmpdataxx::solvers::mpdata<ct_params_t>
   public:
 
   // ctor
-  gmd_2012( 
+  reversing_deform( 
     typename parent_t::ctor_args_t args, 
     const typename parent_t::rt_params_t &p
   ) :

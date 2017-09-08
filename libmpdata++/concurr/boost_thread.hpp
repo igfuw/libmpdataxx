@@ -10,6 +10,7 @@
 
 #include <boost/thread.hpp>
 
+#include <limits>
 #include <cstdlib> // std::getenv()
 
 namespace libmpdataxx
@@ -35,18 +36,24 @@ namespace libmpdataxx
 
         public:
 
-	static int size() 
+	static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max()) 
 	{
 	  const char *env_var("OMP_NUM_THREADS");
-	  return (std::getenv(env_var) != NULL)
-	    ? std::atoi(std::getenv(env_var)) // TODO: check if conversion OK?
-	    : boost::thread::hardware_concurrency();
+
+          static int nthreads = std::min((std::getenv(env_var) != NULL) ?
+                                           std::atoi(std::getenv(env_var)) // TODO: check if conversion OK?
+	                                 : boost::thread::hardware_concurrency()
+                                         ,
+                                         max_threads);
+
+	  return nthreads;
 	}
+
 
         // ctor
         mem_t(const std::array<int, solver_t::n_dims> &grid_size) :
-          b(size()),
-          parent_t::mem_t(grid_size, size()) 
+          b(size(grid_size[0])),
+          parent_t::mem_t(grid_size, size(grid_size[0])) 
         {}; 
 
 	void barrier()
@@ -74,7 +81,7 @@ namespace libmpdataxx
 
       // ctor
       boost_thread(const typename solver_t::rt_params_t &p) : 
-        parent_t(p, new mem_t(p.grid_size), mem_t::size())
+        parent_t(p, new mem_t(p.grid_size), mem_t::size(p.grid_size[0]))
       {}
 
     };

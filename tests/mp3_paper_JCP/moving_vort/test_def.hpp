@@ -1,10 +1,3 @@
-/* 
- * @file
- * @copyright University of Warsaw
- * @section LICENSE
- * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
- */
-
 #pragma once
 
 #include <cmath>
@@ -12,10 +5,7 @@
 #include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/hdf5_xdmf.hpp>
-
-#include "moving.hpp"
-#include "../common/transforms.hpp"
-#include "../common/convergence.hpp"
+#include "moving_vort.hpp"
 
 using namespace libmpdataxx;
 
@@ -34,7 +24,7 @@ struct ct_test_params_t
 };
 
 template <bool var_dt_arg, int opts_arg, int opts_iters>
-stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
+void test(const std::string &base_name, const int ny, const T max_cfl)
 {
   auto dir_name = base_name + "_" + std::to_string(ny);
   std::cout << "Calculating: " << dir_name << std::endl;
@@ -46,6 +36,7 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
     enum { n_dims = 2 };
     enum { n_eqns = 1 };
     enum { opts = opts_arg };
+    enum { sptl_intrp = solvers::aver2 };
   };
   
   const int nx = 2 * ny + 1;
@@ -56,7 +47,7 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
 
   using slv_out_t = 
       output::hdf5_xdmf<
-        moving<ct_params_t, ct_test_params_t>
+        moving_vort<ct_params_t, ct_test_params_t>
     >;
   typename slv_out_t::rt_params_t p;
 
@@ -67,9 +58,9 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
   p.dj = dy;
   p.max_courant = max_cfl;
 
-  p.outfreq = var_dt_arg ? 6 : nt / 2; 
+  p.outfreq = var_dt_arg ? 12.0 : nt;
   p.outvars[0].name = "psi";
-  p.outdir = dir_name;
+  p.outdir = "out_" + dir_name;
   
   concurr::threads<
     slv_out_t, 
@@ -110,42 +101,4 @@ stat_t<> test(const std::string &base_name, const int ny, const T max_cfl)
 
   // integration
   run.advance(var_dt_arg ? time : nt);
-
-  // analytical solution
-  decltype(run.advectee()) solution(run.advectee().extent());
-
-  xpf.x0 = pi;
-  xpf.y0 = pi / 2 - tp::a;
-  ypf.x0 = pi;
-  ypf.y0 = pi / 2 - tp::a;
-
-  ixpf.x0 = pi;
-  ixpf.y0 = pi / 2 - tp::a;
-  iypf.x0 = pi;
-  iypf.y0 = pi / 2 - tp::a;
-
-  T x = xpf(tp::x0, tp::y0);
-  T y = ypf(tp::x0, tp::y0);
-
-  x += tp::u0 * run.time();
-
-  T xc = ixpf(x, y);
-  T yc = iypf(x, y);
-  
-  xpf.x0 = xc;
-  xpf.y0 = yc;
-  ypf.x0 = xc;
-  ypf.y0 = yc;
-  r = 3 * cos(ypf(X, Y));
-  omg = where(r != 0, tp::v0 * 3 * sqrt(2.) / (2 * r) * tanh(r) / pow2(cosh(r)), 0);
-  solution = 1 - tanh(r / 5 * sin(xpf(X, Y) - omg * run.time()));
-
-  // calculation of stats
-  stat_t<> ret;
-  ret.min = min(run.advectee());
-  ret.max = max(run.advectee());
-  ret.L1 = sum(run.g_factor() * abs(run.advectee() - solution)) / sum(run.g_factor() * abs(solution));
-  ret.L2 = sqrt(sum(run.g_factor() * pow2(run.advectee() - solution)) / sum(run.g_factor() * pow2(solution)));
-  ret.Li = max(abs(run.advectee() - solution)) / max(abs(solution));
-  return ret;
 }
