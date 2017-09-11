@@ -19,7 +19,7 @@ namespace libmpdataxx
       using idxperm::pi;
 
       // 1D version
-      template <int ord, class arg_t, typename real_t>
+      template <int ord = 2, class arg_t, typename real_t>
       inline auto grad(
 	const arg_t &x,
 	const rng_t &i,
@@ -49,7 +49,7 @@ namespace libmpdataxx
       )
 
       // 2D version
-      template <int d, int ord, class arg_t, typename real_t>
+      template <int d, int ord = 2, class arg_t, typename real_t>
       inline auto grad(
 	const arg_t &x,
 	const rng_t &i,
@@ -81,7 +81,7 @@ namespace libmpdataxx
       )
       
       // 3D version
-      template <int d, int ord, class arg_t, typename real_t>
+      template <int d, int ord = 2, class arg_t, typename real_t>
       inline auto grad(
 	const arg_t &x,
 	const rng_t &i,
