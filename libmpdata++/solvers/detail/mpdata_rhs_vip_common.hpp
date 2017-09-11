@@ -44,7 +44,7 @@ namespace libmpdataxx
 
 	protected:
 	
-        using parent_t = mpdata_rhs<ct_params_t>;
+        using parent_t = mpdata_rhs<ct_params_vip_default_t<ct_params_t>>;
 
 	// member fields
         std::array<int, parent_t::n_dims> vip_ixs;
