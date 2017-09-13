@@ -1,0 +1,1 @@
+libmpdataxx_add_test(bconds_div)
