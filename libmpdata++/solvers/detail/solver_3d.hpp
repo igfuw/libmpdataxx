@@ -29,7 +29,9 @@ namespace libmpdataxx
 	protected:
 
 	const rng_t i, j, k; // TODO: we have ijk in solver_common - could it be removed?
-        typename parent_t::arr_t &courant_field; // TODO:/: should be in solver common but cannot be allocated there ?
+
+        // generic field used for various statistics (currently Courant number and divergence)
+        typename parent_t::arr_t &stat_field; // TODO:/: should be in solver common but cannot be allocated there ?
 
 	virtual void xchng_sclr(typename parent_t::arr_t &arr,
                        const rng_t &range_i,
@@ -120,20 +122,8 @@ namespace libmpdataxx
           // TODO: same in 1D
           if (!opts::isset(ct_params_t::opts, opts::dfl))
           {
-            typename ct_params_t::real_t max_abs_div = max(abs(
-              (
-                ( 
-                  this->mem->GC[0](i-h, j, k) - 
-                  this->mem->GC[0](i+h, j, k)
-                ) + (
-                  this->mem->GC[1](i, j-h, k) - 
-                  this->mem->GC[1](i, j+h, k)
-                ) + (
-                  this->mem->GC[2](i, j, k-h) - 
-                  this->mem->GC[2](i, j, k+h)
-                )
-              ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k)
-            ));
+            typename ct_params_t::real_t max_abs_div = max_abs_vctr_div(this->mem->GC);
+
 	    if (max_abs_div > this->max_abs_div_eps) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
@@ -141,12 +131,23 @@ namespace libmpdataxx
 
         typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
-          courant_field(this->ijk) =  0.5 * (
-                                               abs(arrvec[0](i+h, j, k) + arrvec[0](i-h, j, k))
-                                             + abs(arrvec[1](i, j+h, k) + arrvec[1](i, j-h, k))
-                                             + abs(arrvec[2](i, j, k+h) + arrvec[2](i, j, k-h))
-                                             ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k);
-          return this->mem->max(this->rank, courant_field(this->ijk));
+          stat_field(this->ijk) =  0.5 * (
+                                            abs(arrvec[0](i+h, j, k) + arrvec[0](i-h, j, k))
+                                          + abs(arrvec[1](i, j+h, k) + arrvec[1](i, j-h, k))
+                                          + abs(arrvec[2](i, j, k+h) + arrvec[2](i, j, k-h))
+                                         ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k);
+          return this->mem->max(this->rank, stat_field(this->ijk));
+        }
+        
+        typename parent_t::real_t max_abs_vctr_div(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        {
+          stat_field(this->ijk) =  abs(
+                                         (arrvec[0](i+h, j, k) - arrvec[0](i-h, j, k))
+                                       + (arrvec[1](i, j+h, k) - arrvec[1](i, j-h, k))
+                                       + (arrvec[2](i, j, k+h) - arrvec[2](i, j, k-h))
+                                      ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k);
+
+          return this->mem->max(this->rank, stat_field(this->ijk));
         }
 
         void scale_gc(const typename parent_t::real_t time,
@@ -197,7 +198,7 @@ namespace libmpdataxx
 	  i(args.i), 
           j(args.j), 
           k(args.k),
-          courant_field(args.mem->tmp[__FILE__][0][0])
+          stat_field(args.mem->tmp[__FILE__][0][0])
 	{
           this->di = p.di;
           this->dj = p.dj;

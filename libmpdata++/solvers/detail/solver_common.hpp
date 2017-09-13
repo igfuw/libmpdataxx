@@ -90,6 +90,7 @@ namespace libmpdataxx
         }
 
 	virtual real_t courant_number(const arrvec_t<arr_t>&) = 0;
+	virtual real_t max_abs_vctr_div(const arrvec_t<arr_t>&) = 0;
        
         // return false if advector does not change in time
         virtual bool calc_gc() {return false;}
@@ -246,7 +247,7 @@ namespace libmpdataxx
                 while (cfl > max_courant);
               }
             }
-
+            
             hook_ante_step();
 
 	    for (int e = 0; e < n_eqns; ++e) scale(e, ct_params_t::hint_scale(e));
