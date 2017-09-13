@@ -42,6 +42,11 @@ namespace libmpdataxx
         // equivalent to one-sided derivatives at the boundary
         a(pi<d>(this->left_halo_sclr.last(), j)) = 2 * a(pi<d>(this->left_edge_sclr,     j))
                                                      - a(pi<d>(this->left_edge_sclr + 1, j));
+        if (halo > 1)
+        {
+          a(pi<d>(this->left_halo_sclr.last() - 1, j)) =   3 * a(pi<d>(this->left_edge_sclr,     j))
+                                                         - 2 * a(pi<d>(this->left_edge_sclr + 1, j));
+        }
       }
 
       void save_edge_vel(const arr_t &, const rng_t &) {}
@@ -100,6 +105,12 @@ namespace libmpdataxx
         // equivalent to one-sided derivatives at the boundary
         a(pi<d>(this->rght_halo_sclr.first(), j)) = 2 * a(pi<d>(this->rght_edge_sclr,     j))
                                                       - a(pi<d>(this->rght_edge_sclr - 1, j));
+
+        if (halo > 1)
+        {
+          a(pi<d>(this->rght_halo_sclr.first() + 1, j)) =   3 * a(pi<d>(this->rght_edge_sclr,     j))
+                                                          - 2 * a(pi<d>(this->rght_edge_sclr - 1, j));
+        }
       }
       
       void save_edge_vel(const arr_t &, const rng_t &) {}

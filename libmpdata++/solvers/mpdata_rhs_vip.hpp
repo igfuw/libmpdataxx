@@ -134,21 +134,23 @@ namespace libmpdataxx
       {
         using namespace libmpdataxx::arakawa_c;
 
-	intrp<0>(this->stash[0], im, this->j^this->halo, this->di);
-	intrp<1>(this->stash[1], jm, this->i^this->halo, this->dj);
-        this->xchng_vctr_alng(this->mem->GC);
         auto ex = this->halo - 1;
-        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+	intrp<0>(this->stash[0], im^ex, this->j^ex, this->di);
+	intrp<1>(this->stash[1], jm^ex, this->i^ex, this->dj);
+        //this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
       }
 
       void extrapolate_in_time() final
       {
         using namespace libmpdataxx::arakawa_c; 
 
-	this->extrp(0, ix::vip_i);     
-	this->xchng_sclr(this->stash[0], this->i^this->halo, this->j^this->halo);      // filling halos 
+	this->extrp(0, ix::vip_i);
+        // using xchng_pres because bcs have to be consistent with those used in
+        // pressure solver to obtain non-divergent advector field
+        auto ex = this->halo - 1;
+	this->xchng_pres(this->stash[0], this->ijk, ex);
 	this->extrp(1, ix::vip_j);
-	this->xchng_sclr(this->stash[1], this->i^this->halo, this->j^this->halo);      // filling halos 
+	this->xchng_pres(this->stash[1], this->ijk, ex);
       }
 
       public:
@@ -247,33 +249,27 @@ namespace libmpdataxx
       {
         using namespace libmpdataxx::arakawa_c;
 
-	intrp<0>(this->stash[0], im, this->j^this->halo, this->k^this->halo, this->di);
-	intrp<1>(this->stash[1], jm, this->k^this->halo, this->i^this->halo, this->dj);
-	intrp<2>(this->stash[2], km, this->i^this->halo, this->j^this->halo, this->dk);
-        this->xchng_vctr_alng(this->mem->GC);
         auto ex = this->halo - 1;
-        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
+	intrp<0>(this->stash[0], im^ex, this->j^ex, this->k^ex, this->di);
+	intrp<1>(this->stash[1], jm^ex, this->k^ex, this->i^ex, this->dj);
+	intrp<2>(this->stash[2], km^ex, this->i^ex, this->j^ex, this->dk);
+        //this->xchng_vctr_alng(this->mem->GC);
+        //this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
       }
 
       void extrapolate_in_time() final
       {
         using namespace libmpdataxx::arakawa_c; 
 
+        // using xchng_pres because bcs have to be consistent with those used in
+        // pressure solver to obtain non-divergent advector field
+        auto ex = this->halo - 1;
 	this->extrp(0, ix::vip_i);     
-	this->xchng_sclr(this->stash[0],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_pres(this->stash[0], this->ijk, ex);
 	this->extrp(1, ix::vip_j);
-	this->xchng_sclr(this->stash[1],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_pres(this->stash[1], this->ijk, ex);
 	this->extrp(2, ix::vip_k);
-	this->xchng_sclr(this->stash[2],
-                         this->i^this->halo,
-                         this->j^this->halo,
-                         this->k^this->halo);      // filling halos 
+	this->xchng_pres(this->stash[2], this->ijk, ex);
       }
 
       public:
