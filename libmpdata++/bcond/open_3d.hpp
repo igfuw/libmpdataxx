@@ -93,7 +93,7 @@ namespace libmpdataxx
 	assert(std::isfinite(sum(av[d+2](pi<d>(i, j, k+h)))));
 
         // zero-divergence condition
-        for (int ii = this->left_halo_vctr.first(); ii <= this->left_halo_vctr.last(); ++ii)
+        for (int ii = this->left_halo_vctr.first(); ii <= this->left_halo_vctr.last() - (ad ? 1 : 0); ++ii)
         {
           av[d](pi<d>(ii, j, k)) = 
             av[d](pi<d>(i+h, j, k)) 
@@ -197,7 +197,7 @@ namespace libmpdataxx
 	assert(std::isfinite(sum(av[d+2](pi<d>(i, j, k-h)))));
 	assert(std::isfinite(sum(av[d+2](pi<d>(i, j, k+h)))));
 
-        for (int ii = this->rght_halo_vctr.first(); ii <= this->rght_halo_vctr.last(); ++ii)
+        for (int ii = this->rght_halo_vctr.first() + (ad ? 1 : 0); ii <= this->rght_halo_vctr.last(); ++ii)
         {
           av[d](pi<d>(ii, j, k)) = 
             av[d](pi<d>(i-h, j, k)) 
