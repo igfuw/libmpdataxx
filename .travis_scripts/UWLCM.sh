@@ -34,7 +34,8 @@ cd libcloudphxx
 mkdir build 
 cd build
 if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-cmake -DCMAKE_BUILD_TYPE=Release ../ 
+# RelWithDebInfo = Release with asserts
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../ 
 make 
 sudo make install
 cd ../..
