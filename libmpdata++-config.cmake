@@ -106,12 +106,20 @@ set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
 
 
 ############################################################################################
-# Boost libraries
+# Boost libraries v>=1.55.0, because boost/predef was added then
 set(Boost_DETAILED_FAILURE_MSG ON)
-find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem)
+find_package(Boost 1.55.0 COMPONENTS thread date_time system iostreams timer filesystem)
 if(Boost_FOUND)
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
+  if(
+    (${Boost_MINOR_VERSION} equal 55) and
+    (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang") 
+  )
+    # add a definition -DBOOST_HAS_INT128=1 to clang calls on linux to avoid errors with boost.atomic (https://svn.boost.org/trac/boost/ticket/9610)
+    set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -DBOOST_HAS_INT128=1")
+    set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -DBOOST_HAS_INT128=1")
+  endif()
 else()
   #TODO: check separately for optional and mandatory components
   message(FATAL_ERROR "Boost (or some of its components) not found.
