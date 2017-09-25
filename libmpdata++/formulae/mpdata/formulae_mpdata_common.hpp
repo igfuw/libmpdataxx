@@ -36,15 +36,17 @@ namespace libmpdataxx
       using std::abs;
 
       const int n_tlev = 2;
-
-      constexpr const int halo(const opts_t &opts) 
+  
+      template <class ct_params_t>
+      constexpr int halo()
       {
         return (
-          opts::isset(opts, opts::tot)        || // see psi 2-nd derivatives in eq. (36) in PKS & LGM 1998
-          opts::isset(opts, opts::dfl)        || // see +3/2 in eq. (30) in PKS & LGM 1998
-          opts::isset(opts, opts::div_2nd)    || 
-          opts::isset(opts, opts::div_3rd)    ||
-          opts::isset(opts, opts::div_3rd_dt)
+          opts::isset(ct_params_t::opts, opts::tot)        || // see psi 2-nd derivatives in eq. (36) in PKS & LGM 1998
+          opts::isset(ct_params_t::opts, opts::dfl)        || // see +3/2 in eq. (30) in PKS & LGM 1998
+          opts::isset(ct_params_t::opts, opts::div_2nd)    || 
+          opts::isset(ct_params_t::opts, opts::div_3rd)    ||
+          opts::isset(ct_params_t::opts, opts::div_3rd_dt) ||
+          ct_params_t::prs_order == 4
         ) ? 2 : 1; 
       }
 
