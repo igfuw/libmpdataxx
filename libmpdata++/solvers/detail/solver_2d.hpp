@@ -50,11 +50,19 @@ namespace libmpdataxx
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
 	}
 
-        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, ad);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i, ad);
+          if (!cyclic)
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, ad);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i, ad);
+          }
+          else
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, j, ad);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng_cyclic(arrvec, i, ad);
+          }
           // TODO: open bc nust be last!!!
           this->mem->barrier();
         }
@@ -62,12 +70,21 @@ namespace libmpdataxx
         virtual void xchng_vctr_nrml(
           arrvec_t<typename parent_t::arr_t> &arrvec, 
           const rng_t &range_i, 
-          const rng_t &range_j
+          const rng_t &range_j,
+          const bool cyclic = false
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h);
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h);
+          if (!cyclic)
+          {
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h);
+          }
+          else
+          {
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_i^h);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_j^h);
+          }
           this->mem->barrier();
         }
 

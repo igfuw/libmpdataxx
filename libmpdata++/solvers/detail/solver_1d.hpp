@@ -44,10 +44,17 @@ namespace libmpdataxx
           xchng_sclr(this->mem->psi[e][ this->n[e]]);
 	}
 
-        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, ad); 
+          if (!cyclic)
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, ad); 
+          }
+          else
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, ad);
+          }
           this->mem->barrier();
         }
 

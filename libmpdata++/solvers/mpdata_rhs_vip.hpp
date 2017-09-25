@@ -137,7 +137,8 @@ namespace libmpdataxx
         auto ex = this->halo - 1;
 	intrp<0>(this->stash[0], im^ex, this->j^ex, this->di);
 	intrp<1>(this->stash[1], jm^ex, this->i^ex, this->dj);
-        //this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+        this->xchng_vctr_alng(this->mem->GC, /*ad*/ false, /*cyclic*/ true);
+        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, /*cyclic*/ true);
       }
 
       void extrapolate_in_time() final
@@ -253,8 +254,8 @@ namespace libmpdataxx
 	intrp<0>(this->stash[0], im^ex, this->j^ex, this->k^ex, this->di);
 	intrp<1>(this->stash[1], jm^ex, this->k^ex, this->i^ex, this->dj);
 	intrp<2>(this->stash[2], km^ex, this->i^ex, this->j^ex, this->dk);
-        //this->xchng_vctr_alng(this->mem->GC);
-        //this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
+        this->xchng_vctr_alng(this->mem->GC, /*ad*/ false, /*cyclic*/ true);
+        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex, /*cyclic*/ true);
       }
 
       void extrapolate_in_time() final
