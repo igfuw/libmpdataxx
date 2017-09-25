@@ -64,8 +64,6 @@ before_install:
 install:
     # compilers
     
-    # add a definition -DBOOST_HAS_INT128=1 to clang calls on linux to avoid errors with boost.atomic (https://svn.boost.org/trac/boost/ticket/9610)
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export CXXFLAGS="-DBOOST_HAS_INT128=1 ${CXXFLAGS}"; fi
     # silence the gazillion warnings coming from blitz headers when using the osx clang
     - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then export CXXFLAGS="-Wno-parentheses ${CXXFLAGS}"; fi
 
