@@ -66,6 +66,14 @@ namespace libmpdataxx
         parent_t::record_all();
       }
 
+      protected:
+
+      void record_aux(const std::string &name, typename solver_t::real_t *data)
+      {
+        xdmfw.add_attribute(name, this->hdf_name(), this->shape); 
+        parent_t::record_aux(name, data);
+      }
+
       public:
 
       // ctor
@@ -73,7 +81,7 @@ namespace libmpdataxx
 	typename parent_t::ctor_args_t args,
 	const typename parent_t::rt_params_t &p
       ) : parent_t(args, p)
-      { }
+      {}
     };
   } // namespace output
 } // namespace libmpdataxx
