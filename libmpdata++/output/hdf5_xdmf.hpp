@@ -71,6 +71,9 @@ namespace libmpdataxx
       void record_aux(const std::string &name, typename solver_t::real_t *data)
       {
         xdmfw.add_attribute(name, this->hdf_name(), this->shape); 
+        // write xdmf markup
+        std::string xmf_name = this->base_name() + ".xmf";
+        xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->record_time);
         parent_t::record_aux(name, data);
       }
 
