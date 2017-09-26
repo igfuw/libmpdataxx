@@ -60,7 +60,7 @@ bool test()
 int main()
 {
   // TODO: find another sample data that does not require it
-  fesetround(FE_TOWARDZERO);
+  fesetround(FE_DOWNWARD);
   
   // expecting fail
   if (test<false>()) 
