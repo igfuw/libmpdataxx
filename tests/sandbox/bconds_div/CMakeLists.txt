@@ -1,1 +1,2 @@
-libmpdataxx_add_test(bconds_div)
+libmpdataxx_add_test(bconds_div_2d)
+libmpdataxx_add_test(bconds_div_3d)
