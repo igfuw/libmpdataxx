@@ -22,6 +22,11 @@ set(libmpdataxx_LIBRARIES "")
 set(libmpdataxx_CXX_FLAGS_DEBUG "")
 set(libmpdataxx_CXX_FLAGS_RELEASE "")
 
+############################################################################################
+# libmpdata++ headers 
+# also work for non-default install location (i.e. for make DESTDIR=<dir> install)
+set(libmpdataxx_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../include/")
+
 
 ############################################################################################
 # debug mode compiler flags
