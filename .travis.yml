@@ -108,7 +108,7 @@ script:
     - cmake ..
     - cd ../..
 
-    # compiling and running all unit tests in Debug mode
+    # compiling and running all unit tests in Debug & Release modes
     - if [[ $TEST_SUITE == 'unit' ]]; then . ./.travis_scripts/unit.sh; fi
 
     # compiling and running selected paper tests in Debug mode
