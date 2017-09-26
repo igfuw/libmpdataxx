@@ -35,6 +35,11 @@ namespace libmpdataxx
       {
 	av[0](this->left_halo_vctr) = av[0](this->rght_intr_vctr);
       }
+      
+      void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const bool ad = false)
+      {
+        fill_halos_vctr_alng(av, ad);
+      }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int dim>
@@ -62,6 +67,10 @@ namespace libmpdataxx
 	av[0](this->rght_halo_vctr) = av[0](this->left_intr_vctr);
       }
       
+      void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const bool ad = false)
+      {
+        fill_halos_vctr_alng(av, ad);
+      }
     };
   } // namespace bcond
 } // namespace libmpdataxx

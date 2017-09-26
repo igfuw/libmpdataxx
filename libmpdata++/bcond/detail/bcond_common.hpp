@@ -46,6 +46,9 @@ namespace libmpdataxx
 	{ 
 	  assert(false && "bcond::fill_halos_vctr() called!"); 
 	};
+	
+        virtual void fill_halos_vctr_alng_cyclic(arrvec_t<blitz::Array<real_t, 1>> &, const bool ad = false)
+	{};
 
 	// 2D
 	virtual void fill_halos_sclr(blitz::Array<real_t, 2> &, const rng_t &, const bool deriv = false) 
@@ -77,6 +80,12 @@ namespace libmpdataxx
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
 	};
+	
+        virtual void fill_halos_vctr_alng_cyclic(arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &, const bool ad = false) 
+	{};
+
+	virtual void fill_halos_vctr_nrml_cyclic(blitz::Array<real_t, 2> &, const rng_t &) 
+	{};
 
 	// 3D
 	virtual void fill_halos_sclr(blitz::Array<real_t, 3> &, const rng_t &, const rng_t &, const bool deriv = false) 
@@ -108,6 +117,12 @@ namespace libmpdataxx
 	{
 	  assert(false && "bcond::fill_halos_vctr_nrml() called!");
 	};
+	
+        virtual void fill_halos_vctr_alng_cyclic(arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &, const bool ad = false) 
+	{};
+
+	virtual void fill_halos_vctr_nrml_cyclic(blitz::Array<real_t, 3> &, const rng_t &, const rng_t &) 
+	{};
 
 	protected:
 	  // sclr

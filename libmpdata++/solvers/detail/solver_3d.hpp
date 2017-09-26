@@ -51,12 +51,21 @@ namespace libmpdataxx
 	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
 	}
 
-        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k, ad); 
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i, ad); 
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i, j, ad);
+          if (!cyclic)
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k, ad); 
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i, ad); 
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i, j, ad);
+          }
+          else
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, j, k, ad); 
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng_cyclic(arrvec, k, i, ad); 
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng_cyclic(arrvec, i, j, ad);
+          }
           this->mem->barrier();
         }
 
@@ -64,30 +73,46 @@ namespace libmpdataxx
           arrvec_t<typename parent_t::arr_t> &arrvec,
           const rng_t &range_i,
           const rng_t &range_j,
-          const rng_t &range_k
+          const rng_t &range_k,
+          const bool cyclic = false
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k^1, range_i^h);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h, range_j^1);
+          if (!cyclic)
+          {
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_k^1, range_i^h);
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h, range_j^1);
 
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h, range_k^1);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_i^1, range_j^h);
-   
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j^1, range_k^h);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k^h, range_i^1);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h, range_k^1);
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_i^1, range_j^h);
+     
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_j^1, range_k^h);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_k^h, range_i^1);
+          }
+          else
+          {
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_k^1, range_i^h);
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_i^h, range_j^1);
+
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_j^h, range_k^1);
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_i^1, range_j^h);
+     
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_j^1, range_k^h);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_k^h, range_i^1);
+          }
           this->mem->barrier();
         }
 
         virtual void xchng_pres(
 	  typename parent_t::arr_t &arr,
-	  const idx_t<3> &range_ijk
+	  const idx_t<3> &range_ijk,
+          const int ex = 0
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1], range_ijk[2]);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2], range_ijk[0]);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk[0], range_ijk[1]);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1]^ex, range_ijk[2]^ex);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2]^ex, range_ijk[0]^ex);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk[0]^ex, range_ijk[1]^ex);
           this->mem->barrier();
         }
 
