@@ -54,12 +54,12 @@ namespace libmpdataxx
       
       void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
-        fill_halos_vctr_alng_cyclic(av, j, k, ad);
+        fill_halos_vctr_alng(av, j, k, ad);
       }
 
       void fill_halos_vctr_nrml_cyclic(arr_t &a, const rng_t &j, const rng_t &k)
       {
-        fill_halos_vctr_nrml_cyclic(a, j, k);
+        fill_halos_vctr_nrml(a, j, k);
       }
     };
 
@@ -106,12 +106,12 @@ namespace libmpdataxx
       
       void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
-        fill_halos_vctr_alng_cyclic(av, j, k, ad);
+        fill_halos_vctr_alng(av, j, k, ad);
       }
 
       void fill_halos_vctr_nrml_cyclic(arr_t &a, const rng_t &j, const rng_t &k)
       {
-        fill_halos_vctr_nrml_cyclic(a, j, k);
+        fill_halos_vctr_nrml(a, j, k);
       }
     };
   } // namespace bcond
