@@ -116,21 +116,49 @@ namespace libmpdataxx
       {   
 	using idxperm::pi;
 	using namespace arakawa_c;
-  
-	if (!this->mem->G)
-	{
-	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
-	    psi(pi<d>(i,    j)) + 
-	    psi(pi<d>(i + 1,j))
-	  );
-	} 
-	else
-	{ 
-	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
-	    (*this->mem->G)(pi<d>(i,    j)) * psi(pi<d>(i,    j)) + 
-	    (*this->mem->G)(pi<d>(i + 1,j)) * psi(pi<d>(i + 1,j))
-	  );
-	}
+ 
+        if (parent_t::sptl_intrp == aver2)
+        {
+          if (!this->mem->G)
+          {
+            this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
+              psi(pi<d>(i,    j)) + 
+              psi(pi<d>(i + 1,j))
+            );
+          } 
+          else
+          { 
+            this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
+              (*this->mem->G)(pi<d>(i,    j)) * psi(pi<d>(i,    j)) + 
+              (*this->mem->G)(pi<d>(i + 1,j)) * psi(pi<d>(i + 1,j))
+            );
+          }
+        }
+        else if (parent_t::sptl_intrp == aver4)
+        {
+          if (!this->mem->G)
+          {
+            this->mem->GC[d](pi<d>(i+h,j)) = this->dt /(12 * di) * (
+              7 *
+              (
+                psi(pi<d>(i,     j)) + 
+                psi(pi<d>(i + 1, j))
+              )
+              -
+              (
+              psi(pi<d>(i - 1, j)) + 
+              psi(pi<d>(i + 2, j))
+              )
+            );
+          } 
+          else
+          { 
+            this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
+              (*this->mem->G)(pi<d>(i,    j)) * psi(pi<d>(i,    j)) + 
+              (*this->mem->G)(pi<d>(i + 1,j)) * psi(pi<d>(i + 1,j))
+            );
+          }
+        }
       }  
 
       void interpolate_in_space() final
@@ -139,9 +167,10 @@ namespace libmpdataxx
 
         const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
         auto ex = this->halo - 1;
-	intrp<0>(this->stash[0 + off], im^ex, this->j^ex, this->di);
-	intrp<1>(this->stash[1 + off], jm^ex, this->i^ex, this->dj);
-        this->xchng_vctr_alng(this->mem->GC, /*ad*/ false, /*cyclic*/ true);
+
+	intrp<0>(this->stash[0 + off], im, this->j^ex, this->di);
+	intrp<1>(this->stash[1 + off], jm, this->i^ex, this->dj);
+        this->xchng_vctr_alng(this->mem->GC, /*ad*/ true, /*cyclic*/ false, ex);
         this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, /*cyclic*/ true);
       }
 
@@ -257,6 +286,7 @@ namespace libmpdataxx
         
         const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
         auto ex = this->halo - 1;
+
 	intrp<0>(this->stash[0 + off], im^ex, this->j^ex, this->k^ex, this->di);
 	intrp<1>(this->stash[1 + off], jm^ex, this->k^ex, this->i^ex, this->dj);
 	intrp<2>(this->stash[2 + off], km^ex, this->i^ex, this->j^ex, this->dk);
