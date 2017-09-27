@@ -34,7 +34,7 @@ namespace libmpdataxx
       template <class ct_params_t> 
       struct ct_params_vip_default_t : ct_params_t
       {
-        enum {splt_intrp = aver2};
+        enum {sptl_intrp = ct_params_t::prs_order == 4 ? aver4 : aver2};
       };
 
       template <class ct_params_t> 
@@ -50,6 +50,8 @@ namespace libmpdataxx
         std::array<int, parent_t::n_dims> vip_ixs;
 	arrvec_t<typename parent_t::arr_t> &stash, &vip_rhs;
         typename parent_t::real_t eps;
+        // to propagate the default override forward
+        static constexpr auto sptl_intrp = ct_params_vip_default_t<ct_params_t>::sptl_intrp;
 
 	virtual void fill_stash() = 0;
 	virtual void fill_stash_helper(const int d, const int e) final
