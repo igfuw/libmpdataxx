@@ -51,20 +51,24 @@ namespace libmpdataxx
 	  this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo, k^this->halo);
 	}
 
-        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec,
+                             const bool ad = false,
+                             const bool cyclic = false,
+                             const int ex = 0
+        ) final
         {
           this->mem->barrier();
           if (!cyclic)
           {
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k, ad); 
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i, ad); 
-            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i, j, ad);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j^ex, k^ex, ad); 
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k^ex, i^ex, ad); 
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i^ex, j^ex, ad);
           }
           else
           {
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, j, k, ad); 
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng_cyclic(arrvec, k, i, ad); 
-            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng_cyclic(arrvec, i, j, ad);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, j^ex, k^ex, ad); 
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng_cyclic(arrvec, k^ex, i^ex, ad); 
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng_cyclic(arrvec, i^ex, j^ex, ad);
           }
           this->mem->barrier();
         }

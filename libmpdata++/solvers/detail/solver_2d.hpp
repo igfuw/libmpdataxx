@@ -50,18 +50,22 @@ namespace libmpdataxx
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
 	}
 
-        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec,
+                             const bool ad = false,
+                             const bool cyclic = false,
+                             const int ex = 0
+        ) final
         {
           this->mem->barrier();
           if (!cyclic)
           {
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, ad);
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i, ad);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j^ex, ad);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i^ex, ad);
           }
           else
           {
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, j, ad);
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng_cyclic(arrvec, i, ad);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, j^ex, ad);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng_cyclic(arrvec, i^ex, ad);
           }
           // TODO: open bc nust be last!!!
           this->mem->barrier();

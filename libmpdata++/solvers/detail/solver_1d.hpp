@@ -44,7 +44,11 @@ namespace libmpdataxx
           xchng_sclr(this->mem->psi[e][ this->n[e]]);
 	}
 
-        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec,
+                             const bool ad = false,
+                             const bool cyclic = false,
+                             const int ex = 0
+        ) final
         {
           this->mem->barrier();
           if (!cyclic)
