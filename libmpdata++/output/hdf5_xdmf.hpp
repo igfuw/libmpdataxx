@@ -33,15 +33,16 @@ namespace libmpdataxx
       static_assert(parent_t::n_dims > 1, "only 2D and 3D output supported");
       
       std::vector<std::string> timesteps;
+      std::vector<std::string> attr_names;
       //xdmf writer
       detail::xdmf_writer<parent_t::n_dims> xdmfw;
+
 
       void start(const typename parent_t::advance_arg_t nt)
       {
         parent_t::start(nt);
 
         // get variable names for xdmf writer setup
-        std::vector<std::string> attr_names;
         for (const auto &v : this->outvars)
         {
           attr_names.push_back(v.second.name);
@@ -66,24 +67,18 @@ namespace libmpdataxx
         parent_t::record_all();
       }
 
-      protected:
-
-      void record_aux(const std::string &name, typename solver_t::real_t *data)
-      {
-        xdmfw.add_attribute(name, this->hdf_name(), this->shape); 
-        // write xdmf markup
-        std::string xmf_name = this->base_name() + ".xmf";
-        xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->record_time);
-        parent_t::record_aux(name, data);
-      }
-
       public:
+
+      struct rt_params_t : parent_t::rt_params_t
+      {
+        std::vector<std::string> outvars_aux;
+      };
 
       // ctor
       hdf5_xdmf(
 	typename parent_t::ctor_args_t args,
-	const typename parent_t::rt_params_t &p
-      ) : parent_t(args, p)
+	const rt_params_t &p
+      ) : parent_t(args, p), attr_names(p.outvars_aux)
       {}
     };
   } // namespace output
