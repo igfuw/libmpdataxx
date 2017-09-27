@@ -40,12 +40,10 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         // equivalent to one-sided derivatives at the boundary
-        a(pi<d>(this->left_halo_sclr.last(), j)) = 2 * a(pi<d>(this->left_edge_sclr,     j))
-                                                     - a(pi<d>(this->left_edge_sclr + 1, j));
-        if (halo > 1)
+        for (int i = this->left_halo_sclr.first(), n = halo; i <= this->left_halo_sclr.last(); ++i, --n)
         {
-          a(pi<d>(this->left_halo_sclr.last() - 1, j)) =   3 * a(pi<d>(this->left_edge_sclr,     j))
-                                                         - 2 * a(pi<d>(this->left_edge_sclr + 1, j));
+          a(pi<d>(i, j)) = 2 * a(pi<d>(this->left_edge_sclr,     j))
+                             - a(pi<d>(this->left_edge_sclr + n, j));
         }
       }
 
@@ -60,10 +58,20 @@ namespace libmpdataxx
       void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const bool ad = false)
       {
 	using namespace idxperm;
-        // zero velocity condition
-        for (int i = this->left_halo_vctr.first(), n = halo; i <= this->left_halo_vctr.last() - (ad ? 1 : 0); ++i, --n)
+        int i = this->left_halo_vctr.last();
+
+        if (!ad)
         {
-	  av[d](pi<d>(i, j)) = -av[d](pi<d>(this->left_edge_sclr + n - h, j));
+          // zero velocity condition
+          av[d](pi<d>(i, j)) = -av[d](pi<d>(this->left_edge_sclr + h, j));
+        }
+        if (halo > 1)
+        {
+          // extrapolation
+          av[d](pi<d>(i - 1, j)) = av[d](pi<d>(this->left_edge_sclr + 1 + h, j)) + 3 * (
+                                    av[d](pi<d>(this->left_edge_sclr - h, j))
+                                  - av[d](pi<d>(this->left_edge_sclr + h, j))
+                                  );
         }
       }
 
@@ -103,13 +111,10 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         // equivalent to one-sided derivatives at the boundary
-        a(pi<d>(this->rght_halo_sclr.first(), j)) = 2 * a(pi<d>(this->rght_edge_sclr,     j))
-                                                      - a(pi<d>(this->rght_edge_sclr - 1, j));
-
-        if (halo > 1)
+        for (int i = this->rght_halo_sclr.first(), n = 1; i <= this->rght_halo_sclr.last(); ++i, ++n)
         {
-          a(pi<d>(this->rght_halo_sclr.first() + 1, j)) =   3 * a(pi<d>(this->rght_edge_sclr,     j))
-                                                          - 2 * a(pi<d>(this->rght_edge_sclr - 1, j));
+          a(pi<d>(i, j)) = 2 * a(pi<d>(this->rght_edge_sclr,     j))
+                             - a(pi<d>(this->rght_edge_sclr - n, j));
         }
       }
       
@@ -124,10 +129,20 @@ namespace libmpdataxx
       void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const bool ad = false)
       {
 	using namespace idxperm;
-        // zero velocity condition
-        for (int i = this->rght_halo_vctr.first() + (ad ? 1 : 0), n = 1; i <= this->rght_halo_vctr.last(); ++i, ++n)
+        
+        int i = this->rght_halo_vctr.first();
+        if (!ad)
         {
-	  av[d](pi<d>(i, j)) = -av[d](pi<d>(this->rght_edge_sclr - n + h, j));
+          // zero velocity condition
+	  av[d](pi<d>(i, j)) = -av[d](pi<d>(this->rght_edge_sclr - h, j));
+        }
+        if (halo > 1)
+        {
+          // extrapolation
+          av[d](pi<d>(i + 1, j)) = av[d](pi<d>(this->rght_edge_sclr - 1 - h, j)) + 3 * (
+                                    av[d](pi<d>(this->rght_edge_sclr + h, j))
+                                  - av[d](pi<d>(this->rght_edge_sclr - h, j))
+                                  );
         }
       }
       
