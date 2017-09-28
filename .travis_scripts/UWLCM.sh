@@ -33,7 +33,6 @@ git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
 cd libcloudphxx
 mkdir build 
 cd build
-if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
 # RelWithDebInfo = Release with asserts
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../ 
 make 

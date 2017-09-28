@@ -3,8 +3,6 @@ set -e
 cd tests/sandbox
 mkdir build
 cd build
-# the one from homebrew
-if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi
 cmake ..
 VERBOSE=1 $make_j
 # running selected sandbox tests in Release mode
