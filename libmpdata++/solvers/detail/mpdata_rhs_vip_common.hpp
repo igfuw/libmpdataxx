@@ -57,16 +57,16 @@ namespace libmpdataxx
 	virtual void fill_stash_helper(const int d, const int e) final
 	{
 	  if (ix::vip_den == -1)
-	    this->stash[d](this->ijk) = this->state(e)(this->ijk);
+	    this->vip_state(-1, d)(this->ijk) = this->state(e)(this->ijk);
 	  else if (eps == 0) // this is the default  
           {
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
-            this->stash[d](this->ijk) = this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk);
+            this->vip_state(-1, d)(this->ijk) = this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk);
           }
 	  else
 	  {  
-	    this->stash[d](this->ijk) = where(
+	    this->vip_state(-1, d)(this->ijk) = where(
 	      // if
 	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
@@ -76,8 +76,39 @@ namespace libmpdataxx
 	    );
 	  }
 
-          assert(std::isfinite(sum(this->stash[d](this->ijk))));
+          assert(std::isfinite(sum(this->vip_state(-1, d)(this->ijk))));
 	}
+
+        typename parent_t::arr_t& vip_state(const int t_lev, const int d)
+        {
+          // t_lev ==  0 -> output for extrapolation/derivatives
+          // t_lev == -1 -> (n-1) state
+          // t_lev == -2 -> (n-2) state, only available with div3_mpdata
+          if (!ct_params_t::var_dt && !parent_t::div3_mpdata)
+          {
+            assert(t_lev == 0 || t_lev == -1);
+            // for dt constant in time we can
+            // use the same stash since we don't need the previous state any more
+            return stash[d];
+          }
+          else if (!parent_t::div3_mpdata)
+          {
+            // for dt variable in time, however, we have to perform multiple
+            // extrapolations per time step and we need to keep the previous state
+            assert(t_lev == 0 || t_lev == -1);
+            return stash[d - t_lev *  ct_params_t::n_dims];
+          }
+          else
+          {
+            // for the fully third-order mpdata we need to keep both the (n-1)
+            // and the (n-2) state and juggle them around to avoid array copying
+            assert(t_lev == 0 || t_lev == -1 || t_lev == -2);
+            return (t_lev == 0 ? stash[d] :
+                      this->timestep % 2 == 0 ? stash[d - t_lev * ct_params_t::n_dims] : 
+                        stash[d + (3 + t_lev) * ct_params_t::n_dims]
+                   );
+          }
+        }
 
 	void extrp(const int d, const int e) // extrapolate velocity field in time to t+1/2
 	{                 
@@ -85,33 +116,26 @@ namespace libmpdataxx
 
           const auto beta = this->prev_dt[0] > 0 ? this->dt / (2 * this->prev_dt[0]) : 0;
 
-          // for dt constant in time we can
-          // write the result to stash since we don't need the previous state any more
-          // for dt variable in time, however, we have to perform multiple
-          // extrapolations per time step and we need to keep the previous state
-          // hence the need for another output variable masqueraded as stash[d + offset]
-          const auto outd = d + (ct_params_t::var_dt ? ct_params_t::n_dims : 0);
-
           if (!ct_params_t::var_dt)
           {
-	    this->stash[outd](this->ijk) *= -beta;
+	    this->vip_state(0, d)(this->ijk) *= -beta;
           }
           else
           {
-	    this->stash[outd](this->ijk) = -beta * this->stash[d](this->ijk);
+	    this->vip_state(0, d)(this->ijk) = -beta * this->vip_state(-1, d)(this->ijk);
           }
 
 	  if (ix::vip_den == -1) 
-	    this->stash[outd](this->ijk) += (1 + beta) * this->state(e)(this->ijk);
+	    this->vip_state(0, d)(this->ijk) += (1 + beta) * this->state(e)(this->ijk);
 	  else if (eps == 0) //this is the default
           {             
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
-	    this->stash[outd](this->ijk) += (1 + beta) * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
+	    this->vip_state(0, d)(this->ijk) += (1 + beta) * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
           }
 	  else
 	  {
-	    this->stash[outd](this->ijk) += where(
+	    this->vip_state(0, d)(this->ijk) += where(
 	      // if
 	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
@@ -121,7 +145,7 @@ namespace libmpdataxx
 	    );  
 	  }
 
-          assert(std::isfinite(sum(this->stash[outd](this->ijk))));
+          assert(std::isfinite(sum(this->vip_state(0, d)(this->ijk))));
 	}   
 
 	arrvec_t<typename parent_t::arr_t>& vips()
@@ -273,7 +297,8 @@ namespace libmpdataxx
           const int &n_iters
 	) {
 	  parent_t::alloc(mem, n_iters);
-	  parent_t::alloc_tmp_sclr(mem, __FILE__, (ct_params_t::var_dt ? 2 : 1) * parent_t::n_dims); // stash
+	  parent_t::alloc_tmp_sclr(mem, __FILE__,
+                                   (parent_t::div3_mpdata ? 3 : ct_params_t::var_dt ? 2 : 1) * parent_t::n_dims); // stash
 	  parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_dims); // vip_rhs
 	}
  
