@@ -36,11 +36,6 @@ namespace libmpdataxx
       // member fields
       const rng_t im;
 
-      void fill_stash() final
-      {
-        this->fill_stash_helper(0, ix::vip_i);
-      }
-
       void interpolate_in_space() final
       {
         using namespace libmpdataxx::arakawa_c;
@@ -96,12 +91,6 @@ namespace libmpdataxx
 
       // member fields
       const rng_t im, jm;
-
-      void fill_stash() final 
-      {
-        this->fill_stash_helper(0, ix::vip_i);
-        this->fill_stash_helper(1, ix::vip_j);
-      }
 
       template<int d, class arr_t> 
       void intrp(
@@ -240,13 +229,6 @@ namespace libmpdataxx
 
       // member fields
       const rng_t im, jm, km;
-
-      void fill_stash() final 
-      {
-        this->fill_stash_helper(0, ix::vip_i);
-        this->fill_stash_helper(1, ix::vip_j);
-        this->fill_stash_helper(2, ix::vip_k);
-      }
 
       template<int d, class arr_t> 
       void intrp(

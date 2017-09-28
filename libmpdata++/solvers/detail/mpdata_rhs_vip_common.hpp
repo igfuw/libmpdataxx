@@ -53,31 +53,35 @@ namespace libmpdataxx
         // to propagate the default override forward
         static constexpr auto sptl_intrp = ct_params_vip_default_t<ct_params_t>::sptl_intrp;
 
-	virtual void fill_stash() = 0;
-	virtual void fill_stash_helper(const int d, const int e) final
+	virtual void fill_stash_helper(const int d) final
 	{
 	  if (ix::vip_den == -1)
-	    this->vip_state(-1, d)(this->ijk) = this->state(e)(this->ijk);
+	    vip_state(-1, d)(this->ijk) = vips()[d](this->ijk);
 	  else if (eps == 0) // this is the default  
           {
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
-            this->vip_state(-1, d)(this->ijk) = this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk);
+            vip_state(-1, d)(this->ijk) = vips()[d](this->ijk) / this->state(ix::vip_den)(this->ijk);
           }
 	  else
 	  {  
-	    this->vip_state(-1, d)(this->ijk) = where(
+	    vip_state(-1, d)(this->ijk) = where(
 	      // if
 	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
-	      this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk),
+	      vips()[d](this->ijk) / this->state(ix::vip_den)(this->ijk),
 	      // else
 	      0
 	    );
 	  }
 
-          assert(std::isfinite(sum(this->vip_state(-1, d)(this->ijk))));
+          assert(std::isfinite(sum(vip_state(-1, d)(this->ijk))));
 	}
+	
+        void fill_stash() 
+        {
+          for (int d = 0; d < ct_params_t::n_dims; ++d) fill_stash_helper(d);
+        }
 
         typename parent_t::arr_t& vip_state(const int t_lev, const int d)
         {
