@@ -167,7 +167,7 @@ namespace libmpdataxx
           const decltype(ijk) &ijk
         ) :
           rank(rank), 
-          prev_dt{0, 0},
+          prev_dt{},
           dt(p.dt),
           di(0),
           dj(0),
