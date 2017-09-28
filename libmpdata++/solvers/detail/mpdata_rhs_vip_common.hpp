@@ -83,7 +83,7 @@ namespace libmpdataxx
 	{                 
 	  using namespace arakawa_c;
 
-          const auto beta = this->dt / (2 * this->prev_dt);
+          const auto beta = this->prev_dt[0] > 0 ? this->dt / (2 * this->prev_dt[0]) : 0;
 
           // for dt constant in time we can
           // write the result to stash since we don't need the previous state any more

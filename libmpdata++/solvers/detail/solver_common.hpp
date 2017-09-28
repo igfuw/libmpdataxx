@@ -50,14 +50,19 @@ namespace libmpdataxx
 
 	protected: 
         // TODO: output common doesnt know about ct_params_t
-        bool var_dt = ct_params_t::var_dt;
+        static constexpr bool var_dt = ct_params_t::var_dt;
+       
+        // for convenience
+        static constexpr bool div3_mpdata = opts::isset(ct_params_t::opts, opts::div_3rd)    ||
+                                            opts::isset(ct_params_t::opts, opts::div_3rd_dt)  ;
 
         std::array<std::array<bcp_t, 2>, n_dims> bcs;
 
         const int rank;
 
         // di, dj, dk declared here for output purposes
-        real_t prev_dt, dt, di, dj, dk, max_abs_div_eps, max_courant;
+        real_t dt, di, dj, dk, max_abs_div_eps, max_courant;
+        std::array<real_t, div3_mpdata ? 2 : 1> prev_dt;
         std::array<real_t, n_dims> dijk;
 
 	const idx_t<n_dims> ijk;
@@ -139,7 +144,7 @@ namespace libmpdataxx
             if (cfl > 0)
             {
               dt *= max_courant / cfl;
-              scale_gc(time, dt, prev_dt);
+              scale_gc(time, dt, prev_dt[0]);
             }
           }
         }
@@ -162,7 +167,7 @@ namespace libmpdataxx
           const decltype(ijk) &ijk
         ) :
           rank(rank), 
-          prev_dt(p.dt),
+          prev_dt{0, 0},
           dt(p.dt),
           di(0),
           dj(0),
@@ -264,7 +269,8 @@ namespace libmpdataxx
 
             timestep++;
             time = ct_params_t::var_dt ? time + dt : timestep * dt;
-            prev_dt = dt;
+            if (div3_mpdata) prev_dt[1] = prev_dt[0];
+            prev_dt[0] = dt;
             hook_post_step();
 
             if (time >= nt) additional_steps--;
