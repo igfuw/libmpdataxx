@@ -122,7 +122,7 @@ namespace libmpdataxx
 
           const auto beta = this->prev_dt[0] > 0 ? this->dt / (2 * this->prev_dt[0]) : 0;
 
-          if (!ct_params_t::var_dt)
+          if (!ct_params_t::var_dt && !parent_t::div3_mpdata)
           {
 	    this->vip_state(0, d)(this->ijk) *= -beta;
           }
