@@ -55,18 +55,19 @@ namespace libmpdataxx
 
 	virtual void fill_stash_helper(const int d) final
 	{
-          // saving to t_lev == -2 so that it becomes -1 at the next time step
+          // for third-order mpdata saving to t_lev == -2 so that it becomes -1 at the next time step
+          int save_t_lev = parent_t::div3_mpdata ? -2 : -1;
 	  if (ix::vip_den == -1)
-	    vip_state(-2, d)(this->ijk) = vips()[d](this->ijk);
+	    vip_state(save_t_lev, d)(this->ijk) = vips()[d](this->ijk);
 	  else if (eps == 0) // this is the default  
           {
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
-            vip_state(-2, d)(this->ijk) = vips()[d](this->ijk) / this->state(ix::vip_den)(this->ijk);
+            vip_state(save_t_lev, d)(this->ijk) = vips()[d](this->ijk) / this->state(ix::vip_den)(this->ijk);
           }
 	  else
 	  {  
-	    vip_state(-2, d)(this->ijk) = where(
+	    vip_state(save_t_lev, d)(this->ijk) = where(
 	      // if
 	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
@@ -76,7 +77,7 @@ namespace libmpdataxx
 	    );
 	  }
 
-          assert(std::isfinite(sum(vip_state(-2, d)(this->ijk))));
+          assert(std::isfinite(sum(vip_state(save_t_lev, d)(this->ijk))));
 	}
 	
         void fill_stash() 
