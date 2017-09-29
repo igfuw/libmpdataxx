@@ -163,7 +163,7 @@ namespace libmpdataxx
         }
 
 	virtual void extrapolate_in_time() = 0;
-	virtual void interpolate_in_space() = 0;
+	virtual void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &interpolated) = 0;
 
         virtual void vip_rhs_impl_init()
         {
@@ -267,7 +267,7 @@ namespace libmpdataxx
 	  extrapolate_in_time();
 
 	  //interpolate from velocity field to courant field (mpdata needs courant numbers from t+1/2)
-	  interpolate_in_space();
+	  interpolate_in_space(this->mem->GC);
 
           // TODO: why???
 	  this->mem->barrier();

@@ -36,13 +36,13 @@ namespace libmpdataxx
       // member fields
       const rng_t im;
 
-      void interpolate_in_space() final
+      void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &interpolated) final
       {
         using namespace libmpdataxx::arakawa_c;
 
 	if (!this->mem->G)
 	{
-	  this->mem->GC[0](im + h) = this->dt / this->di * .5 * (
+	  interpolated(im + h) = this->dt / this->di * .5 * (
 	    this->vip_state(0, 0)(im    ) + 
 	    this->vip_state(0, 0)(im + 1)
 	  );
@@ -94,7 +94,8 @@ namespace libmpdataxx
 
       template<int d, class arr_t> 
       void intrp(
-	const arr_t psi,
+        arrvec_t<typename parent_t::arr_t> &intrp_psi,
+	const arr_t &psi,
 	const rng_t &i, 
 	const rng_t &j, 
 	const typename ct_params_t::real_t &di 
@@ -107,14 +108,14 @@ namespace libmpdataxx
         {
           if (!this->mem->G)
           {
-            this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
+            intrp_psi[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
               psi(pi<d>(i,    j)) + 
               psi(pi<d>(i + 1,j))
             );
           } 
           else
           { 
-            this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
+            intrp_psi[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
               (*this->mem->G)(pi<d>(i,    j)) * psi(pi<d>(i,    j)) + 
               (*this->mem->G)(pi<d>(i + 1,j)) * psi(pi<d>(i + 1,j))
             );
@@ -124,7 +125,7 @@ namespace libmpdataxx
         {
           if (!this->mem->G)
           {
-            this->mem->GC[d](pi<d>(i+h,j)) = this->dt /(12 * di) * (
+            intrp_psi[d](pi<d>(i+h,j)) = this->dt /(12 * di) * (
               7 *
               (
                 psi(pi<d>(i,     j)) + 
@@ -139,7 +140,7 @@ namespace libmpdataxx
           } 
           else
           { 
-            this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
+            intrp_psi[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
               (*this->mem->G)(pi<d>(i,    j)) * psi(pi<d>(i,    j)) + 
               (*this->mem->G)(pi<d>(i + 1,j)) * psi(pi<d>(i + 1,j))
             );
@@ -147,16 +148,16 @@ namespace libmpdataxx
         }
       }  
 
-      void interpolate_in_space() final
+      void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &interpolated) final
       {
         using namespace libmpdataxx::arakawa_c;
 
         auto ex = this->halo - 1;
 
-	intrp<0>(this->vip_state(0, 0), im, this->j^ex, this->di);
-	intrp<1>(this->vip_state(0, 1), jm, this->i^ex, this->dj);
-        this->xchng_vctr_alng(this->mem->GC, /*ad*/ true, /*cyclic*/ false, ex);
-        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, /*cyclic*/ true);
+	intrp<0>(interpolated, this->vip_state(0, 0), im, this->j^ex, this->di);
+	intrp<1>(interpolated, this->vip_state(0, 1), jm, this->i^ex, this->dj);
+        this->xchng_vctr_alng(interpolated, /*ad*/ true, /*cyclic*/ false, ex);
+        this->xchng_vctr_nrml(interpolated, this->i^ex, this->j^ex, /*cyclic*/ true);
       }
 
       void extrapolate_in_time() final
@@ -232,7 +233,8 @@ namespace libmpdataxx
 
       template<int d, class arr_t> 
       void intrp(
-	const arr_t psi,
+        arrvec_t<typename parent_t::arr_t> &intrp_psi,
+	const arr_t &psi,
 	const rng_t &i, 
 	const rng_t &j, 
 	const rng_t &k, 
@@ -244,32 +246,32 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+	  intrp_psi[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
 	    psi(pi<d>(i,     j, k)) + 
 	    psi(pi<d>(i + 1, j, k))
 	  );
 	} 
 	else
 	{ 
-	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+	  intrp_psi[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
 	    (*this->mem->G)(pi<d>(i  , j, k)) * psi(pi<d>(i,   j, k)) + 
 	    (*this->mem->G)(pi<d>(i+1, j, k)) * psi(pi<d>(i+1, j, k))
 	  );
 	}
       }  
 
-      void interpolate_in_space() final
+      void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &interpolated) final
       {
         using namespace libmpdataxx::arakawa_c;
         
         const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
         auto ex = this->halo - 1;
 
-	intrp<0>(this->vip_state(0, 0), im^ex, this->j^ex, this->k^ex, this->di);
-	intrp<1>(this->vip_state(0, 1), jm^ex, this->k^ex, this->i^ex, this->dj);
-	intrp<2>(this->vip_state(0, 2), km^ex, this->i^ex, this->j^ex, this->dk);
-        this->xchng_vctr_alng(this->mem->GC, /*ad*/ false, /*cyclic*/ true);
-        this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex, /*cyclic*/ true);
+	intrp<0>(interpolated, this->vip_state(0, 0), im^ex, this->j^ex, this->k^ex, this->di);
+	intrp<1>(interpolated, this->vip_state(0, 1), jm^ex, this->k^ex, this->i^ex, this->dj);
+	intrp<2>(interpolated, this->vip_state(0, 2), km^ex, this->i^ex, this->j^ex, this->dk);
+        this->xchng_vctr_alng(interpolated, /*ad*/ false, /*cyclic*/ true);
+        this->xchng_vctr_nrml(interpolated, this->i^ex, this->j^ex, this->k^ex, /*cyclic*/ true);
       }
 
       void extrapolate_in_time() final
