@@ -143,8 +143,11 @@ namespace libmpdataxx
             real_t cfl = courant_number(mem->GC);
             if (cfl > 0)
             {
+              auto old_dt = dt; // a bit confusing, old_dt - dt before scaling,
+                                // prev_dt[] - dt(s) from previous time steps
+                                // TODO: reconsider
               dt *= max_courant / cfl;
-              scale_gc(time, dt, prev_dt[0]);
+              scale_gc(time, dt, old_dt);
             }
           }
         }
