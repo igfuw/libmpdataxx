@@ -274,6 +274,25 @@ namespace libmpdataxx
 
           return true;
         }
+        
+        void calc_ndt_gc() final
+        {
+          if (parent_t::div3_mpdata)
+          {
+            auto ex = this->halo - 1;
+            if (this->prev_dt[0] > 0)
+            {
+              for (int d = 0; d < parent_t::n_dims; ++d)
+              {
+                vip_state(0, d)(this->ijk) = this->dt * (vips()[d](this->ijk) - vip_state(-1, d)(this->ijk)) / this->prev_dt[0];
+                this->xchng_pres(this->vip_state(0, d), this->ijk, ex);
+              }
+
+              interpolate_in_space(this->mem->ndt_GC);
+              this->mem->barrier();
+            }
+          }
+        }
 
 	void hook_ante_step()
 	{ 

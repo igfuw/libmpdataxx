@@ -99,6 +99,7 @@ namespace libmpdataxx
        
         // return false if advector does not change in time
         virtual bool calc_gc() {return false;}
+        virtual void calc_ndt_gc() {}
 
         virtual void scale_gc(const real_t time, const real_t cur_dt, const real_t old_dt) = 0;
 
@@ -255,6 +256,10 @@ namespace libmpdataxx
                 while (cfl > max_courant);
               }
             }
+
+            // once we set the time step
+            // for third-order MPDATA we need to calculate time derivatives of the advector field
+            if (var_gc && div3_mpdata) calc_ndt_gc();
             
             hook_ante_step();
 
