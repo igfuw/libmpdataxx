@@ -164,7 +164,6 @@ namespace libmpdataxx
       {
         using namespace libmpdataxx::arakawa_c; 
 
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
 	this->extrp(0, ix::vip_i);
         // using xchng_pres because bcs have to be consistent with those used in
         // pressure solver to obtain non-divergent advector field
@@ -264,7 +263,6 @@ namespace libmpdataxx
       {
         using namespace libmpdataxx::arakawa_c;
         
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
         auto ex = this->halo - 1;
 
 	intrp<0>(interpolated, this->vip_state(0, 0), im^ex, this->j^ex, this->k^ex, this->di);
@@ -278,7 +276,6 @@ namespace libmpdataxx
       {
         using namespace libmpdataxx::arakawa_c; 
 
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
         // using xchng_pres because bcs have to be consistent with those used in
         // pressure solver to obtain non-divergent advector field
         auto ex = this->halo - 1;
