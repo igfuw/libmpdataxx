@@ -287,8 +287,22 @@ namespace libmpdataxx
                 vip_state(0, d)(this->ijk) = this->dt * (vips()[d](this->ijk) - vip_state(-1, d)(this->ijk)) / this->prev_dt[0];
                 this->xchng_pres(this->vip_state(0, d), this->ijk, ex);
               }
-
               interpolate_in_space(this->mem->ndt_GC);
+              this->mem->barrier();
+            }
+            
+            if (this->prev_dt[0] > 0 && this->prev_dt[1] > 0)
+            {
+              for (int d = 0; d < parent_t::n_dims; ++d)
+              {
+                vip_state(0, d)(this->ijk) = this->dt * this->dt * (
+                                                  this->prev_dt[1] * vips()[d](this->ijk)
+                                                - (this->prev_dt[1] + this->prev_dt[0]) * vip_state(-1, d)(this->ijk)
+                                                + this->prev_dt[0] * vip_state(-2, d)(this->ijk)
+                                                ) / (this->prev_dt[0] * this->prev_dt[1]);
+                this->xchng_pres(this->vip_state(0, d), this->ijk, ex);
+              }
+              interpolate_in_space(this->mem->ndtt_GC);
               this->mem->barrier();
             }
           }
