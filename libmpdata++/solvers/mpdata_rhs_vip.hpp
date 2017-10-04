@@ -125,24 +125,32 @@ namespace libmpdataxx
         {
           if (!this->mem->G)
           {
-            intrp_psi[d](pi<d>(i+h,j)) = this->dt /(12 * di) * (
+            intrp_psi[d](pi<d>(i+h, j)) = this->dt /(12 * di) * (
               7 *
               (
-                psi(pi<d>(i,     j)) + 
-                psi(pi<d>(i + 1, j))
+                psi(pi<d>(i  , j)) + 
+                psi(pi<d>(i+1, j))
               )
               -
               (
-              psi(pi<d>(i - 1, j)) + 
-              psi(pi<d>(i + 2, j))
+                psi(pi<d>(i-1, j)) + 
+                psi(pi<d>(i+2, j))
               )
             );
           } 
           else
           { 
-            intrp_psi[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
-              (*this->mem->G)(pi<d>(i,    j)) * psi(pi<d>(i,    j)) + 
-              (*this->mem->G)(pi<d>(i + 1,j)) * psi(pi<d>(i + 1,j))
+            intrp_psi[d](pi<d>(i+h, j)) = this->dt /(12 * di) * (
+              7 *
+              (
+                (*this->mem->G)(pi<d>(i  , j)) * psi(pi<d>(i  , j)) + 
+                (*this->mem->G)(pi<d>(i+1, j)) * psi(pi<d>(i+1, j))
+              )
+              -
+              (
+                (*this->mem->G)(pi<d>(i-1, j)) * psi(pi<d>(i-1, j)) + 
+                (*this->mem->G)(pi<d>(i+2, j)) * psi(pi<d>(i+2, j))
+              )
             );
           }
         }
@@ -243,20 +251,56 @@ namespace libmpdataxx
 	using idxperm::pi;
 	using namespace arakawa_c;
   
-	if (!this->mem->G)
-	{
-	  intrp_psi[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
-	    psi(pi<d>(i,     j, k)) + 
-	    psi(pi<d>(i + 1, j, k))
-	  );
-	} 
-	else
-	{ 
-	  intrp_psi[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
-	    (*this->mem->G)(pi<d>(i  , j, k)) * psi(pi<d>(i,   j, k)) + 
-	    (*this->mem->G)(pi<d>(i+1, j, k)) * psi(pi<d>(i+1, j, k))
-	  );
-	}
+        if (parent_t::sptl_intrp == aver2)
+        {
+          if (!this->mem->G)
+          {
+            intrp_psi[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+              psi(pi<d>(i,     j, k)) + 
+              psi(pi<d>(i + 1, j, k))
+            );
+          } 
+          else
+          { 
+            intrp_psi[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+              (*this->mem->G)(pi<d>(i  , j, k)) * psi(pi<d>(i,   j, k)) + 
+              (*this->mem->G)(pi<d>(i+1, j, k)) * psi(pi<d>(i+1, j, k))
+            );
+          }
+        }
+        else if (parent_t::sptl_intrp == aver4)
+        {
+          if (!this->mem->G)
+          {
+            intrp_psi[d](pi<d>(i+h, j, k)) = this->dt /(12 * di) * (
+              7 *
+              (
+                psi(pi<d>(i  , j, k)) + 
+                psi(pi<d>(i+1, j, k))
+              )
+              -
+              (
+                psi(pi<d>(i-1, j, k)) + 
+                psi(pi<d>(i+2, j, k))
+              )
+            );
+          } 
+          else
+          { 
+            intrp_psi[d](pi<d>(i+h, j, k)) = this->dt /(12 * di) * (
+              7 *
+              (
+                (*this->mem->G)(pi<d>(i  , j, k)) * psi(pi<d>(i  , j, k)) + 
+                (*this->mem->G)(pi<d>(i+1, j, k)) * psi(pi<d>(i+1, j, k))
+              )
+              -
+              (
+                (*this->mem->G)(pi<d>(i-1, j, k)) * psi(pi<d>(i-1, j, k)) + 
+                (*this->mem->G)(pi<d>(i+2, j, k)) * psi(pi<d>(i+2, j, k))
+              )
+            );
+          }
+        }
       }  
 
       void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &interpolated) final
