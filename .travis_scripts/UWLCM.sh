@@ -33,19 +33,19 @@ git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
 cd libcloudphxx
 mkdir build 
 cd build
-if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-cmake -DCMAKE_BUILD_TYPE=Release ../ 
+# RelWithDebInfo = Release with asserts
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../ 
 make 
 sudo make install
 cd ../..
 
-#bicycles
-#if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-program-options-dev; fi
-git clone --depth=1 git://github.com/igfuw/bicycles.git
-cd bicycles
+# UWLCM
+# if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-program-options-dev; fi
+git clone --depth=1 git://github.com/igfuw/UWLCM.git
+cd UWLCM
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
 make
 make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
 cd ../..
