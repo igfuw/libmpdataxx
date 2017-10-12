@@ -44,7 +44,7 @@ namespace libmpdataxx
         {
           const auto &i(this->i), &j(this->j), &k(this->k);
           this->xchng_sclr(tmp1, this->ijk);
-          tmp2(i, j, k) = 0.25 * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k + 1));
+          tmp2(i, j, k) = 0.25 * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k - 1));
         }
         
         // helpers for buoyancy forces
