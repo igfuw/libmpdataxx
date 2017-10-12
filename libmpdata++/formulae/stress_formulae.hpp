@@ -178,7 +178,7 @@ namespace libmpdataxx
                                   typename std::enable_if<nd == 2>::type* = 0)
       {
         auto zro = rng_t(0, 0);
-        tau[0](ijkm[0] + h, zro) = cdrag * 0.25 * 
+        tau[0](ijkm[0] + h, zro) = cdrag / 8 * 
                                    abs((v[0](ijkm[0] + 1, zro) + v[0](ijkm[0], zro))) *
                                    (v[0](ijkm[0] + 1, zro) + v[0](ijkm[0], zro)) *
                                    (  G<opts, 0>(rho, ijkm[0] + 1, zro)
@@ -197,7 +197,7 @@ namespace libmpdataxx
                                   typename std::enable_if<nd == 3>::type* = 0)
       {
         auto zro = rng_t(0, 0);
-        tau[0](ijkm[0] + h, ijk[1], zro) = cdrag * 0.25 * sqrt(
+        tau[0](ijkm[0] + h, ijk[1], zro) = cdrag / 8 * sqrt(
                                                 pow2((v[0](ijkm[0] + 1, ijk[1], zro) + v[0](ijkm[0], ijk[1], zro)))
                                               + pow2((v[1](ijkm[0] + 1, ijk[1], zro) + v[1](ijkm[0], ijk[1], zro)))
                                               ) *
@@ -205,7 +205,7 @@ namespace libmpdataxx
                                            (  G<opts, 0>(rho, ijkm[0] + 1, ijk[1], zro)
                                             + G<opts, 0>(rho, ijkm[0]    , ijk[1], zro) );
 
-        tau[1](ijk[0], ijkm[1] + h, zro) = cdrag * 0.25 * sqrt(
+        tau[1](ijk[0], ijkm[1] + h, zro) = cdrag / 8 * sqrt(
                                                 pow2((v[0](ijk[0], ijkm[1] + 1, zro) + v[0](ijk[0], ijkm[1], zro)))
                                               + pow2((v[1](ijk[0], ijkm[1] + 1, zro) + v[1](ijk[0], ijkm[1], zro)))
                                               ) *
