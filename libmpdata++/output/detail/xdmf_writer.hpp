@@ -94,6 +94,15 @@ namespace libmpdataxx
         std::vector<attribute> attrs;
         std::vector<attribute> c_attrs;
 
+        attribute make_attribute(const std::string& name,
+                                 const blitz::TinyVector<int, dim>& dimensions)
+        {
+          attribute a;
+          a.name = name;
+          a.item.dimensions = dimensions - 1;
+          return a;
+        }
+
         public:
 
         void setup(const std::string& hdf_name,
@@ -111,20 +120,15 @@ namespace libmpdataxx
 
           for (const auto& n : attr_names)
           {
-            attribute a;
-            a.name = n;
-            a.item.dimensions = dimensions - 1;
-            attrs.push_back(a);
+            attrs.push_back(make_attribute(n, dimensions));
           }
         }
-        
+
         void add_const_attribute(const std::string& name,
                                  const std::string& hdf_name,
                                  const blitz::TinyVector<int, dim>& dimensions)
         {
-          attribute a;
-          a.name = name;
-          a.item.dimensions = dimensions - 1;
+          attribute a = make_attribute(name, dimensions);
           a.item.data = hdf_name + ":/" + a.name;
           c_attrs.push_back(a);
         }
