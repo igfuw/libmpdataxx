@@ -3,6 +3,7 @@
 #include <map>
 #include <array>
 #include <vector>
+#include <unordered_set>
 #include <string>
 #include <sstream>
 
@@ -76,7 +77,7 @@ namespace libmpdataxx
           std::string name;
           static const std::string attribute_type;
           static const std::string center;
-          data_item item;
+          mutable data_item item;
           void add(ptree& node)
           {
             ptree& attr_node = node.add("Attribute", "");
@@ -85,14 +86,26 @@ namespace libmpdataxx
             attr_node.put("<xmlattr>.Center", center);
             item.add(attr_node);
           }
+          bool operator==(const attribute &b) const
+          {
+            return (name == b.name);
+          }
+        };
+
+        struct hash_attribute
+        {
+          auto operator()(attribute a) const
+          {
+            return std::hash<std::string>{}(a.name);
+          }
         };
 
         static const std::string name;
         static const std::string grid_type;
         topology top;
         geometry geo;
-        std::vector<attribute> attrs;
-        std::vector<attribute> c_attrs;
+        std::unordered_set<attribute, hash_attribute> attrs;
+        std::unordered_set<attribute, hash_attribute> c_attrs;
 
         attribute make_attribute(const std::string& name,
                                  const blitz::TinyVector<int, dim>& dimensions)
@@ -120,8 +133,18 @@ namespace libmpdataxx
 
           for (const auto& n : attr_names)
           {
-            attrs.push_back(make_attribute(n, dimensions));
+            attrs.insert(make_attribute(n, dimensions));
           }
+        }
+        
+
+        void add_attribute(const std::string& name,
+                                 const std::string& hdf_name,
+                                 const blitz::TinyVector<int, dim>& dimensions)
+        {
+          attribute a = make_attribute(name, dimensions);
+          a.item.data = hdf_name + ":/" + a.name;
+          attrs.insert(a);
         }
 
         void add_const_attribute(const std::string& name,
@@ -130,7 +153,7 @@ namespace libmpdataxx
         {
           attribute a = make_attribute(name, dimensions);
           a.item.data = hdf_name + ":/" + a.name;
-          c_attrs.push_back(a);
+          c_attrs.insert(a);
         }
 
         void write(const std::string& xmf_name, const std::string& hdf_name, const double time)
