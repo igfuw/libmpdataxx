@@ -30,6 +30,7 @@ namespace libmpdataxx
     {
       protected:
       
+      using output_t = hdf5_xdmf<solver_t>;
       using parent_t = hdf5<solver_t>;
       
       static_assert(parent_t::n_dims > 1, "only 2D and 3D output supported");
