@@ -5,7 +5,7 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 #pragma once
-#include <libmpdata++/solvers/detail/boussinesq_common.hpp>
+#include <libmpdata++/solvers/detail/boussinesq_sgs_common.hpp>
 
 namespace libmpdataxx
 {
@@ -14,10 +14,14 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t>
-      class boussinesq_impl : public boussinesq_common<ct_params_t>
+      class boussinesq_impl : public
+                              std::conditional<static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles,
+                                               boussinesq_common<ct_params_t>,
+                                               boussinesq_sgs_common<ct_params_t>>::type
       {
-        using parent_t = boussinesq_common<ct_params_t>;
-
+        using parent_t = typename std::conditional<static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles,
+                                                   boussinesq_common<ct_params_t>,
+                                                   boussinesq_sgs_common<ct_params_t>>::type;
         public:
         using real_t = typename ct_params_t::real_t;
 
@@ -29,15 +33,20 @@ namespace libmpdataxx
         template <int nd = ct_params_t::n_dims>
         void calc_dtht_e(typename std::enable_if<nd == 2>::type* = 0)
         {
-          this->xchng_sclr(this->tht_e, this->i, this->j);
+          this->xchng_sclr(this->tht_e, this->ijk);
           this->dtht_e(this->ijk) = formulae::nabla::grad<1>(this->tht_e, this->j, this->i, this->dj);
         }
         
         template <int nd = ct_params_t::n_dims>
         void calc_dtht_e(typename std::enable_if<nd == 3>::type* = 0)
         {
-          this->xchng_sclr(this->tht_e, this->i, this->j, this->k);
+          this->xchng_sclr(this->tht_e, this->ijk);
           this->dtht_e(this->ijk) = formulae::nabla::grad<2>(this->tht_e, this->k, this->i, this->j, this->dk);
+        }
+
+        void calc_full_tht(typename parent_t::arr_t &full_tht) final
+        {
+          full_tht(this->ijk) = this->state(ix::tht)(this->ijk) + this->tht_e(this->ijk);
         }
 
 	void hook_ante_loop(const int nt) 
@@ -86,14 +95,14 @@ namespace libmpdataxx
           {
             case (0):
             {
-              rhs.at(ix::tht)(ijk) += -w(ijk) * this->dtht_e(ijk) + this->hflux(ijk) - this->tht_abs(ijk) * tht(ijk);
+              rhs.at(ix::tht)(ijk) += -w(ijk) * this->dtht_e(ijk) + this->hflux_frc(ijk) - this->tht_abs(ijk) * tht(ijk);
 
               rhs.at(ix_w)(ijk) += this->g * tht(ijk) / this->Tht_ref;
               break;
             }
             case (1):
             {
-              rhs.at(ix::tht)(ijk) += (this->hflux(ijk) - this->tht_abs(ijk) * tht(ijk))
+              rhs.at(ix::tht)(ijk) += (this->hflux_frc(ijk) - this->tht_abs(ijk) * tht(ijk))
                                       / (1 + 0.5 * this->dt * this->tht_abs(ijk));
 
               rhs.at(ix_w)(ijk) += this->g * (tht(ijk) + 0.5 * this->dt * rhs.at(ix::tht)(ijk)) / this->Tht_ref;

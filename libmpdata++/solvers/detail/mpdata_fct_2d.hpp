@@ -56,7 +56,7 @@ namespace libmpdataxx
 
 	  // fill halos of GC_corr -> mpdata works with halo=1, we need halo=2
           this->xchng_vctr_alng(GC_corr, true);
-          this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j);
+          this->xchng_vctr_nrml(this->GC_corr(iter), this->ijk);
 
           // calculation of fluxes for betas denominators
           if (opts::isset(ct_params_t::opts, opts::iga))

@@ -13,10 +13,15 @@ env:
     - TEST_SUITE=elliptic_drop
     - TEST_SUITE=nair_jablonowski_2008
     - TEST_SUITE=UWLCM
+    - TEST_SUITE=pbl
+
 matrix:
     exclude:
         - os: osx
           compiler: gcc
+        
+        - os: osx
+          env: TEST_SUITE=pbl # pbl not tested on osx
 
         - compiler: clang
           env: TEST_SUITE=UWLCM # UWLCM is not tested on clang yet
@@ -32,6 +37,11 @@ addons:
 osx_image: xcode8
 
 before_install:
+    # define a compiler variable for use in if statements
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export COMPILER=clang++; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then export COMPILER=g++; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export COMPILER=clang++; fi # only clang on osx
+
 # to avoid python lib/interpreter mismatch; https://github.com/travis-ci/travis-ci/issues/5326
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
@@ -50,20 +60,20 @@ before_install:
 
     # you may not believe it, but GCC (4.8.2) is giving ICEs otherwise!
     - export make_j="make -j 2"
-    - if [[ $CXX == 'g++' ]]; then export make_j="make"; fi
+    - if [[ $COMPILER == 'g++' ]]; then export make_j="make"; fi
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
     - export PY3DEB=""
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++' ]]; then PY3DEB=3; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' ]]; then PY3DEB=3; fi
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
  
 install:
     # silence the gazillion warnings coming from blitz headers when using the osx clang
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'clang++' ]]; then export CXXFLAGS="-Wno-parentheses ${CXXFLAGS}"; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $COMPILER == 'clang++' ]]; then export CXXFLAGS="-Wno-parentheses ${CXXFLAGS}"; fi
 
-    # compilers
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export CXX=clang++-4.0; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then export CXX=g++-6; fi
+    # redefine CXX to the actual version used
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then export CXX=clang++-4.0; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++'     ]]; then export CXX=g++-6; fi
 
     # boost
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
@@ -124,3 +134,6 @@ script:
     
     # compiling and running tests from Nair & Jablonowski 2008 MWR paper in Release mode
     - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then . ./.travis_scripts/nair_jablonowski_2008.sh; fi
+    
+    # running pbl tests in Release mode
+    - if [[ $TEST_SUITE == 'pbl' ]]; then . ./.travis_scripts/pbl.sh; fi
