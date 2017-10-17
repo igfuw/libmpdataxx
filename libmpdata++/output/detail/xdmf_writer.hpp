@@ -3,7 +3,7 @@
 #include <map>
 #include <array>
 #include <vector>
-#include <unordered_set>
+#include <set>
 #include <string>
 #include <sstream>
 
@@ -86,17 +86,11 @@ namespace libmpdataxx
             attr_node.put("<xmlattr>.Center", center);
             item.add(attr_node);
           }
-          bool operator==(const attribute &b) const
-          {
-            return (name == b.name);
-          }
-        };
 
-        struct hash_attribute
-        {
-          auto operator()(attribute a) const
+          // to allow storing attributes in std::set
+          friend bool operator<(const attribute &lhs, const attribute &rhs)
           {
-            return std::hash<std::string>{}(a.name);
+            return lhs.name < rhs.name;
           }
         };
 
@@ -104,8 +98,8 @@ namespace libmpdataxx
         static const std::string grid_type;
         topology top;
         geometry geo;
-        std::unordered_set<attribute, hash_attribute> attrs;
-        std::unordered_set<attribute, hash_attribute> c_attrs;
+        std::set<attribute> attrs;
+        std::set<attribute> c_attrs;
 
         attribute make_attribute(const std::string& name,
                                  const blitz::TinyVector<int, dim>& dimensions)
