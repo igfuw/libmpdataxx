@@ -30,15 +30,14 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            max<ix_t>(max<ix_t>(max<ix_t>(max<ix_t>(max<ix_t>(max<ix_t>(max<ix_t>(
-                        psi_max(i, j, k),
-                        psi(i, j, k)),
-                        psi(i+1, j, k)),
-                        psi(i-1, j, k)),
-                        psi(i, j+1, k)),
-                        psi(i, j-1, k)),
-                        psi(i, j, k+1)),
-                        psi(i, j, k-1)
+            max<ix_t>(psi_max(i, j, k),
+                      psi(i, j, k),
+                      psi(i+1, j, k),
+                      psi(i-1, j, k),
+                      psi(i, j+1, k),
+                      psi(i, j-1, k),
+                      psi(i, j, k+1),
+                      psi(i, j, k-1)
             )
           - psi(i, j, k)
           ) * formulae::G<opts, 0>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
@@ -95,15 +94,14 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           (
             psi(i, j, k)
-            - min<ix_t>(min<ix_t>(min<ix_t>(min<ix_t>(min<ix_t>(min<ix_t>(min<ix_t>(
-                      psi_min(i, j, k),
-                      psi(i, j+1, k)),
-                      psi(i-1, j, k)),
-                      psi(i, j, k  )),
-                      psi(i+1, j, k)),
-                      psi(i, j, k+1)),
-                      psi(i, j, k-1)),
-                      psi(i, j-1, k)
+            - min<ix_t>(psi_min(i, j, k),
+                        psi(i, j+1, k),
+                        psi(i-1, j, k),
+                        psi(i, j, k  ),
+                        psi(i+1, j, k),
+                        psi(i, j, k+1),
+                        psi(i, j, k-1),
+                        psi(i, j-1, k)
             )
           ) * formulae::G<opts, 0>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
         );
@@ -176,30 +174,30 @@ namespace libmpdataxx
                   // if
                   psi(pi<d>(i, j, k)) > 0,
                   // then
-                  min<ix_t>(1, min<ix_t>(
+                  min<ix_t>(1,
                     beta_dn(pi<d>(i,     j, k)),
                     beta_up(pi<d>(i + 1, j, k))
-                  )),
+                  ),
                   // else
-                  min<ix_t>(1, min<ix_t>(
+                  min<ix_t>(1,
                     beta_up(pi<d>(i,     j, k)),
                     beta_dn(pi<d>(i + 1, j, k))
-                  ))
+                  )
                 ),
                 // else
                 where<ix_t>(
                   // if
                   psi(pi<d>(i+1, j, k)) > 0,
                   // then
-                  min<ix_t>(1, min<ix_t>(
+                  min<ix_t>(1,
                     beta_up(pi<d>(i,     j, k)),
                     beta_dn(pi<d>(i + 1, j, k))
-                  )),
+                  ),
                   // else
-                  min<ix_t>(1, min<ix_t>(
+                  min<ix_t>(1,
                     beta_dn(pi<d>(i,     j, k)),
                     beta_up(pi<d>(i + 1, j, k))
-                  ))
+                  )
                 )
               );
             }
@@ -233,15 +231,15 @@ namespace libmpdataxx
                 // if
                 GC_corr[d]( pi<d>(i+h, j, k) ) > 0,
                 // then
-                min<ix_t>(1, min<ix_t>(
+                min<ix_t>(1,
                   beta_dn(pi<d>(i,     j, k)),
                   beta_up(pi<d>(i + 1, j, k))
-                )),
+                ),
                 // else
-                min<ix_t>(1, min<ix_t>(
+                min<ix_t>(1,
                   beta_up(pi<d>(i,     j, k)),
                   beta_dn(pi<d>(i + 1, j, k))
-                ))
+                )
               );
             }
           }

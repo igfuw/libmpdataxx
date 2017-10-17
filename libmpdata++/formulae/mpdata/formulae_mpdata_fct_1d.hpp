@@ -34,7 +34,7 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          (max<ix_t>(max<ix_t>(max<ix_t>(psi_max(i), psi(i-1)), psi(i)), psi(i+1)) - psi(i)) * formulae::G<opts>(G, i)
+          (max<ix_t>(psi_max(i), psi(i-1), psi(i), psi(i+1)) - psi(i)) * formulae::G<opts>(G, i)
         );
       }                                                                    //to make beta dimensionless 
                                                                            //when transporting mixing ratios with momentum
@@ -75,7 +75,7 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          (psi(i) - min<ix_t>(min<ix_t>(min<ix_t>(psi_min(i), psi(i-1)), psi(i)), psi(i+1))) * formulae::G<opts>(G, i)
+          (psi(i) - min<ix_t>(psi_min(i), psi(i-1), psi(i), psi(i+1))) * formulae::G<opts>(G, i)
         );
       }                                                                      //to make beta dimensionless 
                                                                              //when transporting mixing ratios with momentum
@@ -131,30 +131,30 @@ namespace libmpdataxx
                // if
                psi(i) > 0,
                // then
-               min<ix_t>(1, min<ix_t>(
+               min<ix_t>(1,
                  beta_dn(i    ), 
                  beta_up(i + 1)
-               )), 
+               ), 
                // else
-               min<ix_t>(1, min<ix_t>(
+               min<ix_t>(1,
                  beta_up(i    ), 
                  beta_dn(i + 1)
-               ))  
+               )  
              ),  
              // else
              where<ix_t>(
                // if
                psi(i+1) > 0,
                // then
-               min<ix_t>(1, min<ix_t>(
+               min<ix_t>(1,
                  beta_up(i    ), 
                  beta_dn(i + 1)
-               )), 
+               ), 
                // else
-               min<ix_t>(1, min<ix_t>(
+               min<ix_t>(1,
                  beta_dn(i   ), 
                  beta_up(i + 1)
-               ))  
+               )  
              )   
           );
         } 
@@ -180,15 +180,15 @@ namespace libmpdataxx
             // if
             GC_corr(i+h) > 0,
             // then
-            min<ix_t>(1, min<ix_t>(
+            min<ix_t>(1,
               beta_dn(i),
               beta_up(i + 1)
-            )), 
+            ), 
             // else
-            min<ix_t>(1, min<ix_t>(
+            min<ix_t>(1,
               beta_up(i),
               beta_dn(i + 1)
-            ))  
+            )  
           );
         }
       }  

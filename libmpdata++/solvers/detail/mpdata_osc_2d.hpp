@@ -42,11 +42,11 @@ namespace libmpdataxx
           //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
-            this->xchng_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo);
+            this->xchng_sclr(*this->mem->G, this->ijk, this->halo);
           
           // filling Y halos for GC_x, and X halos for GC_y
           auto ex = this->halo - 1;
-          this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+          this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
 
           // set time derivatives of GC to zero
           // needed for stationary flows prescribed using the advector method
@@ -61,8 +61,8 @@ namespace libmpdataxx
             this->xchng_vctr_alng(this->mem->ndt_GC);
             this->xchng_vctr_alng(this->mem->ndtt_GC);
 
-            this->xchng_vctr_nrml(this->mem->ndt_GC, this->i^ex, this->j^ex);
-            this->xchng_vctr_nrml(this->mem->ndtt_GC, this->i^ex, this->j^ex);
+            this->xchng_vctr_nrml(this->mem->ndt_GC, this->ijk, ex);
+            this->xchng_vctr_nrml(this->mem->ndtt_GC, this->ijk, ex);
           }
 	} 
 
@@ -114,7 +114,7 @@ namespace libmpdataxx
               // the following check
               if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
               {
-                this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j);
+                this->xchng_vctr_nrml(this->GC_corr(iter), this->ijk);
                 // if dfl option is set we need to fill these as well
                 if (opts::isset(ct_params_t::opts, opts::dfl)) this->xchng_vctr_alng(this->GC_corr(iter));
               }
