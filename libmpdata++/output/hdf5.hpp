@@ -33,6 +33,8 @@ namespace libmpdataxx
 
       protected:
 
+      using output_t = hdf5<solver_t>;
+
       std::unique_ptr<H5::H5File> hdfp;
       std::map<int, H5::DataSet> vars;
       std::map<int, std::string> dim_names;
