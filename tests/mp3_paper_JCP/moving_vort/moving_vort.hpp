@@ -140,11 +140,11 @@ class moving_vort : public libmpdataxx::solvers::mpdata<ct_params_t>
 
     for (int d = 0; d < 2; ++d)
     {
-      this->xchng_sclr(ex_node[d], this->i, this->j);
+      this->xchng_sclr(ex_node[d], this->ijk);
       if (needs_dt)
       {
-        this->xchng_sclr(ex_node[2 + d], this->i, this->j);
-        this->xchng_sclr(ex_node[4 + d], this->i, this->j);
+        this->xchng_sclr(ex_node[2 + d], this->ijk);
+        this->xchng_sclr(ex_node[4 + d], this->ijk);
       }
     }
 
@@ -167,11 +167,11 @@ class moving_vort : public libmpdataxx::solvers::mpdata<ct_params_t>
       }
     }
 
-    this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+    this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
     if (needs_dt)
     {
-      this->xchng_vctr_nrml(this->mem->ndt_GC, this->i^ex, this->j^ex);
-      this->xchng_vctr_nrml(this->mem->ndtt_GC, this->i^ex, this->j^ex);
+      this->xchng_vctr_nrml(this->mem->ndt_GC, this->ijk, ex);
+      this->xchng_vctr_nrml(this->mem->ndtt_GC, this->ijk, ex);
     }
 
     return true;

@@ -161,11 +161,10 @@ namespace libmpdataxx
         using namespace libmpdataxx::arakawa_c;
 
         auto ex = this->halo - 1;
-
 	intrp<0>(interpolated, this->vip_state(0, 0), im, this->j^ex, this->di);
 	intrp<1>(interpolated, this->vip_state(0, 1), jm, this->i^ex, this->dj);
-        this->xchng_vctr_alng(interpolated, /*ad*/ true, /*cyclic*/ false, ex);
-        this->xchng_vctr_nrml(interpolated, this->i^ex, this->j^ex, /*cyclic*/ true);
+        this->xchng_vctr_alng(interpolated, /*ad*/ true, /*cyclic*/ true, ex);
+        this->xchng_vctr_nrml(interpolated, this->ijk, /*cyclic*/ true, ex);
       }
 
       void extrapolate_in_time() final
@@ -308,12 +307,11 @@ namespace libmpdataxx
         using namespace libmpdataxx::arakawa_c;
         
         auto ex = this->halo - 1;
-
 	intrp<0>(interpolated, this->vip_state(0, 0), im^ex, this->j^ex, this->k^ex, this->di);
 	intrp<1>(interpolated, this->vip_state(0, 1), jm^ex, this->k^ex, this->i^ex, this->dj);
 	intrp<2>(interpolated, this->vip_state(0, 2), km^ex, this->i^ex, this->j^ex, this->dk);
-        this->xchng_vctr_alng(interpolated, /*ad*/ false, /*cyclic*/ true);
-        this->xchng_vctr_nrml(interpolated, this->i^ex, this->j^ex, this->k^ex, /*cyclic*/ true);
+        this->xchng_vctr_alng(interpolated, /*ad*/ true, /*cyclic*/ true);
+        this->xchng_vctr_nrml(interpolated, this->ijk, /*cyclic*/ true, ex);
       }
 
       void extrapolate_in_time() final

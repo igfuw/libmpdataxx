@@ -72,15 +72,15 @@ class convergence_2d_spacetime : public libmpdataxx::solvers::mpdata<ct_params_t
 
     auto ex = this->halo - 1;
     this->xchng_vctr_alng(this->mem->GC);
-    this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+    this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
     
     if (isset(ct_params_t::opts, div_3rd))
     {
       this->xchng_vctr_alng(this->mem->ndt_GC);
-      this->xchng_vctr_nrml(this->mem->ndt_GC, this->i^ex, this->j^ex);
+      this->xchng_vctr_nrml(this->mem->ndt_GC, this->ijk, ex);
       
       this->xchng_vctr_alng(this->mem->ndtt_GC);
-      this->xchng_vctr_nrml(this->mem->ndtt_GC, this->i^ex, this->j^ex);
+      this->xchng_vctr_nrml(this->mem->ndtt_GC, this->ijk, ex);
     }
     return true;
   }
