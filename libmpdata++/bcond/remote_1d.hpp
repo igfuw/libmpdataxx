@@ -30,12 +30,12 @@ namespace libmpdataxx
 
       public:
 
-      void fill_halos_sclr(const arr_t &a, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const bool deriv = false)
       {
         this->xchng(a, idx_t(idx_ctor_arg_t(this->left_intr_sclr + off)), idx_t(idx_ctor_arg_t(this->left_halo_sclr)));
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const bool ad = false)
       {
         if(!this->is_cyclic) 
         {
@@ -70,12 +70,12 @@ namespace libmpdataxx
 
       public:
 
-      void fill_halos_sclr(const arr_t &a, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const bool deriv = false)
       {
         this->xchng(a, idx_t(idx_ctor_arg_t(this->rght_intr_sclr + off)), idx_t(idx_ctor_arg_t(this->rght_halo_sclr)));
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const bool ad = false)
       {
         if(!this->is_cyclic) 
         {

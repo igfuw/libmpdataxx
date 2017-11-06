@@ -29,23 +29,23 @@ namespace libmpdataxx
 
       public:
 
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
         using namespace idxperm;
         this->xchng(a, pi<d>(this->left_intr_sclr + off, j, k), pi<d>(this->left_halo_sclr, j, k));
       }
 
-      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
       {
         fill_halos_sclr(a, j, k);
       }
       
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
       
-      void set_edge_pres(const arr_t &, const rng_t &, const rng_t &, int) {}
+      void set_edge_pres(arr_t &, const rng_t &, const rng_t &, int) {}
 
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
         using namespace idxperm;
         if(!this->is_cyclic)
@@ -61,7 +61,7 @@ namespace libmpdataxx
       }
 
       // TODO: move to common? (same in cyclic!)
-      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j, const rng_t &k)                 
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)                 
       {                                                                         
         fill_halos_sclr(a, j, k);                                                  
       }  
@@ -85,23 +85,23 @@ namespace libmpdataxx
 
       public:
 
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
         using namespace idxperm;
         this->xchng(a, pi<d>(this->rght_intr_sclr + off, j, k), pi<d>(this->rght_halo_sclr, j, k));
       }
 
-      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
       {
         fill_halos_sclr(a, j, k);
       }
       
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
       
-      void set_edge_pres(const arr_t &, const rng_t &, const rng_t &, int) {}
+      void set_edge_pres(arr_t &, const rng_t &, const rng_t &, int) {}
 
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
         using namespace idxperm;
         if(!this->is_cyclic)
@@ -116,7 +116,7 @@ namespace libmpdataxx
       }
 
       // TODO: move to common? (same in cyclic!)
-      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j, const rng_t &k)                 
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)                 
       {                                                                         
         fill_halos_sclr(a, j, k);                                                  
       }
