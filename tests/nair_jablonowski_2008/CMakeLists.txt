@@ -39,4 +39,4 @@ endfunction()
 enable_testing()
 
 add_subdirectory(stationary)
-add_subdirectory(moving)
+#add_subdirectory(moving)

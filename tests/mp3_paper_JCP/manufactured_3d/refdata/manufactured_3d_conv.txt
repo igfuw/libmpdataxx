@@ -1,0 +1,8 @@
+Manufactured solution in 3D: convergence in the L2 error norm
+
+  N       Mp3     Mp3cc
+  9  1.14e-02  2.19e-02
+ 17  1.49e-03  5.24e-03
+ 33  1.80e-04  1.29e-03
+ 65  2.16e-05  3.28e-04
+129  2.71e-06  8.27e-05

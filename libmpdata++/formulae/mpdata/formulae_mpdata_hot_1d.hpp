@@ -16,37 +16,43 @@ namespace libmpdataxx
   { 
     namespace mpdata 
     {
-      template<opts_t opts, class arr_1d_t>
-      inline auto ndxx_psi_coeff(
+      template<opts_t opts, class arr_1d_t, class ix_t>
+      forceinline_macro auto ndxx_psi_coeff(
         const arr_1d_t &GC,
         const arr_1d_t &G,
-        const rng_t &i
-      ) return_macro(,
-	(
-          3 * GC(i+h) * abs(GC(i+h)) / G_bar_x<opts>(G, i)
-          - 2 * pow(GC(i+h), 3) / pow(G_bar_x<opts>(G, i), 2)  
-          - GC(i+h)
-        ) / 6
+        const ix_t &i
       )
+      {
+        return return_helper<ix_t>(
+          (
+            3 * GC(i+h) * abs(GC(i+h)) / G_bar_x<opts>(G, i)
+            - 2 * pow(GC(i+h), 3) / pow(G_bar_x<opts>(G, i), 2)  
+            - GC(i+h)
+          ) / 6
+        );
+      }
 
       // third order terms
-      template<opts_t opts, class arr_1d_t>
-      inline auto TOT(
+      template<opts_t opts, class arr_1d_t, class ix_t>
+      forceinline_macro auto TOT(
         const arr_1d_t &psi,
         const arr_1d_t &GC,
         const arr_1d_t &G,
-        const rng_t &i,
+        const ix_t &i,
         typename std::enable_if<opts::isset(opts, opts::tot)>::type* = 0 
-      ) return_macro(,
-          ndxx_psi<opts>(psi, i) * ndxx_psi_coeff<opts>(GC, G, i)
       )
+      {
+        return return_helper<ix_t>(
+            ndxx_psi<opts>(psi, i) * ndxx_psi_coeff<opts>(GC, G, i)
+        );
+      }
       
-      template<opts_t opts, class arr_1d_t>
-      inline typename arr_1d_t::T_numtype TOT(
+      template<opts_t opts, class arr_1d_t, class ix_t>
+      forceinline_macro auto TOT(
         const arr_1d_t &psi,
         const arr_1d_t &GC,
         const arr_1d_t &G,
-        const rng_t &i,
+        const ix_t &i,
         typename std::enable_if<!opts::isset(opts, opts::tot)>::type* = 0 
       )
       { 

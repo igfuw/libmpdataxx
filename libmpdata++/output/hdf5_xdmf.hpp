@@ -28,8 +28,11 @@ namespace libmpdataxx
     template <class solver_t>
     class hdf5_xdmf : public hdf5<solver_t>
     {
+      protected:
+      
+      using output_t = hdf5_xdmf<solver_t>;
       using parent_t = hdf5<solver_t>;
-
+      
       static_assert(parent_t::n_dims > 1, "only 2D and 3D output supported");
       
       std::vector<std::string> timesteps;
@@ -57,7 +60,7 @@ namespace libmpdataxx
         }
       }
 
-      void record_all()
+      void write_xmfs()
       {
 #if defined(USE_MPI)
         if (this->mem->distmem.rank() == 0)
@@ -72,7 +75,18 @@ namespace libmpdataxx
           // write temporal xmf
           xdmfw.write_temporal(this->outdir + "/temp.xmf", timesteps);
         }
+      }
+
+      void record_all()
+      {
+        write_xmfs();
         parent_t::record_all();
+      }
+
+      void record_aux(const std::string &name, typename solver_t::real_t *data)
+      {
+        xdmfw.add_attribute(name, this->hdf_name(), this->shape); 
+        parent_t::record_aux(name, data);
       }
 
       public:
@@ -82,7 +96,7 @@ namespace libmpdataxx
 	typename parent_t::ctor_args_t args,
 	const typename parent_t::rt_params_t &p
       ) : parent_t(args, p)
-      { }
+      {}
     };
   } // namespace output
 } // namespace libmpdataxx

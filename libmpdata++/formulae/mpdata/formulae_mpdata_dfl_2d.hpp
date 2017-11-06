@@ -17,77 +17,83 @@ namespace libmpdataxx
     namespace mpdata 
     {
       // divergent flow correction - no correction
-      template<opts_t opts, int dim, class arr_2d_t>
+      template<opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto DFL(
         const arr_2d_t &psi,
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
-        const rng_t &i,
-        const rng_t &j,
+        const ix_t &i,
+        const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::dfl)>::type* = 0 
-      ) -> decltype(0)
+      )
       { 
         return 0;  
       }
 
       // divergent flow correction - general case
-      template<opts_t opts, int dim, class arr_2d_t>
+      template<opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto DFL(
         const arr_2d_t &psi,    //to have the same arguments as in iga option
         const arrvec_t<arr_2d_t> &GC,      
         const arr_2d_t &G,
-        const rng_t &i,
-        const rng_t &j,
+        const ix_t &i,
+        const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::dfl) && !opts::isset(opts, opts::iga)>::type* = 0 
-      ) return_macro(,
-        - 0.25 * GC[dim](pi<dim>(i+h, j)) 
-        /
-        G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) 
-        * 
-        (
-          (
-            GC[dim](pi<dim>((i+1)+h, j)) - 
-            GC[dim](pi<dim>(i-h    , j))
-          )
-          +
-          (
-            GC[dim-1](pi<dim>(i+1, j+h)) + 
-            GC[dim-1](pi<dim>(i,   j+h)) -
-            GC[dim-1](pi<dim>(i+1, j-h)) - 
-            GC[dim-1](pi<dim>(i,   j-h))
-          )
-        )
       )
+      {
+        return return_helper<ix_t>(
+          - 0.25 * GC[dim](pi<dim>(i+h, j)) 
+          /
+          G_bar_x<opts, dim>(G, i, j) 
+          * 
+          (
+            (
+              GC[dim](pi<dim>((i+1)+h, j)) - 
+              GC[dim](pi<dim>(i-h    , j))
+            )
+            +
+            (
+              GC[dim-1](pi<dim>(i+1, j+h)) + 
+              GC[dim-1](pi<dim>(i,   j+h)) -
+              GC[dim-1](pi<dim>(i+1, j-h)) - 
+              GC[dim-1](pi<dim>(i,   j-h))
+            )
+          )
+        );
+      }
 
       // divergent flow correction - infinite gauge version
-      template<opts_t opts, int dim, class arr_2d_t>
+      template<opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto DFL(
         const arr_2d_t &psi,
         const arrvec_t<arr_2d_t> &GC,
         const arr_2d_t &G,
-        const rng_t &i,
-        const rng_t &j,
+        const ix_t &i,
+        const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::dfl) && opts::isset(opts, opts::iga)>::type* = 0 
-      ) return_macro(,
-        - 0.25 * GC[dim](pi<dim>(i+h, j)) 
-        /
-        G_bar_x<opts BOOST_PP_COMMA() dim>(G, i, j) 
-        * 
-        (
-          (
-            GC[dim](pi<dim>((i+1)+h, j)) - 
-            GC[dim](pi<dim>(i-h    , j))
-          )
-          +
-          (
-            GC[dim-1](pi<dim>(i+1, j+h)) + 
-            GC[dim-1](pi<dim>(i,   j+h)) -
-            GC[dim-1](pi<dim>(i+1, j-h)) - 
-            GC[dim-1](pi<dim>(i,   j-h))
-          )
-        )
-        * psi_bar_x<opts BOOST_PP_COMMA() dim>(psi, i, j) 
       )
+      {
+        return return_helper<ix_t>(
+          - 0.25 * GC[dim](pi<dim>(i+h, j)) 
+          /
+          G_bar_x<opts, dim>(G, i, j) 
+          * 
+          (
+            (
+              GC[dim](pi<dim>((i+1)+h, j)) - 
+              GC[dim](pi<dim>(i-h    , j))
+            )
+            +
+            (
+              GC[dim-1](pi<dim>(i+1, j+h)) + 
+              GC[dim-1](pi<dim>(i,   j+h)) -
+              GC[dim-1](pi<dim>(i+1, j-h)) - 
+              GC[dim-1](pi<dim>(i,   j-h))
+            )
+          )
+          * psi_bar_x<opts, dim>(psi, i, j) 
+        );
+      }
     } // namespace mpdata
   } // namespace formulae
 } // namespace libmpdataxx 

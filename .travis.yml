@@ -2,6 +2,7 @@ language: cpp
 os: 
     - linux
     - osx
+dist: trusty
 compiler:
     - gcc
     - clang
@@ -17,10 +18,12 @@ env:
     - TEST_SUITE=paper MPI=none
     - TEST_SUITE=elliptic_drop MPI=none
     - TEST_SUITE=nair_jablonowski_2008 MPI=none
-    - TEST_SUITE=bicycles MPI=none
+    - TEST_SUITE=UWLCM MPI=none
+    - TEST_SUITE=pbl MPI=none 
     - TEST_SUITE=unit MPI=openmpi
     - TEST_SUITE=sandbox MPI=openmpi
 # MPI paper tests don't do file comparison and plotting; TODO: fix them
+# TODO: add missing MPI tests
     - TEST_SUITE=paper MPI=openmpi
     - TEST_SUITE=elliptic_drop MPI=openmpi
     - TEST_SUITE=nair_jablonowski_2008 MPI=openmpi
@@ -39,13 +42,31 @@ matrix:
           env: TEST_SUITE=nair_jablonowski_2008 MPI=openmpi
         - os: osx
           compiler: gcc
+        
+        - os: osx
+          env: TEST_SUITE=pbl # pbl not tested on osx
 
         - compiler: clang
-          env: TEST_SUITE=bicycles MPI=none # bicycles is not tested on clang yet
+          env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
+addons:
+  apt:
+    packages:
+      - g++-6
+      - clang-4.0
+    sources: &sources
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-trusty-4.0
 
 osx_image: xcode8
 
 before_install:
+    # define a compiler variable for use in if statements
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export COMPILER=clang++; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then export COMPILER=g++; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export COMPILER=clang++; fi # only clang on osx
+
+# to avoid python lib/interpreter mismatch; https://github.com/travis-ci/travis-ci/issues/5326
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
@@ -63,18 +84,20 @@ before_install:
 
     # you may not believe it, but GCC (4.8.2) is giving ICEs otherwise!
     - export make_j="make -j 2"
-    - if [[ $CXX == 'g++' ]]; then export make_j="make"; fi
+    - if [[ $COMPILER == 'g++' ]]; then export make_j="make"; fi
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
     - export PY3DEB=""
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++' ]]; then PY3DEB=3; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' ]]; then PY3DEB=3; fi
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
  
 install:
-    # compilers
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then sudo $apt_get_install clang-3.5; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'g++'     ]]; then sudo $apt_get_install g++; fi
-    #- if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then brew install gcc48; fi   # would need a gcc-compiled boost ... (see note below)
+    # silence the gazillion warnings coming from blitz headers when using the osx clang
+    - if [[ $TRAVIS_OS_NAME == 'osx' && $COMPILER == 'clang++' ]]; then export CXXFLAGS="-Wno-parentheses ${CXXFLAGS}"; fi
+
+    # redefine CXX to the actual version used
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then export CXX=clang++-4.0; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++'     ]]; then export CXX=g++-6; fi
 
     # add a definition -DBOOST_HAS_INT128=1 to clang calls on linux to avoid errors with boost.atomic (https://svn.boost.org/trac/boost/ticket/9610)
 #    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then mkdir /tmp/bin; fi
@@ -95,9 +118,10 @@ install:
     - if [[ $MPI != 'none'    ]]; then export CC=mpicc.$MPI ; fi
 
     # boost
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libboost-mpi1.55-dev; fi
+    #- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libboost-mpi1.55-dev; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
 
     # cmake 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install cmake; fi
@@ -125,6 +149,9 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo make install; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd ..; fi 
 
+#=======
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install  -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install hdf5-tools; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5 --with-cxx; fi
 
     # gnuplot-iostream
@@ -155,7 +182,7 @@ script:
     - cmake ..
     - cd ../..
 
-    # compiling and running all unit tests in Debug mode
+    # compiling and running all unit tests in Debug & Release modes
     - if [[ $TEST_SUITE == 'unit' ]]; then . ./.travis_scripts/unit.sh; fi # with '.' to pass env vars
 
     # compiling and running selected paper tests in Debug mode
@@ -166,40 +193,11 @@ script:
 
     - if [[ $TEST_SUITE == 'elliptic_drop' ]]; then . ./.travis_scripts/elliptic_drop.sh; fi
 
-    # running tests from bicycles in Release mode
-    - if [[ $TEST_SUITE == 'bicycles' ]]; then . ./.travis_scripts/bicycles.sh; fi
+    # running tests from UWLCM in Release mode
+    - if [[ $TEST_SUITE == 'UWLCM' ]]; then . ./.travis_scripts/UWLCM.sh; fi # with '.' to pass env vars
     
     # compiling and running tests from Nair & Jablonowski 2008 MWR paper in Release mode
     - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then . ./.travis_scripts/nair_jablonowski_2008.sh; fi
     
-#    # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
-#    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
-#    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 10; fi
-#
-#    # libcloudph++'s dependencies
-#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-python-dev python-numpy libthrust-dev; fi
-#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install boost-python; fi
-#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then git clone --depth=1 git://github.com/thrust/thrust.git; fi
-#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust; fi
-#
-#    # libcloudph++ (needed by icicle, skipping tests and CUDA build)
-#    - git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
-#    - cd libcloudphxx
-#    - mkdir build 
-#    - cd build
-#    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
-#    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-#    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
-#    - make 
-#    - sudo make install
-#    - cd ../..
-#
-#    ## icicle (no tests - just testing if any changes in libmpdata's API did not break icicle)
-#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-program-options-dev; fi
-#    - cd libcloudphxx/tests/paper_GMD_2015
-#    - mkdir build 
-#    - cd build
-#    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ ../; fi # Travis default is not the packaged     one
-#    - if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi # the one from homebrew
-#    - cmake -DCMAKE_BUILD_TYPE=Release ../ 
-#    - make
+    # running pbl tests in Release mode
+    - if [[ $TEST_SUITE == 'pbl' ]]; then . ./.travis_scripts/pbl.sh; fi

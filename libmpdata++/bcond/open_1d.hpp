@@ -26,7 +26,7 @@ namespace libmpdataxx
       
       public:
 
-      void fill_halos_sclr(const arr_t &a, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const bool deriv = false)
       {
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
         {
@@ -37,7 +37,7 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const bool ad = false)
       {
         for (int i = this->left_halo_vctr.first(); i <= this->left_halo_vctr.last(); ++i)
 	  av[0](rng_t(i, i)) = av[0](this->left_intr_vctr.first());
@@ -59,7 +59,7 @@ namespace libmpdataxx
       
       public:
 
-      void fill_halos_sclr(const arr_t &a, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const bool deriv = false)
       {
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
         {
@@ -70,7 +70,7 @@ namespace libmpdataxx
         }
       }
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const bool ad = false)
       {
         for (int i = this->rght_halo_vctr.first(); i <= this->rght_halo_vctr.last(); ++i)
 	  av[0](rng_t(i, i)) = av[0](this->rght_intr_vctr.first());

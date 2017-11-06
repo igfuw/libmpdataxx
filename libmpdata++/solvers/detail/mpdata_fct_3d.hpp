@@ -68,8 +68,8 @@ namespace libmpdataxx
             im1 = this->im^1, jm1 = this->jm^1, km1 = this->km^1; 
 
 	  // fill halos -> mpdata works with halo=1, we need halo=2
-          this->xchng_vctr_alng(GC_corr);
-          this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j, this->k);
+          this->xchng_vctr_alng(GC_corr, true);
+          this->xchng_vctr_nrml(this->GC_corr(iter), this->ijk);
           
           // calculation of fluxes for betas denominators
           if (opts::isset(ct_params_t::opts, opts::iga))
@@ -88,8 +88,8 @@ namespace libmpdataxx
           const auto &flx = (*(this->flux_ptr));
 
           // calculating betas
-          this->beta_up(i1, j1, k1) = formulae::mpdata::beta_up<ct_params_t::opts>(psi, this->psi_max, flx, G, i1, j1, k1);
-          this->beta_dn(i1, j1, k1) = formulae::mpdata::beta_dn<ct_params_t::opts>(psi, this->psi_min, flx, G, i1, j1, k1);
+          formulae::mpdata::beta_up<ct_params_t::opts>(this->beta_up, psi, this->psi_max, flx, G, i1, j1, k1);
+          formulae::mpdata::beta_dn<ct_params_t::opts>(this->beta_dn, psi, this->psi_min, flx, G, i1, j1, k1);
         
 
           // should detect the need for ext=1 in hallo-filling above
@@ -104,9 +104,9 @@ namespace libmpdataxx
           this->beta_barrier(iter);
 
 	  // calculating the monotonic corrective velocity
-	  this->GC_mono[0]( im+h, this->j, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 0>(psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j, this->k);
-	  this->GC_mono[1]( this->i, jm+h, this->k ) = formulae::mpdata::GC_mono<ct_params_t::opts, 1>(psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->k, this->i);
-	  this->GC_mono[2]( this->i, this->j, km+h ) = formulae::mpdata::GC_mono<ct_params_t::opts, 2>(psi, this->beta_up, this->beta_dn, GC_corr, G, km, this->i, this->j);
+	  formulae::mpdata::GC_mono<ct_params_t::opts, 0>(this->GC_mono, psi, this->beta_up, this->beta_dn, GC_corr, G, im, this->j, this->k);
+	  formulae::mpdata::GC_mono<ct_params_t::opts, 1>(this->GC_mono, psi, this->beta_up, this->beta_dn, GC_corr, G, jm, this->k, this->i);
+	  formulae::mpdata::GC_mono<ct_params_t::opts, 2>(this->GC_mono, psi, this->beta_up, this->beta_dn, GC_corr, G, km, this->i, this->j);
         }
 
       };

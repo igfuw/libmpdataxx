@@ -41,9 +41,7 @@ enable_testing()
 libmpdataxx_add_test(gmd_2012)
 
 add_test(gmd_2012_stats_and_plots bash -c "
-  for i in nug_i2_120 nug_i2_240 nug_iga_fct_i2_120 nug_iga_fct_i2_240; do 
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/stats_and_plots.py $i;
-  done
+  python  ${CMAKE_CURRENT_SOURCE_DIR}/stats_and_plots.py nug_i2_120 nug_i2_240 nug_iga_fct_i2_120 nug_iga_fct_i2_240;
 ") 
 
 add_test(gmd_2012_stats_diff bash -c "

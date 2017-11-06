@@ -36,11 +36,19 @@ function(libmpdataxx_add_test test)
   endif()
 endfunction()
 
+# same as above but for travis only tests that should be excluded from make all
+function(libmpdataxx_add_test_travis test)
+  add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
+  target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
+  target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
+  add_test(${test} ${test})
+endfunction()
+
 enable_testing()
 
 add_subdirectory(0_mpi_adv)
 add_subdirectory(1_straka)
-add_subdirectory(2_turbulence)
+add_subdirectory(2_tgv)
 add_subdirectory(3_convergence_2d_3d)
 add_subdirectory(4_pbl)
 add_subdirectory(5_convergence_spacetime)

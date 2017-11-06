@@ -42,12 +42,31 @@ namespace libmpdataxx
   //  note that it's not needed for upstream
 	  parent_t::hook_ante_loop(nt);
 	  if (opts::isset(ct_params_t::opts, opts::nug))
-            this->xchng_sclr(*this->mem->G, this->i^this->halo, this->j^this->halo, this->k^this->halo);
+            this->xchng_sclr(*this->mem->G, this->ijk, this->halo);
           
           // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y
           // halos for GC_z
           auto ex = this->halo - 1;
-          this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex, this->k^ex);
+          this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
+         
+          // set time derivatives of GC to zero
+          // needed for stationary flows prescribed using the advector method
+          if (opts::isset(ct_params_t::opts, opts::div_3rd_dt) || opts::isset(ct_params_t::opts, opts::div_3rd))
+          {
+            this->mem->ndt_GC[0](this->im + h, this->j, this->k) = 0;
+            this->mem->ndt_GC[1](this->i, this->jm + h, this->k) = 0;
+            this->mem->ndt_GC[2](this->i, this->j, this->km + h) = 0;
+            
+            this->mem->ndtt_GC[0](this->im + h, this->j, this->k) = 0;
+            this->mem->ndtt_GC[1](this->i, this->jm + h, this->k) = 0;
+            this->mem->ndtt_GC[2](this->i, this->j, this->km + h) = 0;
+
+            this->xchng_vctr_alng(this->mem->ndt_GC);
+            this->xchng_vctr_alng(this->mem->ndtt_GC);
+
+            this->xchng_vctr_nrml(this->mem->ndt_GC, this->ijk, ex);
+            this->xchng_vctr_nrml(this->mem->ndtt_GC, this->ijk, ex);
+          }
 	} 
 
 	// method invoked by the solver
@@ -63,41 +82,47 @@ namespace libmpdataxx
               this->xchng(e);
 
 	      // calculating the antidiffusive C 
-	      this->GC_corr(iter)[0](this->im+h, this->j, this->k) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 0>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-                  *this->mem->G,
-                  this->im,
-                  this->j,
-                  this->k
-		);
+              formulae::mpdata::antidiff<ct_params_t::opts, 0, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
+                this->GC_corr(iter)[0],
+                this->mem->psi[e][this->n[e]], 
+                this->mem->psi[e][this->n[e]-1],
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                this->im,
+                this->j,
+                this->k
+              );
 
-	      this->GC_corr(iter)[1](this->i, this->jm+h, this->k) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 1>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-                  *this->mem->G,
-                  this->jm,
-                  this->k,
-                  this->i
-	        );
-	      
-	      this->GC_corr(iter)[2](this->i, this->j, this->km+h) = 
-		formulae::mpdata::antidiff<ct_params_t::opts, 2>(
-                  this->mem->psi[e][this->n[e]], 
-                  this->GC_unco(iter),
-                  this->mem->ndt_GC,
-                  this->mem->ndtt_GC,
-                  *this->mem->G,
-                  this->km,
-                  this->i,
-                  this->j
-	        );
+              formulae::mpdata::antidiff<ct_params_t::opts, 1, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
+                this->GC_corr(iter)[1],
+                this->mem->psi[e][this->n[e]], 
+                this->mem->psi[e][this->n[e]-1], 
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                this->jm,
+                this->k,
+                this->i
+              );
+            
+              formulae::mpdata::antidiff<ct_params_t::opts, 2, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
+                this->GC_corr(iter)[2],
+                this->mem->psi[e][this->n[e]], 
+                this->mem->psi[e][this->n[e]-1], 
+                this->GC_unco(iter),
+                this->mem->ndt_GC,
+                this->mem->ndtt_GC,
+                *this->mem->G,
+                this->km,
+                this->i,
+                this->j
+              );
+	    
+              if (opts::isset(ct_params_t::opts, opts::div_3rd_dt))
+                this->mem->barrier();
               
 	      // filling Y and Z halos for GC_x, X and Z halos for GC_y, X and Y halos for GC_z 
 	      // needed for calculation of antidiffusive velocities in the third and subsequent
@@ -105,7 +130,7 @@ namespace libmpdataxx
               // the following check
               if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
               {
-                this->xchng_vctr_nrml(this->GC_corr(iter), this->i, this->j, this->k);
+                this->xchng_vctr_nrml(this->GC_corr(iter), this->ijk);
                 // if dfl option is set we need to fill these as well
                 if (opts::isset(ct_params_t::opts, opts::dfl)) this->xchng_vctr_alng(this->GC_corr(iter));
               }

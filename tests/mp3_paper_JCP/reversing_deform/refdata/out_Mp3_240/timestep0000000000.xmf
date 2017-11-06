@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Xdmf>
+	<Domain>
+		<Grid Name="Grid" GridType="Uniform" xml:id="gid">
+			<Time Value="0.000000"/>
+			<Topology TopologyType="2DSMesh" Dimensions="482 241 "/>
+			<Geometry GeometryType="X_Y">
+				<DataItem Dimensions="482 241 " NumberType="Float" Format="HDF">const.h5:/X</DataItem>
+				<DataItem Dimensions="482 241 " NumberType="Float" Format="HDF">const.h5:/Y</DataItem>
+			</Geometry>
+			<Attribute Name="cb" AttributeType="Scalar" Center="Cell">
+				<DataItem Dimensions="481 240 " NumberType="Float" Format="HDF">timestep0000000000.h5:/cb</DataItem>
+			</Attribute>
+			<Attribute Name="ccb" AttributeType="Scalar" Center="Cell">
+				<DataItem Dimensions="481 240 " NumberType="Float" Format="HDF">timestep0000000000.h5:/ccb</DataItem>
+			</Attribute>
+			<Attribute Name="gh" AttributeType="Scalar" Center="Cell">
+				<DataItem Dimensions="481 240 " NumberType="Float" Format="HDF">timestep0000000000.h5:/gh</DataItem>
+			</Attribute>
+			<Attribute Name="sc" AttributeType="Scalar" Center="Cell">
+				<DataItem Dimensions="481 240 " NumberType="Float" Format="HDF">timestep0000000000.h5:/sc</DataItem>
+			</Attribute>
+			<Attribute Name="G" AttributeType="Scalar" Center="Cell">
+				<DataItem Dimensions="481 240 " NumberType="Float" Format="HDF">const.h5:/G</DataItem>
+			</Attribute>
+		</Grid>
+	</Domain>
+</Xdmf>

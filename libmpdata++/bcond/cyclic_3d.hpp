@@ -26,28 +26,45 @@ namespace libmpdataxx
 
       public:
 
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
 	using namespace idxperm;
 	a(pi<d>(this->left_halo_sclr, j, k)) = a(pi<d>(this->rght_intr_sclr, j, k)); 
       }
 
-      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
       {
         fill_halos_sclr(a, j, k);
       }
       
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
       
-      void set_edge_pres(const arr_t &, const rng_t &, const rng_t &, int) {}
+      void set_edge_pres(arr_t &, const rng_t &, const rng_t &, int) {}
 
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
 	using namespace idxperm;
         av[d](pi<d>(this->left_halo_vctr, j, k)) = av[d](pi<d>(this->rght_intr_vctr, j, k));
       }
+      
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
+      }
+      
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
+      {
+	using namespace idxperm;
+        // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
+        av[d + offset](pi<d>(this->left_halo_vctr, j, k)) = av[d + offset](pi<d>(this->rght_intr_vctr, j, k));
+      }
+      
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
+      {
+        fill_halos_vctr_alng(av, j, k);
+      }
 
-      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)
       {
         fill_halos_sclr(a, j, k);
       }
@@ -68,28 +85,45 @@ namespace libmpdataxx
 
       public:
 
-      void fill_halos_sclr(const arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
+      void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
 	using namespace idxperm;
 	a(pi<d>(this->rght_halo_sclr, j, k)) = a(pi<d>(this->left_intr_sclr, j, k));
       }
 
-      void fill_halos_pres(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
       {
         fill_halos_sclr(a, j, k);
       }
       
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
       
-      void set_edge_pres(const arr_t &, const rng_t &, const rng_t &, int) {}
+      void set_edge_pres(arr_t &, const rng_t &, const rng_t &, int) {}
       
-      void fill_halos_vctr_alng(const arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
 	using namespace idxperm;
         av[d](pi<d>(this->rght_halo_vctr, j, k)) = av[d](pi<d>(this->left_intr_vctr, j, k));
       }
+      
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
+      }
+      
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
+      {
+	using namespace idxperm;
+        // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
+        av[d + offset](pi<d>(this->rght_halo_vctr, j, k)) = av[d + offset](pi<d>(this->left_intr_vctr, j, k));
+      }
+      
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
+      {
+        fill_halos_vctr_alng(av, j, k);
+      }
 
-      void fill_halos_vctr_nrml(const arr_t &a, const rng_t &j, const rng_t &k)
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)
       {
         fill_halos_sclr(a, j, k);
       }

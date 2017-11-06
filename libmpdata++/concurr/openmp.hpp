@@ -8,6 +8,8 @@
 
 #include <libmpdata++/concurr/detail/concurr_common.hpp>
 
+#include <limits>
+
 #ifdef _OPENMP
 # include <omp.h>
 #endif
@@ -32,9 +34,11 @@ namespace libmpdataxx
 
       struct mem_t : parent_t::mem_t
       {
-	static int size() 
+	static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max())
 	{
 #if defined(_OPENMP)
+	  static int nthreads = std::min(max_threads, static_cast<unsigned>(omp_get_max_threads()));
+          omp_set_num_threads(nthreads);
 	  return omp_get_max_threads();
 #else
 	  return 1;
@@ -48,7 +52,7 @@ namespace libmpdataxx
         }
 
         // ctors
-        mem_t(const std::array<int, solver_t::n_dims> &grid_size) : parent_t::mem_t(grid_size, size()) {};
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size) : parent_t::mem_t(grid_size, size(grid_size[0])) {};
       };
 
       void solve(typename parent_t::advance_arg_t nt)
@@ -67,7 +71,7 @@ namespace libmpdataxx
 
       // ctor
       openmp(const typename solver_t::rt_params_t &p) : 
-        parent_t(p, new mem_t(p.grid_size), mem_t::size())
+        parent_t(p, new mem_t(p.grid_size), mem_t::size(p.grid_size[0]))
       {}
 
     };
