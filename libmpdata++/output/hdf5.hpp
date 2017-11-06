@@ -199,6 +199,8 @@ namespace libmpdataxx
               auto g_set = (*hdfp).createDataSet("G", flttype_output, sspace);
               record_dsc_helper(g_set, *this->mem->G);
             }
+          }
+        }
       }
 
       std::string base_name()
