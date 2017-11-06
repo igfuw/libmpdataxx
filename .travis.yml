@@ -41,10 +41,9 @@ matrix:
         - compiler: clang
           env: TEST_SUITE=nair_jablonowski_2008 MPI=openmpi
         - os: osx
-          compiler: gcc
-        
+          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
         - os: osx
-          env: TEST_SUITE=pbl # pbl not tested on osx
+          compiler: gcc
 
         - compiler: clang
           env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
