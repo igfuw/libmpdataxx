@@ -35,19 +35,17 @@ namespace libmpdataxx
           a(pi<d>(i, j)) = a(pi<d>(this->left_edge_sclr + n, j));
         }
       }
-      
+ 
       void fill_halos_pres(arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
         // equivalent to one-sided derivatives at the boundary
-        a(pi<d>(this->left_halo_sclr.last(), j)) = 2 * a(pi<d>(this->left_edge_sclr,     j))
-                                                     - a(pi<d>(this->left_edge_sclr + 1, j));
-        if (halo > 1)
+        for (int i = this->left_halo_sclr.first(), n = halo; i <= this->left_halo_sclr.last(); ++i, --n)
         {
-          a(pi<d>(this->left_halo_sclr.last() - 1, j)) =   3 * a(pi<d>(this->left_edge_sclr,     j))
-                                                         - 2 * a(pi<d>(this->left_edge_sclr + 1, j));
+          a(pi<d>(i, j)) = 2 * a(pi<d>(this->left_edge_sclr,     j))
+                             - a(pi<d>(this->left_edge_sclr + n, j));
         }
-      }
+      }     
 
       void save_edge_vel(const arr_t &, const rng_t &) {}
      
@@ -109,13 +107,10 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         // equivalent to one-sided derivatives at the boundary
-        a(pi<d>(this->rght_halo_sclr.first(), j)) = 2 * a(pi<d>(this->rght_edge_sclr,     j))
-                                                      - a(pi<d>(this->rght_edge_sclr - 1, j));
-
-        if (halo > 1)
+        for (int i = this->rght_halo_sclr.first(), n = 1; i <= this->rght_halo_sclr.last(); ++i, ++n)
         {
-          a(pi<d>(this->rght_halo_sclr.first() + 1, j)) =   3 * a(pi<d>(this->rght_edge_sclr,     j))
-                                                          - 2 * a(pi<d>(this->rght_edge_sclr - 1, j));
+          a(pi<d>(i, j)) = 2 * a(pi<d>(this->rght_edge_sclr,     j))
+                             - a(pi<d>(this->rght_edge_sclr - n, j));
         }
       }
       
