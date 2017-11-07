@@ -126,8 +126,8 @@ namespace libmpdataxx
         virtual void xchng_vctr_nrml(
           arrvec_t<typename parent_t::arr_t> &arrvec, 
           const idx_t<2> &range_ijk,
-          const bool cyclic = false,
-          const int ext = 0
+          const int ext = 0,
+          const bool cyclic = false
         ) final
         {
           this->mem->barrier();
