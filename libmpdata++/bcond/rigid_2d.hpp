@@ -72,6 +72,12 @@ namespace libmpdataxx
         // note intentional sclr
         fill_halos_sclr(a, j);
       }
+      
+      void fill_halos_flux(arrvec_t<arr_t> &av, const rng_t &j)
+      {
+        using namespace idxperm;
+	av[d](pi<d>(this->left_halo_vctr.last(), j)) = -av[d](pi<d>(this->left_edge_sclr + h, j));
+      }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
@@ -135,6 +141,13 @@ namespace libmpdataxx
       {
         // note intentional sclr
         fill_halos_sclr(a, j);
+      }
+      
+      void fill_halos_flux(arrvec_t<arr_t> &av, const rng_t &j)
+      {
+	using namespace idxperm;
+        // zero flux condition
+	av[d](pi<d>(this->rght_halo_vctr.first(), j)) = -av[d](pi<d>(this->rght_edge_sclr - h, j));
       }
     };
   } // namespace bcond

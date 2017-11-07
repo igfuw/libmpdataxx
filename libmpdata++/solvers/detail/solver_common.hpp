@@ -82,6 +82,7 @@ namespace libmpdataxx
         // TODO: implement flagging of valid/invalid halo for optimisations
 
         virtual void xchng_vctr_alng(arrvec_t<arr_t>&, const bool ad = false, const bool cyclic = false) = 0;
+        virtual void xchng_flux(arrvec_t<arr_t>&) = 0;
 
         void set_bcs(const int &d, bcp_t &bcl, bcp_t &bcr)
         {

@@ -68,6 +68,14 @@ namespace libmpdataxx
           this->mem->barrier();
         }
         
+        void xchng_flux(arrvec_t<typename parent_t::arr_t> &arrvec) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_flux(arrvec, j, k);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_flux(arrvec, k, i);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_flux(arrvec, i, j);
+        }
+        
         virtual void xchng_sgs_div(
 	  typename parent_t::arr_t &arr,
 	  const idx_t<3> &range_ijk
