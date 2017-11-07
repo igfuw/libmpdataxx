@@ -142,7 +142,7 @@ namespace libmpdataxx
 	intrp<0>(this->stash[0 + off], im^ex, this->j^ex, this->di);
 	intrp<1>(this->stash[1 + off], jm^ex, this->i^ex, this->dj);
         this->xchng_vctr_alng(this->mem->GC, /*ad*/ false, /*cyclic*/ true);
-        this->xchng_vctr_nrml(this->mem->GC, this->ijk, /*cyclic*/ true, ex);
+        this->xchng_vctr_nrml(this->mem->GC, this->ijk, /*cyclic*/ false, ex);
       }
 
       void extrapolate_in_time() final
@@ -261,7 +261,7 @@ namespace libmpdataxx
 	intrp<1>(this->stash[1 + off], jm^ex, this->k^ex, this->i^ex, this->dj);
 	intrp<2>(this->stash[2 + off], km^ex, this->i^ex, this->j^ex, this->dk);
         this->xchng_vctr_alng(this->mem->GC, /*ad*/ false, /*cyclic*/ true);
-        this->xchng_vctr_nrml(this->mem->GC, this->ijk, /*cyclic*/ true, ex);
+        this->xchng_vctr_nrml(this->mem->GC, this->ijk, /*cyclic*/ false, ex);
       }
 
       void extrapolate_in_time() final
