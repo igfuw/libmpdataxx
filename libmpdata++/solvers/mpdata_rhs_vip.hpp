@@ -164,17 +164,17 @@ namespace libmpdataxx
 	intrp<0>(interpolated, this->vip_state(0, 0), im, this->j^ex, this->di);
 	intrp<1>(interpolated, this->vip_state(0, 1), jm, this->i^ex, this->dj);
         this->xchng_vctr_alng(interpolated, /*ad*/ true, /*cyclic*/ true, ex);
-        this->xchng_vctr_nrml(interpolated, this->ijk, /*cyclic*/ true, ex);
+        this->xchng_vctr_nrml(interpolated, this->ijk, ex, /*cyclic*/ true);
       }
 
       void extrapolate_in_time() final
       {
         using namespace libmpdataxx::arakawa_c; 
 
-	this->extrp(0, ix::vip_i);
         // using xchng_pres because bcs have to be consistent with those used in
         // pressure solver to obtain non-divergent advector field
         auto ex = this->halo - 1;
+	this->extrp(0, ix::vip_i);
 	this->xchng_pres(this->vip_state(0, 0), this->ijk, ex);
 	this->extrp(1, ix::vip_j);
 	this->xchng_pres(this->vip_state(0, 1), this->ijk, ex);
@@ -311,7 +311,7 @@ namespace libmpdataxx
 	intrp<1>(interpolated, this->vip_state(0, 1), jm^ex, this->k^ex, this->i^ex, this->dj);
 	intrp<2>(interpolated, this->vip_state(0, 2), km^ex, this->i^ex, this->j^ex, this->dk);
         this->xchng_vctr_alng(interpolated, /*ad*/ true, /*cyclic*/ true);
-        this->xchng_vctr_nrml(interpolated, this->ijk, /*cyclic*/ true, ex);
+        this->xchng_vctr_nrml(interpolated, this->ijk, ex, /*cyclic*/ false, ex);
       }
 
       void extrapolate_in_time() final

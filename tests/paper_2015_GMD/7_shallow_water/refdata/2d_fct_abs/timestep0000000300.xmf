@@ -8,14 +8,14 @@
 				<DataItem Dimensions="321 321 " NumberType="Float" Format="HDF">const.h5:/X</DataItem>
 				<DataItem Dimensions="321 321 " NumberType="Float" Format="HDF">const.h5:/Y</DataItem>
 			</Geometry>
+			<Attribute Name="h" AttributeType="Scalar" Center="Cell">
+				<DataItem Dimensions="320 320 " NumberType="Float" Format="HDF">timestep0000000300.h5:/h</DataItem>
+			</Attribute>
 			<Attribute Name="qx" AttributeType="Scalar" Center="Cell">
 				<DataItem Dimensions="320 320 " NumberType="Float" Format="HDF">timestep0000000300.h5:/qx</DataItem>
 			</Attribute>
 			<Attribute Name="qy" AttributeType="Scalar" Center="Cell">
 				<DataItem Dimensions="320 320 " NumberType="Float" Format="HDF">timestep0000000300.h5:/qy</DataItem>
-			</Attribute>
-			<Attribute Name="h" AttributeType="Scalar" Center="Cell">
-				<DataItem Dimensions="320 320 " NumberType="Float" Format="HDF">timestep0000000300.h5:/h</DataItem>
 			</Attribute>
 		</Grid>
 	</Domain>

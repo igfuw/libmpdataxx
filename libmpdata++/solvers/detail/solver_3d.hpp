@@ -72,6 +72,14 @@ namespace libmpdataxx
           this->mem->barrier();
         }
         
+        virtual void xchng_flux(arrvec_t<typename parent_t::arr_t> &arrvec) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_flux(arrvec, j, k);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_flux(arrvec, k, i);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_flux(arrvec, i, j);
+        }
+        
         virtual void xchng_sgs_div(
 	  typename parent_t::arr_t &arr,
 	  const idx_t<3> &range_ijk
@@ -139,9 +147,9 @@ namespace libmpdataxx
 
         virtual void xchng_vctr_nrml(
           arrvec_t<typename parent_t::arr_t> &arrvec,
-	  const idx_t<3> &range_ijk,
-          const bool cyclic = false,
-          const int ext = 0
+          const idx_t<3> &range_ijk,
+          const int ext = 0,
+          const bool cyclic = false
         ) final
         {
           this->mem->barrier();
@@ -152,7 +160,11 @@ namespace libmpdataxx
 
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[0]^ext^1, range_ijk[1]^ext^h);
+<<<<<<< HEAD
      
+=======
+       
+>>>>>>> bc_fixes
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
           }
@@ -163,7 +175,11 @@ namespace libmpdataxx
 
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[0]^ext^1, range_ijk[1]^ext^h);
+<<<<<<< HEAD
      
+=======
+       
+>>>>>>> bc_fixes
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
           }

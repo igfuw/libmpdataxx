@@ -35,7 +35,7 @@ namespace libmpdataxx
           a(pi<d>(i, j)) = a(pi<d>(this->left_edge_sclr + n, j));
         }
       }
-      
+ 
       void fill_halos_pres(arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
@@ -45,7 +45,7 @@ namespace libmpdataxx
           a(pi<d>(i, j)) = 2 * a(pi<d>(this->left_edge_sclr,     j))
                              - a(pi<d>(this->left_edge_sclr + n, j));
         }
-      }
+      }     
 
       void save_edge_vel(const arr_t &, const rng_t &) {}
      
@@ -79,6 +79,12 @@ namespace libmpdataxx
       {
         // note intentional sclr
         fill_halos_sclr(a, j);
+      }
+      
+      void fill_halos_flux(arrvec_t<arr_t> &av, const rng_t &j)
+      {
+        using namespace idxperm;
+	av[d](pi<d>(this->left_halo_vctr.last(), j)) = -av[d](pi<d>(this->left_edge_sclr + h, j));
       }
     };
 
@@ -150,6 +156,13 @@ namespace libmpdataxx
       {
         // note intentional sclr
         fill_halos_sclr(a, j);
+      }
+      
+      void fill_halos_flux(arrvec_t<arr_t> &av, const rng_t &j)
+      {
+	using namespace idxperm;
+        // zero flux condition
+	av[d](pi<d>(this->rght_halo_vctr.first(), j)) = -av[d](pi<d>(this->rght_edge_sclr - h, j));
       }
     };
   } // namespace bcond

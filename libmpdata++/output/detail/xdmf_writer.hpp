@@ -3,6 +3,7 @@
 #include <map>
 #include <array>
 #include <vector>
+#include <set>
 #include <string>
 #include <sstream>
 
@@ -76,7 +77,7 @@ namespace libmpdataxx
           std::string name;
           static const std::string attribute_type;
           static const std::string center;
-          data_item item;
+          mutable data_item item;
           void add(ptree& node)
           {
             ptree& attr_node = node.add("Attribute", "");
@@ -85,14 +86,29 @@ namespace libmpdataxx
             attr_node.put("<xmlattr>.Center", center);
             item.add(attr_node);
           }
+
+          // to allow storing attributes in std::set
+          friend bool operator<(const attribute &lhs, const attribute &rhs)
+          {
+            return lhs.name < rhs.name;
+          }
         };
 
         static const std::string name;
         static const std::string grid_type;
         topology top;
         geometry geo;
-        std::vector<attribute> attrs;
-        std::vector<attribute> c_attrs;
+        std::set<attribute> attrs;
+        std::set<attribute> c_attrs;
+
+        attribute make_attribute(const std::string& name,
+                                 const blitz::TinyVector<int, dim>& dimensions)
+        {
+          attribute a;
+          a.name = name;
+          a.item.dimensions = dimensions - 1;
+          return a;
+        }
 
         public:
 
@@ -111,22 +127,27 @@ namespace libmpdataxx
 
           for (const auto& n : attr_names)
           {
-            attribute a;
-            a.name = n;
-            a.item.dimensions = dimensions - 1;
-            attrs.push_back(a);
+            attrs.insert(make_attribute(n, dimensions));
           }
         }
         
+
+        void add_attribute(const std::string& name,
+                                 const std::string& hdf_name,
+                                 const blitz::TinyVector<int, dim>& dimensions)
+        {
+          attribute a = make_attribute(name, dimensions);
+          a.item.data = hdf_name + ":/" + a.name;
+          attrs.insert(a);
+        }
+
         void add_const_attribute(const std::string& name,
                                  const std::string& hdf_name,
                                  const blitz::TinyVector<int, dim>& dimensions)
         {
-          attribute a;
-          a.name = name;
-          a.item.dimensions = dimensions - 1;
+          attribute a = make_attribute(name, dimensions);
           a.item.data = hdf_name + ":/" + a.name;
-          c_attrs.push_back(a);
+          c_attrs.insert(a);
         }
 
         void write(const std::string& xmf_name, const std::string& hdf_name, const double time)

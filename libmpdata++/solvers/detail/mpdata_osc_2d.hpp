@@ -147,7 +147,8 @@ namespace libmpdataxx
               this->flux_ptr = &this->GC(iter);
             }   
 
-            const auto &flx = (*(this->flux_ptr));
+            auto &flx = (*(this->flux_ptr));
+            this->xchng_flux(flx);
 
             // sanity check for input
             //assert(std::isfinite(sum(this->mem->psi[e][this->n[e]](this->ijk))));
