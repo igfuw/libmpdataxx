@@ -22,6 +22,10 @@ set(libmpdataxx_LIBRARIES "")
 set(libmpdataxx_CXX_FLAGS_DEBUG "")
 set(libmpdataxx_CXX_FLAGS_RELEASE "")
 
+############################################################################################
+# libmpdata++ headers for non-default install location (i.e. for make DESTDIR=<dir> install)
+set(libmpdataxx_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../include/")
+
 
 ############################################################################################
 # debug mode compiler flags
@@ -134,7 +138,7 @@ endif()
 
 ############################################################################################
 # HDF5 libraries
-find_package(HDF5 COMPONENTS CXX HL QUIET)
+find_package(HDF5 COMPONENTS CXX HL)
 if(HDF5_FOUND)
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${HDF5_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${HDF5_INCLUDE_DIRS}")

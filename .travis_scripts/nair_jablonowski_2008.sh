@@ -3,8 +3,6 @@ set -e
 cd tests/nair_jablonowski_2008
 mkdir build
 cd build
-# the one from homebrew
-if [[ $TRAVIS_OS_NAME == 'osx' && $CXX == 'g++' ]]; then cmake -DCMAKE_CXX_COMPILER=g++-4.8 ../; fi
 
 # compiling everything in the Release mode
 cmake -DCMAKE_BUILD_TYPE=Release ../

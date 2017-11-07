@@ -34,20 +34,20 @@ namespace libmpdataxx
         typename parent_t::arr_t &stat_field; // TODO: should be in solver common but cannot be allocated there ?
 
 	virtual void xchng_sclr(typename parent_t::arr_t &arr,
-                        const rng_t &range_i,
-                        const rng_t &range_j,
+                        const idx_t<2> &range_ijk,
+                        const int ext = 0,
                         const bool deriv = false
         ) final // for a given array
 	{
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_j, deriv);
-	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_i, deriv);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk[1]^ext, deriv);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, deriv);
           this->mem->barrier();
 	}
 
 	void xchng(int e) final
 	{
-          this->xchng_sclr(this->mem->psi[e][ this->n[e]], i^this->halo, j^this->halo);
+          this->xchng_sclr(this->mem->psi[e][ this->n[e]], this->ijk, this->halo);
 	}
 
         void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
@@ -66,24 +66,72 @@ namespace libmpdataxx
           // TODO: open bc nust be last!!!
           this->mem->barrier();
         }
+        
+        virtual void xchng_sgs_div(
+          typename parent_t::arr_t &arr,
+          const idx_t<2> &range_ijk
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_div(arr, range_ijk[1]^h);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div(arr, range_ijk[0]);
+          this->mem->barrier();
+        }
+        
+        virtual void xchng_sgs_vctr(arrvec_t<typename parent_t::arr_t> &av,
+                            const typename parent_t::arr_t &b,
+                            const idx_t<2> &range_ijk
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_vctr(av, b, range_ijk[1]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_vctr(av, b, range_ijk[0]);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_sgs_tnsr_diag(arrvec_t<typename parent_t::arr_t> &av,
+                                         const typename parent_t::arr_t &w,
+                                         const typename parent_t::arr_t &vip_div,
+	                                 const idx_t<2> &range_ijk
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_tnsr(av, w, vip_div, range_ijk[1], this->dijk[0]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_tnsr(av, w, vip_div, range_ijk[0], this->dijk[1]);
+          this->mem->barrier();
+        }
+
+        virtual void xchng_sgs_tnsr_offdiag(arrvec_t<typename parent_t::arr_t> &av,
+                                            const arrvec_t<typename parent_t::arr_t> &bv, 
+	                                    const idx_t<2> &range_ijk,
+	                                    const std::array<rng_t, 2> &range_ijkm
+        ) final
+        {
+
+          // off-diagonal components of stress tensor are treated the same as a vector
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[1], 2);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[0], 1);
+          this->mem->barrier();
+        }
 
         virtual void xchng_vctr_nrml(
           arrvec_t<typename parent_t::arr_t> &arrvec, 
-          const rng_t &range_i, 
-          const rng_t &range_j,
-          const bool cyclic = false
+          const idx_t<2> &range_ijk,
+          const bool cyclic = false,
+          const int ext = 0
         ) final
         {
           this->mem->barrier();
           if (!cyclic)
           {
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_i^h);
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_j^h);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[0]^ext^h);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h);
           }
           else
           {
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_i^h);
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_j^h);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk[0]^ext^h);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h);
           }
           this->mem->barrier();
         }
@@ -164,7 +212,7 @@ namespace libmpdataxx
           this->mem->GC[1](i, rng_t(j.first(), j.last()-1)^h) *= cur_dt / old_dt;
           this->xchng_vctr_alng(this->mem->GC);
           auto ex = this->halo - 1;
-          this->xchng_vctr_nrml(this->mem->GC, this->i^ex, this->j^ex);
+          this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex);
         }
 
         public:
@@ -279,28 +327,42 @@ namespace libmpdataxx
 
         protected:
 
+        // helper method to allocate a temporary space composed of arbitrarily staggered arrays
+        static void alloc_tmp_stgr(
+          typename parent_t::mem_t *mem,
+          const char * __file__,
+          const int n_arr,
+          const std::vector<std::vector<bool>> &stgr,
+          bool srfc = false
+        )
+        {
+          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+          for (int n = 0; n < n_arr; ++n)
+          {
+            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
+              stgr[n][0] ? parent_t::rng_vctr(mem->grid_size[0]) : parent_t::rng_sclr(mem->grid_size[0]),
+              srfc ? rng_t(0, 0) :
+                stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) :
+                  parent_t::rng_sclr(mem->grid_size[1])
+            ))); 
+          }
+        }
+        
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
           typename parent_t::mem_t *mem,
           const char * __file__
         )
         {
-          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
-          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_vctr(mem->grid_size[0]), 
-            parent_t::rng_sclr(mem->grid_size[1]) 
-          ))); 
-          mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_sclr(mem->grid_size[0]), 
-            parent_t::rng_vctr(mem->grid_size[1]) 
-          ))); 
+          alloc_tmp_stgr(mem, __file__, 2, {{true, false}, {false, true}});
         }
 
         // helper method to allocate n_arr scalar temporary arrays 
         static void alloc_tmp_sclr(
           typename parent_t::mem_t *mem, 
           const char * __file__, const int n_arr,
-          std::string name = ""
+          std::string name = "",
+          bool srfc = false
         )   
         {   
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
@@ -310,7 +372,7 @@ namespace libmpdataxx
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
               parent_t::rng_sclr(mem->grid_size[0]),
-              parent_t::rng_sclr(mem->grid_size[1])
+              srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[1])
             )));
         } 
       };

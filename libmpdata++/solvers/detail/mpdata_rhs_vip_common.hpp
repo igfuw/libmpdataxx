@@ -119,8 +119,9 @@ namespace libmpdataxx
 	arrvec_t<typename parent_t::arr_t>& vips()
         {
           static thread_local arrvec_t<typename parent_t::arr_t> ret;
+          ret.resize(parent_t::n_dims);
           for (int d = 0; d < parent_t::n_dims; ++d)
-            ret.insert(ret.begin() + d, this->mem->never_delete(&(this->state(vip_ixs[d]))));
+            ret.replace(ret.begin() + d, this->mem->never_delete(&(this->state(vip_ixs[d]))));
           return ret;
         }
 

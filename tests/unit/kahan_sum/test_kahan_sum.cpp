@@ -22,12 +22,14 @@ void main_tmpl()
       << "rev + blitz::sum = " << blitz::sum(rev) << std::endl
       << "rev +  kahan_sum = " << blitz::kahan_sum(rev) << std::endl;
     
-    
+    // expected without Kahan sum
+    auto expected_diff = 1.4e-8;
+
     // that's why we might need a Kahan sum
-    if (std::abs(blitz::sum(a) - blitz::sum(rev)) < 4e-8) 
+    if (std::abs(blitz::sum(a) - blitz::sum(rev)) < expected_diff) 
       throw std::runtime_error("A");
     // that's to show it works
-    if (std::abs(blitz::kahan_sum(a) - blitz::kahan_sum(rev)) > 4e-8) 
+    if (std::abs(blitz::kahan_sum(a) - blitz::kahan_sum(rev)) > expected_diff)
       throw std::runtime_error("B");
   }
 }

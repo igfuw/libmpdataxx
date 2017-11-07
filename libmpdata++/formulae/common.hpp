@@ -51,6 +51,19 @@ namespace libmpdataxx
     {
       return blitz::max(a, b);
     }
+   
+    // variadic max & min
+    template<class ix_t, class a_t, class... b_ts>
+    forceinline_macro auto max(const a_t &a, const b_ts & ... bs)
+    {
+      return max<ix_t>(a, max<ix_t>(bs...));
+    }
+    
+    template<class ix_t, class a_t, class... b_ts>
+    forceinline_macro auto min(const a_t &a, const b_ts & ... bs)
+    {
+      return min<ix_t>(a, min<ix_t>(bs...));
+    }
       
     template<class ix_t, class arg_t>
     forceinline_macro auto where(bool c, const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)   

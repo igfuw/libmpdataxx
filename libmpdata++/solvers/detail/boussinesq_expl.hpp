@@ -5,7 +5,7 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 #pragma once
-#include <libmpdata++/solvers/detail/boussinesq_common.hpp>
+#include <libmpdata++/solvers/detail/boussinesq_sgs_common.hpp>
 
 namespace libmpdataxx
 {
@@ -14,10 +14,14 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t>
-      class boussinesq_expl : public boussinesq_common<ct_params_t>
+      class boussinesq_expl : public
+                              std::conditional<static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles,
+                                               boussinesq_common<ct_params_t>,
+                                               boussinesq_sgs_common<ct_params_t>>::type
       {
-        using parent_t = boussinesq_common<ct_params_t>;
-
+        using parent_t = typename std::conditional<static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles,
+                                                   boussinesq_common<ct_params_t>,
+                                                   boussinesq_sgs_common<ct_params_t>>::type;
         public:
         using real_t = typename ct_params_t::real_t;
 
@@ -31,7 +35,7 @@ namespace libmpdataxx
         void filter(typename std::enable_if<nd == 2>::type* = 0)
         {
           const auto &i(this->i), &j(this->j);
-          this->xchng_sclr(tmp1, i, j);
+          this->xchng_sclr(tmp1, this->ijk);
           tmp2(i, j) = 0.25 * (tmp1(i, j + 1) + 2 * tmp1(i, j) + tmp1(i, j - 1));
         }
 
@@ -39,8 +43,8 @@ namespace libmpdataxx
         void filter(typename std::enable_if<nd == 3>::type* = 0)
         {
           const auto &i(this->i), &j(this->j), &k(this->k);
-          this->xchng_sclr(tmp1, i, j, k);
-          tmp2(i, j, k) = 0.25 * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k + 1));
+          this->xchng_sclr(tmp1, this->ijk);
+          tmp2(i, j, k) = 0.25 * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k - 1));
         }
         
         // helpers for buoyancy forces
@@ -58,11 +62,16 @@ namespace libmpdataxx
           return return_helper<rng_t>(
             this->g * (
                 (  this->state(ix::tht)(ijk)
-                 + 0.5 * this->dt * this->hflux(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
+                 + 0.5 * this->dt * this->hflux_frc(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
                 / (1 + 0.5 * this->dt * this->tht_abs(ijk))
                 - this->tht_e(ijk)
               ) / this->Tht_ref
           );
+        }
+
+        void calc_full_tht(typename parent_t::arr_t &full_tht) final
+        {
+          full_tht(this->ijk) = this->state(ix::tht)(this->ijk);
         }
 
         // explicit forcings 
@@ -84,7 +93,7 @@ namespace libmpdataxx
           {
             case (0):
             {
-              rhs.at(ix::tht)(ijk) += this->hflux(ijk) - this->tht_abs(ijk) * (tht(ijk) - this->tht_e(ijk));
+              rhs.at(ix::tht)(ijk) += this->hflux_frc(ijk) - this->tht_abs(ijk) * (tht(ijk) - this->tht_e(ijk));
               
               if (!buoy_filter)
               {
@@ -100,8 +109,8 @@ namespace libmpdataxx
             }
             case (1):
             {
-              rhs.at(ix::tht)(ijk) += this->hflux(ijk) - this->tht_abs(ijk) * (
-                (tht(ijk) + 0.5 * this->dt * this->hflux(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
+              rhs.at(ix::tht)(ijk) += this->hflux_frc(ijk) - this->tht_abs(ijk) * (
+                (tht(ijk) + 0.5 * this->dt * this->hflux_frc(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
                 / (1 + 0.5 * this->dt * this->tht_abs(ijk))
                 - this->tht_e(ijk)
               );
