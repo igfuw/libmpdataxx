@@ -164,7 +164,7 @@ namespace libmpdataxx
 	intrp<0>(interpolated, this->vip_state(0, 0), im, this->j^ex, this->di);
 	intrp<1>(interpolated, this->vip_state(0, 1), jm, this->i^ex, this->dj);
         this->xchng_vctr_alng(interpolated, /*ad*/ true, /*cyclic*/ true, ex);
-        this->xchng_vctr_nrml(interpolated, this->ijk, ex, /*cyclic*/ true);
+        this->xchng_vctr_nrml(interpolated, this->ijk, ex, /*cyclic*/ false);
       }
 
       void extrapolate_in_time() final
@@ -311,7 +311,7 @@ namespace libmpdataxx
 	intrp<1>(interpolated, this->vip_state(0, 1), jm^ex, this->k^ex, this->i^ex, this->dj);
 	intrp<2>(interpolated, this->vip_state(0, 2), km^ex, this->i^ex, this->j^ex, this->dk);
         this->xchng_vctr_alng(interpolated, /*ad*/ true, /*cyclic*/ true);
-        this->xchng_vctr_nrml(interpolated, this->ijk, ex, /*cyclic*/ false, ex);
+        this->xchng_vctr_nrml(interpolated, this->ijk, ex, /*cyclic*/ false);
       }
 
       void extrapolate_in_time() final
