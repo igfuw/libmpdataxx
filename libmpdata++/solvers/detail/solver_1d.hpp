@@ -28,7 +28,9 @@ namespace libmpdataxx
 	protected:
 
 	const rng_t i; //TODO: to be removed
-        typename parent_t::arr_t &courant_field; // TODO: should be in solver common but cannot be allocated there ?
+
+        // generic field used for various statistics (currently Courant number and divergence)
+        typename parent_t::arr_t &stat_field; // TODO: should be in solver common but cannot be allocated there ?
 
         virtual void xchng_sclr(typename parent_t::arr_t &arr, const bool deriv = false) final // for a given array
         {
@@ -42,17 +44,30 @@ namespace libmpdataxx
           xchng_sclr(this->mem->psi[e][ this->n[e]]);
 	}
 
-        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, ad); 
+          if (!cyclic)
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, ad); 
+          }
+          else
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, ad);
+          }
           this->mem->barrier();
         }
 
         typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
-          courant_field(this->ijk) = 0.5 * (abs(arrvec[0](i+h) + arrvec[0](i-h)));
-          return this->mem->max(this->rank, courant_field(this->ijk));
+          stat_field(this->ijk) = 0.5 * (abs(arrvec[0](i+h) + arrvec[0](i-h)));
+          return this->mem->max(this->rank, stat_field(this->ijk));
+        }
+        
+        typename parent_t::real_t max_abs_vctr_div(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        {
+          stat_field(this->ijk) = abs((arrvec[0](i+h) - arrvec[0](i-h)));
+          return this->mem->max(this->rank, stat_field(this->ijk));
         }
 
         void scale_gc(const typename parent_t::real_t time,
@@ -94,7 +109,7 @@ namespace libmpdataxx
             idx_t<parent_t::n_dims>(args.i)
           ), 
           i(args.i),
-          courant_field(args.mem->tmp[__FILE__][0][0])
+          stat_field(args.mem->tmp[__FILE__][0][0])
 	{
           this->di = p.di;
           this->dijk = {p.di};

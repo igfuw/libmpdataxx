@@ -47,6 +47,11 @@ namespace libmpdataxx
         // equivalent to one-sided derivatives at the boundary
         a(pi<d>(this->left_halo_sclr.last(), j, k)) = 2 * a(pi<d>(this->left_edge_sclr,     j, k))
                                                         - a(pi<d>(this->left_edge_sclr + 1, j, k));
+        if (halo > 1)
+        {
+          a(pi<d>(this->left_halo_sclr.last() - 1, j, k)) =   3 * a(pi<d>(this->left_edge_sclr,     j, k))
+                                                            - 2 * a(pi<d>(this->left_edge_sclr + 1, j, k));
+        }
       }
       
       void save_edge_vel(const arr_t &a, const rng_t &j, const rng_t &k)
@@ -93,7 +98,7 @@ namespace libmpdataxx
 	assert(std::isfinite(sum(av[d+2](pi<d>(i, j, k+h)))));
 
         // zero-divergence condition
-        for (int ii = this->left_halo_vctr.first(); ii <= this->left_halo_vctr.last(); ++ii)
+        for (int ii = this->left_halo_vctr.first(); ii <= this->left_halo_vctr.last() - (ad ? 1 : 0); ++ii)
         {
           av[d](pi<d>(ii, j, k)) = 
             av[d](pi<d>(i+h, j, k)) 
@@ -153,6 +158,12 @@ namespace libmpdataxx
         // equivalent to one-sided derivatives at the boundary
         a(pi<d>(this->rght_halo_sclr.first(), j, k)) = 2 * a(pi<d>(this->rght_edge_sclr,     j, k))
                                                          - a(pi<d>(this->rght_edge_sclr - 1, j, k));
+
+        if (halo > 1)
+        {
+          a(pi<d>(this->rght_halo_sclr.first() + 1, j, k)) =   3 * a(pi<d>(this->rght_edge_sclr,     j, k))
+                                                             - 2 * a(pi<d>(this->rght_edge_sclr - 1, j, k));
+        }
       }
       
       void save_edge_vel(const arr_t &a, const rng_t &j, const rng_t &k)
@@ -197,7 +208,7 @@ namespace libmpdataxx
 	assert(std::isfinite(sum(av[d+2](pi<d>(i, j, k-h)))));
 	assert(std::isfinite(sum(av[d+2](pi<d>(i, j, k+h)))));
 
-        for (int ii = this->rght_halo_vctr.first(); ii <= this->rght_halo_vctr.last(); ++ii)
+        for (int ii = this->rght_halo_vctr.first() + (ad ? 1 : 0); ii <= this->rght_halo_vctr.last(); ++ii)
         {
           av[d](pi<d>(ii, j, k)) = 
             av[d](pi<d>(i-h, j, k)) 

@@ -62,6 +62,12 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         a(pi<d>(this->left_edge_sclr, j)) = sign * edge_velocity(pi<d>(0, j));
+        
+        if (halo > 1)
+        {
+          a(pi<d>(this->left_halo_sclr.last() - 1, j)) =   3 * a(pi<d>(this->left_edge_sclr,     j))
+                                                         - 2 * a(pi<d>(this->left_edge_sclr + 1, j));
+        }
       }
 
       void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const bool ad = false)
@@ -77,7 +83,7 @@ namespace libmpdataxx
         }
        
 	// zero-divergence condition
-        for (int ii = this->left_halo_vctr.first(); ii <= this->left_halo_vctr.last(); ++ii)
+        for (int ii = this->left_halo_vctr.first(); ii <= this->left_halo_vctr.last() - (ad ? 1 : 0); ++ii)
         {
 	  av[d](pi<d>(ii, j)) = 
 	    av[d](pi<d>(i+h, j)) 
@@ -133,6 +139,12 @@ namespace libmpdataxx
         // equivalent to one-sided derivatives at the boundary
         a(pi<d>(this->rght_halo_sclr.first(), j)) = 2 * a(pi<d>(this->rght_edge_sclr,     j))
                                                       - a(pi<d>(this->rght_edge_sclr - 1, j));
+        if (halo > 1)
+        {
+          a(pi<d>(this->rght_halo_sclr.first() + 1, j)) =   3 * a(pi<d>(this->rght_edge_sclr,     j))
+                                                          - 2 * a(pi<d>(this->rght_edge_sclr - 1, j));
+        }
+
       }
       
       void save_edge_vel(const arr_t &a, const rng_t &j)
@@ -163,7 +175,7 @@ namespace libmpdataxx
         }
        
 	// zero-divergence condition
-        for (int ii = this->rght_halo_vctr.first(); ii <= this->rght_halo_vctr.last(); ++ii)
+        for (int ii = this->rght_halo_vctr.first() + (ad ? 1 : 0); ii <= this->rght_halo_vctr.last(); ++ii)
         {
 	  av[d](pi<d>(ii, j)) = 
 	    av[d](pi<d>(i-h, j)) + (
