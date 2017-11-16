@@ -64,7 +64,7 @@ err_t test(int np)
     bcond::cyclic, bcond::cyclic
   > slv(p);
 
-  decltype(slv.advectee(ix::u)) exact_u(slv.advectee(ix::u).shape());
+  decltype(slv.advectee(ix::u)) exact_u(slv.advectee_global(ix::u).shape());
   {
     blitz::firstIndex i;
     blitz::secondIndex j;
@@ -78,8 +78,8 @@ err_t test(int np)
   slv.advance(nt); 
 
   err_t res;
-  res.L2 = sqrt(sum(pow2(slv.advectee(ix::u) - exact_u))) / sqrt(sum(pow2(exact_u)));
-  res.Li = max(abs(slv.advectee(ix::u) - exact_u)) / max(abs(exact_u));
+  res.L2 = sqrt(sum(pow2(slv.advectee_global(ix::u) - exact_u))) / sqrt(sum(pow2(exact_u)));
+  res.Li = max(abs(slv.advectee_global(ix::u) - exact_u)) / max(abs(exact_u));
 
   return res;
 };
@@ -108,5 +108,15 @@ bool check()
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_SERIALIZED);
+#endif
+
   if (!check<opts::iga, 2>()) throw std::runtime_error("iga");
+
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }
