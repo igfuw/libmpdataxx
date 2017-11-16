@@ -65,7 +65,7 @@ double test(int np)
   blitz::thirdIndex k;
 
   decltype(run.advectee()) true_solution(run.advectee_global().shape());
-  decltype(run.advectee()) g_factor_global(true_soliution.shape());
+  decltype(run.advectee()) g_factor_global(true_solution.shape());
   true_solution = (2 + sin(i * dx) * sin(time)) * (2 + sin(j * dy) * sin(time)) * (2 + sin(k * dz) * sin(time));
   
   run.g_factor() = exp(cos(i * dx) + cos(j * dy) + cos(k * dz));
