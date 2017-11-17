@@ -238,6 +238,7 @@ namespace libmpdataxx
         }
 
 
+
         // this hack is introduced to allow to use neverDeleteData
         // and hence to not use BZ_THREADSAFE
         private:
@@ -460,6 +461,18 @@ namespace libmpdataxx
           else
 #endif
             return advectee(e);
+        }  
+
+        void advectee_global_set(const blitz::Array<real_t, 2> arr, int e = 0)
+        {   
+#if defined(USE_MPI)
+          if(this->distmem.size() > 1)
+          {
+            advectee(e) = arr(this->slab(rng_t(0, this->distmem.grid_size[0]-1), this->distmem.rank(), this->distmem.size()));
+          }
+          else
+#endif
+          advectee(e) = arr;
         }  
 
 	blitz::Array<real_t, 2> advector(int d = 0)  

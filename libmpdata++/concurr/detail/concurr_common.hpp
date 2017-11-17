@@ -285,6 +285,15 @@ namespace libmpdataxx
 #endif
 	}
 
+	void advectee_global_set(const typename solver_t::arr_t arr, int e = 0) final
+	{
+#if defined(USE_MPI)
+          mem->advectee_global_set(arr, e);
+#else
+	  advectee(e) = arr;
+#endif
+	}
+
 	typename solver_t::arr_t advector(int d = 0) final
 	{
 	  return mem->advector(d);

@@ -62,30 +62,31 @@ void test(const std::string filename)
   T x0 = 0.5;
   T y0 = 0.5;
 
-  decltype(run.advectee()) r_local(run.advectee().extent());
-  r_local.reindexSelf(run.advectee().lbound());
-
   blitz::firstIndex i;
   blitz::secondIndex j;
-
-  r_local = sqrt(blitz::pow(i * dx - x0, 2) + blitz::pow(j * dy - y0, 2));
-  run.advectee() = where(
-    r_local <= rr,
-    1 + 0.25 * pow(1 + cos(pi * r_local / rr), 2),
-    1.
-  );
 
   decltype(run.advectee()) solution(run.advectee_global().shape());
   decltype(run.advectee()) r_global(run.advectee_global().shape());
 
+  // set advectee using global_set
+  r_global = sqrt(blitz::pow(i * dx - x0, 2) + blitz::pow(j * dy - y0, 2));
+  // use r_global as temp storage of the init advectee values
+  r_global = where(
+    r_global <= rr,
+    1 + 0.25 * pow(1 + cos(pi * r_global / rr), 2),
+    1.
+  );
+  run.advectee_global_set(r_global);
+
+  // calculate expected soultion, includes displacement
   T disp = std::fmod(time, 4.0);
-  
   r_global = sqrt(blitz::pow(i * dx - (x0 + disp), 2) + blitz::pow(j * dy - y0, 2));
   solution = where(
     r_global <= rr,
     1 + 0.25 * pow(1 + cos(pi * r_global / rr), 2),
     1.
   );
+
 
   run.advector(0) =  dt / dx;
   run.advector(1) =  0;
