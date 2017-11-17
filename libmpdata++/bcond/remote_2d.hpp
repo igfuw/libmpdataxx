@@ -58,6 +58,33 @@ namespace libmpdataxx
         else
           this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j), pi<d>(this->left_halo_vctr, j));
       }
+      
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j)
+      {
+        fill_halos_sclr(a, j);
+      }
+
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const int offset = 0)
+      {
+	using namespace idxperm;
+        // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
+        if(!this->is_cyclic) 
+        {
+          if(halo == 1)
+            // send vectors to the left of the domain
+            this->send(av[0 + offset], pi<d>(this->left_intr_vctr + off, j));
+          else
+            // receive the halo without the rightmost column, which was caluclated by this process
+            this->xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j), pi<d>((this->left_halo_vctr^h)^(-1), j));
+        }
+        else
+          this->xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j), pi<d>(this->left_halo_vctr, j));
+      }
+      
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const real_t)
+      {
+        fill_halos_vctr_alng(av, j);
+      }
 
       // TODO: sgs fill_halos
 
@@ -114,6 +141,33 @@ namespace libmpdataxx
         }
         else
           this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j), pi<d>(this->rght_halo_vctr, j));
+      }
+      
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j)
+      {
+        fill_halos_sclr(a, j);
+      }
+
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const int offset = 0)
+      {
+	using namespace idxperm;
+        // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
+        if(!this->is_cyclic)
+        {
+          if(halo == 1)
+            //receive the halo
+            this->recv(av[0 + offset], pi<d>(this->rght_halo_vctr, j));
+          else
+            // don't send the first column to the right of the domain, it will be calculated and sent here by the process to the right
+            this->xchng(av[0 + offset], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j), pi<d>(this->rght_halo_vctr, j));
+        }
+        else
+          this->xchng(av[0 + offset], pi<d>(this->rght_intr_vctr + off, j), pi<d>(this->rght_halo_vctr, j));
+      }
+      
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const real_t)
+      {
+        fill_halos_vctr_alng(av, j);
       }
 
       // TODO: move to common? (same in cyclic!)
