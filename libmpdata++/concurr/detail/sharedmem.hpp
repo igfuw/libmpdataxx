@@ -283,6 +283,20 @@ namespace libmpdataxx
           );
         }
 
+        virtual arr_t advectee(int e = 0) = 0;
+
+        void advectee_global_set(const arr_t arr, int e = 0)
+        {   
+#if defined(USE_MPI)
+          if(this->distmem.size() > 1)
+          {
+            advectee(e) = arr(slab(rng_t(0, distmem.grid_size[0]-1), distmem.rank(), distmem.size()));
+          }
+          else
+#endif
+          advectee(e) = arr;
+        }  
+
         protected:
 
 	rng_t distmem_ext(const rng_t &rng)
@@ -461,18 +475,6 @@ namespace libmpdataxx
           else
 #endif
             return advectee(e);
-        }  
-
-        void advectee_global_set(const blitz::Array<real_t, 2> arr, int e = 0)
-        {   
-#if defined(USE_MPI)
-          if(this->distmem.size() > 1)
-          {
-            advectee(e) = arr(this->slab(rng_t(0, this->distmem.grid_size[0]-1), this->distmem.rank(), this->distmem.size()));
-          }
-          else
-#endif
-          advectee(e) = arr;
         }  
 
 	blitz::Array<real_t, 2> advector(int d = 0)  
