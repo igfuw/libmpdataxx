@@ -123,8 +123,16 @@ void test(const std::string &dirname, const int nt)
     prtrb(i_r, ny - 1, k_r) = prtrb(i_r, 0, k_r);
     
     // initial conditions
+/*
     slv.advectee(ix::tht)(i_r, j_r, k_r) = 0.001 * prtrb(i_r, j_r, k_r);
     slv.advectee(ix::w)(i_r, j_r, k_r) = 0.2 * prtrb(i_r, j_r, k_r);
+    slv.advectee(ix::u) = 0;
+    slv.advectee(ix::v) = 0; 
+*/
+    prtrb = prtrb * 0.001; //scale perturbation for theta
+    slv.advectee_global_set(prtrb(i_r, j_r, k_r), ix::tht); // TODO: global_set not needed at all? just set advectee() = prtrb(slv.ijk)
+    prtrb = prtrb * 200; //scale perturbation for w
+    slv.advectee_global_set(prtrb(i_r, j_r, k_r), ix::w);
     slv.advectee(ix::u) = 0;
     slv.advectee(ix::v) = 0; 
 
@@ -136,7 +144,8 @@ void test(const std::string &dirname, const int nt)
       slv.sclr_array("tht_abs") = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
       
       // velocity absorbers
-      slv.vab_coefficient()(i_r, j_r, k_r) = slv.sclr_array("tht_abs")(i_r, j_r, k_r);
+      //slv.vab_coefficient()(i_r, j_r, k_r) = slv.sclr_array("tht_abs")(i_r, j_r, k_r);
+      slv.vab_coefficient() = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
       slv.vab_relaxed_state(0) = 0;
       slv.vab_relaxed_state(1) = 0;
       slv.vab_relaxed_state(2) = 0;
