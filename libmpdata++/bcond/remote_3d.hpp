@@ -59,6 +59,32 @@ namespace libmpdataxx
         else
           this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
       }
+      
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
+      }
+      
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
+      {
+	using namespace idxperm;
+        // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
+        if(!this->is_cyclic)
+        {
+          if(halo == 1)
+            // see remote_2d
+            this->send(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k));
+          else
+            this->xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k));
+        }
+        else
+          this->xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
+      }
+      
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
+      {
+        fill_halos_vctr_alng(av, j, k);
+      }
 
       // TODO: move to common? (same in cyclic!)
       void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)                 
@@ -113,6 +139,31 @@ namespace libmpdataxx
         }
         else
           this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
+      }
+      
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
+      }
+      
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
+      {
+	using namespace idxperm;
+        // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
+        if(!this->is_cyclic)
+        {
+          if(halo == 1)
+            this->recv(av[0 + offset], pi<d>(this->rght_halo_vctr, j, k));
+          else
+            this->xchng(av[0 + offset], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
+        }
+        else
+          this->xchng(av[0 + offset], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
+      }
+      
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
+      {
+        fill_halos_vctr_alng(av, j, k);
       }
 
       // TODO: move to common? (same in cyclic!)
