@@ -190,15 +190,28 @@ namespace libmpdataxx
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
             }
             
-            // save selected compile and runtime parameters, the choice depends on the solver family
-            record_params(*hdfp, typename parent_t::solver_family{});
-
             // G factor
             if (this->mem->G.get() != nullptr)
             {
               auto g_set = (*hdfp).createDataSet("G", flttype_output, sspace);
               record_dsc_helper(g_set, *this->mem->G);
             }
+            
+#if defined(USE_MPI)
+            // close the const file with mpi access
+            hdfp.release();
+            // do record_params only on the first node
+            if (this->mem->distmem.rank() == 0)
+            {
+              // open the const file with regular access
+              hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC));
+              // save selected compile and runtime parameters, the choice depends on the solver family
+              record_params(*hdfp, typename parent_t::solver_family{});
+            } 
+            this->mem->distmem.barrier();
+#else
+            record_params(*hdfp, typename parent_t::solver_family{});
+#endif
           }
         }
       }
@@ -325,7 +338,7 @@ namespace libmpdataxx
         auto aux = (*hdfp).createDataSet(
           name,
           flttype_output,
-          H5::DataSpace(parent_t::n_dims, shape.data()),
+          sspace,
           params
         );
         
