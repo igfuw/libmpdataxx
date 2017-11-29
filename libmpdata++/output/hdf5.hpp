@@ -60,7 +60,7 @@ namespace libmpdataxx
 
       H5::DataSpace sspace, cspace;
 #if defined(USE_MPI)
-      hid_t plist_id;
+      hid_t fapl_id, dxpl_id;
 #endif
 
       void start(const typename parent_t::advance_arg_t nt)
@@ -78,12 +78,12 @@ namespace libmpdataxx
           // creating the const file
 #if defined(USE_MPI)
           this->mem->distmem.barrier();
-          H5Pset_fapl_mpio(plist_id, MPI_COMM_WORLD, MPI_INFO_NULL);
-          // H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE); // TODO: check!
+          H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL);
+          H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_INDEPENDENT); // TODO: change to _COLLECTIVE and debug
 #endif
           hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC
 #if defined(USE_MPI)
-            , H5P_DEFAULT, plist_id
+            , H5P_DEFAULT, fapl_id
 #endif
           ));
           
@@ -171,7 +171,7 @@ namespace libmpdataxx
 
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, cshape.data(), offst.data());
-              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space);
+              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space, dxpl_id);
             }
             
             // T
@@ -187,7 +187,7 @@ namespace libmpdataxx
 
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, &nt_out, &zero);
-              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
+              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space, dxpl_id);
             }
             
             // G factor
@@ -225,7 +225,7 @@ namespace libmpdataxx
 	// creating the timestep file
 	hdfp.reset(new H5::H5File(this->outdir + "/" + hdf_name(), H5F_ACC_TRUNC
 #if defined(USE_MPI)
-            , H5P_DEFAULT, plist_id
+            , H5P_DEFAULT, fapl_id
 #endif
 	));
 
@@ -257,7 +257,7 @@ namespace libmpdataxx
           case 1:
           {
             space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-            dset.write( &(arr(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+            dset.write( &(arr(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
             break;
           }
           case 2:
@@ -270,7 +270,7 @@ namespace libmpdataxx
             ) {
               offst[0] = i;
               space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-              dset.write( &(arr(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+              dset.write( &(arr(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
             }
             break;
           }
@@ -290,7 +290,7 @@ namespace libmpdataxx
                 offst[0] = i;
                 offst[1] = j;
                 space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
               }
             }
             break;
@@ -314,7 +314,7 @@ namespace libmpdataxx
         auto space = aux.getSpace();
         offst = 0;
         space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
-        aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space);
+        aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
       }
       
       // for discontiguous array with halos
@@ -515,9 +515,9 @@ namespace libmpdataxx
       ) : parent_t(args, p)
       {
 #if defined(USE_MPI)
-        plist_id = H5Pcreate(H5P_FILE_ACCESS);
+        fapl_id = H5Pcreate(H5P_FILE_ACCESS);
+        dxpl_id = H5Pcreate(H5P_DATASET_XFER);
 #endif
-        //plist_id = H5Pcreate(H5Pcreate(H5P_DATASET_XFER); // check!
 
         // TODO: clean it up - it should not be here
         // overrding the default from output_common
@@ -529,7 +529,8 @@ namespace libmpdataxx
       virtual ~hdf5()
       {
 #if defined(USE_MPI)
-        H5Pclose(plist_id);
+        H5Pclose(dxpl_id);
+        H5Pclose(fapl_id);
 #endif
       }
     };
