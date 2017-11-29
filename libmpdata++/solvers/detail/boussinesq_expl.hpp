@@ -50,20 +50,24 @@ namespace libmpdataxx
         // helpers for buoyancy forces
         template<class ijk_t>
         inline auto buoy_at_0(const ijk_t &ijk)
-        return_macro(,
-          this->g * (this->state(ix::tht)(ijk) - this->tht_e(ijk)) / this->Tht_ref
-        )
+        {
+          return return_helper<rng_t>(
+            this->g * (this->state(ix::tht)(ijk) - this->tht_e(ijk)) / this->Tht_ref
+          );
+        }
         
         template<class ijk_t>
         inline auto buoy_at_1(const ijk_t &ijk)
-        return_macro(,
-          this->g * (
-              (  this->state(ix::tht)(ijk)
-               + 0.5 * this->dt * this->hflux_frc(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
-              / (1 + 0.5 * this->dt * this->tht_abs(ijk))
-              - this->tht_e(ijk)
-            ) / this->Tht_ref
-        )
+        {
+          return return_helper<rng_t>(
+            this->g * (
+                (  this->state(ix::tht)(ijk)
+                 + 0.5 * this->dt * this->hflux_frc(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
+                / (1 + 0.5 * this->dt * this->tht_abs(ijk))
+                - this->tht_e(ijk)
+              ) / this->Tht_ref
+          );
+        }
 
         void calc_full_tht(typename parent_t::arr_t &full_tht) final
         {

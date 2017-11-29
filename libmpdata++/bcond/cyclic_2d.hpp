@@ -68,6 +68,16 @@ namespace libmpdataxx
       {
         fill_halos_sclr(a, j);
       }
+      
+      void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const rng_t &j, const bool ad = false)
+      {
+        fill_halos_vctr_alng(av, j, ad);
+      }
+
+      void fill_halos_vctr_nrml_cyclic(arr_t &a, const rng_t &j)
+      {
+        fill_halos_vctr_nrml(a, j);
+      }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
@@ -126,6 +136,16 @@ namespace libmpdataxx
       void fill_halos_vctr_nrml(arr_t &a, const rng_t &j)
       {
         fill_halos_sclr(a, j);
+      }
+      
+      void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const rng_t &j, const bool ad = false)
+      {
+        fill_halos_vctr_alng(av, j, ad);
+      }
+
+      void fill_halos_vctr_nrml_cyclic(arr_t &a, const rng_t &j)
+      {
+        fill_halos_vctr_nrml(a, j);
       }
     };
   } // namespace bcond

@@ -29,7 +29,9 @@ namespace libmpdataxx
 	protected:
       
 	const rng_t i, j; // TODO: to be removed
-        typename parent_t::arr_t &courant_field; // TODO: should be in solver common but cannot be allocated there ?
+
+        // generic field used for various statistics (currently Courant number and divergence)
+        typename parent_t::arr_t &stat_field; // TODO: should be in solver common but cannot be allocated there ?
 
 	virtual void xchng_sclr(typename parent_t::arr_t &arr,
                         const idx_t<2> &range_ijk,
@@ -48,12 +50,28 @@ namespace libmpdataxx
           this->xchng_sclr(this->mem->psi[e][ this->n[e]], this->ijk, this->halo);
 	}
 
-        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false) final
+        void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, ad);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i, ad);
+          if (!cyclic)
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, ad);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, i, ad);
+          }
+          else
+          {
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, j, ad);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng_cyclic(arrvec, i, ad);
+          }
           // TODO: open bc nust be last!!!
+          this->mem->barrier();
+        }
+        
+        virtual void xchng_flux(arrvec_t<typename parent_t::arr_t> &arrvec) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->fill_halos_flux(arrvec, j);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_flux(arrvec, i);
           this->mem->barrier();
         }
         
@@ -108,23 +126,33 @@ namespace libmpdataxx
         virtual void xchng_vctr_nrml(
           arrvec_t<typename parent_t::arr_t> &arrvec, 
           const idx_t<2> &range_ijk,
-          const int ext = 0
+          const int ext = 0,
+          const bool cyclic = false
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[0]^ext^h);
-          for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h);
+          if (!cyclic)
+          {
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[0]^ext^h);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h);
+          }
+          else
+          {
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk[0]^ext^h);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h);
+          }
           this->mem->barrier();
         }
 
         virtual void xchng_pres(
           typename parent_t::arr_t &arr,
-          const idx_t<2> &range_ijk
+          const idx_t<2> &range_ijk,
+          const int ex = 0
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1]);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[0]);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1]^ex);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[0]^ex);
           this->mem->barrier();
         }
 
@@ -159,17 +187,7 @@ namespace libmpdataxx
           // TODO: same in 1D
           if (!opts::isset(ct_params_t::opts, opts::dfl))
           {
-            typename ct_params_t::real_t max_abs_div = max(abs(
-              (
-                ( 
-                  this->mem->GC[0](i-h, j  ) - 
-                  this->mem->GC[0](i+h, j  )
-                ) + (
-                  this->mem->GC[1](i,   j-h) - 
-                  this->mem->GC[1](i,   j+h)
-                )
-              ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j)
-	    ));
+            typename ct_params_t::real_t max_abs_div = max_abs_vctr_div(this->mem->GC);
 
 	    if (max_abs_div > this->max_abs_div_eps) 
 	      throw std::runtime_error("initial advector field is divergent");
@@ -178,11 +196,20 @@ namespace libmpdataxx
 
         typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
-          courant_field(this->ijk) = 0.5 * (
-                                             abs(arrvec[0](i+h, j) + arrvec[0](i-h, j))
-                                           + abs(arrvec[1](i, j+h) + arrvec[1](i, j-h))
-                                           ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j);
-          return this->mem->max(this->rank, courant_field(this->ijk));
+          stat_field(this->ijk) = 0.5 * (
+                                           abs(arrvec[0](i+h, j) + arrvec[0](i-h, j))
+                                         + abs(arrvec[1](i, j+h) + arrvec[1](i, j-h))
+                                        ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j);
+          return this->mem->max(this->rank, stat_field(this->ijk));
+        }
+        
+        typename parent_t::real_t max_abs_vctr_div(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        {
+          stat_field(this->ijk) = abs(
+                                        (arrvec[0](i+h, j) - arrvec[0](i-h, j))
+                                      + (arrvec[1](i, j+h) - arrvec[1](i, j-h))
+                                     ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j);
+          return this->mem->max(this->rank, stat_field(this->ijk));
         }
         
         void scale_gc(const typename parent_t::real_t time,
@@ -228,7 +255,7 @@ namespace libmpdataxx
           ),
 	  i(args.i), 
 	  j(args.j),
-          courant_field(args.mem->tmp[__FILE__][0][0])
+          stat_field(args.mem->tmp[__FILE__][0][0])
 	{
           this->di = p.di;
           this->dj = p.dj;

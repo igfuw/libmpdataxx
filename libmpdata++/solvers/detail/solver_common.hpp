@@ -81,7 +81,7 @@ namespace libmpdataxx
 	virtual void xchng(int e) = 0;
         // TODO: implement flagging of valid/invalid halo for optimisations
 
-        virtual void xchng_vctr_alng(arrvec_t<arr_t>&, const bool ad = false) = 0;
+        virtual void xchng_vctr_alng(arrvec_t<arr_t>&, const bool ad = false, const bool cyclic = false) = 0;
 
         void set_bcs(const int &d, bcp_t &bcl, bcp_t &bcr)
         {
@@ -96,6 +96,7 @@ namespace libmpdataxx
         }
 
 	virtual real_t courant_number(const arrvec_t<arr_t>&) = 0;
+	virtual real_t max_abs_vctr_div(const arrvec_t<arr_t>&) = 0;
        
         // return false if advector does not change in time
         virtual bool calc_gc() {return false;}
@@ -260,7 +261,7 @@ namespace libmpdataxx
                 while (cfl > max_courant);
               }
             }
-
+            
             hook_ante_step();
 
 	    for (int e = 0; e < n_eqns; ++e) scale(e, ct_params_t::hint_scale(e));

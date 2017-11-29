@@ -71,7 +71,7 @@ namespace libmpdataxx
             }
           }
           if (!simple) this->normalize_vip(lap_tmp);
-          this->set_edges(lap_tmp, this->ijk, 0);
+          this->set_edges(lap_tmp, this->ijk, err_init ? -1 : 0);
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             this->xchng_pres(lap_tmp[d], ijk);
