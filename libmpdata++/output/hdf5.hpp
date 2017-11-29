@@ -60,8 +60,9 @@ namespace libmpdataxx
 
       H5::DataSpace sspace, cspace;
 #if defined(USE_MPI)
-      hid_t fapl_id, dxpl_id;
+      hid_t fapl_id;
 #endif
+      hid_t dxpl_id;
 
       void start(const typename parent_t::advance_arg_t nt)
       {
@@ -516,8 +517,8 @@ namespace libmpdataxx
       {
 #if defined(USE_MPI)
         fapl_id = H5Pcreate(H5P_FILE_ACCESS);
-        dxpl_id = H5Pcreate(H5P_DATASET_XFER);
 #endif
+        dxpl_id = H5Pcreate(H5P_DATASET_XFER);
 
         // TODO: clean it up - it should not be here
         // overrding the default from output_common
@@ -528,8 +529,8 @@ namespace libmpdataxx
       // dtor
       virtual ~hdf5()
       {
-#if defined(USE_MPI)
         H5Pclose(dxpl_id);
+#if defined(USE_MPI)
         H5Pclose(fapl_id);
 #endif
       }
