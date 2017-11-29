@@ -197,21 +197,8 @@ namespace libmpdataxx
               record_dsc_helper(g_set, *this->mem->G);
             }
             
-#if defined(USE_MPI)
-            // close the const file with mpi access
-            hdfp.release();
-            // do record_params only on the first node
-            if (this->mem->distmem.rank() == 0)
-            {
-              // open the const file with regular access
-              hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC));
-              // save selected compile and runtime parameters, the choice depends on the solver family
-              record_params(*hdfp, typename parent_t::solver_family{});
-            } 
-            this->mem->distmem.barrier();
-#else
+            // save selected compile and runtime parameters, the choice depends on the solver family
             record_params(*hdfp, typename parent_t::solver_family{});
-#endif
           }
         }
       }
@@ -489,7 +476,6 @@ namespace libmpdataxx
                                                         (parent_t::ct_params_t_::sgs_scheme) == solvers::iles,
                                                        typename solvers::mpdata_rhs_vip_prs_family_tag,
                                                        typename solvers::mpdata_rhs_vip_prs_sgs_smg_family_tag>::type{});
-        
         hdfcp.createGroup("boussinesq");
         const auto &group = hdfcp.openGroup("boussinesq");
         {
@@ -499,7 +485,7 @@ namespace libmpdataxx
           group.createAttribute("hflux_const", type, H5::DataSpace(1, &one)).write(type, &this->hflux_const);
         }
         {
-          auto dset = group.createDataSet("tht_e", flttype_output, H5::DataSpace(parent_t::n_dims, shape.data()));
+          auto dset = group.createDataSet("tht_e", flttype_output, sspace);
           record_dsc_helper(dset, this->tht_e);
         }
       }
@@ -515,7 +501,7 @@ namespace libmpdataxx
           group.createAttribute("prandtl_num", type, H5::DataSpace(1, &one)).write(type, &this->prandtl_num);
         }
         {
-          auto dset = group.createDataSet("mix_len", flttype_output, H5::DataSpace(parent_t::n_dims, shape.data()));
+          auto dset = group.createDataSet("mix_len", flttype_output, sspace);
           record_dsc_helper(dset, this->mix_len);
         }
       }
