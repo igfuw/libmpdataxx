@@ -129,17 +129,17 @@ namespace libmpdataxx
           {
             // master thread calculates the sum from this process, stores in shared array
             if (sum_khn)
-              (*sumtmp)(ijk[0].first())= blitz::kahan_sum(*sumtmp);
+              (*sumtmp)(grid_size[0].first())= blitz::kahan_sum(*sumtmp); // inplace?!
             else
-              (*sumtmp)(ijk[0].first())= blitz::sum(*sumtmp);
+              (*sumtmp)(grid_size[0].first())= blitz::sum(*sumtmp); // inplace?!
 #if defined(USE_MPI)
             // master thread calculates sum of sums from all processes
-            (*sumtmp)(ijk[0].first()) = this->distmem.sum((*sumtmp)(ijk[0].first()));
+            (*sumtmp)(grid_size[0].first()) = this->distmem.sum((*sumtmp)(grid_size[0].first())); // inplace?!
 #endif
           }
           barrier();
-          real_t res = (*sumtmp)(ijk[0].first()); // propagate the total sum to all threads of the process
-          barrier(); // to avoid sumtmp being overwritten by some other threads' next sum call
+          real_t res = (*sumtmp)(grid_size[0].first()); // propagate the total sum to all threads of the process
+          barrier(); // to avoid sumtmp being overwritten by next call to sum from other thread
           return res;
         }
 
@@ -165,17 +165,17 @@ namespace libmpdataxx
           {
             // master thread calculates the sum from this process, stores in shared array
             if (sum_khn)
-              (*sumtmp)(ijk[0].first())= blitz::kahan_sum(*sumtmp);
+              (*sumtmp)(grid_size[0].first())= blitz::kahan_sum(*sumtmp); // inplace?!
             else
-              (*sumtmp)(ijk[0].first())= blitz::sum(*sumtmp);
+              (*sumtmp)(grid_size[0].first())= blitz::sum(*sumtmp); // inplace?!
 #if defined(USE_MPI)
             // master thread calculates sum of sums from all processes
-            (*sumtmp)(ijk[0].first()) = this->distmem.sum((*sumtmp)(ijk[0].first()));
+            (*sumtmp)(grid_size[0].first()) = this->distmem.sum((*sumtmp)(grid_size[0].first())); // inplace?!
 #endif
           }
           barrier();
-          real_t res = (*sumtmp)(ijk[0].first()); // propagate the total sum to all threads of the process
-          barrier(); // to avoid sumtmp being overwritten by some other threads' next sum call
+          real_t res = (*sumtmp)(grid_size[0].first()); // propagate the total sum to all threads of the process
+          barrier(); // to avoid sumtmp being overwritten by next call to sum from other thread
           return res;
         }
 
@@ -236,7 +236,6 @@ namespace libmpdataxx
           result = this->distmem.max(result);
           return result;
         }
-
         // this hack is introduced to allow to use neverDeleteData
         // and hence to not use BZ_THREADSAFE
         private:
