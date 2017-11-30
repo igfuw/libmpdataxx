@@ -19,40 +19,77 @@ namespace libmpdataxx
       using idxperm::pi;
       using arakawa_c::h;
 
-      template <class arg_t, typename real_t>
+      // 1D version
+      template <int ord = 2, class arg_t, typename real_t>
       inline auto grad(
 	const arg_t &x,
 	const rng_t &i,
-	const real_t dx
+	const real_t dx,
+        typename std::enable_if<ord == 2>::type* = 0
       ) return_macro(,
 	(
 	  x(i+1) - 
 	  x(i-1)
 	) / dx / 2.
       )
+      
+      // 4th order version of the above
+      template <int ord, class arg_t, typename real_t>
+      inline auto grad(
+	const arg_t &x,
+	const rng_t &i,
+	const real_t dx,
+        typename std::enable_if<ord == 4>::type* = 0
+      ) return_macro(,
+	(
+	  -   x(i+2) +
+	  8 * x(i+1) - 
+	  8 * x(i-1) +
+	      x(i-2)
+	) / (12 * dx)
+      )
 
       // 2D version
-      template <int d, class arg_t, typename real_t>
+      template <int d, int ord = 2, class arg_t, typename real_t>
       inline auto grad(
 	const arg_t &x,
 	const rng_t &i,
 	const rng_t &j,
-	const real_t dx
+	const real_t dx,
+        typename std::enable_if<ord == 2>::type* = 0
       ) return_macro(,
 	(
 	  x(pi<d>(i+1, j)) - 
 	  x(pi<d>(i-1, j))
 	) / dx / 2.
       )
+
+      // 4th order version of the above
+      template <int d, int ord, class arg_t, typename real_t>
+      inline auto grad(
+	const arg_t &x,
+	const rng_t &i,
+	const rng_t &j,
+	const real_t dx,
+        typename std::enable_if<ord == 4>::type* = 0
+      ) return_macro(,
+	(
+	  -   x(pi<d>(i+2, j)) + 
+	  8 * x(pi<d>(i+1, j)) - 
+	  8 * x(pi<d>(i-1, j)) +
+	      x(pi<d>(i-2, j))
+	) / (12 * dx)
+      )
       
       // 3D version
-      template <int d, class arg_t, typename real_t>
+      template <int d, int ord = 2, class arg_t, typename real_t>
       inline auto grad(
 	const arg_t &x,
 	const rng_t &i,
 	const rng_t &j,
 	const rng_t &k,
-	const real_t dx
+	const real_t dx,
+        typename std::enable_if<ord == 2>::type* = 0
       ) return_macro(,
 	(
 	  x(pi<d>(i+1, j, k)) - 
@@ -60,6 +97,26 @@ namespace libmpdataxx
 	) / dx / 2.
       )
       
+      // 4th order version of the above
+      template <int d, int ord, class arg_t, typename real_t>
+      inline auto grad(
+	const arg_t &x,
+	const rng_t &i,
+	const rng_t &j,
+	const rng_t &k,
+	const real_t dx,
+        typename std::enable_if<ord == 4>::type* = 0
+      ) return_macro(,
+	(
+	  -   x(pi<d>(i+2, j, k)) +
+	  8 * x(pi<d>(i+1, j, k)) - 
+	  8 * x(pi<d>(i-1, j, k)) +
+	      x(pi<d>(i-2, j, k))
+	) / (12 * dx)
+      )
+      
+      // compact gradients
+
       template <class arg_t, typename real_t>
       inline auto grad_cmpct(
 	const arg_t &x,
@@ -104,27 +161,27 @@ namespace libmpdataxx
       // helper function to calculate gradient components of a scalar field
       
       // 1D version
-      template <int nd, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
+      template <int nd, int ord = 2, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline void calc_grad(arrvec_t v, arr_t a, ijk_t ijk, dijk_t dijk, typename std::enable_if<nd == 1>::type* = 0)
       {
-        v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], dijk[0]);
+        v[0](ijk) = grad<0, ord>(a, ijk[0], dijk[0]);
       }
 
       // 2D version
-      template <int nd, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
+      template <int nd, int ord = 2, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline void calc_grad(arrvec_t v, arr_t a, ijk_t ijk, dijk_t dijk, typename std::enable_if<nd == 2>::type* = 0)
       {
-        v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], ijk[1], dijk[0]);
-        v[1](ijk) = formulae::nabla::grad<1>(a, ijk[1], ijk[0], dijk[1]);
+        v[0](ijk) = grad<0, ord>(a, ijk[0], ijk[1], dijk[0]);
+        v[1](ijk) = grad<1, ord>(a, ijk[1], ijk[0], dijk[1]);
       }
 
       // 3D version
-      template <int nd, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
+      template <int nd, int ord = 2, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline void calc_grad(arrvec_t v, arr_t a, ijk_t ijk, dijk_t dijk, typename std::enable_if<nd == 3>::type* = 0)
       {
-        v[0](ijk) = formulae::nabla::grad<0>(a, ijk[0], ijk[1], ijk[2], dijk[0]);
-        v[1](ijk) = formulae::nabla::grad<1>(a, ijk[1], ijk[2], ijk[0], dijk[1]);
-        v[2](ijk) = formulae::nabla::grad<2>(a, ijk[2], ijk[0], ijk[1], dijk[2]);
+        v[0](ijk) = grad<0, ord>(a, ijk[0], ijk[1], ijk[2], dijk[0]);
+        v[1](ijk) = grad<1, ord>(a, ijk[1], ijk[2], ijk[0], dijk[1]);
+        v[2](ijk) = grad<2, ord>(a, ijk[2], ijk[0], ijk[1], dijk[2]);
       }
       
       // 2D version
@@ -147,31 +204,28 @@ namespace libmpdataxx
       // divergence
       
       // 2D version
-      template <int nd, class arrvec_t, class ijk_t, class dijk_t>
+      template <int nd, int ord = 2, class arrvec_t, class ijk_t, class dijk_t>
       inline auto div(
 	const arrvec_t &v, // vector field
 	const ijk_t &ijk,
 	const dijk_t dijk,
         typename std::enable_if<nd == 2>::type* = 0
       ) return_macro(,
-	(v[0](ijk[0]+1, ijk[1]) - v[0](ijk[0]-1, ijk[1])) / dijk[0] / 2.
-	+
-	(v[1](ijk[0], ijk[1]+1) - v[1](ijk[0], ijk[1]-1)) / dijk[1] / 2.
+          grad<0 BOOST_PP_COMMA() ord>(v[0], ijk[0], ijk[1], dijk[0])
+        + grad<1 BOOST_PP_COMMA() ord>(v[1], ijk[1], ijk[0], dijk[1])
       )
       
       // 3D version
-      template <int nd, class arrvec_t, class ijk_t, class dijk_t>
+      template <int nd, int ord = 2, class arrvec_t, class ijk_t, class dijk_t>
       inline auto div(
 	const arrvec_t &v, // vector field
 	const ijk_t &ijk,
 	const dijk_t dijk,
         typename std::enable_if<nd == 3>::type* = 0
       ) return_macro(,
-	(v[0](ijk[0]+1, ijk[1], ijk[2]) - v[0](ijk[0]-1, ijk[1], ijk[2])) / dijk[0] / 2.
-	+
-	(v[1](ijk[0], ijk[1]+1, ijk[2]) - v[1](ijk[0], ijk[1]-1, ijk[2])) / dijk[1] / 2.
-	+
-	(v[2](ijk[0], ijk[1], ijk[2]+1) - v[2](ijk[0], ijk[1], ijk[2]-1)) / dijk[2] / 2.
+          grad<0 BOOST_PP_COMMA() ord>(v[0], ijk[0], ijk[1], ijk[2], dijk[0])
+        + grad<1 BOOST_PP_COMMA() ord>(v[1], ijk[1], ijk[2], ijk[0], dijk[1])
+        + grad<2 BOOST_PP_COMMA() ord>(v[2], ijk[2], ijk[0], ijk[1], dijk[2])
       )
     } // namespace nabla_op
   } // namespace formulae

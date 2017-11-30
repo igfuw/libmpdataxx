@@ -55,7 +55,7 @@ namespace libmpdataxx
           bool simple // if true do not normalize gradients (simple laplacian)
         ) return_macro(
           this->xchng_pres(arr, ijk);
-          formulae::nabla::calc_grad<parent_t::n_dims>(lap_tmp, arr, ijk, dijk);
+          formulae::nabla::calc_grad<parent_t::n_dims BOOST_PP_COMMA() ct_params_t::prs_order>(lap_tmp, arr, ijk, dijk);
           if (err_init)
           {
             for (int d = 0; d < parent_t::n_dims; ++d)
@@ -77,7 +77,7 @@ namespace libmpdataxx
             this->xchng_pres(lap_tmp[d], ijk);
           }
           ,
-          formulae::nabla::div<parent_t::n_dims>(lap_tmp, ijk, dijk)
+          formulae::nabla::div<parent_t::n_dims BOOST_PP_COMMA() ct_params_t::prs_order>(lap_tmp, ijk, dijk)
           / formulae::G<ct_params_t::opts>(*this->mem->G, this->ijk)
         )
 
@@ -121,7 +121,7 @@ namespace libmpdataxx
 
 	  this->xchng_pres(this->Phi, this->ijk);
 
-          formulae::nabla::calc_grad<parent_t::n_dims>(tmp_uvw, Phi, this->ijk, this->dijk);
+          formulae::nabla::calc_grad<parent_t::n_dims, ct_params_t::prs_order>(tmp_uvw, Phi, this->ijk, this->dijk);
         }
 
 	void pressure_solver_apply()
@@ -144,7 +144,7 @@ namespace libmpdataxx
 	  pressure_solver_update(true);
 
           this->xchng_pres(this->Phi, this->ijk);
-          formulae::nabla::calc_grad<parent_t::n_dims>(tmp_uvw, Phi, this->ijk, this->dijk);
+          formulae::nabla::calc_grad<parent_t::n_dims, ct_params_t::prs_order>(tmp_uvw, Phi, this->ijk, this->dijk);
 	  pressure_solver_apply();
           this->set_edges(this->vips(), this->ijk, 1);
 	  
@@ -155,7 +155,7 @@ namespace libmpdataxx
  
           // allow pressure_solver_apply at the first time step
 	  this->xchng_pres(this->Phi, this->ijk);
-          formulae::nabla::calc_grad<parent_t::n_dims>(tmp_uvw, Phi, this->ijk, this->dijk);
+          formulae::nabla::calc_grad<parent_t::n_dims, ct_params_t::prs_order>(tmp_uvw, Phi, this->ijk, this->dijk);
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             this->vip_rhs[d](this->ijk) -= tmp_uvw[d](this->ijk);

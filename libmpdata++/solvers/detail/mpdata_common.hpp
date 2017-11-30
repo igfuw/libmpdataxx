@@ -16,13 +16,13 @@ namespace libmpdataxx
       class mpdata_common : public detail::solver<
         ct_params_t, 
         formulae::mpdata::n_tlev, 
-        detail::max(minhalo, formulae::mpdata::halo(ct_params_t::opts))
+        detail::max(minhalo, formulae::mpdata::halo<ct_params_t>())
       >
       {
         using parent_t = detail::solver<
           ct_params_t, 
           formulae::mpdata::n_tlev, 
-          detail::max(minhalo, formulae::mpdata::halo(ct_params_t::opts))
+          detail::max(minhalo, formulae::mpdata::halo<ct_params_t>())
         >;
 
 	using GC_t = arrvec_t<typename parent_t::arr_t>;
