@@ -10,7 +10,7 @@ def panel_plot(plot_data, fname = 'panel.pdf'):
 
     levels = np.linspace(-0.05, 1.15, 25)
 
-    fig, axarr = plt.subplots(2, 2, figsize=(20, 14), sharex = 'col', sharey = 'row')
+    fig, axarr = plt.subplots(2, 2, figsize=(16, 10), sharex = 'col', sharey = 'row')
     field2pos = {'gh' :  (0, 0), 'cb' : (0, 1), 'ccb' : (1, 1), 'sc' : (1, 0) }
     field2title = {'gh' :  '(a) Gaussian hills',
                    'cb' : '(b) cosine bells',
@@ -27,11 +27,15 @@ def panel_plot(plot_data, fname = 'panel.pdf'):
         axarr[i].set_title(field2title[f], fontsize = 30, y = 1.02)
     
     for ax in axarr.flatten():
+        ax.set_xlim([0, nx - 1])
         ax.set_xticks([0, (nx - 1) / 4, (nx - 1) / 2, 3 * (nx - 1) / 4, nx - 1])
         ax.set_xticklabels([r'$0$', r'$\pi$/2', r'$\pi$', r'$3\pi/2$', r'$2\pi$'])
         
+        ax.set_ylim([0, ny - 1])
         ax.set_yticks([0, (ny+0.5) / 2, ny - 1])
         ax.set_yticklabels([r'$-\pi/2$', r'$0$', r'$\pi/2$'])
+        
+        ax.set_aspect(1.0, adjustable = 'box-forced')
         ax.grid(color = 'w', lw = 2, linestyle = ':')
 
     plt.subplots_adjust(bottom=0.2)
