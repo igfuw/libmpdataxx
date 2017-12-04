@@ -64,23 +64,28 @@ int main()
   std::mt19937 gen(1);
   std::uniform_real_distribution<> dis(-1, 1);
   real_t amp = 1e-6;
-  
+  auto rand = std::bind(dis, gen);
+
   // add random perturbation in the interior
-  for (int i = 1; i < nx - 1; ++i)
+  std::array<decltype(ix::u), 3> velo = {ix::u, ix::v, ix::w};
+  std::for_each(velo.begin(), velo.end(), [&](decltype(ix::u) vel)
   {
-    for (int j = 1; j < ny - 1; ++j)
-    {
-      for (int k = 1; k < nz - 1; ++k)
-      {
-        slv.advectee(ix::u)(i, j, k) += amp * dis(gen);
-        slv.advectee(ix::v)(i, j, k) += amp * dis(gen);
-        slv.advectee(ix::w)(i, j, k) += amp * dis(gen);
-      }
-    }
-  }
+    decltype(slv.advectee(vel)) prtrb(slv.advectee(vel).shape()); // array to store perturbation
+    prtrb.reindexSelf(slv.advectee().lbound());
+    std::generate(prtrb.begin(), prtrb.end(), [&] () {return amp * rand();}); // fill it, TODO: is it officialy stl compatible?
+    // no perturbation at the edges, TODO: with MPI this won't work
+    if(slv.advectee(vel).lbound(0) == 0) prtrb(0, all, all) = 0;
+    prtrb(all, 0, all) = 0;
+    prtrb(all, all, 0) = 0;
+    if(slv.advectee(vel).ubound(0) == nx-1) prtrb(nx-1, all, all) = 0;
+    prtrb(all, ny-1, all) = 0;
+    prtrb(all, all, nz-1) = 0;
+    slv.advectee(vel) += prtrb;
+  } );
 
   slv.advance(nt);
 
+  // TODO: with MPI these ranges won't work either
   auto err_cyclic = max(abs(slv.advectee(ix::u)(0, all, all) - slv.advectee(ix::u)(nx - 1, all, all)));
   if (err_cyclic > 1e-10)
   {

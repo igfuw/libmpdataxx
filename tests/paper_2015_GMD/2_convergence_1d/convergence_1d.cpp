@@ -75,6 +75,11 @@ struct gauss_int_t
 // all the test logic
 int main() 
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_SERIALIZED);
+#endif
   // simulation parameters
   const T 
     t_max    = 1.,                // "arbitrarily"
@@ -165,4 +170,7 @@ int main()
       }
     }
   }
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }

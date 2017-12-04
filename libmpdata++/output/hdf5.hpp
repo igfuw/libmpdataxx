@@ -18,6 +18,10 @@
 // the C++ HDF5 API
 #include <H5Cpp.h>
 
+#if defined(USE_MPI) && !defined(H5_HAVE_PARALLEL)
+#  error "MPI enabled in libmpdata++ but not in HDF5"
+#endif
+
 #include <vector>
 #include <string>
 #include <sstream>
@@ -36,7 +40,6 @@ namespace libmpdataxx
       using output_t = hdf5<solver_t>;
 
       std::unique_ptr<H5::H5File> hdfp;
-      std::map<int, H5::DataSet> vars;
       std::map<int, std::string> dim_names;
       const std::string const_name = "const.h5";
       std::string const_file;
@@ -55,22 +58,48 @@ namespace libmpdataxx
       blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, count, offst;
       H5::DSetCreatPropList params;
 
+      H5::DataSpace sspace, cspace;
+#if defined(USE_MPI)
+      hid_t fapl_id;
+#endif
+      hid_t dxpl_id;
+
       void start(const typename parent_t::advance_arg_t nt)
       {
+        std::string const_file = this->outdir + "/" + const_name;
+
+        if (this->mem->distmem.rank() == 0)
         {
           // creating the directory
           boost::filesystem::create_directory(this->outdir);
+        }
 
+ 
+        {
           // creating the const file
-          const_file = this->outdir + "/" + const_name;
-          hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC));
+#if defined(USE_MPI)
+          this->mem->distmem.barrier();
+          H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL);
+          H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_INDEPENDENT); // TODO: change to _COLLECTIVE and debug
+#endif
+          hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC
+#if defined(USE_MPI)
+            , H5P_DEFAULT, fapl_id
+#endif
+          ));
+          
+          // save selected compile and runtime parameters, the choice depends on the solver family
+//          record_params(*hdfp, typename parent_t::solver_family{});
+        }
 
+        {
           // creating the dimensions
           // x,y,z
           offst = 0;
 
-          shape = this->mem->advectee().extent();
-          
+          for (int d = 0; d < parent_t::n_dims; ++d)
+	    shape[d] = this->mem->distmem.grid_size[d];
+
           chunk = 1;
           // change chunk size along the last dimension
           *(chunk.end() - 1) = *(shape.end() - 1);
@@ -82,8 +111,34 @@ namespace libmpdataxx
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
 
+          sspace = H5::DataSpace(parent_t::n_dims, shape.data());
+          cspace = H5::DataSpace(parent_t::n_dims, cshape.data());
+
+#if defined(USE_MPI)
+          if (this->mem->distmem.size() > 1)
+          {
+	    shape[0] = this->mem->grid_size[0].length();
+	    cshape[0] = this->mem->grid_size[0].length();
+
+	    if (this->mem->distmem.rank() == this->mem->distmem.size() - 1) 
+              cshape[0] += 1;
+
+            offst[0] = this->mem->grid_size[0].first();
+
+            if (parent_t::n_dims == 1)
+            {
+              // chunk size has to be common to all processes !
+              // TODO: something better ?
+              chunk[0] = this->mem->distmem.grid_size[0] / this->mem->distmem.size();
+              count[0] = shape[0];
+            }
+          }
+#endif
+
 	  params.setChunk(parent_t::n_dims, chunk.data());
+#if !defined(USE_MPI)
 	  params.setDeflate(5); // TODO: move such constant to the header
+#endif
 
           // creating variables
           {
@@ -92,6 +147,9 @@ namespace libmpdataxx
             {
 
               blitz::Array<typename solver_t::real_t, parent_t::n_dims> coord(cshape);
+#if defined(USE_MPI)
+              coord.reindexSelf(offst);
+#endif
               std::string name;
               switch (i)
               {
@@ -110,11 +168,11 @@ namespace libmpdataxx
                 default : break;
               }
 
-              auto curr_dim = (*hdfp).createDataSet(name, flttype_output, H5::DataSpace(parent_t::n_dims, cshape.data()));
+              auto curr_dim = (*hdfp).createDataSet(name, flttype_output, cspace);
 
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, cshape.data(), offst.data());
-              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space);
+              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space, dxpl_id);
             }
             
             // T
@@ -130,18 +188,18 @@ namespace libmpdataxx
 
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, &nt_out, &zero);
-              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space);
+              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space, dxpl_id);
+            }
+            
+            // G factor
+            if (this->mem->G.get() != nullptr)
+            {
+              auto g_set = (*hdfp).createDataSet("G", flttype_output, sspace);
+              record_dsc_helper(g_set, *this->mem->G);
             }
             
             // save selected compile and runtime parameters, the choice depends on the solver family
             record_params(*hdfp, typename parent_t::solver_family{});
-
-            // G factor
-            if (this->mem->G.get() != nullptr)
-            {
-              auto g_set = (*hdfp).createDataSet("G", flttype_output, H5::DataSpace(parent_t::n_dims, shape.data()));
-              record_dsc_helper(g_set, *this->mem->G);
-            }
           }
         }
       }
@@ -165,19 +223,25 @@ namespace libmpdataxx
         assert(this->rank == 0);
         //count[1] = 1; TODO
 
-        // creating the timestep file
-        hdfp.reset(new H5::H5File(this->outdir + "/" + hdf_name(), H5F_ACC_TRUNC));
+	// creating the timestep file
+	hdfp.reset(new H5::H5File(this->outdir + "/" + hdf_name(), H5F_ACC_TRUNC
+#if defined(USE_MPI)
+            , H5P_DEFAULT, fapl_id
+#endif
+	));
 
         {
+          std::map<int, H5::DataSet> vars;
+
 	  for (const auto &v : this->outvars)
-          {
-            // creating the user-requested variables
-            vars[v.first] = (*hdfp).createDataSet(
-              v.second.name,
-              flttype_output,
-              H5::DataSpace(parent_t::n_dims, shape.data()),
-              params
-            );
+	  {
+	    // creating the user-requested variables
+	    vars[v.first] = (*hdfp).createDataSet(
+	      v.second.name,
+	      flttype_output,
+	      sspace,
+	      params
+	    );
 	    // TODO: units attribute
 
             record_dsc_helper(vars[v.first], this->out_data(v.first));
@@ -194,7 +258,7 @@ namespace libmpdataxx
           case 1:
           {
             space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-            dset.write( &(arr(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+            dset.write( &(arr(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
             break;
           }
           case 2:
@@ -207,7 +271,7 @@ namespace libmpdataxx
             ) {
               offst[0] = i;
               space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-              dset.write( &(arr(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+              dset.write( &(arr(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
             }
             break;
           }
@@ -227,7 +291,7 @@ namespace libmpdataxx
                 offst[0] = i;
                 offst[1] = j;
                 space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
               }
             }
             break;
@@ -244,14 +308,14 @@ namespace libmpdataxx
         auto aux = (*hdfp).createDataSet(
           name,
           flttype_output,
-          H5::DataSpace(parent_t::n_dims, shape.data()),
+          sspace,
           params
         );
 
         auto space = aux.getSpace();
         offst = 0;
         space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
-        aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space);
+        aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
       }
       
       // for discontiguous array with halos
@@ -262,7 +326,7 @@ namespace libmpdataxx
         auto aux = (*hdfp).createDataSet(
           name,
           flttype_output,
-          H5::DataSpace(parent_t::n_dims, shape.data()),
+          sspace,
           params
         );
         
@@ -413,7 +477,6 @@ namespace libmpdataxx
                                                         (parent_t::ct_params_t_::sgs_scheme) == solvers::iles,
                                                        typename solvers::mpdata_rhs_vip_prs_family_tag,
                                                        typename solvers::mpdata_rhs_vip_prs_sgs_smg_family_tag>::type{});
-        
         hdfcp.createGroup("boussinesq");
         const auto &group = hdfcp.openGroup("boussinesq");
         {
@@ -423,7 +486,7 @@ namespace libmpdataxx
           group.createAttribute("hflux_const", type, H5::DataSpace(1, &one)).write(type, &this->hflux_const);
         }
         {
-          auto dset = group.createDataSet("tht_e", flttype_output, H5::DataSpace(parent_t::n_dims, shape.data()));
+          auto dset = group.createDataSet("tht_e", flttype_output, sspace);
           record_dsc_helper(dset, this->tht_e);
         }
       }
@@ -439,7 +502,7 @@ namespace libmpdataxx
           group.createAttribute("prandtl_num", type, H5::DataSpace(1, &one)).write(type, &this->prandtl_num);
         }
         {
-          auto dset = group.createDataSet("mix_len", flttype_output, H5::DataSpace(parent_t::n_dims, shape.data()));
+          auto dset = group.createDataSet("mix_len", flttype_output, sspace);
           record_dsc_helper(dset, this->mix_len);
         }
       }
@@ -452,10 +515,24 @@ namespace libmpdataxx
 	const typename parent_t::rt_params_t &p
       ) : parent_t(args, p)
       {
+#if defined(USE_MPI)
+        fapl_id = H5Pcreate(H5P_FILE_ACCESS);
+#endif
+        dxpl_id = H5Pcreate(H5P_DATASET_XFER);
+
         // TODO: clean it up - it should not be here
         // overrding the default from output_common
         if (this->outvars.size() == 1 && parent_t::n_eqns == 1)
           this->outvars[0].name = "psi";
+      }
+
+      // dtor
+      virtual ~hdf5()
+      {
+        H5Pclose(dxpl_id);
+#if defined(USE_MPI)
+        H5Pclose(fapl_id);
+#endif
       }
     };
   } // namespace output

@@ -24,12 +24,16 @@ endif()
 # to make <libmpdata++/...> work
 set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CXX_FLAGS}")
 
-# macro to be used in the subdirectories
+# macros to be used in the subdirectories
 function(libmpdataxx_add_test test)
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
   target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
-  add_test(${test} ${test})
+  if(USE_MPI)
+    add_test(NAME ${test} COMMAND ${libmpdataxx_MPIRUN} -np 3 -x OMP_NUM_THREADS ${CMAKE_CURRENT_BINARY_DIR}/${test}) # TODO: why 3? :)
+  else()
+    add_test(${test} ${test})
+  endif()
 endfunction()
 
 # same as above but for travis only tests that should be excluded from make all
@@ -42,9 +46,10 @@ endfunction()
 
 enable_testing()
 
-add_subdirectory(straka)
-add_subdirectory(tgv)
-add_subdirectory(convergence_2d_3d)
-add_subdirectory(pbl)
-add_subdirectory(convergence_spacetime)
-add_subdirectory(bconds_div)
+add_subdirectory(0_mpi_adv)
+add_subdirectory(1_straka)
+add_subdirectory(2_tgv)
+add_subdirectory(3_convergence_2d_3d)
+add_subdirectory(4_pbl)
+add_subdirectory(5_convergence_spacetime)
+add_subdirectory(6_bconds_div)

@@ -117,11 +117,11 @@ namespace libmpdataxx
                    const std::vector<std::string>& attr_names,
                    const blitz::TinyVector<int, dim>& dimensions)
         {
-          top.dimensions = dimensions;
+          top.dimensions = dimensions + 1;
 
           for (const auto& dn : dim_names)
           {
-            geo.coords[dn.first].dimensions = dimensions;
+            geo.coords[dn.first].dimensions = dimensions + 1;
             geo.coords[dn.first].data = hdf_name + ":/" + dn.second;
           }
 

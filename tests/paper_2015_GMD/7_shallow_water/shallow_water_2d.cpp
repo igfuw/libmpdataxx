@@ -99,6 +99,14 @@ void test(const std::string &outdir)
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_SERIALIZED);
+#endif
   test<opts::fct | opts::iga>("2d_fct_iga");
   test<opts::fct | opts::abs>("2d_fct_abs");
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }

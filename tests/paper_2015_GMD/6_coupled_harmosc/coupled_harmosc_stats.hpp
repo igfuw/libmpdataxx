@@ -40,10 +40,10 @@ struct stats : public parent_t
       ofs<<"min(phi) = "<<std::setw(12) << min(this->mem->advectee(ix::phi))<<" @ index "<< minIndex(this->mem->advectee(ix::phi)) << std::endl;
       ofs<<"max(phi) = "<<std::setw(12) << max(this->mem->advectee(ix::phi))<<" @ index "<< maxIndex(this->mem->advectee(ix::phi)) << std::endl;
 
-      decltype(this->mem->advectee(ix::psi)) solution(this->mem->advectee().extent());
+      decltype(this->mem->advectee(ix::psi)) solution(this->mem->advectee().lbound(), this->mem->advectee().extent());
   
       assert(max(this->mem->advector() == min(this->mem->advector())));
-      real_t vel = this->mem->advector()(0);
+      real_t vel = this->mem->advector()(this->mem->grid_size[0].first());
 
       real_t t = this->timestep * this->dt;
       using boost::math::constants::pi;
