@@ -3,7 +3,6 @@
 #if defined(USE_MPI)
 #  include <boost/mpi/communicator.hpp>
 #  include <boost/mpi/collectives.hpp>
-#  include <mutex>
 #else
 #  include <cstdlib>
 #endif
@@ -16,7 +15,6 @@ namespace libmpdataxx
     namespace detail
     {
 #if defined(USE_MPI)
-      std::mutex mpi_mutex;
       bool mpi_initialized_before = true; // flag if MPI was initialized before distmem ctor
 #endif
 
@@ -35,7 +33,6 @@ public: // TODO: just a temp measure, make it private again
         {
 #if defined(USE_MPI)
           real_t res;
-//          std::lock_guard<std::mutex> lock(mpi_mutex);
           boost::mpi::all_reduce(mpicom, val, res, Op()); // it's thread-safe?
           return res;
 #else
@@ -104,6 +101,7 @@ public: // TODO: just a temp measure, make it private again
         {
 #if !defined(USE_MPI)
           if (
+            // TODO: mvapich2
             // mpich
             std::getenv("PMI_RANK") != NULL ||
             // openmpi
@@ -118,11 +116,11 @@ public: // TODO: just a temp measure, make it private again
           if(!MPI::Is_initialized())
           {
             mpi_initialized_before = false;
-            MPI::Init_thread(MPI_THREAD_SERIALIZED);
+            MPI::Init_thread(MPI_THREAD_MULTIPLE);
           }
-          if (boost::mpi::environment::thread_level() != boost::mpi::threading::serialized)
+          if (boost::mpi::environment::thread_level() != boost::mpi::threading::multiple)
           {
-            throw std::runtime_error("failed to initialise MPI environment with MPI_THREAD_SERIALIZED");
+            throw std::runtime_error("failed to initialise MPI environment with MPI_THREAD_MULTIPLE");
           }
 #endif
         }
