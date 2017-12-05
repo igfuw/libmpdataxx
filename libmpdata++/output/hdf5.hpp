@@ -80,7 +80,8 @@ namespace libmpdataxx
 #if defined(USE_MPI)
           this->mem->distmem.barrier();
           H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL);
-          H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_INDEPENDENT); // TODO: change to _COLLECTIVE and debug
+          //H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_INDEPENDENT); 
+          H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE); 
 #endif
           hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC
 #if defined(USE_MPI)
@@ -253,6 +254,14 @@ namespace libmpdataxx
       {
         H5::DataSpace space = dset.getSpace();
 
+        offst = 0;
+        space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
+        auto contiguous_arr = arr(this->ijk).copy(); // create a copy that is contiguous
+        dset.write(&contiguous_arr, flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
+
+        // Below is the old way of doing this, which avoids creating a copy of the array,
+        // this method was very slow in distmem case when using MVAPICH2
+/*
         switch (int(solver_t::n_dims))
         {
           case 1:
@@ -298,6 +307,7 @@ namespace libmpdataxx
           }
           default: assert(false);
         }
+*/
       }
 
       // data is assumed to be contiguous and in the same layout as hdf variable
