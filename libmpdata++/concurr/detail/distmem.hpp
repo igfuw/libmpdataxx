@@ -101,7 +101,8 @@ public: // TODO: just a temp measure, make it private again
         {
 #if !defined(USE_MPI)
           if (
-            // TODO: mvapich2
+            // mvapich2
+            std::getenv("MV2_COMM_WORLD_RANK") != NULL ||
             // mpich
             std::getenv("PMI_RANK") != NULL ||
             // openmpi
