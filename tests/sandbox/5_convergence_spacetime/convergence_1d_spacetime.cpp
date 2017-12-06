@@ -10,7 +10,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <libmpdata++/solvers/mpdata.hpp>
 #include <libmpdata++/concurr/threads.hpp>
-#include "convergence_2d_spacetime.hpp"
+#include "convergence_1d_spacetime.hpp"
 
 using namespace libmpdataxx;
 
@@ -20,7 +20,7 @@ double test(int np)
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;
-    enum { n_dims = 2 };
+    enum { n_dims = 1 };
     enum { n_eqns = 1 };
     enum { opts = opts_arg };
   };
@@ -29,45 +29,43 @@ double test(int np)
     pi = boost::math::constants::pi<typename ct_params_t::real_t>(),
     time = 1.0,
     dx = 2.0 * pi / (np - 1),  
-    dy = 2.0 * pi / (np - 1),  
-    dt = 1.0 * dx;
+    dt = 2.0 * dx;
 
   int nt = time / dt;
   time = nt * dt;
 
-  using slv_t = convergence_2d_spacetime<ct_params_t>;
+  using slv_t = convergence_1d_spacetime<ct_params_t>;
 
   typename slv_t::rt_params_t p;
   p.n_iters = opts_iters; 
-  p.grid_size = {np, np};
+  p.grid_size = {np};
   p.di = dx;
-  p.dj = dy;
   p.dt = dt;
 
   concurr::threads<
     slv_t, 
-    bcond::cyclic, bcond::cyclic,
     bcond::cyclic, bcond::cyclic
   > run(p); 
 
-  run.advectee() = 4;
+  run.advectee() = 2;
 
   // just to fool the divergence check
   run.advector(0) = 0;
-  run.advector(1) = 0;
-  
-  blitz::firstIndex i;
-  blitz::secondIndex j;
 
-  decltype(run.advectee()) true_solution(run.advectee().shape());
-  true_solution = (2 + sin(i * dx) * sin(time)) * (2 + sin(j * dy) * sin(time));
+  blitz::firstIndex i;
+
+  decltype(run.advectee()) true_solution(run.advectee_global().shape());
+  decltype(run.advectee()) g_factor_global(true_solution.shape());
+  true_solution = (2 + sin(i * dx) * sin(time));
+//  true_solution.reindexSelf(run.advectee().lbound());
   
-  run.g_factor() = exp(cos(i * dx) + cos(j * dy));
+  run.g_factor() = exp(cos(i * dx));
+  g_factor_global = exp(cos(i * dx));
 
   run.advance(nt);
 
-  auto L2_error = sqrt(sum(run.g_factor() * pow2(run.advectee() - true_solution)))
-                  / sqrt(sum(run.g_factor() *  pow2(true_solution)));
+  auto L2_error = sqrt(sum(g_factor_global * pow2(run.advectee_global() - true_solution)))
+                  / sqrt(sum(g_factor_global *  pow2(true_solution)));
   return L2_error;
 }
 
@@ -81,6 +79,11 @@ int order()
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_SERIALIZED);
+#endif
   // mpdata without dfl option set is frist-order accurate for divergent flows
   {
     enum { opts = opts::nug };
@@ -122,4 +125,8 @@ int main()
     enum { opts_iters = 2};
     if (order<opts, opts_iters>() != 3) throw std::runtime_error("iga_div_3rd");
   }
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
+
 }

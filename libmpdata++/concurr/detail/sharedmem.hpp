@@ -11,8 +11,10 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/formulae/arakawa_c.hpp>
+#include <libmpdata++/concurr/detail/distmem.hpp>
 
 #include <array>
+#include <numeric>
 
 namespace libmpdataxx
 {
@@ -45,6 +47,8 @@ namespace libmpdataxx
 	int n = 0;
         std::array<rng_t, n_dims> grid_size; 
         bool panic = false; // for multi-threaded SIGTERM handling
+
+        detail::distmem<real_t, n_dims> distmem;
 
         // TODO: these are public because used from outside in alloc - could friendship help?
 	arrvec_t<arr_t> GC, ndt_GC, ndtt_GC;
@@ -80,13 +84,21 @@ namespace libmpdataxx
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
         sharedmem_common(const std::array<int, n_dims> &grid_size, const int &size)
-          : n(0) // TODO: is n(0) needed?
+          : n(0), distmem(grid_size) // TODO: is n(0) needed?
         {
           for (int d = 0; d < n_dims; ++d) 
           {
-            this->grid_size[d] = rng_t(0, grid_size[d]-1);
+            this->grid_size[d] = slab(
+              rng_t(0, grid_size[d]-1),
+              d == 0 ? distmem.rank() : 0,
+              d == 0 ? distmem.size() : 1
+            );
             origin[d] = this->grid_size[d].first();
           }
+
+          std::ostringstream oss;
+          oss << "grid_size[0]: " << this->grid_size[0] << " origin[0]: " << origin[0] << std::endl;
+          std::cerr << oss.str() << std::endl;
 
           if (size > grid_size[0]) 
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
@@ -97,7 +109,7 @@ namespace libmpdataxx
         }
 
         /// @brief concurrency-aware summation of array elements
-        real_t sum(const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
+        real_t sum(const int &rank, const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
@@ -112,7 +124,8 @@ namespace libmpdataxx
             else
 	      (*sumtmp)(c) = blitz::sum(arr(slice_idx));
           }
-          barrier();
+          barrier(); // wait for all threads to calc their part
+#if !defined(USE_MPI)
           real_t result;
           if (sum_khn)
             result = blitz::kahan_sum(*sumtmp);
@@ -120,10 +133,26 @@ namespace libmpdataxx
             result = blitz::sum(*sumtmp);
           barrier();
           return result;
+#else
+          if(rank == 0) 
+          {
+            // master thread calculates the sum from this process, stores in shared array
+            if (sum_khn)
+              (*sumtmp)(grid_size[0].first())= blitz::kahan_sum(*sumtmp); // inplace?!
+            else
+              (*sumtmp)(grid_size[0].first())= blitz::sum(*sumtmp); // inplace?!
+            // master thread calculates sum of sums from all processes
+            (*sumtmp)(grid_size[0].first()) = this->distmem.sum((*sumtmp)(grid_size[0].first())); // inplace?!
+          }
+          barrier();
+          real_t res = (*sumtmp)(grid_size[0].first()); // propagate the total sum to all threads of the process
+          barrier(); // to avoid sumtmp being overwritten by next call to sum from other thread
+          return res;
+#endif
         }
 
         /// @brief concurrency-aware summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
+        real_t sum(const int &rank, const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
@@ -138,7 +167,9 @@ namespace libmpdataxx
             else
 	      (*sumtmp)(c) = blitz::sum(arr1(slice_idx) * arr2(slice_idx)); 
           }
-          barrier();
+          // TODO: code below same as in the function above
+          barrier(); // wait for all threads to calc their part
+#if !defined(USE_MPI)
           real_t result;
           if (sum_khn)
             result = blitz::kahan_sum(*sumtmp);
@@ -146,23 +177,87 @@ namespace libmpdataxx
             result = blitz::sum(*sumtmp);
           barrier();
           return result;
+#else
+          if(rank == 0) 
+          {
+            // master thread calculates the sum from this process, stores in shared array
+            if (sum_khn)
+              (*sumtmp)(grid_size[0].first())= blitz::kahan_sum(*sumtmp); // inplace?!
+            else
+              (*sumtmp)(grid_size[0].first())= blitz::sum(*sumtmp); // inplace?!
+            // master thread calculates sum of sums from all processes
+            (*sumtmp)(grid_size[0].first()) = this->distmem.sum((*sumtmp)(grid_size[0].first())); // inplace?!
+          }
+          barrier();
+          real_t res = (*sumtmp)(grid_size[0].first()); // propagate the total sum to all threads of the process
+          barrier(); // to avoid sumtmp being overwritten by next call to sum from other thread
+          return res;
+#endif
         }
 
         real_t min(const int &rank, const arr_t &arr)
         {
+          // min across local threads
           (*xtmtmp)(rank) = blitz::min(arr); 
           barrier();
+#if !defined(USE_MPI)
           real_t result = blitz::min(*xtmtmp);
           barrier();
           return result;
+#else
+          if(rank == 0)
+          {
+            (*xtmtmp)(0) = blitz::min(*xtmtmp);
+            // min across mpi processes
+            (*xtmtmp)(0) = this->distmem.min((*xtmtmp)(0));
+          }
+          barrier();
+          real_t res = (*xtmtmp)(0); // propagate the total min to all threads of the process
+          barrier(); // to avoid xtmtmp being overwritten by some other threads' next sum call
+          return res;
+#endif
         }
 
+        // TODO: almost the same as min
         real_t max(const int &rank, const arr_t &arr)
         {
+          // max across local threads
           (*xtmtmp)(rank) = blitz::max(arr); 
           barrier();
+#if !defined(USE_MPI)
           real_t result = blitz::max(*xtmtmp);
           barrier();
+          return result;
+#else
+          if(rank == 0)
+          {
+            (*xtmtmp)(0) = blitz::max(*xtmtmp);
+            // max across mpi processes
+            (*xtmtmp)(0) = this->distmem.max((*xtmtmp)(0));
+          }
+          barrier();
+          real_t res = (*xtmtmp)(0); // propagate the total max to all threads of the process
+          barrier(); // to avoid xtmtmp being overwritten by some other threads' next sum call
+          return res;
+#endif
+        }
+
+        // single-threaded, MPI-aware versions of the min and max functions
+        real_t min(const arr_t &arr)
+        {
+          // min across local threads
+          real_t result = blitz::min(arr);
+          // min across mpi processes
+          result = this->distmem.min(result);
+          return result;
+        }
+
+        real_t max(const arr_t &arr)
+        {
+          // min across local threads
+          real_t result = blitz::max(arr);
+          // min across mpi processes
+          result = this->distmem.max(result);
           return result;
         }
 
@@ -209,6 +304,35 @@ namespace libmpdataxx
             span.first() + max(span.length(), rank, size)
           );
         }
+
+        virtual arr_t advectee(int e = 0) = 0;
+
+        void advectee_global_set(const arr_t arr, int e = 0)
+        {   
+#if defined(USE_MPI)
+          if(this->distmem.size() > 1)
+          {
+            advectee(e) = arr(slab(rng_t(0, distmem.grid_size[0]-1), distmem.rank(), distmem.size()));
+          }
+          else
+#endif
+          advectee(e) = arr;
+        }  
+
+        protected:
+
+	rng_t distmem_ext(const rng_t &rng)
+	{
+	  return this->distmem.size() == 0
+	    ? rng
+	    : this->distmem.rank() > 0 && this->distmem.rank() < (this->distmem.size() - 1)
+	      ? rng_t(rng.first()-1, rng.last()+1)
+	      : this->distmem.rank() == 0
+                ? rng_t(rng.first()  ,   rng.last()+1)
+                : rng_t(rng.first()-1,   rng.last()  )
+          ;
+	}
+
       };
 
       template<typename real_t, int n_dims, int n_tlev>
@@ -235,6 +359,41 @@ namespace libmpdataxx
 	  ).reindex(this->origin);
 	}
 
+        const blitz::Array<real_t, 1> advectee_global(int e = 0)
+        {   
+#if defined(USE_MPI)
+          if(this->distmem.size() > 1)
+          {
+// TODO: move some of that to distmem...
+// TODO: a lot of common code betwee 1,2 and 3 dimensions...
+
+            // a vector of number of elements to be sent by each non-root process
+            std::vector<int> sizes(this->distmem.size());
+            std::iota(sizes.begin(), sizes.end(), 0); // fill with 1,2,3,...
+            for(auto &size : sizes) { size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length();}
+            // calc displacement
+            std::vector<int> displ(sizes.size());
+            std::partial_sum(sizes.begin(), sizes.end(), displ.begin()); 
+            std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
+            // a vector that will store the received data, relevant only on process rank=0
+            std::vector<real_t> out_values(this->distmem.grid_size[0]);
+            // create an array that will store advectee to be sent in a contiguous memory block
+            std::vector<real_t> in_values_vec(advectee(e).size());
+            std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
+
+            // gather the data from all processes on rank=0
+            boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
+         
+            blitz::Array<real_t, 1> res(out_values.data(), blitz::shape(this->distmem.grid_size[0]), blitz::duplicateData);
+            // send the result to other processes
+            boost::mpi::broadcast(this->distmem.mpicom, res, 0);
+            return res;
+          }
+          else
+#endif
+            return advectee(e);
+        }  
+
 	blitz::Array<real_t, 1> advector(int d = 0)  
 	{   
           using namespace arakawa_c;
@@ -243,8 +402,12 @@ namespace libmpdataxx
           // reindexed to make it more intuitive when working with index placeholders
           // (i.e. border between cell 0 and cell 1 is indexed with 0)
 	  return this->GC[d](
-            this->grid_size[0]^(-1)^h
-          ).reindex(this->origin);
+            this->distmem_ext(this->grid_size[0]^(-1)^h)
+          ).reindex(
+            this->distmem.rank() > 0
+              ? decltype(this->origin)({this->origin[0] - 1})
+              : this->origin
+          );
 	}   
 
         blitz::Array<real_t, 1> g_factor()
@@ -295,16 +458,72 @@ namespace libmpdataxx
 	  ).reindex(this->origin);
 	}
 
+        const blitz::Array<real_t, 2> advectee_global(int e = 0)
+        {   
+#if defined(USE_MPI)
+          if(this->distmem.size() > 1)
+          {
+// TODO: move some of that to distmem...
+// TODO: a lot of common code betwee 1,2 and 3 dimensions...
+
+            // a vector of number of elements to be sent by each non-root process
+            std::vector<int> sizes(this->distmem.size());
+            std::iota(sizes.begin(), sizes.end(), 0); // fill with 1,2,3,...
+            for(auto &size : sizes) 
+            { 
+              size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length()
+                      * this->grid_size[1].length();
+            }
+            // calc displacement
+            std::vector<int> displ(sizes.size());
+            std::partial_sum(sizes.begin(), sizes.end(), displ.begin()); 
+            std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
+            // a vector that will store the received data, relevant only on process rank=0
+            std::vector<real_t> out_values(this->distmem.grid_size[0] * this->grid_size[1].length());
+            // create an array that will store advectee to be sent in a contiguous memory block
+            std::vector<real_t> in_values_vec(advectee(e).size());
+            std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
+
+            // gather the data from all processes on rank=0
+            boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
+            // send the result to other processes
+            boost::mpi::broadcast(this->distmem.mpicom, out_values, 0);
+         
+            blitz::Array<real_t, 2> res(out_values.data(), blitz::shape(
+              this->distmem.grid_size[0], this->grid_size[1].length()),
+              blitz::duplicateData);
+            return res;
+          }
+          else
+#endif
+            return advectee(e);
+        }  
+
 	blitz::Array<real_t, 2> advector(int d = 0)  
 	{   
           using namespace arakawa_c;
           assert(d == 0 || d== 1);
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
+          auto orgn = this->distmem.rank() > 0
+            ? decltype(this->origin)({
+                this->origin[0] - 1, 
+                this->origin[1]
+              })
+            : this->origin
+          ;
           switch (d)
           { 
-            case 0: return this->GC[d](this->grid_size[0]^(-1)^h, this->grid_size[1]).reindex(this->origin); 
-            case 1: return this->GC[d](this->grid_size[0], this->grid_size[1]^(-1)^h).reindex(this->origin); 
+            case 0: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]^(-1)^h), 
+                this->grid_size[1]
+              ).reindex(orgn); 
+            case 1: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]), 
+                this->grid_size[1]^(-1)^h
+              ).reindex(orgn);
             default: assert(false); throw;
           }
 	}   
@@ -376,23 +595,81 @@ namespace libmpdataxx
 	  ).reindex(this->origin);
 	}
 
+        const blitz::Array<real_t, 3> advectee_global(int e = 0)
+        {   
+#if defined(USE_MPI)
+          if(this->distmem.size() > 1)
+          {
+// TODO: move some of that to distmem...
+// TODO: a lot of common code betwee 1,2 and 3 dimensions...
+
+            // a vector of number of elements to be sent by each non-root process
+            std::vector<int> sizes(this->distmem.size());
+            std::iota(sizes.begin(), sizes.end(), 0); // fill with 1,2,3,...
+            for(auto &size : sizes) 
+            { 
+              size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length()
+                      * this->grid_size[1].length() * this->grid_size[2].length();
+            }
+            // calc displacement
+            std::vector<int> displ(sizes.size());
+            std::partial_sum(sizes.begin(), sizes.end(), displ.begin()); 
+            std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
+            // a vector that will store the received data, relevant only on process rank=0
+            std::vector<real_t> out_values(this->distmem.grid_size[0] * this->grid_size[1].length() * this->grid_size[2].length());
+            // create an array that will store advectee to be sent in a contiguous memory block
+            std::vector<real_t> in_values_vec(advectee(e).size());
+            std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
+
+            // gather the data from all processes on rank=0
+            boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
+            // send the result to other processes
+            boost::mpi::broadcast(this->distmem.mpicom, out_values, 0);
+         
+            blitz::Array<real_t, 3> res(out_values.data(), blitz::shape(
+              this->distmem.grid_size[0], this->grid_size[1].length(), this->grid_size[2].length()),
+              blitz::duplicateData);
+            return res;
+          }
+          else
+#endif
+            return advectee(e);
+        }  
+
 	blitz::Array<real_t, 3> advector(int d = 0)  
 	{   
           using namespace arakawa_c;
           assert(d == 0 || d == 1 || d == 2);
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
+          auto orgn = this->distmem.rank() > 0
+            ? decltype(this->origin)({
+                this->origin[0] - 1, 
+                this->origin[1],
+                this->origin[2]
+              })
+            : this->origin
+          ;
           switch (d)
           { 
-            case 0: return this->GC[d](this->grid_size[0]^(-1)^h,
-                                       this->grid_size[1],
-                                       this->grid_size[2]).reindex(this->origin);  
-            case 1: return this->GC[d](this->grid_size[0],
-                                       this->grid_size[1]^(-1)^h,
-                                       this->grid_size[2]).reindex(this->origin);  
-            case 2: return this->GC[d](this->grid_size[0],
-                                       this->grid_size[1],
-                                       this->grid_size[2]^(-1)^h).reindex(this->origin);  
+            case 0: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]^(-1)^h),
+                this->grid_size[1],
+                this->grid_size[2]
+              ).reindex(this->origin);  
+            case 1: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]),
+                this->grid_size[1]^(-1)^h,
+                this->grid_size[2]
+              ).reindex(this->origin);  
+            case 2: 
+              return this->GC[d](
+                this->distmem_ext(this->grid_size[0]),
+                this->grid_size[1],
+                this->grid_size[2]^(-1)^h
+              ).reindex(this->origin);  
             default: assert(false); throw;
           }
 	}   

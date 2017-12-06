@@ -58,6 +58,11 @@ void test(const std::string filename)
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_SERIALIZED);
+#endif
   {
     enum { opts = opts::abs };
     test<opts>("out_abs.svg");
@@ -78,4 +83,7 @@ int main()
     enum { opts = opts::iga | opts::tot | opts::fct };
     test<opts>("out_iga_tot_fct.svg");
   }
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }

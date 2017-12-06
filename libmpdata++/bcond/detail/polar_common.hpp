@@ -37,7 +37,7 @@ namespace libmpdataxx
 	// ctor
 	polar_common(
           const rng_t &i, 
-          const int grid_size_0
+          const int &grid_size_0
         ) :
 	  parent_t(i, grid_size_0),
 	  pole((grid_size_0 - 1) / 2)

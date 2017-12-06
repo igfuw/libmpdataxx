@@ -39,12 +39,12 @@ namespace libmpdataxx
 
         real_t prs_sum(const arr_t &arr, const ijk_t &ijk)
         {
-          return this->mem->sum(arr, ijk, ct_params_t::prs_khn);
+          return this->mem->sum(this->rank, arr, ijk, ct_params_t::prs_khn);
         }
 
         real_t prs_sum(const arr_t &arr1, const arr_t &arr2, const ijk_t &ijk)
         {
-          return this->mem->sum(arr1, arr2, ijk, ct_params_t::prs_khn);
+          return this->mem->sum(this->rank, arr1, arr2, ijk, ct_params_t::prs_khn);
         }
 
         auto lap(

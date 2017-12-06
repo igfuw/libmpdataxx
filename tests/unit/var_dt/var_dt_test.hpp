@@ -27,7 +27,7 @@ class var_dt_test : public libmpdataxx::solvers::mpdata<ct_params_t>
     using namespace libmpdataxx::arakawa_c;
     for (int i = this->i.first(); i <= this->i.last(); ++i)
     {
-      this->mem->GC[0](i+h) = this->dt / this->di * u_0 * cos(pi * t_half / tau);
+      this->mem->GC[0](i-h) = this->dt / this->di * u_0 * cos(pi * t_half / tau); // vector to the left of the domain also has to be set
     }
     this->xchng_vctr_alng(this->mem->GC);
     return true;

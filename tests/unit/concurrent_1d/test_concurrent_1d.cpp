@@ -19,6 +19,11 @@
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_SERIALIZED);
+#endif
   using namespace libmpdataxx;
 
   std::cerr << "OpenMP: ";
@@ -104,4 +109,7 @@ int main()
     run.advector() = 0;
     run.advance(nt);
   }
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }
