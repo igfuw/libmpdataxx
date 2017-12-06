@@ -55,7 +55,7 @@ namespace libmpdataxx
 	      H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, count, offst;
+      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, offst;
       H5::DSetCreatPropList params;
 
       H5::DataSpace sspace, cspace;
@@ -79,8 +79,7 @@ namespace libmpdataxx
           // creating the const file
 #if defined(USE_MPI)
           this->mem->distmem.barrier();
-          H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL);
-        //  H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_INDEPENDENT); 
+          H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL); 
           H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE); 
 #endif
           hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC
@@ -101,13 +100,7 @@ namespace libmpdataxx
           for (int d = 0; d < parent_t::n_dims; ++d)
 	    shape[d] = this->mem->distmem.grid_size[d];
 
-          chunk = 1;
-          // change chunk size along the last dimension
-          *(chunk.end() - 1) = *(shape.end() - 1);
-
-          count = 1;
-          // see above
-          *(count.end() - 1) = *(shape.end() - 1);
+          chunk = shape;
 
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
@@ -126,16 +119,11 @@ namespace libmpdataxx
 
             offst[0] = this->mem->grid_size[0].first();
 
-            if (parent_t::n_dims == 1)
-            {
-              // chunk size has to be common to all processes !
-              // TODO: something better ?
-              chunk[0] = this->mem->distmem.grid_size[0] / this->mem->distmem.size();
-              count[0] = shape[0];
-            }
+            // chunk size has to be common to all processes !
+            // TODO: something better ?
+            chunk[0] = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
           }
 #endif
-
 	  params.setChunk(parent_t::n_dims, chunk.data());
 #if !defined(USE_MPI)
 	  params.setDeflate(5); // TODO: move such constant to the header
@@ -253,8 +241,6 @@ namespace libmpdataxx
       void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
       {
         H5::DataSpace space = dset.getSpace();
-
-        offst = 0;
         space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
         // TODO: some permutation of grid_size instead of the switch
         switch (int(solver_t::n_dims))
@@ -279,56 +265,6 @@ namespace libmpdataxx
           }
           default: assert(false);
         };
-
-        // Below is the old way of doing this, which avoids creating a copy of the array,
-        // this method was very slow in distmem case when using MVAPICH2
-/*
-        switch (int(solver_t::n_dims))
-        {
-          case 1:
-          {
-            space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-            dset.write( &(arr(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
-            break;
-          }
-          case 2:
-          {
-            // halos present -> data not contiguous -> looping over the major rank
-            assert(this->mem->grid_size[0].stride() == 1);
-            for (auto i  = this->mem->grid_size[0].first(); 
-                      i <= this->mem->grid_size[0].last(); 
-                      i += this->mem->grid_size[0].stride()
-            ) {
-              offst[0] = i;
-              space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-              dset.write( &(arr(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
-            }
-            break;
-          }
-          case 3:
-          {
-            // halos present -> data not contiguous -> looping over the major rank
-            assert(this->mem->grid_size[0].stride() == 1);
-            for (auto i  = this->mem->grid_size[0].first(); 
-                      i <= this->mem->grid_size[0].last(); 
-                      i += this->mem->grid_size[0].stride()
-            ) {
-              assert(this->mem->grid_size[1].stride() == 1);
-              for (auto j  = this->mem->grid_size[1].first(); 
-                        j <= this->mem->grid_size[1].last(); 
-                        j += this->mem->grid_size[1].stride()
-              ) {
-                offst[0] = i;
-                offst[1] = j;
-                space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space, dxpl_id);
-              }
-            }
-            break;
-          }
-          default: assert(false);
-        }
-*/
       }
 
       // data is assumed to be contiguous and in the same layout as hdf variable
