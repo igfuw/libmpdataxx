@@ -81,7 +81,9 @@ namespace libmpdataxx
           // launching async data transfer
           if(buf_send.size()!=0)
           {
-	    reqs[0] = mpicom.isend(peer, msg_send, buf_send);
+            // use the pointer+size kind of send instead of serialization, because
+            // serialization caused memory leaks, probably because it breaks blitz reference counting
+	    reqs[0] = mpicom.isend(peer, msg_send, buf_send.data(), buf_send.size()); 
 
             // sending debug information
 #  if !defined(NDEBUG)
@@ -113,7 +115,7 @@ namespace libmpdataxx
           // launching async data transfer
           if(buf_recv.size()!=0)
           {
-	    reqs[1+n_dbg_reqs] = mpicom.irecv(peer, msg_recv, buf_recv);
+	    reqs[1+n_dbg_reqs] = mpicom.irecv(peer, msg_recv, buf_recv.data(), buf_recv.size());
 
             // sending debug information
 #  if !defined(NDEBUG)
