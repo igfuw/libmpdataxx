@@ -18,9 +18,9 @@ namespace libmpdataxx
         dir == left &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t, halo>
+    > : public detail::bcond_common<real_t, halo, n_dims>
     { 
-      using parent_t = detail::bcond_common<real_t, halo>;
+      using parent_t = detail::bcond_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, n_dims>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -85,9 +85,9 @@ namespace libmpdataxx
         dir == rght &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t, halo>
+    > : public detail::bcond_common<real_t, halo, n_dims>
     {
-      using parent_t = detail::bcond_common<real_t, halo>;
+      using parent_t = detail::bcond_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, n_dims>;
       using parent_t::parent_t; // inheriting ctor
       

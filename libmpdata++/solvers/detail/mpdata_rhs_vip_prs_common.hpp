@@ -88,7 +88,7 @@ namespace libmpdataxx
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
 	    Phi(this->ijk) -= 0.5 * pow2(this->vips()[d](this->ijk));
-            npoints *= (this->mem->grid_size[d].last() + 1);
+            npoints *= (this->mem->distmem.grid_size[d]);
           }
           
           auto Phi_mean = prs_sum(Phi, this->ijk) / npoints;

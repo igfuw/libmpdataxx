@@ -31,7 +31,7 @@ namespace libmpdataxx
 
     namespace detail
     {
-      template <typename real_t, int halo>
+      template <typename real_t, int halo, int n_dims>
       class bcond_common
       {
         protected:
@@ -189,7 +189,7 @@ namespace libmpdataxx
 	public:
 
 	// ctor
-	bcond_common(const rng_t &i, const int &) :
+	bcond_common(const rng_t &i, const std::array<int, n_dims> &) :
 	  // sclr
 	  left_edge_sclr(
 	    i.first()

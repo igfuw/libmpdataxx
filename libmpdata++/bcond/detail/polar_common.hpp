@@ -17,10 +17,10 @@ namespace libmpdataxx
     {
       using namespace arakawa_c;
 
-      template <typename real_t, int halo>
-      class polar_common : public bcond_common<real_t, halo>
+      template <typename real_t, int halo, int n_dims>
+      class polar_common : public bcond_common<real_t, halo, n_dims>
       {
-	using parent_t = bcond_common<real_t, halo>;
+	using parent_t = bcond_common<real_t, halo, n_dims>;
 
 	protected:
 

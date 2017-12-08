@@ -19,9 +19,9 @@ namespace libmpdataxx
     namespace detail
     {
       template <typename real_t, int halo, drctn_e dir, int n_dims>
-      class remote_common : public detail::bcond_common<real_t, halo>
+      class remote_common : public detail::bcond_common<real_t, halo, n_dims>
       {
-	using parent_t = detail::bcond_common<real_t, halo>;
+	using parent_t = detail::bcond_common<real_t, halo, n_dims>;
 
         protected:
 
@@ -34,6 +34,8 @@ namespace libmpdataxx
 
 #if defined(USE_MPI)
         boost::mpi::communicator mpicom;
+        real_t *buf_send,
+               *buf_recv;
 
 #  if defined(NDEBUG)
         static const int n_reqs = 2; // data, reqs for recv only is enough?
@@ -75,15 +77,17 @@ namespace libmpdataxx
           const int  
             msg_send = dir == left ? left : rght;
 
-          // copying data to be sent (TODO: it doesn't work without copy(), why??)
-	  arr_t buf_send = a(idx_send).copy();
+          // arr_send references part of the send buffer that will be used
+          arr_t arr_send(buf_send, a(idx_send).shape(), blitz::neverDeleteData);
+          // copying data to be sent
+	  arr_send = a(idx_send);
 
           // launching async data transfer
-          if(buf_send.size()!=0)
+          if(arr_send.size()!=0)
           {
-            // use the pointer+size kind of send instead of serialization, because
+            // use the pointer+size kind of send instead of serialization of blitz arrays, because
             // serialization caused memory leaks, probably because it breaks blitz reference counting
-	    reqs[0] = mpicom.isend(peer, msg_send, buf_send.data(), buf_send.size()); 
+	    reqs[0] = mpicom.isend(peer, msg_send, buf_send, arr_send.size()); 
 
             // sending debug information
 #  if !defined(NDEBUG)
@@ -98,31 +102,26 @@ namespace libmpdataxx
 #endif
         };
 
-        arr_t recv_hlpr(
+        void recv_hlpr(
           const arr_t &a, 
           const idx_t &idx_recv
         )
         {
 #if defined(USE_MPI)
-          // distinguishing between left and right messages 
-          // (important e.g. with 2 procs and cyclic bc)
           const int  
             msg_recv = dir == left ? rght : left;
 
-          arr_t 
-             buf_recv(a(idx_recv).shape());
 
           // launching async data transfer
-          if(buf_recv.size()!=0)
+          if(a(idx_recv).size()!=0) // TODO: test directly size of idx_recv
           {
-	    reqs[1+n_dbg_reqs] = mpicom.irecv(peer, msg_recv, buf_recv.data(), buf_recv.size());
+	    reqs[1+n_dbg_reqs] = mpicom.irecv(peer, msg_recv, buf_recv, a(idx_recv).size());
 
             // sending debug information
 #  if !defined(NDEBUG)
 	    reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
 #  endif
           }
-          return buf_recv;
 #else
           assert(false);
 #endif
@@ -149,21 +148,24 @@ namespace libmpdataxx
         )
         {
 #if defined(USE_MPI)
-          auto buf_recv = recv_hlpr(a, idx_recv);
+          //auto arr_recv = recv_hlpr(a, idx_recv);
+          recv_hlpr(a, idx_recv);
 
           // waiting for the transfers to finish
 	  boost::mpi::wait_all(reqs.begin() + 1 + n_dbg_reqs, reqs.end()); // MPI_Waitall is thread-safe?
+
+          // a blitz handler for the used part of the receive buffer
+          arr_t arr_recv(buf_recv, a(idx_recv).shape(), blitz::neverDeleteData); // TODO: shape directly from idx_recv
 
           // checking debug information
           
           // positive modulo (grid_size_0 - 1)
           auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
-
 	  assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
           assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
 
           // writing received data to the array
-	  a(idx_recv) = buf_recv;
+	  a(idx_recv) = arr_recv;
 #else
           assert(false);
 #endif
@@ -177,10 +179,13 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           send_hlpr(a, idx_send);
-          auto buf_recv = recv_hlpr(a, idx_recv);
+          recv_hlpr(a, idx_recv);
 
           // waiting for the transfers to finish
-	  boost::mpi::wait_all(reqs.begin(), reqs.end()); // MPI_Waitall is thread-safe?
+	  boost::mpi::wait_all(reqs.begin(), reqs.end()); 
+
+          // a blitz handler for the used part of the receive buffer
+          arr_t arr_recv(buf_recv, a(idx_recv).shape(), blitz::neverDeleteData);
 
           // checking debug information
           
@@ -191,7 +196,7 @@ namespace libmpdataxx
           assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
 
           // writing received data to the array
-	  a(idx_recv) = buf_recv;
+	  a(idx_recv) = arr_recv;
 #else
           assert(false);
 #endif
@@ -202,11 +207,23 @@ namespace libmpdataxx
         // ctor                                  
         remote_common(                                                           
           const rng_t &i,
-          const int &grid_size_0
+          const std::array<int, n_dims> &grid_size
         ) :
-          parent_t(i, grid_size_0),
-          grid_size_0(grid_size_0)
-        {} 
+          parent_t(i, grid_size),
+          grid_size_0(grid_size[0])
+        {
+          const int slice_size = n_dims==1 ? 1 : (n_dims==2? grid_size[1]+6 : (grid_size[1]+6) * (grid_size[2]+6) ); // 3 is the max halo size (?), so 6 on both sides
+          // allocate enough memory in buffers to store largest halos to be sent
+          buf_send = (real_t *) malloc(halo * slice_size * sizeof(real_t));
+          buf_recv = (real_t *) malloc(halo * slice_size * sizeof(real_t));
+        } 
+
+        // dtor                                  
+        ~remote_common()
+        {
+          free(buf_send);
+          free(buf_recv);
+        }
       };
     }
   } // namespace bcond

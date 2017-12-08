@@ -52,9 +52,9 @@ namespace libmpdataxx
         {
           if(halo == 1)
             // see remote_2d
-            this->send(av[0], pi<d>(this->left_intr_vctr + off, j, k));
+            this->send(av[0], pi<d>(this->left_intr_vctr + off, j, k)); // TODO: no need to receive? the vector in halo was calculated anyway?
           else
-            this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k));
+            this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k)); // ditto
         }
         else
           this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
@@ -91,6 +91,16 @@ namespace libmpdataxx
       {                                                                         
         fill_halos_sclr(a, j, k);                                                  
       }  
+      
+      void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
+      {
+        fill_halos_vctr_alng(av, j, k, ad);
+      }
+
+      void fill_halos_vctr_nrml_cyclic(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_vctr_nrml(a, j, k);
+      }
 
     };
 
@@ -133,7 +143,7 @@ namespace libmpdataxx
         if(!this->is_cyclic)
         {
           if(halo == 1)
-            this->recv(av[0], pi<d>(this->rght_halo_vctr, j, k));
+            this->recv(av[0], pi<d>(this->rght_halo_vctr, j, k)); 
           else
             this->xchng(av[0], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
         }
@@ -170,6 +180,16 @@ namespace libmpdataxx
       void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)                 
       {                                                                         
         fill_halos_sclr(a, j, k);                                                  
+      }
+       
+      void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
+      {
+        fill_halos_vctr_alng(av, j, k, ad);
+      }
+
+      void fill_halos_vctr_nrml_cyclic(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_vctr_nrml(a, j, k);
       }
     };
   } // namespace bcond
