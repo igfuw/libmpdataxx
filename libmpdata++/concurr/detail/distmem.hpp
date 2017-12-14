@@ -90,6 +90,7 @@ public: // TODO: just a temp measure, make it private again
 #endif
         }
 
+        // TODO: option to run more accurate summation (e.g. in pressure solver), see https://link.springer.com/content/pdf/10.1023/A:1008153532043.pdf
         real_t sum(const real_t &val)
         {
           return reduce_hlpr<std::plus<real_t>>(val);
