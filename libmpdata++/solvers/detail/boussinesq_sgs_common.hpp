@@ -104,7 +104,7 @@ namespace libmpdataxx
                                                                                         1.0 / prandtl_num,
                                                                                         this->k_m,
                                                                                         *this->mem->G,
-                                                                                        this->ijk);
+                                                                                        ijkm_aux); // vectors in between domains also have to be calculated for MPI to work - how to force it and why didn't it break sharedmem?
 
           this->xchng_sgs_vctr(grad_tht, hflux_srfc, this->ijk);
           // hack, convinient place to update the heat flux forcing
