@@ -20,26 +20,26 @@ env:
     - TEST_SUITE=nair_jablonowski_2008 MPI=none
     - TEST_SUITE=UWLCM MPI=none
     - TEST_SUITE=pbl MPI=none 
-    - TEST_SUITE=unit MPI=openmpi
-    - TEST_SUITE=sandbox MPI=openmpi
+    - TEST_SUITE=unit MPI=mvapich2
+    - TEST_SUITE=sandbox MPI=mvapich2
 # MPI paper tests don't do file comparison and plotting; TODO: fix them
 # TODO: add missing MPI tests
-    - TEST_SUITE=paper MPI=openmpi
-    - TEST_SUITE=elliptic_drop MPI=openmpi
-    - TEST_SUITE=nair_jablonowski_2008 MPI=openmpi
+    - TEST_SUITE=paper MPI=mvapich2
+    - TEST_SUITE=elliptic_drop MPI=mvapich2
+    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
 
 matrix:
     exclude:
         - compiler: clang
-          env: TEST_SUITE=unit MPI=openmpi
+          env: TEST_SUITE=unit MPI=mvapich2
         - compiler: clang
-          env: TEST_SUITE=sandbox MPI=openmpi
+          env: TEST_SUITE=sandbox MPI=mvapich2
         - compiler: clang
-          env: TEST_SUITE=paper MPI=openmpi
+          env: TEST_SUITE=paper MPI=mvapich2
         - compiler: clang
-          env: TEST_SUITE=elliptic_drop MPI=openmpi
+          env: TEST_SUITE=elliptic_drop MPI=mvapich2
         - compiler: clang
-          env: TEST_SUITE=nair_jablonowski_2008 MPI=openmpi
+          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
         - os: osx
           env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
         - os: osx
@@ -109,9 +109,16 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export CXXFLAGS="-DBOOST_HAS_INT128=1 ${CXXFLAGS}"; fi
 
     # MPI
-    - if [[ $MPI == 'mpich'   ]]; then sudo $apt_get_install mpich libmpich-dev; fi
-    - if [[ $MPI == 'lam'     ]]; then sudo $apt_get_install lam-runtime lam4-dev; fi
-    - if [[ $MPI == 'openmpi' ]]; then sudo $apt_get_install openmpi-bin libopenmpi-dev; fi
+    - if [[ $MPI == 'mpich'    ]]; then sudo $apt_get_install mpich libmpich-dev; fi
+    - if [[ $MPI == 'lam'      ]]; then sudo $apt_get_install lam-runtime lam4-dev; fi
+    - if [[ $MPI == 'openmpi'  ]]; then sudo $apt_get_install openmpi-bin libopenmpi-dev; fi
+    - if [[ $MPI == 'mvapich2' ]]; then wget http://mvapich.cse.ohio-state.edu/download/mvapich/mv2/mvapich2-2.3b.tar.gz; fi
+    - if [[ $MPI == 'mvapich2' ]]; then tar xvf mvapich2-2.3b; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then cd mvapich2-2.3b; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then ./configure; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then make -j4; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then sudo make install; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then cd ..; fi 
 
     - if [[ $MPI != 'none'    ]]; then export CXX=mpic++.$MPI ; fi
     - if [[ $MPI != 'none'    ]]; then export CC=mpicc.$MPI ; fi
