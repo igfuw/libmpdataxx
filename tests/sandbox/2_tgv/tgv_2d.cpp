@@ -78,7 +78,6 @@ err_t test(int np)
   slv.advance(nt); 
 
   err_t res;
-std::cout << slv.advectee_global(ix::u);
   res.L2 = sqrt(sum(pow2(slv.advectee_global(ix::u) - exact_u))) / sqrt(sum(pow2(exact_u)));
   res.Li = max(abs(slv.advectee_global(ix::u) - exact_u)) / max(abs(exact_u));
 
