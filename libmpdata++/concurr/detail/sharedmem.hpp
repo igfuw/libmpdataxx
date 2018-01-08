@@ -104,7 +104,7 @@ namespace libmpdataxx
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
 
           if (n_dims != 1) 
-            sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
+            sumtmp.reset(new blitz::Array<real_t, 1>(this->grid_size[0]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
