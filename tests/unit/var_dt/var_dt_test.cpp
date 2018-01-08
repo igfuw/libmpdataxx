@@ -86,7 +86,7 @@ bool check(T cfl)
 int main()
 {
 #if defined(USE_MPI)
-    MPI::Init_thread(MPI_THREAD_SERIALIZED);
+    MPI::Init_thread(MPI_THREAD_MULTIPLE);
 #endif
     enum { opts = 0 };
     enum { opts_iters = 2};

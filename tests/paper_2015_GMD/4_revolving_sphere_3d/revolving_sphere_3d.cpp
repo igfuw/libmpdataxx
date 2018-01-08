@@ -104,7 +104,7 @@ int main()
 #if defined(USE_MPI)
   // we will instantiate many solvers, so we have to init mpi manually, 
   // because solvers will not know should they finalize mpi upon destruction
-  MPI::Init_thread(MPI_THREAD_SERIALIZED);
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
 #endif
   {
     enum { opts = 0 };
