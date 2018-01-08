@@ -212,17 +212,21 @@ namespace libmpdataxx
           parent_t(i, grid_size),
           grid_size_0(grid_size[0])
         {
+#if defined(USE_MPI)
           const int slice_size = n_dims==1 ? 1 : (n_dims==2? grid_size[1]+6 : (grid_size[1]+6) * (grid_size[2]+6) ); // 3 is the max halo size (?), so 6 on both sides
           // allocate enough memory in buffers to store largest halos to be sent
           buf_send = (real_t *) malloc(halo * slice_size * sizeof(real_t));
           buf_recv = (real_t *) malloc(halo * slice_size * sizeof(real_t));
+#endif
         } 
 
         // dtor                                  
         ~remote_common()
         {
+#if defined(USE_MPI)
           free(buf_send);
           free(buf_recv);
+#endif
         }
       };
     }
