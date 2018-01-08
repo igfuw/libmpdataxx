@@ -128,8 +128,8 @@ void test(const std::string &dirname, const int nt)
     // scale the perturbations of tht and w
     // NOTE: if prtrb is scaled and then applied to tht and then rescaled and appplied to w, 
     //       the result is a little different due to numerical errors
-    slv.advectee(ix::tht)(i_r, j_r, k_r) = 0.001 *  slv.advectee(ix::tht)(i_r, j_r, k_r);
-    slv.advectee(ix::w)(i_r, j_r, k_r) = 0.2 *  slv.advectee(ix::w)(i_r, j_r, k_r);
+    slv.advectee(ix::tht) = 0.001 *  slv.advectee(ix::tht);
+    slv.advectee(ix::w)   = 0.2 *  slv.advectee(ix::w);
     slv.advectee(ix::u) = 0;
     slv.advectee(ix::v) = 0; 
 
@@ -141,7 +141,7 @@ void test(const std::string &dirname, const int nt)
       slv.sclr_array("tht_abs") = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
       
       // velocity absorbers
-      slv.vab_coefficient()(i_r, j_r, k_r) = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
+      slv.vab_coefficient() = where(k * p.dk >= 1000, 1. / 1020 * (k * p.dk - 1000) / (1500-1000.0), 0);
       slv.vab_relaxed_state(0) = 0;
       slv.vab_relaxed_state(1) = 0;
       slv.vab_relaxed_state(2) = 0;
