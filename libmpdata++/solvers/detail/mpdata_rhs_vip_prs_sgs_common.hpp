@@ -47,6 +47,7 @@ namespace libmpdataxx
         arrvec_t<typename parent_t::arr_t> &wrk;
 
         std::array<rng_t, ct_params_t::n_dims> ijkm;
+        std::array<rng_t, ct_params_t::n_dims> ijk_vec; // like ijk, but with range in x direction extended by 1 for rank=0 for MPI compliance (c.f. remote_2d.hpp fill_halos_vctr_alng), TODO: change MPI logic?
         typename parent_t::real_t cdrag;
 
         virtual void multiply_sgs_visc() = 0;
@@ -177,8 +178,11 @@ namespace libmpdataxx
         {
           for (int d = 0; d < ct_params_t::n_dims; ++d)
           {
-            ijkm[d] = rng_t(this->ijk[d].first() - 1, this->ijk[d].last());
+            ijkm[d]    = rng_t(this->ijk[d].first() - 1, this->ijk[d].last());
+            ijk_vec[d] = rng_t(this->ijk[d].first(),     this->ijk[d].last());
           }
+          if (this->rank == 0)
+            ijk_vec[0] = rng_t(this->ijk[0].first() - 1, this->ijk[0].last());
         }
 
         static void alloc(

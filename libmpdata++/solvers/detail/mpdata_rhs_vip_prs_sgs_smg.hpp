@@ -36,7 +36,7 @@ namespace libmpdataxx
                                                                                           1.0,
                                                                                           this->k_m,
                                                                                           *this->mem->G,
-                                                                                          this->ijk);
+                                                                                          this->ijk_vec);
 
             this->xchng_sgs_tnsr_diag(this->tau, this->vips()[ct_params_t::n_dims - 1], this->vip_div, this->ijk);
             this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
