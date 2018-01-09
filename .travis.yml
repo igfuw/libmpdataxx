@@ -51,7 +51,7 @@ addons:
   apt:
     packages:
       - g++-6
-      - clang-5.0
+#      - clang-5.0
     sources: &sources
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-4.0
