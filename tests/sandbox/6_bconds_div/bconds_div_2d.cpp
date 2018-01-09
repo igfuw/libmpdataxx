@@ -74,7 +74,7 @@ int main()
   // because solvers will not know should they finalize mpi upon destruction
   MPI::Init_thread(MPI_THREAD_MULTIPLE);
 #endif
-//  test<bcond::cyclic, bcond::cyclic>("cyclic_cyclic");
+  test<bcond::cyclic, bcond::cyclic>("cyclic_cyclic");
   test<bcond::open  , bcond::cyclic>("open_cyclic");
   test<bcond::open  , bcond::rigid >("open_rigid");
   test<bcond::cyclic, bcond::rigid >("cyclic_rigid");
