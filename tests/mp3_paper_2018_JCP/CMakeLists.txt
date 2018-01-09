@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(libmpdata++-tests-mp3_paper_JCP CXX)
+project(libmpdata++-tests-mp3_paper_2018_JCP CXX)
 
 include(${CMAKE_SOURCE_DIR}/../../libmpdata++-config.cmake)
 if(NOT libmpdataxx_FOUND) 
