@@ -57,7 +57,7 @@ T test(int np)
 
   run.advectee() = 2 + sin(2 * pi * i * dx) * sin(2 * pi * j * dy) * sin(2 * pi * k * dz);
 
-  auto true_solution = run.advectee_global();
+  auto true_solution = run.advectee_global().copy();
 
   run.advector(0) = 1.0 * dt/dx;
   run.advector(1) = 2.0 * dt/dy;
