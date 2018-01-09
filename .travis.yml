@@ -129,6 +129,19 @@ install:
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
 
+    # for MPI we need boost>=1.59, boost installation based on https://github.com/boostorg/compute/blob/master/.travis.yml
+    - | 
+      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
+        wget http://sourceforge.net/projects/boost/files/boost/1.65.1/boost_1_65_1.tar.gz 
+        tar xf boost_1_65_1.tar.gz
+        cd boost_1_65_1
+        # configure and install
+        echo "using mpi ;" > $HOME/user-config.jam
+        ./bootstrap.sh --with-libraries=serialization,mpi
+        sudo ./b2 install
+        cd ..
+      fi
+
     # cmake 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install cmake; fi
 
