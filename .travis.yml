@@ -13,20 +13,20 @@ env:
 #    - MPI=lam    
 #    - MPI=mpich  
 
-    - TEST_SUITE=unit MPI=none
-    - TEST_SUITE=sandbox MPI=none
-    - TEST_SUITE=paper MPI=none
-    - TEST_SUITE=elliptic_drop MPI=none
-    - TEST_SUITE=nair_jablonowski_2008 MPI=none
-    - TEST_SUITE=UWLCM MPI=none
-    - TEST_SUITE=pbl MPI=none 
+#    - TEST_SUITE=unit MPI=none
+#    - TEST_SUITE=sandbox MPI=none
+#    - TEST_SUITE=paper MPI=none
+#    - TEST_SUITE=elliptic_drop MPI=none
+#    - TEST_SUITE=nair_jablonowski_2008 MPI=none
+#    - TEST_SUITE=UWLCM MPI=none
+#    - TEST_SUITE=pbl MPI=none 
     - TEST_SUITE=unit MPI=mvapich2
-    - TEST_SUITE=sandbox MPI=mvapich2
+#    - TEST_SUITE=sandbox MPI=mvapich2
 # MPI paper tests don't do file comparison and plotting; TODO: fix them
 # TODO: add missing MPI tests
-    - TEST_SUITE=paper MPI=mvapich2
-    - TEST_SUITE=elliptic_drop MPI=mvapich2
-    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+#    - TEST_SUITE=paper MPI=mvapich2
+#    - TEST_SUITE=elliptic_drop MPI=mvapich2
+#    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
 
 matrix:
     exclude:
