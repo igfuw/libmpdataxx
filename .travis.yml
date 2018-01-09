@@ -120,8 +120,8 @@ install:
     - if [[ $MPI == 'mvapich2' ]]; then sudo make install; fi 
     - if [[ $MPI == 'mvapich2' ]]; then cd ..; fi 
 
-    - if [[ $MPI != 'none'    ]]; then export CXX=mpic++.$MPI ; fi
-    - if [[ $MPI != 'none'    ]]; then export CC=mpicc.$MPI ; fi
+#    - if [[ $MPI != 'none'    ]]; then export CXX=mpic++.$MPI ; fi
+#    - if [[ $MPI != 'none'    ]]; then export CC=mpicc.$MPI ; fi
 
     # boost
     #- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
@@ -150,7 +150,7 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.20.tar; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xvf hdf5-1.8.20.tar; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-1.8.20; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then CXXFLAGS=-w CFLAGS=-w ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=/usr; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then CXXFLAGS=-w CFLAGS=-w CXX=mpic++ CC=mpicc ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=/usr; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then make; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo make install; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd ..; fi 
