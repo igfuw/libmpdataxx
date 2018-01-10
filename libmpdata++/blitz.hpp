@@ -20,9 +20,9 @@
 // (as of gcc 20140212, it gives an ICE: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=60198) - TODO: check in CMake
 //#define BZ_USE_ALIGNMENT_PRAGMAS  
 
-#if defined(USE_MPI)
-#  define BZ_HAVE_BOOST_SERIALIZATION
-#endif
+//#if defined(USE_MPI)
+//#  define BZ_HAVE_BOOST_SERIALIZATION
+//#endif
 
 #include <blitz/tv2fastiter.h> // otherwise Clang fails in debug mode
 #include <blitz/array.h>

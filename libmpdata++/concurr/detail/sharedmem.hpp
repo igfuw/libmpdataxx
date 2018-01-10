@@ -383,10 +383,10 @@ namespace libmpdataxx
 
             // gather the data from all processes on rank=0
             boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
-         
-            blitz::Array<real_t, 1> res(out_values.data(), blitz::shape(this->distmem.grid_size[0]), blitz::duplicateData);
             // send the result to other processes
-            boost::mpi::broadcast(this->distmem.mpicom, res, 0);
+            boost::mpi::broadcast(this->distmem.mpicom, out_values, 0);
+
+            blitz::Array<real_t, 1> res(out_values.data(), blitz::shape(this->distmem.grid_size[0]), blitz::duplicateData);
             return res;
           }
           else
