@@ -39,9 +39,10 @@ namespace libmpdataxx
                         const bool deriv = false
         ) final // for a given array
 	{
+          const auto range_ijk_0__ext = this->extend_range(range_ijk[0], ext);
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk[1]^ext, deriv);
-	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, deriv);
+	  for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk_0__ext, deriv);
           this->mem->barrier();
 	}
 
@@ -130,15 +131,17 @@ namespace libmpdataxx
           const bool cyclic = false
         ) final
         {
+
+          const auto range_ijk_0__ext_h = this->extend_range(range_ijk[0], ext, h);
           this->mem->barrier();
           if (!cyclic)
           {
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[0]^ext^h);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk_0__ext_h);
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h);
           }
           else
           {
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk[0]^ext^h);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk_0__ext_h);
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h);
           }
           this->mem->barrier();
@@ -147,12 +150,13 @@ namespace libmpdataxx
         virtual void xchng_pres(
           typename parent_t::arr_t &arr,
           const idx_t<2> &range_ijk,
-          const int ex = 0
+          const int ext = 0
         ) final
         {
+          const auto range_ijk_0__ext = this->extend_range(range_ijk[0], ext);
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1]^ex);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[0]^ex);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1]^ext);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk_0__ext);
           this->mem->barrier();
         }
 
