@@ -138,9 +138,9 @@ install:
         # configure and install
         g++-6 -v
         echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam
-#        echo "using mpi ;" > $HOME/user-config.jam
+        #        echo "using mpi ;" > $HOME/user-config.jam
         ./bootstrap.sh --with-libraries=serialization 
-#,mpi
+        #,mpi
         sudo ./b2 install
         cd ..
       fi
