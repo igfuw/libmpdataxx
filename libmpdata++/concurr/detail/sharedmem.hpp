@@ -43,6 +43,7 @@ namespace libmpdataxx
 	public:
 
 	int n = 0;
+	const int size;
         std::array<rng_t, n_dims> grid_size; 
         bool panic = false; // for multi-threaded SIGTERM handling
 
@@ -80,7 +81,7 @@ namespace libmpdataxx
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
         sharedmem_common(const std::array<int, n_dims> &grid_size, const int &size)
-          : n(0) // TODO: is n(0) needed?
+          : n(0), size(size) // TODO: is n(0) needed?
         {
           for (int d = 0; d < n_dims; ++d) 
           {
