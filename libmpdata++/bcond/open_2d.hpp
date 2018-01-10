@@ -55,7 +55,7 @@ namespace libmpdataxx
         auto s = a.shape();
         s[d] = 1;
         edge_velocity.resize(s);
-        edge_velocity.reindexSelf({a.lbound(0), 0});
+        if(d != 0) edge_velocity.reindexSelf({a.lbound(0), 0});
         edge_velocity(pi<d>(0, j)) = a(pi<d>(this->left_edge_sclr, j));
       }
       
@@ -154,7 +154,7 @@ namespace libmpdataxx
         auto s = a.shape();
         s[d] = 1;
         edge_velocity.resize(s);
-        edge_velocity.reindexSelf({a.lbound(0), 0});
+        if(d != 0) edge_velocity.reindexSelf({a.lbound(0), 0});
         edge_velocity(pi<d>(0, j)) = a(pi<d>(this->rght_edge_sclr, j));
       }
       
