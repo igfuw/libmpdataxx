@@ -112,16 +112,16 @@ install:
     - if [[ $MPI == 'mpich'    ]]; then sudo $apt_get_install mpich libmpich-dev; fi
     - if [[ $MPI == 'lam'      ]]; then sudo $apt_get_install lam-runtime lam4-dev; fi
     - if [[ $MPI == 'openmpi'  ]]; then sudo $apt_get_install openmpi-bin libopenmpi-dev; fi
-#    - if [[ $MPI == 'mvapich2' ]]; then wget http://mvapich.cse.ohio-state.edu/download/mvapich/mv2/mvapich2-2.3b.tar.gz; fi
-#    - if [[ $MPI == 'mvapich2' ]]; then tar xf mvapich2-2.3b.tar.gz; fi 
-#    - if [[ $MPI == 'mvapich2' ]]; then cd mvapich2-2.3b; fi 
-#    - if [[ $MPI == 'mvapich2' ]]; then ./configure --disable-fortran --enable-cxx --enable-threads=multiple --with-device=ch3:sock CC=gcc-6 CXX=g++-6; fi 
-#    - if [[ $MPI == 'mvapich2' ]]; then make -j4; fi 
-#    - if [[ $MPI == 'mvapich2' ]]; then sudo make install; fi 
-#    - if [[ $MPI == 'mvapich2' ]]; then cd ..; fi 
-#
-#    - if [[ $MPI != 'none'    ]]; then export CXX=mpic++ ; fi
-#    - if [[ $MPI != 'none'    ]]; then export CC=mpicc ; fi
+    - if [[ $MPI == 'mvapich2' ]]; then wget http://mvapich.cse.ohio-state.edu/download/mvapich/mv2/mvapich2-2.3b.tar.gz; fi
+    - if [[ $MPI == 'mvapich2' ]]; then tar xf mvapich2-2.3b.tar.gz; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then cd mvapich2-2.3b; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then ./configure --disable-fortran --enable-cxx --enable-threads=multiple --with-device=ch3:sock CC=gcc-6 CXX=g++-6; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then make -j4; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then sudo make install; fi 
+    - if [[ $MPI == 'mvapich2' ]]; then cd ..; fi 
+
+    - if [[ $MPI != 'none'    ]]; then export CXX=mpic++ ; fi
+    - if [[ $MPI != 'none'    ]]; then export CC=mpicc ; fi
 
     # boost
     #- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
@@ -138,9 +138,8 @@ install:
         # configure and install
         g++-6 -v
         echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam
-        #        echo "using mpi ;" > $HOME/user-config.jam
-        ./bootstrap.sh --with-libraries=serialization 
-        #,mpi
+        echo "using mpi ;" > $HOME/user-config.jam
+        ./bootstrap.sh --with-libraries=serialization,mpi
         sudo ./b2 install
         cd ..
       fi
