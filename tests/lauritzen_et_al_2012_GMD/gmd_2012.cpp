@@ -12,7 +12,7 @@
 #include <libmpdata++/concurr/threads.hpp>
 #include <libmpdata++/output/hdf5_xdmf.hpp>
 
-#include "../mp3_paper_JCP/reversing_deform/test_def.hpp"
+#include "../mp3_paper_2018_JCP/reversing_deform/test_def.hpp"
 
 using namespace libmpdataxx;
 

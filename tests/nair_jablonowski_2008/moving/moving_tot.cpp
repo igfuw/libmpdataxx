@@ -2,7 +2,7 @@
 using namespace libmpdataxx;
 
 #include "../common/convergence.hpp"
-#include "../../mp3_paper_JCP/moving_vort/test_def.hpp"
+#include "../../mp3_paper_2018_JCP/moving_vort/test_def.hpp"
 
 int main()
 {
