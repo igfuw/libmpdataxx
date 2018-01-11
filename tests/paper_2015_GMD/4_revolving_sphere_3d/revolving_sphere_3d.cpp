@@ -79,6 +79,7 @@ void test(const std::string& dir_name)
 
   // sphere shape
   decltype(slv.advectee()) tmp(slv.advectee().extent());
+  tmp.reindexSelf(slv.advectee().base());
   tmp =   blitz::pow(i * dx - x0, 2)
         + blitz::pow(j * dx - y0, 2)
         + blitz::pow(k * dx - z0, 2);
