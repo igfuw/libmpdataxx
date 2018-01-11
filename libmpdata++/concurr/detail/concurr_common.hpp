@@ -118,6 +118,10 @@ namespace libmpdataxx
           typename solver_t::bcp_t &bcp
         ) 
         {
+          // sanity check - polar coords do not work with MPI yet
+	  if (type == bcond::polar && mem->distmem.size() > 1)
+            throw std::runtime_error("Polar boundary conditions do not work with MPI.");
+
           // distmem overrides
 	  if (type != bcond::remote && mem->distmem.size() > 1 && dim == 0)
 	  {
