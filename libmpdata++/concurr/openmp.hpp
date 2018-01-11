@@ -37,8 +37,14 @@ namespace libmpdataxx
 	static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max())
 	{
 #if defined(_OPENMP)
-	  static int nthreads = std::min(max_threads, static_cast<unsigned>(omp_get_max_threads()));
+	  const char *env_var("OMP_NUM_THREADS");
+
+	  int nthreads = std::min(max_threads, static_cast<unsigned>(
+            (std::getenv(env_var) != NULL) ?  std::atoi(std::getenv(env_var)) : omp_get_max_threads()
+          ));
+
           omp_set_num_threads(nthreads);
+
 	  return omp_get_max_threads();
 #else
 	  return 1;

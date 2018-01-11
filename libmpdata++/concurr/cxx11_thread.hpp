@@ -82,11 +82,11 @@ namespace libmpdataxx
 	{
 	  const char *env_var("OMP_NUM_THREADS");
 
-          static int nthreads = std::min((std::getenv(env_var) != NULL) ?
-                                           std::atoi(std::getenv(env_var)) // TODO: check if conversion OK?
-	                                 : std::thread::hardware_concurrency()
-                                         ,
-                                         max_threads);
+          int nthreads = std::min((std::getenv(env_var) != NULL) ?
+                                    std::atoi(std::getenv(env_var)) // TODO: check if conversion OK?
+	                          : std::thread::hardware_concurrency()
+                                  ,
+                                  max_threads);
 
 	  return nthreads;
 	}
