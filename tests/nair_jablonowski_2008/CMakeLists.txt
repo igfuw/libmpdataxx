@@ -38,5 +38,8 @@ endfunction()
 
 enable_testing()
 
-add_subdirectory(stationary)
+#polar bconds don't work with mpi yet
+if(NOT USE_MPI) 
+  add_subdirectory(stationary)
+endif()
 #add_subdirectory(moving)
