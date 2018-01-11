@@ -127,7 +127,7 @@ namespace libmpdataxx
 
           for (const auto& n : attr_names)
           {
-            attrs.insert(make_attribute(n, dimensions));
+            attrs.insert(make_attribute(n, dimensions + 1));
           }
         }
         
@@ -145,7 +145,8 @@ namespace libmpdataxx
                                  const std::string& hdf_name,
                                  const blitz::TinyVector<int, dim>& dimensions)
         {
-          attribute a = make_attribute(name, dimensions);
+          // there is one more coordinate than cell index in each dimension
+          attribute a = make_attribute(name, dimensions + 1);
           a.item.data = hdf_name + ":/" + a.name;
           c_attrs.insert(a);
         }
