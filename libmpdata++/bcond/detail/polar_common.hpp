@@ -41,7 +41,11 @@ namespace libmpdataxx
         ) :
 	  parent_t(i, grid_size_0),
 	  pole((grid_size_0 - 1) / 2)
-	{} 
+	{
+          #if defined(USE_MPI)
+            throw std::runtime_error("Polar boundary conditions do not work with MPI.");
+          #endif
+        } 
       };
     } // namespace detail
   } // namespace bcond
