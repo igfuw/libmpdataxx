@@ -113,7 +113,7 @@ function(libmpdataxx_add_test_gi test)
   # this will not work with multiple threads (make -j) as it depends on the order of execution + $PPID might be different?
   add_test(NAME "init_${test}" COMMAND "bash" "-c" "> log-$PPID")
   if(USE_MPI)
-    add_test(NAME "calc_${test}" COMMAND "bash" "-c" "GNUPLOT_IOSTREAM_CMD=\"cat >> log-`echo $PPID`\" ${libmpdataxx_MPIRUN} -np 3 -x OMP_NUM_THREADS ${CMAKE_CURRENT_BINARY_DIR}/${test}")
+    add_test(NAME "calc_${test}" COMMAND "bash" "-c" "GNUPLOT_IOSTREAM_CMD=\"cat >> log-`echo $PPID`\" ${libmpdataxx_MPIRUN} -np 3 ${CMAKE_CURRENT_BINARY_DIR}/${test}")
   else()
     add_test(NAME "calc_${test}" COMMAND "bash" "-c" "GNUPLOT_IOSTREAM_CMD=\"cat >> log-`echo $PPID`\" ${CMAKE_CURRENT_BINARY_DIR}/${test}")
   endif()
