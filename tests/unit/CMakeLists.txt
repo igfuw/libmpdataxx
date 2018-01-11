@@ -42,8 +42,8 @@ add_subdirectory(kahan_sum)
 add_subdirectory(cone_bugs)
 add_subdirectory(shallow_water)
 add_subdirectory(concurrent_1d)
+add_subdirectory(hint_scale) # initialization from pre-defined arrays, not using index placeholders
 if(!USE_MPI)
-  add_subdirectory(hint_scale) # initialization from pre-defined arrays, not using index placeholders
   add_subdirectory(hdf5_catch) # parallel_hdf5 exceptions - couldn't find any documentation
 endif()
 add_subdirectory(git_revision)
