@@ -97,6 +97,23 @@ namespace libmpdataxx
 
         virtual void scale_gc(const real_t time, const real_t cur_dt, const real_t old_dt) = 0;
 
+        // thread-aware range extension
+        template <class n_t>
+        rng_t extend_range(const rng_t &r, const n_t n) const
+        {
+          if (mem->size == 1) return r^n;
+          return rank == 0 ? rng_t((r - n).first(), r.last()) :
+                               rank == mem->size - 1 ? rng_t(r.first(), (r + n).last()) :
+                                 r;
+        }
+        
+        // thread-aware range extension, variadic version
+        template <class n_t, class... ns_t>
+        rng_t extend_range(const rng_t &r, const n_t n, const ns_t... ns) const
+        {
+          return extend_range(extend_range(r, n), ns...);
+        }
+
         private:
       
 #if !defined(NDEBUG)
