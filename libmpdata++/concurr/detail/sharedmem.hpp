@@ -323,14 +323,7 @@ namespace libmpdataxx
 
 	rng_t distmem_ext(const rng_t &rng)
 	{
-	  return this->distmem.size() == 0
-	    ? rng
-	    : this->distmem.rank() > 0 && this->distmem.rank() < (this->distmem.size() - 1)
-	      ? rng_t(rng.first()-1, rng.last()+1)
-	      : this->distmem.rank() == 0
-                ? rng_t(rng.first()  ,   rng.last()+1)
-                : rng_t(rng.first()-1,   rng.last()  )
-          ;
+          return rng_t(rng.first()-1, rng.last());
 	}
 
       };
@@ -401,12 +394,16 @@ namespace libmpdataxx
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
           // (i.e. border between cell 0 and cell 1 is indexed with 0)
+          auto orgn = decltype(this->origin)({
+                 this->origin[0] - 1 
+               }); 
+
 	  return this->GC[d](
             this->distmem_ext(this->grid_size[0]^(-1)^h)
           ).reindex(
             this->distmem.rank() > 0
               ? decltype(this->origin)({this->origin[0] - 1})
-              : this->origin
+              : orgn
           );
 	}   
 
@@ -505,13 +502,11 @@ namespace libmpdataxx
           assert(d == 0 || d== 1);
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
-          auto orgn = this->distmem.rank() > 0
-            ? decltype(this->origin)({
-                this->origin[0] - 1, 
-                this->origin[1]
-              })
-            : this->origin
-          ;
+          auto orgn = decltype(this->origin)({
+                 this->origin[0] - 1, 
+                 this->origin[1]
+               }); 
+
           switch (d)
           { 
             case 0: 
@@ -642,14 +637,12 @@ namespace libmpdataxx
           assert(d == 0 || d == 1 || d == 2);
           // returning just the domain interior, i.e. without halos
           // reindexed to make it more intuitive when working with index placeholders
-          auto orgn = this->distmem.rank() > 0
-            ? decltype(this->origin)({
-                this->origin[0] - 1, 
-                this->origin[1],
-                this->origin[2]
-              })
-            : this->origin
-          ;
+          auto orgn = decltype(this->origin)({
+                 this->origin[0] - 1, 
+                 this->origin[1],
+                 this->origin[2]
+               }); 
+
           switch (d)
           { 
             case 0: 
@@ -657,19 +650,19 @@ namespace libmpdataxx
                 this->distmem_ext(this->grid_size[0]^(-1)^h),
                 this->grid_size[1],
                 this->grid_size[2]
-              ).reindex(this->origin);  
+              ).reindex(orgn);  
             case 1: 
               return this->GC[d](
                 this->distmem_ext(this->grid_size[0]),
                 this->grid_size[1]^(-1)^h,
                 this->grid_size[2]
-              ).reindex(this->origin);  
+              ).reindex(orgn);  
             case 2: 
               return this->GC[d](
                 this->distmem_ext(this->grid_size[0]),
                 this->grid_size[1],
                 this->grid_size[2]^(-1)^h
-              ).reindex(this->origin);  
+              ).reindex(orgn);  
             default: assert(false); throw;
           }
 	}   
