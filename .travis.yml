@@ -139,9 +139,10 @@ install:
           sudo make install;
           cd ..;
         fi
-        export PATH=${DEPS_DIR}/mvapich2-2.3b/bin/:${PATH}
+        export PATH=${DEPS_DIR}/mvapich2-2.3b/bin:${PATH}
         # LIBRARY_PATH for clang?osx?
-        export LD_LIBRARY_PATH=${DEPS_DIR}/mvapich2-2.3b/lib/:${LD_LIBRARY_PATH}
+        export LD_LIBRARY_PATH=${DEPS_DIR}/mvapich2-2.3b/lib:${LD_LIBRARY_PATH}
+        export LD_RUN_PATH=${DEPS_DIR}/mvapich2-2.3b/lib:${LD_RUN_PATH}
       fi
 
     - if [[ $MPI != 'none'    ]]; then export CXX=mpic++ ; fi
