@@ -160,9 +160,9 @@ namespace libmpdataxx
           // checking debug information
           
           // positive modulo (grid_size_0 - 1)
-          auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
-	  assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
-          assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
+//          auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
+//          assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
+//          assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
 
           // writing received data to the array
 	  a(idx_recv) = arr_recv;
@@ -190,10 +190,9 @@ namespace libmpdataxx
           // checking debug information
           
           // positive modulo (grid_size_0 - 1)
-          auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
-
-	  assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
-          assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
+         // auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
+	 // assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
+         // assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
 
           // writing received data to the array
 	  a(idx_recv) = arr_recv;
