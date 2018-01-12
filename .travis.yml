@@ -31,19 +31,23 @@ env:
 # TODO: once libcloud MPI works, turn UWLCM MPI test on
 #    - TEST_SUITE=UWLCM MPI=mvapich2
 
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/deps/mvapich2-2.3b
+
 matrix:
     exclude:
-        - compiler: clang
+        - os: osx
           env: TEST_SUITE=unit MPI=mvapich2
-        - compiler: clang
+        - os: osx
           env: TEST_SUITE=sandbox MPI=mvapich2
-        - compiler: clang
+        - os: osx
           env: TEST_SUITE=paper MPI=mvapich2
-        - compiler: clang
+        - os: osx
           env: TEST_SUITE=elliptic_drop MPI=mvapich2
-        - compiler: clang
+        - os: osx
           env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-        - compiler: clang
+        - os: osx
           env: TEST_SUITE=pbl MPI=mvapich2
 
         - os: osx
@@ -97,6 +101,11 @@ before_install:
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
  
 install:
+    ############################################################################
+    ## All the cached dependencies are installed in ${TRAVIS_BUILD_DIR}/deps/
+    #############################################################################
+    - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+
     # silence the gazillion warnings coming from blitz headers when using the osx clang
     - if [[ $TRAVIS_OS_NAME == 'osx' && $COMPILER == 'clang++' ]]; then export CXXFLAGS="-Wno-parentheses ${CXXFLAGS}"; fi
 
@@ -118,14 +127,20 @@ install:
     - if [[ $MPI == 'mpich'    ]]; then sudo $apt_get_install mpich libmpich-dev; fi
     - if [[ $MPI == 'lam'      ]]; then sudo $apt_get_install lam-runtime lam4-dev; fi
     - if [[ $MPI == 'openmpi'  ]]; then sudo $apt_get_install openmpi-bin libopenmpi-dev; fi
-    - if [[ $MPI == 'mvapich2' ]]; then wget http://mvapich.cse.ohio-state.edu/download/mvapich/mv2/mvapich2-2.3b.tar.gz; fi
-    - if [[ $MPI == 'mvapich2' ]]; then tar xf mvapich2-2.3b.tar.gz; fi 
-    - if [[ $MPI == 'mvapich2' ]]; then cd mvapich2-2.3b; fi 
-    - if [[ $MPI == 'mvapich2' && $COMPILER == 'g++' ]]; then ./configure --disable-fortran --enable-cxx --enable-threads=multiple --with-device=ch3:sock CC=gcc-6 CXX=g++-6; fi 
-    - if [[ $MPI == 'mvapich2' && $COMPILER == 'clang++' ]]; then ./configure --disable-fortran --enable-cxx --enable-threads=multiple --with-device=ch3:sock CC=clang-5.0 CXX=clang++-5.0; fi 
-    - if [[ $MPI == 'mvapich2' ]]; then make -j4; fi 
-    - if [[ $MPI == 'mvapich2' ]]; then sudo make install; fi 
-    - if [[ $MPI == 'mvapich2' ]]; then cd ..; fi 
+    - |
+      if [[ $MPI == 'mvapich2' ]]; then 
+        if [[ -z "$(ls -A ${DEPS_DIR}/mvapich2-2.3b)" ]]; then
+          wget http://mvapich.cse.ohio-state.edu/download/mvapich/mv2/mvapich2-2.3b.tar.gz;
+          tar xf mvapich2-2.3b.tar.gz;
+          cd mvapich2-2.3b;
+          if [[ $COMPILER == 'g++' ]]; then ./configure --disable-fortran --enable-cxx --enable-threads=multiple --with-device=ch3:sock CC=gcc-6 CXX=g++-6 --prefix=${DEPS_DIR}/mvapich2-2.3b ; fi 
+          if [[ $COMPILER == 'clang++' ]]; then ./configure --disable-fortran --enable-cxx --enable-threads=multiple --with-device=ch3:sock CC=clang-5.0 CXX=clang++-5.0 --prefix=${DEPS_DIR}/mvapich2-2.3b ; fi 
+          make -j4;  
+          sudo make install;
+          cd ..;
+        fi
+        export PATH=${DEPS_DIR}/mvapich2-2.3b/bin:${PATH}
+      fi
 
     - if [[ $MPI != 'none'    ]]; then export CXX=mpic++ ; fi
     - if [[ $MPI != 'none'    ]]; then export CC=mpicc ; fi
