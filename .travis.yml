@@ -1,11 +1,11 @@
 language: cpp
 os: 
     - linux
-    - osx
+#    - osx
 dist: trusty
 compiler:
     - gcc
-    - clang
+#    - clang
 env:
 #    - MPI=none
 #    - MPI=openmpi
@@ -13,50 +13,50 @@ env:
 #    - MPI=lam    
 #    - MPI=mpich  
 
-    - TEST_SUITE=unit MPI=none
-    - TEST_SUITE=sandbox MPI=none
-    - TEST_SUITE=paper MPI=none
-    - TEST_SUITE=elliptic_drop MPI=none
-    - TEST_SUITE=nair_jablonowski_2008 MPI=none
-    - TEST_SUITE=UWLCM MPI=none
-    - TEST_SUITE=pbl MPI=none 
+#    - TEST_SUITE=unit MPI=none
+#    - TEST_SUITE=sandbox MPI=none
+#    - TEST_SUITE=paper MPI=none
+#    - TEST_SUITE=elliptic_drop MPI=none
+#    - TEST_SUITE=nair_jablonowski_2008 MPI=none
+#    - TEST_SUITE=UWLCM MPI=none
+#    - TEST_SUITE=pbl MPI=none 
     - TEST_SUITE=unit MPI=mvapich2
-    - TEST_SUITE=sandbox MPI=mvapich2
-# MPI paper tests don't do file comparison and plotting; TODO: fix them
-    - TEST_SUITE=paper MPI=mvapich2
-    - TEST_SUITE=elliptic_drop MPI=mvapich2
-# disabled, because polar bconds dont work with MPI
-#    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-    - TEST_SUITE=pbl MPI=mvapich2
-# TODO: once libcloud MPI works, turn UWLCM MPI test on
-#    - TEST_SUITE=UWLCM MPI=mvapich2
+#    - TEST_SUITE=sandbox MPI=mvapich2
+## MPI paper tests don't do file comparison and plotting; TODO: fix them
+#    - TEST_SUITE=paper MPI=mvapich2
+#    - TEST_SUITE=elliptic_drop MPI=mvapich2
+## disabled, because polar bconds dont work with MPI
+##    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+#    - TEST_SUITE=pbl MPI=mvapich2
+## TODO: once libcloud MPI works, turn UWLCM MPI test on
+##    - TEST_SUITE=UWLCM MPI=mvapich2
 
 cache:
   directories:
     - ${TRAVIS_BUILD_DIR}/deps/mvapich2-2.3b
 
-matrix:
-    exclude:
-        - os: osx
-          env: TEST_SUITE=unit MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=sandbox MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=paper MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=elliptic_drop MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=pbl MPI=mvapich2
-
-        - os: osx
-          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
-        - os: osx
-          compiler: gcc
-
-        - compiler: clang
-          env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
+#matrix:
+#    exclude:
+#        - os: osx
+#          env: TEST_SUITE=unit MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=sandbox MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=paper MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=elliptic_drop MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=pbl MPI=mvapich2
+#
+#        - os: osx
+#          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
+#        - os: osx
+#          compiler: gcc
+#
+#        - compiler: clang
+#          env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
 addons:
   apt:
     sources: &sources
