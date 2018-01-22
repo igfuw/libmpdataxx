@@ -91,9 +91,7 @@ before_install:
     # to avoid problems with plotting by paraview on Travis
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then unset DISPLAY; fi 
 
-    # you may not believe it, but GCC (4.8.2) is giving ICEs otherwise!
-    - export make_j="make -j 2"
-    - if [[ $COMPILER == 'g++' ]]; then export make_j="make"; fi
+    - export make_j="make -j 4"
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
     - export PY3DEB=""
