@@ -1,11 +1,11 @@
 language: cpp
 os: 
     - linux
-    - osx
+#    - osx
 dist: trusty
 compiler:
     - gcc
-    - clang
+#    - clang
 env:
 #    - MPI=none
 #    - MPI=openmpi
@@ -13,50 +13,50 @@ env:
 #    - MPI=lam    
 #    - MPI=mpich  
 
-    - TEST_SUITE=unit MPI=none
-    - TEST_SUITE=sandbox MPI=none
-    - TEST_SUITE=paper MPI=none
-    - TEST_SUITE=elliptic_drop MPI=none
-    - TEST_SUITE=nair_jablonowski_2008 MPI=none
-    - TEST_SUITE=UWLCM MPI=none
-    - TEST_SUITE=pbl MPI=none 
+#    - TEST_SUITE=unit MPI=none
+#    - TEST_SUITE=sandbox MPI=none
+#    - TEST_SUITE=paper MPI=none
+#    - TEST_SUITE=elliptic_drop MPI=none
+#    - TEST_SUITE=nair_jablonowski_2008 MPI=none
+#    - TEST_SUITE=UWLCM MPI=none
+#    - TEST_SUITE=pbl MPI=none 
     - TEST_SUITE=unit MPI=mvapich2
-    - TEST_SUITE=sandbox MPI=mvapich2
-# MPI paper tests don't do file comparison and plotting; TODO: fix them
-    - TEST_SUITE=paper MPI=mvapich2
-    - TEST_SUITE=elliptic_drop MPI=mvapich2
-# disabled, because polar bconds dont work with MPI
-#    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-    - TEST_SUITE=pbl MPI=mvapich2
-# TODO: once libcloud MPI works, turn UWLCM MPI test on
-#    - TEST_SUITE=UWLCM MPI=mvapich2
+#    - TEST_SUITE=sandbox MPI=mvapich2
+## MPI paper tests don't do file comparison and plotting; TODO: fix them
+#    - TEST_SUITE=paper MPI=mvapich2
+#    - TEST_SUITE=elliptic_drop MPI=mvapich2
+## disabled, because polar bconds dont work with MPI
+##    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+#    - TEST_SUITE=pbl MPI=mvapich2
+## TODO: once libcloud MPI works, turn UWLCM MPI test on
+##    - TEST_SUITE=UWLCM MPI=mvapich2
 
 cache:
   directories:
     - ${TRAVIS_BUILD_DIR}/deps/mvapich2-2.3b
 
-matrix:
-    exclude:
-        - os: osx
-          env: TEST_SUITE=unit MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=sandbox MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=paper MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=elliptic_drop MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-        - os: osx
-          env: TEST_SUITE=pbl MPI=mvapich2
-
-        - os: osx
-          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
-        - os: osx
-          compiler: gcc
-
-        - compiler: clang
-          env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
+#matrix:
+#    exclude:
+#        - os: osx
+#          env: TEST_SUITE=unit MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=sandbox MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=paper MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=elliptic_drop MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=pbl MPI=mvapich2
+#
+#        - os: osx
+#          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
+#        - os: osx
+#          compiler: gcc
+#
+#        - compiler: clang
+#          env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
 addons:
   apt:
     sources: &sources
@@ -92,8 +92,8 @@ before_install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then unset DISPLAY; fi 
 
     # you may not believe it, but GCC (4.8.2) is giving ICEs otherwise!
-    - export make_j="make -j 2"
-    - if [[ $COMPILER == 'g++' ]]; then export make_j="make"; fi
+    - export make_j="make -j 4"
+    - if [[ $COMPILER == 'g++' ]]; then export make_j="make -j 4"; fi
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
     - export PY3DEB=""
@@ -155,27 +155,27 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
 
     # for MPI we need boost>=1.59, boost installation based on https://github.com/boostorg/compute/blob/master/.travis.yml
-    - | 
-      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
-        wget http://sourceforge.net/projects/boost/files/boost/1.65.1/boost_1_65_1.tar.gz 
-        tar xf boost_1_65_1.tar.gz
-        cd boost_1_65_1
-        # configure and install
-        g++-6 -v
-        if [[ $COMPILER == 'g++' ]]; then echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam; fi
-        if [[ $COMPILER == 'clang++' ]]; then echo "using clang : 5.0 : clang++-5.0 ;" > $HOME/user-config.jam; fi
-        echo "using mpi ;" > $HOME/user-config.jam
-        ./bootstrap.sh --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
-        sudo ./b2 -d0 install
-        cd ..
-      fi
-
-    # cmake 
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install cmake; fi
-
-    # blitz
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install blitz; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libblitz0-dev; fi
+#    - | 
+#      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
+#        wget http://sourceforge.net/projects/boost/files/boost/1.65.1/boost_1_65_1.tar.gz 
+#        tar xf boost_1_65_1.tar.gz
+#        cd boost_1_65_1
+#        # configure and install
+#        g++-6 -v
+#        if [[ $COMPILER == 'g++' ]]; then echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam; fi
+#        if [[ $COMPILER == 'clang++' ]]; then echo "using clang : 5.0 : clang++-5.0 ;" > $HOME/user-config.jam; fi
+#        echo "using mpi ;" > $HOME/user-config.jam
+#        ./bootstrap.sh --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
+#        sudo ./b2 -d0 install
+#        cd ..
+#      fi
+#
+#    # cmake 
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install cmake; fi
+#
+#    # blitz
+#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install blitz; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libblitz0-dev; fi
 
     # Ubuntu dependency issue fix
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libpango-1.0-0 libpangocairo-1.0-0; fi
