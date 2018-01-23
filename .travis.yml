@@ -169,10 +169,9 @@ install:
         tar xf boost_1_65_1.tar.gz
         cd boost_1_65_1
         # configure and install
-        g++-6 -v
         if [[ $COMPILER == 'g++' ]]; then echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam; fi
         if [[ $COMPILER == 'clang++' ]]; then echo "using clang : 5.0 : clang++-5.0 ;" > $HOME/user-config.jam; fi
-        echo "using mpi : $CC ;" > $HOME/user-config.jam
+        echo "using mpi : $CC ;" >> $HOME/user-config.jam
         cat $HOME/user-config.jam
         ./bootstrap.sh --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
         sudo ./b2 -d0 install
