@@ -242,7 +242,8 @@ if(HDF5_FOUND)
     )
 
     execute_process(
-      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order matters here!
+      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS},-rpath-link,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
+      # rpath-link needed because boost-mpi requires boost-serialization, and rpath works only for direct dependencies (i.e. boost-mpi) and not dependencies of a dependency (i.e. boost-serialization)
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status 
       ERROR_VARIABLE error
