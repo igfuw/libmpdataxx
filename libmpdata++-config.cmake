@@ -228,7 +228,7 @@ if(HDF5_FOUND)
       }
     ")
     execute_process(
-      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES} "-Wl,-rpath,${Boost_LIBRARY_DIRS}"# the order matters here!
+      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order matters here!
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status 
       ERROR_VARIABLE error
@@ -237,6 +237,12 @@ if(HDF5_FOUND)
       message(FATAL_ERROR "${pfx}: compilation failed\n ${error}")                               
     endif()                                                                       
     message(STATUS "${msg} - compilation OK")
+    execute_process(
+      COMMAND "ldd" "a.out"
+      WORKING_DIRECTORY ${tmpdir} 
+      RESULT_VARIABLE status 
+      ERROR_VARIABLE error
+    )
     execute_process(
       COMMAND "./a.out" 
       WORKING_DIRECTORY ${tmpdir} 
