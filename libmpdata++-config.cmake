@@ -244,6 +244,12 @@ if(HDF5_FOUND)
       ERROR_VARIABLE error
     )
     execute_process(
+      COMMAND "objdump" "-a" "-x" "a.out"
+      WORKING_DIRECTORY ${tmpdir} 
+      RESULT_VARIABLE status 
+      ERROR_VARIABLE error
+    )
+    execute_process(
       COMMAND "./a.out" 
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status
