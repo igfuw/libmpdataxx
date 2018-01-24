@@ -179,7 +179,7 @@ install:
           echo "using mpi : $CC ;" >> $HOME/user-config.jam
           cat $HOME/user-config.jam
           ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
-          ./b2 -d0 install
+          ./b2 install
           cd ..
         else
           echo "Using cached boost."

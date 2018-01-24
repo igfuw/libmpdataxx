@@ -227,6 +227,20 @@ if(HDF5_FOUND)
 	H5Pclose(plist_id); 
       }
     ")
+    message("boost libraris: ${Boost_LIBRARIES}")
+    execute_process(
+      COMMAND "ls" "-la"
+      WORKING_DIRECTORY ${Boost_LIBRARY_DIRS} 
+      RESULT_VARIABLE status 
+      ERROR_VARIABLE error
+    )
+    execute_process(
+      COMMAND "ldd" "libboost_mpi.so"
+      WORKING_DIRECTORY ${Boost_LIBRARY_DIRS} 
+      RESULT_VARIABLE status 
+      ERROR_VARIABLE error
+    )
+
     execute_process(
       COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order matters here!
       WORKING_DIRECTORY ${tmpdir} 
