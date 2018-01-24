@@ -227,23 +227,11 @@ if(HDF5_FOUND)
 	H5Pclose(plist_id); 
       }
     ")
-    message("boost libraris: ${Boost_LIBRARIES}")
-    execute_process(
-      COMMAND "ls" "-la"
-      WORKING_DIRECTORY ${Boost_LIBRARY_DIRS} 
-      RESULT_VARIABLE status 
-      ERROR_VARIABLE error
-    )
-    execute_process(
-      COMMAND "ldd" "libboost_mpi.so"
-      WORKING_DIRECTORY ${Boost_LIBRARY_DIRS} 
-      RESULT_VARIABLE status 
-      ERROR_VARIABLE error
-    )
 
     execute_process(
-      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS},-rpath-link,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
-      # rpath-link needed because boost-mpi requires boost-serialization, and rpath works only for direct dependencies (i.e. boost-mpi) and not dependencies of a dependency (i.e. boost-serialization)
+      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
+      # Boost_LIBRARY_DIRS has to be in LD_RUN_PATH, tried to specify it through rpath/rpath-link but failed; at runtime it correctly finds libboost-mpi (direct dependency), but fails on boost-serialization (which is a dependency of boost-mpi)
+      #COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS},-rpath-link,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status 
       ERROR_VARIABLE error
@@ -252,18 +240,6 @@ if(HDF5_FOUND)
       message(FATAL_ERROR "${pfx}: compilation failed\n ${error}")                               
     endif()                                                                       
     message(STATUS "${msg} - compilation OK")
-    execute_process(
-      COMMAND "ldd" "a.out"
-      WORKING_DIRECTORY ${tmpdir} 
-      RESULT_VARIABLE status 
-      ERROR_VARIABLE error
-    )
-    execute_process(
-      COMMAND "objdump" "-a" "-x" "a.out"
-      WORKING_DIRECTORY ${tmpdir} 
-      RESULT_VARIABLE status 
-      ERROR_VARIABLE error
-    )
     execute_process(
       COMMAND "./a.out" 
       WORKING_DIRECTORY ${tmpdir} 
