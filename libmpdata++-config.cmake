@@ -134,7 +134,7 @@ unset(output)
 ############################################################################################
 # Boost libraries
 set(Boost_DETAILED_FAILURE_MSG ON)
-set(req_comp thread date_time system iostreams timer filesystem)
+set(req_comp thread date_time system iostreams timer filesystem ptr_container)
 if(USE_MPI)
   list(APPEND req_comp mpi)
   list(APPEND req_comp serialization)
