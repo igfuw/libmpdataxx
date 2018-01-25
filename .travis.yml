@@ -98,6 +98,7 @@ before_install:
     - export PY3DEB=""
     - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' ]]; then PY3DEB=3; fi
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
+    - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-pip; fi
  
 install:
     ############################################################################
