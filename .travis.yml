@@ -154,6 +154,7 @@ install:
         # LIBRARY_PATH for clang?osx?
         export LD_LIBRARY_PATH=${DEPS_DIR}/mvapich2-2.3b/lib:${LD_LIBRARY_PATH}
         export LD_RUN_PATH=${DEPS_DIR}/mvapich2-2.3b/lib:${LD_RUN_PATH}
+        export LIBRARY_PATH=${DEPS_DIR}/mvapich2-2.3b/lib:${LIBRARY_PATH}
       fi
 
     - if [[ $MPI != 'none'    ]]; then export CXX=${DEPS_DIR}/mvapich2-2.3b/bin/mpic++ ; fi # full path, since libtool in hdf5 installation does not understand PATH set above (?)
@@ -185,7 +186,9 @@ install:
           echo "Using cached boost."
         fi
         export BOOST_ROOT=${DEPS_DIR}/boost
+        export LD_LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LD_LIBRARY_PATH}
         export LD_RUN_PATH=${DEPS_DIR}/boost/lib:${LD_RUN_PATH}
+        export LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LIBRARY_PATH}
       fi
 
     # blitz
