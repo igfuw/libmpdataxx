@@ -28,6 +28,8 @@ env:
 # disabled, because polar bconds dont work with MPI
 #    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
     - TEST_SUITE=pbl MPI=mvapich2
+# bconds_div has to be ran separately with mpi because of timeouts
+    - TEST_SUITE=bconds_div MPI=mvapich2 
 # TODO: once libcloud MPI works, turn UWLCM MPI test on
 #    - TEST_SUITE=UWLCM MPI=mvapich2
 
@@ -50,6 +52,8 @@ cache:
 #          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
 #        - os: osx
 #          env: TEST_SUITE=pbl MPI=mvapich2
+#        - os: osx
+#          env: TEST_SUITE=bconds_div MPI=mvapich2
 #
 #        - os: osx
 #          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
@@ -289,3 +293,6 @@ script:
     
     # running pbl tests in Release mode
     - if [[ $TEST_SUITE == 'pbl' ]]; then . ./.travis_scripts/pbl.sh; fi
+
+    # running bconds_div tests in Release mode
+    - if [[ $TEST_SUITE == 'bcond_div' ]]; then . ./.travis_scripts/bconds_div.sh; fi
