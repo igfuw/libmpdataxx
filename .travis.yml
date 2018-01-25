@@ -233,16 +233,8 @@ install:
     # h5py
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi 
     # build h5py with mpi support
-    - |
-      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
-        sudo pip install mpi4py;
-        travis_retry wget --no-check-certificate --quiet -O - https://github.com/h5py/h5py/archive/2.7.1.tar.gz | tar --strip-components=1 -xz
-        cd h5py-2.7.1
-        #python setup.py configure --hdf5=/path/to/hdf5
-        python setup.py configure --mpi
-        sudo python setup.py install #TODO: sudo not needed?
-        cd ..
-      fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo pip install mpi4py; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then HDF5_MPI="ON" sudo pip install --no-binary=h5py h5py; fi 
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
 
     # scipy 
