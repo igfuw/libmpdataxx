@@ -245,7 +245,12 @@ install:
     # h5py
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi 
     # build h5py with mpi support
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo pip install mpi4py; fi 
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo pip install mpi4py; fi 
+    - |
+      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then
+        sudo pip install Cython # to generate the C wrappers
+        sudo pip install https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz
+      fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then HDF5_MPI="ON" sudo pip install --no-binary=h5py h5py; fi 
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
 
