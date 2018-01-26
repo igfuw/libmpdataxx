@@ -207,6 +207,7 @@ install:
         export LD_LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LD_LIBRARY_PATH}
         export LD_RUN_PATH=${DEPS_DIR}/boost/lib:${LD_RUN_PATH}
         export LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LIBRARY_PATH}
+        export CPATH=${DEPS_DIR}/boost/include:${CPATH}
       fi
 
     # blitz
