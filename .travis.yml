@@ -255,8 +255,9 @@ install:
       if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then
         sudo pip install Cython # to generate the C wrappers
         #sudo pip install https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz
-        travis_retry wget --no-check-certificate --quiet -O - https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz | tar --strip-components=1 -xz 
+        mkdir mpi4py
         cd mpi4py
+        travis_retry wget --no-check-certificate --quiet -O - https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz | tar --strip-components=1 -xz 
         python setup.py build
         sudo python setup.py install
         cd ..
