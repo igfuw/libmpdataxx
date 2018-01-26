@@ -114,7 +114,7 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'osx' && $COMPILER == 'clang++' ]]; then export CXXFLAGS="-Wno-parentheses ${CXXFLAGS}"; fi
 
     # get libclang-dev for headers
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then $apt_get_install libclang-5.0-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then sudo $apt_get_install libclang-5.0-dev; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then export CXXFLAGS="-nostdinc++ ${CXXFLAGS}"; fi
 
     # redefine CXX to the actual version used
