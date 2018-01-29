@@ -28,14 +28,6 @@ matrix:
 
         - compiler: clang
           env: TEST_SUITE=UWLCM # UWLCM is not tested on clang yet
-addons:
-  apt:
-    packages:
-      - g++-6
-      - clang-4.0
-    sources: &sources
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-4.0
 
 osx_image: xcode8
 
