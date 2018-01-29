@@ -1,7 +1,7 @@
 language: cpp
 os: 
     - linux
-#    - osx
+    - osx
 dist: trusty
 compiler:
     - gcc
@@ -115,8 +115,8 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'osx' && $COMPILER == 'clang++' ]]; then export CXXFLAGS="-Wno-parentheses ${CXXFLAGS}"; fi
 
     # get libclang-dev for headers
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then sudo $apt_get_install libclang-5.0-dev; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then export CXXFLAGS="-nostdinc++ ${CXXFLAGS}"; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' && $MPI != 'none' ]]; then sudo $apt_get_install libclang-5.0-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' && $MPI != 'none' ]]; then export CXXFLAGS="-nostdinc++ ${CXXFLAGS}"; fi
 
     # redefine CXX to the actual version used
     - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then export CXX=clang++-5.0; fi
