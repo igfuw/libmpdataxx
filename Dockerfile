@@ -6,6 +6,7 @@ WORKDIR /usr/local/src/libmpdataxx
 
 RUN apt-get update -qq \
     && apt-get install -yq --no-install-recommends \
+        sudo \
         apt-utils \
         build-essential \
         pkg-config \
