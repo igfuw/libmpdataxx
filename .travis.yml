@@ -113,7 +113,7 @@ install:
     # make Python 3 the default if requested
     #- if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
 
-before script:
+before_script:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then docker build -t libmpdataxx .; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export docker_run="docker run -e make_j -e CXX -t libmpdataxx"; fi
 script:
