@@ -115,7 +115,7 @@ install:
 
 before_script:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then docker build -t libmpdataxx .; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export docker_run="docker run -e make_j -e CXX -t libmpdataxx"; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export docker_run="docker run -e make_j -e CXX -e COMPILER -e TRAVIS_OS_NAME -t libmpdataxx"; fi
 script:
     # libmpdata++
     #- cd libmpdata++
