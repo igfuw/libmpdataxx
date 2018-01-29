@@ -41,19 +41,19 @@ cache:
 matrix:
     exclude:
 #   MPI with clang disabled due to difficulties with building boost with clang
-        - os: clang
+        - complier: clang
           env: TEST_SUITE=unit MPI=mvapich2
-        - os: clang
+        - complier: clang
           env: TEST_SUITE=sandbox MPI=mvapich2
-        - os: clang
+        - complier: clang
           env: TEST_SUITE=paper MPI=mvapich2
-        - os: clang
+        - complier: clang
           env: TEST_SUITE=elliptic_drop MPI=mvapich2
-        - os: clang
+        - complier: clang
           env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-        - os: clang
+        - complier: clang
           env: TEST_SUITE=pbl MPI=mvapich2
-        - os: clang
+        - complier: clang
           env: TEST_SUITE=bconds_div MPI=mvapich2
 
         - os: osx
