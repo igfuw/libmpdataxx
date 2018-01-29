@@ -13,13 +13,13 @@ env:
 #    - MPI=lam    
 #    - MPI=mpich  
 
-#    - TEST_SUITE=unit MPI=none
-#    - TEST_SUITE=sandbox MPI=none
-#    - TEST_SUITE=paper MPI=none
-#    - TEST_SUITE=elliptic_drop MPI=none
-#    - TEST_SUITE=nair_jablonowski_2008 MPI=none
-#    - TEST_SUITE=UWLCM MPI=none
-#    - TEST_SUITE=pbl MPI=none 
+    - TEST_SUITE=unit MPI=none
+    - TEST_SUITE=sandbox MPI=none
+    - TEST_SUITE=paper MPI=none
+    - TEST_SUITE=elliptic_drop MPI=none
+    - TEST_SUITE=nair_jablonowski_2008 MPI=none
+    - TEST_SUITE=UWLCM MPI=none
+    - TEST_SUITE=pbl MPI=none 
     - TEST_SUITE=unit MPI=mvapich2
     - TEST_SUITE=sandbox MPI=mvapich2
 # MPI paper tests don't do file comparison and plotting; TODO: fix them
@@ -38,30 +38,31 @@ cache:
     - ${TRAVIS_BUILD_DIR}/deps/mvapich2-2.3b
     - ${TRAVIS_BUILD_DIR}/deps/boost
 
-#matrix:
-#    exclude:
-#        - os: osx
-#          env: TEST_SUITE=unit MPI=mvapich2
-#        - os: osx
-#          env: TEST_SUITE=sandbox MPI=mvapich2
-#        - os: osx
-#          env: TEST_SUITE=paper MPI=mvapich2
-#        - os: osx
-#          env: TEST_SUITE=elliptic_drop MPI=mvapich2
-#        - os: osx
-#          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-#        - os: osx
-#          env: TEST_SUITE=pbl MPI=mvapich2
-#        - os: osx
-#          env: TEST_SUITE=bconds_div MPI=mvapich2
-#
-#        - os: osx
-#          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
-#        - os: osx
-#          compiler: gcc
-#
-#        - compiler: clang
-#          env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
+matrix:
+    exclude:
+#   MPI with clang disabled due to difficulties with building boost with clang
+        - os: clang
+          env: TEST_SUITE=unit MPI=mvapich2
+        - os: clang
+          env: TEST_SUITE=sandbox MPI=mvapich2
+        - os: clang
+          env: TEST_SUITE=paper MPI=mvapich2
+        - os: clang
+          env: TEST_SUITE=elliptic_drop MPI=mvapich2
+        - os: clang
+          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+        - os: clang
+          env: TEST_SUITE=pbl MPI=mvapich2
+        - os: clang
+          env: TEST_SUITE=bconds_div MPI=mvapich2
+
+        - os: osx
+          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
+        - os: osx
+          compiler: gcc
+
+        - compiler: clang
+          env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
 addons:
   apt:
     sources: &sources
@@ -190,7 +191,7 @@ install:
           cat $HOME/user-config.jam
           if [[ $COMPILER == 'g++' ]]; then
             ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
-            ./b2 -d1 install
+            ./b2 -d0 install
           fi
           if [[ $COMPILER == 'clang++' ]]; then 
             #clang installation taken from https://gist.github.com/jimporter/10442880
