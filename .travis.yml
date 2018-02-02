@@ -53,7 +53,7 @@ before_install:
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
     - export PY3DEB=""
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $TEST_SUITE != 'UWLCM']]; then PY3DEB=3; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $TEST_SUITE != 'UWLCM' ]]; then PY3DEB=3; fi
  
 install:
     # silence the gazillion warnings coming from blitz headers when using the osx clang
