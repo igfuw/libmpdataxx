@@ -173,7 +173,7 @@ namespace libmpdataxx
         typename std::enable_if<nd == 2>::type* = 0
       ) 
       {
-        return return_helper<arrvec_t>(
+        return blitz::safeToReturn(
 	  (v[0](ijk[0]+1, ijk[1]) - v[0](ijk[0]-1, ijk[1])) / dijk[0] / 2.
 	  +
 	  (v[1](ijk[0], ijk[1]+1) - v[1](ijk[0], ijk[1]-1)) / dijk[1] / 2.
@@ -189,7 +189,7 @@ namespace libmpdataxx
         typename std::enable_if<nd == 3>::type* = 0
       ) 
       {
-        return return_helper<arrvec_t>(
+        return blitz::safeToReturn(
 	  (v[0](ijk[0]+1, ijk[1], ijk[2]) - v[0](ijk[0]-1, ijk[1], ijk[2])) / dijk[0] / 2.
 	  +
 	  (v[1](ijk[0], ijk[1]+1, ijk[2]) - v[1](ijk[0], ijk[1]-1, ijk[2])) / dijk[1] / 2.
