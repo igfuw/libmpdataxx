@@ -147,7 +147,7 @@ namespace libmpdataxx
         typename std::enable_if<nd == 2>::type* = 0
       ) 
       { 
-        return return_helper<arrvec_t>(
+        return blitz::safeToReturn(
 	  pow2(tau[0](ijk)) / 2 + pow2(tau[1](ijk)) + pow2(tau[2](ijk)) / 2
         );
       }
@@ -160,7 +160,7 @@ namespace libmpdataxx
         typename std::enable_if<nd == 3>::type* = 0
       ) 
       {
-        return return_helper<arrvec_t>(
+        return blitz::safeToReturn(
           pow2(tau[0](ijk)) / 2 + 
           pow2(tau[1](ijk)) +
           pow2(tau[2](ijk)) +
@@ -371,7 +371,7 @@ namespace libmpdataxx
         typename std::enable_if<nd == 2>::type* = 0
       ) 
       {
-        return return_helper<arrvec_t>(
+        return blitz::safeToReturn(
           // one half taken as an average 
           (
             pow2(tau[0](ijk[0] + h, ijk[1])) + pow2(tau[0](ijk[0] - h, ijk[1]))
@@ -398,7 +398,7 @@ namespace libmpdataxx
         typename std::enable_if<nd == 3>::type* = 0
       )
       {
-        return return_helper<arrvec_t>(
+        return blitz::safeToReturn(
           // one half taken as an average 
           (
             pow2(tau[0](ijk[0] + h, ijk[1], ijk[2])) + pow2(tau[0](ijk[0] - h, ijk[1], ijk[2]))
@@ -598,7 +598,7 @@ namespace libmpdataxx
         typename std::enable_if<nd == 2>::type* = 0
       ) 
       {
-        return return_helper<arrvec_t>(
+        return blitz::safeToReturn(
 	  ( (f[0](ijk[0]+h, ijk[1]) - f[0](ijk[0]-h, ijk[1])) / dijk[0]
 	    +
 	    (f[1](ijk[0], ijk[1]+h) - f[1](ijk[0], ijk[1]-h)) / dijk[1]
@@ -616,7 +616,7 @@ namespace libmpdataxx
         typename std::enable_if<nd == 3>::type* = 0
       ) 
       {
-        return return_helper<arrvec_t>(
+        return blitz::safeToReturn(
 	  ( (f[0](ijk[0]+h, ijk[1], ijk[2]) - f[0](ijk[0]-h, ijk[1], ijk[2])) / dijk[0]
 	    +
 	    (f[1](ijk[0], ijk[1]+h, ijk[2]) - f[1](ijk[0], ijk[1]-h, ijk[2])) / dijk[1]
@@ -729,7 +729,7 @@ namespace libmpdataxx
 	const rng_t &j
       ) 
       {
-        return return_helper<arg_t>(
+        return blitz::safeToReturn(
 	  x(idxperm::pi<d>(i + 1, j)) + 2 * x(idxperm::pi<d>(i, j)) + x(idxperm::pi<d>(i - 1, j))
         );
       }
@@ -762,7 +762,7 @@ namespace libmpdataxx
 	const rng_t &k
       ) 
       {
-        return return_helper<arg_t>(
+        return blitz::safeToReturn(
 	  x(idxperm::pi<d>(i+1, j, k)) + 2 * x(idxperm::pi<d>(i, j, k)) + x(idxperm::pi<d>(i - 1, j, k))
         );
       }

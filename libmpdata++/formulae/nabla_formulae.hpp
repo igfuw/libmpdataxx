@@ -26,7 +26,7 @@ namespace libmpdataxx
 	const real_t dx
       )
       {
-        return return_helper<arg_t>(
+        return blitz::safeToReturn(
   	  (
 	    x(i+1) - 
 	    x(i-1)
@@ -43,7 +43,7 @@ namespace libmpdataxx
 	const real_t dx
       )
       {
-        return return_helper<arg_t>(
+        return blitz::safeToReturn(
   	  (
   	    x(pi<d>(i+1, j)) - 
   	    x(pi<d>(i-1, j))
@@ -61,7 +61,7 @@ namespace libmpdataxx
 	const real_t dx
       ) 
       {
-        return return_helper<arg_t>(
+        return blitz::safeToReturn(
   	  (
 	    x(pi<d>(i+1, j, k)) - 
 	    x(pi<d>(i-1, j, k))
@@ -76,7 +76,7 @@ namespace libmpdataxx
 	const real_t dx
       )
       {
-        return return_helper<arg_t>(
+        return blitz::safeToReturn(
 	  (
 	    x(i+1) - 
 	    x(i)
@@ -93,7 +93,7 @@ namespace libmpdataxx
 	const real_t dx
       ) 
       {
-        return return_helper<arg_t>(
+        return blitz::safeToReturn(
 	  (
 	    x(pi<d>(i+1, j)) - 
 	    x(pi<d>(i  , j))
@@ -111,7 +111,7 @@ namespace libmpdataxx
 	const real_t dx
       )
       {
-        return return_helper<arg_t>(
+        return blitz::safeToReturn(
 	  (
 	    x(pi<d>(i+1, j, k)) - 
 	    x(pi<d>(i, j, k))

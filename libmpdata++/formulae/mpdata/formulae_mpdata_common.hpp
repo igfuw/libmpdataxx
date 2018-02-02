@@ -49,14 +49,14 @@ namespace libmpdataxx
       }
 
       // frac: implemented using blitz::where()
-      template<opts_t opts, class nom_t, class den_t>
+      template<opts_t opts, class ix_t, class nom_t, class den_t>
       forceinline_macro auto frac(
         const nom_t &nom, 
         const den_t &den,
         typename std::enable_if<opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == true
       )
       {
-        return return_helper<nom_t>(
+        return return_helper<ix_t>(
           where(den != 0, nom / den, 0) // note: apparently >0 would suffice
         );
       }
@@ -70,7 +70,7 @@ namespace libmpdataxx
         typename std::enable_if<!opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == false
       )
       {
-        return return_helper<int>( // int to fool return_helper not to use safetoreturn, TODO: change return_helper logic?
+        return return_helper<ix_t>(
           nom / (den + blitz::tiny(typename real_t_helper<ix_t, nom_t>::type(0.))) // note: for negative signal eps -> -eps
         );
       }
@@ -82,7 +82,7 @@ namespace libmpdataxx
         const den_t &den
       )
       {
-        return return_helper<int>(
+        return return_helper<ix_t>(
           nom / (den + blitz::epsilon(typename real_t_helper<ix_t, nom_t>::type(0.)))
         );
       }
