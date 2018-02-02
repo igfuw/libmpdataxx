@@ -49,8 +49,8 @@ int main()
 
   using ix = typename ct_params_t::ix;
   p.outvars = {
-    {ix::psi, {.name = "psi", .unit = "1"}},
-    {ix::phi, {.name = "phi", .unit = "1"}}
+    {ix::psi, {"psi", "1"}},
+    {ix::phi, {"phi", "1"}}
   };
   p.gnuplot_command = "plot";
 

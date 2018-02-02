@@ -53,9 +53,9 @@ void test(const std::string &dirname, double rey)
   p.outfreq = 50; 
   p.outwindow = 3;
   p.outvars = {
-    {ix::u,   {.name = "u",   .unit = "m/s"}}, 
-    {ix::v,   {.name = "v",   .unit = "m/s"}}, 
-    {ix::w,   {.name = "w",   .unit = "m/s"}}, 
+    {ix::u,   { "u",   "m/s"}}, 
+    {ix::v,   { "v",   "m/s"}}, 
+    {ix::w,   { "w",   "m/s"}}, 
   };
   p.outdir = dirname;
   p.prs_tol = 1e-7;

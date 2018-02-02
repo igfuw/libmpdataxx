@@ -51,7 +51,7 @@ int main()
 
   p.outfreq = nt / 25;
   p.outvars = {
-    {ix::h, { .name = "h",   .unit = "m" }}, 
+    {ix::h, { "h",   "m" }}, 
   };
   p.gnuplot_with = "lines";
   p.gnuplot_output = "figure_%s_%04d.svg";

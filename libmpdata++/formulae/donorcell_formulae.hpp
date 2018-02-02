@@ -25,52 +25,58 @@ namespace libmpdataxx
       template<opts_t opts, class T1, class T2, class T3> 
       inline auto F(
 	const T1 &psi_l, const T2 &psi_r, const T3 &GC
-      ) return_macro(, 
-        pospart<opts BOOST_PP_COMMA() rng_t>(GC) * psi_l +
-        negpart<opts BOOST_PP_COMMA() rng_t>(GC) * psi_r
-      ) 
+      )
+      {
+	return return_helper<rng_t>(
+          pospart<opts BOOST_PP_COMMA() rng_t>(GC) * psi_l +
+          negpart<opts BOOST_PP_COMMA() rng_t>(GC) * psi_r
+        );
+      }
 
       template <opts_t opts, class arr_1d_t>
-      inline auto flux( 
+      inline auto make_flux( 
 	const arr_1d_t &psi, 
 	const arr_1d_t &GC, 
 	const rng_t &i
-      ) return_macro(,
-	F<opts>(
+      )
+      {
+	return return_helper<rng_t>(F<opts>(
 	  psi(i  ), 
 	  psi(i+1), 
-	   GC(i+h)
-	) 
-      )
+	  GC(i+h)
+        ));
+      }
 
       template<opts_t opts, int d, class arr_2d_t>  
-      inline auto flux( 
+      inline auto make_flux( 
 	const arr_2d_t &psi, 
 	const arr_2d_t &GC, 
 	const rng_t &i, 
 	const rng_t &j
-      ) return_macro(,
-	F<opts>(
+      ) 
+      {
+	return return_helper<rng_t>(F<opts>(
 	  psi(pi<d>(i,   j)), 
 	  psi(pi<d>(i+1, j)), 
 	   GC(pi<d>(i+h, j))
-	)
-      )
+	));
+      }
 
       template<opts_t opts, int d, class arr_3d_t>  
-      inline auto flux( 
+      inline auto make_flux( 
 	const arr_3d_t &psi, 
 	const arr_3d_t &GC, 
 	const rng_t &i, 
 	const rng_t &j,
 	const rng_t &k
-      ) return_macro(,
-	F<opts>(
+      )
+      {
+	return return_helper<rng_t>(F<opts>(
 	  psi(pi<d>(i,   j, k)), 
 	  psi(pi<d>(i+1, j, k)), 
 	   GC(pi<d>(i+h, j, k))
-	) 
-      )
+	));
+      }
 
       template <opts_t opts, class a_t, class f1_t, class f2_t, class g_t>
       inline void donorcell_sum(

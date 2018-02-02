@@ -60,7 +60,7 @@ namespace libmpdataxx
           }
           else
           {
-            this->flux[0](im1+h) = formulae::donorcell::flux<ct_params_t::opts>(psi, GC_corr[0], im1);
+            this->flux[0](im1+h) = formulae::donorcell::make_flux<ct_params_t::opts>(psi, GC_corr[0], im1);
             this->flux_ptr = &this->flux;
           }
 

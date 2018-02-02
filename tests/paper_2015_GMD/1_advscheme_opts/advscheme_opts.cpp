@@ -26,8 +26,8 @@ void test(const std::string filename)
   p.grid_size = { nx };
   p.outfreq = nt; 
   p.outvars = {
-    {0, {.name = "", .unit = "1"}},
-    {1, {.name = "", .unit = "1"}}
+    {0, {"", "1"}},
+    {1, {"", "1"}}
   };
   p.gnuplot_output = filename; 
   p.gnuplot_command = "plot";
