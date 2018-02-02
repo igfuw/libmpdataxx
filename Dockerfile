@@ -14,9 +14,11 @@ RUN apt-get update -qq \
         cmake \
         ca-certificates \
         clang-4.0 \
+        software-properties-common \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN apt-get update -qq \
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test \
+    && apt-get update -qq \
     && apt-get install -yq --no-install-recommends \
         libblitz0-dev \
         libboost-all-dev \
@@ -27,6 +29,7 @@ RUN apt-get update -qq \
         python-h5py \
         python-scipy \
         python-matplotlib \
+        gcc-6 g++-6 \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h
