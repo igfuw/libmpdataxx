@@ -32,6 +32,9 @@ RUN add-apt-repository ppa:ubuntu-toolchain-r/test \
         python-matplotlib \
         gcc-6 g++-6 \
         python3-dev \
+        python3-h5py \
+        python3-scipy \
+        python3-matplotlib \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG PYVER
