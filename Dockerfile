@@ -30,7 +30,10 @@ RUN add-apt-repository ppa:ubuntu-toolchain-r/test \
         python-scipy \
         python-matplotlib \
         gcc-6 g++-6 \
+        python3-dev \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
 
 RUN wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h
 
