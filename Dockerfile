@@ -2,6 +2,7 @@ FROM ubuntu:16.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+
 WORKDIR /usr/local/src/libmpdataxx
 
 RUN apt-get update -qq \
@@ -33,7 +34,9 @@ RUN add-apt-repository ppa:ubuntu-toolchain-r/test \
         python3-dev \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
+ARG PYVER
+
+RUN if [ "$PYVER" = 3 ]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
 
 RUN wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h
 

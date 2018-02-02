@@ -52,8 +52,8 @@ before_install:
     - export make_j="make -j 2"
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
-    - export PY3DEB=""
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $TEST_SUITE != 'UWLCM' ]]; then PY3DEB=3; fi
+    - export PYVER="2"
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $TEST_SUITE != 'UWLCM' ]]; then PYVER=3; fi
  
 install:
     # silence the gazillion warnings coming from blitz headers when using the osx clang
@@ -83,8 +83,8 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install matplotlib; fi
 
 before_script:
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then docker build -t libmpdataxx .; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export docker_run="docker run -e PY3DEB -e apt_get_install -e make_j -e CXX -e COMPILER -e TRAVIS_OS_NAME -t libmpdataxx"; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then docker build --build-arg PYVER=$PYVER -t libmpdataxx .; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export docker_run="docker run -e apt_get_install -e make_j -e CXX -e COMPILER -e TRAVIS_OS_NAME -t libmpdataxx"; fi
 script:
     # libmpdata++
     #- cd libmpdata++
