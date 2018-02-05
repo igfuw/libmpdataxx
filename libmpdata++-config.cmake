@@ -242,7 +242,7 @@ if(HDF5_FOUND)
     endif()                                                                       
     message(STATUS "${msg} - compilation OK")
     execute_process(
-      COMMAND "./a.out" 
+      COMMAND "mpiexec" "-np" "1" "./a.out" 
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status
       ERROR_VARIABLE error
