@@ -56,7 +56,7 @@ if(
   CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
 )
   # flags taken from -fast but without -static
-  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=gnu++14 -DNDEBUG -xHOST -O3 -ipo -no-prec-div -fp-model fast=2 -march=native")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=gnu++14 -DNDEBUG -xHOST -O3 -ipo -no-prec-div -fp-model fast=2")
 endif()
 
 
