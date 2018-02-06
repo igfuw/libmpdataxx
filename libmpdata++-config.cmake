@@ -38,8 +38,7 @@ set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++14 -DBZ_
 if(
   CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
   CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR
-  CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" 
 )
   set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++14 -DNDEBUG -Ofast -march=native")
 
@@ -50,6 +49,14 @@ if(
   )
     set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -fno-vectorize") 
   endif()
+endif()
+
+
+if(
+  CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+)
+  # flags taken from -fast but without -static
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=gnu++14 -DNDEBUG -xHOST -O3 -ipo -no-prec-div -fp-model fast=2 -march=native")
 endif()
 
 
