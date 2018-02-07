@@ -43,7 +43,6 @@ before_install:
 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -y"; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew tap homebrew/science; fi
 
     # fixing broken OSX gzip tools
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export PATH=/usr/local/bin:$PATH; fi # so that brew-installed ones are first
