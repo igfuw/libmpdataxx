@@ -1,10 +1,7 @@
-sudo: required
 language: cpp
-services:
-  - docker
 os: 
     - linux
-#    - osx
+    - osx
 dist: trusty
 compiler:
     - gcc
@@ -19,6 +16,13 @@ env:
     - TEST_SUITE=pbl
 
 matrix:
+    include:
+        - os: osx
+          sudo: false
+        - os: linux
+          sudo: required
+          services:
+            - docker
     exclude:
         - os: osx
           compiler: gcc
