@@ -36,7 +36,7 @@
   #define forceinline_macro inline
 #endif
 
-// C++11 auto return type macro
+// C++11 auto return type macro, deprecated since C++14
 #define return_macro(init,expr)          \
   -> decltype(blitz::safeToReturn(expr)) \
 {                                        \
@@ -53,7 +53,7 @@ namespace libmpdataxx
   template <class ix_t, class expr_t>
   forceinline_macro auto return_helper(const expr_t &expr, typename std::enable_if<!std::is_same<ix_t, int>::value>::type* = 0)
   {
-    return safeToReturn(expr);
+    return blitz::safeToReturn(expr);
   }
 
   template <class ix_t, class expr_t>

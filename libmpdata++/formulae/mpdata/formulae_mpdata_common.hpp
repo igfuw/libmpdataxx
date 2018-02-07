@@ -49,14 +49,17 @@ namespace libmpdataxx
       }
 
       // frac: implemented using blitz::where()
-      template<opts_t opts, class nom_t, class den_t>
+      template<opts_t opts, class ix_t, class nom_t, class den_t>
       forceinline_macro auto frac(
         const nom_t &nom, 
         const den_t &den,
         typename std::enable_if<opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == true
-      ) return_macro(,
-        where(den != 0, nom / den, 0) // note: apparently >0 would suffice
       )
+      {
+        return return_helper<ix_t>(
+          where(den != 0, nom / den, 0) // note: apparently >0 would suffice
+        );
+      }
 
       // frac: implemented as suggested in MPDATA papers
       //       if den == 0, then adding a smallest representable positive number
