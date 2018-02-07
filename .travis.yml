@@ -88,13 +88,14 @@ install:
 before_script:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then docker build --build-arg PYVER=$PYVER -t libmpdataxx .; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export docker_run="docker run -e apt_get_install -e make_j -e CXX -e COMPILER -e TRAVIS_OS_NAME -t libmpdataxx"; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export docker_run=""; fi
 script:
     # libmpdata++
-    #- cd libmpdata++
-    #- mkdir build
-    #- cd build
-    #- cmake ..
-    #- cd ../..
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cd libmpdata++; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then mkdir build; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cd build; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cmake ..; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cd ../..; fi 
 
     # compiling and running all unit tests in Debug & Release modes
     - if [[ $TEST_SUITE == 'unit' ]]; then $docker_run bash ./.travis_scripts/unit.sh; fi
