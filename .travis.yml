@@ -73,7 +73,7 @@ install:
 
     # gnuplot-iostream
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot; fi
-      #- sudo wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h; fi
 
     # h5py
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
