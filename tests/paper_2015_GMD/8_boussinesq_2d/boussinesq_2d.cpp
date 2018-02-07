@@ -54,7 +54,7 @@ int main()
   p.outvars = {
 //    {ix::u,   {.name = "u",   .unit = "m/s"}}, 
 //    {ix::w,   {.name = "w",   .unit = "m/s"}}, 
-    {ix::tht, {.name = "tht", .unit = "K"  }}
+    {ix::tht, {"tht", "K"  }}
   };
   p.gnuplot_view = "map";
   p.gnuplot_output = "figure_%s_%04d.svg";

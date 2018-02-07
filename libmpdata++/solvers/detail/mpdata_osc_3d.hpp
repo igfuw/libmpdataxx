@@ -150,9 +150,9 @@ namespace libmpdataxx
             // calculation of fluxes
             if (!opts::isset(ct_params_t::opts, opts::iga) || iter == 0)
             {
-              this->flux[0](im+h, j, k) = flux<ct_params_t::opts, 0>(psi[n], GC[0], im, j, k);
-              this->flux[1](i, jm+h, k) = flux<ct_params_t::opts, 1>(psi[n], GC[1], jm, k, i);
-              this->flux[2](i, j, km+h) = flux<ct_params_t::opts, 2>(psi[n], GC[2], km, i, j);
+              this->flux[0](im+h, j, k) = make_flux<ct_params_t::opts, 0>(psi[n], GC[0], im, j, k);
+              this->flux[1](i, jm+h, k) = make_flux<ct_params_t::opts, 1>(psi[n], GC[1], jm, k, i);
+              this->flux[2](i, j, km+h) = make_flux<ct_params_t::opts, 2>(psi[n], GC[2], km, i, j);
               this->flux_ptr = &this->flux; // TODO: if !iga this is needed only once per simulation, TODO: move to common
             }
             else

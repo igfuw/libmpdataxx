@@ -81,10 +81,10 @@ void test(const std::string &dirname, const int nt)
   p.outfreq = 150;
   p.outwindow = 1;
   p.outvars = {
-    {ix::u,   {.name = "u",   .unit = "m/s"}}, 
-    {ix::v,   {.name = "v",   .unit = "m/s"}}, 
-    {ix::w,   {.name = "w",   .unit = "m/s"}}, 
-    {ix::tht,   {.name = "tht",   .unit = "K"}}, 
+    {ix::u,   { "u",    "m/s"}}, 
+    {ix::v,   { "v",    "m/s"}}, 
+    {ix::w,   { "w",    "m/s"}}, 
+    {ix::tht,   {"tht",   "K"}}, 
   };
   p.outdir = dirname;
 

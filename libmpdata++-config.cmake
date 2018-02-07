@@ -37,7 +37,8 @@ set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++14 -DBZ_
 if(
   CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
   CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR
+  CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
 )
   set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++14 -DNDEBUG -Ofast -march=native")
 

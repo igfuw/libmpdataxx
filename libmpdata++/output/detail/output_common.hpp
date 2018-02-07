@@ -191,7 +191,8 @@ namespace libmpdataxx
 	{
           // default value for outvars
           if (this->outvars.size() == 0 && parent_t::n_eqns == 1)
-            outvars = {{0, {.name = "", .unit = ""}}};
+            outvars = {{0, {"", ""}}};
+
           
           // assign 1 to dt, di, dj, dk for output purposes if they are not defined by the user
           for (auto ref : 

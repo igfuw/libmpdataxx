@@ -24,12 +24,15 @@ namespace libmpdataxx
 	const arg_t &x,
 	const rng_t &i,
 	const real_t dx
-      ) return_macro(,
-	(
-	  x(i+1) - 
-	  x(i-1)
-	) / dx / 2.
       )
+      {
+        return blitz::safeToReturn(
+  	  (
+	    x(i+1) - 
+	    x(i-1)
+	  ) / dx / 2.
+        );
+      }
 
       // 2D version
       template <int d, class arg_t, typename real_t>
@@ -38,12 +41,15 @@ namespace libmpdataxx
 	const rng_t &i,
 	const rng_t &j,
 	const real_t dx
-      ) return_macro(,
-	(
-	  x(pi<d>(i+1, j)) - 
-	  x(pi<d>(i-1, j))
-	) / dx / 2.
       )
+      {
+        return blitz::safeToReturn(
+  	  (
+  	    x(pi<d>(i+1, j)) - 
+  	    x(pi<d>(i-1, j))
+  	  ) / dx / 2.
+        );
+      }
       
       // 3D version
       template <int d, class arg_t, typename real_t>
@@ -53,24 +59,30 @@ namespace libmpdataxx
 	const rng_t &j,
 	const rng_t &k,
 	const real_t dx
-      ) return_macro(,
-	(
-	  x(pi<d>(i+1, j, k)) - 
-	  x(pi<d>(i-1, j, k))
-	) / dx / 2.
-      )
+      ) 
+      {
+        return blitz::safeToReturn(
+  	  (
+	    x(pi<d>(i+1, j, k)) - 
+	    x(pi<d>(i-1, j, k))
+	  ) / dx / 2.
+        );
+      }
       
       template <class arg_t, typename real_t>
       inline auto grad_cmpct(
 	const arg_t &x,
 	const rng_t &i,
 	const real_t dx
-      ) return_macro(,
-	(
-	  x(i+1) - 
-	  x(i)
-	) / dx
       )
+      {
+        return blitz::safeToReturn(
+	  (
+	    x(i+1) - 
+	    x(i)
+	  ) / dx
+        );
+      }
 
       // 2D version
       template <int d, class arg_t, typename real_t>
@@ -79,12 +91,15 @@ namespace libmpdataxx
 	const rng_t &i,
 	const rng_t &j,
 	const real_t dx
-      ) return_macro(,
-	(
-	  x(pi<d>(i+1, j)) - 
-	  x(pi<d>(i  , j))
-	) / dx
-      )
+      ) 
+      {
+        return blitz::safeToReturn(
+	  (
+	    x(pi<d>(i+1, j)) - 
+	    x(pi<d>(i  , j))
+	  ) / dx
+        );
+      }
       
       // 3D version
       template <int d, class arg_t, typename real_t>
@@ -94,12 +109,15 @@ namespace libmpdataxx
 	const rng_t &j,
 	const rng_t &k,
 	const real_t dx
-      ) return_macro(,
-	(
-	  x(pi<d>(i+1, j, k)) - 
-	  x(pi<d>(i, j, k))
-	) / dx
       )
+      {
+        return blitz::safeToReturn(
+	  (
+	    x(pi<d>(i+1, j, k)) - 
+	    x(pi<d>(i, j, k))
+	  ) / dx
+        );
+      }
       
       // helper function to calculate gradient components of a scalar field
       
@@ -153,11 +171,14 @@ namespace libmpdataxx
 	const ijk_t &ijk,
 	const dijk_t dijk,
         typename std::enable_if<nd == 2>::type* = 0
-      ) return_macro(,
-	(v[0](ijk[0]+1, ijk[1]) - v[0](ijk[0]-1, ijk[1])) / dijk[0] / 2.
-	+
-	(v[1](ijk[0], ijk[1]+1) - v[1](ijk[0], ijk[1]-1)) / dijk[1] / 2.
-      )
+      ) 
+      {
+        return blitz::safeToReturn(
+	  (v[0](ijk[0]+1, ijk[1]) - v[0](ijk[0]-1, ijk[1])) / dijk[0] / 2.
+	  +
+	  (v[1](ijk[0], ijk[1]+1) - v[1](ijk[0], ijk[1]-1)) / dijk[1] / 2.
+        );
+      }
       
       // 3D version
       template <int nd, class arrvec_t, class ijk_t, class dijk_t>
@@ -166,13 +187,16 @@ namespace libmpdataxx
 	const ijk_t &ijk,
 	const dijk_t dijk,
         typename std::enable_if<nd == 3>::type* = 0
-      ) return_macro(,
-	(v[0](ijk[0]+1, ijk[1], ijk[2]) - v[0](ijk[0]-1, ijk[1], ijk[2])) / dijk[0] / 2.
-	+
-	(v[1](ijk[0], ijk[1]+1, ijk[2]) - v[1](ijk[0], ijk[1]-1, ijk[2])) / dijk[1] / 2.
-	+
-	(v[2](ijk[0], ijk[1], ijk[2]+1) - v[2](ijk[0], ijk[1], ijk[2]-1)) / dijk[2] / 2.
-      )
+      ) 
+      {
+        return blitz::safeToReturn(
+	  (v[0](ijk[0]+1, ijk[1], ijk[2]) - v[0](ijk[0]-1, ijk[1], ijk[2])) / dijk[0] / 2.
+	  +
+	  (v[1](ijk[0], ijk[1]+1, ijk[2]) - v[1](ijk[0], ijk[1]-1, ijk[2])) / dijk[1] / 2.
+	  +
+	  (v[2](ijk[0], ijk[1], ijk[2]+1) - v[2](ijk[0], ijk[1], ijk[2]-1)) / dijk[2] / 2.
+        );
+      }
     } // namespace nabla_op
   } // namespace formulae
 } // namespace libmpdataxx

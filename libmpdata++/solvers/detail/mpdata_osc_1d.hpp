@@ -92,7 +92,7 @@ namespace libmpdataxx
 	    // calculation of fluxes
 	    if (!opts::isset(ct_params_t::opts, opts::iga) || iter == 0)
 	    {
-              this->flux[0](im+h) = formulae::donorcell::flux<ct_params_t::opts>(
+              this->flux[0](im+h) = formulae::donorcell::make_flux<ct_params_t::opts>(
                 this->mem->psi[e][this->n[e]],
                 this->GC(iter)[0], 
                 im

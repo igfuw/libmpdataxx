@@ -78,9 +78,9 @@ namespace libmpdataxx
           }
           else
           {
-            this->flux[0](im1+h, j1,    k1   ) = formulae::donorcell::flux<ct_params_t::opts, 0>(psi, GC_corr[0], im1, j1, k1);
-            this->flux[1](i1,    jm1+h, k1   ) = formulae::donorcell::flux<ct_params_t::opts, 1>(psi, GC_corr[1], jm1, k1, i1);
-            this->flux[2](i1,    j1,    km1+h) = formulae::donorcell::flux<ct_params_t::opts, 2>(psi, GC_corr[2], km1, i1, j1);
+            this->flux[0](im1+h, j1,    k1   ) = formulae::donorcell::make_flux<ct_params_t::opts, 0>(psi, GC_corr[0], im1, j1, k1);
+            this->flux[1](i1,    jm1+h, k1   ) = formulae::donorcell::make_flux<ct_params_t::opts, 1>(psi, GC_corr[1], jm1, k1, i1);
+            this->flux[2](i1,    j1,    km1+h) = formulae::donorcell::make_flux<ct_params_t::opts, 2>(psi, GC_corr[2], km1, i1, j1);
             this->flux_ptr = &this->flux;
           }
 
