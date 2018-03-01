@@ -95,5 +95,3 @@ Some CMake hints:
 
 - the output of commands executed by "make test" can be viewed with:
   $ less Testing/Temporary/LastTest.log
-
-Codacy Badge
