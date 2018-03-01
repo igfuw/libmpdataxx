@@ -1,2 +1,0 @@
-# libmpdataxx
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/cc5f854162d64af48afcfe31b3de5aef)](https://app.codacy.com/app/trontrytel/libmpdataxx?utm_source=github.com&utm_medium=referral&utm_content=igfuw/libmpdataxx&utm_campaign=badger)
