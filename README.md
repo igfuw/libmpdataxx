@@ -1,0 +1,2 @@
+# libmpdataxx
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c1be1645743a463b8ead70f111d2ba15)](https://app.codacy.com/app/igfuw/libmpdataxx?utm_source=github.com&utm_medium=referral&utm_content=igfuw/libmpdataxx&utm_campaign=badger)
