@@ -1,6 +1,5 @@
-libmpdata++ - a library of parallel MPDATA-based solvers 
-for systems of generalised transport equations 
-=======================================================================
+libmpdata++ - a library of parallel MPDATA-based solvers for systems of generalised transport equations 
+=======================================================================================================
 
 To get more information on libmpdata++, please check: 
   - http://libmpdataxx.igf.fuw.edu.pl/
