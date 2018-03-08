@@ -31,10 +31,10 @@ namespace libmpdataxx
     
     struct mpdata_rhs_family_tag {};
 
-    template <class ct_params_t>
-    class mpdata_rhs : public mpdata<ct_params_t>
+    template <class ct_params_t, int minhalo = 0>
+    class mpdata_rhs : public mpdata<ct_params_t, minhalo>
     {
-      using parent_t = mpdata<ct_params_t>;
+      using parent_t = mpdata<ct_params_t, minhalo>;
 
       enum { n = 0 }; // just to make n, n+1 look nice :)
 

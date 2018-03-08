@@ -16,10 +16,10 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <class ct_params_t>
-      class mpdata_rhs_vip_prs_common : public mpdata_rhs_vip<ct_params_t>
+      template <class ct_params_t, int minhalo = 0>
+      class mpdata_rhs_vip_prs_common : public mpdata_rhs_vip<ct_params_t, minhalo>
       {
-	using parent_t = mpdata_rhs_vip<ct_params_t>;
+	using parent_t = mpdata_rhs_vip<ct_params_t, minhalo>;
         using ix = typename ct_params_t::ix;
 	using ijk_t = decltype(mpdata_rhs_vip_prs_common<ct_params_t>::ijk);
 
