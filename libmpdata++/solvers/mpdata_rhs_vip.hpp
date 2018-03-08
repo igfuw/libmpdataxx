@@ -24,7 +24,7 @@ namespace libmpdataxx
     class mpdata_rhs_vip<
       ct_params_t, minhalo,
       typename std::enable_if<ct_params_t::n_dims == 1>::type
-    > : public detail::mpdata_rhs_vip_common<ct_params_t>
+    > : public detail::mpdata_rhs_vip_common<ct_params_t, minhalo>
     {
       using ix = typename ct_params_t::ix;
 
@@ -88,7 +88,7 @@ namespace libmpdataxx
     class mpdata_rhs_vip<
       ct_params_t, minhalo,
       typename std::enable_if<ct_params_t::n_dims == 2>::type
-    > : public detail::mpdata_rhs_vip_common<ct_params_t>
+    > : public detail::mpdata_rhs_vip_common<ct_params_t, minhalo>
     {
       using ix = typename ct_params_t::ix;
 
@@ -204,7 +204,7 @@ namespace libmpdataxx
     class mpdata_rhs_vip<
       ct_params_t, minhalo,
       typename std::enable_if<ct_params_t::n_dims == 3>::type
-    > : public detail::mpdata_rhs_vip_common<ct_params_t>
+    > : public detail::mpdata_rhs_vip_common<ct_params_t, minhalo>
     {
       using ix = typename ct_params_t::ix;
 
