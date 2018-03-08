@@ -1,4 +1,4 @@
-### The code reproducing the results of the three numerical tests in the paper *"MPDATA: Third-order accuracy for arbitrary flows"* :
+### The code reproducing the results of the numerical tests in Section 5 of the paper *"MPDATA: Third-order accuracy for variable flows" (J. Comp. Phys. 359 2018)* :
 - Manufactured solution in 3D
 - Moving vortices
 - Reversing deformational flow
