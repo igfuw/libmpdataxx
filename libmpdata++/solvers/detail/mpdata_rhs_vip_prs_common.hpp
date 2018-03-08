@@ -21,7 +21,7 @@ namespace libmpdataxx
       {
 	using parent_t = mpdata_rhs_vip<ct_params_t, minhalo>;
         using ix = typename ct_params_t::ix;
-	using ijk_t = decltype(mpdata_rhs_vip_prs_common<ct_params_t>::ijk);
+	using ijk_t = decltype(mpdata_rhs_vip_prs_common<ct_params_t, minhalo>::ijk);
 
         public:
         using real_t = typename ct_params_t::real_t;
