@@ -280,7 +280,6 @@ namespace libmpdataxx
         );
 
         auto space = aux.getSpace();
-        offst = 0;
         space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
       }
