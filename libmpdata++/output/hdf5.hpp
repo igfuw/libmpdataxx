@@ -302,15 +302,14 @@ namespace libmpdataxx
       // has to be called after const file was created (i.e. after start())
       void record_aux_const(const std::string &name, typename solver_t::real_t data)
       {
-        assert(this->rank == 0);
-        float data_f(data);
+        if(this->mem->distmem.rank==0)
+        {
+          assert(this->rank == 0);
+          float data_f(data);
 
-        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
-#if defined(USE_MPI)
-          , H5P_DEFAULT, fapl_id
-#endif
-        ); // reopen the const file
-        hdfcp.openGroup("/").createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data_f);
+          H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
+          hdfcp.openGroup("/").createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data_f);
+        }
       }
 
       // parameters saved for pure advection solvers
