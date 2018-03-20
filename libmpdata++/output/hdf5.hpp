@@ -302,7 +302,7 @@ namespace libmpdataxx
       // has to be called after const file was created (i.e. after start())
       void record_aux_const(const std::string &name, typename solver_t::real_t data)
       {
-        if(this->mem->distmem.rank==0)
+        if(this->mem->distmem.rank()==0)
         {
           assert(this->rank == 0);
           float data_f(data);
