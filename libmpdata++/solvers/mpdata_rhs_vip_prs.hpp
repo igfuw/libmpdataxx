@@ -57,9 +57,9 @@ namespace libmpdataxx
     class mpdata_rhs_vip_prs<
       ct_params_t, minhalo,
       typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr>::type
-    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, minhalo, 1>
+    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1, minhalo>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, minhalo, 1>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1, minhalo>; 
       using parent_t::parent_t; // inheriting constructors
       
       protected:
@@ -71,9 +71,9 @@ namespace libmpdataxx
     class mpdata_rhs_vip_prs<
       ct_params_t, minhalo,
       typename std::enable_if<(int)ct_params_t::prs_scheme == (int)gcrk>::type
-    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, minhalo, ct_params_t::prs_k_iters>
+    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters, minhalo>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, minhalo, ct_params_t::prs_k_iters>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters, minhalo>; 
       using parent_t::parent_t; // inheriting constructors
       
       protected:

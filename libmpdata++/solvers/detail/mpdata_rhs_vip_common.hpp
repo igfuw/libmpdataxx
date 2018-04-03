@@ -31,7 +31,7 @@ namespace libmpdataxx
     namespace detail
     {
       // 
-      template <class ct_params_t, int minhalo = 0 > 
+      template <class ct_params_t, int minhalo> 
       class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_t, minhalo>
       {
         using ix = typename ct_params_t::ix;

@@ -16,7 +16,7 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <class ct_params_t, int minhalo = 0>
+      template <class ct_params_t, int minhalo>
       class mpdata_rhs_vip_prs_common : public mpdata_rhs_vip<ct_params_t, minhalo>
       {
 	using parent_t = mpdata_rhs_vip<ct_params_t, minhalo>;
