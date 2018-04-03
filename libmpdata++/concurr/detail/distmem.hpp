@@ -98,7 +98,7 @@ public: // TODO: just a temp measure, make it private again
 
         // ctor
         distmem(const std::array<int, n_dims> &grid_size) 
-          : grid_size(grid_size), mpicom(MPI_COMM_WORLD, comm_duplicate) // use a duplicate of MPI_COMM_WORLD
+          : grid_size(grid_size), mpicom(MPI_COMM_WORLD, boost::mpi::comm_duplicate) // use a duplicate of MPI_COMM_WORLD
         {
 #if !defined(USE_MPI)
           if (
