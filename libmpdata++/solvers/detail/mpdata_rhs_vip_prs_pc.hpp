@@ -20,8 +20,8 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <class ct_params_t>
-      class mpdata_rhs_vip_prs_pc : public detail::mpdata_rhs_vip_prs_common<ct_params_t>
+      template <class ct_params_t, int minhalo>
+      class mpdata_rhs_vip_prs_pc : public detail::mpdata_rhs_vip_prs_common<ct_params_t, minhalo>
       {
         public:
 	
@@ -29,7 +29,7 @@ namespace libmpdataxx
 
         private:
 
-	using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t>;
+	using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
         using ix = typename ct_params_t::ix;
 
 	const int pc_iters;

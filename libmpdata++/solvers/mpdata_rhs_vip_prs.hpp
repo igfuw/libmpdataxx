@@ -32,20 +32,20 @@ namespace libmpdataxx
     struct mpdata_rhs_vip_prs_family_tag {};
 
     // the mpdata class
-    template<typename ct_params_t, class enableif = void> 
+    template<typename ct_params_t, int minhalo = 0, class enableif = void> 
     class mpdata_rhs_vip_prs
     {
       static_assert(!std::is_void<enableif>::value, "please specify pressure scheme type !");
     };
 
     // minimal residual
-    template<typename ct_params_t>
+    template<typename ct_params_t, int minhalo>
     class mpdata_rhs_vip_prs<
-      ct_params_t,
+      ct_params_t, minhalo,
       typename std::enable_if<(int)ct_params_t::prs_scheme == (int)mr>::type
-    > : public detail::mpdata_rhs_vip_prs_mr<ct_params_t>
+    > : public detail::mpdata_rhs_vip_prs_mr<ct_params_t, minhalo>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_mr<ct_params_t>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_mr<ct_params_t, minhalo>; 
       using parent_t::parent_t; // inheriting constructors
 
       protected:
@@ -53,13 +53,13 @@ namespace libmpdataxx
     };
 
     // conjugate residual
-    template<typename ct_params_t>
+    template<typename ct_params_t, int minhalo>
     class mpdata_rhs_vip_prs<
-      ct_params_t,
+      ct_params_t, minhalo,
       typename std::enable_if<(int)ct_params_t::prs_scheme == (int)cr>::type
-    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1>
+    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1, minhalo>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1, minhalo>; 
       using parent_t::parent_t; // inheriting constructors
       
       protected:
@@ -67,13 +67,13 @@ namespace libmpdataxx
     };
     
     // generalized conjugate residual
-    template<typename ct_params_t>
+    template<typename ct_params_t, int minhalo>
     class mpdata_rhs_vip_prs<
-      ct_params_t,
+      ct_params_t, minhalo,
       typename std::enable_if<(int)ct_params_t::prs_scheme == (int)gcrk>::type
-    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters>
+    > : public detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters, minhalo>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters, minhalo>; 
       using parent_t::parent_t; // inheriting constructors
       
       protected:
@@ -81,13 +81,13 @@ namespace libmpdataxx
     };
 
     // preconditioned
-    template<typename ct_params_t>
+    template<typename ct_params_t, int minhalo>
     class mpdata_rhs_vip_prs<
-      ct_params_t,
+      ct_params_t, minhalo,
       typename std::enable_if<(int)ct_params_t::prs_scheme == (int)pc>::type
-    > : public detail::mpdata_rhs_vip_prs_pc<ct_params_t>
+    > : public detail::mpdata_rhs_vip_prs_pc<ct_params_t, minhalo>
     {
-      using parent_t = detail::mpdata_rhs_vip_prs_pc<ct_params_t>; 
+      using parent_t = detail::mpdata_rhs_vip_prs_pc<ct_params_t, minhalo>; 
       using parent_t::parent_t; // inheriting constructors
       
       protected:

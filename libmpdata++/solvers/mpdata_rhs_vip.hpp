@@ -15,23 +15,23 @@ namespace libmpdataxx
   {
 
     // to be specialised
-    template <typename ct_params_t, class enableif = void>
+    template <typename ct_params_t, int minhalo = 0, class enableif = void>
     class mpdata_rhs_vip 
     {};
 
     // 1D version
-    template <class ct_params_t> 
+    template <class ct_params_t, int minhalo> 
     class mpdata_rhs_vip<
-      ct_params_t,
+      ct_params_t, minhalo,
       typename std::enable_if<ct_params_t::n_dims == 1>::type
-    > : public detail::mpdata_rhs_vip_common<ct_params_t>
+    > : public detail::mpdata_rhs_vip_common<ct_params_t, minhalo>
     {
       using ix = typename ct_params_t::ix;
 
       protected:
 
       using solver_family = mpdata_rhs_vip_family_tag;
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t, minhalo>;
 
       // member fields
       const rng_t im;
@@ -84,18 +84,18 @@ namespace libmpdataxx
     };
 
     // 2D version
-    template <class ct_params_t> 
+    template <class ct_params_t, int minhalo> 
     class mpdata_rhs_vip<
-      ct_params_t, 
+      ct_params_t, minhalo,
       typename std::enable_if<ct_params_t::n_dims == 2>::type
-    > : public detail::mpdata_rhs_vip_common<ct_params_t>
+    > : public detail::mpdata_rhs_vip_common<ct_params_t, minhalo>
     {
       using ix = typename ct_params_t::ix;
 
       protected:
 
       using solver_family = mpdata_rhs_vip_family_tag;
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t, minhalo>;
 
       // member fields
       const rng_t im, jm;
@@ -200,18 +200,18 @@ namespace libmpdataxx
     };
     
     // 3D version
-    template <class ct_params_t> 
+    template <class ct_params_t, int minhalo> 
     class mpdata_rhs_vip<
-      ct_params_t, 
+      ct_params_t, minhalo,
       typename std::enable_if<ct_params_t::n_dims == 3>::type
-    > : public detail::mpdata_rhs_vip_common<ct_params_t>
+    > : public detail::mpdata_rhs_vip_common<ct_params_t, minhalo>
     {
       using ix = typename ct_params_t::ix;
 
       protected:
       
       using solver_family = mpdata_rhs_vip_family_tag;
-      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t>;
+      using parent_t = detail::mpdata_rhs_vip_common<ct_params_t, minhalo>;
 
       // member fields
       const rng_t im, jm, km;
