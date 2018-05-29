@@ -29,8 +29,8 @@ const_h = h5py.File(fnames[0], "r")
 dt = const_h['advection'].attrs['dt'][0]
 dz = const_h['advection'].attrs['dk'][0]
 g = const_h['boussinesq'].attrs['g'][0]
-tht_ref = const_h['boussinesq'].attrs['Tht_ref'][0] 
-H0 = const_h['boussinesq'].attrs['hflux_const'][0] 
+tht_ref = const_h['boussinesq'].attrs['Tht_ref'][0]
+H0 = const_h['boussinesq'].attrs['hflux_const'][0]
 if subgrid:
     mix_len = np.array(const_h['boussinesq/mix_len'])
 

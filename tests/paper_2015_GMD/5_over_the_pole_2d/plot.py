@@ -28,7 +28,7 @@ reader = OpenDataFile(fname)
 
 # creating the view
 view = CreateRenderView()
-view.Background = [1, 1, 1]  
+view.Background = [1, 1, 1]
 view.CenterAxesVisibility = False
 view.OrientationAxesVisibility = False
 

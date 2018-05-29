@@ -13,7 +13,7 @@ def solution(geo_data, field_data, field, ny):
     X = geo_data[ny]['di'] * np.arange(nx)
     Y = geo_data[ny]['dj'] * (np.arange(ny) + 0.5) - pi / 2
     X, Y = np.meshgrid(X, Y, indexing ='ij')
-    
+
     return asolution(12.0, X, Y)
 
 def main():
