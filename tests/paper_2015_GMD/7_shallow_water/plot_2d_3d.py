@@ -8,7 +8,7 @@ import h5py
 import plot_settings as ps
 
 
-# reading model output from text file and converting to an array    
+# reading model output from text file and converting to an array
 def reading_modeloutput(dir, time):
     dir_model = {}
     f_crd = h5py.File(dir+ "/const.h5", "r")
@@ -26,7 +26,7 @@ def plotting_3D(X, Y, Z):
     ax = fig.gca(projection='3d')
     ax.plot_surface(X, Y, Z, rstride=10, cstride=10, alpha=0.2)
     cset = ax.contourf(X, Y, Z, zdir='z', offset=-0.1, cmap=cm.Blues)
-    fig.colorbar(cset) 
+    fig.colorbar(cset)
     ps.ticks_changes(ax)
     ax.set_xlabel('x')
     ax.set_ylabel('y')
@@ -36,7 +36,7 @@ def plotting_3D(X, Y, Z):
 
 def main(dir, time, xy_lim=8):
     var_model = reading_modeloutput(dir, time)
-    # calculating model output coord.                      
+    # calculating model output coord.
     var_model["x_range"] = np.arange(-xy_lim+var_model["dx"]/2., xy_lim, var_model["dx"])
     var_model["y_range"] = np.arange(-xy_lim+var_model["dy"]/2., xy_lim, var_model["dy"])
     assert(var_model["x_range"].shape[0] == var_model["h"].shape[0]), "domain size differs from model output shape"

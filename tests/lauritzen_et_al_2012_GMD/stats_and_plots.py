@@ -33,12 +33,12 @@ def write_stats(conv, mixing_diags, filament_diags, opt, ny):
 def main():
     geo_data, field_data = prepare_data(sys.argv[1:])
     conv = calc_convergence(geo_data, field_data, '5.0', solution)
-    
+
     nys = [120, 240]
 
     mixing_diags = calc_mixing_diags(geo_data, field_data, nys)
     filament_diags = calc_filament_diags(geo_data, field_data, nys)
-    
+
     for ny in nys:
         for opt in conv.keys():
             write_stats(conv, mixing_diags, filament_diags, opt, ny)

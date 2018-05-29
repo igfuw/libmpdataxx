@@ -42,7 +42,7 @@ def main():
     conv_plot(plot_data, ord_data, fname = 'reversing_deform_conv.pdf')
 
     panel_plot(field_data[120]['nug|iga|div_2nd|div_3rd|fct']['2.5'], fname = 'reversing_deform_panel.pdf')
-   
+
     mixing_ny = 240
     mixing_diags = calc_mixing_diags(geo_data, field_data, nys = [mixing_ny])
 

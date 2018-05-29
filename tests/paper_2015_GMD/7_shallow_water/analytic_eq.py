@@ -3,11 +3,11 @@ import math
 from scipy.optimize import fsolve
 from scipy.integrate import odeint
 
-#eq. 5.6 (Schar&Smolarkiewicz, 1996) 
+#eq. 5.6 (Schar&Smolarkiewicz, 1996)
 def d1_lambda_eq(x, *time):
     return 0.5 * ((x*(x-1.))**0.5 + math.log((x-1.)**0.5 + x**0.5)) - time
 
-# finging roots of lambda_eq 
+# finging roots of lambda_eq
 def d1_lambda_evol(time, x0=1):
     return fsolve(d1_lambda_eq, x0, args=time)
 
@@ -27,10 +27,10 @@ def d1_initial(x):
 
 def d2_rad2(x,y):
     return x**2 + y**2
- 
+
 def d2_lambda_evol(time):
     return (2*time**2 + 1)**0.5
- 
+
 def d2_height(lamb, x, y):
     return np.where(d2_rad2(x,y) <= lamb**2, lamb**-2 * (1. - d2_rad2(x,y)/lamb**2), 0)
 

@@ -4,7 +4,7 @@ import numpy as np
 import h5py
 import analytic_eq as eq
 
-#reading model output and saving as numpy arrays   
+#reading model output and saving as numpy arrays
 def reading_modeloutput(dir, time):
     dir_model = {}
     f_crd = h5py.File(dir+ "/const.h5", "r")
@@ -29,15 +29,15 @@ def errors(dir, time_l, xy_lim):
         var_model["y_range"] = np.arange(-xy_lim+var_model["dy"]/2., xy_lim, var_model["dx"])
         assert(var_model["y_range"].shape[0] == var_model["h"].shape[1]), "domainsize differs from model output shape"
 
-        # calculating the analytical solution 
+        # calculating the analytical solution
         lamb = eq.d2_lambda_evol(time)
         h_an = eq.d2_height_plane(lamb, var_model["x_range"], var_model["y_range"])
-                        
+
         # calculating the errors of the drop depth, eq. 25 and 26 from the paper
         h_diff    = var_model["h"] - h_an
         points_nr = var_model["h"].shape[0] * var_model["h"].shape[1]
-        delh_inf  = abs(h_diff).max() 
-        delh_2    = 1./time * ((h_diff**2).sum() / points_nr )**0.5 
+        delh_inf  = abs(h_diff).max()
+        delh_2    = 1./time * ((h_diff**2).sum() / points_nr )**0.5
 
         # outputing general info
         if time == time_l[0]:
@@ -79,7 +79,7 @@ def errors(dir, time_l, xy_lim):
                                  )
                   )
     file.close()
-        
+
 # printing errors at different time steps
 def evolution_test(dir, time_l=[1,2,3], xy_lim=8):
     errors(dir, time_l, xy_lim)
@@ -88,5 +88,5 @@ def main(dir, casename_l):
     for casename in casename_l:
         print(casename)
         evolution_test(dir + str(casename))
-        
+
 main("./", sys.argv[1:])

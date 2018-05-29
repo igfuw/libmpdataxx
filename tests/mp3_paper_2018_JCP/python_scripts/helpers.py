@@ -35,7 +35,7 @@ def prepare_data(dirnames, chosen_times = []):
         const_file = h5py.File(fnames[0], 'r')
 
         g = const_file['G'][:,:]
-        ndims = len(g.shape) 
+        ndims = len(g.shape)
         ny = g.shape[1]
 
         geo_data[ny] = {'g' : g}
@@ -43,10 +43,10 @@ def prepare_data(dirnames, chosen_times = []):
         geo_data[ny]['dj'] = const_file['advection'].attrs['dj'][0]
         if ndims > 2:
             geo_data[ny]['dk'] = const_file['advection'].attrs['dk'][0]
-        
+
         opts = const_file['advection'].attrs['opts'][0].decode('ASCII')
         times = const_file['T'][:]
-      
+
         if len(chosen_times) > 0:
             indices_t = []
             for m in range(len(times)):
@@ -61,7 +61,7 @@ def prepare_data(dirnames, chosen_times = []):
             data_file = h5py.File(fnames[t+1], 'r')
             for field in data_file['/']:
                 field_data[ny][opts][ts][field] = data_file[field][:,:]
-        
+
     return geo_data, field_data
 
 def calc_convergence(geo_data, field_data, at_time, solution):
