@@ -128,12 +128,12 @@ In order to use the image you have to [install Docker](https://docs.docker.com/i
 Once you have Docker, the image can be downloaded:
 
 ```
-docker pull djarecka/libmpdataxx:latest
+docker pull igfuw/libmpdataxx:latest
 ```
 
 To run the Docker in interactive mode:
 ```
-docker run -it --rm djarecka/libmpdataxx:latest
+docker run -it --rm igfuw/libmpdataxx:latest
 ```
 This will open an interactive `bash` in the container
 and your working directory will be `/usr/local/src/libmpdataxx`.
