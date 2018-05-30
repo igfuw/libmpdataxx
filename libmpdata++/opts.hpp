@@ -70,7 +70,6 @@ namespace libmpdataxx
       }
       return ret.size() > 0 ? ret.substr(1) : "0";
     };
-
   } // namespace opts
 
   struct ct_params_default_t
@@ -91,5 +90,4 @@ namespace libmpdataxx
                                 // order > 1 is mostly useful for convergence tests as it can result
                                 // in negative field values
   };
-
 } // namespace libmpdataxx
