@@ -38,8 +38,12 @@ The .travis.yml file shipped with the library contains a complete
 set of commands needed to build and execute all tests programs
 shipped with libmpdata++ on fresh Ubuntu and OSX installations -
 it may contain useful information on obtaining the dependencies.
+We also provide a Docker image that contains all requirements 
+and the libmpdata++ library.
 
-1. To verify if all dependencies are met, please start with:
+## Installing the library and running tests locally
+
+### 1. To verify if all dependencies are met, please start with:
 ```
   $ cd libmpdata++
   $ mkdir build
@@ -52,7 +56,7 @@ recommended to verify if the library works correctly in your
 environment. Nevertheless, in principle you can skip to step four
 and install the library right away.
   
-2. To perform unit tests, please try:
+### 2. To perform unit tests, please try:
 ```
   $ cd tests/unit
   $ mkdir build
@@ -64,7 +68,7 @@ and install the library right away.
 ```
 The unit tests should complete in a dozen of seconds.
 
-3. To reproduce all results from the GMD paper, please try:
+### 3. To reproduce all results from the GMD paper, please try:
 ```
   $ cd tests/paper_2015_GMD
   $ mkdir build 
@@ -82,7 +86,7 @@ to consecutive chapters in the GMD paper. Some of the scripts run
 by "make test" require additional packages including Python, Python
 libraries (NumPy, SciPy, matplotlib) and Paraview.
 
-4. To install the library system-wide, please try:
+### 4. To install the library system-wide, please try:
 ```
   $ cd libmpdata++/build
   $ sudo make install
@@ -92,7 +96,7 @@ This will copy the libmpdata++ headers into the system include path
 file into the system share directory (e.g. /usr/share/libmpdata++) 
 what will allow CMake users to do find_package(libmpdata++).
 
-Some CMake hints:
+### Some CMake hints:
 - to point CMake to a non-default C++ compiler (e.g. clang++):
 ```
   $ cmake .. -DCMAKE_CXX_COMPILER=clang++ 
@@ -117,3 +121,20 @@ Some CMake hints:
 ```
   $ less Testing/Temporary/LastTest.log
 ```
+
+## Using and testing the library with a [Docker](https://docs.docker.com/) image
+
+In order to use the image you have to [install Docker](https://docs.docker.com/install/).
+Once you have Docker, the image can be downloaded:
+
+```
+docker pull djarecka/libmpdataxx:latest
+```
+
+To run the Docker in interactive mode:
+```
+docker run -it --rm djarecka/libmpdataxx:latest
+```
+This will open an interactive `bash` in the container
+and your working directory will be `/usr/local/src/libmpdataxx`.
+You can repeat step 2 and 3 from the previous part to run the tests.
