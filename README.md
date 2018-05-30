@@ -56,7 +56,7 @@ recommended to verify if the library works correctly in your
 environment. Nevertheless, in principle you can skip to step four
 and install the library right away.
   
-### 2. To perform unit tests, please try:
+### 2. To perform unit tests, please try: {#unit}
 ```
   $ cd tests/unit
   $ mkdir build
@@ -68,7 +68,7 @@ and install the library right away.
 ```
 The unit tests should complete in a dozen of seconds.
 
-### 3. To reproduce all results from the GMD paper, please try:
+### 3. To reproduce all results from the GMD paper, please try: {#GMD}
 ```
   $ cd tests/paper_2015_GMD
   $ mkdir build 
@@ -137,4 +137,4 @@ docker run -it --rm djarecka/libmpdataxx:latest
 ```
 This will open an interactive `bash` in the container
 and your working directory will be `/usr/local/src/libmpdataxx`.
-You can repeat step 2 and 3 from the previous part to run the tests.
+You can repeat the [step 2](#unit) and the [step 3](#GMD) from the previous part to run the tests.
