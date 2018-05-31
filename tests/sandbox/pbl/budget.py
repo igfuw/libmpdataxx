@@ -98,7 +98,7 @@ inb = dssp + hflux + tke_t
 outname = dirname[4:]
 outfile = open('budget_' + outname + '.txt', 'w')
 for lev_d in zip(Z, hflux, tke_t, dssp, inb):
-    outfile.write('{:6.2f} {:10.3e} {:10.3e} {:10.3e} {:10.2e}\n'.format(*lev_d))
+    outfile.write('{:6.2f} {:10.3e} {:10.3e} {:10.3e} {:10.1e}\n'.format(*lev_d))
 
 fig, axarr = plt.subplots(1, 1, figsize= (10, 6))
 axarr.plot(hflux, Z, 'k-', lw = 1, label = 'B')
