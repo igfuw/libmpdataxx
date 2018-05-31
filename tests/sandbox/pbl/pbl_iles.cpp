@@ -9,5 +9,5 @@
 
 int main()
 {
-  test<iles_tag>("out_pbl_iles", 1501);
+  test<iles_tag>("out_pbl_iles", 65, 1501);
 }

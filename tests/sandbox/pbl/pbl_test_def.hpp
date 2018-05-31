@@ -35,9 +35,9 @@ void set_sgs_specific(params_t &p, smg_tag)
 }
 
 template <typename sgs_t>
-void test(const std::string &dirname, const int nt)
+void test(const std::string &dirname, const int np, const int nt)
 {
-  const int nx = 65, ny = 65, nz = 51;
+  const int nx = np, ny = np, nz = 51;
 
   struct ct_params_t : ct_params_default_t
   {
@@ -60,11 +60,13 @@ void test(const std::string &dirname, const int nt)
 
   using solver_t = pbl<ct_params_t>;
 
+  const int scale = 64 / (np - 1);
+
   typename solver_t::rt_params_t p;
   p.n_iters = 2;
-  p.dt = 10;
-  p.di = 50;
-  p.dj = 50;
+  p.dt = 10 * scale;
+  p.di = 50 * scale;
+  p.dj = 50 * scale;
   p.dk = 30;
   p.grid_size = {nx, ny, nz};
   p.prs_tol = 1e-6;

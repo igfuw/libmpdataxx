@@ -3,23 +3,23 @@
 	<Domain>
 		<Grid Name="Grid" GridType="Uniform" xml:id="gid">
 			<Time Value="0.000000"/>
-			<Topology TopologyType="3DSMesh" Dimensions="66 66 52 "/>
+			<Topology TopologyType="3DSMesh" Dimensions="34 34 52 "/>
 			<Geometry GeometryType="X_Y_Z">
-				<DataItem Dimensions="66 66 52 " NumberType="Float" Format="HDF">const.h5:/X</DataItem>
-				<DataItem Dimensions="66 66 52 " NumberType="Float" Format="HDF">const.h5:/Y</DataItem>
-				<DataItem Dimensions="66 66 52 " NumberType="Float" Format="HDF">const.h5:/Z</DataItem>
+				<DataItem Dimensions="34 34 52 " NumberType="Float" Format="HDF">const.h5:/X</DataItem>
+				<DataItem Dimensions="34 34 52 " NumberType="Float" Format="HDF">const.h5:/Y</DataItem>
+				<DataItem Dimensions="34 34 52 " NumberType="Float" Format="HDF">const.h5:/Z</DataItem>
 			</Geometry>
 			<Attribute Name="tht" AttributeType="Scalar" Center="Cell">
-				<DataItem Dimensions="65 65 51 " NumberType="Float" Format="HDF">timestep0000000000.h5:/tht</DataItem>
+				<DataItem Dimensions="33 33 51 " NumberType="Float" Format="HDF">timestep0000000000.h5:/tht</DataItem>
 			</Attribute>
 			<Attribute Name="u" AttributeType="Scalar" Center="Cell">
-				<DataItem Dimensions="65 65 51 " NumberType="Float" Format="HDF">timestep0000000000.h5:/u</DataItem>
+				<DataItem Dimensions="33 33 51 " NumberType="Float" Format="HDF">timestep0000000000.h5:/u</DataItem>
 			</Attribute>
 			<Attribute Name="v" AttributeType="Scalar" Center="Cell">
-				<DataItem Dimensions="65 65 51 " NumberType="Float" Format="HDF">timestep0000000000.h5:/v</DataItem>
+				<DataItem Dimensions="33 33 51 " NumberType="Float" Format="HDF">timestep0000000000.h5:/v</DataItem>
 			</Attribute>
 			<Attribute Name="w" AttributeType="Scalar" Center="Cell">
-				<DataItem Dimensions="65 65 51 " NumberType="Float" Format="HDF">timestep0000000000.h5:/w</DataItem>
+				<DataItem Dimensions="33 33 51 " NumberType="Float" Format="HDF">timestep0000000000.h5:/w</DataItem>
 			</Attribute>
 		</Grid>
 	</Domain>
