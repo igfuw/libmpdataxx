@@ -126,14 +126,16 @@ what will allow CMake users to do find_package(libmpdata++).
 
 ## Using and testing the library with a [Docker](https://docs.docker.com/) image
 
-In order to use the image you have to [install Docker](https://docs.docker.com/install/).
+- In order to use the image you have to [install Docker](https://docs.docker.com/install/).
 Once you have Docker, the image can be downloaded:
 
 ```
 docker pull igfuw/libmpdataxx:latest
 ```
+You can also download an image with a specific version of the library,
+a full list of available tags can be found [here](https://hub.docker.com/r/igfuw/libmpdataxx/tags/).
 
-To run the Docker in interactive mode:
+- To run the Docker in interactive mode:
 ```
 docker run -it --rm igfuw/libmpdataxx:latest
 ```
