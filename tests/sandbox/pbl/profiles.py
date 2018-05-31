@@ -52,7 +52,7 @@ var_w /= w_scale ** 2
 outname = dirname[4:]
 outfile = open('profiles_' + outname + '.txt', 'w')
 for lev_d in zip(Z, hflux, var_th, var_w):
-    outfile.write('{:6.2f} {:10.4e} {:10.4e} {:10.4e}\n'.format(*lev_d))
+    outfile.write('{:6.2f} {:10.3e} {:10.3e} {:10.3e}\n'.format(*lev_d))
 
 # plot profiles
 fig, axarr = plt.subplots(1, 3, figsize= (10, 6))
