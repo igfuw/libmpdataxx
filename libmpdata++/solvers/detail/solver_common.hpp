@@ -133,6 +133,11 @@ namespace libmpdataxx
 #endif
         }
 
+        virtual void hook_ante_delayed_step() 
+        { 
+          // add similar sanity check here
+        }
+
         virtual void hook_post_step() 
         {
 #if !defined(NDEBUG)
@@ -267,14 +272,27 @@ namespace libmpdataxx
             
             hook_ante_step();
 
-	    for (int e = 0; e < n_eqns; ++e) scale(e, ct_params_t::hint_scale(e));
-
-	    for (int e = 0; e < n_eqns; ++e) xchng(e);
-	    for (int e = 0; e < n_eqns; ++e) 
-            { 
+	    for (int e = 0; e < n_eqns; ++e)
+            {
+              if (opts::isset(ct_params_t::delayed_step, opts::bit(e))) continue;
+              scale(e, ct_params_t::hint_scale(e));
+	      xchng(e);
               advop(e);
-              if (e != n_eqns - 1) mem->barrier();
+              mem->barrier(); // TODO: barrier only needed between advop calls
             }
+
+            hook_ante_delayed_step();
+
+	    for (int e = 0; e < n_eqns; ++e)
+            {
+              if (!opts::isset(ct_params_t::delayed_step, opts::bit(e))) continue;
+              scale(e, ct_params_t::hint_scale(e));
+	      xchng(e);
+              advop(e);
+              mem->barrier(); // TODO: barrier only needed between advop calls
+                              // TODO2: barrier not needed after the last one in the loop
+            }
+
 	    for (int e = 0; e < n_eqns; ++e) cycle(e); // note: cycle assumes ascending loop index
 
 	    for (int e = 0; e < n_eqns; ++e) scale(e, -ct_params_t::hint_scale(e));
