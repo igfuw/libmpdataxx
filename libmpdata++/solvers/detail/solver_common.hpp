@@ -141,9 +141,10 @@ namespace libmpdataxx
       
 #if !defined(NDEBUG)
         bool 
-          hook_ante_step_called = true, // initially true to handle nt=0 
-          hook_post_step_called = true, // 
-          hook_ante_loop_called = true;
+          hook_ante_step_called         = true, // initially true to handle nt=0 
+          hook_ante_delayed_step_called = true, 
+          hook_post_step_called         = true,  
+          hook_ante_loop_called         = true;
 #endif
 
 
@@ -159,7 +160,10 @@ namespace libmpdataxx
 
         virtual void hook_ante_delayed_step() 
         { 
-          // TODO: add similar sanity check here?
+          // sanity check if all subclasses call their parents' hooks
+#if !defined(NDEBUG)
+          hook_ante_delayed_step_called = true;
+#endif
         }
 
         virtual void hook_post_step() 
@@ -235,6 +239,7 @@ namespace libmpdataxx
 	  assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
 	  assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
 	  assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
+	  assert(hook_ante_delayed_step_called && "any overriding hook_ante_delayed_step() must call parent_t::hook_ante_delayed_step()");
 #endif
         }
 
@@ -259,6 +264,7 @@ namespace libmpdataxx
 #if !defined(NDEBUG)
 	  hook_ante_step_called = false;
 	  hook_post_step_called = false;
+	  hook_ante_delayed_step_called = false;
 #endif
           // higher-order temporal interpolation for output requires doing a few additional steps
           int additional_steps = ct_params_t::out_intrp_ord;
