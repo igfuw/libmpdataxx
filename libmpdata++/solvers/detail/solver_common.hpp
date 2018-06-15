@@ -29,6 +29,7 @@ namespace libmpdataxx
         return a > b ? a : b;
       }
 
+
       template <typename ct_params_t, int n_tlev_, int minhalo>
       class solver_common
       {
@@ -47,6 +48,7 @@ namespace libmpdataxx
         using ix = typename ct_params_t::ix;
 
         using advance_arg_t = typename std::conditional<ct_params_t::var_dt, real_t, int>::type;
+
 
 	protected: 
         // TODO: output common doesnt know about ct_params_t
@@ -72,10 +74,20 @@ namespace libmpdataxx
 	// helper methods invoked by solve()
 	virtual void advop(int e) = 0;
 
+        // helper method telling us if equation e is the last one advected assuming increasing order, 
+        // but taking into account possible delay of advection of some equations
+        // and assuming that is_last_eqn is not called for delayed equations before it's called for non-delayed equations
+        constexpr bool is_last_eqn(int e)
+        {
+          return
+            (!opts::most_significant(ct_params_t::delayed_step) && e == n_eqns-1) ||    // no equations with delayed step
+            (e == opts::most_significant(ct_params_t::delayed_step)-1);                 // last of the delayed equations
+        }
+
 	virtual void cycle(int e) final
 	{ 
 	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
-          if (e == n_eqns - 1) mem->cycle(rank); 
+          if(is_last_eqn(e)) mem->cycle(rank); 
 	}
 
 	virtual void xchng(int e) = 0;
@@ -96,6 +108,17 @@ namespace libmpdataxx
         virtual bool calc_gc() {return false;}
 
         virtual void scale_gc(const real_t time, const real_t cur_dt, const real_t old_dt) = 0;
+
+        void solve_loop_body(const int e)
+        {
+          scale(e, ct_params_t::hint_scale(e));
+	  xchng(e);
+          advop(e);
+          if(!is_last_eqn(e))
+            mem->barrier();
+	  cycle(e);  // note: assuming ascending order, mem->cycle is done after the lest eqn
+          scale(e, -ct_params_t::hint_scale(e));
+        }
 
         // thread-aware range extension
         template <class n_t>
@@ -123,6 +146,7 @@ namespace libmpdataxx
           hook_ante_loop_called = true;
 #endif
 
+
         protected:
 
         virtual void hook_ante_step() 
@@ -135,7 +159,7 @@ namespace libmpdataxx
 
         virtual void hook_ante_delayed_step() 
         { 
-          // add similar sanity check here
+          // TODO: add similar sanity check here?
         }
 
         virtual void hook_post_step() 
@@ -275,10 +299,7 @@ namespace libmpdataxx
 	    for (int e = 0; e < n_eqns; ++e)
             {
               if (opts::isset(ct_params_t::delayed_step, opts::bit(e))) continue;
-              scale(e, ct_params_t::hint_scale(e));
-	      xchng(e);
-              advop(e);
-              mem->barrier(); // TODO: barrier only needed between advop calls
+              solve_loop_body(e);
             }
 
             hook_ante_delayed_step();
@@ -286,16 +307,8 @@ namespace libmpdataxx
 	    for (int e = 0; e < n_eqns; ++e)
             {
               if (!opts::isset(ct_params_t::delayed_step, opts::bit(e))) continue;
-              scale(e, ct_params_t::hint_scale(e));
-	      xchng(e);
-              advop(e);
-              mem->barrier(); // TODO: barrier only needed between advop calls
-                              // TODO2: barrier not needed after the last one in the loop
+              solve_loop_body(e);
             }
-
-	    for (int e = 0; e < n_eqns; ++e) cycle(e); // note: cycle assumes ascending loop index
-
-	    for (int e = 0; e < n_eqns; ++e) scale(e, -ct_params_t::hint_scale(e));
 
             timestep++;
             time = ct_params_t::var_dt ? time + dt : timestep * dt;
