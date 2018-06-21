@@ -25,6 +25,12 @@ namespace libmpdataxx
       return 0 != (x & y);
     }
 
+    // return position of the most significant bit
+    constexpr int most_significant(const opts_t &x)
+    {
+      return x == 0 ? 0. : int(log(x)/log(2)) + 1;
+    }
+
     enum
     {
       fct = opts::bit(0), // flux-corrected transport
@@ -76,6 +82,7 @@ namespace libmpdataxx
   {
     enum { opts = opts::iga | opts::fct };
     enum { hint_norhs = 0 };
+    enum { delayed_step = 0 };
     struct ix {};
     static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
     enum { var_dt = false};
