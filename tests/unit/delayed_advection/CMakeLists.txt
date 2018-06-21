@@ -1,0 +1,1 @@
+libmpdataxx_add_test(delayed_advection)
