@@ -204,7 +204,7 @@ namespace libmpdataxx
           }
         }
 
-	void hook_ante_loop(const int nt)
+	void hook_ante_loop(const typename parent_t::advance_arg_t nt)
 	{
           // fill Courant numbers with zeros so that the divergence test does no harm
           if (this->rank == 0)
