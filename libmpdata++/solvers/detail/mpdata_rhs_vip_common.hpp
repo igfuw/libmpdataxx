@@ -45,65 +45,105 @@ namespace libmpdataxx
 	arrvec_t<typename parent_t::arr_t> &stash, &vip_rhs;
         typename parent_t::real_t eps;
 
-	virtual void fill_stash() = 0;
-	virtual void fill_stash_helper(const int d, const int e) final
+        arrvec_t<typename parent_t::arr_t>& vip_stash(const int t_lev)
+        {
+          // t_lev ==  0 -> output for extrapolation/derivatives
+          // t_lev == -1 -> (n-1) state
+          // t_lev == -2 -> (n-2) state, only available with div3_mpdata
+          
+          static thread_local arrvec_t<typename parent_t::arr_t> ret;
+          ret.resize(parent_t::n_dims);
+          for (int d = 0; d < parent_t::n_dims; ++d)
+          {
+            if (!ct_params_t::var_dt && !parent_t::div3_mpdata)
+            {
+              assert(t_lev == 0 || t_lev == -1);
+              // for dt constant in time we can
+              // use the same stash since we don't need the previous state any more
+              auto& comp = stash[d];
+              ret.replace(ret.begin() + d, this->mem->never_delete(&(comp)));
+            }
+            else if (!parent_t::div3_mpdata)
+            {
+              // for dt variable in time, however, we have to perform multiple
+              // extrapolations per time step and we need to keep the previous state
+              assert(t_lev == 0 || t_lev == -1);
+              auto &comp = stash[d - t_lev *  ct_params_t::n_dims];
+              ret.replace(ret.begin() + d, this->mem->never_delete(&(comp)));
+            }
+            else
+            {
+              // for the fully third-order mpdata we need to keep both the (n-1)
+              // and the (n-2) state and juggle them around to avoid array copying
+              assert(t_lev == 0 || t_lev == -1 || t_lev == -2);
+              auto& comp = (t_lev == 0 ? stash[d] :
+                this->timestep % 2 == 0 ? stash[d - t_lev * ct_params_t::n_dims] : 
+                  stash[d + (3 + t_lev) * ct_params_t::n_dims]
+              );
+              ret.replace(ret.begin() + d, this->mem->never_delete(&(comp)));
+            }
+          }
+          return ret;
+        }
+
+        virtual void fill_stash_helper(const int d) final
 	{
+          // for third-order mpdata saving to t_lev == -2 so that it becomes -1 at the next time step
+          int save_t_lev = parent_t::div3_mpdata ? -2 : -1;
 	  if (ix::vip_den == -1)
-	    this->stash[d](this->ijk) = this->state(e)(this->ijk);
+	    vip_stash(save_t_lev)[d](this->ijk) = vips()[d](this->ijk);
 	  else if (eps == 0) // this is the default  
           {
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
-            this->stash[d](this->ijk) = this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk);
+            vip_stash(save_t_lev)[d](this->ijk) = vips()[d](this->ijk) / this->state(ix::vip_den)(this->ijk);
           }
 	  else
 	  {  
-	    this->stash[d](this->ijk) = where(
+	    vip_stash(save_t_lev)[d](this->ijk) = where(
 	      // if
 	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
-	      this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk),
+	      vips()[d](this->ijk) / this->state(ix::vip_den)(this->ijk),
 	      // else
 	      0
 	    );
 	  }
 
-          assert(std::isfinite(sum(this->stash[d](this->ijk))));
+          assert(std::isfinite(sum(vip_stash(save_t_lev)[d](this->ijk))));
 	}
+
+        void fill_stash() 
+        {
+          for (int d = 0; d < ct_params_t::n_dims; ++d) fill_stash_helper(d);
+        }
 
 	void extrp(const int d, const int e) // extrapolate velocity field in time to t+1/2
 	{                 
 	  using namespace arakawa_c;
 
-          const auto beta = this->dt / (2 * this->prev_dt);
+          const auto beta = this->dt_stash[0] > 0 ? this->dt / (2 * this->dt_stash[0]) : 0;
 
-          // for dt constant in time we can
-          // write the result to stash since we don't need the previous state any more
-          // for dt variable in time, however, we have to perform multiple
-          // extrapolations per time step and we need to keep the previous state
-          // hence the need for another output variable masqueraded as stash[d + offset]
-          const auto outd = d + (ct_params_t::var_dt ? ct_params_t::n_dims : 0);
-
-          if (!ct_params_t::var_dt)
+          if (!ct_params_t::var_dt && !parent_t::div3_mpdata)
           {
-	    this->stash[outd](this->ijk) *= -beta;
+	    this->vip_stash(0)[d](this->ijk) *= -beta;
           }
           else
           {
-	    this->stash[outd](this->ijk) = -beta * this->stash[d](this->ijk);
+	    this->vip_stash(0)[d](this->ijk) = -beta * this->vip_stash(-1)[d](this->ijk);
           }
 
 	  if (ix::vip_den == -1) 
-	    this->stash[outd](this->ijk) += (1 + beta) * this->state(e)(this->ijk);
+	    this->vip_stash(0)[d](this->ijk) += (1 + beta) * this->state(e)(this->ijk);
 	  else if (eps == 0) //this is the default
           {             
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
-	    this->stash[outd](this->ijk) += (1 + beta) * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
+	    this->vip_stash(0)[d](this->ijk) += (1 + beta) * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
           }
 	  else
 	  {
-	    this->stash[outd](this->ijk) += where(
+	    this->vip_stash(0)[d](this->ijk) += where(
 	      // if
 	      this->state(ix::vip_den)(this->ijk) > eps,
 	      // then
@@ -113,7 +153,7 @@ namespace libmpdataxx
 	    );  
 	  }
 
-          assert(std::isfinite(sum(this->stash[outd](this->ijk))));
+          assert(std::isfinite(sum(this->vip_stash(0)[d](this->ijk))));
 	}   
 
 	arrvec_t<typename parent_t::arr_t>& vips()
@@ -126,7 +166,8 @@ namespace libmpdataxx
         }
 
 	virtual void extrapolate_in_time() = 0;
-	virtual void interpolate_in_space() = 0;
+	virtual void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &dst,
+                                          const arrvec_t<typename parent_t::arr_t> &src) = 0;
 
         virtual void vip_rhs_impl_init()
         {
@@ -211,10 +252,16 @@ namespace libmpdataxx
             for (int d=0; d < parent_t::n_dims; ++d) this->mem->GC.at(d) = 0; 
           this->mem->barrier();
 
+          for (int d = 0; d < parent_t::n_dims; ++d)
+          {
+            // these arrays should be multiplied by zeros if used before
+            // they are available but to avoid problems with NaNs we fill them with zeros anyway
+            vip_stash(-1)[d](this->ijk) = 0;
+            if (parent_t::div3_mpdata) vip_stash(-2)[d](this->ijk) = 0;
+          }
+
 	  parent_t::hook_ante_loop(nt);
 	  
-	  // to make extrapolation possible at the first time-step
-	  fill_stash();
           vip_rhs_impl_init();
 	}
 
@@ -224,12 +271,47 @@ namespace libmpdataxx
 	  extrapolate_in_time();
 
 	  //interpolate from velocity field to courant field (mpdata needs courant numbers from t+1/2)
-	  interpolate_in_space();
+	  interpolate_in_space(this->mem->GC, vip_stash(0));
 
           // TODO: why???
 	  this->mem->barrier();
 
           return true;
+        }
+        
+        void calc_ndt_gc() final
+        {
+          if (parent_t::div3_mpdata)
+          {
+            auto ex = this->halo - 1;
+            if (this->dt_stash[0] > 0)
+            {
+              for (int d = 0; d < parent_t::n_dims; ++d)
+              {
+                vip_stash(0)[d](this->ijk) = this->dt * (vips()[d](this->ijk) - vip_stash(-1)[d](this->ijk)) / this->dt_stash[0];
+                this->xchng_pres(this->vip_stash(0)[d], this->ijk, ex);
+              }
+              interpolate_in_space(this->mem->ndt_GC, vip_stash(0));
+              this->mem->barrier();
+            }
+            
+            if (this->dt_stash[0] > 0 && this->dt_stash[1] > 0)
+            {
+              for (int d = 0; d < parent_t::n_dims; ++d)
+              {
+                vip_stash(0)[d](this->ijk) = this->dt * this->dt * (
+                                                  this->dt_stash[1] * vips()[d](this->ijk)
+                                                - (this->dt_stash[1] + this->dt_stash[0]) * vip_stash(-1)[d](this->ijk)
+                                                + this->dt_stash[0] * vip_stash(-2)[d](this->ijk)
+                                             ) / ( this->dt_stash[0] * this->dt_stash[1]
+                                                 * 0.5 * (this->dt_stash[0] + this->dt_stash[1])
+                                             );
+                this->xchng_pres(this->vip_stash(0)[d], this->ijk, ex);
+              }
+              interpolate_in_space(this->mem->ndtt_GC, vip_stash(0));
+              this->mem->barrier();
+            }
+          }
         }
 
 	void hook_ante_step()
@@ -266,7 +348,8 @@ namespace libmpdataxx
           const int &n_iters
 	) {
 	  parent_t::alloc(mem, n_iters);
-	  parent_t::alloc_tmp_sclr(mem, __FILE__, (ct_params_t::var_dt ? 2 : 1) * parent_t::n_dims); // stash
+	  parent_t::alloc_tmp_sclr(mem, __FILE__,
+            (parent_t::div3_mpdata ? 3 : ct_params_t::var_dt ? 2 : 1) * parent_t::n_dims); // stash
 	  parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_dims); // vip_rhs
 	}
  

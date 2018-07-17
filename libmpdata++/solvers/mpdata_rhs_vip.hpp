@@ -36,35 +36,28 @@ namespace libmpdataxx
       // member fields
       const rng_t im;
 
-      void fill_stash() final
-      {
-        this->fill_stash_helper(0, ix::vip_i);
-      }
-
-      void interpolate_in_space() final
+      void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &dst,
+                                const arrvec_t<typename parent_t::arr_t> &src) final
       {
         using namespace libmpdataxx::arakawa_c;
-        
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
-
 	if (!this->mem->G)
 	{
-	  this->mem->GC[0](im + h) = this->dt / this->di * .5 * (
-	    this->stash[0 + off](im    ) + 
-	    this->stash[0 + off](im + 1)
+	  dst[0](im + h) = this->dt / this->di * .5 * (
+	    src[0](im    ) + 
+	    src[0](im + 1)
 	  );
 	} 
 	else
 	{ 
 	  assert(false); // TODO: and if G is not const...
 	}
+        this->xchng_vctr_alng(dst, /*ad*/ false, /*cyclic*/ true);
       }
 
       void extrapolate_in_time() final
       {
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
 	this->extrp(0, ix::vip_i);     
-	this->xchng_sclr(this->stash[0 + off]);      // filling halos 
+	this->xchng_sclr(this->vip_stash(0)[0]);      // filling halos 
       }
 
       public:
@@ -100,15 +93,10 @@ namespace libmpdataxx
       // member fields
       const rng_t im, jm;
 
-      void fill_stash() final 
-      {
-        this->fill_stash_helper(0, ix::vip_i);
-        this->fill_stash_helper(1, ix::vip_j);
-      }
-
       template<int d, class arr_t> 
       void intrp(
-	const arr_t psi,
+	arr_t &dst,
+	const arr_t &src,
 	const rng_t &i, 
 	const rng_t &j, 
 	const typename ct_params_t::real_t &di 
@@ -119,44 +107,41 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
-	    psi(pi<d>(i,    j)) + 
-	    psi(pi<d>(i + 1,j))
+	  dst(pi<d>(i+h,j)) = this->dt / di * .5 * (
+	    src(pi<d>(i,    j)) + 
+	    src(pi<d>(i + 1,j))
 	  );
 	} 
 	else
 	{ 
-	  this->mem->GC[d](pi<d>(i+h,j)) = this->dt / di * .5 * (
-	    (*this->mem->G)(pi<d>(i,    j)) * psi(pi<d>(i,    j)) + 
-	    (*this->mem->G)(pi<d>(i + 1,j)) * psi(pi<d>(i + 1,j))
+	  dst(pi<d>(i+h,j)) = this->dt / di * .5 * (
+	    (*this->mem->G)(pi<d>(i,    j)) * src(pi<d>(i,    j)) + 
+	    (*this->mem->G)(pi<d>(i + 1,j)) * src(pi<d>(i + 1,j))
 	  );
 	}
       }  
 
-      void interpolate_in_space() final
+      void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &dst,
+                                const arrvec_t<typename parent_t::arr_t> &src) final
       {
-        using namespace libmpdataxx::arakawa_c;
-
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
         auto ex = this->halo - 1;
-	intrp<0>(this->stash[0 + off], im^ex, this->j^ex, this->di);
-	intrp<1>(this->stash[1 + off], jm^ex, this->i^ex, this->dj);
-        this->xchng_vctr_alng(this->mem->GC, /*ad*/ false, /*cyclic*/ true);
-        this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex, /*cyclic*/ false);
+	intrp<0>(src[0], dst[0], im^ex, this->j^ex, this->di);
+	intrp<1>(src[0], dst[1], jm^ex, this->i^ex, this->dj);
+        this->xchng_vctr_alng(dst, /*ad*/ false, /*cyclic*/ true);
+        this->xchng_vctr_nrml(dst, this->ijk, ex, /*cyclic*/ false);
       }
 
       void extrapolate_in_time() final
       {
         using namespace libmpdataxx::arakawa_c; 
 
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
 	this->extrp(0, ix::vip_i);
         // using xchng_pres because bcs have to be consistent with those used in
         // pressure solver to obtain non-divergent advector field
         auto ex = this->halo - 1;
-	this->xchng_pres(this->stash[0 + off], this->ijk, ex);
 	this->extrp(1, ix::vip_j);
-	this->xchng_pres(this->stash[1 + off], this->ijk, ex);
+	this->xchng_pres(this->vip_stash(0)[0], this->ijk, ex);
+	this->xchng_pres(this->vip_stash(0)[1], this->ijk, ex);
       }
 
       public:
@@ -216,16 +201,10 @@ namespace libmpdataxx
       // member fields
       const rng_t im, jm, km;
 
-      void fill_stash() final 
-      {
-        this->fill_stash_helper(0, ix::vip_i);
-        this->fill_stash_helper(1, ix::vip_j);
-        this->fill_stash_helper(2, ix::vip_k);
-      }
-
       template<int d, class arr_t> 
       void intrp(
-	const arr_t psi,
+	arr_t &dst,
+	const arr_t &src,
 	const rng_t &i, 
 	const rng_t &j, 
 	const rng_t &k, 
@@ -237,47 +216,44 @@ namespace libmpdataxx
   
 	if (!this->mem->G)
 	{
-	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
-	    psi(pi<d>(i,     j, k)) + 
-	    psi(pi<d>(i + 1, j, k))
+	  dst(pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+	    src(pi<d>(i,     j, k)) + 
+	    src(pi<d>(i + 1, j, k))
 	  );
 	} 
 	else
 	{ 
-	  this->mem->GC[d](pi<d>(i+h, j, k)) = this->dt / di * .5 * (
-	    (*this->mem->G)(pi<d>(i  , j, k)) * psi(pi<d>(i,   j, k)) + 
-	    (*this->mem->G)(pi<d>(i+1, j, k)) * psi(pi<d>(i+1, j, k))
+	  dst(pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+	    (*this->mem->G)(pi<d>(i  , j, k)) * src(pi<d>(i,   j, k)) + 
+	    (*this->mem->G)(pi<d>(i+1, j, k)) * src(pi<d>(i+1, j, k))
 	  );
 	}
       }  
 
-      void interpolate_in_space() final
+      void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &dst,
+                                const arrvec_t<typename parent_t::arr_t> &src) final
       {
-        using namespace libmpdataxx::arakawa_c;
-        
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
         auto ex = this->halo - 1;
-	intrp<0>(this->stash[0 + off], im^ex, this->j^ex, this->k^ex, this->di);
-	intrp<1>(this->stash[1 + off], jm^ex, this->k^ex, this->i^ex, this->dj);
-	intrp<2>(this->stash[2 + off], km^ex, this->i^ex, this->j^ex, this->dk);
-        this->xchng_vctr_alng(this->mem->GC, /*ad*/ false, /*cyclic*/ true);
-        this->xchng_vctr_nrml(this->mem->GC, this->ijk, ex, /*cyclic*/ false);
+	intrp<0>(dst[0], src[0], im^ex, this->j^ex, this->k^ex, this->di);
+	intrp<1>(dst[1], src[1], jm^ex, this->k^ex, this->i^ex, this->dj);
+	intrp<2>(dst[2], src[2], km^ex, this->i^ex, this->j^ex, this->dk);
+        this->xchng_vctr_alng(dst, /*ad*/ false, /*cyclic*/ true);
+        this->xchng_vctr_nrml(dst, this->ijk, ex, /*cyclic*/ false);
       }
 
       void extrapolate_in_time() final
       {
         using namespace libmpdataxx::arakawa_c; 
 
-        const auto off = ct_params_t::var_dt ? ct_params_t::n_dims : 0;
         // using xchng_pres because bcs have to be consistent with those used in
         // pressure solver to obtain non-divergent advector field
         auto ex = this->halo - 1;
 	this->extrp(0, ix::vip_i);     
-	this->xchng_pres(this->stash[0 + off], this->ijk, ex);
 	this->extrp(1, ix::vip_j);
-	this->xchng_pres(this->stash[1 + off], this->ijk, ex);
 	this->extrp(2, ix::vip_k);
-	this->xchng_pres(this->stash[2 + off], this->ijk, ex);
+	this->xchng_pres(this->vip_stash(0)[0], this->ijk, ex);
+	this->xchng_pres(this->vip_stash(0)[1], this->ijk, ex);
+	this->xchng_pres(this->vip_stash(0)[2], this->ijk, ex);
       }
 
       public:

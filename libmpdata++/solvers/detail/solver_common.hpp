@@ -29,7 +29,6 @@ namespace libmpdataxx
         return a > b ? a : b;
       }
 
-
       template <typename ct_params_t, int n_tlev_, int minhalo>
       class solver_common
       {
@@ -52,14 +51,19 @@ namespace libmpdataxx
 
 	protected: 
         // TODO: output common doesnt know about ct_params_t
-        bool var_dt = ct_params_t::var_dt;
+        static constexpr bool var_dt = ct_params_t::var_dt;
+
+        // for convenience
+        static constexpr bool div3_mpdata = opts::isset(ct_params_t::opts, opts::div_3rd)    ||
+                                            opts::isset(ct_params_t::opts, opts::div_3rd_dt)  ;
 
         std::array<std::array<bcp_t, 2>, n_dims> bcs;
 
         const int rank;
 
         // di, dj, dk declared here for output purposes
-        real_t prev_dt, dt, di, dj, dk, max_abs_div_eps, max_courant;
+        real_t dt, di, dj, dk, max_abs_div_eps, max_courant;
+        std::array<real_t, div3_mpdata ? 2 : 1> dt_stash;
         std::array<real_t, n_dims> dijk;
 
 	const idx_t<n_dims> ijk;
@@ -106,8 +110,11 @@ namespace libmpdataxx
        
         // return false if advector does not change in time
         virtual bool calc_gc() {return false;}
+       
+        // used to calculate nondimensionalised first and second time derivatives of advector
+        virtual void calc_ndt_gc() {}
 
-        virtual void scale_gc(const real_t time, const real_t cur_dt, const real_t old_dt) = 0;
+        virtual void scale_gc(const real_t time, const real_t cur_dt, const real_t prev_dt) = 0;
 
         void solve_loop_body(const int e)
         {
@@ -188,6 +195,7 @@ namespace libmpdataxx
             real_t cfl = courant_number(mem->GC);
             if (cfl > 0)
             {
+              auto prev_dt = dt;
               dt *= max_courant / cfl;
               scale_gc(time, dt, prev_dt);
             }
@@ -212,7 +220,7 @@ namespace libmpdataxx
           const decltype(ijk) &ijk
         ) :
           rank(rank), 
-          prev_dt(p.dt),
+          dt_stash{},
           dt(p.dt),
           di(0),
           dj(0),
@@ -300,6 +308,10 @@ namespace libmpdataxx
               }
             }
             
+            // once we set the time step
+            // for third-order MPDATA we need to calculate time derivatives of the advector field
+            if (var_gc && div3_mpdata) calc_ndt_gc();
+            
             hook_ante_step();
 
 	    for (int e = 0; e < n_eqns; ++e)
@@ -318,7 +330,8 @@ namespace libmpdataxx
 
             timestep++;
             time = ct_params_t::var_dt ? time + dt : timestep * dt;
-            prev_dt = dt;
+            if (div3_mpdata) dt_stash[1] = dt_stash[0];
+            dt_stash[0] = dt;
             hook_post_step();
 
             if (time >= nt) additional_steps--;

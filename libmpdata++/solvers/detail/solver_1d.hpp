@@ -39,6 +39,13 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
+        // no pressure solver in 1D but this function needs to be present for dimension independant code,
+        // should be only used with cyclic boundary conditions where xchng_pres == xchng_sclr
+        virtual void xchng_pres(typename parent_t::arr_t &arr, const idx_t<1>&, const int ext = 0) final
+        {
+          xchng_sclr(arr);
+        }
+
 	void xchng(int e) final
 	{
           xchng_sclr(this->mem->psi[e][ this->n[e]]);
