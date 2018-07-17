@@ -124,9 +124,10 @@ namespace libmpdataxx
       void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &dst,
                                 const arrvec_t<typename parent_t::arr_t> &src) final
       {
+        using namespace arakawa_c; // for rng_t operator^
         auto ex = this->halo - 1;
-	intrp<0>(src[0], dst[0], im^ex, this->j^ex, this->di);
-	intrp<1>(src[0], dst[1], jm^ex, this->i^ex, this->dj);
+	intrp<0>(dst[0], src[0], im^ex, this->j^ex, this->di);
+	intrp<1>(dst[1], src[1], jm^ex, this->i^ex, this->dj);
         this->xchng_vctr_alng(dst, /*ad*/ false, /*cyclic*/ true);
         this->xchng_vctr_nrml(dst, this->ijk, ex, /*cyclic*/ false);
       }
@@ -233,6 +234,7 @@ namespace libmpdataxx
       void interpolate_in_space(arrvec_t<typename parent_t::arr_t> &dst,
                                 const arrvec_t<typename parent_t::arr_t> &src) final
       {
+        using namespace arakawa_c; // for rng_t operator^
         auto ex = this->halo - 1;
 	intrp<0>(dst[0], src[0], im^ex, this->j^ex, this->k^ex, this->di);
 	intrp<1>(dst[1], src[1], jm^ex, this->k^ex, this->i^ex, this->dj);
