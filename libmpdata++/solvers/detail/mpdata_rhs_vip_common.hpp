@@ -30,15 +30,24 @@ namespace libmpdataxx
 
     namespace detail
     {
-      // 
+      // override default extrapolation/interpolation in ct_params
+      template <class ct_params_t> 
+      struct ct_params_vip_default_t : ct_params_t
+      {
+        // only override if it has the default value, preserve any special options
+        enum {sptl_intrp = ct_params_t::sptl_intrp > 0 ? ct_params_t::sptl_intrp : aver2};
+        // unconditionally override, temporal extrapolation dosen't have any special options for now
+        enum {tmprl_extrp = linear2};
+      };
+
       template <class ct_params_t, int minhalo> 
-      class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_t, minhalo>
+      class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>
       {
         using ix = typename ct_params_t::ix;
 
 	protected:
 	
-        using parent_t = mpdata_rhs<ct_params_t, minhalo>;
+        using parent_t = mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>;
 
 	// member fields
         std::array<int, parent_t::n_dims> vip_ixs;
