@@ -191,6 +191,50 @@ namespace libmpdataxx
 	  }
 	}
 
+        // performs advection of a given field using the donorcell scheme
+        // and stores the result in the same field
+        // useful for advecting right-hand-sides etc
+        void self_advec_donorcell(typename parent_t::arr_t &field)
+        {
+          const auto &i(this->i), &j(this->j), &k(this->k);
+          const auto &ijk(this->ijk);
+          auto &GC(this->mem->GC);
+          using namespace formulae::donorcell;
+ 
+          this->xchng_sclr(field, this->ijk);
+ 
+          // calculation of fluxes
+          this->flux[0](im+h, j, k) = make_flux<ct_params_t::opts, 0>(field, GC[0], im, j, k);
+          this->flux[1](i, jm+h, k) = make_flux<ct_params_t::opts, 1>(field, GC[1], jm, k, i);
+          this->flux[2](i, j, km+h) = make_flux<ct_params_t::opts, 2>(field, GC[2], km, i, j);
+ 
+          this->xchng_flux(this->flux);
+ 
+          // sanity check for input
+          assert(std::isfinite(sum(field(ijk))));
+          assert(std::isfinite(sum(this->flux[0](i^h, j,   k  ))));
+          assert(std::isfinite(sum(this->flux[1](i,   j^h, k  ))));
+          assert(std::isfinite(sum(this->flux[2](i,   j,   k^h))));
+ 
+          // donor-cell call 
+          donorcell_sum<ct_params_t::opts>(
+            this->mem->khn_tmp,
+            ijk,
+            field(ijk),
+            field(ijk),
+            this->flux[0](i+h, j,   k  ),
+            this->flux[0](i-h, j,   k  ),
+            this->flux[1](i,   j+h, k  ),
+            this->flux[1](i,   j-h, k  ),
+            this->flux[2](i,   j,   k+h),
+            this->flux[2](i,   j,   k-h),
+            formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k)
+          );
+
+          // sanity check for output
+          assert(std::isfinite(sum(field(ijk))));
+        }
+
 	public:
 
 	// ctor
