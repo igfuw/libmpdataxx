@@ -20,13 +20,15 @@ namespace libmpdataxx
     { 
       euler_a, // Euler's method, Eulerian spirit:        psi^n+1 = ADV(psi^n) + R^n
       euler_b, // Euler's method, semi-Lagrangian spirit: psi^n+1 = ADV(psi^n + R^n)
-      trapez   // paraphrase of trapezoidal rule:         psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1 
+      trapez,  // paraphrase of trapezoidal rule:         psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1 
+      mixed    // allows implementation of arbitrary mixed explicit/implicit schemes
     };
 
     const std::map<rhs_scheme_t, std::string> scheme2string {
       {euler_a, "euler_a"},
       {euler_b, "euler_b"},
-      {trapez , "trapez"},
+      {trapez , "trapez" },
+      {mixed  , "mixed"  }
     };
     
     struct mpdata_rhs_family_tag {};
@@ -107,6 +109,21 @@ namespace libmpdataxx
 #endif
       }
 
+      virtual void hook_mixed_rhs_ante_loop()
+      {
+        assert(false && "empty hook_mixed_rhs_ante_loop called");
+      }
+
+      virtual void hook_mixed_rhs_ante_step()
+      {
+        assert(false && "empty hook_mixed_rhs_ante_step called");
+      }
+
+      virtual void hook_mixed_rhs_post_step()
+      {
+        assert(false && "empty hook_mixed_rhs_post_step called");
+      }
+
       void hook_ante_loop(const typename parent_t::advance_arg_t nt)
       {
         parent_t::hook_ante_loop(nt);
@@ -118,6 +135,9 @@ namespace libmpdataxx
             break;
           case rhs_scheme_t::trapez:
             update_rhs(rhs, this->dt / 2, n);
+            break;
+          case rhs_scheme_t::mixed:
+            hook_mixed_rhs_ante_loop();
             break;
           default: 
             assert(false);
@@ -144,6 +164,9 @@ namespace libmpdataxx
           case rhs_scheme_t::trapez: 
             apply_rhs(this->dt / 2); 
             break;
+          case rhs_scheme_t::mixed: 
+            hook_mixed_rhs_ante_step();
+            break;
           default: 
             assert(false);
         }
@@ -162,6 +185,9 @@ namespace libmpdataxx
           case rhs_scheme_t::trapez: 
             update_rhs(rhs, this->dt / 2, n+1);
             apply_rhs(this->dt / 2);
+            break;
+          case rhs_scheme_t::mixed: 
+            hook_mixed_rhs_post_step();
             break;
           default:
             assert(false);
