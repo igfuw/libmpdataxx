@@ -1,0 +1,1 @@
+libmpdataxx_add_test(convergence_vip_1d)
