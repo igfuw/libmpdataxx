@@ -117,6 +117,12 @@ namespace libmpdataxx
 	  {
             pressure_solver_loop_body(simple);
 	    iters++;
+
+            if (iters > 10000) // going beyond 10000 iters means something is really wrong,
+                               // usually boundary conditions but not always !
+            {
+              throw std::runtime_error("stuck in pressure solver");
+            }
           }
 
 	  this->xchng_pres(this->Phi, this->ijk);
