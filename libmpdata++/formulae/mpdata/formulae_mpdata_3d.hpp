@@ -70,6 +70,36 @@ namespace libmpdataxx
         return 0;
       }
       
+      template <opts_t opts, int dim, solvers::tmprl_extrp_t tmprl_extrp, class arr_3d_t, class ix_t>
+      forceinline_macro auto div_3rd_temporal(
+        const arr_3d_t &psi, 
+        const arrvec_t<arr_3d_t> &ndtt_GC,
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k,
+        typename std::enable_if<tmprl_extrp == solvers::noextrp>::type* = 0
+      )
+      {
+        return return_helper<ix_t>(
+          ndtt_GC0<opts, dim>(psi, ndtt_GC[dim], i, j, k)
+        );
+      }
+      
+      template <opts_t opts, int dim, solvers::tmprl_extrp_t tmprl_extrp, class arr_3d_t, class ix_t>
+      forceinline_macro auto div_3rd_temporal(
+        const arr_3d_t &psi, 
+        const arrvec_t<arr_3d_t> &ndtt_GC,
+        const ix_t &i, 
+        const ix_t &j,
+        const ix_t &k,
+        typename std::enable_if<tmprl_extrp == solvers::linear2>::type* = 0
+      )
+      {
+        return return_helper<ix_t>(
+          10 * ndtt_GC0<opts, dim>(psi, ndtt_GC[dim], i, j, k)
+        );
+      }
+      
       template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
       forceinline_macro auto div_3rd_spatial_helper(
         const arr_3d_t &psi, 
@@ -133,7 +163,9 @@ namespace libmpdataxx
         );
       }
       
-      template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
+      template <opts_t opts, int dim,
+                solvers::sptl_intrp_t, solvers::tmprl_extrp_t,
+                class arr_3d_t, class ix_t>
       forceinline_macro auto div_3rd(
         const arr_3d_t &psi_np1, 
         const arr_3d_t &psi_n, 
@@ -150,7 +182,9 @@ namespace libmpdataxx
         return 0;
       }
       
-      template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
+      template <opts_t opts, int dim,
+                solvers::sptl_intrp_t sptl_intrp, solvers::tmprl_extrp_t tmprl_extrp,
+                class arr_3d_t, class ix_t>
       forceinline_macro auto div_3rd(
         const arr_3d_t &psi_np1, 
         const arr_3d_t &psi_n, 
@@ -175,14 +209,16 @@ namespace libmpdataxx
           + 1.0 / 24 *
           (
               - 8 * GC[dim](pi<dim>(i+h, j, k)) *  nfdiv_fdiv<opts, dim>(psi_np1, GC, G, i, j, k)
-              + 1 * ndtt_GC0<opts, dim>(psi_np1, ndtt_GC[dim], i, j, k)
+              + div_3rd_temporal<opts, dim, tmprl_extrp>(psi_np1, ndtt_GC, i, j, k)
               + 2 * GC[dim](pi<dim>(i+h, j, k)) *  nfdiv<opts, dim>(psi_np1, ndt_GC, G, i, j, k)
               - 2 * ndt_GC[dim](pi<dim>(i+h, j, k)) * nfdiv<opts, dim>(psi_np1, GC, G, i, j, k)
           )
         );
       }
       
-      template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t, class ix_t>
+      template <opts_t opts, int dim,
+                solvers::sptl_intrp_t sptl_intrp, solvers::tmprl_extrp_t tmprl_extrp,
+                class arr_3d_t, class ix_t>
       forceinline_macro auto div_3rd(
         const arr_3d_t &psi_np1, 
         const arr_3d_t &psi_n, 
@@ -207,7 +243,7 @@ namespace libmpdataxx
           + 1.0 / 24 *
           (
               + 8 * GC[dim](pi<dim>(i+h, j, k)) *  nfdiv_dt<opts, dim>(psi_np1, psi_n, GC, G, i, j, k)
-              + 1 * ndtt_GC0<opts, dim>(psi_np1, ndtt_GC[dim], i, j, k)
+              + div_3rd_temporal<opts, dim, tmprl_extrp>(psi_np1, ndtt_GC, i, j, k)
               + 2 * GC[dim](pi<dim>(i+h, j, k)) *  nfdiv<opts, dim>(psi_np1, ndt_GC, G, i, j, k)
               + 2 * ndt_GC[dim](pi<dim>(i+h, j, k)) * ndt_psi<opts, dim>(psi_np1, psi_n, i, j, k)
           )
@@ -215,7 +251,7 @@ namespace libmpdataxx
       }
 
       // antidiffusive velocity - standard version
-      template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t>
+      template <opts_t opts, int dim, solvers::sptl_intrp_t, solvers::tmprl_extrp_t, class arr_3d_t>
       inline void antidiff(
         arr_3d_t &res,
         const arr_3d_t &psi_np1,
@@ -259,7 +295,7 @@ namespace libmpdataxx
       }
 
       // antidiffusive velocity - divergence form
-      template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, class arr_3d_t>
+      template <opts_t opts, int dim, solvers::sptl_intrp_t sptl_intrp, solvers::tmprl_extrp_t tmprl_extrp, class arr_3d_t>
       inline void antidiff(
         arr_3d_t &res, 
         const arr_3d_t &psi_np1, 
@@ -285,7 +321,7 @@ namespace libmpdataxx
             {
               res(pi<dim>(i + h, j, k)) = 
               div_2nd<opts, dim>(psi_np1, GC, G, i, j, k) +
-              div_3rd<opts, dim, sptl_intrp>(psi_np1, psi_n, GC, ndt_GC, ndtt_GC, G, i, j, k);
+              div_3rd<opts, dim, sptl_intrp, tmprl_extrp>(psi_np1, psi_n, GC, ndt_GC, ndtt_GC, G, i, j, k);
             }
           }
         }

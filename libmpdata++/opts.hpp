@@ -93,6 +93,7 @@ namespace libmpdataxx
     enum { stress_diff = 0};
     enum { impl_tht = false};
     enum { sptl_intrp = 0}; // spatial interpolation of velocities
+    enum { tmprl_extrp = 0}; // temporal extrapolation of velocities
     enum { out_intrp_ord = 1};  // order of temporal interpolation for output
                                 // order > 1 is mostly useful for convergence tests as it can result
                                 // in negative field values

@@ -138,7 +138,7 @@ namespace libmpdataxx
           }
 	}
 
-        void hook_ante_loop(const int nt)
+        void hook_ante_loop(const typename parent_t::advance_arg_t nt)
         {
           // save initial edge velocities
           this->save_edges(this->vips(), this->ijk);

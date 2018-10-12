@@ -24,6 +24,12 @@ namespace libmpdataxx
       aver2,
       aver4,
     };
+    
+    enum tmprl_extrp_t
+    { 
+      noextrp,
+      linear2,
+    };
   }
 
   namespace formulae 
