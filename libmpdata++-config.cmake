@@ -71,20 +71,20 @@ unset(CMAKE_REQUIRED_FLAGS)
 
 ############################################################################################
 # Blitz++
-find_package(PkgConfig)
-pkg_check_modules(BLITZ QUIET blitz>=0.10)
-if (NOT BLITZ_FOUND)
-  message(FATAL_ERROR "Blitz++ library not found or Blitz++ version requirement not met (>=0.10)
-
-* To insall Blitz++, please try:
-*   Debian/Ubuntu: sudo apt-get install libblitz0-dev
-*   Fedora: sudo yum install blitz-devel
-*   Homebrew: brew install blitz
-  ")
-else()
-  set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${BLITZ_INCLUDE_DIRS}")
-  set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARIES}")
-endif()
+#find_package(PkgConfig)
+#pkg_check_modules(BLITZ QUIET blitz>=0.10)
+#if (NOT BLITZ_FOUND)
+#  message(FATAL_ERROR "Blitz++ library not found or Blitz++ version requirement not met (>=0.10)
+#
+#* To insall Blitz++, please try:
+#*   Debian/Ubuntu: sudo apt-get install libblitz0-dev
+#*   Fedora: sudo yum install blitz-devel
+#*   Homebrew: brew install blitz
+#  ")
+#else()
+#  set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${BLITZ_INCLUDE_DIRS}")
+#  set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${BLITZ_LIBRARIES}")
+#endif()
 
 ############################################################################################
 # OpenMP
