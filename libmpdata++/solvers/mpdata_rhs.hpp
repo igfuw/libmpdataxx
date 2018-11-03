@@ -113,16 +113,18 @@ namespace libmpdataxx
       {
         assert(false && "empty hook_mixed_rhs_ante_loop called");
       }
+
       virtual void hook_mixed_rhs_ante_step()
       {
         assert(false && "empty hook_mixed_rhs_ante_step called");
       }
+
       virtual void hook_mixed_rhs_post_step()
       {
         assert(false && "empty hook_mixed_rhs_post_step called");
       }
 
-      void hook_ante_loop(typename parent_t::advance_arg_t nt)
+      void hook_ante_loop(const typename parent_t::advance_arg_t nt)
       {
         parent_t::hook_ante_loop(nt);
 

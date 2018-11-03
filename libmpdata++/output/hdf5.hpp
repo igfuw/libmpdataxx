@@ -278,6 +278,25 @@ namespace libmpdataxx
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR);; // reopen the const file
         hdfcp.openGroup("/").createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data_f);
       }
+      
+      // see above, also assumes that z is the last dimension
+      void record_prof_const(const std::string &name, typename solver_t::real_t *data)
+      {
+        assert(this->rank == 0);
+        
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR);; // reopen the const file
+
+        auto aux = hdfcp.createDataSet(
+          name,
+          flttype_output,
+          H5::DataSpace(1, &shape[parent_t::n_dims - 1])
+        );
+
+        auto space = aux.getSpace();
+        offst = 0;
+        space.selectHyperslab(H5S_SELECT_SET, &shape[parent_t::n_dims - 1], &offst[parent_t::n_dims - 1]);
+        aux.write(data, flttype_solver, H5::DataSpace(1, &shape[parent_t::n_dims - 1]), space);
+      }
 
       // parameters saved for pure advection solvers
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_family_tag)
