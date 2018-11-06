@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -x
 cd tests/paper_2015_GMD
 mkdir build
 cd build
