@@ -155,6 +155,16 @@ namespace libmpdataxx
           if (!cyclic)
           {
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[2]^ext^1, range_ijk[0]^ext^h);
+  
+            // without this barrier, there is a race condition when some threads handle subdomains
+            // with one gridpoint width, the problem manifests itself, for example, in pbl test
+            // TODO: figure out the exact cause and try to avoid this barrier, what about 2D,
+            //       what about atypical boundary condition choices -- rigid/cyclic/rigid etc
+            if (parent_t::div3_mpdata)
+            {
+              this->mem->barrier();
+            }
+
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk_0__ext_h, range_ijk[1]^ext^1);
 
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
