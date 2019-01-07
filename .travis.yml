@@ -59,8 +59,7 @@ before_install:
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew cask uninstall oclint; fi
     
     # https://github.com/travis-ci/travis-ci/issues/10165
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnupg2; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then command curl -sSL https://rvm.io/mpapis.asc | gpg --import -; fi 
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi
 
     # fixing broken OSX gzip tools
