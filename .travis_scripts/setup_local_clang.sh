@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 mkdir local_clang
 cd local_clang
 export CLANG_VER=clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz

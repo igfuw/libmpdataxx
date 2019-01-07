@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 # installing
 cd libmpdata++/build
 sudo make install
