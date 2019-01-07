@@ -14,6 +14,7 @@ env:
     - TEST_SUITE=nair_jablonowski_2008
     - TEST_SUITE=UWLCM
     - TEST_SUITE=pbl
+    - TEST_SUITE=osx_local_clang
 
 matrix:
     exclude:
@@ -25,6 +26,12 @@ matrix:
 
         - compiler: clang
           env: TEST_SUITE=UWLCM # UWLCM is not tested on clang yet
+       
+        # local clang tests on osx
+        - os: linux
+          env: TEST_SUITE=osx_local_clang
+        - compiler: gcc
+          env: TEST_SUITE=osx_local_clang
 addons:
   apt:
     packages:
@@ -79,6 +86,8 @@ install:
     # redefine CXX to the actual version used
     - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then export CXX=clang++-4.0; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++'     ]]; then export CXX=g++-6; fi
+    # downloads and setups local clang on osx
+    - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/setup_local_clang.sh; fi
 
     # boost
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
@@ -142,3 +151,6 @@ script:
     
     # running pbl tests in Release mode
     - if [[ $TEST_SUITE == 'pbl' ]]; then . ./.travis_scripts/pbl.sh; fi
+  
+    # testing local clang on osx
+    - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/unit.sh; fi # with '.' to pass env vars
