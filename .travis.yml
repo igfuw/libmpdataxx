@@ -7,13 +7,13 @@ compiler:
     - gcc
     - clang
 env:
-    - TEST_SUITE=unit
-    - TEST_SUITE=sandbox
-    - TEST_SUITE=paper
-    - TEST_SUITE=elliptic_drop
-    - TEST_SUITE=nair_jablonowski_2008
-    - TEST_SUITE=UWLCM
-    - TEST_SUITE=pbl
+  #    - TEST_SUITE=unit
+  #    - TEST_SUITE=sandbox
+  #    - TEST_SUITE=paper
+  #    - TEST_SUITE=elliptic_drop
+  #    - TEST_SUITE=nair_jablonowski_2008
+  #    - TEST_SUITE=UWLCM
+  #    - TEST_SUITE=pbl
     - TEST_SUITE=osx_local_clang
 
 matrix:
