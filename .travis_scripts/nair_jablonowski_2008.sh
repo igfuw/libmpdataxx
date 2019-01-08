@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 cd tests/nair_jablonowski_2008
 mkdir build
 cd build

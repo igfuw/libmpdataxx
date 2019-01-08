@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 
 # install libmpata++
 cd libmpdata++/build
