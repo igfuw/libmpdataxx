@@ -64,9 +64,11 @@ before_install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -; fi
     # https://github.com/travis-ci/travis-ci/issues/10165
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi
+   
+    # locally installed stuff comes first
+    - export PATH=/usr/local/bin:$PATH
 
     # fixing broken OSX gzip tools
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export PATH=/usr/local/bin:$PATH; fi # so that brew-installed ones are first
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gzip; fi
      
     # to avoid problems with plotting by paraview on Travis
