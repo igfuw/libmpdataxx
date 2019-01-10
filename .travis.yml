@@ -37,7 +37,9 @@ addons:
     packages:
       - g++-6
       - clang-4.0
+      - boost1.67
     sources: &sources
+      - sourceline: 'ppa:mhier/libboost-latest'
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-4.0
 
@@ -92,9 +94,8 @@ install:
     # downloads and setups local clang on osx
     - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/setup_local_clang.sh; fi
 
-    # boost
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
-
+    # latest boost is installed using addons functionality
+    
     # cmake 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install cmake; fi
 
