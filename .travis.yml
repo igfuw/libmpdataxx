@@ -37,7 +37,9 @@ addons:
     packages:
       - g++-6
       - clang-4.0
+      - boost1.61
     sources: &sources
+      - sourceline: 'ppa:rakhimov/boost'
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-4.0
 
@@ -62,9 +64,11 @@ before_install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -; fi
     # https://github.com/travis-ci/travis-ci/issues/10165
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi
+   
+    # locally installed stuff comes first
+    - export PATH=/usr/local/bin:$PATH
 
     # fixing broken OSX gzip tools
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export PATH=/usr/local/bin:$PATH; fi # so that brew-installed ones are first
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gzip; fi
      
     # to avoid problems with plotting by paraview on Travis
@@ -92,11 +96,11 @@ install:
     # downloads and setups local clang on osx
     - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/setup_local_clang.sh; fi
 
-    # boost
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
-
+    # latest boost is installed using addons functionality
+    
     # cmake 
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install cmake; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then wget https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2-Linux-x86_64.sh; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo sh cmake-3.13.2-Linux-x86_64.sh --prefix=/usr/local --exclude-subdir; fi
 
     # blitz
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install blitz; fi
