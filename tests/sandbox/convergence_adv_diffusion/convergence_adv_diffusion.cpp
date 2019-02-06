@@ -41,6 +41,7 @@ err_t test(int np)
     time = 1.0,
     dx = 2.0 * pi / (np - 1),  
     dt = 0.4 * dx,
+    advective_vel = 1.0,
     mu = 0.001;
 
   int nt = time / dt;
@@ -54,6 +55,7 @@ err_t test(int np)
   p.di = dx;
   p.dt = dt;
   p.mu = mu;
+  p.advective_vel = advective_vel;
 
   concurr::serial<
     slv_t, 
@@ -62,11 +64,11 @@ err_t test(int np)
 
   blitz::firstIndex i;
 
-  run.advectee(0) = exact_f{0., mu}(i * dx);
+  run.advectee(0) = exact_f{0., mu, advective_vel}(i * dx);
   run.advectee(1) = 0;
 
   decltype(run.advectee()) true_solution(run.advectee().shape());
-  true_solution = exact_f{time, mu}(i * dx);
+  true_solution = exact_f{time, mu, advective_vel}(i * dx);
 
   run.advance(nt);
 
