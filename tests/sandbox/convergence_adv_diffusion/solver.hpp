@@ -18,11 +18,11 @@ using real_t = double;
 
 struct exact_f
 {
-  real_t t, mu;
+  real_t t, mu, advective_vel;
 
   real_t operator()(const real_t x) const
   {
-    return 2 + std::sin(x - t) * std::exp(-mu * t);
+    return 2 + std::sin(x - advective_vel * t) * std::exp(-mu * t);
 
   }
   BZ_DECLARE_FUNCTOR(exact_f);
@@ -71,7 +71,7 @@ class adv_diffusion_solver : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
 
   protected:
   
-  real_t mu;
+  real_t mu, advective_vel;
 
   void hook_ante_loop(const typename parent_t::advance_arg_t nt)
   {
@@ -91,7 +91,7 @@ class adv_diffusion_solver : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
       tmp(ii) = exact_f{-this->dt, mu}(ii * this->di);
     }
     this->xchng_sclr(tmp);
-    this->vip_stash(-1)[0](i) = 1 + diffusive_vel<diffusive_vel_ord>(tmp, i, this->di, mu);
+    this->vip_stash(-1)[0](i) = advective_vel + diffusive_vel<diffusive_vel_ord>(tmp, i, this->di, mu);
 
     if (parent_t::div3_mpdata)
     {
@@ -101,7 +101,7 @@ class adv_diffusion_solver : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
         tmp(ii) = exact_f{-2 * this->dt, mu}(ii * this->di);
       }
       this->xchng_sclr(tmp);
-      this->vip_stash(-2)[0](i) = 1 + diffusive_vel<diffusive_vel_ord>(tmp, i, this->di, mu);
+      this->vip_stash(-2)[0](i) = advective_vel + diffusive_vel<diffusive_vel_ord>(tmp, i, this->di, mu);
     }
   }
   
@@ -111,7 +111,7 @@ class adv_diffusion_solver : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
     const auto &i = this->i;
 
     this->xchng_sclr(psi);
-    this->vips()[0](i) = 1 + diffusive_vel<diffusive_vel_ord>(psi, i, this->di, mu);
+    this->vips()[0](i) = advective_vel + diffusive_vel<diffusive_vel_ord>(psi, i, this->di, mu);
 
     return parent_t::calc_gc();
   }
@@ -120,7 +120,7 @@ class adv_diffusion_solver : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
 
   struct rt_params_t : parent_t::rt_params_t 
   { 
-    real_t mu;
+    real_t mu, advective_vel;
   };
 
   adv_diffusion_solver(
@@ -128,6 +128,7 @@ class adv_diffusion_solver : public libmpdataxx::solvers::mpdata_rhs_vip<ct_para
     const rt_params_t &p
   ) :
   parent_t(args, p),
-  mu(p.mu)
+  mu(p.mu),
+  advective_vel(p.advective_vel)
   {}
 };
