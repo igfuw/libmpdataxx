@@ -7,7 +7,6 @@ compiler:
     - gcc
     - clang
 env:
-<<<<<<< HEAD
 #    - MPI=none
 #    - MPI=openmpi
 # not supported by Boost.MPI in Debian on amd64:
