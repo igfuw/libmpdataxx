@@ -33,7 +33,7 @@ def save_mixing_diags(mixing_diags, ny, stat_file):
     ordered_opts = list(range(len(mixing_diags[ny].keys())))
     for opt in mixing_diags[ny].keys():
         ordered_opts[lab2pos[opt2lab[opt]]] = opt
-    
+
     stat_file.write('Reversing deformational flow: mixing diagnostics for the N = {} ({} degree interval) simulations\n\n'
                     .format(ny, 180. / ny))
     stat_file.write('  ')
@@ -77,8 +77,8 @@ def plot_mixing(field_data, mixing_diags, ny, fname = 'mixing.pdf'):
 
     plt.clf()
     fig, axarr = plt.subplots(2, 2, sharex='col', sharey = 'row', figsize=(14, 12))
-    
-    c = 'red' 
+
+    c = 'red'
     s = 1
     marker = '.'
     edgecolor = 'r'
@@ -119,15 +119,15 @@ def plot_mixing(field_data, mixing_diags, ny, fname = 'mixing.pdf'):
         axarr[num].grid()
 
         lr, lu, lo = mixing_diags[ny][opt]
-        
+
         expformat = '{} \\times 10^{{{}}}'
 
         lrs = '{:.2e}'.format(lr)
         l_r_d, l_r_e = (lrs[0:4], int(lrs[5:]))
-        
+
         lus = '{:.2e}'.format(lu)
         l_u_d, l_u_e = lus[0:4], int(lus[5:])
-       
+
         if lo != 0:
             los = '{:.2e}'.format(lo)
             lo = (los[0:4], int(los[5:]))
@@ -135,7 +135,7 @@ def plot_mixing(field_data, mixing_diags, ny, fname = 'mixing.pdf'):
         else:
             lo = (lo,)
             loformat = '{:g}'
-        
+
         test2 = (
                 '''\\begin{{{{align}}}}'''
                 '''l_r &= {l_r_format}\\\\'''

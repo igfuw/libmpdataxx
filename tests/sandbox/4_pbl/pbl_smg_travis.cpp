@@ -9,5 +9,5 @@
 
 int main()
 {
-  test<smg_tag>("out_pbl_smg_travis", 601);
+  test<smg_tag>("out_pbl_smg_travis", 33, 601);
 }

@@ -14,7 +14,7 @@ def conv_plot(plot_data, ord_data, fname = 'fig.pdf'):
     lab2dsh = {'Mp3' : [], 'Mp3cc' : [6, 1], 'Mg3No' : [1, 1], 'Mg2No' : [6, 1, 1 ,1]}
 
     fig, axarr = plt.subplots(1, 1, figsize=(14,12))
-    
+
     plots = {}
     for x, y, opt in plot_data:
         zo = 2.0
@@ -23,7 +23,7 @@ def conv_plot(plot_data, ord_data, fname = 'fig.pdf'):
             zo = 2.1
         p, = axarr.loglog(x, y, lab2ls[lab], label = lab, lw = 6, ms = 16, dashes = lab2dsh[lab], zorder = zo)
         plots[lab] = p
-    
+
     for x, y, x0, y0, t, a in ord_data:
         axarr.loglog(x, y, color = 'gray', lw = 6)
         axarr.text(x0, y0, t, rotation = a, size = 28, backgroundcolor = 'w', zorder=2.1)
@@ -37,7 +37,7 @@ def conv_plot(plot_data, ord_data, fname = 'fig.pdf'):
 
     axarr.set_xlabel('$N$', fontsize = fs)
     axarr.set_ylabel('$\ell_2$ error norm', fontsize = fs)
-   
+
     labels = list(range(len(plots.keys())))
     for lab in plots.keys():
         labels[lab2pos[lab]] = lab

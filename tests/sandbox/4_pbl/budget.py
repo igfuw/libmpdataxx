@@ -29,8 +29,8 @@ const_h = h5py.File(fnames[0], "r")
 dt = const_h['advection'].attrs['dt'][0]
 dz = const_h['advection'].attrs['dk'][0]
 g = const_h['boussinesq'].attrs['g'][0]
-tht_ref = const_h['boussinesq'].attrs['Tht_ref'][0] 
-H0 = const_h['boussinesq'].attrs['hflux_const'][0] 
+tht_ref = const_h['boussinesq'].attrs['Tht_ref'][0]
+H0 = const_h['boussinesq'].attrs['hflux_const'][0]
 if subgrid:
     mix_len = np.array(const_h['boussinesq/mix_len'])
 
@@ -98,7 +98,7 @@ inb = dssp + hflux + tke_t
 outname = dirname[4:]
 outfile = open('budget_' + outname + '.txt', 'w')
 for lev_d in zip(Z, hflux, tke_t, dssp, inb):
-    outfile.write('{:6.2f} {:10.4e} {:10.4e} {:10.4e} {:10.4e}\n'.format(*lev_d))
+    outfile.write('{:6.2f} {:10.1e} {:10.1e} {:10.1e} {:10.1e}\n'.format(*lev_d))
 
 fig, axarr = plt.subplots(1, 1, figsize= (10, 6))
 axarr.plot(hflux, Z, 'k-', lw = 1, label = 'B')

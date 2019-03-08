@@ -7,7 +7,7 @@ import os
 from analytical_formulae import asolution, pi
 
 xlevels = np.linspace(0, 2 * pi, 17)
-xlevels[-1] = 2 * pi - 0.01 
+xlevels[-1] = 2 * pi - 0.01
 ylevels = np.linspace(-pi/2, pi / 2, 17)
 
 def transform_iso_field(psi, X, Y, xo = 3 * pi / 2, yo = 0.):
@@ -93,8 +93,8 @@ def panel_plot(geo_data, field_data, opt, time, ny, fname):
 
     for cb in [cb1, cb2, cb3, cb4]:
         ticklabs = cb.ax.get_yticklabels()
-        cb.ax.tick_params(labelsize=16) 
-    
+        cb.ax.tick_params(labelsize=16)
+
     axarr[0, 0].set_title('(a) Initial condition', y = 1.02, fontsize = 30)
     axarr[0, 1].set_title(r'(b) Exact solution $t = 12$ days', y = 1.02, fontsize = 30)
     axarr[1, 0].set_title(r'(c) Difference $t = 12$ days', y = 1.02, fontsize = 30)
@@ -102,6 +102,6 @@ def panel_plot(geo_data, field_data, opt, time, ny, fname):
 
 
     cb4.ax.set_yticklabels(ticklabs,ha='right')
-    cb4.ax.yaxis.set_tick_params(pad=50) 
+    cb4.ax.yaxis.set_tick_params(pad=50)
     plt.tight_layout(pad=1., w_pad=5., h_pad=1)
     plt.savefig(fname, transparent = True)

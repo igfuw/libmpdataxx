@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import plot_settings as ps
 import analytic_eq as eq
 
-# plotting analytic solutions for height and velocity 
+# plotting analytic solutions for height and velocity
 def analytic_fig(ax, x_lim, time_l=[0,1,2,3], nxy=320):
     x_range = np.linspace(-x_lim, x_lim, nxy)
     y_range = np.zeros(nxy)
@@ -36,7 +36,7 @@ def reading_modeloutput(dir, time):
     dir_model["qy"] = np.array(f_out["qy"])
     return dir_model
 
-# plotting together analytic solution and model output 
+# plotting together analytic solution and model output
 def analytic_model_fig(ax, var_md, time=1):
     x_range = var_md["x_range"]
     y_range = 0 * var_md["x_range"]
@@ -50,9 +50,9 @@ def analytic_model_fig(ax, var_md, time=1):
             x_range, var_md["vx"][:,ind_cs], "r--")
     ps.ticks_changes(ax)
 
-# time_an - list of time levels for analytical solutions                          
-# time - model time level used for comparison with analytic solution              
-# xy_lim - limit used for calculating x_range for analytical solution              
+# time_an - list of time levels for analytical solutions
+# time - model time level used for comparison with analytic solution
+# xy_lim - limit used for calculating x_range for analytical solution
 def main(dir, casename_l, xy_lim=8, time_l=[0,3], time=3):
     plt.figure(1, figsize = (6,3))
     ax = plt.subplot(1,1,1)
@@ -67,7 +67,7 @@ def main(dir, casename_l, xy_lim=8, time_l=[0,3], time=3):
         var_model = reading_modeloutput(dir + casename, time)
         # calculate velocity (momentum/height) only in the droplet region.
         var_model["vx"] = np.where(var_model["h"]>0, var_model["qx"]/var_model["h"], 0)
-        # calculating model output coord.                                        
+        # calculating model output coord.
         var_model["x_range"] = np.arange(-xy_lim+var_model["dx"]/2., xy_lim, var_model["dx"])
         assert(var_model["x_range"].shape[0] == var_model["h"].shape[0]), "domain size differs from model output shape"
 

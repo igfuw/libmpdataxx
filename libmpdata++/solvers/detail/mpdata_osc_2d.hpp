@@ -79,7 +79,9 @@ namespace libmpdataxx
               this->xchng(e);
 
 	      // calculating the antidiffusive C 
-              formulae::mpdata::antidiff<ct_params_t::opts, 0, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
+              formulae::mpdata::antidiff<ct_params_t::opts, 0,
+                                         static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp),
+                                         static_cast<tmprl_extrp_t>(ct_params_t::tmprl_extrp)>(
                 this->GC_corr(iter)[0],
                 this->mem->psi[e][this->n[e]], 
                 this->mem->psi[e][this->n[e]-1],
@@ -92,7 +94,9 @@ namespace libmpdataxx
               );
               assert(std::isfinite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
 
-              formulae::mpdata::antidiff<ct_params_t::opts, 1, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
+              formulae::mpdata::antidiff<ct_params_t::opts, 1,
+                                         static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp),
+                                         static_cast<tmprl_extrp_t>(ct_params_t::tmprl_extrp)>(
                 this->GC_corr(iter)[1],
                 this->mem->psi[e][this->n[e]], 
                 this->mem->psi[e][this->n[e]-1],
@@ -173,6 +177,46 @@ namespace libmpdataxx
             //assert(std::isfinite(sum(this->mem->psi[e][this->n[e]+1](this->ijk))));
 	  }
 	}
+
+        // performs advection of a given field using the donorcell scheme
+        // and stores the result in the same field
+        // useful for advecting right-hand-sides etc
+        void self_advec_donorcell(typename parent_t::arr_t &field)
+        {
+          const auto &i(this->i), &j(this->j);
+          const auto &ijk(this->ijk);
+          auto &GC(this->mem->GC);
+          using namespace formulae::donorcell;
+ 
+          this->xchng_sclr(field, this->ijk);
+ 
+          // calculation of fluxes
+          this->flux[0](im+h, j) = make_flux<ct_params_t::opts, 0>(field, GC[0], im, j);
+          this->flux[1](i, jm+h) = make_flux<ct_params_t::opts, 1>(field, GC[1], jm, i);
+ 
+          this->xchng_flux(this->flux);
+ 
+          // sanity check for input
+          assert(std::isfinite(sum(field(ijk))));
+          assert(std::isfinite(sum(this->flux[0](i^h, j  ))));
+          assert(std::isfinite(sum(this->flux[1](i,   j^h))));
+ 
+          // donor-cell call 
+          donorcell_sum<ct_params_t::opts>(
+            this->mem->khn_tmp,
+            ijk,
+            field(ijk),
+            field(ijk),
+            this->flux[0](i+h, j  ),
+            this->flux[0](i-h, j  ),
+            this->flux[1](i,   j+h),
+            this->flux[1](i,   j-h),
+            formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j)
+          );
+
+          // sanity check for output
+          assert(std::isfinite(sum(field(ijk))));
+        }
 
 	public:
 

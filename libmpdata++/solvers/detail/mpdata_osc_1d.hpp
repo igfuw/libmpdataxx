@@ -67,7 +67,9 @@ namespace libmpdataxx
               this->xchng(e);
 
 	      // calculating the antidiffusive C 
-              formulae::mpdata::antidiff<ct_params_t::opts, static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp)>(
+              formulae::mpdata::antidiff<ct_params_t::opts,
+                                         static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp),
+                                         static_cast<tmprl_extrp_t>(ct_params_t::tmprl_extrp)>(
                 this->GC_corr(iter)[0],
                 this->mem->psi[e][this->n[e]], 
                 this->GC_unco(iter),
@@ -124,6 +126,40 @@ namespace libmpdataxx
             //assert(std::isfinite(sum(psi[this->n[e]+1](this->ijk)))); 
 	  }
 	}
+
+        // performs advection of a given field using the donorcell scheme
+        // and stores the result in the same field
+        // useful for advecting right-hand-sides etc
+        void self_advec_donorcell(typename parent_t::arr_t &field)
+        {
+          const auto &i(this->i);
+          auto &GC(this->mem->GC);
+          using namespace formulae::donorcell;
+ 
+          this->xchng_sclr(field, this->ijk);
+ 
+          // calculation of fluxes
+          this->flux[0](im+h) = make_flux<ct_params_t::opts>(field, GC[0], im);
+ 
+          // sanity check for input
+          assert(std::isfinite(sum(field(i))));
+          assert(std::isfinite(sum(this->flux[0](i^h))));
+ 
+          // donor-cell call 
+          donorcell_sum<ct_params_t::opts>(
+            this->mem->khn_tmp,
+            i,
+            field(i),
+            field(i),
+            this->flux[0](i+h),
+            this->flux[0](i-h),
+            formulae::G<ct_params_t::opts>(*this->mem->G, i)
+          );
+
+          // sanity check for output
+          assert(std::isfinite(sum(field(i))));
+        }
+
 
 	public:
 

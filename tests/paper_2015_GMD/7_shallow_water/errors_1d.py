@@ -4,7 +4,7 @@ import numpy as np
 import h5py
 import analytic_eq as eq
 
-#reading model output and saving as numpy arrays   
+#reading model output and saving as numpy arrays
 def reading_modeloutput(dir, time):
     dir_model = {}
     f_crd = h5py.File(dir+ "/const.h5", "r")
@@ -25,15 +25,15 @@ def errors(dir, time_l, x_lim):
         var_model["x_range"] = np.arange(-x_lim+var_model["dx"]/2., x_lim, var_model["dx"])
         assert(var_model["x_range"].shape == var_model["h"].shape), "domain size differs from model output shape"
 
-        # calculating the analytical solution 
+        # calculating the analytical solution
         lamb = eq.d1_lambda_evol(time)
         h_an = eq.d1_height(lamb, var_model["x_range"])
 
         # calculating the errors of the drop depth, eq. 25 and 26 from the paper
         h_diff    = var_model["h"] - h_an
         points_nr = var_model["h"].shape[0]
-        delh_inf  = abs(h_diff).max() 
-        delh_2    = 1./time * ((h_diff**2).sum() / points_nr )**0.5 
+        delh_inf  = abs(h_diff).max()
+        delh_2    = 1./time * ((h_diff**2).sum() / points_nr )**0.5
 
         # outputing general info
         if time == time_l[0]:
@@ -47,7 +47,7 @@ def errors(dir, time_l, x_lim):
                       )
             file.write(fstring.format(dx = var_model["dx"], dt = var_model["dt"], npoints = points_nr))
 
-        # outputting error statistics                                             
+        # outputting error statistics
         fstring = (
                    "time                               = {time:.4f}\n"
                    "max(h_an)                          = {max_h_an:.8f}\n"
@@ -66,14 +66,14 @@ def errors(dir, time_l, x_lim):
                                  )
                   )
     file.close()
-        
+
 # printing errors at different time steps
 def evolution_test(dir, time_l=[1,2,3], x_lim=8):
     errors(dir, time_l, x_lim)
-    
+
 def main(dir, casename_l):
     for casename in casename_l:
         print(casename)
         evolution_test(dir + str(casename)) #TODO: read it from the h5 file
-        
+
 main("./", sys.argv[1:])

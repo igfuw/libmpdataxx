@@ -10,5 +10,5 @@
 
 int main() 
 {
-  std::cerr << GIT_REVISION << std::endl;
+  std::cerr << LIBMPDATAXX_GIT_REVISION << std::endl;
 }

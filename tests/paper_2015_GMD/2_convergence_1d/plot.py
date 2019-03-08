@@ -7,17 +7,17 @@
 
 # 1d isolines test from pks & wwg 1990
 
-# for plotting in detached screen 
+# for plotting in detached screen
 import matplotlib
 matplotlib.use('Svg')
 
 from numpy import loadtxt, zeros, linspace
 from sys import argv
 from math import pi, log, cos, sin, sqrt
-from matplotlib.mlab import griddata 
+from matplotlib.mlab import griddata
 from matplotlib.patches import Circle, Path, PathPatch
 
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
 dx, cour, err = loadtxt(argv[1], unpack=True)
 
@@ -40,7 +40,7 @@ for i in range(theta.shape[0]) :
   y[i] = r[i] * sin(theta[i])
 
 ngrid = 800 * 2
-levels = range(-32,-3) #[-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7] 
+levels = range(-32,-3) #[-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7]
 
 xi = linspace(mn, mx, ngrid)
 yi = linspace(mn, mx, ngrid)
@@ -60,10 +60,10 @@ plt.tick_params(length=10, width=2, labelsize=24)
 # colours
 mpble = fig.gca().contourf(xi,yi,zi,levels,cmap=plt.cm.jet)
 # colorbar
-cbar = plt.colorbar(mpble) 
+cbar = plt.colorbar(mpble)
 #cbar.set_label('$log_2(err)$', labelpad=-40, padx = 10, y=0.45, fontsize=35)
 cbar.set_label(r'log$_2$(err)', fontsize=30, labelpad = 20)
-cbar.ax.tick_params(labelsize=24) 
+cbar.ax.tick_params(labelsize=24)
 # grid
 for r in range(mx,0,-1):
   zix = 1
@@ -72,7 +72,7 @@ for r in range(mx,0,-1):
     Path(
       [(0,r),       (r*4*(sqrt(2)-1)/3,r), (r,r*4*(sqrt(2)-1)/3), (r,0)      ],
       [Path.MOVETO, Path.CURVE4,           Path.CURVE4,           Path.CURVE4]
-    ), 
+    ),
     color='white',
     fill=(r==1),
     linewidth=1,
@@ -87,7 +87,7 @@ for i in range(0,19,3) :
       Path(
 	[(1*c,1*s),   (mx*c,mx*s)  ],
 	[Path.MOVETO, Path.LINETO]
-      ), 
+      ),
       color='white',
       fill=None,
       linewidth=1

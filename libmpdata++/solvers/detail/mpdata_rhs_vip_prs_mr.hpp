@@ -20,7 +20,7 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <class ct_params_t, int minhalo = 0>
+      template <class ct_params_t, int minhalo>
       class mpdata_rhs_vip_prs_mr : public mpdata_rhs_vip_prs_common<ct_params_t, minhalo>
       {
         public:

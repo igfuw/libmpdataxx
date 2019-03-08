@@ -19,8 +19,8 @@ tht = data_h["tht"]
 const_h = h5py.File(fnames[0], "r")
 dz = const_h['advection'].attrs['dk'][0]
 g = const_h['boussinesq'].attrs['g'][0]
-tht_ref = const_h['boussinesq'].attrs['Tht_ref'][0] 
-H0 = const_h['boussinesq'].attrs['hflux_const'][0] 
+tht_ref = const_h['boussinesq'].attrs['Tht_ref'][0]
+H0 = const_h['boussinesq'].attrs['hflux_const'][0]
 
 _, _, nz = w.shape
 Z = np.array([dz * k for k in np.arange(nz)])
@@ -52,14 +52,14 @@ var_w /= w_scale ** 2
 outname = dirname[4:]
 outfile = open('profiles_' + outname + '.txt', 'w')
 for lev_d in zip(Z, hflux, var_th, var_w):
-    outfile.write('{:6.2f} {:10.4e} {:10.4e} {:10.4e}\n'.format(*lev_d))
+    outfile.write('{:6.2f} {:10.3e} {:10.3e} {:10.3e}\n'.format(*lev_d))
 
 # plot profiles
 fig, axarr = plt.subplots(1, 3, figsize= (10, 6))
 
 fig.subplots_adjust(top=0.85)
 s = "$z_i = {zi}$ m, $w_* = {ws:.3}$ m/s, $t_* = {ts:.5}$ s, $T_* = {tht_s:.3}$ K"
-fig.text(0.1, 0.95, s.format(zi = zi, ws = w_scale, ts = t_scale, tht_s = tht_scale), 
+fig.text(0.1, 0.95, s.format(zi = zi, ws = w_scale, ts = t_scale, tht_s = tht_scale),
          bbox={'facecolor':'white', 'pad':5}
         )
 

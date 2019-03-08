@@ -49,7 +49,7 @@ namespace libmpdataxx
           full_tht(this->ijk) = this->state(ix::tht)(this->ijk) + this->tht_e(this->ijk);
         }
 
-	void hook_ante_loop(const int nt) 
+	void hook_ante_loop(const typename parent_t::advance_arg_t nt) 
 	{   
           calc_dtht_e();
 	  parent_t::hook_ante_loop(nt);
@@ -102,10 +102,10 @@ namespace libmpdataxx
             }
             case (1):
             {
-              rhs.at(ix::tht)(ijk) += (this->hflux_frc(ijk) - this->tht_abs(ijk) * tht(ijk))
-                                      / (1 + 0.5 * this->dt * this->tht_abs(ijk));
+              rhs.at(ix::tht)(ijk) += this->hflux_frc(ijk);
 
-              rhs.at(ix_w)(ijk) += this->g * (tht(ijk) + 0.5 * this->dt * rhs.at(ix::tht)(ijk)) / this->Tht_ref;
+              rhs.at(ix_w)(ijk) += this->g * (tht(ijk) + 0.5 * this->dt * rhs.at(ix::tht)(ijk))
+                                   / (this->Tht_ref * (1 + 0.5 * this->dt * this->tht_abs(ijk)));
               break;
             }
           }
@@ -116,8 +116,11 @@ namespace libmpdataxx
           parent_t::vip_rhs_impl_fnlz();
           
           const auto &w = this->vips()[ct_params_t::n_dims - 1];
-          this->state(ix::tht)(this->ijk) += - 0.5 * this->dt * w(this->ijk) * this->dtht_e(this->ijk);
-          this->rhs.at(ix::tht)(this->ijk) += -w(this->ijk) * this->dtht_e(this->ijk);
+          this->state(ix::tht)(this->ijk) = ( this->state(ix::tht)(this->ijk) 
+                                            - 0.5 * this->dt * w(this->ijk) * this->dtht_e(this->ijk))
+                                            / (1 + 0.5 * this->dt * this->tht_abs(this->ijk));
+          this->rhs.at(ix::tht)(this->ijk) += -w(this->ijk) * this->dtht_e(this->ijk)
+                                              -this->tht_abs(this->ijk) * this->state(ix::tht)(this->ijk);
         }
         
         public:

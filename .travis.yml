@@ -7,6 +7,7 @@ compiler:
     - gcc
     - clang
 env:
+<<<<<<< HEAD
 #    - MPI=none
 #    - MPI=openmpi
 # not supported by Boost.MPI in Debian on amd64:
@@ -20,6 +21,7 @@ env:
     - TEST_SUITE=nair_jablonowski_2008 MPI=none
     - TEST_SUITE=UWLCM MPI=none
     - TEST_SUITE=pbl MPI=none 
+    - TEST_SUITE=osx_local_clang MPI=none
     - TEST_SUITE=unit MPI=mvapich2
     - TEST_SUITE=sandbox MPI=mvapich2
 # MPI paper tests don't do file comparison and plotting; TODO: fix them
@@ -63,16 +65,22 @@ matrix:
 
         - compiler: clang
           env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
+       
+        # local clang tests on osx
+        - os: linux
+          env: TEST_SUITE=osx_local_clang
+        - compiler: gcc
+          env: TEST_SUITE=osx_local_clang
 addons:
   apt:
     sources: &sources
+      - sourceline: 'ppa:rakhimov/boost'
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-5.0
     packages:
       - g++-6
       - clang-5.0
-
-osx_image: xcode8
+      - boost1.61
 
 before_install:
     # define a compiler variable for use in if statements
@@ -86,11 +94,22 @@ before_install:
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew tap homebrew/science; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi #see https://github.com/travis-ci/travis-ci/issues/6307
+    # - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew tap homebrew/science; fi
+    # - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi #see https://github.com/travis-ci/travis-ci/issues/6307
+    
+    # Workaround for upgrading gcc, see https://github.com/travis-ci/travis-ci/issues/8826
+    # Seems like this is now done by Travis, but leaving it (commented out) for now
+    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew cask uninstall oclint; fi
+    
+    # needed to get rvm, see below
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -; fi
+    # https://github.com/travis-ci/travis-ci/issues/10165
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi
+   
+    # locally installed stuff comes first
+    - export PATH=/usr/local/bin:$PATH
 
     # fixing broken OSX gzip tools
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export PATH=/usr/local/bin:$PATH; fi # so that brew-installed ones are first
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gzip; fi
      
     # to avoid problems with plotting by paraview on Travis
@@ -102,7 +121,9 @@ before_install:
     - export PY3DEB=""
     - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $MPI == 'none' ]]; then PY3DEB=3; fi # had problems with building h5py using python3-pip
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
-    - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-pip; fi
+   
+    # upgrade pip
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
  
 install:
     ############################################################################
@@ -120,7 +141,10 @@ install:
     # redefine CXX to the actual version used
     - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then export CXX=clang++-5.0; fi
     - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++'     ]]; then export CXX=g++-6; fi
+    # downloads and setups local clang on osx
+    - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/setup_local_clang.sh; fi
 
+#<<<<<<< HEAD
     # add a definition -DBOOST_HAS_INT128=1 to clang calls on linux to avoid errors with boost.atomic (https://svn.boost.org/trac/boost/ticket/9610)
 #    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then mkdir /tmp/bin; fi
 #    - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then printf "#!/bin/sh\nexec /usr/bin/clang++ -DBOOST_HAS_INT128=1 \"\$@\"" > /tmp/bin/clang++; fi
@@ -131,14 +155,9 @@ install:
 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $CXX == 'clang++' ]]; then export CXXFLAGS="-DBOOST_HAS_INT128=1 ${CXXFLAGS}"; fi
 
-    # Download and install recent cmake
-    - |
-      if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
-        CMAKE_URL="http://www.cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.tar.gz"
-        mkdir -p ${DEPS_DIR}/cmake
-        travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${DEPS_DIR}/cmake
-        export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-      fi
+    # cmake 
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then wget https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2-Linux-x86_64.sh; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo sh cmake-3.13.2-Linux-x86_64.sh --prefix=/usr/local --exclude-subdir; fi
 
     # MPI
     - if [[ $MPI == 'mpich'    ]]; then sudo $apt_get_install mpich libmpich-dev; fi
@@ -168,47 +187,51 @@ install:
 
     - if [[ $MPI != 'none'    ]]; then export CXX=${DEPS_DIR}/mvapich2-2.3b/bin/mpic++ ; fi # full path, since libtool in hdf5 installation does not understand PATH set above (?)
     - if [[ $MPI != 'none'    ]]; then export CC=${DEPS_DIR}/mvapich2-2.3b/bin/mpicc ; fi
-
-    # boost
-    #- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
-    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libboost-mpi1.55-dev; fi
-    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
-
-    # for MPI we need boost>=1.59, boost installation based on https://github.com/boostorg/compute/blob/master/.travis.yml
-    - | 
-      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
-        ls -A ${DEPS_DIR}/boost
-        if [[ -z "$(ls -A ${DEPS_DIR}/boost)" ]]; then
-          wget http://sourceforge.net/projects/boost/files/boost/1.65.1/boost_1_65_1.tar.gz 
-          tar xf boost_1_65_1.tar.gz
-          cd boost_1_65_1
-          # configure and install
-          if [[ $COMPILER == 'g++' ]]; then echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam; fi
-          if [[ $COMPILER == 'clang++' ]]; then echo "using clang : 5.0 : clang++-5.0 ;" > $HOME/user-config.jam; fi
-          echo "using mpi : $CC ;" >> $HOME/user-config.jam
-          cat $HOME/user-config.jam
-          if [[ $COMPILER == 'g++' ]]; then
-            ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
-            ./b2 -d0 install
-          fi
-          if [[ $COMPILER == 'clang++' ]]; then 
-            #clang installation taken from https://gist.github.com/jimporter/10442880
-            ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem --with-toolset=clang
-            ./b2 clean
-            ./b2 toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=${DEPS_DIR}/boost/ -j 4 stage release
-            ./b2 install toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=${DEPS_DIR}/boost/
-          fi
-          cd ..
-        else
-          echo "Using cached boost."
-        fi
-        export BOOST_ROOT=${DEPS_DIR}/boost
-        export LD_LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LD_LIBRARY_PATH}
-        export LD_RUN_PATH=${DEPS_DIR}/boost/lib:${LD_RUN_PATH}
-        export LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LIBRARY_PATH}
-        export CPATH=${DEPS_DIR}/boost/include:${CPATH}
-      fi
+#
+#    # boost
+#    #- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
+#    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libboost-mpi1.55-dev; fi
+#    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
+#    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
+#
+#    # for MPI we need boost>=1.59, boost installation based on https://github.com/boostorg/compute/blob/master/.travis.yml
+#    - | 
+#      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
+#        ls -A ${DEPS_DIR}/boost
+#        if [[ -z "$(ls -A ${DEPS_DIR}/boost)" ]]; then
+#          wget http://sourceforge.net/projects/boost/files/boost/1.65.1/boost_1_65_1.tar.gz 
+#          tar xf boost_1_65_1.tar.gz
+#          cd boost_1_65_1
+#          # configure and install
+#          if [[ $COMPILER == 'g++' ]]; then echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam; fi
+#          if [[ $COMPILER == 'clang++' ]]; then echo "using clang : 5.0 : clang++-5.0 ;" > $HOME/user-config.jam; fi
+#          echo "using mpi : $CC ;" >> $HOME/user-config.jam
+#          cat $HOME/user-config.jam
+#          if [[ $COMPILER == 'g++' ]]; then
+#            ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
+#            ./b2 -d0 install
+#          fi
+#          if [[ $COMPILER == 'clang++' ]]; then 
+#            #clang installation taken from https://gist.github.com/jimporter/10442880
+#            ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem --with-toolset=clang
+#            ./b2 clean
+#            ./b2 toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=${DEPS_DIR}/boost/ -j 4 stage release
+#            ./b2 install toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=${DEPS_DIR}/boost/
+#          fi
+#          cd ..
+#        else
+#          echo "Using cached boost."
+#        fi
+#        export BOOST_ROOT=${DEPS_DIR}/boost
+#        export LD_LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LD_LIBRARY_PATH}
+#        export LD_RUN_PATH=${DEPS_DIR}/boost/lib:${LD_RUN_PATH}
+#        export LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LIBRARY_PATH}
+#        export CPATH=${DEPS_DIR}/boost/include:${CPATH}
+#      fi
+#=======
+#    # latest boost is installed using addons functionality
+#    
+#>>>>>>> a07596d1b1b4424d85bbf0845bfeff51badedfb8
 
     # blitz
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install blitz; fi
@@ -233,10 +256,9 @@ install:
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo make install; fi 
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd ..; fi 
 
-#=======
 #    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install  -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
 #    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install hdf5-tools; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5 --with-cxx; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5; fi
 
     # gnuplot-iostream
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install gnuplot-nox; fi
@@ -303,3 +325,6 @@ script:
 
     # running bconds_div tests in Release mode
     - if [[ $TEST_SUITE == 'bcond_div' ]]; then . ./.travis_scripts/bconds_div.sh; fi
+  
+    # testing local clang on osx
+    - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/unit.sh; fi # with '.' to pass env vars
