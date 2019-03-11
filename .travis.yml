@@ -67,9 +67,9 @@ matrix:
        
         # local clang tests on osx
         - os: linux
-          env: TEST_SUITE=osx_local_clang
+          env: TEST_SUITE=osx_local_clang MPI=none
         - compiler: gcc
-          env: TEST_SUITE=osx_local_clang
+          env: TEST_SUITE=osx_local_clang MPI=none
 addons:
   apt:
     sources: &sources
