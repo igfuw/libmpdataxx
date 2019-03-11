@@ -14,8 +14,6 @@ if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python 
 #if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-python1.55-dev python-numpy; fi
 if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python-numpy; fi
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install boost-python; fi
-if [[ $TRAVIS_OS_NAME == 'osx' ]]; then git clone --depth=1 git://github.com/thrust/thrust.git; fi
-if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust; fi
 
 # odeint
 if [[ $TRAVIS_OS_NAME == 'linux' ]]; then git clone --depth=1 https://github.com/boostorg/odeint.git; fi # get boost odeint > 1.58
