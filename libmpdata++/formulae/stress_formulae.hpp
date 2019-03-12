@@ -264,20 +264,20 @@ namespace libmpdataxx
         =
         2 * (
           (v[0](ijkm[0] + 1, ijk[1]) - v[0](ijkm[0], ijk[1])) / dijk[0]
-          - 0.25 / 2 * ( div_v(ijkm[0], ijk[1] + h) + div_v(ijkm[0], ijk[1] - h) 
-                       + div_v(ijkm[0] + 1, ijk[1] + h) + div_v(ijkm[0] + 1, ijk[1] - h))
+          - fconst<arr_t>(0.25 / 2) * ( div_v(ijkm[0], ijk[1] + h) + div_v(ijkm[0], ijk[1] - h) 
+                                      + div_v(ijkm[0] + 1, ijk[1] + h) + div_v(ijkm[0] + 1, ijk[1] - h))
         );
         
         tau[1](ijk[0], ijkm[1] + h)
         =
         2 * (
           (v[1](ijk[0], ijkm[1] + 1) - v[1](ijk[0], ijkm[1])) / dijk[1]
-          - 1.0 / 2 * div_v(ijk[0], ijkm[1] + h)
+          - fconst<arr_t>(1.0 / 2) * div_v(ijk[0], ijkm[1] + h)
         );
 
         tau[2](ijkm[0] + h, ijkm[1] + h)
         =
-        0.5 *
+        fconst<arr_t>(0.5) *
         (
           ( v[0](ijkm[0], ijkm[1] + 1) - v[0](ijkm[0], ijkm[1]) 
           + v[0](ijkm[0] + 1, ijkm[1] + 1) - v[0](ijkm[0] + 1, ijkm[1])
@@ -303,28 +303,28 @@ namespace libmpdataxx
         =
         2 * (
           (v[0](ijkm[0] + 1, ijk[1], ijk[2]) - v[0](ijkm[0], ijk[1], ijk[2])) / dijk[0]
-          - 0.25 / 3 * ( div_v(ijkm[0], ijk[1], ijk[2] + h) + div_v(ijkm[0], ijk[1], ijk[2] - h)
-                       + div_v(ijkm[0] + 1, ijk[1], ijk[2] + h) + div_v(ijkm[0] + 1, ijk[1], ijk[2] - h))
+          - fconst<arr_t>(0.25 / 3) * ( div_v(ijkm[0], ijk[1], ijk[2] + h) + div_v(ijkm[0], ijk[1], ijk[2] - h)
+                                      + div_v(ijkm[0] + 1, ijk[1], ijk[2] + h) + div_v(ijkm[0] + 1, ijk[1], ijk[2] - h))
         );
         
         tau[1](ijk[0], ijkm[1] + h, ijk[2])
         =
         2 * (
           (v[1](ijk[0], ijkm[1] + 1, ijk[2]) - v[1](ijk[0], ijkm[1], ijk[2])) / dijk[1]
-          - 0.25 / 3 * ( div_v(ijk[0], ijkm[1], ijk[2] + h) + div_v(ijk[0], ijkm[1], ijk[2] - h)
-                       + div_v(ijk[0], ijkm[1] + 1, ijk[2] + h) + div_v(ijk[0], ijkm[1] + 1, ijk[2] - h))
+          - fconst<arr_t>(0.25 / 3) * ( div_v(ijk[0], ijkm[1], ijk[2] + h) + div_v(ijk[0], ijkm[1], ijk[2] - h)
+                                    + div_v(ijk[0], ijkm[1] + 1, ijk[2] + h) + div_v(ijk[0], ijkm[1] + 1, ijk[2] - h))
         );
         
         tau[2](ijk[0], ijk[1], ijkm[2] + h)
         =
         2 * (
           (v[2](ijk[0], ijk[1], ijkm[2] + 1) - v[2](ijk[0], ijk[1], ijkm[2])) / dijk[2]
-          - 1.0 / 3  * div_v(ijk[0], ijk[1], ijkm[2] + h) 
+          - fconst<arr_t>(1.0 / 3)  * div_v(ijk[0], ijk[1], ijkm[2] + h) 
         );
 
         tau[3](ijkm[0] + h, ijkm[1] + h, ijk[2])
         =
-        0.5 *
+        fconst<arr_t>(0.5) *
         (
           ( v[0](ijkm[0], ijkm[1] + 1, ijk[2]) - v[0](ijkm[0], ijkm[1], ijk[2]) 
           + v[0](ijkm[0] + 1, ijkm[1] + 1, ijk[2]) - v[0](ijkm[0] + 1, ijkm[1], ijk[2])
@@ -337,7 +337,7 @@ namespace libmpdataxx
         
         tau[4](ijkm[0] + h, ijk[1], ijkm[2] + h)
         =
-        0.5 *
+        fconst<arr_t>(0.5) *
         (
           ( v[0](ijkm[0], ijk[1], ijkm[2] + 1) - v[0](ijkm[0], ijk[1], ijkm[2])
           + v[0](ijkm[0] + 1, ijk[1], ijkm[2] + 1) - v[0](ijkm[0] + 1, ijk[1], ijkm[2])
@@ -350,7 +350,7 @@ namespace libmpdataxx
         
         tau[5](ijk[0], ijkm[1] + h, ijkm[2] + h)
         =
-        0.5 *
+        fconst<arr_t>(0.5) *
         (
           ( v[1](ijk[0], ijkm[1], ijkm[2] + 1) - v[1](ijk[0], ijkm[1], ijkm[2])
           + v[1](ijk[0], ijkm[1] + 1, ijkm[2] + 1) - v[1](ijk[0], ijkm[1] + 1, ijkm[2])
@@ -462,12 +462,12 @@ namespace libmpdataxx
                                       typename std::enable_if<nd == 2>::type* = 0)
       {
         av[0](ijk[0] + h, ijk[1]) *= coeff * 
-                           0.5 * (k_m(ijk[0] + 1, ijk[1]) + k_m(ijk[0], ijk[1])) *
-                           0.5 * (G<opts, 0>(rho, ijk[0] + 1, ijk[1]) + G<opts, 0>(rho, ijk[0], ijk[1]));
+                           real_t(0.5) * (k_m(ijk[0] + 1, ijk[1]) + k_m(ijk[0], ijk[1])) *
+                           real_t(0.5) * (G<opts, 0>(rho, ijk[0] + 1, ijk[1]) + G<opts, 0>(rho, ijk[0], ijk[1]));
         
         av[1](ijk[0], ijk[1] + h) *= coeff *
-                           0.5 * (k_m(ijk[0], ijk[1] + 1) + k_m(ijk[0], ijk[1])) * 
-                           0.5 * (G<opts, 0>(rho, ijk[0], ijk[1] + 1) + G<opts, 0>(rho, ijk[0], ijk[1]));
+                           real_t(0.5) * (k_m(ijk[0], ijk[1] + 1) + k_m(ijk[0], ijk[1])) * 
+                           real_t(0.5) * (G<opts, 0>(rho, ijk[0], ijk[1] + 1) + G<opts, 0>(rho, ijk[0], ijk[1]));
       }
 
       // 3D version
@@ -480,16 +480,16 @@ namespace libmpdataxx
                                       typename std::enable_if<nd == 3>::type* = 0)
       {
         av[0](ijk[0] + h, ijk[1], ijk[2]) *= coeff *
-                           0.5 * (k_m(ijk[0] + 1, ijk[1], ijk[2]) + k_m(ijk[0], ijk[1], ijk[2])) *
-                           0.5 * (G<opts, 0>(rho, ijk[0] + 1, ijk[1], ijk[2]) + G<opts, 0>(rho,ijk[0], ijk[1], ijk[2]));
+                           real_t(0.5) * (k_m(ijk[0] + 1, ijk[1], ijk[2]) + k_m(ijk[0], ijk[1], ijk[2])) *
+                           real_t(0.5) * (G<opts, 0>(rho, ijk[0] + 1, ijk[1], ijk[2]) + G<opts, 0>(rho,ijk[0], ijk[1], ijk[2]));
         
         av[1](ijk[0], ijk[1] + h, ijk[2]) *= coeff *
-                           0.5 * (k_m(ijk[0], ijk[1] + 1, ijk[2]) + k_m(ijk[0], ijk[1], ijk[2])) *
-                           0.5 * (G<opts, 0>(rho, ijk[0], ijk[1] + 1, ijk[2]) + G<opts, 0>(rho, ijk[0], ijk[1], ijk[2]));
+                           real_t(0.5) * (k_m(ijk[0], ijk[1] + 1, ijk[2]) + k_m(ijk[0], ijk[1], ijk[2])) *
+                           real_t(0.5) * (G<opts, 0>(rho, ijk[0], ijk[1] + 1, ijk[2]) + G<opts, 0>(rho, ijk[0], ijk[1], ijk[2]));
         
         av[2](ijk[0], ijk[1], ijk[2] + h) *= coeff *
-                           0.5 * (k_m(ijk[0], ijk[1], ijk[2] + 1) + k_m(ijk[0], ijk[1], ijk[2])) *
-                           0.5 * (G<opts, 0>(rho, ijk[0], ijk[1], ijk[2] + 1) + G<opts, 0>(rho, ijk[0], ijk[1], ijk[2]));
+                           real_t(0.5) * (k_m(ijk[0], ijk[1], ijk[2] + 1) + k_m(ijk[0], ijk[1], ijk[2])) *
+                           real_t(0.5) * (G<opts, 0>(rho, ijk[0], ijk[1], ijk[2] + 1) + G<opts, 0>(rho, ijk[0], ijk[1], ijk[2]));
       }
       
       // multiplication of compact tensor components by constant molecular viscosity
@@ -528,16 +528,16 @@ namespace libmpdataxx
       {
         multiply_vctr_cmpct<nd, opts>(av, coeff, k_m, rho, ijk);
         av[2](ijk[0] + h, ijk[1] + h) *= coeff * 
-                                         0.25 * ( k_m(ijk[0] + 1, ijk[1]    )
-                                                + k_m(ijk[0]    , ijk[1]    )
-                                                + k_m(ijk[0] + 1, ijk[1] + 1)
-                                                + k_m(ijk[0]    , ijk[1] + 1)
-                                                ) *
-                                         0.25 * ( G<opts, 0>(rho, ijk[0] + 1, ijk[1]    )
-                                                + G<opts, 0>(rho, ijk[0]    , ijk[1]    )
-                                                + G<opts, 0>(rho, ijk[0] + 1, ijk[1] + 1)
-                                                + G<opts, 0>(rho, ijk[0]    , ijk[1] + 1)
-                                                );
+                                         real_t(0.25) * ( k_m(ijk[0] + 1, ijk[1]    )
+                                                        + k_m(ijk[0]    , ijk[1]    )
+                                                        + k_m(ijk[0] + 1, ijk[1] + 1)
+                                                        + k_m(ijk[0]    , ijk[1] + 1)
+                                                        ) *
+                                         real_t(0.25) * ( G<opts, 0>(rho, ijk[0] + 1, ijk[1]    )
+                                                        + G<opts, 0>(rho, ijk[0]    , ijk[1]    )
+                                                        + G<opts, 0>(rho, ijk[0] + 1, ijk[1] + 1)
+                                                        + G<opts, 0>(rho, ijk[0]    , ijk[1] + 1)
+                                                        );
       }
 
       // 3D version
@@ -551,40 +551,40 @@ namespace libmpdataxx
       {
         multiply_vctr_cmpct<nd, opts>(av, coeff, k_m, rho, ijk);
         av[3](ijk[0] + h, ijk[1] + h, ijk[2]) *= coeff *
-                                                 0.25 * ( k_m(ijk[0] + 1, ijk[1]    , ijk[2])
-                                                        + k_m(ijk[0]    , ijk[1]    , ijk[2])
-                                                        + k_m(ijk[0] + 1, ijk[1] + 1, ijk[2])
-                                                        + k_m(ijk[0]    , ijk[1] + 1, ijk[2])
-                                                        ) *
-                                                 0.25 * ( G<opts, 0>(rho, ijk[0] + 1, ijk[1]    , ijk[2])
-                                                        + G<opts, 0>(rho, ijk[0]    , ijk[1]    , ijk[2])
-                                                        + G<opts, 0>(rho, ijk[0] + 1, ijk[1] + 1, ijk[2])
-                                                        + G<opts, 0>(rho, ijk[0]    , ijk[1] + 1, ijk[2])
-                                                        );
+                                                 real_t(0.25) * ( k_m(ijk[0] + 1, ijk[1]    , ijk[2])
+                                                                + k_m(ijk[0]    , ijk[1]    , ijk[2])
+                                                                + k_m(ijk[0] + 1, ijk[1] + 1, ijk[2])
+                                                                + k_m(ijk[0]    , ijk[1] + 1, ijk[2])
+                                                                ) *
+                                                 real_t(0.25) * ( G<opts, 0>(rho, ijk[0] + 1, ijk[1]    , ijk[2])
+                                                                + G<opts, 0>(rho, ijk[0]    , ijk[1]    , ijk[2])
+                                                                + G<opts, 0>(rho, ijk[0] + 1, ijk[1] + 1, ijk[2])
+                                                                + G<opts, 0>(rho, ijk[0]    , ijk[1] + 1, ijk[2])
+                                                                );
         
         av[4](ijk[0] + h, ijk[1], ijk[2] + h) *= coeff *
-                                                 0.25 * ( k_m(ijk[0] + 1, ijk[1], ijk[2]    )
-                                                        + k_m(ijk[0]    , ijk[1], ijk[2]    )
-                                                        + k_m(ijk[0] + 1, ijk[1], ijk[2] + 1)
-                                                        + k_m(ijk[0]    , ijk[1], ijk[2] + 1)
-                                                        ) *
-                                                 0.25 * ( G<opts, 0>(rho, ijk[0] + 1, ijk[1], ijk[2]    )
-                                                        + G<opts, 0>(rho, ijk[0]    , ijk[1], ijk[2]    )
-                                                        + G<opts, 0>(rho, ijk[0] + 1, ijk[1], ijk[2] + 1)
-                                                        + G<opts, 0>(rho, ijk[0]    , ijk[1], ijk[2] + 1)
-                                                        );
+                                                 real_t(0.25) * ( k_m(ijk[0] + 1, ijk[1], ijk[2]    )
+                                                                + k_m(ijk[0]    , ijk[1], ijk[2]    )
+                                                                + k_m(ijk[0] + 1, ijk[1], ijk[2] + 1)
+                                                                + k_m(ijk[0]    , ijk[1], ijk[2] + 1)
+                                                                ) *
+                                                 real_t(0.25) * ( G<opts, 0>(rho, ijk[0] + 1, ijk[1], ijk[2]    )
+                                                                + G<opts, 0>(rho, ijk[0]    , ijk[1], ijk[2]    )
+                                                                + G<opts, 0>(rho, ijk[0] + 1, ijk[1], ijk[2] + 1)
+                                                                + G<opts, 0>(rho, ijk[0]    , ijk[1], ijk[2] + 1)
+                                                                );
 
         av[5](ijk[0], ijk[1] + h, ijk[2] + h) *= coeff *
-                                                 0.25 * ( k_m(ijk[0], ijk[1]    , ijk[2] + 1)
-                                                        + k_m(ijk[0], ijk[1]    , ijk[2]    )
-                                                        + k_m(ijk[0], ijk[1] + 1, ijk[2] + 1)
-                                                        + k_m(ijk[0], ijk[1] + 1, ijk[2]    )
-                                                        ) *
-                                                 0.25 * ( G<opts, 0>(rho, ijk[0], ijk[1]    , ijk[2] + 1)
-                                                        + G<opts, 0>(rho, ijk[0], ijk[1]    , ijk[2]    )
-                                                        + G<opts, 0>(rho, ijk[0], ijk[1] + 1, ijk[2] + 1)
-                                                        + G<opts, 0>(rho, ijk[0], ijk[1] + 1, ijk[2]    )
-                                                        );
+                                                 real_t(0.25) * ( k_m(ijk[0], ijk[1]    , ijk[2] + 1)
+                                                                + k_m(ijk[0], ijk[1]    , ijk[2]    )
+                                                                + k_m(ijk[0], ijk[1] + 1, ijk[2] + 1)
+                                                                + k_m(ijk[0], ijk[1] + 1, ijk[2]    )
+                                                                ) *
+                                                 real_t(0.25) * ( G<opts, 0>(rho, ijk[0], ijk[1]    , ijk[2] + 1)
+                                                                + G<opts, 0>(rho, ijk[0], ijk[1]    , ijk[2]    )
+                                                                + G<opts, 0>(rho, ijk[0], ijk[1] + 1, ijk[2] + 1)
+                                                                + G<opts, 0>(rho, ijk[0], ijk[1] + 1, ijk[2]    )
+                                                                );
       }
 
       // flux divergence
@@ -642,7 +642,7 @@ namespace libmpdataxx
         coeff *
         (
           (tau[0](ijk[0] + h, ijk[1]) - tau[0](ijk[0] - h, ijk[1])) / dijk[0]
-          + 0.5 * 
+          + real_t(0.5) * 
           ( tau[2](ijk[0] + h, ijk[1] + h) - tau[2](ijk[0] + h, ijk[1] - h)
           + tau[2](ijk[0] - h, ijk[1] + h) - tau[2](ijk[0] - h, ijk[1] - h)
           ) / dijk[1]
@@ -652,7 +652,7 @@ namespace libmpdataxx
         +=
         coeff *
         (
-          0.5 * 
+          real_t(0.5) * 
           ( tau[2](ijk[0] + h, ijk[1] + h) - tau[2](ijk[0] - h, ijk[1] + h)
           + tau[2](ijk[0] + h, ijk[1] - h) - tau[2](ijk[0] - h, ijk[1] - h)
           ) / dijk[0]
@@ -676,11 +676,11 @@ namespace libmpdataxx
         coeff *
         (
           (tau[0](ijk[0] + h, ijk[1], ijk[2]) - tau[0](ijk[0] - h, ijk[1], ijk[2])) / dijk[0]
-          + 0.5 * 
+          + real_t(0.5) * 
           ( tau[3](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] + h, ijk[1] - h, ijk[2])
           + tau[3](ijk[0] - h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] - h, ijk[2])
           ) / dijk[1]
-          + 0.5 * 
+          + real_t(0.5) * 
           ( tau[4](ijk[0] + h, ijk[1], ijk[2] + h) - tau[4](ijk[0] + h, ijk[1], ijk[2] - h)
           + tau[4](ijk[0] - h, ijk[1], ijk[2] + h) - tau[4](ijk[0] - h, ijk[1], ijk[2] - h)
           ) / dijk[2]
@@ -690,13 +690,13 @@ namespace libmpdataxx
         +=
         coeff *
         (
-          0.5 * 
+          real_t(0.5) * 
           ( tau[3](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] + h, ijk[2])
           + tau[3](ijk[0] + h, ijk[1] - h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] - h, ijk[2])
           ) / dijk[0]
           +
           (tau[1](ijk[0], ijk[1] + h, ijk[2]) - tau[1](ijk[0], ijk[1] - h, ijk[2])) / dijk[1]
-          + 0.5 * 
+          + real_t(0.5) * 
           ( tau[5](ijk[0], ijk[1] + h, ijk[2] + h) - tau[5](ijk[0], ijk[1] + h, ijk[2] - h)
           + tau[5](ijk[0], ijk[1] - h, ijk[2] + h) - tau[5](ijk[0], ijk[1] - h, ijk[2] - h)
           ) / dijk[2]
@@ -706,11 +706,11 @@ namespace libmpdataxx
         +=
         coeff *
         (
-          0.5 * 
+          real_t(0.5) * 
           ( tau[4](ijk[0] + h, ijk[1], ijk[2] + h) - tau[4](ijk[0] - h, ijk[1], ijk[2] + h)
           + tau[4](ijk[0] + h, ijk[1], ijk[2] - h) - tau[4](ijk[0] - h, ijk[1], ijk[2] - h)
           ) / dijk[0]
-          + 0.5 * 
+          + real_t(0.5) * 
           ( tau[5](ijk[0], ijk[1] + h, ijk[2] + h) - tau[5](ijk[0], ijk[1] - h, ijk[2] + h)
           + tau[5](ijk[0], ijk[1] + h, ijk[2] - h) - tau[5](ijk[0], ijk[1] - h, ijk[2] - h)
           ) / dijk[1]

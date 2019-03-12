@@ -209,7 +209,7 @@ namespace libmpdataxx
         struct rt_params_t 
         {
           std::array<int, n_dims> grid_size;
-          real_t dt=0, max_abs_div_eps = blitz::epsilon(real_t(44)), max_courant = 0.5;
+          real_t dt=0, max_abs_div_eps = blitz::epsilon(real_t(44)), max_courant = real_t(0.5);
         };
 
 	// ctor

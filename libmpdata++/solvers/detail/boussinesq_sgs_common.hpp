@@ -30,7 +30,7 @@ namespace libmpdataxx
         template <int nd = ct_params_t::n_dims> 
         void calc_rcdsn_num(typename std::enable_if<nd == 2>::type* = 0)
         {
-          rcdsn_num(this->ijk) = this->g * 0.5 * (
+          rcdsn_num(this->ijk) = this->g * real_t(0.5) * (
                                              grad_tht[ct_params_t::n_dims - 1](this->i, this->j - h)
                                            + grad_tht[ct_params_t::n_dims - 1](this->i, this->j + h)
                                            ) / (this->Tht_ref * tdef_sq(this->ijk));
@@ -39,7 +39,7 @@ namespace libmpdataxx
         template <int nd = ct_params_t::n_dims> 
         void calc_rcdsn_num(typename std::enable_if<nd == 3>::type* = 0)
         {
-          rcdsn_num(this->ijk) = this->g * 0.5 * (
+          rcdsn_num(this->ijk) = this->g * real_t(0.5) * (
                                              grad_tht[ct_params_t::n_dims - 1](this->i, this->j, this->k - h)
                                            + grad_tht[ct_params_t::n_dims - 1](this->i, this->j, this->k + h)
                                            ) / (this->Tht_ref * tdef_sq(this->ijk));
@@ -96,12 +96,16 @@ namespace libmpdataxx
           if (this->rank > 0)
             ijkm_aux[0] = this->ijk[0];
 
-          formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims, ct_params_t::opts>(this->tau, 1.0, this->k_m, *this->mem->G, ijkm_aux);
+          formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims, ct_params_t::opts>(this->tau,
+                                                                                        real_t(1.0),
+                                                                                        this->k_m,
+                                                                                        *this->mem->G,
+                                                                                        ijkm_aux);
 
           this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
 
           formulae::stress::multiply_vctr_cmpct<ct_params_t::n_dims, ct_params_t::opts>(grad_tht,
-                                                                                        1.0 / prandtl_num,
+                                                                                        real_t(1.0) / prandtl_num,
                                                                                         this->k_m,
                                                                                         *this->mem->G,
                                                                                         this->ijk);

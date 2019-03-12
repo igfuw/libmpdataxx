@@ -43,16 +43,16 @@ namespace libmpdataxx
       template <class ct_params_t, int minhalo> 
       class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>
       {
+        public:
         using ix = typename ct_params_t::ix;
+        using parent_t = mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>;
+        using real_t = typename ct_params_t::real_t;
 
 	protected:
-	
-        using parent_t = mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>;
-
 	// member fields
         std::array<int, parent_t::n_dims> vip_ixs;
 	arrvec_t<typename parent_t::arr_t> &stash, &vip_rhs;
-        typename parent_t::real_t eps;
+        real_t eps;
 
         arrvec_t<typename parent_t::arr_t>& vip_stash(const int t_lev)
         {
@@ -189,7 +189,7 @@ namespace libmpdataxx
             }
             else
             {
-              vip_rhs[d](this->ijk) = 0.0;
+              vip_rhs[d](this->ijk) = 0;
             }
           }
         }
@@ -220,7 +220,7 @@ namespace libmpdataxx
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
               vip_rhs[d](this->ijk) += vips()[d](this->ijk);
-              vip_rhs[d](this->ijk) /= (0.5 * this->dt);
+              vip_rhs[d](this->ijk) /= (real_t(0.5) * this->dt);
             }
           }
         }
@@ -229,7 +229,7 @@ namespace libmpdataxx
         {    
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            vips()[d](this->ijk) += 0.5 * this->dt * vip_rhs[d](this->ijk);
+            vips()[d](this->ijk) += real_t(0.5) * this->dt * vip_rhs[d](this->ijk);
             vip_rhs[d](this->ijk) = 0;
           }
         }
@@ -240,7 +240,7 @@ namespace libmpdataxx
           {
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
-              v[d](this->ijk) /= (1.0 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+              v[d](this->ijk) /= (1 + real_t(0.5) * this->dt * (*this->mem->vab_coeff)(this->ijk));
             }
           }
         }
@@ -250,7 +250,7 @@ namespace libmpdataxx
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             this->vips()[d](this->ijk) +=
-              0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[d](this->ijk);
+              real_t(0.5) * this->dt * (*this->mem->vab_coeff)(this->ijk) * this->mem->vab_relax[d](this->ijk);
           }
         }
 
@@ -313,7 +313,7 @@ namespace libmpdataxx
                                                 - (this->dt_stash[1] + this->dt_stash[0]) * vip_stash(-1)[d](this->ijk)
                                                 + this->dt_stash[0] * vip_stash(-2)[d](this->ijk)
                                              ) / ( this->dt_stash[0] * this->dt_stash[1]
-                                                 * 0.5 * (this->dt_stash[0] + this->dt_stash[1])
+                                                 * real_t(0.5) * (this->dt_stash[0] + this->dt_stash[1])
                                              );
                 this->xchng_pres(this->vip_stash(0)[d], this->ijk, ex);
               }
@@ -349,7 +349,7 @@ namespace libmpdataxx
 	
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename parent_t::real_t vip_eps = 0;
+          real_t vip_eps = 0;
         };
 
 	static void alloc(

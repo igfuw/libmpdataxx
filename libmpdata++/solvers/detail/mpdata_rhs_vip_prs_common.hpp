@@ -87,7 +87,7 @@ namespace libmpdataxx
           int npoints = 1;
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-	    Phi(this->ijk) -= 0.5 * pow2(this->vips()[d](this->ijk));
+	    Phi(this->ijk) -= real_t(0.5) * pow2(this->vips()[d](this->ijk));
             npoints *= (this->mem->grid_size[d].last() + 1);
           }
           
@@ -184,7 +184,7 @@ namespace libmpdataxx
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             this->vip_rhs[d](this->ijk) += this->vips()[d](this->ijk);
-            this->vip_rhs[d](this->ijk) /= (0.5 * this->dt);
+            this->vip_rhs[d](this->ijk) /= (real_t(0.5) * this->dt);
           }
         }
 

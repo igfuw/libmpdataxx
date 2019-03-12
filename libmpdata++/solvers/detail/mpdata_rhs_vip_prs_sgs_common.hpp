@@ -36,6 +36,7 @@ namespace libmpdataxx
       class mpdata_rhs_vip_prs_sgs_common : public mpdata_rhs_vip_prs<ct_params_t, minhalo>
       {
         using parent_t = mpdata_rhs_vip_prs<ct_params_t, minhalo>;
+        using real_t = typename ct_params_t::real_t;
 
         protected:
 
@@ -47,7 +48,7 @@ namespace libmpdataxx
         arrvec_t<typename parent_t::arr_t> &wrk;
 
         std::array<rng_t, ct_params_t::n_dims> ijkm;
-        typename parent_t::real_t cdrag;
+        real_t cdrag;
 
         virtual void multiply_sgs_visc() = 0;
 
@@ -61,7 +62,7 @@ namespace libmpdataxx
             formulae::stress::pade_dispatch<ct_params_t::n_dims>(wrk, this->ijk, d);
             // finish calculation of wrk[1] before modyfying wrk[0]
             this->mem->barrier();
-            wrk[0](this->ijk) += (drv[d](this->ijk) - 0.25 * wrk[1](this->ijk));
+            wrk[0](this->ijk) += (drv[d](this->ijk) - real_t(0.25) * wrk[1](this->ijk));
           }
           drv[d](this->ijk) = wrk[0](this->ijk);
           // needed because otherwise other threads could start calculating pade correction
@@ -115,7 +116,7 @@ namespace libmpdataxx
                                                                                             *this->mem->G,
                                                                                             this->ijk,
                                                                                             this->dijk,
-                                                                                            2.0);
+                                                                                            real_t(2.0));
           }
           else
           {
@@ -151,7 +152,7 @@ namespace libmpdataxx
             }
 
             // update forces
-            formulae::stress::calc_stress_rhs<ct_params_t::n_dims>(this->vip_rhs, drv, this->ijk, 2.0);
+            formulae::stress::calc_stress_rhs<ct_params_t::n_dims>(this->vip_rhs, drv, this->ijk, real_t(2.0));
           }
         }
 

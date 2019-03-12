@@ -130,7 +130,7 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          - 1.0 / 24 *
+          - fconst<arr_1d_t>(1.0 / 24) *
           (
               4 * GC[0](i+h) * ndxx_psi<opts>(psi, i)
             + 2 * ndx_psi<opts>(psi, i) * ndx_GC0(GC[0], i)
@@ -170,9 +170,9 @@ namespace libmpdataxx
           // spatial terms
           + div_3rd_spatial<opts, sptl_intrp>(psi, GC, G, i)
           // mixed terms
-          + 0.5 * abs(GC[0](i+h)) * ndx_fdiv<opts>(psi, GC, G, i)
+          + fconst<arr_1d_t>(0.5) * abs(GC[0](i+h)) * ndx_fdiv<opts>(psi, GC, G, i)
           // temporal terms
-          + 1.0 / 24 *
+          + fconst<arr_1d_t>(1.0 / 24) *
           (
               - 8 * GC[0](i+h) *  nfdiv_fdiv<opts>(psi, GC, G, i)
               + div_3rd_temporal<opts, tmprl_extrp>(psi, ndtt_GC, i)

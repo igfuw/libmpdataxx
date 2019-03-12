@@ -241,7 +241,7 @@ namespace libmpdataxx
 
         typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
-          stat_field(this->ijk) =  0.5 * (
+          stat_field(this->ijk) =  typename parent_t::real_t(0.5) * (
                                             abs(arrvec[0](i+h, j, k) + arrvec[0](i-h, j, k))
                                           + abs(arrvec[1](i, j+h, k) + arrvec[1](i, j-h, k))
                                           + abs(arrvec[2](i, j, k+h) + arrvec[2](i, j, k-h))
