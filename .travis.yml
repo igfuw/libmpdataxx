@@ -38,6 +38,7 @@ cache:
   directories:
     - ${TRAVIS_BUILD_DIR}/deps/mvapich2-2.3b
     - ${TRAVIS_BUILD_DIR}/deps/boost
+    - ${TRAVIS_BUILD_DIR}/deps/hdf5
 
 matrix:
     exclude:
@@ -244,13 +245,26 @@ install:
     # C++ support missing in Debian package ...
     #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libhdf5-openmpi-dev; fi 
     # ... so we are installing it manually:
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then wget https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.10.5.tar; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then tar xf hdf5-1.10.5.tar; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd hdf5-1.10.5; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then CXXFLAGS=-w CFLAGS=-w ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=/usr; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then make; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo make install; fi 
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then cd ..; fi 
+    - | 
+      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
+        ls -A ${DEPS_DIR}/hdf5
+        if [[ -z "$(ls -A ${DEPS_DIR}/hdf5)" ]]; then
+          wget https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.10.5.tar
+          tar xf hdf5-1.10.5.tar
+          cd hdf5-1.10.5
+          CXXFLAGS=-w CFLAGS=-w ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=/${DEPS_DIR}/hdf5/
+          make
+          sudo make install
+          cd ..
+        else
+          echo "Using cached hdf5."
+        fi
+        export HDF5=${DEPS_DIR}/hdf5
+        export LD_LIBRARY_PATH=${DEPS_DIR}/hdf5/lib:${LD_LIBRARY_PATH}
+        export LD_RUN_PATH=${DEPS_DIR}/hdf5/lib:${LD_RUN_PATH}
+        export LIBRARY_PATH=${DEPS_DIR}/hdf5/lib:${LIBRARY_PATH}
+        export CPATH=${DEPS_DIR}/hdf5/include:${CPATH}
+      fi
 
 #    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install  -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
 #    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install hdf5-tools; fi
