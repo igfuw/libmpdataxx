@@ -186,51 +186,47 @@ install:
 
     - if [[ $MPI != 'none'    ]]; then export CXX=${DEPS_DIR}/mvapich2-2.3b/bin/mpic++ ; fi # full path, since libtool in hdf5 installation does not understand PATH set above (?)
     - if [[ $MPI != 'none'    ]]; then export CC=${DEPS_DIR}/mvapich2-2.3b/bin/mpicc ; fi
-#
-#    # boost
-#    #- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
-#    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libboost-mpi1.55-dev; fi
-#    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
-#    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
-#
-#    # for MPI we need boost>=1.59, boost installation based on https://github.com/boostorg/compute/blob/master/.travis.yml
-#    - | 
-#      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
-#        ls -A ${DEPS_DIR}/boost
-#        if [[ -z "$(ls -A ${DEPS_DIR}/boost)" ]]; then
-#          wget http://sourceforge.net/projects/boost/files/boost/1.65.1/boost_1_65_1.tar.gz 
-#          tar xf boost_1_65_1.tar.gz
-#          cd boost_1_65_1
-#          # configure and install
-#          if [[ $COMPILER == 'g++' ]]; then echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam; fi
-#          if [[ $COMPILER == 'clang++' ]]; then echo "using clang : 5.0 : clang++-5.0 ;" > $HOME/user-config.jam; fi
-#          echo "using mpi : $CC ;" >> $HOME/user-config.jam
-#          cat $HOME/user-config.jam
-#          if [[ $COMPILER == 'g++' ]]; then
-#            ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
-#            ./b2 -d0 install
-#          fi
-#          if [[ $COMPILER == 'clang++' ]]; then 
-#            #clang installation taken from https://gist.github.com/jimporter/10442880
-#            ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem --with-toolset=clang
-#            ./b2 clean
-#            ./b2 toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=${DEPS_DIR}/boost/ -j 4 stage release
-#            ./b2 install toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=${DEPS_DIR}/boost/
-#          fi
-#          cd ..
-#        else
-#          echo "Using cached boost."
-#        fi
-#        export BOOST_ROOT=${DEPS_DIR}/boost
-#        export LD_LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LD_LIBRARY_PATH}
-#        export LD_RUN_PATH=${DEPS_DIR}/boost/lib:${LD_RUN_PATH}
-#        export LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LIBRARY_PATH}
-#        export CPATH=${DEPS_DIR}/boost/include:${CPATH}
-#      fi
-#=======
-#    # latest boost is installed using addons functionality
-#    
-#>>>>>>> a07596d1b1b4424d85bbf0845bfeff51badedfb8
+
+    # boost
+    #- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-thread1.55-dev libboost-timer1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev; fi
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libboost-mpi1.55-dev; fi
+    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew reinstall boost --c++11; fi          # ...what takes too long :(
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install libboost1.55-all-dev; fi
+
+    # for MPI we need boost>=1.59 with mpi support, boost installation based on https://github.com/boostorg/compute/blob/master/.travis.yml
+    - | 
+      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
+        ls -A ${DEPS_DIR}/boost
+        if [[ -z "$(ls -A ${DEPS_DIR}/boost)" ]]; then
+          wget http://sourceforge.net/projects/boost/files/boost/1.65.1/boost_1_65_1.tar.gz 
+          tar xf boost_1_65_1.tar.gz
+          cd boost_1_65_1
+          # configure and install
+          if [[ $COMPILER == 'g++' ]]; then echo "using gcc : 6.2 : g++-6 ;" > $HOME/user-config.jam; fi
+          if [[ $COMPILER == 'clang++' ]]; then echo "using clang : 5.0 : clang++-5.0 ;" > $HOME/user-config.jam; fi
+          echo "using mpi : $CC ;" >> $HOME/user-config.jam
+          cat $HOME/user-config.jam
+          if [[ $COMPILER == 'g++' ]]; then
+            ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem
+            ./b2 -d0 install
+          fi
+          if [[ $COMPILER == 'clang++' ]]; then 
+            #clang installation taken from https://gist.github.com/jimporter/10442880
+            ./bootstrap.sh --prefix=${DEPS_DIR}/boost/ --with-libraries=serialization,mpi,thread,date_time,system,iostreams,timer,filesystem --with-toolset=clang
+            ./b2 clean
+            ./b2 toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=${DEPS_DIR}/boost/ -j 4 stage release
+            ./b2 install toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=${DEPS_DIR}/boost/
+          fi
+          cd ..
+        else
+          echo "Using cached boost."
+        fi
+        export BOOST_ROOT=${DEPS_DIR}/boost
+        export LD_LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LD_LIBRARY_PATH}
+        export LD_RUN_PATH=${DEPS_DIR}/boost/lib:${LD_RUN_PATH}
+        export LIBRARY_PATH=${DEPS_DIR}/boost/lib:${LIBRARY_PATH}
+        export CPATH=${DEPS_DIR}/boost/include:${CPATH}
+      fi
 
     # blitz
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install blitz; fi
