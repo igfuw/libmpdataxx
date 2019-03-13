@@ -162,6 +162,17 @@ bool check(const int expected)
 
 int main()
 {
+  #if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually,
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+  #endif
+
   if (!check<opts::iga | opts::dfl, 2>(2)) throw std::runtime_error("");
   if (!check<opts::iga | opts::div_2nd | opts::div_3rd, 2>(3)) throw std::runtime_error("");
+
+  #if defined(USE_MPI)
+  MPI::Finalize();
+  #endif
+
 }
