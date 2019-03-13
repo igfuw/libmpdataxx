@@ -18,6 +18,9 @@ namespace libmpdataxx
       class mpdata_rhs_vip_prs_sgs_smg : public detail::mpdata_rhs_vip_prs_sgs_common<ct_params_t, minhalo>
       {
 	using parent_t = detail::mpdata_rhs_vip_prs_sgs_common<ct_params_t, minhalo>;
+
+        public:
+
         using real_t = typename ct_params_t::real_t;
 
         protected:

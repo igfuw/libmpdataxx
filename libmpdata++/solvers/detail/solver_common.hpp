@@ -40,7 +40,7 @@ namespace libmpdataxx
         enum { n_tlev = n_tlev_ };
         
         using ct_params_t_ = ct_params_t; // propagate ct_params_t mainly for output purposes
-        typedef typename ct_params_t::real_t real_t;
+        using real_t = typename ct_params_t::real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
         using bcp_t = std::unique_ptr<bcond::detail::bcond_common<real_t, halo>>;
 

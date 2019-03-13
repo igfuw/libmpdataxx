@@ -25,6 +25,10 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
+        public:
+
+	using real_t = typename ct_params_t::real_t;
+
 	protected:
 
 	const rng_t i; //TODO: to be removed
@@ -65,21 +69,21 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
-          stat_field(this->ijk) = typename parent_t::real_t(0.5) * (abs(arrvec[0](i+h) + arrvec[0](i-h)));
+          stat_field(this->ijk) = real_t(0.5) * (abs(arrvec[0](i+h) + arrvec[0](i-h)));
           return this->mem->max(this->rank, stat_field(this->ijk));
         }
         
-        typename parent_t::real_t max_abs_vctr_div(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        real_t max_abs_vctr_div(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           stat_field(this->ijk) = abs((arrvec[0](i+h) - arrvec[0](i-h)));
           return this->mem->max(this->rank, stat_field(this->ijk));
         }
 
-        void scale_gc(const typename parent_t::real_t time,
-                      const typename parent_t::real_t cur_dt,
-                      const typename parent_t::real_t old_dt) final
+        void scale_gc(const real_t time,
+                      const real_t cur_dt,
+                      const real_t old_dt) final
         {
           this->mem->GC[0](rng_t(i.first(), i.last()-1)^h) *= cur_dt / old_dt;
           this->xchng_vctr_alng(this->mem->GC);
@@ -99,7 +103,7 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename parent_t::real_t di = 0;
+          real_t di = 0;
         };
 
         protected:

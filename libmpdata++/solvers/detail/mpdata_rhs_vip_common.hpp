@@ -43,9 +43,10 @@ namespace libmpdataxx
       template <class ct_params_t, int minhalo> 
       class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>
       {
+        using parent_t = mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>;
+
         public:
         using ix = typename ct_params_t::ix;
-        using parent_t = mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>;
         using real_t = typename ct_params_t::real_t;
 
 	protected:
