@@ -252,7 +252,7 @@ install:
           wget https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.10.5.tar
           tar xf hdf5-1.10.5.tar
           cd hdf5-1.10.5
-          CXXFLAGS=-w CFLAGS=-w ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=/${DEPS_DIR}/hdf5/
+          CXXFLAGS=-w CFLAGS=-w ./configure --enable-parallel --enable-cxx --enable-unsupported --enable-threadsafe --prefix=${DEPS_DIR}/hdf5/
           make
           sudo make install
           cd ..
