@@ -160,7 +160,7 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t 
         { 
-          typename parent_t::real_t cdrag = 0; 
+          real_t cdrag = 0; 
         };
 
         // ctor
