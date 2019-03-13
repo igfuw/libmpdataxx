@@ -259,7 +259,7 @@ install:
         else
           echo "Using cached hdf5."
         fi
-        export HDF5=${DEPS_DIR}/hdf5
+        export HDF5_ROOT=${DEPS_DIR}/hdf5
         export LD_LIBRARY_PATH=${DEPS_DIR}/hdf5/lib:${LD_LIBRARY_PATH}
         export LD_RUN_PATH=${DEPS_DIR}/hdf5/lib:${LD_RUN_PATH}
         export LIBRARY_PATH=${DEPS_DIR}/hdf5/lib:${LIBRARY_PATH}
