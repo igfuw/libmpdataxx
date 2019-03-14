@@ -1,6 +1,10 @@
 #TODO:  precache could be done only with one job, but the compiled libs would need to be uploaded to some external storage (wizard? ams s3?); 
 #       then a problem with secure storage of credentials appears - they could be stored in encrypted env vars on travis, but that would make it impossible to start PRs from forked repos;
 #       add an additional compile stage with jobs only for different os/compilers, not env vars (needs external storage as well)
+#       example of a hack how to share cache among different jobs (might mean we do not need external storage):
+#       - https://github.com/travis-ci/travis-ci/issues/7590
+#       - https://github.com/qTox/qTox/blob/59b5578c7bffc56f6227c60bfcb38f97d39ec8d9/.travis.yml
+
 
 stages:
   - precache
@@ -131,8 +135,11 @@ before_install:
    
     # upgrade pip
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
- 
-install:
+
+
+# YAML alias for install phase script common to precache and test stages
+install_common: &install_common
+
     ############################################################################
     ## All the cached dependencies are installed in ${TRAVIS_BUILD_DIR}/deps/
     #############################################################################
@@ -275,6 +282,10 @@ install:
         export PATH=${HDF5_ROOT}/bin:${PATH}
       fi
 
+install:
+
+<<: *install_common
+
 #    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install  -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
 #    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install hdf5-tools; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5; fi
@@ -360,6 +371,8 @@ precache_default: &precache_default
   dist: trusty
   language: cpp
   compiler: gcc
+  install: 
+    <<: *install_common
   script: echo "Preparing cache finished"
 
 jobs:
