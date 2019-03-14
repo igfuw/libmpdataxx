@@ -37,7 +37,6 @@ if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo sh cmake-3.13.2-Linux-x86_64.sh -
 if [[ $MPI == 'mpich'    ]]; then sudo $apt_get_install mpich libmpich-dev; fi
 if [[ $MPI == 'lam'      ]]; then sudo $apt_get_install lam-runtime lam4-dev; fi
 if [[ $MPI == 'openmpi'  ]]; then sudo $apt_get_install openmpi-bin libopenmpi-dev; fi
-|
   if [[ $MPI == 'mvapich2' ]]; then 
     ls -A ${DEPS_DIR}/mvapich2-2.3b
     if [[ -z "$(ls -A ${DEPS_DIR}/mvapich2-2.3b)" ]]; then
@@ -71,7 +70,6 @@ if [[ $MPI != 'none'    ]]; then export CC=${DEPS_DIR}/mvapich2-2.3b/bin/mpicc ;
 if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install boost1.61; fi
 
 # for MPI we need boost>=1.59 with mpi support, boost installation based on https://github.com/boostorg/compute/blob/master/.travis.yml
-| 
   if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
     ls -A ${DEPS_DIR}/boost
     if [[ -z "$(ls -A ${DEPS_DIR}/boost)" ]]; then
@@ -120,7 +118,6 @@ if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_instal
 # C++ support missing in Debian package ...
 #if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo $apt_get_install libhdf5-openmpi-dev; fi 
 # ... so we are installing it manually:
-| 
   if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
     ls -A ${DEPS_DIR}/hdf5
     if [[ -z "$(ls -A ${DEPS_DIR}/hdf5)" ]]; then
