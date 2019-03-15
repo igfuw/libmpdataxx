@@ -120,7 +120,7 @@ err_t test(int np)
   for (int i = 0; i < np; ++i)
   {
     const T ex = exact(slv.time(), i * p.di);
-    const T nm = slv.advectee(ix::u)(i);
+    const T nm = slv.advectee_global(ix::u)(i);
 
     li_err = std::max(li_err, std::abs(ex - nm));
     li_norm = std::max(li_norm, std::abs(ex));
