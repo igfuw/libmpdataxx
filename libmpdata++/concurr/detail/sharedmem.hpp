@@ -32,9 +32,8 @@ namespace libmpdataxx
 	static_assert(n_dims > 0, "n_dims <= 0");
 	static_assert(n_tlev > 0, "n_tlev <= 0");
 
-        // TODO: T_sumtype (perhaps worh using double even if summing floats?)
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; 
-        std::unique_ptr<blitz::Array<real_t, 1>> sumtmp;
+        std::unique_ptr<blitz::Array<double, 1>> sumtmp;
 
         protected:
 
@@ -93,12 +92,12 @@ namespace libmpdataxx
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
 
           if (n_dims != 1) 
-            sumtmp.reset(new blitz::Array<real_t, 1>(grid_size[0]));
+            sumtmp.reset(new blitz::Array<double, 1>(grid_size[0]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
         /// @brief concurrency-aware summation of array elements
-        real_t sum(const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
+        double sum(const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
@@ -114,7 +113,7 @@ namespace libmpdataxx
 	      (*sumtmp)(c) = blitz::sum(arr(slice_idx));
           }
           barrier();
-          real_t result;
+          double result;
           if (sum_khn)
             result = blitz::kahan_sum(*sumtmp);
           else
@@ -124,7 +123,7 @@ namespace libmpdataxx
         }
 
         /// @brief concurrency-aware summation of a (element-wise) product of two arrays
-        real_t sum(const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
+        double sum(const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
 	  // doing a two-step sum to reduce numerical error 
 	  // and make parallel results reproducible
@@ -140,7 +139,7 @@ namespace libmpdataxx
 	      (*sumtmp)(c) = blitz::sum(arr1(slice_idx) * arr2(slice_idx)); 
           }
           barrier();
-          real_t result;
+          double result;
           if (sum_khn)
             result = blitz::kahan_sum(*sumtmp);
           else

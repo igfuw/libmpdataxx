@@ -29,7 +29,7 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           (
             3 * GC(pi<dim>(i+h, j)) * abs(GC(pi<dim>(i+h, j))) / G_bar_x<opts, dim>(G, i, j)
-            - 2 * pow(GC(pi<dim>(i+h, j)), 3) / pow(G_bar_x<opts, dim>(G, i, j), 2)
+            - 2 * pow3(GC(pi<dim>(i+h, j))) / pow2(G_bar_x<opts, dim>(G, i, j))
             - GC(pi<dim>(i+h, j))
           ) / 6
         );
@@ -44,7 +44,7 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          (abs(GC[dim](pi<dim>(i+h, j))) - 2 * pow(GC[dim](pi<dim>(i+h, j)), 2) / G_bar_x<opts, dim>(G, i, j)) 
+          (abs(GC[dim](pi<dim>(i+h, j))) - 2 * pow2(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts, dim>(G, i, j)) 
            * GC1_bar_xy<dim>(GC[dim+1], i, j) / (2 * G_bar_x<opts, dim>(G, i, j))
         );
       }
@@ -90,9 +90,9 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            6 * abs(GC(pi<dim>(i+h, j))) * pow(GC(pi<dim>(i+h, j)), 2) / pow(G_bar_x<opts, dim>(G, i, j), 2)
-            - 3 * pow(GC(pi<dim>(i+h, j)), 2) / G_bar_x<opts, dim>(G, i, j)
-            - 3 * pow(GC(pi<dim>(i+h, j)), 4) / pow(G_bar_x<opts, dim>(G, i, j), 3)
+            6 * abs(GC(pi<dim>(i+h, j))) * pow2(GC(pi<dim>(i+h, j))) / pow2(G_bar_x<opts, dim>(G, i, j))
+            - 3 * pow2(GC(pi<dim>(i+h, j))) / G_bar_x<opts, dim>(G, i, j)
+            - 3 * pow4(GC(pi<dim>(i+h, j))) / pow3(G_bar_x<opts, dim>(G, i, j))
           ) / 2
         );
       }
@@ -107,9 +107,9 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           3 * 
-          (abs(GC[dim](pi<dim>(i+h, j))) - pow(GC[dim](pi<dim>(i+h, j)), 2) / G_bar_x<opts, dim>(G, i, j)) 
+          (abs(GC[dim](pi<dim>(i+h, j))) - pow2(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts, dim>(G, i, j)) 
            * GC[dim](pi<dim>(i+h, j)) * GC1_bar_xy<dim>(GC[dim-1], i, j)
-           / pow(G_bar_x<opts, dim>(G, i, j), 2)
+           / pow2(G_bar_x<opts, dim>(G, i, j))
         );
       }
       
@@ -124,11 +124,11 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           3 *
           (
-              3 * abs(GC1_bar_xy<dim>(GC[dim-1], i, j)) * pow(GC[dim](pi<dim>(i+h, j)), 2) / G_bar_x<opts, dim>(G, i, j)
-            + 3 * pow(GC1_bar_xy<dim>(GC[dim-1], i, j), 2) * abs(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts, dim>(G, i, j)
+              3 * abs(GC1_bar_xy<dim>(GC[dim-1], i, j)) * pow2(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts, dim>(G, i, j)
+            + 3 * pow2(GC1_bar_xy<dim>(GC[dim-1], i, j)) * abs(GC[dim](pi<dim>(i+h, j))) / G_bar_x<opts, dim>(G, i, j)
             - 2 * abs(GC1_bar_xy<dim>(GC[dim-1], i, j)) * abs(GC[dim](pi<dim>(i+h, j)))
-            - 9 * pow(GC1_bar_xy<dim>(GC[dim-1], i, j), 2) * pow(GC[dim](pi<dim>(i+h, j)), 2)
-                / pow(G_bar_x<opts, dim>(G, i, j), 2)
+            - 9 * pow2(GC1_bar_xy<dim>(GC[dim-1], i, j)) * pow2(GC[dim](pi<dim>(i+h, j)))
+                / pow2(G_bar_x<opts, dim>(G, i, j))
           ) / G_bar_x<opts, dim>(G, i, j) / 4
         );
       }

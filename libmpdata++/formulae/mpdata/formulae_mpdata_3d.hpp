@@ -154,7 +154,7 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          - 1.0 / 24 *
+          - fconst<arr_3d_t>(1.0 / 24) *
           (
               4 * GC[dim](pi<dim>(i+h, j, k)) * ndxx_psi<opts, dim>(psi, i, j, k)
             + 2 * ndx_psi<opts, dim>(psi, i, j, k) * ndx_GC0<dim>(GC[dim], i, j, k)
@@ -204,9 +204,9 @@ namespace libmpdataxx
           // spatial terms
           + div_3rd_spatial<opts, dim, sptl_intrp>(psi_np1, GC, G, i, j, k)
           // mixed terms
-          + 0.5 * abs(GC[dim](pi<dim>(i+h, j, k))) * ndx_fdiv<opts, dim>(psi_np1, GC, G, i, j, k)
+          + fconst<arr_3d_t>(0.5) * abs(GC[dim](pi<dim>(i+h, j, k))) * ndx_fdiv<opts, dim>(psi_np1, GC, G, i, j, k)
           // temporal terms
-          + 1.0 / 24 *
+          + fconst<arr_3d_t>(1.0 / 24) *
           (
               - 8 * GC[dim](pi<dim>(i+h, j, k)) *  nfdiv_fdiv<opts, dim>(psi_np1, GC, G, i, j, k)
               + div_3rd_temporal<opts, dim, tmprl_extrp>(psi_np1, ndtt_GC, i, j, k)
@@ -238,9 +238,9 @@ namespace libmpdataxx
           // spatial terms
           + div_3rd_spatial<opts, dim, sptl_intrp>(psi_np1, GC, G, i, j, k)
           // mixed terms
-          - 0.5 * abs(GC[dim](pi<dim>(i+h, j, k))) * ndtx_psi<opts, dim>(psi_np1, psi_n, i, j, k)
+          - fconst<arr_3d_t>(0.5) * abs(GC[dim](pi<dim>(i+h, j, k))) * ndtx_psi<opts, dim>(psi_np1, psi_n, i, j, k)
           // temporal terms
-          + 1.0 / 24 *
+          + fconst<arr_3d_t>(1.0 / 24) *
           (
               + 8 * GC[dim](pi<dim>(i+h, j, k)) *  nfdiv_dt<opts, dim>(psi_np1, psi_n, GC, G, i, j, k)
               + div_3rd_temporal<opts, dim, tmprl_extrp>(psi_np1, ndtt_GC, i, j, k)

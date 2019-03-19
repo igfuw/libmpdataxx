@@ -36,7 +36,7 @@ namespace libmpdataxx
         {
           const auto &i(this->i), &j(this->j);
           this->xchng_sclr(tmp1, this->ijk);
-          tmp2(i, j) = 0.25 * (tmp1(i, j + 1) + 2 * tmp1(i, j) + tmp1(i, j - 1));
+          tmp2(i, j) = real_t(0.25) * (tmp1(i, j + 1) + 2 * tmp1(i, j) + tmp1(i, j - 1));
         }
 
         template <int nd = ct_params_t::n_dims> 
@@ -44,7 +44,7 @@ namespace libmpdataxx
         {
           const auto &i(this->i), &j(this->j), &k(this->k);
           this->xchng_sclr(tmp1, this->ijk);
-          tmp2(i, j, k) = 0.25 * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k - 1));
+          tmp2(i, j, k) = real_t(0.25) * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k - 1));
         }
         
         // helpers for buoyancy forces
@@ -62,8 +62,8 @@ namespace libmpdataxx
           return return_helper<rng_t>(
             this->g * (
                 (  this->state(ix::tht)(ijk)
-                 + 0.5 * this->dt * this->hflux_frc(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
-                / (1 + 0.5 * this->dt * this->tht_abs(ijk))
+                 + real_t(0.5) * this->dt * this->hflux_frc(ijk) + real_t(0.5) * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
+                / (1 + real_t(0.5) * this->dt * this->tht_abs(ijk))
                 - this->tht_e(ijk)
               ) / this->Tht_ref
           );
@@ -110,8 +110,8 @@ namespace libmpdataxx
             case (1):
             {
               rhs.at(ix::tht)(ijk) += this->hflux_frc(ijk) - this->tht_abs(ijk) * (
-                (tht(ijk) + 0.5 * this->dt * this->hflux_frc(ijk) + 0.5 * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
-                / (1 + 0.5 * this->dt * this->tht_abs(ijk))
+                (tht(ijk) + real_t(0.5) * this->dt * this->hflux_frc(ijk) + real_t(0.5) * this->dt * this->tht_abs(ijk) * this->tht_e(ijk))
+                / (1 + real_t(0.5) * this->dt * this->tht_abs(ijk))
                 - this->tht_e(ijk)
               );
 

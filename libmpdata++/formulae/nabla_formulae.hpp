@@ -30,7 +30,7 @@ namespace libmpdataxx
   	  (
 	    x(i+1) - 
 	    x(i-1)
-	  ) / dx / 2.
+	  ) / dx / 2
         );
       }
 
@@ -47,7 +47,7 @@ namespace libmpdataxx
   	  (
   	    x(pi<d>(i+1, j)) - 
   	    x(pi<d>(i-1, j))
-  	  ) / dx / 2.
+  	  ) / dx / 2
         );
       }
       
@@ -65,7 +65,7 @@ namespace libmpdataxx
   	  (
 	    x(pi<d>(i+1, j, k)) - 
 	    x(pi<d>(i-1, j, k))
-	  ) / dx / 2.
+	  ) / dx / 2
         );
       }
       
@@ -174,9 +174,9 @@ namespace libmpdataxx
       ) 
       {
         return blitz::safeToReturn(
-	  (v[0](ijk[0]+1, ijk[1]) - v[0](ijk[0]-1, ijk[1])) / dijk[0] / 2.
+	  (v[0](ijk[0]+1, ijk[1]) - v[0](ijk[0]-1, ijk[1])) / dijk[0] / 2
 	  +
-	  (v[1](ijk[0], ijk[1]+1) - v[1](ijk[0], ijk[1]-1)) / dijk[1] / 2.
+	  (v[1](ijk[0], ijk[1]+1) - v[1](ijk[0], ijk[1]-1)) / dijk[1] / 2
         );
       }
       
@@ -190,11 +190,11 @@ namespace libmpdataxx
       ) 
       {
         return blitz::safeToReturn(
-	  (v[0](ijk[0]+1, ijk[1], ijk[2]) - v[0](ijk[0]-1, ijk[1], ijk[2])) / dijk[0] / 2.
+	  (v[0](ijk[0]+1, ijk[1], ijk[2]) - v[0](ijk[0]-1, ijk[1], ijk[2])) / dijk[0] / 2
 	  +
-	  (v[1](ijk[0], ijk[1]+1, ijk[2]) - v[1](ijk[0], ijk[1]-1, ijk[2])) / dijk[1] / 2.
+	  (v[1](ijk[0], ijk[1]+1, ijk[2]) - v[1](ijk[0], ijk[1]-1, ijk[2])) / dijk[1] / 2
 	  +
-	  (v[2](ijk[0], ijk[1], ijk[2]+1) - v[2](ijk[0], ijk[1], ijk[2]-1)) / dijk[2] / 2.
+	  (v[2](ijk[0], ijk[1], ijk[2]+1) - v[2](ijk[0], ijk[1], ijk[2]-1)) / dijk[2] / 2
         );
       }
     } // namespace nabla_op

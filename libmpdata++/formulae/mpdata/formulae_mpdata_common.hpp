@@ -40,6 +40,10 @@ namespace libmpdataxx
       using idxperm::pi;
       using opts::opts_t;
       using std::abs;
+      
+      using blitz::pow2;
+      using blitz::pow3;
+      using blitz::pow4;
 
       const int n_tlev = 2;
 
