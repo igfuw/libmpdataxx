@@ -28,11 +28,11 @@ public: // TODO: just a temp measure, make it private again
 
         private:
 
-        template <typename Op>
-        real_t reduce_hlpr(const real_t &val)
+        template <typename Op, typename reduce_real_t> // some reductions done on different floating types (e.g. sum always on doubles)
+        reduce_real_t reduce_hlpr(const reduce_real_t &val)
         {
 #if defined(USE_MPI)
-          real_t res;
+          reduce_real_t res;
           boost::mpi::all_reduce(mpicom, val, res, Op()); // it's thread-safe?
           return res;
 #else
@@ -90,10 +90,11 @@ public: // TODO: just a temp measure, make it private again
 #endif
         }
 
+        // sum always done on doubles
         // TODO: option to run more accurate summation (e.g. in pressure solver), see https://link.springer.com/content/pdf/10.1023/A:1008153532043.pdf
-        real_t sum(const real_t &val)
+        double sum(const double &val)
         {
-          return reduce_hlpr<std::plus<real_t>>(val);
+          return reduce_hlpr<std::plus<double>>(val);
         }
 
         // ctor

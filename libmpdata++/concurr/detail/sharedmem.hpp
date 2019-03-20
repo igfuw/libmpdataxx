@@ -23,16 +23,16 @@ namespace libmpdataxx
     namespace detail
     {
       template <
-	typename real_t,
-	int n_dims,
+        typename real_t,
+        int n_dims,
         int n_tlev
       >  
       class sharedmem_common
       {
         using arr_t = blitz::Array<real_t, n_dims>; 
 
-	static_assert(n_dims > 0, "n_dims <= 0");
-	static_assert(n_tlev > 0, "n_tlev <= 0");
+        static_assert(n_dims > 0, "n_dims <= 0");
+        static_assert(n_tlev > 0, "n_tlev <= 0");
 
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; 
         std::unique_ptr<blitz::Array<double, 1>> sumtmp;
@@ -41,30 +41,30 @@ namespace libmpdataxx
 
         blitz::TinyVector<int, n_dims> origin;
 
-	public:
+        public:
 
-	int n = 0;
-	const int size;
+        int n = 0;
+        const int size;
         std::array<rng_t, n_dims> grid_size; 
         bool panic = false; // for multi-threaded SIGTERM handling
 
         detail::distmem<real_t, n_dims> distmem;
 
         // TODO: these are public because used from outside in alloc - could friendship help?
-	arrvec_t<arr_t> GC, ndt_GC, ndtt_GC;
+        arrvec_t<arr_t> GC, ndt_GC, ndtt_GC;
         std::vector<arrvec_t<arr_t>> psi; // TODO: since n_eqns is known, could make it an std::array!
-	std::unique_ptr<arr_t> G;
-	std::unique_ptr<arr_t> vab_coeff; // velocity absorber coefficient
-	arrvec_t<arr_t> vab_relax; // velocity absorber relaxed state
+        std::unique_ptr<arr_t> G;
+        std::unique_ptr<arr_t> vab_coeff; // velocity absorber coefficient
+        arrvec_t<arr_t> vab_relax; // velocity absorber relaxed state
         arrvec_t<arr_t> khn_tmp; // Kahan sum for donor-cell
 
-	std::unordered_map< 
-	  const char*, // intended for addressing with __FILE__
-	  boost::ptr_vector<arrvec_t<arr_t>>
-	> tmp;
+        std::unordered_map< 
+          const char*, // intended for addressing with __FILE__
+          boost::ptr_vector<arrvec_t<arr_t>>
+        > tmp;
         
         // list of temporary fields that can be accessed from outside of concurr
-	std::unordered_map< 
+        std::unordered_map< 
           std::string,
           std::pair<const char*, int>
         > avail_tmp;
@@ -321,10 +321,10 @@ namespace libmpdataxx
 
         protected:
 
-	rng_t distmem_ext(const rng_t &rng)
-	{
+        rng_t distmem_ext(const rng_t &rng)
+        {
           return rng_t(rng.first()-1, rng.last());
-	}
+        }
 
       };
 
@@ -338,19 +338,19 @@ namespace libmpdataxx
         using parent_t = sharedmem_common<real_t, 1, n_tlev>;
         using parent_t::parent_t; // inheriting ctors
 
-	public:
+        public:
 
-	// accessor methods
-	blitz::Array<real_t, 1> advectee(int e = 0)
-	{
+        // accessor methods
+        blitz::Array<real_t, 1> advectee(int e = 0)
+        {
           assert(this->n < n_tlev);
 
           // returning just the domain interior, i.e. without halos
           // reindexing so that element 0 is at 0
-	  return this->psi[e][ this->n ](
+          return this->psi[e][ this->n ](
             this->grid_size[0]
-	  ).reindex(this->origin);
-	}
+          ).reindex(this->origin);
+        }
 
         const blitz::Array<real_t, 1> advectee_global(int e = 0)
         {   
@@ -387,8 +387,8 @@ namespace libmpdataxx
             return advectee(e);
         }  
 
-	blitz::Array<real_t, 1> advector(int d = 0)  
-	{   
+        blitz::Array<real_t, 1> advector(int d = 0)  
+        {   
           using namespace arakawa_c;
           assert(d == 0);
           // returning just the domain interior, i.e. without halos
@@ -398,14 +398,14 @@ namespace libmpdataxx
                  this->origin[0] - 1 
                }); 
 
-	  return this->GC[d](
+          return this->GC[d](
             this->distmem_ext(this->grid_size[0]^(-1)^h)
           ).reindex(
             this->distmem.rank() > 0
               ? decltype(this->origin)({this->origin[0] - 1})
               : orgn
           );
-	}   
+        }   
 
         blitz::Array<real_t, 1> g_factor()
         {
@@ -423,18 +423,18 @@ namespace libmpdataxx
         {
           throw std::logic_error("absorber not yet implemented in 1d");
         }
-	
+        
         blitz::Array<real_t, 1> vab_relaxed_state(int d = 0)  
-	{   
+        {   
           throw std::logic_error("absorber not yet implemented in 1d");
-	}   
+        }   
         
         blitz::Array<real_t, 1> sclr_array(const std::string& name, int n = 0)
-	{
+        {
           return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
             this->grid_size[0]
           ).reindex(this->origin);
-	}
+        }
       };
 
       template<typename real_t, int n_tlev>
@@ -443,17 +443,17 @@ namespace libmpdataxx
         using parent_t = sharedmem_common<real_t, 2, n_tlev>;
         using parent_t::parent_t; // inheriting ctors
 
-	public:
+        public:
 
-	blitz::Array<real_t, 2> advectee(int e = 0)
-	{
+        blitz::Array<real_t, 2> advectee(int e = 0)
+        {
           assert(this->n < n_tlev);
 
-	  return this->psi[e][ this->n ](
-	    this->grid_size[0],
-	    this->grid_size[1]
-	  ).reindex(this->origin);
-	}
+          return this->psi[e][ this->n ](
+            this->grid_size[0],
+            this->grid_size[1]
+          ).reindex(this->origin);
+        }
 
         const blitz::Array<real_t, 2> advectee_global(int e = 0)
         {   
@@ -496,8 +496,8 @@ namespace libmpdataxx
             return advectee(e);
         }  
 
-	blitz::Array<real_t, 2> advector(int d = 0)  
-	{   
+        blitz::Array<real_t, 2> advector(int d = 0)  
+        {   
           using namespace arakawa_c;
           assert(d == 0 || d== 1);
           // returning just the domain interior, i.e. without halos
@@ -521,7 +521,7 @@ namespace libmpdataxx
               ).reindex(orgn);
             default: assert(false); throw;
           }
-	}   
+        }   
 
         blitz::Array<real_t, 2> g_factor()
         {
@@ -548,27 +548,27 @@ namespace libmpdataxx
             this->grid_size[1]
           ).reindex(this->origin);
         }
-	
+        
         blitz::Array<real_t, 2> vab_relaxed_state(int d = 0)  
-	{   
+        {   
           assert(d == 0 || d== 1);
           // a sanity check
           if (this->vab_coeff.get() == nullptr) 
             throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
           // the same logic as in advectee() - see above
-	  return this->vab_relax[d](
-	    this->grid_size[0],
-	    this->grid_size[1]
-	  ).reindex(this->origin);
-	}   
+          return this->vab_relax[d](
+            this->grid_size[0],
+            this->grid_size[1]
+          ).reindex(this->origin);
+        }   
         
         blitz::Array<real_t, 2> sclr_array(const std::string& name, int n = 0)
-	{
+        {
           return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
             this->grid_size[0],
             this->grid_size[1]
           ).reindex(this->origin);
-	}
+        }
       };
 
       template<typename real_t, int n_tlev>
@@ -577,18 +577,18 @@ namespace libmpdataxx
         using parent_t = sharedmem_common<real_t, 3, n_tlev>;
         using parent_t::parent_t; // inheriting ctors
 
-	public:
+        public:
 
-	blitz::Array<real_t, 3> advectee(int e = 0)
-	{
+        blitz::Array<real_t, 3> advectee(int e = 0)
+        {
           assert(this->n < n_tlev);
 
-	  return this->psi[e][ this->n ](
-	    this->grid_size[0],
-	    this->grid_size[1],
-	    this->grid_size[2]
-	  ).reindex(this->origin);
-	}
+          return this->psi[e][ this->n ](
+            this->grid_size[0],
+            this->grid_size[1],
+            this->grid_size[2]
+          ).reindex(this->origin);
+        }
 
         const blitz::Array<real_t, 3> advectee_global(int e = 0)
         {   
@@ -631,8 +631,8 @@ namespace libmpdataxx
             return advectee(e);
         }  
 
-	blitz::Array<real_t, 3> advector(int d = 0)  
-	{   
+        blitz::Array<real_t, 3> advector(int d = 0)  
+        {   
           using namespace arakawa_c;
           assert(d == 0 || d == 1 || d == 2);
           // returning just the domain interior, i.e. without halos
@@ -665,7 +665,7 @@ namespace libmpdataxx
               ).reindex(orgn);  
             default: assert(false); throw;
           }
-	}   
+        }   
 
         blitz::Array<real_t, 3> g_factor()
         {
@@ -694,29 +694,29 @@ namespace libmpdataxx
             this->grid_size[2]
           ).reindex(this->origin);
         }
-	
+        
         blitz::Array<real_t, 3> vab_relaxed_state(int d = 0)  
-	{   
+        {   
           assert(d == 0 || d == 1 || d == 2);
           // a sanity check
           if (this->vab_coeff.get() == nullptr) 
             throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
           // the same logic as in advectee() - see above
-	  return this->vab_relax[d](
-	    this->grid_size[0],
-	    this->grid_size[1],
+          return this->vab_relax[d](
+            this->grid_size[0],
+            this->grid_size[1],
             this->grid_size[2]
-	  ).reindex(this->origin);
-	}   
+          ).reindex(this->origin);
+        }   
 
         blitz::Array<real_t, 3> sclr_array(const std::string& name, int n = 0)
-	{
+        {
           return this->tmp.at(this->avail_tmp[name].first)[this->avail_tmp[name].second][n](
             this->grid_size[0],
             this->grid_size[1],
             this->grid_size[2]
           ).reindex(this->origin);
-	}
+        }
       };
     } // namespace detail
   } // namespace concurr
