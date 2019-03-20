@@ -34,9 +34,8 @@ namespace libmpdataxx
 	static_assert(n_dims > 0, "n_dims <= 0");
 	static_assert(n_tlev > 0, "n_tlev <= 0");
 
-        // TODO: T_sumtype (perhaps worh using double even if summing floats?)
         std::unique_ptr<blitz::Array<real_t, 1>> xtmtmp; 
-        std::unique_ptr<blitz::Array<real_t, 1>> sumtmp;
+        std::unique_ptr<blitz::Array<double, 1>> sumtmp;
 
         protected:
 
@@ -105,29 +104,29 @@ namespace libmpdataxx
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
 
           if (n_dims != 1) 
-            sumtmp.reset(new blitz::Array<real_t, 1>(this->grid_size[0]));
+            sumtmp.reset(new blitz::Array<double, 1>(this->grid_size[0]));
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
         /// @brief concurrency-aware summation of array elements
-        real_t sum(const int &rank, const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
+        double sum(const int &rank, const arr_t &arr, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
-	  // doing a two-step sum to reduce numerical error 
-	  // and make parallel results reproducible
-	  for (int c = ijk[0].first(); c <= ijk[0].last(); ++c) // TODO: optimise for i.count() == 1
+          // doing a two-step sum to reduce numerical error 
+          // and make parallel results reproducible
+          for (int c = ijk[0].first(); c <= ijk[0].last(); ++c) // TODO: optimise for i.count() == 1
           {
             auto slice_idx = ijk;
             slice_idx.lbound(0) = c;
             slice_idx.ubound(0) = c;
 
             if (sum_khn)
-	      (*sumtmp)(c) = blitz::kahan_sum(arr(slice_idx));
+              (*sumtmp)(c) = blitz::kahan_sum(arr(slice_idx));
             else
-	      (*sumtmp)(c) = blitz::sum(arr(slice_idx));
+              (*sumtmp)(c) = blitz::sum(arr(slice_idx));
           }
           barrier(); // wait for all threads to calc their part
 #if !defined(USE_MPI)
-          real_t result;
+          double result;
           if (sum_khn)
             result = blitz::kahan_sum(*sumtmp);
           else
@@ -146,32 +145,32 @@ namespace libmpdataxx
             (*sumtmp)(grid_size[0].first()) = this->distmem.sum((*sumtmp)(grid_size[0].first())); // inplace?!
           }
           barrier();
-          real_t res = (*sumtmp)(grid_size[0].first()); // propagate the total sum to all threads of the process
+          double res = (*sumtmp)(grid_size[0].first()); // propagate the total sum to all threads of the process
           barrier(); // to avoid sumtmp being overwritten by next call to sum from other thread
           return res;
 #endif
         }
 
         /// @brief concurrency-aware summation of a (element-wise) product of two arrays
-        real_t sum(const int &rank, const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
+        double sum(const int &rank, const arr_t &arr1, const arr_t &arr2, const idx_t<n_dims> &ijk, const bool sum_khn)
         {
-	  // doing a two-step sum to reduce numerical error 
-	  // and make parallel results reproducible
-	  for (int c = ijk[0].first(); c <= ijk[0].last(); ++c)
+          // doing a two-step sum to reduce numerical error 
+          // and make parallel results reproducible
+          for (int c = ijk[0].first(); c <= ijk[0].last(); ++c)
           {
             auto slice_idx = ijk;
             slice_idx.lbound(0) = c;
             slice_idx.ubound(0) = c;
 
             if (sum_khn)
-	      (*sumtmp)(c) = blitz::kahan_sum(arr1(slice_idx) * arr2(slice_idx));
+              (*sumtmp)(c) = blitz::kahan_sum(arr1(slice_idx) * arr2(slice_idx));
             else
-	      (*sumtmp)(c) = blitz::sum(arr1(slice_idx) * arr2(slice_idx)); 
+              (*sumtmp)(c) = blitz::sum(arr1(slice_idx) * arr2(slice_idx)); 
           }
           // TODO: code below same as in the function above
           barrier(); // wait for all threads to calc their part
 #if !defined(USE_MPI)
-          real_t result;
+          double result;
           if (sum_khn)
             result = blitz::kahan_sum(*sumtmp);
           else
@@ -190,7 +189,7 @@ namespace libmpdataxx
             (*sumtmp)(grid_size[0].first()) = this->distmem.sum((*sumtmp)(grid_size[0].first())); // inplace?!
           }
           barrier();
-          real_t res = (*sumtmp)(grid_size[0].first()); // propagate the total sum to all threads of the process
+          double res = (*sumtmp)(grid_size[0].first()); // propagate the total sum to all threads of the process
           barrier(); // to avoid sumtmp being overwritten by next call to sum from other thread
           return res;
 #endif

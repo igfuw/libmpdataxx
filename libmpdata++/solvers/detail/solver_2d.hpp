@@ -26,6 +26,10 @@ namespace libmpdataxx
       {
 	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
+        public:
+
+	using real_t = typename ct_params_t::real_t;
+
 	protected:
       
 	const rng_t i, j; // TODO: to be removed
@@ -191,23 +195,23 @@ namespace libmpdataxx
           // TODO: same in 1D
           if (!opts::isset(ct_params_t::opts, opts::dfl))
           {
-            typename ct_params_t::real_t max_abs_div = max_abs_vctr_div(this->mem->GC);
+            real_t max_abs_div = max_abs_vctr_div(this->mem->GC);
 
 	    if (max_abs_div > this->max_abs_div_eps) 
 	      throw std::runtime_error("initial advector field is divergent");
           }
         }
 
-        typename parent_t::real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
-          stat_field(this->ijk) = 0.5 * (
+          stat_field(this->ijk) = real_t(0.5) * (
                                            abs(arrvec[0](i+h, j) + arrvec[0](i-h, j))
                                          + abs(arrvec[1](i, j+h) + arrvec[1](i, j-h))
                                         ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j);
           return this->mem->max(this->rank, stat_field(this->ijk));
         }
         
-        typename parent_t::real_t max_abs_vctr_div(const arrvec_t<typename parent_t::arr_t> &arrvec) final
+        real_t max_abs_vctr_div(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           stat_field(this->ijk) = abs(
                                         (arrvec[0](i+h, j) - arrvec[0](i-h, j))
@@ -216,9 +220,9 @@ namespace libmpdataxx
           return this->mem->max(this->rank, stat_field(this->ijk));
         }
         
-        void scale_gc(const typename parent_t::real_t time,
-                      const typename parent_t::real_t cur_dt,
-                      const typename parent_t::real_t old_dt) final
+        void scale_gc(const real_t time,
+                      const real_t cur_dt,
+                      const real_t old_dt) final
         {
           this->mem->GC[0](rng_t(i.first(), i.last()-1)^h, j) *= cur_dt / old_dt;
           this->mem->GC[1](i, rng_t(j.first(), j.last()-1)^h) *= cur_dt / old_dt;
@@ -241,7 +245,7 @@ namespace libmpdataxx
         
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename parent_t::real_t di = 0, dj = 0;
+          real_t di = 0, dj = 0;
         };
 
         protected:

@@ -38,7 +38,7 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          - 0.5 * GC(i+h) 
+          - fconst<arr_1d_t>(0.5) * GC(i+h) 
           / 
           (formulae::G<opts>(G, i+1) + formulae::G<opts>(G, i)) 
           * 
@@ -56,13 +56,13 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          - 0.5 * GC(i+h) 
+          - fconst<arr_1d_t>(0.5) * GC(i+h) 
           / 
           (formulae::G<opts>(G, i+1) + formulae::G<opts>(G, i)) 
           * 
           (GC((i+1)+h) - GC(i-h))
           *
-          0.5 *  (psi(i+1) + psi(i)) //to be compatible with iga formulation
+          fconst<arr_1d_t>(0.5) *  (psi(i+1) + psi(i)) //to be compatible with iga formulation
         );
       }
     } // namespace mpdata

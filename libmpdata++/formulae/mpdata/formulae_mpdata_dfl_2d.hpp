@@ -42,7 +42,7 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          - 0.25 * GC[dim](pi<dim>(i+h, j)) 
+          - fconst<arr_2d_t>(0.25) * GC[dim](pi<dim>(i+h, j)) 
           /
           G_bar_x<opts, dim>(G, i, j) 
           * 
@@ -74,7 +74,7 @@ namespace libmpdataxx
       )
       {
         return return_helper<ix_t>(
-          - 0.25 * GC[dim](pi<dim>(i+h, j)) 
+          - fconst<arr_2d_t>(0.25) * GC[dim](pi<dim>(i+h, j)) 
           /
           G_bar_x<opts, dim>(G, i, j) 
           * 

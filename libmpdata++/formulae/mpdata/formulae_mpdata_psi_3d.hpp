@@ -933,7 +933,7 @@ namespace libmpdataxx
       {
         static_assert(!opts::isset(opts, opts::abs), "abs & iga options are mutually exclusive");
         return return_helper<ix_t>(
-          0.5 * (psi_np1(pi<d>(i+1, j, k)) - psi_n(pi<d>(i+1, j, k)) + psi_np1(pi<d>(i, j, k)) - psi_n(pi<d>(i, j, k)))
+          fconst<arr_3d_t>(0.5) * (psi_np1(pi<d>(i+1, j, k)) - psi_n(pi<d>(i+1, j, k)) + psi_np1(pi<d>(i, j, k)) - psi_n(pi<d>(i, j, k)))
         );
       }
     } // namespace mpdata

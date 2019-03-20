@@ -19,21 +19,25 @@ namespace libmpdataxx
       {
 	using parent_t = detail::mpdata_rhs_vip_prs_sgs_common<ct_params_t, minhalo>;
 
+        public:
+
+        using real_t = typename ct_params_t::real_t;
+
         protected:
         
-	typename parent_t::real_t smg_c, c_m;
+	real_t smg_c, c_m;
         typename parent_t::arr_t &k_m;
 
         void multiply_sgs_visc()
         {
-          const auto dlta = std::accumulate(this->dijk.begin(), this->dijk.end(), 0.) / 3;
+          const auto dlta = std::accumulate(this->dijk.begin(), this->dijk.end(), real_t(0.)) / 3;
 
           if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
             k_m(this->ijk) = pow(smg_c * dlta, 2) * formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk);
 
             formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims, ct_params_t::opts>(this->tau,
-                                                                                          1.0,
+                                                                                          real_t(1.0),
                                                                                           this->k_m,
                                                                                           *this->mem->G,
                                                                                           this->ijk_vec);
@@ -56,7 +60,7 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename ct_params_t::real_t smg_c, c_m;
+          real_t smg_c, c_m;
         };
 
 	// ctor

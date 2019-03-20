@@ -40,9 +40,11 @@ namespace libmpdataxx
                                 const arrvec_t<typename parent_t::arr_t> &src) final
       {
         using namespace libmpdataxx::arakawa_c;
+        using real_t = typename ct_params_t::real_t;
+
 	if (!this->mem->G)
 	{
-	  dst[0](im + h) = this->dt / this->di * .5 * (
+	  dst[0](im + h) = this->dt / this->di * real_t(.5) * (
 	    src[0](im    ) + 
 	    src[0](im + 1)
 	  );
@@ -104,17 +106,18 @@ namespace libmpdataxx
       {   
 	using idxperm::pi;
 	using namespace arakawa_c;
+        using real_t = typename ct_params_t::real_t;
   
 	if (!this->mem->G)
 	{
-	  dst(pi<d>(i+h,j)) = this->dt / di * .5 * (
+	  dst(pi<d>(i+h,j)) = this->dt / di * real_t(.5) * (
 	    src(pi<d>(i,    j)) + 
 	    src(pi<d>(i + 1,j))
 	  );
 	} 
 	else
 	{ 
-	  dst(pi<d>(i+h,j)) = this->dt / di * .5 * (
+	  dst(pi<d>(i+h,j)) = this->dt / di * real_t(.5) * (
 	    (*this->mem->G)(pi<d>(i,    j)) * src(pi<d>(i,    j)) + 
 	    (*this->mem->G)(pi<d>(i + 1,j)) * src(pi<d>(i + 1,j))
 	  );
@@ -214,17 +217,18 @@ namespace libmpdataxx
       {   
 	using idxperm::pi;
 	using namespace arakawa_c;
+        using real_t = typename ct_params_t::real_t;
   
 	if (!this->mem->G)
 	{
-	  dst(pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+	  dst(pi<d>(i+h, j, k)) = this->dt / di * real_t(.5) * (
 	    src(pi<d>(i,     j, k)) + 
 	    src(pi<d>(i + 1, j, k))
 	  );
 	} 
 	else
 	{ 
-	  dst(pi<d>(i+h, j, k)) = this->dt / di * .5 * (
+	  dst(pi<d>(i+h, j, k)) = this->dt / di * real_t(.5) * (
 	    (*this->mem->G)(pi<d>(i  , j, k)) * src(pi<d>(i,   j, k)) + 
 	    (*this->mem->G)(pi<d>(i+1, j, k)) * src(pi<d>(i+1, j, k))
 	  );

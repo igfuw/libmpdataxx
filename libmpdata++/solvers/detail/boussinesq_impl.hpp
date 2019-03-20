@@ -61,18 +61,18 @@ namespace libmpdataxx
           {
             for (int d = 0; d < ct_params_t::n_dims - 1; ++d)
             {
-              v[d](this->ijk) /= (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk));
+              v[d](this->ijk) /= (1 + real_t(0.5) * this->dt * (*this->mem->vab_coeff)(this->ijk));
             }
             v[ct_params_t::n_dims - 1](this->ijk) /=
-            (1 + 0.5 * this->dt * (*this->mem->vab_coeff)(this->ijk)
-               + 0.25 * this->dt * this->dt * this->g / this->Tht_ref * this->dtht_e(this->ijk)
-                 / (1 + 0.5 * this->dt * this->tht_abs(this->ijk)));
+            (1 + real_t(0.5) * this->dt * (*this->mem->vab_coeff)(this->ijk)
+               + real_t(0.25) * this->dt * this->dt * this->g / this->Tht_ref * this->dtht_e(this->ijk)
+                 / (1 + real_t(0.5) * this->dt * this->tht_abs(this->ijk)));
           }
           else
           {
             v[ct_params_t::n_dims - 1](this->ijk) /=
-            (1 + 0.25 * this->dt * this->dt * this->g / this->Tht_ref * this->dtht_e(this->ijk)
-                 / (1 + 0.5 * this->dt * this->tht_abs(this->ijk)));
+            (1 + real_t(0.25) * this->dt * this->dt * this->g / this->Tht_ref * this->dtht_e(this->ijk)
+                 / (1 + real_t(0.5) * this->dt * this->tht_abs(this->ijk)));
           }
         }
         
@@ -104,8 +104,8 @@ namespace libmpdataxx
             {
               rhs.at(ix::tht)(ijk) += this->hflux_frc(ijk);
 
-              rhs.at(ix_w)(ijk) += this->g * (tht(ijk) + 0.5 * this->dt * rhs.at(ix::tht)(ijk))
-                                   / (this->Tht_ref * (1 + 0.5 * this->dt * this->tht_abs(ijk)));
+              rhs.at(ix_w)(ijk) += this->g * (tht(ijk) + real_t(0.5) * this->dt * rhs.at(ix::tht)(ijk))
+                                   / (this->Tht_ref * (1 + real_t(0.5) * this->dt * this->tht_abs(ijk)));
               break;
             }
           }
@@ -117,8 +117,8 @@ namespace libmpdataxx
           
           const auto &w = this->vips()[ct_params_t::n_dims - 1];
           this->state(ix::tht)(this->ijk) = ( this->state(ix::tht)(this->ijk) 
-                                            - 0.5 * this->dt * w(this->ijk) * this->dtht_e(this->ijk))
-                                            / (1 + 0.5 * this->dt * this->tht_abs(this->ijk));
+                                            - real_t(0.5) * this->dt * w(this->ijk) * this->dtht_e(this->ijk))
+                                            / (1 + real_t(0.5) * this->dt * this->tht_abs(this->ijk));
           this->rhs.at(ix::tht)(this->ijk) += -w(this->ijk) * this->dtht_e(this->ijk)
                                               -this->tht_abs(this->ijk) * this->state(ix::tht)(this->ijk);
         }

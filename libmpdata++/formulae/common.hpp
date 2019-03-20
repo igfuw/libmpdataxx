@@ -13,6 +13,12 @@ namespace libmpdataxx
 {
   namespace formulae
   {
+    // helper to cast floating literals to correct precision based on the blitz array underlaying type
+    template<class arr_t>
+    constexpr auto fconst(const double v)
+    {
+      return static_cast<typename arr_t::T_numtype>(v);
+    }
     // overloads of abs/min/max/where that pick out the correct version based on ix_t
     template<class ix_t, class arg_t>
     forceinline_macro auto abs(const arg_t &a, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)

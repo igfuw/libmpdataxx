@@ -21,7 +21,7 @@ namespace libmpdataxx
 
         protected:
         
-	typename parent_t::real_t eta;
+	typename ct_params_t::real_t eta;
 
         void multiply_sgs_visc() final
         {
