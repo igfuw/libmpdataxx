@@ -30,7 +30,7 @@ namespace libmpdataxx
 	protected:
 
         // static constants
-	const int n_iters;
+	const int n_iters, upwind_filter_freq;
 
 	// member fields
 	std::vector<GC_t*> tmp;
@@ -74,6 +74,7 @@ namespace libmpdataxx
 	struct rt_params_t : parent_t::rt_params_t
         {
           int n_iters = 2; 
+          int upwind_filter_freq = 0; 
         };
 
         protected:
@@ -85,6 +86,7 @@ namespace libmpdataxx
 	) : 
 	  parent_t(args, p),
           n_iters(p.n_iters),
+          upwind_filter_freq(p.upwind_filter_freq),
           tmp(n_tmp(n_iters)),
           flux(args.mem->tmp[__FILE__][n_tmp(p.n_iters)])
         {

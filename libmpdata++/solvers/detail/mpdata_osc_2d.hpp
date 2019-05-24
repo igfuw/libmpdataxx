@@ -173,6 +173,10 @@ namespace libmpdataxx
               formulae::G<ct_params_t::opts, 0>(*this->mem->G, this->i, this->j)
 	    ); 
 
+            if (this->upwind_filter_freq > 0 && this->timestep % this->upwind_filter_freq == 0)
+            {
+              break;
+            }
             // sanity check for output // TODO: move to common
             //assert(std::isfinite(sum(this->mem->psi[e][this->n[e]+1](this->ijk))));
 	  }
