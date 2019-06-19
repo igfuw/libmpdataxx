@@ -10,7 +10,8 @@
 
 // local definition of a Kahan's sum reduction
 // (http://en.wikipedia.org/wiki/Kahan_summation_algorithm)
-BZ_NAMESPACE(blitz)
+namespace blitz
+{
   template<typename P_sourcetype, typename P_resulttype = BZ_SUMTYPE(P_sourcetype)>
   class ReduceKahanSum 
   {
@@ -55,4 +56,4 @@ BZ_NAMESPACE(blitz)
   };
   BZ_DECL_ARRAY_PARTIAL_REDUCE(kahan_sum, ReduceKahanSum)
   BZ_DECL_ARRAY_FULL_REDUCE(kahan_sum, ReduceKahanSum)
-BZ_NAMESPACE_END
+}
