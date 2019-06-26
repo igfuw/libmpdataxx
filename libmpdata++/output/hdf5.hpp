@@ -277,14 +277,13 @@ namespace libmpdataxx
 
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
         H5::Group group;
-        // try to open the group, create it if it doesn't exist
-        try{
+        // open a group if it exists, create it if it doesn't exist
+        // based on: https://stackoverflow.com/questions/35668056/test-group-existence-in-hdf5-c
+        if (H5Lexists(hdfcp.getId(), group_name.c_str(), H5P_DEFAULT) > 0)
           group = hdfcp.openGroup(group_name);
-        }
-        catch ( H5::FileIException error )
-        {
+        else
           group = hdfcp.createGroup(group_name);
-        }
+
         group.createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data_f);
       }
 
