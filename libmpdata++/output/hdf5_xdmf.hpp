@@ -88,6 +88,12 @@ namespace libmpdataxx
         xdmfw.add_attribute(name, this->hdf_name(), this->shape); 
         parent_t::record_aux(name, data);
       }
+      
+      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr)
+      {
+        xdmfw.add_attribute(name, this->hdf_name(), this->shape); 
+        parent_t::record_aux_dsc(name, arr);
+      }
 
       public:
 

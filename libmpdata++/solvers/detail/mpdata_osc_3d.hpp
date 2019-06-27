@@ -191,7 +191,11 @@ namespace libmpdataxx
               flx[2](i,   j,   k-h),
               formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j, k)
 	    ); 
-
+            
+            if (this->upwind_filter_freq > 0 && this->timestep % this->upwind_filter_freq == 0)
+            {
+              break;
+            }
             // sanity check for output
             assert(std::isfinite(sum(psi[n+1](ijk))));
 	  }

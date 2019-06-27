@@ -29,7 +29,9 @@ env:
     - TEST_SUITE=paper MPI=none
     - TEST_SUITE=elliptic_drop MPI=none
     - TEST_SUITE=nair_jablonowski_2008 MPI=none
-    - TEST_SUITE=UWLCM MPI=none
+    - TEST_SUITE=UWLCM_MT MPI=none
+    - TEST_SUITE=UWLCM_unit_iles MPI=none
+    - TEST_SUITE=UWLCM_unit_sgs MPI=none
     - TEST_SUITE=pbl MPI=none 
     - TEST_SUITE=osx_local_clang MPI=none
     - TEST_SUITE=unit MPI=mvapich2
@@ -75,7 +77,11 @@ matrix:
           compiler: gcc
 
         - compiler: clang
-          env: TEST_SUITE=UWLCM MPI=none # UWLCM is not tested on clang yet
+          env: TEST_SUITE=UWLCM_MT MPI=none
+        - compiler: clang
+          env: TEST_SUITE=UWLCM_unit_iles MPI=none
+        - compiler: clang
+          env: TEST_SUITE=UWLCM_unit_sgs MPI=none
        
         # local clang tests on osx
         - os: linux
@@ -196,8 +202,10 @@ script:
 
     - if [[ $TEST_SUITE == 'elliptic_drop' ]]; then . ./.travis_scripts/elliptic_drop.sh; fi
 
-    # running tests from UWLCM in Release mode
-    - if [[ $TEST_SUITE == 'UWLCM' ]]; then . ./.travis_scripts/UWLCM.sh; fi # with '.' to pass env vars
+    # UWLCM
+    - if [[ $TEST_SUITE == 'UWLCM_MT' ]]; then . ./.travis_scripts/UWLCM.sh moist_thermal; fi
+    - if [[ $TEST_SUITE == 'UWLCM_unit_iles' ]]; then . ./.travis_scripts/UWLCM.sh unit_iles; fi
+    - if [[ $TEST_SUITE == 'UWLCM_unit_sgs' ]]; then . ./.travis_scripts/UWLCM.sh unit_sgs; fi
     
     # compiling and running tests from Nair & Jablonowski 2008 MWR paper in Release mode
     - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then . ./.travis_scripts/nair_jablonowski_2008.sh; fi

@@ -1,6 +1,11 @@
 #!/usr/bin/env sh
 set -e
 
+if [ $# -ne 1 ]; then
+  echo "UWLCM.sh accepts exactly one argument"
+  exit 1
+fi
+
 # install libmpata++
 cd libmpdata++/build
 sudo make install
@@ -26,7 +31,7 @@ if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo ln -s `pwd`/odeint/include/boost/
 git clone --depth=1 git://github.com/thrust/thrust.git;
 sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust;
 
-# libcloudph++ (needed by icicle, skipping tests and CUDA build)
+# libcloudph++ 
 git clone --depth=1 git://github.com/igfuw/libcloudphxx.git
 cd libcloudphxx
 mkdir build 
@@ -41,11 +46,7 @@ cd ../..
 # if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-program-options1.55-dev; fi
 git clone --depth=1 git://github.com/igfuw/UWLCM.git
 cd UWLCM
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make
-make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-cd ../..
+. .travis_scripts/$1.sh
+cd ..
 set +e # see https://github.com/travis-ci/travis-ci/issues/6522
 
