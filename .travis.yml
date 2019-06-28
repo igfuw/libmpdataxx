@@ -69,9 +69,8 @@ before_install:
     # needed to get rvm, see below
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -; fi
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import -; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3; fi
     # https://github.com/travis-ci/travis-ci/issues/10165
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi
+    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi
    
     # locally installed stuff comes first
     - export PATH=/usr/local/bin:$PATH
