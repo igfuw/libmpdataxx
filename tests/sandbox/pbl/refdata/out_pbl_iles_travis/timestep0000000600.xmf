@@ -10,7 +10,7 @@
 				<DataItem Dimensions="34 34 52 " NumberType="Float" Format="HDF">const.h5:/Z</DataItem>
 			</Geometry>
 			<Attribute Name="p" AttributeType="Scalar" Center="Cell">
-				<DataItem Dimensions="32 32 50 " NumberType="Float" Format="HDF">timestep0000000600.h5:/p</DataItem>
+				<DataItem Dimensions="33 33 51 " NumberType="Float" Format="HDF">timestep0000000600.h5:/p</DataItem>
 			</Attribute>
 			<Attribute Name="tht" AttributeType="Scalar" Center="Cell">
 				<DataItem Dimensions="33 33 51 " NumberType="Float" Format="HDF">timestep0000000600.h5:/tht</DataItem>
