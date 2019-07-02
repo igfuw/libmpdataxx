@@ -67,10 +67,9 @@ before_install:
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew cask uninstall oclint; fi
     
     # needed to get rvm, see below
-    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -; fi
-    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import -; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then \curl -sSL https://get.rvm.io | bash -s -- --branch stable; fi
     # https://github.com/travis-ci/travis-ci/issues/10165
-    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm reload; fi
    
     # locally installed stuff comes first
     - export PATH=/usr/local/bin:$PATH
