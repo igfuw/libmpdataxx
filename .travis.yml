@@ -135,8 +135,7 @@ before_install:
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
     - export PY3DEB=""
-    #- if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $MPI == 'none' ]]; then PY3DEB=3; fi # had problems with building h5py using python3-pip
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' ]]; then PY3DEB=3; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $MPI == 'none' ]]; then PY3DEB=3; fi # had problems with building h5py using python3-pip
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
    
     # upgrade pip
