@@ -15,6 +15,13 @@ using namespace libmpdataxx;
 
 using T = double;
 
+bool almost_equal(T x, T y, T eps)
+{
+  double err = (x - y) / (x + y);
+  std::cerr << "relative error = " << err << std::endl;
+  return err <= eps;
+}
+
 template <int opts_delayed_step_arg>
 T test()
 {
@@ -90,7 +97,21 @@ int main()
     err[3] = test<delayed_step>(); 
   }
 
+  std::map<int, std::string> test_description = {
+    {0, "without delayed advection"},
+    {1, "with delayed advection of advectee 0"},
+    {2, "with delayed advection of advectee 1"},
+    {3, "with delayed advection of advectees 1 and 2"}
+  };
+
+  for(int i=0;i<4;++i)
+    std::cerr << "error value in test " << test_description[i] << " = " << std::setprecision(20) << err[i] << std::endl;
+
   for(int i=1;i<4;++i){
-    if(err[i] != err[i-1]) throw std::runtime_error("delay error");
+    std::cerr << "comparing error values in the test " << test_description[i] << " and in the test " << test_description[0] << "..." << std::endl;
+    if(!almost_equal(err[i], err[0], 3e-15))
+    {
+      throw std::runtime_error("delay error");
+    }
   }
 }
