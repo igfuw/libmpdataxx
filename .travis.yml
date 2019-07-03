@@ -139,7 +139,8 @@ before_install:
     - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
    
     # upgrade pip
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
+    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
+    - sudo pip install --upgrade pip
 
 install:
     - . ./.travis_scripts/install_common.sh
