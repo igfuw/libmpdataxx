@@ -14,3 +14,4 @@ VERBOSE=1 $make_j
 # "/" intentional! (just to make cat exit with an error code)
 OMP_NUM_THREADS=4 ctest -E test_issue || cat Testing/Temporary/LastTest.log /
 cd ../../..
+set +e
