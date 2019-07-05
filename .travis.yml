@@ -93,7 +93,8 @@ addons:
     packages:
       - g++-6
       - clang-5.0
-      - python3.5
+      - python3.5-dev
+      - python3-pip
     sources: &sources
       - sourceline: 'ppa:rakhimov/boost'
       - ubuntu-toolchain-r-test
@@ -159,7 +160,7 @@ install:
     
     # Python modules
     # make Python 3 the default if requested
-#    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
+    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
 
     # h5py
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi 
