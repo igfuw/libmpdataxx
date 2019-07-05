@@ -93,6 +93,7 @@ addons:
     packages:
       - g++-6
       - clang-5.0
+      - python3.5
     sources: &sources
       - sourceline: 'ppa:rakhimov/boost'
       - ubuntu-toolchain-r-test
@@ -105,11 +106,12 @@ before_install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export COMPILER=clang++; fi # only clang on osx
 
 # to avoid python lib/interpreter mismatch; https://github.com/travis-ci/travis-ci/issues/5326
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
+#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
+
     # - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew tap homebrew/science; fi
     # - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi #see https://github.com/travis-ci/travis-ci/issues/6307
     
@@ -134,9 +136,10 @@ before_install:
     - export make_j="make -j 4"
 
     # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
-    - export PY3DEB=""
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $MPI == 'none' ]]; then PY3DEB=3; fi # had problems with building h5py using python3-pip
-    - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
+#    - export PY3DEB=""
+#    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' && $MPI == 'none' ]]; then PY3DEB=3; fi # had problems with building h5py using python3-pip
+    - PY3DEB=3 # had problems with building h5py using python3-pip
+#    - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
    
     # upgrade pip
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
@@ -156,7 +159,7 @@ install:
     
     # Python modules
     # make Python 3 the default if requested
-    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
+#    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
 
     # h5py
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi 
