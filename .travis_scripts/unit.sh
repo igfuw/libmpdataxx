@@ -25,3 +25,5 @@ if [[ $MPI == 'none' ]]; then VERBOSE=1 $make_j; fi
 # for unknown reasons and it only seems to happen on Travis ...
 # "/" intentional! (just to make cat exit with an error code)
 if [[ $MPI == 'none' ]]; then OMP_NUM_THREADS=4 ctest -E test_issue || cat Testing/Temporary/LastTest.log /;fi
+cd ../../..
+set +e
