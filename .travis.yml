@@ -24,28 +24,28 @@ env:
 #    - MPI=lam    
 #    - MPI=mpich  
 
-    - TEST_SUITE=unit MPI=none
-    - TEST_SUITE=sandbox MPI=none
-    - TEST_SUITE=paper MPI=none
-    - TEST_SUITE=elliptic_drop MPI=none
-    - TEST_SUITE=nair_jablonowski_2008 MPI=none
-    - TEST_SUITE=UWLCM_MT MPI=none
-    - TEST_SUITE=UWLCM_unit_iles MPI=none
-    - TEST_SUITE=UWLCM_unit_sgs MPI=none
-    - TEST_SUITE=pbl MPI=none 
-    - TEST_SUITE=osx_local_clang MPI=none
+#    - TEST_SUITE=unit MPI=none
+#    - TEST_SUITE=sandbox MPI=none
+#    - TEST_SUITE=paper MPI=none
+#    - TEST_SUITE=elliptic_drop MPI=none
+#    - TEST_SUITE=nair_jablonowski_2008 MPI=none
+#    - TEST_SUITE=UWLCM_MT MPI=none
+#    - TEST_SUITE=UWLCM_unit_iles MPI=none
+#    - TEST_SUITE=UWLCM_unit_sgs MPI=none
+#    - TEST_SUITE=pbl MPI=none 
+#    - TEST_SUITE=osx_local_clang MPI=none
     - TEST_SUITE=unit MPI=mvapich2
-    - TEST_SUITE=sandbox MPI=mvapich2
-# MPI paper tests don't do file comparison and plotting; TODO: fix them
-    - TEST_SUITE=paper MPI=mvapich2
-    - TEST_SUITE=elliptic_drop MPI=mvapich2
-# disabled, because polar bconds dont work with MPI
-#    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-    - TEST_SUITE=pbl MPI=mvapich2
-# bconds_div has to be ran separately with mpi because of timeouts
-    - TEST_SUITE=bconds_div MPI=mvapich2 
-# TODO: once libcloud MPI works, turn UWLCM MPI test on
-#    - TEST_SUITE=UWLCM MPI=mvapich2
+#    - TEST_SUITE=sandbox MPI=mvapich2
+## MPI paper tests don't do file comparison and plotting; TODO: fix them
+#    - TEST_SUITE=paper MPI=mvapich2
+#    - TEST_SUITE=elliptic_drop MPI=mvapich2
+## disabled, because polar bconds dont work with MPI
+##    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+#    - TEST_SUITE=pbl MPI=mvapich2
+## bconds_div has to be ran separately with mpi because of timeouts
+#    - TEST_SUITE=bconds_div MPI=mvapich2 
+## TODO: once libcloud MPI works, turn UWLCM MPI test on
+##    - TEST_SUITE=UWLCM MPI=mvapich2
 
 cache:
   directories:
