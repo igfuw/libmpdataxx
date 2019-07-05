@@ -144,7 +144,7 @@ before_install:
    
     # upgrade pip
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
-    - sudo pip install --upgrade pip
+    - sudo pip$PY3DEB install --upgrade pip$PY3DEB
 
 install:
     - . ./.travis_scripts/install_common.sh
@@ -168,7 +168,7 @@ install:
     #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo pip install mpi4py; fi 
     - |
       if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then
-        sudo pip install Cython # to generate the C wrappers
+        sudo pip$PY3DEB install Cython # to generate the C wrappers
         #sudo pip install https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz
         mkdir mpi4py
         cd mpi4py
@@ -177,16 +177,16 @@ install:
         sudo python setup.py install
         cd ..
       fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then HDF5_MPI="ON" sudo pip install --no-binary=h5py h5py; fi 
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then HDF5_MPI="ON" sudo pip$PY3DEB install --no-binary=h5py h5py; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip$PY3DEB install h5py; fi 
 
     # scipy 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-scipy; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install scipy; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip$PY3DEB install scipy; fi 
 
     # matplotlib
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-matplotlib; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install matplotlib; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip$PY3DEB install matplotlib; fi
 
 script:
     # libmpdata++
