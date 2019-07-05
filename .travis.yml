@@ -144,7 +144,7 @@ before_install:
    
     # upgrade pip
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
-    - sudo pip$PY3DEB install --upgrade pip$PY3DEB
+    - sudo pip$PY3DEB install --upgrade pip
 
 install:
     - . ./.travis_scripts/install_common.sh
