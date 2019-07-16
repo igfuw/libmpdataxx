@@ -94,6 +94,7 @@ addons:
       - g++-6
       - clang-5.0
       - python3-pip
+      - python3-setuptools
     sources: &sources
       - sourceline: 'ppa:rakhimov/boost'
       - ubuntu-toolchain-r-test
