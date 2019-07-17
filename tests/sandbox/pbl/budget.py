@@ -94,11 +94,14 @@ dssp *= xnorm
 # budget inbalance
 inb = dssp + hflux + tke_t
 
-# save budget to a text file
+# save budget to a hdf5 file
 outname = dirname[4:]
-outfile = open('budget_' + outname + '.txt', 'w')
-for lev_d in zip(Z, hflux, tke_t, dssp, inb):
-    outfile.write('{:6.2f} {:10.1e} {:10.1e} {:10.1e} {:10.6e}\n'.format(*lev_d))
+budget_h = h5py.File('budget_' + outname + '.h5', "w")
+budget_h.create_dataset("Z", data=Z)
+budget_h.create_dataset("inb", data=inb)
+budget_h.create_dataset("dssp", data=dssp)
+budget_h.create_dataset("tke_t", data=tke_t)
+budget_h.create_dataset("hflux", data=hflux)
 
 fig, axarr = plt.subplots(1, 1, figsize= (10, 6))
 axarr.plot(hflux, Z, 'k-', lw = 1, label = 'B')
