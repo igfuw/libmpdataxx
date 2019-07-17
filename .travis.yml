@@ -31,7 +31,7 @@ env:
     - TEST_SUITE=nair_jablonowski_2008 MPI=none
     - TEST_SUITE=UWLCM_MT MPI=none
     - TEST_SUITE=UWLCM_unit_iles MPI=none
-    - TEST_SUITE=UWLCM_unit_sgs MPI=none
+    - TEST_SUITE=UWLCM_unit_smg MPI=none
     - TEST_SUITE=pbl MPI=none 
     - TEST_SUITE=osx_local_clang MPI=none
     - TEST_SUITE=unit MPI=mvapich2
@@ -81,7 +81,7 @@ matrix:
         - compiler: clang
           env: TEST_SUITE=UWLCM_unit_iles MPI=none
         - compiler: clang
-          env: TEST_SUITE=UWLCM_unit_sgs MPI=none
+          env: TEST_SUITE=UWLCM_unit_smg MPI=none
        
         # local clang tests on osx
         - os: linux
@@ -210,7 +210,7 @@ script:
     # UWLCM
     - if [[ $TEST_SUITE == 'UWLCM_MT' ]]; then . ./.travis_scripts/UWLCM.sh moist_thermal; fi
     - if [[ $TEST_SUITE == 'UWLCM_unit_iles' ]]; then . ./.travis_scripts/UWLCM.sh unit_iles; fi
-    - if [[ $TEST_SUITE == 'UWLCM_unit_sgs' ]]; then . ./.travis_scripts/UWLCM.sh unit_sgs; fi
+    - if [[ $TEST_SUITE == 'UWLCM_unit_smg' ]]; then . ./.travis_scripts/UWLCM.sh unit_smg; fi
     
     # compiling and running tests from Nair & Jablonowski 2008 MWR paper in Release mode
     - if [[ $TEST_SUITE == 'nair_jablonowski_2008' ]]; then . ./.travis_scripts/nair_jablonowski_2008.sh; fi
