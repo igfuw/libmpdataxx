@@ -63,7 +63,7 @@ namespace libmpdataxx
       {fot, "fot"}
     };
 
-    std::string opts_string(opts_t opts)
+    inline std::string opts_string(opts_t opts)
     {
       std::string ret;
       const auto opt_order = {nug, iga, abs, dfl, div_2nd, tot, div_3rd, fot, fct, pfc, npa, khn};

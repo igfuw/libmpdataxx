@@ -16,7 +16,7 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      void monitor(float frac)
+      inline void monitor(float frac)
       {
 	char name[17];
 #if defined(__linux__)
