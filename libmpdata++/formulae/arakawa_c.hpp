@@ -12,7 +12,10 @@ namespace libmpdataxx
 {
   namespace arakawa_c
   {
-    struct hlf_t {} h; 
+    namespace
+    {
+      struct hlf_t {} h; 
+    };
 
     inline rng_t operator+(
       const rng_t &i, const hlf_t &
