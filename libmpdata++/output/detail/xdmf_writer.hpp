@@ -30,8 +30,8 @@ namespace libmpdataxx
         struct data_item
         {
           blitz::TinyVector<int, dim> dimensions;
-          static const std::string number_type;
-          static const std::string format;
+          const std::string number_type = "Float";
+          const std::string format = "HDF";
           std::string data;
           void add(ptree& node)
           {
@@ -47,7 +47,7 @@ namespace libmpdataxx
 
         struct topology
         {
-          static const std::string topology_type;
+          const std::string topology_type = dim == 2 ? "2DSMesh" : "3DSMesh";
           blitz::TinyVector<int, dim> dimensions;
           void add(ptree& node)
           {
@@ -61,7 +61,7 @@ namespace libmpdataxx
 
         struct geometry
         {
-          static const std::string geometry_type;
+          const std::string geometry_type = dim == 2 ? "X_Y" : "X_Y_Z";
           std::array<data_item, dim> coords;
           void add(ptree& node)
           {
@@ -75,8 +75,8 @@ namespace libmpdataxx
         struct attribute
         {
           std::string name;
-          static const std::string attribute_type;
-          static const std::string center;
+          const std::string attribute_type = "Scalar";
+          const std::string center = "Cell";
           mutable data_item item;
           void add(ptree& node)
           {
@@ -94,8 +94,8 @@ namespace libmpdataxx
           }
         };
 
-        static const std::string name;
-        static const std::string grid_type;
+        const std::string name = "Grid";
+        const std::string grid_type = "Uniform";
         topology top;
         geometry geo;
         std::set<attribute> attrs;
@@ -202,27 +202,6 @@ namespace libmpdataxx
 
       };
 
-      // compile time constants
-      template<int dim>
-      const std::string xdmf_writer<dim>::data_item::number_type = "Float";
-      template<int dim>
-      const std::string xdmf_writer<dim>::data_item::format = "HDF";
-      template<>
-      const std::string xdmf_writer<3>::topology::topology_type = "3DSMesh";
-      template<>
-      const std::string xdmf_writer<2>::topology::topology_type = "2DSMesh";
-      template<>
-      const std::string xdmf_writer<3>::geometry::geometry_type = "X_Y_Z";
-      template<>
-      const std::string xdmf_writer<2>::geometry::geometry_type = "X_Y";
-      template<int dim>
-      const std::string xdmf_writer<dim>::attribute::attribute_type = "Scalar";
-      template<int dim>
-      const std::string xdmf_writer<dim>::attribute::center = "Cell";
-      template<int dim>
-      const std::string xdmf_writer<dim>::name = "Grid";
-      template<int dim>
-      const std::string xdmf_writer<dim>::grid_type = "Uniform";
     }
   }
 }
