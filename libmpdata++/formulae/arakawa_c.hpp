@@ -16,32 +16,32 @@ namespace libmpdataxx
     {
       struct hlf_t {} h; 
 
-      rng_t operator+(
+      inline rng_t operator+(
         const rng_t &i, const hlf_t &
       ) { 
         return i; 
       } 
 
-      rng_t operator-(
+      inline rng_t operator-(
         const rng_t &i, const hlf_t &
       ) { 
         return i-1; 
       }
       
-      int operator+(
+      inline int operator+(
         const int i, const hlf_t &
       ) { 
         return i; 
       } 
 
-      int operator-(
+      inline int operator-(
         const int i, const hlf_t &
       ) { 
         return i-1; 
       }
 
       template<class n_t>
-      rng_t operator^(
+      inline rng_t operator^(
         const rng_t &r, const n_t &n
       ) { 
         return rng_t(
