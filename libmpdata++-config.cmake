@@ -237,7 +237,7 @@ if(HDF5_FOUND)
     ")
 
     execute_process(
-      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
+      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-I${HDF5_INCLUDE_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
       # Boost_LIBRARY_DIRS has to be in LD_RUN_PATH, tried to specify it through rpath/rpath-link but failed; at runtime it correctly finds libboost-mpi (direct dependency), but fails on boost-serialization (which is a dependency of boost-mpi)
       #COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS},-rpath-link,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
       WORKING_DIRECTORY ${tmpdir} 
