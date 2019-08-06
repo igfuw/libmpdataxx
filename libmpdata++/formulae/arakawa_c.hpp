@@ -12,40 +12,43 @@ namespace libmpdataxx
 {
   namespace arakawa_c
   {
-    struct hlf_t {} h; 
+    namespace
+    {
+      struct hlf_t {} h; 
 
-    inline rng_t operator+(
-      const rng_t &i, const hlf_t &
-    ) { 
-      return i; 
-    } 
+      inline rng_t operator+(
+        const rng_t &i, const hlf_t &
+      ) { 
+        return i; 
+      } 
 
-    inline rng_t operator-(
-      const rng_t &i, const hlf_t &
-    ) { 
-      return i-1; 
-    }
-    
-    inline int operator+(
-      const int i, const hlf_t &
-    ) { 
-      return i; 
-    } 
+      inline rng_t operator-(
+        const rng_t &i, const hlf_t &
+      ) { 
+        return i-1; 
+      }
+      
+      inline int operator+(
+        const int i, const hlf_t &
+      ) { 
+        return i; 
+      } 
 
-    inline int operator-(
-      const int i, const hlf_t &
-    ) { 
-      return i-1; 
-    }
+      inline int operator-(
+        const int i, const hlf_t &
+      ) { 
+        return i-1; 
+      }
 
-    template<class n_t>
-    inline rng_t operator^(
-      const rng_t &r, const n_t &n
-    ) { 
-      return rng_t(
-        (r - n).first(), 
-        (r + n).last()
-      ); 
-    } 
+      template<class n_t>
+      inline rng_t operator^(
+        const rng_t &r, const n_t &n
+      ) { 
+        return rng_t(
+          (r - n).first(), 
+          (r + n).last()
+        ); 
+      } 
+    };
   } // namespace arakawa_c
 } // namespace libmpdataxx
