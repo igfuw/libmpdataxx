@@ -15,7 +15,10 @@ namespace libmpdataxx
     namespace detail
     {
 #if defined(USE_MPI)
-      bool mpi_initialized_before = true; // flag if MPI was initialized before distmem ctor
+      namespace
+      {
+        bool mpi_initialized_before = true; // flag if MPI was initialized before distmem ctor
+      };
 #endif
 
       template <typename real_t, int n_dims>
