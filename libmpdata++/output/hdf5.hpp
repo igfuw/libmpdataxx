@@ -333,7 +333,11 @@ namespace libmpdataxx
       {
         assert(this->rank == 0);
         
-        H5::H5File hdfcp(const_file, H5F_ACC_RDWR);; // reopen the const file
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
+#if defined(USE_MPI)
+          , H5P_DEFAULT, fapl_id
+#endif
+        ); // reopen the const file
 
         auto aux = hdfcp.createDataSet(
           name,
