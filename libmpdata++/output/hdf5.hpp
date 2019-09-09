@@ -345,10 +345,14 @@ namespace libmpdataxx
           H5::DataSpace(1, &shape[parent_t::n_dims - 1])
         );
 
-        auto space = aux.getSpace();
-        offst = 0;
-        space.selectHyperslab(H5S_SELECT_SET, &shape[parent_t::n_dims - 1], &offst[parent_t::n_dims - 1]);
-        aux.write(data, flttype_solver, H5::DataSpace(1, &shape[parent_t::n_dims - 1]), space);
+#if defined(USE_MPI)
+        if (this->mem->distmem.rank() == 0)
+#endif
+        {
+          auto space = aux.getSpace();
+          space.selectHyperslab(H5S_SELECT_SET, &shape[parent_t::n_dims - 1], &offst[parent_t::n_dims - 1]);
+          aux.write(data, flttype_solver, H5::DataSpace(1, &shape[parent_t::n_dims - 1]), space);
+        }
       }
 
       // parameters saved for pure advection solvers
