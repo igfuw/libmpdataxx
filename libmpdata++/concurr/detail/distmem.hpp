@@ -1,6 +1,7 @@
 #pragma once
 
 #if defined(USE_MPI)
+#  include <boost/serialization/vector.hpp>
 #  include <boost/mpi/communicator.hpp>
 #  include <boost/mpi/collectives.hpp>
 #else
