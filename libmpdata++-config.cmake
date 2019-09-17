@@ -113,7 +113,7 @@ set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
 ############################################################################################
 # Boost libraries v>=1.55.0, because boost/predef was added then
 set(Boost_DETAILED_FAILURE_MSG ON)
-find_package(Boost 1.55.0 COMPONENTS thread date_time system iostreams timer filesystem)
+find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem)
 if(Boost_FOUND)
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
