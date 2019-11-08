@@ -52,7 +52,7 @@ namespace libmpdataxx
 	      H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, count, offst;
+      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, srfcshape, chunk, count, offst;
       H5::DSetCreatPropList params;
 
       void start(const typename parent_t::advance_arg_t nt)
@@ -70,6 +70,9 @@ namespace libmpdataxx
           offst = 0;
 
           shape = this->mem->advectee().extent();
+
+          srfcshape = shape;
+          *(srfcshape.end()) = 1;
           
           chunk = 1;
           // change chunk size along the last dimension
@@ -255,14 +258,14 @@ namespace libmpdataxx
       }
       
       // for discontiguous array with halos
-      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr)
+      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
       {
         assert(this->rank == 0);
         
         auto aux = (*hdfp).createDataSet(
           name,
           flttype_output,
-          H5::DataSpace(parent_t::n_dims, shape.data()),
+          H5::DataSpace(parent_t::n_dims, srfc ? srfcshape.data() : shape.data()),
           params
         );
         
