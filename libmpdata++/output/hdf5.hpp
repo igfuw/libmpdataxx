@@ -72,8 +72,8 @@ namespace libmpdataxx
           shape = this->mem->advectee().extent();
 
           srfcshape = shape;
+          // change srfcshape size along the last dimension
           *(srfcshape.end()-1) = 1;
-          std::cerr << "srfcshape: " << srfcshape << std::endl;
           
           chunk = 1;
           // change chunk size along the last dimension
@@ -241,7 +241,7 @@ namespace libmpdataxx
                 offst[0] = i;
                 offst[1] = j;
                 space.selectHyperslab(H5S_SELECT_SET, count_data, offst.data());
-                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count_data), space);
               }
             }
             break;
