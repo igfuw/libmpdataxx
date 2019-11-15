@@ -55,6 +55,16 @@ namespace libmpdataxx
 
         virtual void multiply_sgs_visc() = 0;
 
+        virtual void calc_drag_cmpct()
+        {
+          formulae::stress::calc_drag_cmpct<ct_params_t::n_dims, ct_params_t::opts>(tau_srfc,
+                                                                                    this->vips(),
+                                                                                    *this->mem->G,
+                                                                                    cdrag,
+                                                                                    this->ijk,
+                                                                                    ijkm);
+        }
+
         // apply pade scheme to the d-th element of the drv array
         void pade_deriv(int d)
         {
@@ -86,12 +96,7 @@ namespace libmpdataxx
           
           if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
-            formulae::stress::calc_drag_cmpct<ct_params_t::n_dims, ct_params_t::opts>(tau_srfc,
-                                                                                      this->vips(),
-                                                                                      *this->mem->G,
-                                                                                      cdrag,
-                                                                                      this->ijk,
-                                                                                      ijkm);
+            calc_drag_cmpct();
 
             if (this->mem->G)
             {
