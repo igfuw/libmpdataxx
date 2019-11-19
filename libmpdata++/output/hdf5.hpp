@@ -100,24 +100,7 @@ namespace libmpdataxx
           for (int d = 0; d < parent_t::n_dims; ++d)
 	    shape[d] = this->mem->distmem.grid_size[d];
 
-          srfcshape = shape;
-          // change srfcshape size along the last dimension
-          *(srfcshape.end()-1) = 1;
-          
-//          chunk = 1;
-//          // change chunk size along the last dimension
-//          *(chunk.end() - 1) = *(shape.end() - 1);
-          
-//          srfcchunk = 1;
-//          // change srfcchunk size along the last dimension
-//          *(srfcchunk.end() - 1) = *(srfcshape.end() - 1);
-
           chunk = shape;
-          srfcchunk = srfcshape;
-
-//          srfccount = 1;
-//          // see above
-//          *(srfccount.end() - 1) = *(srfcshape.end() - 1);
 
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
@@ -141,6 +124,13 @@ namespace libmpdataxx
             chunk[0] = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
           }
 #endif
+
+          srfcshape = shape;
+          *(srfcshape.end()-1) = 1;
+
+          srfcchunk = chunk;
+          *(srfchunk.end()-1) = 1;
+
 	  params.setChunk(parent_t::n_dims, chunk.data());
 #if !defined(USE_MPI)
 	  params.setDeflate(5); // TODO: move such constant to the header
