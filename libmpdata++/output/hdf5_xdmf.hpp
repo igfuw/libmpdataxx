@@ -92,13 +92,15 @@ namespace libmpdataxx
         parent_t::record_aux(name, data);
       }
       
-      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr)
+      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
       {
+        auto shape = this->mem->distmem.grid_size;
+        if(srfc) shape(parent_t::n_dims-1) = 1;
 #if defined(USE_MPI)
         if (this->mem->distmem.rank() == 0)
 #endif
-          xdmfw.add_attribute(name, this->hdf_name(),  this->mem->distmem.grid_size.data()); 
-        parent_t::record_aux_dsc(name, arr);
+          xdmfw.add_attribute(name, this->hdf_name(), shape.data()); 
+        parent_t::record_aux_dsc(name, arr, srfc);
       }
 
       public:
