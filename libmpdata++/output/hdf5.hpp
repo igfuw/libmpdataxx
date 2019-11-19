@@ -52,7 +52,7 @@ namespace libmpdataxx
 	      H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, srfcshape, chunk, count, offst;
+      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, count, srfcshape, srfcchunk, srfccount, offst;
       H5::DSetCreatPropList params;
 
       void start(const typename parent_t::advance_arg_t nt)
@@ -72,15 +72,24 @@ namespace libmpdataxx
           shape = this->mem->advectee().extent();
 
           srfcshape = shape;
-          *(srfcshape.end()) = 1;
+          // change srfcshape size along the last dimension
+          *(srfcshape.end()-1) = 1;
           
           chunk = 1;
           // change chunk size along the last dimension
           *(chunk.end() - 1) = *(shape.end() - 1);
+          
+          srfcchunk = 1;
+          // change srfcchunk size along the last dimension
+          *(srfcchunk.end() - 1) = *(srfcshape.end() - 1);
 
           count = 1;
           // see above
           *(count.end() - 1) = *(shape.end() - 1);
+
+          srfccount = 1;
+          // see above
+          *(srfccount.end() - 1) = *(srfcshape.end() - 1);
 
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
@@ -188,16 +197,18 @@ namespace libmpdataxx
         }
       }
       
-      void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
+      void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr, bool srfc = false)
       {
         H5::DataSpace space = dset.getSpace();
+
+        auto count_data = srfc ? srfccount.data() : count.data();
 
         switch (int(solver_t::n_dims))
         {
           case 1:
           {
-            space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-            dset.write( &(arr(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+            space.selectHyperslab(H5S_SELECT_SET, count_data, offst.data());
+            dset.write( &(arr(0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count_data), space);
             break;
           }
           case 2:
@@ -209,8 +220,8 @@ namespace libmpdataxx
                       i += this->mem->grid_size[0].stride()
             ) {
               offst[0] = i;
-              space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-              dset.write( &(arr(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+              space.selectHyperslab(H5S_SELECT_SET, count_data, offst.data());
+              dset.write( &(arr(i,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count_data), space);
             }
             break;
           }
@@ -229,8 +240,8 @@ namespace libmpdataxx
               ) {
                 offst[0] = i;
                 offst[1] = j;
-                space.selectHyperslab(H5S_SELECT_SET, count.data(), offst.data());
-                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count.data()), space);
+                space.selectHyperslab(H5S_SELECT_SET, count_data, offst.data());
+                dset.write( &(arr(i,j,0)), flttype_solver, H5::DataSpace(parent_t::n_dims, count_data), space);
               }
             }
             break;
@@ -261,6 +272,9 @@ namespace libmpdataxx
       void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
       {
         assert(this->rank == 0);
+
+        if(srfc)
+	  params.setChunk(parent_t::n_dims, srfcchunk.data());
         
         auto aux = (*hdfp).createDataSet(
           name,
@@ -268,8 +282,12 @@ namespace libmpdataxx
           H5::DataSpace(parent_t::n_dims, srfc ? srfcshape.data() : shape.data()),
           params
         );
+ 
+        // revert to default chunk
+        if(srfc)
+	  params.setChunk(parent_t::n_dims, chunk.data());
         
-        record_dsc_helper(aux, arr);
+        record_dsc_helper(aux, arr, srfc);
       }
 
       void record_scalar_hlpr(const std::string &name, const std::string &group_name, typename solver_t::real_t data, H5::H5File hdf)
@@ -304,7 +322,7 @@ namespace libmpdataxx
 
       void record_aux_scalar(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
       {
-        record_scalar_hlpr(name, group_name, data, hdfp);
+        record_scalar_hlpr(name, group_name, data, *hdfp);
       }
 
       void record_aux_scalar(const std::string &name, typename solver_t::real_t data)
