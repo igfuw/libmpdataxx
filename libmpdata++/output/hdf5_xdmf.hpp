@@ -95,7 +95,7 @@ namespace libmpdataxx
       void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
       {
         auto shape = this->mem->distmem.grid_size;
-        if(srfc) shape(parent_t::n_dims-1) = 1;
+        if(srfc) shape.at(parent_t::n_dims-1) = 1;
 #if defined(USE_MPI)
         if (this->mem->distmem.rank() == 0)
 #endif

@@ -250,24 +250,28 @@ namespace libmpdataxx
         H5::DataSpace space = dset.getSpace();
         space.selectHyperslab(H5S_SELECT_SET, srfcshape.data(), offst.data());
         // TODO: some permutation of grid_size instead of the switch
+        blitz::Range zro(0,0);
 
         switch (int(solver_t::n_dims))
         {
           case 1:
           {
-            typename solver_t::arr_t contiguous_arr = arr(0).copy(); // create a copy that is contiguous
+            typename solver_t::arr_t contiguous_arr(1);
+            contiguous_arr = arr(0); // create a copy that is contiguous
             dset.write(contiguous_arr.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, srfcshape.data()), space, dxpl_id);
             break;
           }
           case 2:
           {
-            typename solver_t::arr_t contiguous_arr = arr(this->mem->grid_size[0], 0).copy(); // create a copy that is contiguous
+            typename solver_t::arr_t contiguous_arr(this->mem->grid_size[0], zro); 
+            contiguous_arr = arr(this->mem->grid_size[0], zro); // create a copy that is contiguous
             dset.write(contiguous_arr.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, srfcshape.data()), space, dxpl_id);
             break;
           }
           case 3:
           {
-            typename solver_t::arr_t contiguous_arr = arr(this->mem->grid_size[0], this->mem->grid_size[1], 0).copy(); // create a copy that is contiguous
+            typename solver_t::arr_t contiguous_arr(this->mem->grid_size[0], this->mem->grid_size[1], zro);
+            contiguous_arr = arr(this->mem->grid_size[0], this->mem->grid_size[1], zro); // create a copy that is contiguous
             dset.write(contiguous_arr.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, srfcshape.data()), space, dxpl_id);
             break;
           }
