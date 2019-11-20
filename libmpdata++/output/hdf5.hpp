@@ -129,7 +129,7 @@ namespace libmpdataxx
           *(srfcshape.end()-1) = 1;
 
           srfcchunk = chunk;
-          *(srfchunk.end()-1) = 1;
+          *(srfcchunk.end()-1) = 1;
 
 	  params.setChunk(parent_t::n_dims, chunk.data());
 #if !defined(USE_MPI)
