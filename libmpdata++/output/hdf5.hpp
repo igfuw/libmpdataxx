@@ -58,7 +58,7 @@ namespace libmpdataxx
       blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst;
       H5::DSetCreatPropList params;
 
-      H5::DataSpace sspace, cspace;
+      H5::DataSpace sspace, cspace, srfcspace;
 #if defined(USE_MPI)
       hid_t fapl_id;
 #endif
@@ -105,7 +105,10 @@ namespace libmpdataxx
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
 
+          srfcshape = shape;
+          *(srfcshape.end()-1) = 1;
           sspace = H5::DataSpace(parent_t::n_dims, shape.data());
+          srfcspace = H5::DataSpace(parent_t::n_dims, srfcshape.data());
           cspace = H5::DataSpace(parent_t::n_dims, cshape.data());
 
 #if defined(USE_MPI)
@@ -337,7 +340,7 @@ namespace libmpdataxx
         auto aux = (*hdfp).createDataSet(
           name,
           flttype_output,
-          H5::DataSpace(parent_t::n_dims, srfc ? srfcshape.data() : shape.data()),
+          srfc ? srfcspace : sspace,
           params
         );
  
