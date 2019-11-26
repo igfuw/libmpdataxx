@@ -177,6 +177,7 @@ install:
         sudo python setup.py install
         cd ..
       fi
+    - printenv
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then HDF5_MPI="ON" sudo pip$PY3DEB install --no-binary=h5py h5py; fi 
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip$PY3DEB install h5py; fi 
 

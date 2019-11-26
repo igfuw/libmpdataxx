@@ -120,6 +120,7 @@ if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_instal
 # ... so we are installing it manually:
   if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then 
     ls -A ${DEPS_DIR}/hdf5
+    ls -A ${DEPS_DIR}/hdf5/lib
     if [[ -z "$(ls -A ${DEPS_DIR}/hdf5)" ]]; then
       wget https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.10.5.tar
       tar xf hdf5-1.10.5.tar
