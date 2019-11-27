@@ -6,7 +6,7 @@
 #       - https://github.com/qTox/qTox/blob/59b5578c7bffc56f6227c60bfcb38f97d39ec8d9/.travis.yml
 
 stages:
-  - precache
+#  - precache
   - test
 
 language: cpp
@@ -121,7 +121,7 @@ before_install:
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew cask uninstall oclint; fi
     
     # needed to get rvm, see below
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then \curl -sSL https://get.rvm.io | bash -s -- --branch stable; fi
+#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then \curl -sSL https://get.rvm.io | bash -s -- --branch stable; fi
     # https://github.com/travis-ci/travis-ci/issues/10165
 #    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm reload; fi
 #    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm install ruby-2.6; fi
@@ -235,15 +235,15 @@ script:
 #       add after_success, after_failure to precache, remove building of caches from the test stage, make the build error instead;
 
 # YAML alias for the options common to precache jobs
-job_info: &precache_default
-  stage: precache
-  os: linux
-  dist: xenial
-  language: cpp
-  compiler: gcc
-  install: 
-    - . ./.travis_scripts/install_common.sh
-  script: echo "Preparing cache finished"
+#job_info: &precache_default
+#  stage: precache
+#  os: linux
+#  dist: xenial
+#  language: cpp
+#  compiler: gcc
+#  install: 
+#    - . ./.travis_scripts/install_common.sh
+#  script: echo "Preparing cache finished"
 
 jobs:
   include:
