@@ -12,7 +12,7 @@ stages:
 language: cpp
 os: 
     - linux
-    - osx
+#    - osx
 dist: xenial
 compiler:
     - gcc
@@ -52,7 +52,7 @@ cache:
     - ${TRAVIS_BUILD_DIR}/deps/mvapich2-2.3b
     - ${TRAVIS_BUILD_DIR}/deps/boost
     - ${TRAVIS_BUILD_DIR}/deps/hdf5
-    - /home/travis/.rvm/
+    - /home/travis/.rvm/ # following Travis cache documentation: try to cache installed ruby on osx
 
 matrix:
     exclude:
