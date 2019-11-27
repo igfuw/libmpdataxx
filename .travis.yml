@@ -6,12 +6,12 @@
 #       - https://github.com/qTox/qTox/blob/59b5578c7bffc56f6227c60bfcb38f97d39ec8d9/.travis.yml
 
 stages:
-#  - precache
+  - precache
   - test
 
 language: cpp
 os: 
-#    - linux
+    - linux
     - osx
 dist: xenial
 compiler:
@@ -52,6 +52,7 @@ cache:
     - ${TRAVIS_BUILD_DIR}/deps/mvapich2-2.3b
     - ${TRAVIS_BUILD_DIR}/deps/boost
     - ${TRAVIS_BUILD_DIR}/deps/hdf5
+    - /home/travis/.rvm/
 
 matrix:
     exclude:
@@ -236,30 +237,30 @@ script:
 #       add after_success, after_failure to precache, remove building of caches from the test stage, make the build error instead;
 
 # YAML alias for the options common to precache jobs
-#job_info: &precache_default
-#  stage: precache
-#  os: linux
-#  dist: xenial
-#  language: cpp
-#  compiler: gcc
-#  install: 
-#    - . ./.travis_scripts/install_common.sh
-#  script: echo "Preparing cache finished"
+job_info: &precache_default
+  stage: precache
+  os: linux
+  dist: xenial
+  language: cpp
+  compiler: gcc
+  install: 
+    - . ./.travis_scripts/install_common.sh
+  script: echo "Preparing cache finished"
 
-#jobs:
-#  include:
-#    - <<: *precache_default
-#      env: TEST_SUITE=unit MPI=mvapich2
-#    - <<: *precache_default
-#      env: TEST_SUITE=sandbox MPI=mvapich2
-#    - <<: *precache_default
-#      env: TEST_SUITE=paper MPI=mvapich2
-#    - <<: *precache_default
-#      env: TEST_SUITE=elliptic_drop MPI=mvapich2
-#    - <<: *precache_default
-#      env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-#    - <<: *precache_default
-#      env: TEST_SUITE=pbl MPI=mvapich2
-#    - <<: *precache_default
-#      env: TEST_SUITE=bconds_div MPI=mvapich2
+jobs:
+  include:
+    - <<: *precache_default
+      env: TEST_SUITE=unit MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=sandbox MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=paper MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=elliptic_drop MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=pbl MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=bconds_div MPI=mvapich2
 
