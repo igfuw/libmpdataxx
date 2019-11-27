@@ -245,20 +245,20 @@ script:
 #    - . ./.travis_scripts/install_common.sh
 #  script: echo "Preparing cache finished"
 
-jobs:
-  include:
-    - <<: *precache_default
-      env: TEST_SUITE=unit MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=sandbox MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=paper MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=elliptic_drop MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=pbl MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=bconds_div MPI=mvapich2
+#jobs:
+#  include:
+#    - <<: *precache_default
+#      env: TEST_SUITE=unit MPI=mvapich2
+#    - <<: *precache_default
+#      env: TEST_SUITE=sandbox MPI=mvapich2
+#    - <<: *precache_default
+#      env: TEST_SUITE=paper MPI=mvapich2
+#    - <<: *precache_default
+#      env: TEST_SUITE=elliptic_drop MPI=mvapich2
+#    - <<: *precache_default
+#      env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+#    - <<: *precache_default
+#      env: TEST_SUITE=pbl MPI=mvapich2
+#    - <<: *precache_default
+#      env: TEST_SUITE=bconds_div MPI=mvapich2
 
