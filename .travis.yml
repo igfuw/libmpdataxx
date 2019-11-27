@@ -227,7 +227,7 @@ script:
     # testing local clang on osx
     - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/unit.sh; fi # with '.' to pass env vars
 
-# define the precache stage
+# define the precache stage 
 # empty phases mean that default phases (before_install, install, ...) from the test stage are used (?)
 # TODO: precache stage has a lot of unnecessary before_install and install code common to the (default) test stage;
 #       add after_success, after_failure to precache, remove building of caches from the test stage, make the build error instead;
