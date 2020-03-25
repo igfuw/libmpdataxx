@@ -179,7 +179,7 @@ namespace libmpdataxx
         a(pi<d>(this->rght_edge_sclr + h, j)) = 2 * a(pi<d>(this->rght_edge_sclr - h, j)) - a(pi<d>(this->rght_edge_sclr - 1 - h, j));
       }
 
-      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const int offset = 0)
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &b, const rng_t &j, const int offset = 0)
       {
         // fill halos for a staggered field based on prescribed values on the edge (b array)
         // that is 0.5 * (a(edge-h) + a(edge+h)) = b(i)
