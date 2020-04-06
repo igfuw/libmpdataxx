@@ -45,11 +45,11 @@ namespace libmpdataxx
       // HDF types of host data
       const H5::FloatType
         flttype_solver =
-	  sizeof(typename solver_t::real_t) == sizeof(long double)
-	    ? H5::PredType::NATIVE_LDOUBLE
-	    : sizeof(typename solver_t::real_t) == sizeof(double)
-	      ? H5::PredType::NATIVE_DOUBLE :
-	      H5::PredType::NATIVE_FLOAT,
+          sizeof(typename solver_t::real_t) == sizeof(long double)
+            ? H5::PredType::NATIVE_LDOUBLE
+            : sizeof(typename solver_t::real_t) == sizeof(double)
+              ? H5::PredType::NATIVE_DOUBLE :
+              H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
       blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, count, srfcshape, srfcchunk, srfccount, offst;
@@ -94,8 +94,8 @@ namespace libmpdataxx
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
 
-	  params.setChunk(parent_t::n_dims, chunk.data());
-	  params.setDeflate(5); // TODO: move such constant to the header
+          params.setChunk(parent_t::n_dims, chunk.data());
+          params.setDeflate(5); // TODO: move such constant to the header
 
           // creating variables
           {
@@ -181,7 +181,7 @@ namespace libmpdataxx
         hdfp.reset(new H5::H5File(this->outdir + "/" + hdf_name(), H5F_ACC_TRUNC));
 
         {
-	  for (const auto &v : this->outvars)
+          for (const auto &v : this->outvars)
           {
             // creating the user-requested variables
             vars[v.first] = (*hdfp).createDataSet(
@@ -190,7 +190,7 @@ namespace libmpdataxx
               H5::DataSpace(parent_t::n_dims, shape.data()),
               params
             );
-	    // TODO: units attribute
+            // TODO: units attribute
 
             record_dsc_helper(vars[v.first], this->out_data(v.first));
           }
@@ -251,11 +251,11 @@ namespace libmpdataxx
       }
 
       // data is assumed to be contiguous and in the same layout as hdf variable
-      void record_aux(const std::string &name, typename solver_t::real_t *data)
+      void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, H5::H5File hdf)
       {
         assert(this->rank == 0);
 
-        auto aux = (*hdfp).createDataSet(
+        auto aux = hdf.createDataSet(
           name,
           flttype_output,
           H5::DataSpace(parent_t::n_dims, shape.data()),
@@ -267,16 +267,21 @@ namespace libmpdataxx
         space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space);
       }
+
+      void record_aux(const std::string &name, typename solver_t::real_t *data)
+      {
+        record_aux_hlpr(name, data, *hdfp);
+      }
       
       // for discontiguous array with halos
-      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
+      void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc = false)
       {
         assert(this->rank == 0);
 
         if(srfc)
-	  params.setChunk(parent_t::n_dims, srfcchunk.data());
+          params.setChunk(parent_t::n_dims, srfcchunk.data());
         
-        auto aux = (*hdfp).createDataSet(
+        auto aux = hdf.createDataSet(
           name,
           flttype_output,
           H5::DataSpace(parent_t::n_dims, srfc ? srfcshape.data() : shape.data()),
@@ -285,10 +290,16 @@ namespace libmpdataxx
  
         // revert to default chunk
         if(srfc)
-	  params.setChunk(parent_t::n_dims, chunk.data());
+          params.setChunk(parent_t::n_dims, chunk.data());
         
         record_dsc_helper(aux, arr, srfc);
       }
+
+      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
+      {
+        record_aux_dsc_hlpr(name, arr, *hdfp, srfc);
+      }
+
 
       void record_scalar_hlpr(const std::string &name, const std::string &group_name, typename solver_t::real_t data, H5::H5File hdf)
       {
@@ -309,6 +320,19 @@ namespace libmpdataxx
       }
 
       // has to be called after const file was created (i.e. after start())
+      void record_aux_const(const std::string &name, typename solver_t::real_t *data)
+      {
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
+        record_aux_hlpr(name, data, hdfcp);
+      }
+
+      // has to be called after const file was created (i.e. after start())
+      void record_aux_dsc_const(const std::string &name,  const typename solver_t::arr_t &arr)
+      {
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
+        record_aux_dsc_hlpr(name, arr, hdfcp);
+      }
+
       void record_aux_const(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
       {
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
@@ -518,8 +542,8 @@ namespace libmpdataxx
 
       // ctor
       hdf5(
-	typename parent_t::ctor_args_t args,
-	const typename parent_t::rt_params_t &p
+        typename parent_t::ctor_args_t args,
+        const typename parent_t::rt_params_t &p
       ) : parent_t(args, p)
       {
         // TODO: clean it up - it should not be here
