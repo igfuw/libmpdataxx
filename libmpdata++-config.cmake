@@ -29,7 +29,7 @@ set(libmpdataxx_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../include/")
 
 ############################################################################################
 # debug mode compiler flags
-set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++17 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++14 -DBZ_DEBUG -g") #TODO: -Og if compiler supports it?
 
 
 ############################################################################################
@@ -40,7 +40,7 @@ if(
   CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR
   CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
 )
-  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++17 -DNDEBUG -Ofast -march=native")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++14 -DNDEBUG -Ofast -march=native")
 
   # preventing Kahan summation from being optimised out
   if (
@@ -55,7 +55,7 @@ endif()
 ############################################################################################
 # C++14
 include(CheckCXXSourceCompiles)
-set(CMAKE_REQUIRED_FLAGS "-std=c++17")
+set(CMAKE_REQUIRED_FLAGS "-std=c++14")
 check_cxx_source_compiles("
   #include <type_traits>
   auto f() { return 1;}
