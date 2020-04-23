@@ -54,7 +54,7 @@ cache:
     - ${TRAVIS_BUILD_DIR}/deps/hdf5
     - /home/travis/.rvm/ # following Travis cache documentation: try to cache installed ruby on osx
 
-matrix:
+jobs:
     exclude:
 #   MPI with clang disabled due to difficulties with building boost with clang
         - compiler: clang
