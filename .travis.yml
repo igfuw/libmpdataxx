@@ -266,3 +266,5 @@ script:
     
     # testing local clang on osx
     - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/unit.sh; fi # with '.' to pass env vars
+
+
