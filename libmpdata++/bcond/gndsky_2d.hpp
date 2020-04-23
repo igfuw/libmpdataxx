@@ -56,6 +56,15 @@ namespace libmpdataxx
     };
 
     // sky is the same as rigid
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,
+      typename std::enable_if<
+        knd == gndsky &&
+        dir == rght &&
+        n_dims == 2
+      >::type
+    > : public bcond<real_t, halo, rigid, dir, n_dims, d>
+    {};
 
   } // namespace bcond
 } // namespace libmpdataxx
