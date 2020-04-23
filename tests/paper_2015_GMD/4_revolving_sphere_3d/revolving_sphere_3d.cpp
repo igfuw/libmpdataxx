@@ -79,6 +79,7 @@ void test(const std::string& dir_name)
 
   // sphere shape
   decltype(slv.advectee()) tmp(slv.advectee().extent());
+  tmp.reindexSelf(slv.advectee().base());
   tmp =   blitz::pow(i * dx - x0, 2)
         + blitz::pow(j * dx - y0, 2)
         + blitz::pow(k * dx - z0, 2);
@@ -101,6 +102,11 @@ void test(const std::string& dir_name)
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+#endif
   {
     enum { opts = 0 };
     enum { opts_iters = 1};
@@ -130,4 +136,7 @@ int main()
     enum { opts_iters = 2};
     test<opts, opts_iters>("fct");
   }
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }

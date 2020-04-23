@@ -24,13 +24,15 @@ add_test(moving_diff bash -c "
   done 
 ")
 
-add_test(moving_stats_diff bash -c "
-  for i in nug_i2 nug_iga_fct_i2; do 
-    echo  ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
-    echo  ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
-    zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
-  done
-") 
+if(NOT USE_MPI)
+  add_test(moving_stats_diff bash -c "
+    for i in nug_i2 nug_iga_fct_i2; do 
+      echo  ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
+      echo  ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
+      zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
+    done
+  ") 
+endif()
 
 libmpdataxx_add_test(moving_tot)
 
@@ -40,10 +42,12 @@ add_test(moving_tot_diff bash -c "
   done 
 ")
 
-add_test(moving_tot_stats_diff bash -c "
-  for i in nug_tot_i3 nug_iga_tot_fct_i2; do 
-    echo  ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
-    echo  ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
-    zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
-  done
-") 
+if(NOT USE_MPI)
+  add_test(moving_tot_stats_diff bash -c "
+    for i in nug_tot_i3 nug_iga_tot_fct_i2; do 
+      echo  ${CMAKE_CURRENT_SOURCE_DIR}/stats_$i.txt.gz;
+      echo  ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt;
+      zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats_$i.txt.gz ${CMAKE_CURRENT_BINARY_DIR}/stats_$i.txt || exit 1; 
+    done
+  ") 
+endif()

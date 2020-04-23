@@ -14,7 +14,7 @@ namespace libmpdataxx
   {
     using namespace arakawa_c;
 
-    enum bcond_e { null, cyclic, polar, open, rigid, gndsky, custom }; 
+    enum bcond_e { null, cyclic, polar, open, rigid, remote, gndsky, custom }; 
     enum drctn_e { left, rght };
 
     template<
@@ -31,7 +31,7 @@ namespace libmpdataxx
 
     namespace detail
     {
-      template <typename real_t, int halo>
+      template <typename real_t, int halo, int n_dims>
       class bcond_common
       {
         protected:
@@ -189,7 +189,7 @@ namespace libmpdataxx
 	public:
 
 	// ctor
-	bcond_common(const rng_t &i, const int grid_size_0) :
+	bcond_common(const rng_t &i, const std::array<int, n_dims> &) :
 	  // sclr
 	  left_edge_sclr(
 	    i.first()
@@ -231,6 +231,10 @@ namespace libmpdataxx
 	    (i^h^(-1)).last()
 	  )
 	{} 
+
+        // the one for use in shared
+	bcond_common() 
+        {}
       };
     } // namespace detail
   } // namespace bcond

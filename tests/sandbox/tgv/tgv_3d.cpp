@@ -83,6 +83,16 @@ void test(const std::string &dirname, double rey)
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+#endif
+
   test("rey=800", 800);
   test("rey=100", 100);
+
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }

@@ -38,7 +38,7 @@ void test(double coeff, int nt, double tol, const std::string& name)
   p.di = p.dj = 1; 
 
   p.prs_tol = 1e-6;
-  p.grid_size = {4, 4};
+  p.grid_size = {12, 4};
 
   libmpdataxx::concurr::serial<
     slv_t, 
@@ -98,8 +98,16 @@ void test(double coeff, int nt, double tol, const std::string& name)
 
 int main() 
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+#endif
   test<solvers::expl>(1, 1, 0, "explA");
   test<solvers::expl>(0.01, 100, 1e-4, "explB");
   test<solvers::impl>(2, 1, 0, "implA");
   test<solvers::impl>(0.01, 100, 2e-7, "imblB");
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 };

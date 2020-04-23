@@ -104,11 +104,12 @@ namespace libmpdataxx
 
           this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
 
+          // ijk_vec is used, because MPI requires that thread rank 0 calculates next vector to the left of the process' domain
           formulae::stress::multiply_vctr_cmpct<ct_params_t::n_dims, ct_params_t::opts>(grad_tht,
                                                                                         real_t(1.0) / prandtl_num,
                                                                                         this->k_m,
                                                                                         *this->mem->G,
-                                                                                        this->ijk);
+                                                                                        this->ijk_vec);
 
           this->xchng_sgs_vctr(grad_tht, hflux_srfc, this->ijk);
           // hack, convinient place to update the heat flux forcing

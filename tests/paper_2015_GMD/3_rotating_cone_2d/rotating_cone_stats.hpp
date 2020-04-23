@@ -38,11 +38,12 @@ struct stats : public parent_t
 
     last_timestep = nt;
 
-    true_solution.resize(this->mem->advectee().shape());
-    error_2.resize(this->mem->advectee().shape());
+    true_solution.resize(this->mem->distmem.grid_size[0],
+                         this->mem->distmem.grid_size[1]);
+    error_2.resize(true_solution.shape());
 
     //after one full rotation true solution is equal to the inital state
-    true_solution = this->mem->advectee();
+    true_solution = this->mem->advectee_global();
     ofs << std::fixed << std::setprecision(8) << std::endl;
     ofs << "timestep      = 0"     << std::endl;
     ofs << "min(solution) = " << min(true_solution) <<std::endl;
@@ -61,9 +62,9 @@ struct stats : public parent_t
       ofs << "min(psi)     = " << min(this->mem->advectee()) << std::endl;
       ofs << "max(psi)     = " << max(this->mem->advectee()) << std::endl;
  
-      error_2 = pow(true_solution - this->mem->advectee(), 2);
+      error_2 = pow(true_solution - this->mem->advectee_global(), 2);
       ofs << "rms error    = " 
-        << sqrt(sum(error_2) / this->mem->advectee().extent(0) / this->mem->advectee().extent(1)) / this->timestep / this->dt << std::endl;
+        << sqrt(sum(error_2) / true_solution.extent(0) / true_solution.extent(1)) / this->timestep / this->dt << std::endl;
     }
   }
 };
