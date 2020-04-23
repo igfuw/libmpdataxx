@@ -64,7 +64,10 @@ namespace libmpdataxx
         n_dims == 2
       >::type
     > : public bcond<real_t, halo, rigid, dir, n_dims, d>
-    {};
+    {
+      using parent_t = bcond<real_t, halo, rigid, dir, n_dims, d>;
+      using parent_t::parent_t; // inheriting ctor
+    };
 
   } // namespace bcond
 } // namespace libmpdataxx
