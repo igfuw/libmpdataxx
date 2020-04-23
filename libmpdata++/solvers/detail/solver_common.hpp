@@ -42,7 +42,7 @@ namespace libmpdataxx
         using ct_params_t_ = ct_params_t; // propagate ct_params_t mainly for output purposes
         using real_t = typename ct_params_t::real_t;
         typedef blitz::Array<real_t, n_dims> arr_t;
-        using bcp_t = std::unique_ptr<bcond::detail::bcond_common<real_t, halo>>;
+        using bcp_t = std::unique_ptr<bcond::detail::bcond_common<real_t, halo, n_dims>>;
 
         using ix = typename ct_params_t::ix;
 
@@ -101,6 +101,12 @@ namespace libmpdataxx
 
         void set_bcs(const int &d, bcp_t &bcl, bcp_t &bcr)
         {
+          // with distributed memory and cyclic boundary conditions,
+          // leftmost node must send left first, as
+          // rightmost node is waiting 
+	  if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() == 0)
+	    std::swap(bcl, bcr);
+
           bcs[d][0] = std::move(bcl);
           bcs[d][1] = std::move(bcr);
         }
@@ -243,6 +249,14 @@ namespace libmpdataxx
         // dtor
         virtual ~solver_common()
         {
+#if defined(USE_MPI)
+          // finalize mpi if it was initialized by distmem,
+          // otherwise it would break programs that instantiate many solvers;
+          // TODO: MPI standard requires that the same thread that called mpi_init 
+          // calls mpi_finalize, we don't ensure it
+          if(!libmpdataxx::concurr::detail::mpi_initialized_before && rank==0) 
+            MPI::Finalize();
+#endif
 #if !defined(NDEBUG)
 	  assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
 	  assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");

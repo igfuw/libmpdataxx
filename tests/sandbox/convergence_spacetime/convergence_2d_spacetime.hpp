@@ -34,7 +34,7 @@ class convergence_2d_spacetime : public libmpdataxx::solvers::mpdata<ct_params_t
     auto t = this->time;
     auto dt = this->dt;
 
-    for (int i = this->i.first(); i <= this->i.last(); ++i)
+    for (int i = this->i.first() - 1; i <= this->i.last(); ++i)
     {
       for (int j = this->j.first(); j <= this->j.last(); ++j)
       {
@@ -52,7 +52,7 @@ class convergence_2d_spacetime : public libmpdataxx::solvers::mpdata<ct_params_t
       }
     }
     
-    for (int i = this->i.first(); i <= this->i.last(); ++i)
+    for (int i = this->i.first() - 1; i <= this->i.last(); ++i)
     {
       for (int j = this->j.first(); j <= this->j.last(); ++j)
       {

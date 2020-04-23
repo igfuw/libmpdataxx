@@ -1,53 +1,105 @@
+#TODO:  precache could be done only with one job, but the compiled libs would need to be uploaded to some external storage (wizard? ams s3?); 
+#       then a problem with secure storage of credentials appears - they could be stored in encrypted env vars on travis, but that would make it impossible to start PRs from forked repos;
+#       add an additional compile stage with jobs only for different os/compilers, not env vars (needs external storage as well)
+#       example of a hack how to share cache among different jobs (might mean we do not need external storage):
+#       - https://github.com/travis-ci/travis-ci/issues/7590
+#       - https://github.com/qTox/qTox/blob/59b5578c7bffc56f6227c60bfcb38f97d39ec8d9/.travis.yml
+
+stages:
+  - precache
+  - test
+
 language: cpp
 os: 
     - linux
-    - osx
-dist: trusty
+#    - osx
+dist: xenial
 compiler:
     - gcc
     - clang
 env:
-    - TEST_SUITE=unit
-    - TEST_SUITE=sandbox
-    - TEST_SUITE=paper
-    - TEST_SUITE=elliptic_drop
-    - TEST_SUITE=nair_jablonowski_2008
-    - TEST_SUITE=pbl
-    - TEST_SUITE=osx_local_clang
-    - TEST_SUITE=UWLCM_MT
-    - TEST_SUITE=UWLCM_unit_iles
-    - TEST_SUITE=UWLCM_unit_smg
+#    - MPI=none
+#    - MPI=openmpi
+# not supported by Boost.MPI in Debian on amd64:
+#    - MPI=lam    
+#    - MPI=mpich  
+
+    - TEST_SUITE=unit MPI=none
+    - TEST_SUITE=sandbox MPI=none
+    - TEST_SUITE=paper MPI=none
+    - TEST_SUITE=elliptic_drop MPI=none
+    - TEST_SUITE=nair_jablonowski_2008 MPI=none
+    - TEST_SUITE=UWLCM_MT MPI=none
+    - TEST_SUITE=UWLCM_unit_iles MPI=none
+    - TEST_SUITE=UWLCM_unit_smg MPI=none
+    - TEST_SUITE=pbl MPI=none 
+    - TEST_SUITE=osx_local_clang MPI=none
+    - TEST_SUITE=unit MPI=mvapich2
+    - TEST_SUITE=sandbox MPI=mvapich2
+# MPI paper tests don't do file comparison and plotting; TODO: fix them
+    - TEST_SUITE=paper MPI=mvapich2
+    - TEST_SUITE=elliptic_drop MPI=mvapich2
+# disabled, because polar bconds dont work with MPI
+#    - TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+    - TEST_SUITE=pbl MPI=mvapich2
+# bconds_div has to be ran separately with mpi because of timeouts
+    - TEST_SUITE=bconds_div MPI=mvapich2 
+# TODO: once libcloud MPI works, turn UWLCM MPI test on
+#    - TEST_SUITE=UWLCM MPI=mvapich2
+
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/deps/mvapich2-2.3b
+    - ${TRAVIS_BUILD_DIR}/deps/boost
+    - ${TRAVIS_BUILD_DIR}/deps/hdf5
+    - /home/travis/.rvm/ # following Travis cache documentation: try to cache installed ruby on osx
 
 matrix:
     exclude:
+#   MPI with clang disabled due to difficulties with building boost with clang
+        - compiler: clang
+          env: TEST_SUITE=unit MPI=mvapich2
+        - compiler: clang
+          env: TEST_SUITE=sandbox MPI=mvapich2
+        - compiler: clang
+          env: TEST_SUITE=paper MPI=mvapich2
+        - compiler: clang
+          env: TEST_SUITE=elliptic_drop MPI=mvapich2
+        - compiler: clang
+          env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+        - compiler: clang
+          env: TEST_SUITE=pbl MPI=mvapich2
+        - compiler: clang
+          env: TEST_SUITE=bconds_div MPI=mvapich2
+
+        - os: osx
+          env: TEST_SUITE=pbl MPI=none  # pbl not tested on osx
         - os: osx
           compiler: gcc
-        
-        - os: osx
-          env: TEST_SUITE=pbl # pbl not tested on osx
 
         - compiler: clang
-          env: TEST_SUITE=UWLCM_MT
+          env: TEST_SUITE=UWLCM_MT MPI=none
         - compiler: clang
-          env: TEST_SUITE=UWLCM_unit_iles
+          env: TEST_SUITE=UWLCM_unit_iles MPI=none
         - compiler: clang
-          env: TEST_SUITE=UWLCM_unit_smg
+          env: TEST_SUITE=UWLCM_unit_smg MPI=none
        
         # local clang tests on osx
         - os: linux
-          env: TEST_SUITE=osx_local_clang
+          env: TEST_SUITE=osx_local_clang MPI=none
         - compiler: gcc
-          env: TEST_SUITE=osx_local_clang
+          env: TEST_SUITE=osx_local_clang MPI=none
 addons:
   apt:
     packages:
       - g++-6
-      - clang-4.0
-      - boost1.61
+      - clang-5.0
+      - python3-pip
+      - python3-setuptools
     sources: &sources
       - sourceline: 'ppa:rakhimov/boost'
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-4.0
+      - llvm-toolchain-xenial
 
 before_install:
     # define a compiler variable for use in if statements
@@ -56,20 +108,32 @@ before_install:
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export COMPILER=clang++; fi # only clang on osx
 
 # to avoid python lib/interpreter mismatch; https://github.com/travis-ci/travis-ci/issues/5326
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t trusty -y"; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty main universe multiverse"; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get update; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export apt_get_install="apt-get install --no-install-recommends -t xenial -y"; fi
+#    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew update; fi
+
+    # - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew tap homebrew/science; fi
+    # - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm get stable; fi #see https://github.com/travis-ci/travis-ci/issues/6307
     
     # Workaround for upgrading gcc, see https://github.com/travis-ci/travis-ci/issues/8826
     # Seems like this is now done by Travis, but leaving it (commented out) for now
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew cask uninstall oclint; fi
+
+    # gnuplot-iostream
+    - git clone -n https://github.com/dstahlke/gnuplot-iostream && cd gnuplot-iostream
+    - git checkout 8b6e30c6ea5ee4f07ccf90d858d35a10cf67a3e2 # later commits require c++17
+    - sudo cp gnuplot-iostream.h /usr/local/include/gnuplot-iostream.h
+    - cd ..
     
     # needed to get rvm, see below
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then \curl -sSL https://get.rvm.io | bash -s -- --branch stable; fi
     # https://github.com/travis-ci/travis-ci/issues/10165
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm reload; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm list known; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm install ruby-2.6; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then rvm use 2.6; fi
    
     # locally installed stuff comes first
     - export PATH=/usr/local/bin:$PATH
@@ -80,65 +144,59 @@ before_install:
     # to avoid problems with plotting by paraview on Travis
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then unset DISPLAY; fi 
 
-    # you may not believe it, but GCC (4.8.2) is giving ICEs otherwise!
-    - export make_j="make -j 2"
-    - if [[ $COMPILER == 'g++' ]]; then export make_j="make"; fi
+    - export make_j="make -j 4"
 
-    # testing both Python 2 and 3 on Linux (unrelated to compiler choice!)
+    # testing Python 3 on Linux
     - export PY3DEB=""
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++' ]]; then PY3DEB=3; fi
-    - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
+    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then PY3DEB=3; fi
+#    - PY3DEB=3 # had problems with building h5py using python3-pip
+#    - if [[ $PY3DEB != '' ]]; then sudo apt-get install python3-dev; fi
    
     # upgrade pip
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
- 
+    #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install --upgrade pip; fi 
+    - sudo pip$PY3DEB install --upgrade pip
+
 install:
-    # silence the gazillion warnings coming from blitz headers when using the osx clang
-    - if [[ $TRAVIS_OS_NAME == 'osx' && $COMPILER == 'clang++' ]]; then export CXXFLAGS="-Wno-parentheses ${CXXFLAGS}"; fi
+    - . ./.travis_scripts/install_common.sh
 
-    # redefine CXX to the actual version used
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'clang++' ]]; then export CXX=clang++-4.0; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' && $COMPILER == 'g++'     ]]; then export CXX=g++-6; fi
-    # downloads and setups local clang on osx
-    - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/setup_local_clang.sh; fi
-
-    # latest boost is installed using addons functionality
-    
-    # cmake 
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then wget https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2-Linux-x86_64.sh; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo sh cmake-3.13.2-Linux-x86_64.sh --prefix=/usr/local --exclude-subdir; fi
-
-    # blitz
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install blitz; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libblitz0-dev; fi
-
-    # hdf5
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install  -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install hdf5-tools; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install  -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libpango-1.0-0 libpangocairo-1.0-0 libhdf5-dev; fi
+#    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install hdf5-tools; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5; fi
 
-    # gnuplot-iostream
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install gnuplot-nox; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot; fi
-    - git clone -n https://github.com/dstahlke/gnuplot-iostream && cd gnuplot-iostream
-    - git checkout 8b6e30c6ea5ee4f07ccf90d858d35a10cf67a3e2 # later commits require c++17
-    - sudo cp gnuplot-iostream.h /usr/local/include/gnuplot-iostream.h
-    - cd ..
+    
+    # Python modules
+    # make Python 3 the default if requested
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
 
     # h5py
-    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install h5py; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI == 'none' ]]; then sudo $apt_get_install python$PY3DEB-h5py; fi 
+    # build h5py with mpi support
+    #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo pip install mpi4py; fi 
+    - |
+      if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then
+        sudo pip$PY3DEB install Cython # to generate the C wrappers
+        #sudo pip install https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz
+        mkdir mpi4py
+        cd mpi4py
+        travis_retry wget --no-check-certificate --quiet -O - https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz | tar --strip-components=1 -xz 
+        python setup.py build
+        sudo python setup.py install
+        cd ..
+      fi
+    # h5py uninstallation following https://github.com/h5py/h5py/issues/672
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo -H pip$PY3DEB uninstall h5py; fi 
+    - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then HDF5_DIR=$HDF5_ROOT HDF5_MPI="ON" sudo -H pip$PY3DEB install --no-cache-dir --no-binary=h5py h5py; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip$PY3DEB install h5py; fi 
 
     # scipy 
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-scipy; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install scipy; fi 
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip$PY3DEB install scipy; fi 
 
     # matplotlib
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python$PY3DEB-matplotlib; fi
-    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip install matplotlib; fi
-
-    # make Python 3 the default if requested
-    - if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10; fi
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo pip$PY3DEB install matplotlib; fi
 
 script:
     # libmpdata++
@@ -149,7 +207,7 @@ script:
     - cd ../..
 
     # compiling and running all unit tests in Debug & Release modes
-    - if [[ $TEST_SUITE == 'unit' ]]; then . ./.travis_scripts/unit.sh; fi
+    - if [[ $TEST_SUITE == 'unit' ]]; then . ./.travis_scripts/unit.sh; fi # with '.' to pass env vars
 
     # compiling and running selected paper tests in Debug mode
     - if [[ $TEST_SUITE == 'paper' ]]; then . ./.travis_scripts/paper.sh; fi
@@ -169,6 +227,43 @@ script:
     
     # running pbl tests in Release mode
     - if [[ $TEST_SUITE == 'pbl' ]]; then . ./.travis_scripts/pbl.sh; fi
-  
+
+    # running bconds_div tests in Release mode
+    - if [[ $TEST_SUITE == 'bcond_div' ]]; then . ./.travis_scripts/bconds_div.sh; fi
+    
     # testing local clang on osx
     - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/unit.sh; fi # with '.' to pass env vars
+
+# define the precache stage 
+# empty phases mean that default phases (before_install, install, ...) from the test stage are used (?)
+# TODO: precache stage has a lot of unnecessary before_install and install code common to the (default) test stage;
+#       add after_success, after_failure to precache, remove building of caches from the test stage, make the build error instead;
+
+# YAML alias for the options common to precache jobs
+job_info: &precache_default
+  stage: precache
+  os: linux
+  dist: xenial
+  language: cpp
+  compiler: gcc
+  install: 
+    - . ./.travis_scripts/install_common.sh
+  script: echo "Preparing cache finished"
+
+jobs:
+  include:
+    - <<: *precache_default
+      env: TEST_SUITE=unit MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=sandbox MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=paper MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=elliptic_drop MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=pbl MPI=mvapich2
+    - <<: *precache_default
+      env: TEST_SUITE=bconds_div MPI=mvapich2
+

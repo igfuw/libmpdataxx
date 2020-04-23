@@ -54,15 +54,14 @@ T test(int np)
 
   run.advectee() = 2 + sin(2 * pi * i * dx) * sin(2 * pi * j * dy);
 
-  decltype(run.advectee()) true_solution(run.advectee().shape());
-  true_solution = run.advectee();
+  auto true_solution = run.advectee_global().copy(); 
 
   run.advector(0) = 1.0 * dt/dx;
   run.advector(1) = 2.0 * dt/dy;
 
   run.advance(nt);
 
-  auto L2_error = sqrt(sum(pow2(run.advectee() - true_solution)) / (np * np)) / time;
+  auto L2_error = sqrt(sum(pow2(run.advectee_global() - true_solution)) / (np * np)) / time;
   return L2_error;
 }
 
@@ -76,6 +75,11 @@ int order()
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+#endif
   {
     enum { opts = 0 };
     enum { opts_iters = 2};
@@ -111,4 +115,8 @@ int main()
     enum { opts_iters = 2};
     if (order<opts, opts_iters>() != 4) throw std::runtime_error("iga_fot");
   }
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
+
 }

@@ -24,6 +24,14 @@ namespace libmpdataxx
       { assert(false); throw; }
 
       virtual 
+      const blitz::Array<real_t, n_dims> advectee_global(int eqn = 0)
+      { assert(false); throw; }
+
+      virtual 
+      void advectee_global_set(const blitz::Array<real_t, n_dims>, int eqn = 0)
+      { assert(false); throw; }
+
+      virtual 
       blitz::Array<real_t, n_dims> advector(int dim = 0) 
       { assert(false); throw; }
 
@@ -49,6 +57,16 @@ namespace libmpdataxx
       
       virtual 
       const real_t time() const
+      { assert(false); throw; }
+      
+      // minimum of an advectee, mpi-aware
+      virtual 
+      const real_t min(int eqn = 0) const
+      { assert(false); throw; }
+      
+      // maximum of an advectee, mpi-aware
+      virtual 
+      const real_t max(int eqn = 0) const
       { assert(false); throw; }
 
       // dtor
