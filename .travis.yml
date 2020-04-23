@@ -60,12 +60,13 @@ cache:
 #       add after_success, after_failure to precache, remove building of caches from the test stage, make the build error instead;
 
 # YAML alias for the options common to precache jobs
-job_info: &precache_default
-  stage: precache
-  os: linux
-  dist: xenial
-  language: cpp
-  compiler: gcc
+aliases:
+  - &precache_default
+ # stage: precache
+ # os: linux
+ # dist: xenial
+ # language: cpp
+ # compiler: gcc
   install: 
     - . ./.travis_scripts/install_common.sh
   script: echo "Preparing cache finished"
