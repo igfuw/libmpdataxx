@@ -62,31 +62,31 @@ cache:
 # YAML alias for the options common to precache jobs
 aliases:
   - &precache_default
- # stage: precache
- # os: linux
- # dist: xenial
- # language: cpp
- # compiler: gcc
-  install: 
-    - . ./.travis_scripts/install_common.sh
-  script: echo "Preparing cache finished"
+    stage: precache
+    # os: linux
+    # dist: xenial
+    # language: cpp
+    # compiler: gcc
+    install: 
+      - . ./.travis_scripts/install_common.sh
+    script: echo "Preparing cache finished"
 
 jobs:
-  include:
-    - <<: *precache_default
-      env: TEST_SUITE=unit MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=sandbox MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=paper MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=elliptic_drop MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=pbl MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=bconds_div MPI=mvapich2
+    include:
+      - <<: *precache_default
+        env: TEST_SUITE=unit MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=sandbox MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=paper MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=elliptic_drop MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=pbl MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=bconds_div MPI=mvapich2
 
     # excluded jobs
     exclude:
