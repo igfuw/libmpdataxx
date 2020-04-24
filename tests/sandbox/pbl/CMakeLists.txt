@@ -38,9 +38,9 @@ add_test(pbl_smg_travis_budget bash -c "
 ")
 
 add_test(pbl_iles_travis_budget_diff
-        zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/budget_pbl_iles_travis.txt.gz budget_pbl_iles_travis.txt)
+        h5diff -v2 --relative=1e-2 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/budget_pbl_iles_travis.h5 budget_pbl_iles_travis.h5)
 add_test(pbl_smg_travis_budget_diff
-        zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/budget_pbl_smg_travis.txt.gz budget_pbl_smg_travis.txt)
+        h5diff -v2 --relative=1e-2 ${CMAKE_CURRENT_SOURCE_DIR}/refdata/budget_pbl_smg_travis.h5 budget_pbl_smg_travis.h5)
 
 add_test(pbl_iles_travis_diff bash -c "
     dir=out_pbl_iles_travis

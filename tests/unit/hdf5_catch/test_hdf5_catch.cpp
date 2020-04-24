@@ -37,6 +37,7 @@ int main()
   > run(p);
 
   // integration
+  bool caught = false;
   try
   {
     run.advector() = 0;
@@ -48,7 +49,7 @@ int main()
   catch (H5::Exception)
   {
     std::cerr << "error caught!" << std::endl;
-    exit(EXIT_SUCCESS);
+    caught = true;
   }
-  exit(EXIT_FAILURE);
+  if (!caught) exit(EXIT_FAILURE);
 };

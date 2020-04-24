@@ -18,9 +18,9 @@ namespace libmpdataxx
         dir == left &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t, halo>
+    > : public detail::bcond_common<real_t, halo, n_dims>
     {
-      using parent_t = detail::bcond_common<real_t, halo>;
+      using parent_t = detail::bcond_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -55,6 +55,7 @@ namespace libmpdataxx
         auto s = a.shape();
         s[d] = 1;
         edge_velocity.resize(s);
+        if(d != 0) edge_velocity.reindexSelf({a.lbound(0), 0});
         edge_velocity(pi<d>(0, j)) = a(pi<d>(this->left_edge_sclr, j));
       }
       
@@ -110,9 +111,9 @@ namespace libmpdataxx
         dir == rght &&
         n_dims == 2
       >::type
-    > : public detail::bcond_common<real_t, halo>
+    > : public detail::bcond_common<real_t, halo, n_dims>
     {
-      using parent_t = detail::bcond_common<real_t, halo>;
+      using parent_t = detail::bcond_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
       
@@ -153,6 +154,7 @@ namespace libmpdataxx
         auto s = a.shape();
         s[d] = 1;
         edge_velocity.resize(s);
+        if(d != 0) edge_velocity.reindexSelf({a.lbound(0), 0});
         edge_velocity(pi<d>(0, j)) = a(pi<d>(this->rght_edge_sclr, j));
       }
       

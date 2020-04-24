@@ -18,9 +18,9 @@ namespace libmpdataxx
         dir == left &&
         n_dims == 3
       >::type 
-    > : public detail::polar_common<real_t, halo>
+    > : public detail::polar_common<real_t, halo, n_dims>
     { 
-      using parent_t = detail::polar_common<real_t, halo>;
+      using parent_t = detail::polar_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -79,9 +79,9 @@ namespace libmpdataxx
         dir == rght &&
         n_dims == 3
       >::type
-    > : public detail::polar_common<real_t, halo>
+    > : public detail::polar_common<real_t, halo, n_dims>
     { 
-      using parent_t = detail::polar_common<real_t, halo>;
+      using parent_t = detail::polar_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
 

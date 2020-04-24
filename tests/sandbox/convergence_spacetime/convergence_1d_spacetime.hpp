@@ -34,7 +34,7 @@ class convergence_1d_spacetime : public libmpdataxx::solvers::mpdata<ct_params_t
     auto t = this->time;
     auto dt = this->dt;
 
-    for (int i = this->i.first(); i <= this->i.last(); ++i)
+    for (int i = this->i.first()-1; i <= this->i.last(); ++i) // starting at i.first()-1, because MPI requires that vector to the left of the domain is calculated by thread rank 0
     {
       auto x = (i+0.5) * this->di;
       this->mem->GC[0](i+h) = dt / this->di * advector(t + 0.5 * dt, x);

@@ -57,7 +57,11 @@ namespace libmpdataxx
            << "set termoption solid\n"
         ;
 	if (p.gnuplot_xrange == "[*:*]") 
-	   *gp << "set xrange [0:" << this->mem->advectee(0).extent(0)-1 << "]\n";
+	   *gp << "set xrange [" 
+               << this->mem->grid_size[0].first() 
+               << ":" 
+               << this->mem->grid_size[0].last()
+               << "]\n";
 	else 
 	   *gp << "set xrange " << p.gnuplot_xrange << "\n";
 
@@ -85,7 +89,11 @@ namespace libmpdataxx
           else throw std::runtime_error("gnuplot_command must equal plot or splot");
           
           *gp 
-	     << "set output '" << p.gnuplot_output << "'\n"
+	     << "set output '" << p.gnuplot_output;
+          if (this->mem->distmem.size() > 1) 
+            *gp << "." << this->mem->distmem.rank();
+          *gp <<"'\n";
+          *gp 
 	     << "set title '" << p.gnuplot_title << "'\n"
              << p.gnuplot_command << " 1/0 notitle" // for the comma below :)
           ;
@@ -95,7 +103,13 @@ namespace libmpdataxx
 	    for (const auto &v : this->outvars)
             {
 	      *gp << ", '-'";
-              if (p.gnuplot_command == "splot") *gp << " using (((int($0)+1)/2+(int($0)-1)/2)*.5):(" << t << "):1";
+              if (p.gnuplot_command == "splot") 
+              {
+                *gp << " using (((int($0)+1)/2+(int($0)-1)/2)*.5";
+                if (this->mem->distmem.size() > 1)
+                  *gp << "+" << this->mem->grid_size[0].first();
+                *gp << "):(" << t << "):1";
+              }
               *gp << " with " << p.gnuplot_with; // TODO: assert histeps -> emulation
  
               *gp << " lt ";
@@ -154,19 +168,22 @@ namespace libmpdataxx
           {
             // emulating histeps
             decltype(this->mem->advectee(var)) 
-              tmp(2 * this->mem->advectee(var).extent(0));
+              tmp(2 * this->mem->grid_size[0].length());
             for (int i = 0; i < tmp.extent(0); ++i) 
-              tmp(i) = this->mem->advectee(var)(i/2);
+              tmp(i) = this->mem->advectee(var)(this->mem->grid_size[0].first() + i/2);
 	    gp->send(tmp);
           }
-          else gp->send(this->mem->advectee(var));
+          else gp->send(this->mem->advectee(var).reindex({0}));
         }
 
         if (parent_t::n_dims == 2) // known at compile time
         {
           {
             std::ostringstream tmp;
-	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep << "'\n";
+	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep;
+            if (this->mem->distmem.size() > 1) 
+              tmp << "." << this->mem->distmem.rank();
+            tmp << "'\n";
 	    if (p.gnuplot_title == "notitle") 
               tmp << "set title ''\n";
             else
@@ -179,21 +196,24 @@ namespace libmpdataxx
 	    bool imagebg = (p.gnuplot_with == "lines");
             typename parent_t::real_t ox, oy;
             // ox = oy = .5; // old: x = (i+.5) * dx
-            ox = oy = 0;     // new: x =   i    * dx
+            // ox = oy = 0;  // new: x =   i    * dx
+            ox = this->mem->grid_size[0].first();
+            oy = 0; 
+            auto data = this->mem->advectee(var).copy();
+            data.reindexSelf({0,0});
 	    if (imagebg)
 	    {
 	      float zmin, zmax;
 	      int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
 	      if (count != 2) zmin = 0;
-	      *gp << " '-' binary " << binfmt(this->mem->advectee(0))
+	      *gp << " '-' binary " << binfmt(data)
 		  << " origin=(" << ox << "," << oy << "," << zmin << ")"     
 		  << " with image failsafe notitle,";
 	    }
 	    *gp << " '-'" 
-		<< " binary" << binfmt(this->mem->advectee(0)) 
+		<< " binary" << binfmt(data) 
 		<< " origin=(" << ox << "," << oy << ",0)" 
 		<< " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
-            auto data = this->mem->advectee(var).copy();
             data = blitz::rint(data * pow(10, precision)) * pow(10, -precision);
 	    gp->sendBinary(data);
 	    if (imagebg) gp->sendBinary(data);

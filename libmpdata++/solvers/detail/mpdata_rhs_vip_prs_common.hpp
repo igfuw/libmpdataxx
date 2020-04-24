@@ -39,12 +39,12 @@ namespace libmpdataxx
 
         real_t prs_sum(const arr_t &arr, const ijk_t &ijk)
         {
-          return this->mem->sum(arr, ijk, ct_params_t::prs_khn);
+          return this->mem->sum(this->rank, arr, ijk, ct_params_t::prs_khn);
         }
 
         real_t prs_sum(const arr_t &arr1, const arr_t &arr2, const ijk_t &ijk)
         {
-          return this->mem->sum(arr1, arr2, ijk, ct_params_t::prs_khn);
+          return this->mem->sum(this->rank, arr1, arr2, ijk, ct_params_t::prs_khn);
         }
 
         auto lap(
@@ -84,14 +84,14 @@ namespace libmpdataxx
 	void ini_pressure()
 	{ 
 	  Phi(this->ijk) = 0;
-          int npoints = 1;
-          for (int d = 0; d < parent_t::n_dims; ++d)
-          {
+    int npoints = 1;
+    for (int d = 0; d < parent_t::n_dims; ++d)
+    {
 	    Phi(this->ijk) -= real_t(0.5) * pow2(this->vips()[d](this->ijk));
-            npoints *= (this->mem->grid_size[d].last() + 1);
-          }
-          
-          auto Phi_mean = prs_sum(Phi, this->ijk) / npoints;
+      npoints *= (this->mem->distmem.grid_size[d]);
+    }
+        
+    auto Phi_mean = prs_sum(Phi, this->ijk) / npoints;
 	  Phi(this->ijk) -= Phi_mean;
 	}
 

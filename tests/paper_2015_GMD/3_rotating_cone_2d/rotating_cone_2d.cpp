@@ -140,6 +140,11 @@ void test(const std::string filename)
 
 int main()
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+#endif
   {
     enum { opts = 0 };
     enum { opts_iters = 2};
@@ -165,4 +170,7 @@ int main()
     enum { opts_iters = 2};
     test<opts, opts_iters>("iga_tot_fct");
   }
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }

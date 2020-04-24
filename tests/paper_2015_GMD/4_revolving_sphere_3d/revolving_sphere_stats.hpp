@@ -32,8 +32,8 @@ struct stats : public parent_t
 
     last_timestep = nt;
 
-    ic.resize(this->mem->advectee().shape());
-    ic = this->mem->advectee();
+    ic.resize(this->mem->advectee_global().shape());
+    ic = this->mem->advectee_global();
 
     // at the end of the test true solution is equal to the inital state
     ofs << std::fixed << std::setprecision(8) << std::endl;
@@ -51,16 +51,16 @@ struct stats : public parent_t
     if (this->timestep == last_timestep) 
     { 
       // final condition
-      fc.resize(this->mem->advectee().shape());
-      fc = this->mem->advectee();
+      fc.resize(this->mem->advectee_global().shape());
+      fc = this->mem->advectee_global();
 
       //output stats
       ofs << "timestep = " << this->timestep                                                                                  << std::endl;
       ofs << "max(solution) = " << max(fc)                                                                                    << std::endl;
       ofs << "min(solution) = " << min(fc)                                                                                    << std::endl;
       ofs << "Linf = " << max(abs(fc - ic))                                           /*nx */                                 << std::endl;
-      ofs << "L2 = " << 1.0 / (this->timestep * this->dt) * sqrt(1.0 / pow(this->mem->grid_size[0].length(), 3) * sum(pow2(fc - ic)))  << std::endl;
-      ofs << "L1 = " << 1.0 / (this->timestep * this->dt) *     (1.0 / pow(this->mem->grid_size[0].length(), 3) * sum(abs (fc - ic)))  << std::endl; 
+      ofs << "L2 = " << 1.0 / (this->timestep * this->dt) * sqrt(1.0 / pow(this->mem->distmem.grid_size[0], 3) * sum(pow2(fc - ic)))  << std::endl;
+      ofs << "L1 = " << 1.0 / (this->timestep * this->dt) *     (1.0 / pow(this->mem->distmem.grid_size[0], 3) * sum(abs (fc - ic)))  << std::endl; 
     }
   }
 };

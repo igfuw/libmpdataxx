@@ -72,8 +72,16 @@ void test(const std::string &error_str)
 
 int main() 
 {
+#if defined(USE_MPI)
+  // we will instantiate many solvers, so we have to init mpi manually, 
+  // because solvers will not know should they finalize mpi upon destruction
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+#endif
   test<bcond::cyclic, bcond::cyclic, bcond::cyclic>("cyclic_cyclic_cyclic");
   test<bcond::cyclic, bcond::cyclic, bcond::rigid >("cyclic_cyclic_rigid" );
   test<bcond::open  , bcond::open  , bcond::rigid >("open_open_rigid"     );
   test<bcond::open  , bcond::rigid , bcond::cyclic>("open_rigid_cyclic"   );
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 };

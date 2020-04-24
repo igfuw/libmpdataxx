@@ -21,6 +21,7 @@ set(libmpdataxx_INCLUDE_DIRS "")
 set(libmpdataxx_LIBRARIES "")
 set(libmpdataxx_CXX_FLAGS_DEBUG "")
 set(libmpdataxx_CXX_FLAGS_RELEASE "")
+set(libmpdataxx_MPIRUN "")
 
 ############################################################################################
 # libmpdata++ headers for non-default install location (i.e. for make DESTDIR=<dir> install)
@@ -37,8 +38,7 @@ set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++14 -DBZ_
 if(
   CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
   CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR
-  CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+  CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" 
 )
   set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++14 -DNDEBUG -Ofast -march=native")
 
@@ -49,6 +49,14 @@ if(
   )
     set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -fno-vectorize") 
   endif()
+endif()
+
+
+if(
+  CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
+)
+  # flags taken from -fast but without -static
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=gnu++14 -DNDEBUG -xHOST -O3 -ipo -no-prec-div -fp-model fast=2")
 endif()
 
 
@@ -111,9 +119,39 @@ set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -pthread")
 
 
 ############################################################################################
-# Boost libraries v>=1.55.0, because boost/predef was added then
+# MPI - detecting if the C++ compiler is actually an MPI wrapper
+set(msg "Detecting if the compiler is an MPI wrapper...")
+message(STATUS "${msg}")
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} "-show" RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_QUIET)
+if (status EQUAL 0 AND output MATCHES "mpi") 
+  set(USE_MPI TRUE)
+  set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -DUSE_MPI")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -DUSE_MPI")
+  set(libmpdataxx_MPIRUN ${CMAKE_CXX_COMPILER})
+  string(REPLACE "mpic++" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
+  string(REPLACE "mpicxx" "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
+  string(REPLACE "mpiXX"  "mpirun" libmpdataxx_MPIRUN ${libmpdataxx_MPIRUN})
+else()
+  set(USE_MPI FALSE)
+endif()
+message(STATUS "${msg} - ${USE_MPI}")
+unset(msg)
+unset(status)
+unset(output)
+
+############################################################################################
+# Boost libraries
 set(Boost_DETAILED_FAILURE_MSG ON)
-find_package(Boost COMPONENTS thread date_time system iostreams timer filesystem)
+set(req_comp thread date_time system iostreams timer filesystem)
+if(USE_MPI)
+  list(APPEND req_comp mpi)
+  list(APPEND req_comp serialization)
+  #set(Boost_VERSION 1.59.0)
+else()
+  # Boost libraries v>=1.55.0, because boost/predef was added then
+  #set(Boost_VERSION 1.55.0)
+endif()
+find_package(Boost COMPONENTS ${req_comp})
 if(Boost_FOUND)
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${Boost_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}")
@@ -141,6 +179,110 @@ endif()
 # HDF5 libraries
 find_package(HDF5 COMPONENTS CXX HL)
 if(HDF5_FOUND)
+  if(NOT HDF5_CXX_LIBRARIES)
+    message(FATAL_ERROR "HDF5 installation lacks C++ support.")
+  endif()
+
+  if(USE_MPI AND NOT HDF5_IS_PARALLEL)
+    message(STATUS "MPI was enabled for libmpdata++ but not in HDF5.
+
+* Programs using libmpdata++'s HDF5 output will not compile.
+* To install MPI-enabled HDF5, please try:
+*   Debian/Ubuntu: sudo apt-get install libhdf5-openmpi-dev
+*   Fedora: sudo yum install hdf5-openmpi-devel
+*   Homebrew: brew install hdf5 --with-cxx --with-mpi
+    ") 
+  endif()
+
+  if(NOT USE_MPI AND HDF5_IS_PARALLEL)
+    message(STATUS "MPI was enabled in HDF5 but not in libmpdata++.
+
+* Programs using libmpdata++'s HDF5 output will not compile.
+* To install serial HDF5, please try:
+*   Debian/Ubuntu: sudo apt-get install libhdf5-serial-dev hdf5-tools  (TODO)
+*   Fedora: sudo yum install hdf5-devel                                (TODO)
+*   Homebrew: brew install hdf5 --with-cxx                             (TODO)
+*
+* To enable MPI in libmpdata++ point it to a MPI compiler 
+* with -DCMAKE_CXX_COMPILER=<mpi_compiler>
+  ")
+
+  endif()
+
+  if(USE_MPI AND HDF5_IS_PARALLEL)
+    # detecting if HDF5-MPI is usable from C++
+    # see http://lists.hdfgroup.org/pipermail/hdf-forum_lists.hdfgroup.org/2015-June/008600.html
+    # https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
+    set(msg "Checking if MPI-HDF5 is usable from C++...")
+    set(pfx "HDF5/MPI/C++ check")
+    message(STATUS ${msg})
+    execute_process(COMMAND "mktemp" "-d" RESULT_VARIABLE status OUTPUT_VARIABLE tmpdir)
+    if (NOT status EQUAL 0)                                                       
+      message(FATAL_ERROR "${pfx}: mkdtemp failed")                               
+    endif()                                                                       
+    file(WRITE "${tmpdir}/test.cpp" "                                              
+      #include <boost/mpi/environment.hpp>
+      #include <H5Cpp.h>
+      #if !defined(H5_HAVE_PARALLEL)
+      #  error H5_HAVE_PARALLEL not defined!
+      #endif
+      int main() 
+      { 
+        boost::mpi::environment e; 
+	hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);                                
+	H5Pset_fapl_mpio(plist_id, MPI_COMM_WORLD, MPI_INFO_NULL);                  
+	H5::H5File(\"test.h5\", H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);                
+	H5Pclose(plist_id); 
+      }
+    ")
+
+    execute_process(
+      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-I${HDF5_INCLUDE_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
+      # Boost_LIBRARY_DIRS has to be in LD_RUN_PATH, tried to specify it through rpath/rpath-link but failed; at runtime it correctly finds libboost-mpi (direct dependency), but fails on boost-serialization (which is a dependency of boost-mpi)
+      #COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS},-rpath-link,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
+      WORKING_DIRECTORY ${tmpdir} 
+      RESULT_VARIABLE status 
+      ERROR_VARIABLE error
+    )
+    if (NOT status EQUAL 0)                                                       
+      message(FATAL_ERROR "${pfx}: compilation failed\n ${error}")                               
+    endif()                                                                       
+    message(STATUS "${msg} - compilation OK")
+    execute_process(
+      COMMAND "mpiexec" "-np" "1" "./a.out" 
+      WORKING_DIRECTORY ${tmpdir} 
+      RESULT_VARIABLE status
+      ERROR_VARIABLE error
+    )
+    if (NOT status EQUAL 0)                                                       
+      message(FATAL_ERROR "${pfx}: execution failed\n ${error}
+        likely you have to upgrade HDF5, see:
+        - http://lists.hdfgroup.org/pipermail/hdf-forum_lists.hdfgroup.org/2015-June/008600.html
+        - https://github.com/live-clones/hdf5/commit/cec2478e71d2358a2df32b3dbfeed8b0b51980bb
+      ")
+    endif()                                                                       
+    message(STATUS "${msg} - non-mpirun execution OK")
+
+    # detecting if it runs under mpirun (missing libhwloc-plugins issue:
+    # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=790540
+    # )
+    execute_process(COMMAND ${libmpdataxx_MPIRUN} "-np" "2" "./a.out" 
+      WORKING_DIRECTORY ${tmpdir} 
+      RESULT_VARIABLE status
+      ERROR_VARIABLE error
+    )
+    if (NOT status EQUAL 0)                                                       
+      message(FATAL_ERROR "TODO: ${status}\n ${error}")
+    endif()
+    message(STATUS "${msg} - mpirun execution OK")
+
+    unset(status)
+    unset(pfx)
+    unset(msg)
+  endif() 
+
+
+  #
   set(libmpdataxx_LIBRARIES "${libmpdataxx_LIBRARIES};${HDF5_LIBRARIES}")
   set(libmpdataxx_INCLUDE_DIRS "${libmpdataxx_INCLUDE_DIRS};${HDF5_INCLUDE_DIRS}")
 else()

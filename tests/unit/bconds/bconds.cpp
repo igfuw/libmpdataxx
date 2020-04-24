@@ -59,55 +59,60 @@ int main()
   
   // save initial v profile
   auto all = blitz::Range::all();
-  auto vprof = slv.advectee(ix::v)(all, 0, all);
+  auto vprof = slv.advectee_global(ix::v)(all, 0, all);
 
   std::mt19937 gen(1);
   std::uniform_real_distribution<> dis(-1, 1);
   real_t amp = 1e-6;
-  
+  auto rand = std::bind(dis, gen);
+
   // add random perturbation in the interior
-  for (int i = 1; i < nx - 1; ++i)
+  std::array<decltype(ix::u), 3> velo = {ix::u, ix::v, ix::w};
+  std::for_each(velo.begin(), velo.end(), [&](decltype(ix::u) vel)
   {
-    for (int j = 1; j < ny - 1; ++j)
-    {
-      for (int k = 1; k < nz - 1; ++k)
-      {
-        slv.advectee(ix::u)(i, j, k) += amp * dis(gen);
-        slv.advectee(ix::v)(i, j, k) += amp * dis(gen);
-        slv.advectee(ix::w)(i, j, k) += amp * dis(gen);
-      }
-    }
-  }
+    decltype(slv.advectee(vel)) prtrb(slv.advectee_global(vel).shape()); // array to store perturbation
+    std::generate(prtrb.begin(), prtrb.end(), [&] () {return amp * rand();}); // fill it, TODO: is it officialy stl compatible?
+    // no perturbation at the edges
+    prtrb(0, all, all) = 0;
+    prtrb(all, 0, all) = 0;
+    prtrb(all, all, 0) = 0;
+    prtrb(nx-1, all, all) = 0;
+    prtrb(all, ny-1, all) = 0;
+    prtrb(all, all, nz-1) = 0;
+    // apply the pperturbation
+    prtrb += slv.advectee_global(vel);
+    slv.advectee_global_set(prtrb, vel);
+  } );
 
   slv.advance(nt);
 
-  auto err_cyclic = max(abs(slv.advectee(ix::u)(0, all, all) - slv.advectee(ix::u)(nx - 1, all, all)));
+  auto err_cyclic = max(abs(slv.advectee_global(ix::u)(0, all, all) - slv.advectee_global(ix::u)(nx - 1, all, all)));
   if (err_cyclic > 1e-10)
   {
     std::cerr << err_cyclic << std::endl;
     throw std::runtime_error("cyclic");
   }
 
-  auto err_rigid1 = max(abs(slv.advectee(ix::w)(all, all, 0)));
+  auto err_rigid1 = max(abs(slv.advectee_global(ix::w)(all, all, 0)));
   if (err_rigid1 > 0)
   {
     std::cerr << err_rigid1 << std::endl;
     throw std::runtime_error("rigid1");
   }
-  auto err_rigid2 = max(abs(slv.advectee(ix::w)(all, all, nz - 1)));
+  auto err_rigid2 = max(abs(slv.advectee_global(ix::w)(all, all, nz - 1)));
   if (err_rigid2 > 0)
   {
     std::cerr << err_rigid2 << std::endl;
     throw std::runtime_error("rigid2");
   }
 
-  auto err_open1 = max(abs(slv.advectee(ix::v)(all, 0, all) - vprof));
+  auto err_open1 = max(abs(slv.advectee_global(ix::v)(all, 0, all) - vprof));
   if (err_open1 > 0)
   {
     std::cerr << err_open1 << std::endl;
     throw std::runtime_error("open1");
   }
-  auto err_open2 = max(abs(slv.advectee(ix::v)(all, ny - 1, all) - vprof));
+  auto err_open2 = max(abs(slv.advectee_global(ix::v)(all, ny - 1, all) - vprof));
   if (err_open2 > 0)
   {
     std::cerr << err_open2 << std::endl;

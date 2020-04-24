@@ -11,12 +11,12 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    template <typename real_t, int halo>
-    class shared : public detail::bcond_common<real_t, halo>
+    template <typename real_t, int halo, int n_dims>
+    class shared : public detail::bcond_common<real_t, halo, n_dims>
     {
       public:
       
-      using parent_t = detail::bcond_common<real_t, halo>;
+      using parent_t = detail::bcond_common<real_t, halo, n_dims>;
       
       using arr_1d_t = typename parent_t::arr_1d_t;
       using arr_2d_t = typename parent_t::arr_2d_t;
@@ -56,7 +56,7 @@ namespace libmpdataxx
       // ctor
       // parent constructor takes minimal parameters that construct valid member ranges, note that they
       // aren't actually used !
-      shared() : parent_t(rng_t(0, 2), 2) {} // TODO: bcond_any?
+      shared() : parent_t(rng_t(0, 2), std::array<int, n_dims>()) {} // TODO: bcond_any? TODO2: uninitializesd grid_size! previously it was grid_size[0]=2
     };
   } // namespace bcond
 } // namespace libmpdataxx
