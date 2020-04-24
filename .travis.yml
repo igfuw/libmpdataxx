@@ -54,7 +54,41 @@ cache:
     - ${TRAVIS_BUILD_DIR}/deps/hdf5
     - /home/travis/.rvm/ # following Travis cache documentation: try to cache installed ruby on osx
 
-matrix:
+# define the precache stage 
+# empty phases mean that default phases (before_install, install, ...) from the test stage are used (?)
+# TODO: precache stage has a lot of unnecessary before_install and install code common to the (default) test stage;
+#       add after_success, after_failure to precache, remove building of caches from the test stage, make the build error instead;
+
+# YAML alias for the options common to precache jobs
+aliases:
+  - &precache_default
+    stage: precache
+    # os: linux
+    # dist: xenial
+    # language: cpp
+    # compiler: gcc
+    install: 
+      - . ./.travis_scripts/install_common.sh
+    script: echo "Preparing cache finished"
+
+jobs:
+    include:
+      - <<: *precache_default
+        env: TEST_SUITE=unit MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=sandbox MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=paper MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=elliptic_drop MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=pbl MPI=mvapich2
+      - <<: *precache_default
+        env: TEST_SUITE=bconds_div MPI=mvapich2
+
+    # excluded jobs
     exclude:
 #   MPI with clang disabled due to difficulties with building boost with clang
         - compiler: clang
@@ -121,7 +155,11 @@ before_install:
     # Seems like this is now done by Travis, but leaving it (commented out) for now
     #- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew cask uninstall oclint; fi
 
-    - sudo wget -O /usr/local/include/gnuplot-iostream.h https://raw.githubusercontent.com/dstahlke/gnuplot-iostream/master/gnuplot-iostream.h
+    # gnuplot-iostream
+    - git clone -n https://github.com/dstahlke/gnuplot-iostream && cd gnuplot-iostream
+    - git checkout 8b6e30c6ea5ee4f07ccf90d858d35a10cf67a3e2 # later commits require c++17
+    - sudo cp gnuplot-iostream.h /usr/local/include/gnuplot-iostream.h
+    - cd ..
     
     # needed to get rvm, see below
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then \curl -sSL https://get.rvm.io | bash -s -- --branch stable; fi
@@ -159,7 +197,6 @@ install:
 #    - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install hdf5-tools; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install hdf5; fi
 
-    # gnuplot-iostream
     - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install gnuplot-nox; fi
     - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install gnuplot; fi
     
@@ -231,36 +268,4 @@ script:
     # testing local clang on osx
     - if [[ $TEST_SUITE == 'osx_local_clang' ]]; then . ./.travis_scripts/unit.sh; fi # with '.' to pass env vars
 
-# define the precache stage 
-# empty phases mean that default phases (before_install, install, ...) from the test stage are used (?)
-# TODO: precache stage has a lot of unnecessary before_install and install code common to the (default) test stage;
-#       add after_success, after_failure to precache, remove building of caches from the test stage, make the build error instead;
-
-# YAML alias for the options common to precache jobs
-job_info: &precache_default
-  stage: precache
-  os: linux
-  dist: xenial
-  language: cpp
-  compiler: gcc
-  install: 
-    - . ./.travis_scripts/install_common.sh
-  script: echo "Preparing cache finished"
-
-jobs:
-  include:
-    - <<: *precache_default
-      env: TEST_SUITE=unit MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=sandbox MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=paper MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=elliptic_drop MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=nair_jablonowski_2008 MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=pbl MPI=mvapich2
-    - <<: *precache_default
-      env: TEST_SUITE=bconds_div MPI=mvapich2
 

@@ -77,6 +77,30 @@ namespace libmpdataxx
         // zero flux condition
 	av[d](pi<d>(this->left_halo_vctr.last(), j, k)) = -av[d](pi<d>(this->left_edge_sclr + h, j, k));
       }
+
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        using namespace idxperm;
+        a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * a(pi<d>(this->left_edge_sclr + h, j, k))
+                                                   -   a(pi<d>(this->left_edge_sclr + 1 + h, j, k));
+      }
+
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
+      {
+        // fill halos for a staggered field so that it has zero value on the edge
+        // that is 0.5 * (a(edge-h) + a(edge+h)) = 0
+        using namespace idxperm;
+        const auto &a = av[offset + d];
+        a(pi<d>(this->left_edge_sclr - h, j, k)) = - a(pi<d>(this->left_edge_sclr + h, j, k));
+      }
+
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t di)
+      {
+        using namespace idxperm;
+        const auto &a = av[d];
+        a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * a(pi<d>(this->left_edge_sclr + h, j, k))
+                                                   -   a(pi<d>(this->left_edge_sclr + 1 + h, j, k));
+      }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
@@ -145,6 +169,30 @@ namespace libmpdataxx
 	using namespace idxperm;
         // zero flux condition
 	av[d](pi<d>(this->rght_halo_vctr.first(), j, k)) = -av[d](pi<d>(this->rght_edge_sclr - h, j, k));
+      }
+
+      void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        using namespace idxperm;
+        a(pi<d>(this->rght_edge_sclr + h, j, k)) = 2 * a(pi<d>(this->rght_edge_sclr - h, j, k))
+                                                   -   a(pi<d>(this->rght_edge_sclr - 1 - h, j, k));
+      }
+
+      void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
+      {
+        // fill halos for a staggered field so that it has zero value on tke edge
+        // that is 0.5 * (a(edge-h) + a(edge+h)) = 0
+        using namespace idxperm;
+        const auto &a = av[offset + d];
+        a(pi<d>(this->rght_edge_sclr + h, j, k)) = - a(pi<d>(this->rght_edge_sclr - h, j, k));
+      }
+
+      void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t di)
+      {
+        using namespace idxperm;
+        const auto &a = av[d];
+        a(pi<d>(this->rght_edge_sclr + h, j, k)) = 2 * a(pi<d>(this->rght_edge_sclr - h, j, k))
+                                                   -   a(pi<d>(this->rght_edge_sclr - 1 - h, j, k));
       }
     };
   } // namespace bcond
