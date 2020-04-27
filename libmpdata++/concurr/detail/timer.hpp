@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -14,15 +14,15 @@ namespace libmpdataxx
 {
   namespace concurr
   {
-    namespace detail 
+    namespace detail
     {
-      class timer 
+      class timer
       {
-        std::unique_ptr<boost::timer::cpu_timer> tmr; 
+        std::unique_ptr<boost::timer::cpu_timer> tmr;
         bool started = false;
 
         public:
-      
+
         // ctor
         timer()
         {
@@ -30,9 +30,9 @@ namespace libmpdataxx
         }
 
         void resume()
-        { 
+        {
           if (started) tmr->resume();
-          else 
+          else
           {
             started = true;
             tmr->start();

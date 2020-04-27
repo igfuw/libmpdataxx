@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -31,7 +31,7 @@ namespace libmpdataxx
     namespace detail
     {
       // override default extrapolation/interpolation in ct_params
-      template <class ct_params_t> 
+      template <class ct_params_t>
       struct ct_params_vip_default_t : ct_params_t
       {
         // only override if it has the default value, preserve any special options
@@ -40,7 +40,7 @@ namespace libmpdataxx
         enum {tmprl_extrp = linear2};
       };
 
-      template <class ct_params_t, int minhalo> 
+      template <class ct_params_t, int minhalo>
       class mpdata_rhs_vip_common : public mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>
       {
         using parent_t = mpdata_rhs<ct_params_vip_default_t<ct_params_t>, minhalo>;
@@ -60,7 +60,7 @@ namespace libmpdataxx
           // t_lev ==  0 -> output for extrapolation/derivatives
           // t_lev == -1 -> (n-1) state
           // t_lev == -2 -> (n-2) state, only available with div3_mpdata
-          
+
           static thread_local arrvec_t<typename parent_t::arr_t> ret;
           ret.resize(parent_t::n_dims);
           for (int d = 0; d < parent_t::n_dims; ++d)
@@ -87,7 +87,7 @@ namespace libmpdataxx
               // and the (n-2) state and juggle them around to avoid array copying
               assert(t_lev == 0 || t_lev == -1 || t_lev == -2);
               auto& comp = (t_lev == 0 ? stash[d] :
-                this->timestep % 2 == 0 ? stash[d - t_lev * ct_params_t::n_dims] : 
+                this->timestep % 2 == 0 ? stash[d - t_lev * ct_params_t::n_dims] :
                   stash[d + (3 + t_lev) * ct_params_t::n_dims]
               );
               ret.replace(ret.begin() + d, this->mem->never_delete(&(comp)));
@@ -102,14 +102,14 @@ namespace libmpdataxx
           int save_t_lev = parent_t::div3_mpdata ? -2 : -1;
           if (ix::vip_den == -1)
             vip_stash(save_t_lev)[d](this->ijk) = vips()[d](this->ijk);
-          else if (eps == 0) // this is the default  
+          else if (eps == 0) // this is the default
           {
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
             vip_stash(save_t_lev)[d](this->ijk) = vips()[d](this->ijk) / this->state(ix::vip_den)(this->ijk);
           }
           else
-          {  
+          {
             vip_stash(save_t_lev)[d](this->ijk) = where(
               // if
               this->state(ix::vip_den)(this->ijk) > eps,
@@ -123,13 +123,13 @@ namespace libmpdataxx
           assert(std::isfinite(sum(vip_stash(save_t_lev)[d](this->ijk))));
         }
 
-        void fill_stash() 
+        void fill_stash()
         {
           for (int d = 0; d < ct_params_t::n_dims; ++d) fill_stash_helper(d);
         }
 
         void extrp(const int d, const int e) // extrapolate velocity field in time to t+1/2
-        {                 
+        {
           using namespace arakawa_c;
 
           const auto beta = this->dt_stash[0] > 0 ? this->dt / (2 * this->dt_stash[0]) : 0;
@@ -143,13 +143,13 @@ namespace libmpdataxx
             this->vip_stash(0)[d](this->ijk) = -beta * this->vip_stash(-1)[d](this->ijk);
           }
 
-          if (ix::vip_den == -1) 
+          if (ix::vip_den == -1)
             this->vip_stash(0)[d](this->ijk) += (1 + beta) * this->state(e)(this->ijk);
           else if (eps == 0) //this is the default
-          {             
+          {
             // for those simulations advecting momentum where the division by mass will not cause division by zero
             // (for shallow water simulations it means simulations with no collapsing/inflating shallow water layers)
-            this->vip_stash(0)[d](this->ijk) += (1 + beta) * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk)); 
+            this->vip_stash(0)[d](this->ijk) += (1 + beta) * (this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk));
           }
           else
           {
@@ -159,12 +159,12 @@ namespace libmpdataxx
               // then
               (1 + beta) * this->state(e)(this->ijk) / this->state(ix::vip_den)(this->ijk),
               // else
-              0   
-            );  
+              0
+            );
           }
 
           assert(std::isfinite(sum(this->vip_stash(0)[d](this->ijk))));
-        }   
+        }
 
         arrvec_t<typename parent_t::arr_t>& vips()
         {
@@ -185,7 +185,7 @@ namespace libmpdataxx
           {
             if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
             {
-              vip_rhs[d](this->ijk) = - 
+              vip_rhs[d](this->ijk) = -
                 (*this->mem->vab_coeff)(this->ijk) * (vips()[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
             else
@@ -194,7 +194,7 @@ namespace libmpdataxx
             }
           }
         }
-        
+
         virtual void vip_rhs_expl_calc()
         {
           if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == expl)
@@ -202,12 +202,12 @@ namespace libmpdataxx
             for (int d = 0; d < parent_t::n_dims; ++d)
             {
               // factor of 2 because it is multiplied by 0.5 * dt in vip_rhs_apply
-              vip_rhs[d](this->ijk) += -2 * 
+              vip_rhs[d](this->ijk) += -2 *
                 (*this->mem->vab_coeff)(this->ijk) * (vips()[d](this->ijk) - this->mem->vab_relax[d](this->ijk));
             }
           }
         }
-        
+
         virtual void vip_rhs_impl_fnlz()
         {
           if (static_cast<vip_vab_t>(ct_params_t::vip_vab) == impl)
@@ -225,9 +225,9 @@ namespace libmpdataxx
             }
           }
         }
-        
+
         void vip_rhs_apply()
-        {    
+        {
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             vips()[d](this->ijk) += real_t(0.5) * this->dt * vip_rhs[d](this->ijk);
@@ -245,7 +245,7 @@ namespace libmpdataxx
             }
           }
         }
-        
+
         void add_relax()
         {
           for (int d = 0; d < parent_t::n_dims; ++d)
@@ -259,7 +259,7 @@ namespace libmpdataxx
         {
           // fill Courant numbers with zeros so that the divergence test does no harm
           if (this->rank == 0)
-            for (int d=0; d < parent_t::n_dims; ++d) this->mem->GC.at(d) = 0; 
+            for (int d=0; d < parent_t::n_dims; ++d) this->mem->GC.at(d) = 0;
           this->mem->barrier();
 
           for (int d = 0; d < parent_t::n_dims; ++d)
@@ -271,7 +271,7 @@ namespace libmpdataxx
           }
 
           parent_t::hook_ante_loop(nt);
-          
+
           vip_rhs_impl_init();
         }
 
@@ -288,7 +288,7 @@ namespace libmpdataxx
 
           return true;
         }
-        
+
         void calc_ndt_gc() final
         {
           if (parent_t::div3_mpdata)
@@ -304,7 +304,7 @@ namespace libmpdataxx
               interpolate_in_space(this->mem->ndt_GC, vip_stash(0));
               this->mem->barrier();
             }
-            
+
             if (this->dt_stash[0] > 0 && this->dt_stash[1] > 0)
             {
               for (int d = 0; d < parent_t::n_dims; ++d)
@@ -325,8 +325,8 @@ namespace libmpdataxx
         }
 
         void hook_ante_step()
-        { 
-          // filling the stash with data from current velocity field 
+        {
+          // filling the stash with data from current velocity field
           // (so that in the next time step they can be used for extrapolation in time)
           fill_stash();
 
@@ -336,25 +336,25 @@ namespace libmpdataxx
           // finish calculating velocity forces before moving on
           this->mem->barrier();
 
-          parent_t::hook_ante_step(); 
+          parent_t::hook_ante_step();
           vip_rhs_apply();
         }
-        
+
         void hook_post_step()
-        { 
-          parent_t::hook_post_step(); 
+        {
+          parent_t::hook_post_step();
           vip_rhs_impl_fnlz();
         }
 
         public:
-        
+
         struct rt_params_t : parent_t::rt_params_t
         {
           real_t vip_eps = 0;
         };
 
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
@@ -362,14 +362,14 @@ namespace libmpdataxx
             (parent_t::div3_mpdata ? 3 : ct_params_t::var_dt ? 2 : 1) * parent_t::n_dims); // stash
           parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_dims); // vip_rhs
         }
- 
+
         protected:
 
         // ctor
         mpdata_rhs_vip_common(
           typename parent_t::ctor_args_t args,
           const rt_params_t &p
-        ) : 
+        ) :
           parent_t(args, p),
           stash(args.mem->tmp[__FILE__][0]),
           vip_rhs(args.mem->tmp[__FILE__][1]),

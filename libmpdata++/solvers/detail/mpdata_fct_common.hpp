@@ -26,10 +26,10 @@ namespace libmpdataxx
         protected:
 
         // member fields
-        typename parent_t::arr_t psi_min, psi_max, beta_up, beta_dn; 
-        arrvec_t<typename parent_t::arr_t> GC_mono; 
+        typename parent_t::arr_t psi_min, psi_max, beta_up, beta_dn;
+        arrvec_t<typename parent_t::arr_t> GC_mono;
 
-        arrvec_t<typename parent_t::arr_t> &GC(int iter) 
+        arrvec_t<typename parent_t::arr_t> &GC(int iter)
         {
           if (iter > 0) return GC_mono;
           return parent_t::GC(iter);
@@ -47,7 +47,7 @@ namespace libmpdataxx
         mpdata_fct_common(
           typename parent_t::ctor_args_t args,
           const typename parent_t::rt_params_t &p
-        ) : 
+        ) :
           parent_t(args, p),
           psi_min(args.mem->tmp[__FILE__][0][0]),
           psi_max(args.mem->tmp[__FILE__][0][1]),
@@ -57,7 +57,7 @@ namespace libmpdataxx
         {}
 
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
@@ -68,9 +68,9 @@ namespace libmpdataxx
       };
 
       // partial specialisations
-      template<typename ct_params_t, int minhalo, class enableif = void> 
+      template<typename ct_params_t, int minhalo, class enableif = void>
       class mpdata_fct
-      {}; 
+      {};
     } // namespace detail
   } // namespace solvers
 } // namescpae libmpdataxx

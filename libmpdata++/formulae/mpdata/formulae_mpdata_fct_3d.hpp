@@ -23,7 +23,7 @@ namespace libmpdataxx
         const arr_3d_t &psi,
         const arr_3d_t &psi_max,
         const arr_3d_t &G,
-        const ix_t &i, 
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k
       )
@@ -42,7 +42,7 @@ namespace libmpdataxx
           - psi(i, j, k)
           ) * formulae::G<opts, 0>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
         );
-      } 
+      }
 
       template <opts_t opts, class arr_3d_t, class flx_t>
       forceinline_macro void beta_up(
@@ -51,7 +51,7 @@ namespace libmpdataxx
         const arr_3d_t &psi_max, // from before the first iteration
         const flx_t &flx,
         const arr_3d_t &G,
-        const rng_t &ir, 
+        const rng_t &ir,
         const rng_t &jr,
         const rng_t &kr
       )
@@ -63,7 +63,7 @@ namespace libmpdataxx
           {
             for (int k = kr.first(); k <= kr.last(); ++k)
             {
-              b(i, j, k) = 
+              b(i, j, k) =
               fct_frac<ix_t>(
                 beta_up_nominator<opts>(psi, psi_max, G, i, j, k)
                 , //-------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ namespace libmpdataxx
           ) * formulae::G<opts, 0>(G, i, j, k) //to make beta up dimensionless when transporting mixing ratios with momentum
         );
       }
-      
+
       template <opts_t opts, class arr_3d_t, class flx_t>
       forceinline_macro void beta_dn(
         arr_3d_t &b,
@@ -126,7 +126,7 @@ namespace libmpdataxx
           {
             for (int k = kr.first(); k <= kr.last(); ++k)
             {
-              b(i, j, k) = 
+              b(i, j, k) =
               fct_frac<ix_t>(
                 beta_dn_nominator<opts>(psi, psi_min, G, i, j, k)
                 , //-----------------------------------------------------------------------------------

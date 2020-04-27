@@ -36,11 +36,11 @@ namespace libmpdataxx
         {
           if (deriv)
             a(pi<d>(i, j)) = 0;
-          else 
+          else
             a(pi<d>(i, j)) = a(pi<d>(this->left_edge_sclr, j)); // zero-gradient condition for scalar
         }
       }
-      
+
       void fill_halos_pres(arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
@@ -48,7 +48,7 @@ namespace libmpdataxx
         a(pi<d>(this->left_halo_sclr.last(), j)) = 2 * a(pi<d>(this->left_edge_sclr,     j))
                                                      - a(pi<d>(this->left_edge_sclr + 1, j));
       }
-      
+
       void save_edge_vel(const arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
@@ -58,12 +58,12 @@ namespace libmpdataxx
         if(d != 0) edge_velocity.reindexSelf({a.lbound(0), 0});
         edge_velocity(pi<d>(0, j)) = a(pi<d>(this->left_edge_sclr, j));
       }
-      
+
       void set_edge_pres(arr_t &a, const rng_t &j, int sign)
       {
         using namespace idxperm;
         a(pi<d>(this->left_edge_sclr, j)) = sign * edge_velocity(pi<d>(0, j));
-        
+
         if (halo > 1)
         {
           a(pi<d>(this->left_halo_sclr.last() - 1, j)) =   3 * a(pi<d>(this->left_edge_sclr,     j))
@@ -75,19 +75,19 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         const int i = this->left_edge_sclr;
-   
+
         // if executed first (d=0) this could contain NaNs
-        if (d == 0) 
+        if (d == 0)
         {
           av[d+1](pi<d>(i, (j-h).first())) = 0;
           av[d+1](pi<d>(i, (j+h).last())) = 0;
         }
-       
+
         // zero-divergence condition
         for (int ii = this->left_halo_vctr.first(); ii <= this->left_halo_vctr.last() - (ad ? 1 : 0); ++ii)
         {
-          av[d](pi<d>(ii, j)) = 
-            av[d](pi<d>(i+h, j)) 
+          av[d](pi<d>(ii, j)) =
+            av[d](pi<d>(i+h, j))
             -(
               av[d+1](pi<d>(i, j-h)) -
               av[d+1](pi<d>(i, j+h))
@@ -100,7 +100,7 @@ namespace libmpdataxx
         using namespace idxperm;
         // note intentional sclr
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
-          a(pi<d>(i, j)) = 0; 
+          a(pi<d>(i, j)) = 0;
       }
     };
 
@@ -116,10 +116,10 @@ namespace libmpdataxx
       using parent_t = detail::bcond_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
-      
+
       // holds saved initial value of edge velocity
       arr_t edge_velocity;
-      
+
       public:
 
       void fill_halos_sclr(arr_t &a, const rng_t &j, const bool deriv = false)
@@ -133,7 +133,7 @@ namespace libmpdataxx
             a(pi<d>(i, j)) = a(pi<d>(this->rght_edge_sclr, j)); // zero gradient for scalar
         }
       }
-      
+
       void fill_halos_pres(arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
@@ -147,7 +147,7 @@ namespace libmpdataxx
         }
 
       }
-      
+
       void save_edge_vel(const arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
@@ -157,7 +157,7 @@ namespace libmpdataxx
         if(d != 0) edge_velocity.reindexSelf({a.lbound(0), 0});
         edge_velocity(pi<d>(0, j)) = a(pi<d>(this->rght_edge_sclr, j));
       }
-      
+
       void set_edge_pres(arr_t &a, const rng_t &j, int sign)
       {
         using namespace idxperm;
@@ -170,29 +170,29 @@ namespace libmpdataxx
         const int i = this->rght_edge_sclr;
 
         // if executed first (d=0) this could contain NaNs
-        if (d == 0) 
+        if (d == 0)
         {
           av[d+1](pi<d>(i, (j-h).first())) = 0;
           av[d+1](pi<d>(i, (j+h).last())) = 0;
         }
-       
+
         // zero-divergence condition
         for (int ii = this->rght_halo_vctr.first() + (ad ? 1 : 0); ii <= this->rght_halo_vctr.last(); ++ii)
         {
-          av[d](pi<d>(ii, j)) = 
+          av[d](pi<d>(ii, j)) =
             av[d](pi<d>(i-h, j)) + (
               av[d+1](pi<d>(i, j-h)) -
               av[d+1](pi<d>(i, j+h))
             );
         }
       }
-      
+
       void fill_halos_vctr_nrml(arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
         // note intentional sclr
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-          a(pi<d>(i, j)) = 0; 
+          a(pi<d>(i, j)) = 0;
       }
     };
   } // namespace bcond

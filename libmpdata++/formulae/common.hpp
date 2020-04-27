@@ -25,7 +25,7 @@ namespace libmpdataxx
     {
       return std::abs(a);
     }
-    
+
     template<class ix_t, class arg_t>
     forceinline_macro auto abs(const arg_t &a, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
     {
@@ -38,7 +38,7 @@ namespace libmpdataxx
       using cm_t = typename std::common_type<a_t, b_t>::type;
       return std::min(static_cast<cm_t>(a), static_cast<cm_t>(b));
     }
-    
+
     template<class ix_t, class a_t, class b_t>
     forceinline_macro auto min(const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
     {
@@ -51,34 +51,34 @@ namespace libmpdataxx
       using cm_t = typename std::common_type<a_t, b_t>::type;
       return std::max(static_cast<cm_t>(a), static_cast<cm_t>(b));
     }
-    
+
     template<class ix_t, class a_t, class b_t>
     forceinline_macro auto max(const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
     {
       return blitz::max(a, b);
     }
-   
+
     // variadic max & min
     template<class ix_t, class a_t, class... b_ts>
     forceinline_macro auto max(const a_t &a, const b_ts & ... bs)
     {
       return max<ix_t>(a, max<ix_t>(bs...));
     }
-    
+
     template<class ix_t, class a_t, class... b_ts>
     forceinline_macro auto min(const a_t &a, const b_ts & ... bs)
     {
       return min<ix_t>(a, min<ix_t>(bs...));
     }
-      
+
     template<class ix_t, class arg_t>
-    forceinline_macro auto where(bool c, const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)   
+    forceinline_macro auto where(bool c, const arg_t &a, const arg_t &b, typename std::enable_if<std::is_same<ix_t, int>::value>::type* = 0)
     {
       return c ? a : b;
     }
-    
+
     template<class ix_t, class c_t, class a_t, class b_t>
-    forceinline_macro auto where(c_t c, const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)  
+    forceinline_macro auto where(c_t c, const a_t &a, const b_t &b, typename std::enable_if<std::is_same<ix_t, rng_t>::value>::type* = 0)
     {
       return blitz::where(c, a, b);
     }
@@ -130,7 +130,7 @@ namespace libmpdataxx
       const ix_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
     ) {
-      return 1; 
+      return 1;
     }
 
     // 2D: G = const = 1
@@ -140,7 +140,7 @@ namespace libmpdataxx
       const ix_t &, const ix_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
     ) {
-      return 1; 
+      return 1;
     }
 
     // 3D: G = const = 1
@@ -150,7 +150,7 @@ namespace libmpdataxx
       const ix_t &, const ix_t &, const ix_t &,
       typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == false
     ) {
-      return 1; 
+      return 1;
     }
 
     // 1D on ND: G != const
@@ -159,15 +159,15 @@ namespace libmpdataxx
       const arr_t &G,
       const ix_t &i,
       typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0 // enabled if nug == true
-    ) 
+    )
     {
       return return_helper<ix_t>(
         G(i) + 0 // return_macro includes a call to blitz::safeToReturn() which expects an expression as an arg
       );
     }
-    
+
     // 2D: G != const
-    template<opts::opts_t opts, int d, class arr_t, class ix_t> 
+    template<opts::opts_t opts, int d, class arr_t, class ix_t>
     inline auto G(
       const arr_t &G,
       const ix_t &i,
@@ -179,9 +179,9 @@ namespace libmpdataxx
         G(idxperm::pi<d>(i, j)) + 0
       );
     }
-    
+
     // 3D: G != const
-    template<opts::opts_t opts, int d, class arr_t, class ix_t> 
+    template<opts::opts_t opts, int d, class arr_t, class ix_t>
     inline auto G(
       const arr_t &G,
       const ix_t &i,

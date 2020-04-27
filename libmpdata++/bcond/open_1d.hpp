@@ -23,7 +23,7 @@ namespace libmpdataxx
       using parent_t = detail::bcond_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 1>;
       using parent_t::parent_t; // inheriting ctor
-      
+
       public:
 
       void fill_halos_sclr(arr_t &a, const bool deriv = false)
@@ -56,14 +56,14 @@ namespace libmpdataxx
       using parent_t = detail::bcond_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 1>;
       using parent_t::parent_t; // inheriting ctor
-      
+
       public:
 
       void fill_halos_sclr(arr_t &a, const bool deriv = false)
       {
         for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
         {
-          if (deriv) 
+          if (deriv)
             a(rng_t(i, i)) = 0;
           else
             a(rng_t(i, i)) = a(this->rght_edge_sclr);

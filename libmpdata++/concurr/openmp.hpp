@@ -30,7 +30,7 @@ namespace libmpdataxx
     class openmp : public detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
     {
       using parent_t = detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
- 
+
 
       struct mem_t : parent_t::mem_t
       {
@@ -70,13 +70,13 @@ namespace libmpdataxx
           i = omp_get_thread_num();
 #endif
           this->algos[i].solve(nt);
-        } 
+        }
       }
 
       public:
 
       // ctor
-      openmp(const typename solver_t::rt_params_t &p) : 
+      openmp(const typename solver_t::rt_params_t &p) :
         parent_t(p, new mem_t(p.grid_size), mem_t::size(p.grid_size[0]))
       {}
 

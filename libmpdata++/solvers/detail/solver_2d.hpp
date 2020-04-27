@@ -1,4 +1,4 @@
-/** @file 
+/** @file
 * @copyright University of Warsaw
 * @section LICENSE
 * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
@@ -18,8 +18,8 @@ namespace libmpdataxx
 
       template<typename ct_params_t, int n_tlev, int minhalo>
       class solver<
-        ct_params_t, 
-        n_tlev,  
+        ct_params_t,
+        n_tlev,
         minhalo,
         typename std::enable_if<ct_params_t::n_dims == 2 >::type
       > : public solver_common<ct_params_t, n_tlev, minhalo>
@@ -31,7 +31,7 @@ namespace libmpdataxx
         using real_t = typename ct_params_t::real_t;
 
         protected:
-      
+
         const rng_t i, j; // TODO: to be removed
 
         // generic field used for various statistics (currently Courant number and divergence)
@@ -71,7 +71,7 @@ namespace libmpdataxx
           // TODO: open bc nust be last!!!
           this->mem->barrier();
         }
-        
+
         virtual void xchng_flux(arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           this->mem->barrier();
@@ -79,7 +79,7 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[1]) bc->fill_halos_flux(arrvec, i);
           this->mem->barrier();
         }
-        
+
         virtual void xchng_sgs_div(
           typename parent_t::arr_t &arr,
           const idx_t<2> &range_ijk
@@ -90,7 +90,7 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div(arr, range_ijk[0]);
           this->mem->barrier();
         }
-        
+
         virtual void xchng_sgs_vctr(arrvec_t<typename parent_t::arr_t> &av,
                             const typename parent_t::arr_t &b,
                             const idx_t<2> &range_ijk
@@ -115,7 +115,7 @@ namespace libmpdataxx
         }
 
         virtual void xchng_sgs_tnsr_offdiag(arrvec_t<typename parent_t::arr_t> &av,
-                                            const arrvec_t<typename parent_t::arr_t> &bv, 
+                                            const arrvec_t<typename parent_t::arr_t> &bv,
                                             const idx_t<2> &range_ijk,
                                             const std::array<rng_t, 2> &range_ijkm
         ) final
@@ -129,7 +129,7 @@ namespace libmpdataxx
         }
 
         virtual void xchng_vctr_nrml(
-          arrvec_t<typename parent_t::arr_t> &arrvec, 
+          arrvec_t<typename parent_t::arr_t> &arrvec,
           const idx_t<2> &range_ijk,
           const int ext = 0,
           const bool cyclic = false
@@ -197,7 +197,7 @@ namespace libmpdataxx
           {
             real_t max_abs_div = max_abs_vctr_div(this->mem->GC);
 
-            if (max_abs_div > this->max_abs_div_eps) 
+            if (max_abs_div > this->max_abs_div_eps)
               throw std::runtime_error("initial advector field is divergent");
           }
         }
@@ -210,7 +210,7 @@ namespace libmpdataxx
                                         ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j);
           return this->mem->max(this->rank, stat_field(this->ijk));
         }
-        
+
         real_t max_abs_vctr_div(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           stat_field(this->ijk) = abs(
@@ -219,7 +219,7 @@ namespace libmpdataxx
                                      ) / formulae::G<ct_params_t::opts, 0>(*this->mem->G, i, j);
           return this->mem->max(this->rank, stat_field(this->ijk));
         }
-        
+
         void scale_gc(const real_t time,
                       const real_t cur_dt,
                       const real_t old_dt) final
@@ -232,17 +232,17 @@ namespace libmpdataxx
         }
 
         public:
- 
+
         struct ctor_args_t
-        {   
+        {
           // <TODO> these should be common for 1D,2D,3D
           int rank;
           typename parent_t::mem_t *mem;
           // </TODO>
-          typename parent_t::bcp_t &bcxl, &bcxr, &bcyl, &bcyr; 
-          const rng_t &i, &j; 
-        };  
-        
+          typename parent_t::bcp_t &bcxl, &bcxr, &bcyl, &bcyr;
+          const rng_t &i, &j;
+        };
+
         struct rt_params_t : parent_t::rt_params_t
         {
           real_t di = 0, dj = 0;
@@ -257,18 +257,18 @@ namespace libmpdataxx
         ) :
           parent_t(
             args.rank,
-            args.mem, 
-            p, 
+            args.mem,
+            p,
             idx_t<parent_t::n_dims>({args.i, args.j})
           ),
-          i(args.i), 
+          i(args.i),
           j(args.j),
           stat_field(args.mem->tmp[__FILE__][0][0])
         {
           this->di = p.di;
           this->dj = p.dj;
           this->dijk = {p.di, p.dj};
-          this->set_bcs(0, args.bcxl, args.bcxr); 
+          this->set_bcs(0, args.bcxl, args.bcxr);
           this->set_bcs(1, args.bcyl, args.bcyr);
         }
 
@@ -277,26 +277,26 @@ namespace libmpdataxx
         public:
 
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
-          // psi 
+          // psi
           mem->psi.resize(parent_t::n_eqns);
           for (int e = 0; e < parent_t::n_eqns; ++e) // equations
             for (int n = 0; n < n_tlev; ++n) // time levels
-              mem->psi[e].push_back(mem->old(new typename parent_t::arr_t( 
-                parent_t::rng_sclr(mem->grid_size[0]), 
+              mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(
+                parent_t::rng_sclr(mem->grid_size[0]),
                 parent_t::rng_sclr(mem->grid_size[1])
               )));
 
           // Courant field components (Arakawa-C grid)
-          mem->GC.push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_vctr(mem->grid_size[0]), 
-            parent_t::rng_sclr(mem->grid_size[1]) 
+          mem->GC.push_back(mem->old(new typename parent_t::arr_t(
+            parent_t::rng_vctr(mem->grid_size[0]),
+            parent_t::rng_sclr(mem->grid_size[1])
           )));
-          mem->GC.push_back(mem->old(new typename parent_t::arr_t( 
-            parent_t::rng_sclr(mem->grid_size[0]), 
-            parent_t::rng_vctr(mem->grid_size[1]) 
+          mem->GC.push_back(mem->old(new typename parent_t::arr_t(
+            parent_t::rng_sclr(mem->grid_size[0]),
+            parent_t::rng_vctr(mem->grid_size[1])
           )));
 
           // fully third-order accurate mpdata needs also time derivatives of
@@ -305,24 +305,24 @@ namespace libmpdataxx
               opts::isset(ct_params_t::opts, opts::div_3rd_dt))
           {
             // TODO: why for (auto f : {mem->ndt_GC, mem->ndtt_GC}) doesn't work ?
-            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t( 
-              parent_t::rng_vctr(mem->grid_size[0]), 
-              parent_t::rng_sclr(mem->grid_size[1]) 
+            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
+              parent_t::rng_vctr(mem->grid_size[0]),
+              parent_t::rng_sclr(mem->grid_size[1])
             )));
-            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t( 
-              parent_t::rng_sclr(mem->grid_size[0]), 
-              parent_t::rng_vctr(mem->grid_size[1]) 
+            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
+              parent_t::rng_sclr(mem->grid_size[0]),
+              parent_t::rng_vctr(mem->grid_size[1])
             )));
-            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t( 
-              parent_t::rng_vctr(mem->grid_size[0]), 
-              parent_t::rng_sclr(mem->grid_size[1]) 
+            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
+              parent_t::rng_vctr(mem->grid_size[0]),
+              parent_t::rng_sclr(mem->grid_size[1])
             )));
-            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t( 
-              parent_t::rng_sclr(mem->grid_size[0]), 
-              parent_t::rng_vctr(mem->grid_size[1]) 
+            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
+              parent_t::rng_sclr(mem->grid_size[0]),
+              parent_t::rng_vctr(mem->grid_size[1])
             )));
           }
- 
+
           // allocate G
           if (opts::isset(ct_params_t::opts, opts::nug))
             mem->G.reset(mem->old(new typename parent_t::arr_t(
@@ -332,9 +332,9 @@ namespace libmpdataxx
 
           // allocate Kahan summation temporary vars
           if (opts::isset(ct_params_t::opts, opts::khn))
-            for (int n = 0; n < 3; ++n) 
-              mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t( 
-                parent_t::rng_sclr(mem->grid_size[0]), 
+            for (int n = 0; n < 3; ++n)
+              mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t(
+                parent_t::rng_sclr(mem->grid_size[0]),
                 parent_t::rng_sclr(mem->grid_size[1])
               )));
           // courant field
@@ -360,10 +360,10 @@ namespace libmpdataxx
               srfc ? rng_t(0, 0) :
                 stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) :
                   parent_t::rng_sclr(mem->grid_size[1])
-            ))); 
+            )));
           }
         }
-        
+
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
           typename parent_t::mem_t *mem,
@@ -373,24 +373,24 @@ namespace libmpdataxx
           alloc_tmp_stgr(mem, __file__, 2, {{true, false}, {false, true}});
         }
 
-        // helper method to allocate n_arr scalar temporary arrays 
+        // helper method to allocate n_arr scalar temporary arrays
         static void alloc_tmp_sclr(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const char * __file__, const int n_arr,
           std::string name = "",
           bool srfc = false
-        )   
-        {   
+        )
+        {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
 
           if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
 
           for (int n = 0; n < n_arr; ++n)
-            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t( 
+            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[1])
             )));
-        } 
+        }
       };
     } // namespace detail
   } // namespace solvers

@@ -12,14 +12,14 @@ namespace libmpdataxx
   namespace bcond
   {
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,  
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,
       typename std::enable_if<
         knd == polar &&
         dir == left &&
         n_dims == 2
-      >::type 
+      >::type
     > : public detail::polar_common<real_t, halo, n_dims>
-    { 
+    {
       using parent_t = detail::polar_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
@@ -31,15 +31,15 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         for (int i = 0; i < halo; ++i)
-        { 
+        {
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
             a(pi<d>(this->left_halo_sclr.last() - i,
-                    jj)) 
+                    jj))
             =
             a(pi<d>(this->left_edge_sclr + i,
                     this->polar_neighbours(jj)));
-              
+
           }
         }
       }
@@ -53,7 +53,7 @@ namespace libmpdataxx
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
             av[d](pi<d>(this->left_halo_vctr.first(), jj))
-            = 
+            =
             av[d](pi<d>(this->left_edge_sclr + h, this->polar_neighbours(jj)));
           }
         }
@@ -63,29 +63,29 @@ namespace libmpdataxx
       {
         using namespace idxperm;
         for (int i = 0; i < halo; ++i)
-        { 
+        {
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
             a(pi<d>(this->left_halo_sclr.first() + i,
-                    jj + h)) 
+                    jj + h))
             =
             a(pi<d>(this->left_intr_vctr.last() - i,
                     this->polar_neighbours(jj) + h));
-              
+
           }
         }
       }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,  
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,
       typename std::enable_if<
         knd == polar &&
         dir == rght &&
         n_dims == 2
       >::type
     > : public detail::polar_common<real_t, halo, n_dims>
-    { 
+    {
       using parent_t = detail::polar_common<real_t, halo, n_dims>;
       using arr_t = blitz::Array<real_t, 2>;
       using parent_t::parent_t; // inheriting ctor
@@ -98,15 +98,15 @@ namespace libmpdataxx
         using namespace idxperm;
 
         for (int i = 0; i < halo; ++i)
-        { 
+        {
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
             a(pi<d>(this->rght_halo_sclr.first() + i,
-                    jj)) 
+                    jj))
             =
             a(pi<d>(this->rght_edge_sclr - i,
                     this->polar_neighbours(jj)));
-              
+
           }
         }
       }
@@ -125,20 +125,20 @@ namespace libmpdataxx
           }
         }
       }
-      
+
       void fill_halos_vctr_nrml(arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
         for (int i = 0; i < halo; ++i)
-        { 
+        {
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
             a(pi<d>(this->rght_halo_sclr.first() + i,
-                    jj + h)) 
+                    jj + h))
             =
             a(pi<d>(this->rght_intr_vctr.last() - i,
                     this->polar_neighbours(jj) + h));
-              
+
           }
         }
       }

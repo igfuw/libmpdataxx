@@ -94,7 +94,7 @@ namespace libmpdataxx
           // TODO: get rid of superfluous barriers
           for (auto& vip : this->vips())
             this->xchng_sclr(vip, this->ijk, 1);
-          
+
           if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
             calc_drag_cmpct();
@@ -115,10 +115,10 @@ namespace libmpdataxx
 
             this->xchng_sgs_tnsr_diag(tau, this->vips()[ct_params_t::n_dims - 1], vip_div, this->ijk);
             this->xchng_sgs_tnsr_offdiag(tau, tau_srfc, this->ijk, this->ijkm);
-            
+
             // multiply deformation tensor by sgs viscosity to obtain stress tensor
             multiply_sgs_visc();
-            
+
             // update forces
             formulae::stress::calc_stress_rhs_cmpct<ct_params_t::n_dims, ct_params_t::opts>(this->vip_rhs,
                                                                                             tau,
@@ -138,13 +138,13 @@ namespace libmpdataxx
               for (int d = 0; d < std::pow(static_cast<int>(ct_params_t::n_dims), 2); ++d)
                 pade_deriv(d);
             }
-            
+
             // calculate independent components of deformation tensor
             formulae::stress::calc_deform<ct_params_t::n_dims>(tau, drv, this->ijk);
-            
+
             // multiply deformation tensor by sgs viscosity to obtain stress tensor
             multiply_sgs_visc();
-            
+
             // TODO: get rid of superfluous barriers
             for (auto& t : tau)
             {
@@ -167,9 +167,9 @@ namespace libmpdataxx
 
         public:
 
-        struct rt_params_t : parent_t::rt_params_t 
-        { 
-          real_t cdrag = 0; 
+        struct rt_params_t : parent_t::rt_params_t
+        {
+          real_t cdrag = 0;
         };
 
         // ctor
@@ -195,11 +195,11 @@ namespace libmpdataxx
         }
 
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
-          // no staggering for non-compact differencing  
+          // no staggering for non-compact differencing
           if (static_cast<stress_diff_t>(ct_params_t::stress_diff) != compact)
           {
             parent_t::alloc_tmp_sclr(mem, __FILE__, 3 * (ct_params_t::n_dims - 1)); // unique strain rate tensor elements

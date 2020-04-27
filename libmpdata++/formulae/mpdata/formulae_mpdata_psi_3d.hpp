@@ -14,15 +14,15 @@
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 
-namespace libmpdataxx 
-{ 
-  namespace formulae 
-  { 
-    namespace mpdata 
+namespace libmpdataxx
+{
+  namespace formulae
+  {
+    namespace mpdata
     {
       // interpolation of psi to (i+1/2, j, k) - positive sign scalar / infinite gauge version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_x( 
+      inline auto psi_bar_x(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -32,15 +32,15 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            psi(pi<dim>(i+1, j, k)) + 
+            psi(pi<dim>(i+1, j, k)) +
             psi(pi<dim>(i  , j, k))
           ) / 2
         );
       }
-      
+
       // interpolation of psi to (i+1/2, j, k) - variable sign scalar version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_x( 
+      inline auto psi_bar_x(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -50,15 +50,15 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            abs(psi(pi<dim>(i+1, j, k))) + 
+            abs(psi(pi<dim>(i+1, j, k))) +
             abs(psi(pi<dim>(i  , j, k)))
           ) / 2
         );
       }
-      
+
       // interpolation of psi to (i, j+1/2, k) - positive sign scalar / infinite gauge version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_y( 
+      inline auto psi_bar_y(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -68,7 +68,7 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            psi(pi<dim>(i, j  , k)) + 
+            psi(pi<dim>(i, j  , k)) +
             psi(pi<dim>(i, j+1, k))
           ) / 2
         );
@@ -76,7 +76,7 @@ namespace libmpdataxx
 
       // interpolation of psi to (i, j+1/2, k) - variable sign scalar version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_y( 
+      inline auto psi_bar_y(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -86,15 +86,15 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            abs(psi(pi<dim>(i, j  , k))) + 
+            abs(psi(pi<dim>(i, j  , k))) +
             abs(psi(pi<dim>(i, j+1, k)))
           ) / 2
         );
       }
-      
+
       // interpolation of psi to (i, j, k+1/2) - positive sign scalar / infinite gauge version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_z( 
+      inline auto psi_bar_z(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -104,7 +104,7 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            psi(pi<dim>(i, j, k  )) + 
+            psi(pi<dim>(i, j, k  )) +
             psi(pi<dim>(i, j, k+1))
           ) / 2
         );
@@ -112,7 +112,7 @@ namespace libmpdataxx
 
       // interpolation of psi to (i, j, k+1/2) - variable sign scalar version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_z( 
+      inline auto psi_bar_z(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -122,15 +122,15 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            abs(psi(pi<dim>(i, j, k  ))) + 
+            abs(psi(pi<dim>(i, j, k  ))) +
             abs(psi(pi<dim>(i, j, k+1)))
           ) / 2
         );
       }
-      
+
       // interpolation of psi to (i+1/2, j+1/2, k) - positive sign scalar / infinite gauge version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_xy( 
+      inline auto psi_bar_xy(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -140,7 +140,7 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            psi(pi<dim>(i+1, j  , k)) + 
+            psi(pi<dim>(i+1, j  , k)) +
             psi(pi<dim>(i  , j  , k)) +
             psi(pi<dim>(i  , j+1, k)) +
             psi(pi<dim>(i+1, j+1, k))
@@ -150,7 +150,7 @@ namespace libmpdataxx
 
       // interpolation of psi to (i+1/2, j+1/2, k) - variable sign scalar version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_xy( 
+      inline auto psi_bar_xy(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -160,17 +160,17 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            abs(psi(pi<dim>(i+1, j  , k))) + 
+            abs(psi(pi<dim>(i+1, j  , k))) +
             abs(psi(pi<dim>(i  , j  , k))) +
             abs(psi(pi<dim>(i  , j+1, k))) +
             abs(psi(pi<dim>(i+1, j+1, k)))
           ) / 4
         );
       }
-      
+
       // interpolation of psi to (i+1/2, j, k+1/2) - positive sign scalar / infinite gauge version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_xz( 
+      inline auto psi_bar_xz(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -180,7 +180,7 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            psi(pi<dim>(i+1, j  , k)) + 
+            psi(pi<dim>(i+1, j  , k)) +
             psi(pi<dim>(i  , j  , k)) +
             psi(pi<dim>(i  , j, k+1)) +
             psi(pi<dim>(i+1, j, k+1))
@@ -190,7 +190,7 @@ namespace libmpdataxx
 
       // interpolation of psi to (i+1/2, j, k+1/2) - variable sign scalar version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_xz( 
+      inline auto psi_bar_xz(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -200,17 +200,17 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            abs(psi(pi<dim>(i+1, j  , k))) + 
+            abs(psi(pi<dim>(i+1, j  , k))) +
             abs(psi(pi<dim>(i  , j  , k))) +
             abs(psi(pi<dim>(i  , j, k+1))) +
             abs(psi(pi<dim>(i+1, j, k+1)))
           ) / 4
         );
       }
-      
+
       // interpolation of psi to (i+1/2, j+1/2, k+1/2) - positive sign scalar / infinite gauge version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_xyz( 
+      inline auto psi_bar_xyz(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -221,20 +221,20 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           (
             psi(pi<dim>(i  , j  , k  )) +
-            psi(pi<dim>(i+1, j  , k  )) + 
+            psi(pi<dim>(i+1, j  , k  )) +
             psi(pi<dim>(i  , j+1, k  )) +
             psi(pi<dim>(i  , j  , k+1)) +
-            psi(pi<dim>(i+1, j+1, k  )) + 
-            psi(pi<dim>(i+1, j  , k+1)) + 
-            psi(pi<dim>(i  , j+1, k+1)) + 
+            psi(pi<dim>(i+1, j+1, k  )) +
+            psi(pi<dim>(i+1, j  , k+1)) +
+            psi(pi<dim>(i  , j+1, k+1)) +
             psi(pi<dim>(i+1, j+1, k+1))
           ) / 8
         );
       }
-      
+
       // interpolation of psi to (i+1/2, j+1/2, k+1/2) - variable sign scalar version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto psi_bar_xyz( 
+      inline auto psi_bar_xyz(
         const arr_3d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -245,23 +245,23 @@ namespace libmpdataxx
         return return_helper<ix_t>(
           (
             abs(psi(pi<dim>(i  , j  , k  ))) +
-            abs(psi(pi<dim>(i+1, j  , k  ))) + 
+            abs(psi(pi<dim>(i+1, j  , k  ))) +
             abs(psi(pi<dim>(i  , j+1, k  ))) +
             abs(psi(pi<dim>(i  , j  , k+1))) +
-            abs(psi(pi<dim>(i+1, j+1, k  ))) + 
-            abs(psi(pi<dim>(i+1, j  , k+1))) + 
-            abs(psi(pi<dim>(i  , j+1, k+1))) + 
+            abs(psi(pi<dim>(i+1, j+1, k  ))) +
+            abs(psi(pi<dim>(i+1, j  , k+1))) +
+            abs(psi(pi<dim>(i  , j+1, k+1))) +
             abs(psi(pi<dim>(i+1, j+1, k+1)))
           ) / 8
         );
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2, j, k) - positive sign scalar version  
+      // dx/psi * dpsi/dx at (i+1/2, j, k) - positive sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndx_psi(
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
@@ -278,11 +278,11 @@ namespace libmpdataxx
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2, j, k) - variable-sign scalar version 
+      // dx/psi * dpsi/dx at (i+1/2, j, k) - variable-sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndx_psi(
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
@@ -294,16 +294,16 @@ namespace libmpdataxx
             abs(psi(pi<d>(i+1, j, k))) - abs(psi(pi<d>(i, j, k)))
             ,
             abs(psi(pi<d>(i+1, j, k))) + abs(psi(pi<d>(i, j, k)))
-          ) 
+          )
         );
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2, j, k) - infinite gauge version 
+      // dx/psi * dpsi/dx at (i+1/2, j, k) - infinite gauge version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndx_psi(  // inf. gauge option
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
@@ -319,15 +319,15 @@ namespace libmpdataxx
       // dy/psi * dpsi/dy at (i+1/2, j, k) - positive sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndy_psi(
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       )
       {
         return return_helper<ix_t>(
-          frac<opts, ix_t>( 
+          frac<opts, ix_t>(
               psi(pi<d>(i+1, j+1, k))
             + psi(pi<d>(i  , j+1, k))
             - psi(pi<d>(i+1, j-1, k))
@@ -345,15 +345,15 @@ namespace libmpdataxx
       // dy/psi * dpsi/dy at (i+1/2, j, k) - variable sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndy_psi(
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
       {
         return return_helper<ix_t>(
-          frac<opts, ix_t>( 
+          frac<opts, ix_t>(
               abs(psi(pi<d>(i+1, j+1, k)))
             + abs(psi(pi<d>(i  , j+1, k)))
             - abs(psi(pi<d>(i+1, j-1, k)))
@@ -371,8 +371,8 @@ namespace libmpdataxx
       // dy/psi * dpsi/dy at (i+1/2, j, k) - infinite gauge version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndy_psi(
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
@@ -388,20 +388,20 @@ namespace libmpdataxx
           ) / 4
         );
       }
-      
+
       // nondimensionalised z derivative of psi i.e.
       // dz/psi * dpsi/dz at (i+1/2, j, k) - positive sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndz_psi( // positive sign signal
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       )
       {
         return return_helper<ix_t>(
-          frac<opts, ix_t>( 
+          frac<opts, ix_t>(
               psi(pi<d>(i+1, j, k+1))
             + psi(pi<d>(i  , j, k+1))
             - psi(pi<d>(i+1, j, k-1))
@@ -419,15 +419,15 @@ namespace libmpdataxx
       // dz/psi * dpsi/dz at (i+1/2, j, k) - variable sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndz_psi(
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
       {
         return return_helper<ix_t>(
-          frac<opts, ix_t>( 
+          frac<opts, ix_t>(
               abs(psi(pi<d>(i+1, j, k+1)))
             + abs(psi(pi<d>(i  , j, k+1)))
             - abs(psi(pi<d>(i+1, j, k-1)))
@@ -445,8 +445,8 @@ namespace libmpdataxx
       // dz/psi * dpsi/dz at (i+1/2, j, k) - infinite gauge version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndz_psi(
-        const arr_3d_t &psi, 
-        const ix_t &i, 
+        const arr_3d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
@@ -556,7 +556,7 @@ namespace libmpdataxx
                 psi(pi<dim>(i+1, j+1, k))
               - psi(pi<dim>(i  , j+1, k))
               - psi(pi<dim>(i+1, j-1, k))
-              + psi(pi<dim>(i  , j-1, k))            
+              + psi(pi<dim>(i  , j-1, k))
               ,
                 psi(pi<dim>(i+1, j+1, k))
               + psi(pi<dim>(i  , j+1, k))
@@ -583,7 +583,7 @@ namespace libmpdataxx
                 abs(psi(pi<dim>(i+1, j+1, k)))
               - abs(psi(pi<dim>(i  , j+1, k)))
               - abs(psi(pi<dim>(i+1, j-1, k)))
-              + abs(psi(pi<dim>(i  , j-1, k)))            
+              + abs(psi(pi<dim>(i  , j-1, k)))
               ,
                 abs(psi(pi<dim>(i+1, j+1, k)))
               + abs(psi(pi<dim>(i  , j+1, k)))
@@ -610,11 +610,11 @@ namespace libmpdataxx
                 psi(pi<dim>(i+1, j+1, k))
               - psi(pi<dim>(i  , j+1, k))
               - psi(pi<dim>(i+1, j-1, k))
-              + psi(pi<dim>(i  , j-1, k))            
+              + psi(pi<dim>(i  , j-1, k))
           ) / 4
         );
       }
-      
+
       // nondimensionalised xz derivative of psi i.e.
       // dx*dz/psi * dpsi/dxdz at (i+1/2, j, k) - positive sign scalar version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
@@ -632,7 +632,7 @@ namespace libmpdataxx
                 psi(pi<dim>(i+1, j, k+1))
               - psi(pi<dim>(i  , j, k+1))
               - psi(pi<dim>(i+1, j, k-1))
-              + psi(pi<dim>(i  , j, k-1))            
+              + psi(pi<dim>(i  , j, k-1))
               ,
                 psi(pi<dim>(i+1, j, k+1))
               + psi(pi<dim>(i  , j, k+1))
@@ -641,7 +641,7 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised xz derivative of psi i.e.
       // dx*dz/psi * dpsi/dxdz at (i+1/2, j, k) - variable sign scalar version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
@@ -659,7 +659,7 @@ namespace libmpdataxx
                 abs(psi(pi<dim>(i+1, j, k+1)))
               - abs(psi(pi<dim>(i  , j, k+1)))
               - abs(psi(pi<dim>(i+1, j, k-1)))
-              + abs(psi(pi<dim>(i  , j, k-1)))            
+              + abs(psi(pi<dim>(i  , j, k-1)))
               ,
                 abs(psi(pi<dim>(i+1, j, k+1)))
               + abs(psi(pi<dim>(i  , j, k+1)))
@@ -668,7 +668,7 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised xz derivative of psi i.e.
       // dx*dz/psi * dpsi/dxdz at (i+1/2, j, k) - infinite gauge version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
@@ -686,7 +686,7 @@ namespace libmpdataxx
                 psi(pi<dim>(i+1, j, k+1))
               - psi(pi<dim>(i  , j, k+1))
               - psi(pi<dim>(i+1, j, k-1))
-              + psi(pi<dim>(i  , j, k-1))            
+              + psi(pi<dim>(i  , j, k-1))
           ) / 4
         );
       }
@@ -707,19 +707,19 @@ namespace libmpdataxx
               psi(pi<dim>(i+1, j+1, k+1))
             + psi(pi<dim>(i+1, j-1, k-1))
             - psi(pi<dim>(i+1, j+1, k-1))
-            - psi(pi<dim>(i+1, j-1, k+1))           
+            - psi(pi<dim>(i+1, j-1, k+1))
             + psi(pi<dim>(i  , j+1, k+1))
             + psi(pi<dim>(i  , j-1, k-1))
-            - psi(pi<dim>(i  , j+1, k-1))           
+            - psi(pi<dim>(i  , j+1, k-1))
             - psi(pi<dim>(i  , j-1, k+1))
             , //-------------------------
               psi(pi<dim>(i+1, j+1, k+1))
             + psi(pi<dim>(i+1, j-1, k-1))
             + psi(pi<dim>(i+1, j+1, k-1))
-            + psi(pi<dim>(i+1, j-1, k+1))           
+            + psi(pi<dim>(i+1, j-1, k+1))
             + psi(pi<dim>(i  , j+1, k+1))
             + psi(pi<dim>(i  , j-1, k-1))
-            + psi(pi<dim>(i  , j+1, k-1))           
+            + psi(pi<dim>(i  , j+1, k-1))
             + psi(pi<dim>(i  , j-1, k+1))
             )
         );
@@ -741,19 +741,19 @@ namespace libmpdataxx
               abs(psi(pi<dim>(i+1, j+1, k+1)))
             + abs(psi(pi<dim>(i+1, j-1, k-1)))
             - abs(psi(pi<dim>(i+1, j+1, k-1)))
-            - abs(psi(pi<dim>(i+1, j-1, k+1)))           
+            - abs(psi(pi<dim>(i+1, j-1, k+1)))
             + abs(psi(pi<dim>(i  , j+1, k+1)))
             + abs(psi(pi<dim>(i  , j-1, k-1)))
-            - abs(psi(pi<dim>(i  , j+1, k-1)))          
+            - abs(psi(pi<dim>(i  , j+1, k-1)))
             - abs(psi(pi<dim>(i  , j-1, k+1)))
             , //------------------------------
               abs(psi(pi<dim>(i+1, j+1, k+1)))
             + abs(psi(pi<dim>(i+1, j-1, k-1)))
             + abs(psi(pi<dim>(i+1, j+1, k-1)))
-            + abs(psi(pi<dim>(i+1, j-1, k+1)))           
+            + abs(psi(pi<dim>(i+1, j-1, k+1)))
             + abs(psi(pi<dim>(i  , j+1, k+1)))
             + abs(psi(pi<dim>(i  , j-1, k-1)))
-            + abs(psi(pi<dim>(i  , j+1, k-1)))          
+            + abs(psi(pi<dim>(i  , j+1, k-1)))
             + abs(psi(pi<dim>(i  , j-1, k+1)))
             )
         );
@@ -768,7 +768,7 @@ namespace libmpdataxx
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) 
+      )
       {
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         return return_helper<ix_t>(
@@ -778,7 +778,7 @@ namespace libmpdataxx
             - psi(pi<dim>(i+1, j+1, k-1))
             - psi(pi<dim>(i+1, j-1, k+1))
             + psi(pi<dim>(i  , j+1, k+1))
-            + psi(pi<dim>(i  , j-1, k-1))           
+            + psi(pi<dim>(i  , j-1, k-1))
             - psi(pi<dim>(i  , j+1, k-1))
             - psi(pi<dim>(i  , j-1, k+1))
             )
@@ -788,14 +788,14 @@ namespace libmpdataxx
             )
         );
       }
-      
+
       // nondimensionalised tx derivative of psi i.e.
-      // dx*dt/psi * dpsi/dtx at (i+1/2, j, k) - positive sign scalar version  
+      // dx*dt/psi * dpsi/dtx at (i+1/2, j, k) - positive sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndtx_psi(
-        const arr_3d_t &psi_np1, 
-        const arr_3d_t &psi_n, 
-        const ix_t &i, 
+        const arr_3d_t &psi_np1,
+        const arr_3d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
@@ -816,14 +816,14 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised tx derivative of psi i.e.
-      // dx*dt/psi * dpsi/dtx at (i+1/2, j, k) - variable sign scalar version  
+      // dx*dt/psi * dpsi/dtx at (i+1/2, j, k) - variable sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndtx_psi(
-        const arr_3d_t &psi_np1, 
-        const arr_3d_t &psi_n, 
-        const ix_t &i, 
+        const arr_3d_t &psi_np1,
+        const arr_3d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
@@ -844,14 +844,14 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised tx derivative of psi i.e.
       // dx*dt/psi * dpsi/dtx at (i+1/2, j, k) - infinite gauge version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndtx_psi(
-        const arr_3d_t &psi_np1, 
-        const arr_3d_t &psi_n, 
-        const ix_t &i, 
+        const arr_3d_t &psi_np1,
+        const arr_3d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
@@ -862,14 +862,14 @@ namespace libmpdataxx
           psi_np1(pi<d>(i+1, j, k)) - psi_n(pi<d>(i+1, j, k)) - psi_np1(pi<d>(i, j, k)) + psi_n(pi<d>(i, j, k))
         );
       }
-      
+
       // nondimensionalised t derivative of psi i.e.
-      // dt/psi * dpsi/dt at (i+1/2, j, k) - positive sign scalar version  
+      // dt/psi * dpsi/dt at (i+1/2, j, k) - positive sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndt_psi(
-        const arr_3d_t &psi_np1, 
-        const arr_3d_t &psi_n, 
-        const ix_t &i, 
+        const arr_3d_t &psi_np1,
+        const arr_3d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
@@ -890,14 +890,14 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised t derivative of psi i.e.
-      // dt/psi * dpsi/dt at (i+1/2, j, k) - variable sign scalar version  
+      // dt/psi * dpsi/dt at (i+1/2, j, k) - variable sign scalar version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndt_psi(
-        const arr_3d_t &psi_np1, 
-        const arr_3d_t &psi_n, 
-        const ix_t &i, 
+        const arr_3d_t &psi_np1,
+        const arr_3d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
@@ -918,14 +918,14 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised tx derivative of psi i.e.
       // dt/psi * dpsi/dt at (i+1/2, j, k) - infinite gauge version
       template<opts_t opts, int d, class arr_3d_t, class ix_t>
       inline auto ndt_psi(
-        const arr_3d_t &psi_np1, 
-        const arr_3d_t &psi_n, 
-        const ix_t &i, 
+        const arr_3d_t &psi_np1,
+        const arr_3d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         const ix_t &k,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
@@ -938,4 +938,4 @@ namespace libmpdataxx
       }
     } // namespace mpdata
   } // namespace formulae
-} // namespcae libmpdataxx 
+} // namespcae libmpdataxx

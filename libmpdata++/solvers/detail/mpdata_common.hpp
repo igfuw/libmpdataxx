@@ -14,19 +14,19 @@ namespace libmpdataxx
     {
       template <typename ct_params_t, int minhalo>
       class mpdata_common : public detail::solver<
-        ct_params_t, 
-        formulae::mpdata::n_tlev, 
+        ct_params_t,
+        formulae::mpdata::n_tlev,
         detail::max(minhalo, formulae::mpdata::halo(ct_params_t::opts))
       >
       {
         using parent_t = detail::solver<
-          ct_params_t, 
-          formulae::mpdata::n_tlev, 
+          ct_params_t,
+          formulae::mpdata::n_tlev,
           detail::max(minhalo, formulae::mpdata::halo(ct_params_t::opts))
         >;
 
         using GC_t = arrvec_t<typename parent_t::arr_t>;
- 
+
         protected:
 
         // static constants
@@ -38,13 +38,13 @@ namespace libmpdataxx
 
         // methods
         GC_t &GC_unco(int iter)
-        {   
-          return (iter == 1)  
-            ? this->mem->GC 
-            : (iter % 2)  
+        {
+          return (iter == 1)
+            ? this->mem->GC
+            : (iter % 2)
               ? *tmp[1]  // odd iters
               : *tmp[0]; // even iters
-        }   
+        }
 
         GC_t &GC_corr(int iter)
         {
@@ -59,22 +59,22 @@ namespace libmpdataxx
           return GC_corr(iter);
         }
 
-        // for Flux-Corrected Transport 
+        // for Flux-Corrected Transport
         virtual void fct_init(int e) { }
         virtual void fct_adjust_antidiff(int e, int iter) { }
 
-        //  
+        //
         static int n_tmp(const int &n_iters)
         {
-          return n_iters > 2 ? 2 : 1; 
+          return n_iters > 2 ? 2 : 1;
         }
 
         public:
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          int n_iters = 2; 
-          int upwind_filter_freq = 0; 
+          int n_iters = 2;
+          int upwind_filter_freq = 0;
         };
 
         protected:
@@ -83,7 +83,7 @@ namespace libmpdataxx
         mpdata_common(
           typename parent_t::ctor_args_t args,
           const rt_params_t &p
-        ) : 
+        ) :
           parent_t(args, p),
           n_iters(p.n_iters),
           upwind_filter_freq(p.upwind_filter_freq),
@@ -100,18 +100,18 @@ namespace libmpdataxx
 
         // memory allocation
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
-        ) {   
+        ) {
           parent_t::alloc(mem, n_iters);
           for (int n = 0; n < n_tmp(n_iters); ++n)
             parent_t::alloc_tmp_vctr(mem, __FILE__);
           parent_t::alloc_tmp_vctr(mem, __FILE__); // fluxes
-        }   
+        }
       };
 
       // partial specialisations
-      template<typename ct_params_t, int minhalo, class enableif = void> 
+      template<typename ct_params_t, int minhalo, class enableif = void>
       class mpdata_osc
       {};
     } // namespace detail

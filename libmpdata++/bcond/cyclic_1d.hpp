@@ -11,11 +11,11 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int dim>    
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int dim>
     class bcond<       real_t,     halo,         knd,         dir,     n_dims,     dim,
       typename std::enable_if<
-        knd == cyclic && 
-        dir == left   && 
+        knd == cyclic &&
+        dir == left   &&
         n_dims == 1
       >::type
     > : public detail::bcond_common<real_t, halo, n_dims>
@@ -35,7 +35,7 @@ namespace libmpdataxx
       {
         av[0](this->left_halo_vctr) = av[0](this->rght_intr_vctr);
       }
-      
+
       void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const bool ad = false)
       {
         fill_halos_vctr_alng(av, ad);
@@ -66,7 +66,7 @@ namespace libmpdataxx
       {
         av[0](this->rght_halo_vctr) = av[0](this->left_intr_vctr);
       }
-      
+
       void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const bool ad = false)
       {
         fill_halos_vctr_alng(av, ad);

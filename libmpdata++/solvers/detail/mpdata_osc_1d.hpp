@@ -23,7 +23,7 @@ namespace libmpdataxx
 
       template<typename ct_params_t, int minhalo>
       class mpdata_osc<
-        ct_params_t, 
+        ct_params_t,
         minhalo,
         typename std::enable_if<ct_params_t::n_dims == 1>::type
       > : public detail::mpdata_common<ct_params_t, minhalo>
@@ -39,14 +39,14 @@ namespace libmpdataxx
   //  note that it's not needed for upstream
           parent_t::hook_ante_loop(nt);
           if (opts::isset(ct_params_t::opts, opts::nug))
-            this->xchng_sclr(*this->mem->G); 
+            this->xchng_sclr(*this->mem->G);
 
           // set time derivatives of GC to zero
           // needed for stationary flows prescribed using the advector method
           if (opts::isset(ct_params_t::opts, opts::div_3rd_dt) || opts::isset(ct_params_t::opts, opts::div_3rd))
           {
             this->mem->ndt_GC[0](this->im + h) = 0;
-            
+
             this->mem->ndtt_GC[0](this->im + h) = 0;
 
             this->xchng_vctr_alng(this->mem->ndt_GC);
@@ -59,19 +59,19 @@ namespace libmpdataxx
         {
           this->fct_init(e); // e.g. store psi_min, psi_max in FCT
 
-          for (int iter = 0; iter < this->n_iters; ++iter) 
+          for (int iter = 0; iter < this->n_iters; ++iter)
           {
-            if (iter != 0) 
+            if (iter != 0)
             {
               this->cycle(e); // cycles subdomain's "n", and global "n" if it's the last equation
               this->xchng(e);
 
-              // calculating the antidiffusive C 
+              // calculating the antidiffusive C
               formulae::mpdata::antidiff<ct_params_t::opts,
                                          static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp),
                                          static_cast<tmprl_extrp_t>(ct_params_t::tmprl_extrp)>(
                 this->GC_corr(iter)[0],
-                this->mem->psi[e][this->n[e]], 
+                this->mem->psi[e][this->n[e]],
                 this->GC_unco(iter),
                 this->mem->ndt_GC,
                 this->mem->ndtt_GC,
@@ -96,7 +96,7 @@ namespace libmpdataxx
             {
               this->flux[0](im+h) = formulae::donorcell::make_flux<ct_params_t::opts>(
                 this->mem->psi[e][this->n[e]],
-                this->GC(iter)[0], 
+                this->GC(iter)[0],
                 im
               );
               this->flux_ptr = &this->flux; // TODO: if !iga this is needed only once per simulation, TODO: move to common
@@ -108,7 +108,7 @@ namespace libmpdataxx
             }
 
             // sanity checks for input // TODO: move to common
-            //assert(std::isfinite(sum(psi[this->n[e]](this->ijk)))); 
+            //assert(std::isfinite(sum(psi[this->n[e]](this->ijk))));
             //assert(std::isfinite(sum(flux_ref[0](i^h))));
 
             // donor-cell call // TODO: could be made common for 1D/2D/3D
@@ -127,7 +127,7 @@ namespace libmpdataxx
               break;
             }
             // sanity checks for output // TODO: move to common
-            //assert(std::isfinite(sum(psi[this->n[e]+1](this->ijk)))); 
+            //assert(std::isfinite(sum(psi[this->n[e]+1](this->ijk))));
           }
         }
 
@@ -139,17 +139,17 @@ namespace libmpdataxx
           const auto &i(this->i);
           auto &GC(this->mem->GC);
           using namespace formulae::donorcell;
- 
+
           this->xchng_sclr(field, this->ijk);
- 
+
           // calculation of fluxes
           this->flux[0](im+h) = make_flux<ct_params_t::opts>(field, GC[0], im);
- 
+
           // sanity check for input
           assert(std::isfinite(sum(field(i))));
           assert(std::isfinite(sum(this->flux[0](i^h))));
- 
-          // donor-cell call 
+
+          // donor-cell call
           donorcell_sum<ct_params_t::opts>(
             this->mem->khn_tmp,
             i,
@@ -171,7 +171,7 @@ namespace libmpdataxx
         mpdata_osc(
           typename parent_t::ctor_args_t args,
           const typename parent_t::rt_params_t &p
-        ) : 
+        ) :
           parent_t(args, p),
           im(args.i.first() - 1, args.i.last())
         {}

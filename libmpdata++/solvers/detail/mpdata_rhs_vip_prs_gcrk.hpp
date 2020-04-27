@@ -1,12 +1,12 @@
-/** 
+/**
   * @file
   * @copyright University of Warsaw
   * @section LICENSE
   * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
   *
-  * @brief generalized conjugate residual pressure solver 
-  *   (for more detailed discussion consult Smolarkiewicz & Margolin 1994 
-  *  Appl. Math and Comp. Sci. 
+  * @brief generalized conjugate residual pressure solver
+  *   (for more detailed discussion consult Smolarkiewicz & Margolin 1994
+  *  Appl. Math and Comp. Sci.
   *  Variational solver for elliptic problems in atmospheric flows)
   */
 
@@ -35,7 +35,7 @@ namespace libmpdataxx
         std::vector<real_t> alpha, tmp_den;
         typename parent_t::arr_t lap_err;
         arrvec_t<typename parent_t::arr_t> p_err, lap_p_err;
-        
+
         void pressure_solver_loop_init(bool simple) final
         {
           p_err[0](this->ijk) = this->err(this->ijk);
@@ -52,7 +52,7 @@ namespace libmpdataxx
             this->err(this->ijk) += beta * lap_p_err[v](this->ijk);
 
             real_t error = std::max(
-              std::abs(this->mem->max(this->rank, this->err(this->ijk))), 
+              std::abs(this->mem->max(this->rank, this->err(this->ijk))),
               std::abs(this->mem->min(this->rank, this->err(this->ijk)))
             );
 
@@ -62,15 +62,15 @@ namespace libmpdataxx
 
             for (int l = 0; l <= v; ++l)
             {
-              if (tmp_den[l] != 0) 
+              if (tmp_den[l] != 0)
                 alpha[l] = - this->prs_sum(lap_err, lap_p_err[l], this->ijk) / tmp_den[l];
             }
-            
+
             if (v < (k_iters - 1))
             {
-              p_err[v + 1](this->ijk) = this->err(this->ijk);  
+              p_err[v + 1](this->ijk) = this->err(this->ijk);
               lap_p_err[v + 1](this->ijk) = lap_err(this->ijk);
-              
+
               for (int l = 0; l <= v; ++l)
               {
                 p_err[v + 1](this->ijk) += alpha[l] * p_err[l](this->ijk);
@@ -80,7 +80,7 @@ namespace libmpdataxx
             }
             else
             {
-              p_err[0](this->ijk) = this->err(this->ijk) + alpha[0] * p_err[0](this->ijk);  
+              p_err[0](this->ijk) = this->err(this->ijk) + alpha[0] * p_err[0](this->ijk);
               lap_p_err[0](this->ijk) = lap_err(this->ijk) + alpha[0] * lap_p_err[0](this->ijk);
               for (int l = 1; l <= v; ++l)
               {
@@ -110,7 +110,7 @@ namespace libmpdataxx
         {}
 
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
@@ -118,7 +118,7 @@ namespace libmpdataxx
           parent_t::alloc_tmp_sclr(mem, __FILE__, k_iters);
           parent_t::alloc_tmp_sclr(mem, __FILE__, k_iters);
         }
-      }; 
+      };
     } // namespace detail
   } // namespace solvers
 } // namespace libmpdataxx

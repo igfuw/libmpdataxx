@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -29,14 +29,14 @@ namespace libmpdataxx
         // member fields
         using ix = typename ct_params_t::ix;
         typename parent_t::arr_t &dtht_e;
-        
+
         template <int nd = ct_params_t::n_dims>
         void calc_dtht_e(typename std::enable_if<nd == 2>::type* = 0)
         {
           this->xchng_sclr(this->tht_e, this->ijk);
           this->dtht_e(this->ijk) = formulae::nabla::grad<1>(this->tht_e, this->j, this->i, this->dj);
         }
-        
+
         template <int nd = ct_params_t::n_dims>
         void calc_dtht_e(typename std::enable_if<nd == 3>::type* = 0)
         {
@@ -49,8 +49,8 @@ namespace libmpdataxx
           full_tht(this->ijk) = this->state(ix::tht)(this->ijk) + this->tht_e(this->ijk);
         }
 
-        void hook_ante_loop(const typename parent_t::advance_arg_t nt) 
-        {   
+        void hook_ante_loop(const typename parent_t::advance_arg_t nt)
+        {
           calc_dtht_e();
           parent_t::hook_ante_loop(nt);
         }
@@ -75,19 +75,19 @@ namespace libmpdataxx
                  / (1 + real_t(0.5) * this->dt * this->tht_abs(this->ijk)));
           }
         }
-        
+
         void update_rhs(
           libmpdataxx::arrvec_t<
             typename parent_t::arr_t
-          > &rhs, 
-          const real_t &dt, 
-          const int &at 
+          > &rhs,
+          const real_t &dt,
+          const int &at
         ) {
           parent_t::update_rhs(rhs, dt, at);
 
           auto ix_w = this->vip_ixs[ct_params_t::n_dims - 1];
 
-          const auto &tht = this->state(ix::tht); 
+          const auto &tht = this->state(ix::tht);
           const auto &w = this->state(ix_w);
           const auto &ijk = this->ijk;
 
@@ -110,23 +110,23 @@ namespace libmpdataxx
             }
           }
         }
-        
+
         void vip_rhs_impl_fnlz()
         {
           parent_t::vip_rhs_impl_fnlz();
-          
+
           const auto &w = this->vips()[ct_params_t::n_dims - 1];
-          this->state(ix::tht)(this->ijk) = ( this->state(ix::tht)(this->ijk) 
+          this->state(ix::tht)(this->ijk) = ( this->state(ix::tht)(this->ijk)
                                             - real_t(0.5) * this->dt * w(this->ijk) * this->dtht_e(this->ijk))
                                             / (1 + real_t(0.5) * this->dt * this->tht_abs(this->ijk));
           this->rhs.at(ix::tht)(this->ijk) += -w(this->ijk) * this->dtht_e(this->ijk)
                                               -this->tht_abs(this->ijk) * this->state(ix::tht)(this->ijk);
         }
-        
+
         public:
         // ctor
-        boussinesq_impl( 
-          typename parent_t::ctor_args_t args, 
+        boussinesq_impl(
+          typename parent_t::ctor_args_t args,
           const typename parent_t::rt_params_t &p
         ) :
           parent_t(args, p),

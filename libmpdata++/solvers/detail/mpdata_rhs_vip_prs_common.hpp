@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -8,7 +8,7 @@
 #pragma once
 
 #include <libmpdata++/formulae/nabla_formulae.hpp>
-#include <libmpdata++/solvers/mpdata_rhs_vip.hpp> 
+#include <libmpdata++/solvers/mpdata_rhs_vip.hpp>
 
 namespace libmpdataxx
 {
@@ -48,9 +48,9 @@ namespace libmpdataxx
         }
 
         auto lap(
-          arr_t &arr, 
-          const ijk_t &ijk, 
-          const std::array<real_t, parent_t::n_dims>& dijk, 
+          arr_t &arr,
+          const ijk_t &ijk,
+          const std::array<real_t, parent_t::n_dims>& dijk,
           bool err_init, // if true then subtract initial state for error calculation
           bool simple // if true do not normalize gradients (simple laplacian)
         ) return_macro(
@@ -82,7 +82,7 @@ namespace libmpdataxx
         )
 
         void ini_pressure()
-        { 
+        {
           Phi(this->ijk) = 0;
     int npoints = 1;
     for (int d = 0; d < parent_t::n_dims; ++d)
@@ -90,7 +90,7 @@ namespace libmpdataxx
             Phi(this->ijk) -= real_t(0.5) * pow2(this->vips()[d](this->ijk));
       npoints *= (this->mem->distmem.grid_size[d]);
     }
-        
+
     auto Phi_mean = prs_sum(Phi, this->ijk) / npoints;
           Phi(this->ijk) -= Phi_mean;
         }
@@ -105,7 +105,7 @@ namespace libmpdataxx
             tmp_uvw[d](this->ijk) = this->vips()[d](this->ijk);
           }
 
-          //initial error   
+          //initial error
           err(this->ijk) = lap(Phi, this->ijk, this->dijk, true, simple);
 
           iters = 0;
@@ -142,7 +142,7 @@ namespace libmpdataxx
         {
           // save initial edge velocities
           this->save_edges(this->vips(), this->ijk);
-          
+
           // correct initial velocity
           Phi(this->ijk) = real_t(0);
           this->xchng_pres(Phi, this->ijk);
@@ -153,12 +153,12 @@ namespace libmpdataxx
           formulae::nabla::calc_grad<parent_t::n_dims>(tmp_uvw, Phi, this->ijk, this->dijk);
           pressure_solver_apply();
           this->set_edges(this->vips(), this->ijk, 1);
-          
+
           parent_t::hook_ante_loop(nt);
 
           // potential pressure
           ini_pressure();
- 
+
           // allow pressure_solver_apply at the first time step
           this->xchng_pres(this->Phi, this->ijk);
           formulae::nabla::calc_grad<parent_t::n_dims>(tmp_uvw, Phi, this->ijk, this->dijk);
@@ -190,8 +190,8 @@ namespace libmpdataxx
 
         public:
 
-        struct rt_params_t : parent_t::rt_params_t 
-        { 
+        struct rt_params_t : parent_t::rt_params_t
+        {
           real_t prs_tol;
         };
 
@@ -199,7 +199,7 @@ namespace libmpdataxx
         mpdata_rhs_vip_prs_common(
           typename parent_t::ctor_args_t args,
           const rt_params_t &p
-        ) : 
+        ) :
           parent_t(args, p),
           prs_tol(p.prs_tol),
           err_tol(p.prs_tol / this->dt), // make stopping criterion correspond to dimensionless divergence
@@ -207,10 +207,10 @@ namespace libmpdataxx
                err(args.mem->tmp[__FILE__][0][1]),
            tmp_uvw(args.mem->tmp[__FILE__][1]),
            lap_tmp(args.mem->tmp[__FILE__][2])
-        {} 
+        {}
 
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
@@ -218,7 +218,7 @@ namespace libmpdataxx
           parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_dims); // tmp_uvw
           parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_dims); // lap_tmp
         }
-      }; 
+      };
     } // namespace detail
   } // namespace solvers
 } // namespace libmpdataxx

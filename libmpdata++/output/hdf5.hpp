@@ -74,20 +74,20 @@ namespace libmpdataxx
           boost::filesystem::create_directory(this->outdir);
         }
 
- 
+
         {
           // creating the const file
 #if defined(USE_MPI)
           this->mem->distmem.barrier();
-          H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL); 
-          H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE); 
+          H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL);
+          H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE);
 #endif
           hdfp.reset(new H5::H5File(const_file, H5F_ACC_TRUNC
 #if defined(USE_MPI)
             , H5P_DEFAULT, fapl_id
 #endif
           ));
-          
+
           // save selected compile and runtime parameters, the choice depends on the solver family
 //          record_params(*hdfp, typename parent_t::solver_family{});
         }
@@ -117,7 +117,7 @@ namespace libmpdataxx
             shape[0] = this->mem->grid_size[0].length();
             cshape[0] = this->mem->grid_size[0].length();
 
-            if (this->mem->distmem.rank() == this->mem->distmem.size() - 1) 
+            if (this->mem->distmem.rank() == this->mem->distmem.size() - 1)
               cshape[0] += 1;
 
             offst[0] = this->mem->grid_size[0].first();
@@ -173,10 +173,10 @@ namespace libmpdataxx
               dim_space.selectHyperslab(H5S_SELECT_SET, cshape.data(), offst.data());
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space, dxpl_id);
             }
-            
+
             // T
             {
-              const hsize_t 
+              const hsize_t
                 nt_out = nt / this->outfreq + 1; // incl. t=0
               float dt = this->dt;
 
@@ -189,14 +189,14 @@ namespace libmpdataxx
               dim_space.selectHyperslab(H5S_SELECT_SET, &nt_out, &zero);
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(1, &nt_out), dim_space, dxpl_id);
             }
-            
+
             // G factor
             if (this->mem->G.get() != nullptr)
             {
               auto g_set = (*hdfp).createDataSet("G", flttype_output, sspace);
               record_dsc_helper(g_set, *this->mem->G);
             }
-            
+
             // save selected compile and runtime parameters, the choice depends on the solver family
             record_params(*hdfp, typename parent_t::solver_family{});
           }
@@ -209,7 +209,7 @@ namespace libmpdataxx
         ss << "timestep" << std::setw(10) << std::setfill('0') << this->timestep;
         return ss.str();
       }
-      
+
       std::string hdf_name()
       {
         // TODO: add option of .nc extension for Paraview sake ?
@@ -266,7 +266,7 @@ namespace libmpdataxx
           }
           case 2:
           {
-            typename solver_t::arr_t contiguous_arr(this->mem->grid_size[0], zro); 
+            typename solver_t::arr_t contiguous_arr(this->mem->grid_size[0], zro);
             contiguous_arr = arr(this->mem->grid_size[0], zro); // create a copy that is contiguous
             dset.write(contiguous_arr.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, srfcshape.data()), space, dxpl_id);
             break;
@@ -281,7 +281,7 @@ namespace libmpdataxx
           default: assert(false);
         };
       }
-      
+
       void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
       {
         H5::DataSpace space = dset.getSpace();
@@ -333,7 +333,7 @@ namespace libmpdataxx
       {
         record_aux_hlpr(name, data, *hdfp);
       }
-      
+
       // for discontiguous array with halos
       void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc = false)
       {
@@ -341,14 +341,14 @@ namespace libmpdataxx
 
         if(srfc)
           params.setChunk(parent_t::n_dims, srfcchunk.data());
-        
+
         auto aux = hdf.createDataSet(
           name,
           flttype_output,
           srfc ? srfcspace : sspace,
           params
         );
- 
+
         if(srfc)
         {
           // revert to default chunk
@@ -421,12 +421,12 @@ namespace libmpdataxx
       {
         record_aux_scalar(name, "/", data);
       }
-      
+
       // see above, also assumes that z is the last dimension
       void record_prof_const(const std::string &name, typename solver_t::real_t *data)
       {
         assert(this->rank == 0);
-        
+
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR
 #if defined(USE_MPI)
           , H5P_DEFAULT, fapl_id
@@ -485,7 +485,7 @@ namespace libmpdataxx
           group.createAttribute("n_iters", type, H5::DataSpace(1, &one)).write(type, &data);
         }
       }
-      
+
       // as above but for solvers with rhs
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_family_tag)
       {
@@ -497,24 +497,24 @@ namespace libmpdataxx
         const auto type = H5::StrType(H5::PredType::C_S1, scheme_str.size());
         group.createAttribute("rhs_scheme", type, H5::DataSpace(1, &one)).write(type, scheme_str.data());
       }
-      
+
       // as above but for solvers with velocities
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_family_tag)
       {
         record_params(hdfcp, typename solvers::mpdata_rhs_family_tag{});
-        
+
         hdfcp.createGroup("vip");
         const auto &group = hdfcp.openGroup("vip");
         const auto vab_str = solvers::vab2string.at(static_cast<solvers::vip_vab_t>(parent_t::ct_params_t_::vip_vab));
         const auto type = H5::StrType(H5::PredType::C_S1, vab_str.size());
         group.createAttribute("vip_abs", type, H5::DataSpace(1, &one)).write(type, vab_str.data());
       }
-      
+
       // as above but for solvers with pressure equation
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_prs_family_tag)
       {
         record_params(hdfcp, typename solvers::mpdata_rhs_vip_family_tag{});
-        
+
         hdfcp.createGroup("prs");
         const auto &group = hdfcp.openGroup("prs");
         {
@@ -527,12 +527,12 @@ namespace libmpdataxx
           group.createAttribute("prs_tol", type, H5::DataSpace(1, &one)).write(type, &this->prs_tol);
         }
       }
-      
+
       // as above but for solvers with subgrid model (parameters common to all subgrid models)
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_family_tag)
       {
         record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_family_tag{});
-        
+
         hdfcp.createGroup("sgs");
         const auto &group = hdfcp.openGroup("sgs");
         {
@@ -550,24 +550,24 @@ namespace libmpdataxx
           group.createAttribute("cdrag", type, H5::DataSpace(1, &one)).write(type, &this->cdrag);
         }
       }
-      
+
       // as above but for solvers with the dns subgrid model
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_dns_family_tag)
       {
         record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_family_tag{});
-        
+
         const auto &group = hdfcp.openGroup("sgs");
         {
           const auto type = flttype_solver;
           group.createAttribute("eta", type, H5::DataSpace(1, &one)).write(type, &this->eta);
         }
       }
-      
+
       // as above but for solvers with the smg subgrid model
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_smg_family_tag)
       {
         record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_family_tag{});
-        
+
         const auto &group = hdfcp.openGroup("sgs");
         {
           const auto type = flttype_solver;
@@ -575,7 +575,7 @@ namespace libmpdataxx
           group.createAttribute("c_m", type, H5::DataSpace(1, &one)).write(type, &this->c_m);
         }
       }
-      
+
       // as above but for the boussinesq solver
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_boussinesq_family_tag)
       {
@@ -601,7 +601,7 @@ namespace libmpdataxx
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_boussinesq_sgs_family_tag)
       {
         record_params(hdfcp, typename solvers::mpdata_boussinesq_family_tag{});
-        
+
         const auto &group = hdfcp.openGroup("boussinesq");
         {
           const auto type = flttype_solver;

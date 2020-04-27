@@ -53,12 +53,12 @@ namespace libmpdataxx
         vg[7](ijk) = formulae::nabla::grad<2>(v[1], ijk[2], ijk[0], ijk[1], dijk[2]);
         vg[8](ijk) = formulae::nabla::grad<2>(v[2], ijk[2], ijk[0], ijk[1], dijk[2]);
       }
-      
+
       // calculates unique deformation tensor components
       // 2D version
       template <int nd, class arrvec_t, class ijk_t>
       inline void calc_deform(arrvec_t &tau,
-                              const arrvec_t &vg, 
+                              const arrvec_t &vg,
                               const ijk_t &ijk,
                               typename std::enable_if<nd == 2>::type* = 0)
       {
@@ -66,7 +66,7 @@ namespace libmpdataxx
         tau[1](ijk) = vg[1](ijk) + vg[2](ijk);
         tau[2](ijk) = 2 * vg[3](ijk);
       }
-      
+
       // 3D version
       template <int nd, class arrvec_t, class ijk_t>
       inline void calc_deform(arrvec_t &tau,
@@ -81,7 +81,7 @@ namespace libmpdataxx
         tau[4](ijk) = vg[5](ijk) + vg[7](ijk);
         tau[5](ijk) = 2 * vg[8](ijk);
       }
-      
+
       // calculate elements of stress tensor divergence
       // 2D version
       template <int nd, class arrvec_t, class ijk_t, class dijk_t>
@@ -97,7 +97,7 @@ namespace libmpdataxx
         sdiv[2](ijk) = formulae::nabla::grad<1>(tau[1], ijk[1], ijk[0], dijk[1]);
         sdiv[3](ijk) = formulae::nabla::grad<1>(tau[2], ijk[1], ijk[0], dijk[1]);
       }
-      
+
       // 3D version
       template <int nd, class arrvec_t, class ijk_t, class dijk_t>
       inline void calc_stress_div(arrvec_t &sdiv,
@@ -118,7 +118,7 @@ namespace libmpdataxx
         sdiv[7](ijk) = formulae::nabla::grad<2>(tau[4], ijk[2], ijk[0], ijk[1], dijk[2]);
         sdiv[8](ijk) = formulae::nabla::grad<2>(tau[5], ijk[2], ijk[0], ijk[1], dijk[2]);
       }
-      
+
 
       // add stress forces
       // 2D version
@@ -128,7 +128,7 @@ namespace libmpdataxx
         rhs[0](ijk) += coeff * (drv[0](ijk) + drv[2](ijk));
         rhs[1](ijk) += coeff * (drv[1](ijk) + drv[3](ijk));
       }
-      
+
       // 3D version
       template <int nd, class arrvec_t, class ijk_t, class real_t>
       inline void calc_stress_rhs(arrvec_t &rhs, const arrvec_t &drv, ijk_t &ijk, real_t coeff, typename std::enable_if<nd == 3>::type* = 0)
@@ -137,7 +137,7 @@ namespace libmpdataxx
         rhs[1](ijk) += coeff * (drv[1](ijk) + drv[4](ijk) + drv[7](ijk));
         rhs[2](ijk) += coeff * (drv[2](ijk) + drv[5](ijk) + drv[8](ijk));
       }
-      
+
       // Total deformation
       // 2D version
       template <int nd, class arrvec_t, class ijk_t>
@@ -145,23 +145,23 @@ namespace libmpdataxx
         const arrvec_t &tau,
         const ijk_t &ijk,
         typename std::enable_if<nd == 2>::type* = 0
-      ) 
-      { 
+      )
+      {
         return blitz::safeToReturn(
           pow2(tau[0](ijk)) / 2 + pow2(tau[1](ijk)) + pow2(tau[2](ijk)) / 2
         );
       }
-      
+
       // 3D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq(
         const arrvec_t &tau,
         const ijk_t &ijk,
         typename std::enable_if<nd == 3>::type* = 0
-      ) 
+      )
       {
         return blitz::safeToReturn(
-          pow2(tau[0](ijk)) / 2 + 
+          pow2(tau[0](ijk)) / 2 +
           pow2(tau[1](ijk)) +
           pow2(tau[2](ijk)) +
           pow2(tau[3](ijk)) / 2 +
@@ -169,9 +169,9 @@ namespace libmpdataxx
           pow2(tau[5](ijk)) / 2
         );
       }
-      
+
       // Compact formulation
-      
+
       // surface stress
       // 2D version
       template <int nd, opts_t opts, class arr_t, class arrvec_t, class real_t, class ijk_t, class ijkm_t>
@@ -184,7 +184,7 @@ namespace libmpdataxx
                                   typename std::enable_if<nd == 2>::type* = 0)
       {
         auto zro = rng_t(0, 0);
-        tau[0](ijkm[0] + h, zro) = cdrag / 8 * 
+        tau[0](ijkm[0] + h, zro) = cdrag / 8 *
                                    abs((v[0](ijkm[0] + 1, zro) + v[0](ijkm[0], zro))) *
                                    (v[0](ijkm[0] + 1, zro) + v[0](ijkm[0], zro)) *
                                    (  G<opts, 0>(rho, ijkm[0] + 1, zro)
@@ -219,7 +219,7 @@ namespace libmpdataxx
                                            (  G<opts, 0>(rho, ijk[0], ijkm[1] + 1, zro)
                                             + G<opts, 0>(rho, ijk[0], ijkm[1]    , zro) );
       }
-      
+
       // velocity divergence
       // 2D version
       template <int nd, class arr_t, class arrvec_t, class ijk_t, class dijk_t>
@@ -234,7 +234,7 @@ namespace libmpdataxx
                                     (rho(ijk[0], ijk[1] + 1) - rho(ijk[0], ijk[1])) /
                                     (dijk[1] * (rho(ijk[0], ijk[1] + 1) + rho(ijk[0], ijk[1])));
       }
-      
+
       // 3D version
       template <int nd, class arr_t, class arrvec_t, class ijk_t, class dijk_t>
       inline void calc_vip_div_cmpct(arr_t &div,
@@ -264,10 +264,10 @@ namespace libmpdataxx
         =
         2 * (
           (v[0](ijkm[0] + 1, ijk[1]) - v[0](ijkm[0], ijk[1])) / dijk[0]
-          - fconst<arr_t>(0.25 / 2) * ( div_v(ijkm[0], ijk[1] + h) + div_v(ijkm[0], ijk[1] - h) 
+          - fconst<arr_t>(0.25 / 2) * ( div_v(ijkm[0], ijk[1] + h) + div_v(ijkm[0], ijk[1] - h)
                                       + div_v(ijkm[0] + 1, ijk[1] + h) + div_v(ijkm[0] + 1, ijk[1] - h))
         );
-        
+
         tau[1](ijk[0], ijkm[1] + h)
         =
         2 * (
@@ -279,11 +279,11 @@ namespace libmpdataxx
         =
         fconst<arr_t>(0.5) *
         (
-          ( v[0](ijkm[0], ijkm[1] + 1) - v[0](ijkm[0], ijkm[1]) 
+          ( v[0](ijkm[0], ijkm[1] + 1) - v[0](ijkm[0], ijkm[1])
           + v[0](ijkm[0] + 1, ijkm[1] + 1) - v[0](ijkm[0] + 1, ijkm[1])
           ) / dijk[1]
           +
-          ( v[1](ijkm[0] + 1, ijkm[1]) - v[1](ijkm[0], ijkm[1]) 
+          ( v[1](ijkm[0] + 1, ijkm[1]) - v[1](ijkm[0], ijkm[1])
           + v[1](ijkm[0] + 1, ijkm[1] + 1) - v[1](ijkm[0], ijkm[1] + 1)
           ) / dijk[0]
         );
@@ -306,7 +306,7 @@ namespace libmpdataxx
           - fconst<arr_t>(0.25 / 3) * ( div_v(ijkm[0], ijk[1], ijk[2] + h) + div_v(ijkm[0], ijk[1], ijk[2] - h)
                                       + div_v(ijkm[0] + 1, ijk[1], ijk[2] + h) + div_v(ijkm[0] + 1, ijk[1], ijk[2] - h))
         );
-        
+
         tau[1](ijk[0], ijkm[1] + h, ijk[2])
         =
         2 * (
@@ -314,27 +314,27 @@ namespace libmpdataxx
           - fconst<arr_t>(0.25 / 3) * ( div_v(ijk[0], ijkm[1], ijk[2] + h) + div_v(ijk[0], ijkm[1], ijk[2] - h)
                                     + div_v(ijk[0], ijkm[1] + 1, ijk[2] + h) + div_v(ijk[0], ijkm[1] + 1, ijk[2] - h))
         );
-        
+
         tau[2](ijk[0], ijk[1], ijkm[2] + h)
         =
         2 * (
           (v[2](ijk[0], ijk[1], ijkm[2] + 1) - v[2](ijk[0], ijk[1], ijkm[2])) / dijk[2]
-          - fconst<arr_t>(1.0 / 3)  * div_v(ijk[0], ijk[1], ijkm[2] + h) 
+          - fconst<arr_t>(1.0 / 3)  * div_v(ijk[0], ijk[1], ijkm[2] + h)
         );
 
         tau[3](ijkm[0] + h, ijkm[1] + h, ijk[2])
         =
         fconst<arr_t>(0.5) *
         (
-          ( v[0](ijkm[0], ijkm[1] + 1, ijk[2]) - v[0](ijkm[0], ijkm[1], ijk[2]) 
+          ( v[0](ijkm[0], ijkm[1] + 1, ijk[2]) - v[0](ijkm[0], ijkm[1], ijk[2])
           + v[0](ijkm[0] + 1, ijkm[1] + 1, ijk[2]) - v[0](ijkm[0] + 1, ijkm[1], ijk[2])
           ) / dijk[1]
           +
-          ( v[1](ijkm[0] + 1, ijkm[1], ijk[2]) - v[1](ijkm[0], ijkm[1], ijk[2]) 
+          ( v[1](ijkm[0] + 1, ijkm[1], ijk[2]) - v[1](ijkm[0], ijkm[1], ijk[2])
           + v[1](ijkm[0] + 1, ijkm[1] + 1, ijk[2]) - v[1](ijkm[0], ijkm[1] + 1, ijk[2])
           ) / dijk[0]
         );
-        
+
         tau[4](ijkm[0] + h, ijk[1], ijkm[2] + h)
         =
         fconst<arr_t>(0.5) *
@@ -343,11 +343,11 @@ namespace libmpdataxx
           + v[0](ijkm[0] + 1, ijk[1], ijkm[2] + 1) - v[0](ijkm[0] + 1, ijk[1], ijkm[2])
           ) / dijk[2]
           +
-          ( v[2](ijkm[0] + 1, ijk[1], ijkm[2]) - v[2](ijkm[0], ijk[1], ijkm[2]) 
+          ( v[2](ijkm[0] + 1, ijk[1], ijkm[2]) - v[2](ijkm[0], ijk[1], ijkm[2])
           + v[2](ijkm[0] + 1, ijk[1], ijkm[2] + 1) - v[2](ijkm[0], ijk[1], ijkm[2] + 1)
           ) / dijk[0]
         );
-        
+
         tau[5](ijk[0], ijkm[1] + h, ijkm[2] + h)
         =
         fconst<arr_t>(0.5) *
@@ -356,12 +356,12 @@ namespace libmpdataxx
           + v[1](ijk[0], ijkm[1] + 1, ijkm[2] + 1) - v[1](ijk[0], ijkm[1] + 1, ijkm[2])
           ) / dijk[2]
           +
-          ( v[2](ijk[0], ijkm[1] + 1, ijkm[2]) - v[2](ijk[0], ijkm[1], ijkm[2]) 
+          ( v[2](ijk[0], ijkm[1] + 1, ijkm[2]) - v[2](ijk[0], ijkm[1], ijkm[2])
           + v[2](ijk[0], ijkm[1] + 1, ijkm[2] + 1) - v[2](ijk[0], ijkm[1], ijkm[2] + 1)
           ) / dijk[1]
         );
       }
-      
+
       // Total deformation
       // 2D version
       template <int nd, class arrvec_t, class ijk_t>
@@ -369,10 +369,10 @@ namespace libmpdataxx
         const arrvec_t &tau,
         const ijk_t &ijk,
         typename std::enable_if<nd == 2>::type* = 0
-      ) 
+      )
       {
         return blitz::safeToReturn(
-          // one half taken as an average 
+          // one half taken as an average
           (
             pow2(tau[0](ijk[0] + h, ijk[1])) + pow2(tau[0](ijk[0] - h, ijk[1]))
           + pow2(tau[1](ijk[0], ijk[1] + h)) + pow2(tau[1](ijk[0], ijk[1] - h))
@@ -399,7 +399,7 @@ namespace libmpdataxx
       )
       {
         return blitz::safeToReturn(
-          // one half taken as an average 
+          // one half taken as an average
           (
             pow2(tau[0](ijk[0] + h, ijk[1], ijk[2])) + pow2(tau[0](ijk[0] - h, ijk[1], ijk[2]))
           + pow2(tau[1](ijk[0], ijk[1] + h, ijk[2])) + pow2(tau[1](ijk[0], ijk[1] - h, ijk[2]))
@@ -426,7 +426,7 @@ namespace libmpdataxx
           ) / 4
         );
       }
-     
+
       // multiplication of compact vector components by constant molecular viscosity
       // 2D version
       template <int nd, class arrvec_t, class real_t, class ijk_t>
@@ -461,12 +461,12 @@ namespace libmpdataxx
                                       const ijk_t &ijk,
                                       typename std::enable_if<nd == 2>::type* = 0)
       {
-        av[0](ijk[0] + h, ijk[1]) *= coeff * 
+        av[0](ijk[0] + h, ijk[1]) *= coeff *
                            real_t(0.5) * (k_m(ijk[0] + 1, ijk[1]) + k_m(ijk[0], ijk[1])) *
                            real_t(0.5) * (G<opts, 0>(rho, ijk[0] + 1, ijk[1]) + G<opts, 0>(rho, ijk[0], ijk[1]));
-        
+
         av[1](ijk[0], ijk[1] + h) *= coeff *
-                           real_t(0.5) * (k_m(ijk[0], ijk[1] + 1) + k_m(ijk[0], ijk[1])) * 
+                           real_t(0.5) * (k_m(ijk[0], ijk[1] + 1) + k_m(ijk[0], ijk[1])) *
                            real_t(0.5) * (G<opts, 0>(rho, ijk[0], ijk[1] + 1) + G<opts, 0>(rho, ijk[0], ijk[1]));
       }
 
@@ -482,16 +482,16 @@ namespace libmpdataxx
         av[0](ijk[0] + h, ijk[1], ijk[2]) *= coeff *
                            real_t(0.5) * (k_m(ijk[0] + 1, ijk[1], ijk[2]) + k_m(ijk[0], ijk[1], ijk[2])) *
                            real_t(0.5) * (G<opts, 0>(rho, ijk[0] + 1, ijk[1], ijk[2]) + G<opts, 0>(rho,ijk[0], ijk[1], ijk[2]));
-        
+
         av[1](ijk[0], ijk[1] + h, ijk[2]) *= coeff *
                            real_t(0.5) * (k_m(ijk[0], ijk[1] + 1, ijk[2]) + k_m(ijk[0], ijk[1], ijk[2])) *
                            real_t(0.5) * (G<opts, 0>(rho, ijk[0], ijk[1] + 1, ijk[2]) + G<opts, 0>(rho, ijk[0], ijk[1], ijk[2]));
-        
+
         av[2](ijk[0], ijk[1], ijk[2] + h) *= coeff *
                            real_t(0.5) * (k_m(ijk[0], ijk[1], ijk[2] + 1) + k_m(ijk[0], ijk[1], ijk[2])) *
                            real_t(0.5) * (G<opts, 0>(rho, ijk[0], ijk[1], ijk[2] + 1) + G<opts, 0>(rho, ijk[0], ijk[1], ijk[2]));
       }
-      
+
       // multiplication of compact tensor components by constant molecular viscosity
       // 2D version
       template <int nd, class arrvec_t, class real_t, class ijk_t>
@@ -527,7 +527,7 @@ namespace libmpdataxx
                                       typename std::enable_if<nd == 2>::type* = 0)
       {
         multiply_vctr_cmpct<nd, opts>(av, coeff, k_m, rho, ijk);
-        av[2](ijk[0] + h, ijk[1] + h) *= coeff * 
+        av[2](ijk[0] + h, ijk[1] + h) *= coeff *
                                          real_t(0.25) * ( k_m(ijk[0] + 1, ijk[1]    )
                                                         + k_m(ijk[0]    , ijk[1]    )
                                                         + k_m(ijk[0] + 1, ijk[1] + 1)
@@ -561,7 +561,7 @@ namespace libmpdataxx
                                                                 + G<opts, 0>(rho, ijk[0] + 1, ijk[1] + 1, ijk[2])
                                                                 + G<opts, 0>(rho, ijk[0]    , ijk[1] + 1, ijk[2])
                                                                 );
-        
+
         av[4](ijk[0] + h, ijk[1], ijk[2] + h) *= coeff *
                                                  real_t(0.25) * ( k_m(ijk[0] + 1, ijk[1], ijk[2]    )
                                                                 + k_m(ijk[0]    , ijk[1], ijk[2]    )
@@ -596,7 +596,7 @@ namespace libmpdataxx
         const ijk_t &ijk,
         const dijk_t dijk,
         typename std::enable_if<nd == 2>::type* = 0
-      ) 
+      )
       {
         return blitz::safeToReturn(
           ( (f[0](ijk[0]+h, ijk[1]) - f[0](ijk[0]-h, ijk[1])) / dijk[0]
@@ -605,7 +605,7 @@ namespace libmpdataxx
           ) / G<opts>(rho, ijk)
         );
       }
-      
+
       // 3D version
       template <int nd, opts_t opts, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline auto flux_div_cmpct(
@@ -614,7 +614,7 @@ namespace libmpdataxx
         const ijk_t &ijk,
         const dijk_t dijk,
         typename std::enable_if<nd == 3>::type* = 0
-      ) 
+      )
       {
         return blitz::safeToReturn(
           ( (f[0](ijk[0]+h, ijk[1], ijk[2]) - f[0](ijk[0]-h, ijk[1], ijk[2])) / dijk[0]
@@ -625,7 +625,7 @@ namespace libmpdataxx
           ) / G<opts>(rho, ijk)
         );
       }
-     
+
       // add stress forces
       // 2D version
       template <int nd, opts_t opts, class arrvec_t, class arr_t, class ijk_t, class dijk_t, class real_t>
@@ -642,17 +642,17 @@ namespace libmpdataxx
         coeff *
         (
           (tau[0](ijk[0] + h, ijk[1]) - tau[0](ijk[0] - h, ijk[1])) / dijk[0]
-          + real_t(0.5) * 
+          + real_t(0.5) *
           ( tau[2](ijk[0] + h, ijk[1] + h) - tau[2](ijk[0] + h, ijk[1] - h)
           + tau[2](ijk[0] - h, ijk[1] + h) - tau[2](ijk[0] - h, ijk[1] - h)
           ) / dijk[1]
         ) / G<opts>(rho, ijk);
-        
+
         rhs[1](ijk)
         +=
         coeff *
         (
-          real_t(0.5) * 
+          real_t(0.5) *
           ( tau[2](ijk[0] + h, ijk[1] + h) - tau[2](ijk[0] - h, ijk[1] + h)
           + tau[2](ijk[0] + h, ijk[1] - h) - tau[2](ijk[0] - h, ijk[1] - h)
           ) / dijk[0]
@@ -676,41 +676,41 @@ namespace libmpdataxx
         coeff *
         (
           (tau[0](ijk[0] + h, ijk[1], ijk[2]) - tau[0](ijk[0] - h, ijk[1], ijk[2])) / dijk[0]
-          + real_t(0.5) * 
+          + real_t(0.5) *
           ( tau[3](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] + h, ijk[1] - h, ijk[2])
           + tau[3](ijk[0] - h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] - h, ijk[2])
           ) / dijk[1]
-          + real_t(0.5) * 
+          + real_t(0.5) *
           ( tau[4](ijk[0] + h, ijk[1], ijk[2] + h) - tau[4](ijk[0] + h, ijk[1], ijk[2] - h)
           + tau[4](ijk[0] - h, ijk[1], ijk[2] + h) - tau[4](ijk[0] - h, ijk[1], ijk[2] - h)
           ) / dijk[2]
         ) / G<opts>(rho, ijk);
-        
+
         rhs[1](ijk)
         +=
         coeff *
         (
-          real_t(0.5) * 
+          real_t(0.5) *
           ( tau[3](ijk[0] + h, ijk[1] + h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] + h, ijk[2])
           + tau[3](ijk[0] + h, ijk[1] - h, ijk[2]) - tau[3](ijk[0] - h, ijk[1] - h, ijk[2])
           ) / dijk[0]
           +
           (tau[1](ijk[0], ijk[1] + h, ijk[2]) - tau[1](ijk[0], ijk[1] - h, ijk[2])) / dijk[1]
-          + real_t(0.5) * 
+          + real_t(0.5) *
           ( tau[5](ijk[0], ijk[1] + h, ijk[2] + h) - tau[5](ijk[0], ijk[1] + h, ijk[2] - h)
           + tau[5](ijk[0], ijk[1] - h, ijk[2] + h) - tau[5](ijk[0], ijk[1] - h, ijk[2] - h)
           ) / dijk[2]
         ) / G<opts>(rho, ijk);
-        
+
         rhs[2](ijk)
         +=
         coeff *
         (
-          real_t(0.5) * 
+          real_t(0.5) *
           ( tau[4](ijk[0] + h, ijk[1], ijk[2] + h) - tau[4](ijk[0] - h, ijk[1], ijk[2] + h)
           + tau[4](ijk[0] + h, ijk[1], ijk[2] - h) - tau[4](ijk[0] - h, ijk[1], ijk[2] - h)
           ) / dijk[0]
-          + real_t(0.5) * 
+          + real_t(0.5) *
           ( tau[5](ijk[0], ijk[1] + h, ijk[2] + h) - tau[5](ijk[0], ijk[1] - h, ijk[2] + h)
           + tau[5](ijk[0], ijk[1] + h, ijk[2] - h) - tau[5](ijk[0], ijk[1] - h, ijk[2] - h)
           ) / dijk[1]
@@ -727,7 +727,7 @@ namespace libmpdataxx
         const arg_t &x,
         const rng_t &i,
         const rng_t &j
-      ) 
+      )
       {
         return blitz::safeToReturn(
           x(idxperm::pi<d>(i + 1, j)) + 2 * x(idxperm::pi<d>(i, j)) + x(idxperm::pi<d>(i - 1, j))
@@ -760,7 +760,7 @@ namespace libmpdataxx
         const rng_t &i,
         const rng_t &j,
         const rng_t &k
-      ) 
+      )
       {
         return blitz::safeToReturn(
           x(idxperm::pi<d>(i+1, j, k)) + 2 * x(idxperm::pi<d>(i, j, k)) + x(idxperm::pi<d>(i - 1, j, k))

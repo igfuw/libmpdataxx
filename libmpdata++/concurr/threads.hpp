@@ -18,8 +18,8 @@ namespace libmpdataxx
 {
   namespace concurr
   {
-    /// @brief shared-memory concurency logic using threads 
-    ///        (\ref libmpdataxx::concurr::openmp if supported, 
+    /// @brief shared-memory concurency logic using threads
+    ///        (\ref libmpdataxx::concurr::openmp if supported,
     ///        \ref libmpdataxx::concurr::boost_thread otherwise)
     template <
       class solver_t,
@@ -29,7 +29,7 @@ namespace libmpdataxx
       bcond::bcond_e bcyr = bcond::null,
       bcond::bcond_e bczl = bcond::null,
       bcond::bcond_e bczr = bcond::null
-    > using threads = 
+    > using threads =
 #if defined(_OPENMP)
     openmp<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
 #else

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -15,7 +15,7 @@ namespace libmpdataxx
 {
   namespace output
   {
-    namespace detail 
+    namespace detail
     {
       template <class solver_t>
       class output_common : public solver_t
@@ -38,7 +38,7 @@ namespace libmpdataxx
 
         virtual void record(const int var) {}
         virtual void start(const typename parent_t::advance_arg_t nt) {}
-        
+
         typename parent_t::arr_t out_data(const int var)
         {
           return this->var_dt ? intrp_vars[var] : this->mem->advectee(var);
@@ -55,7 +55,7 @@ namespace libmpdataxx
             this->mem->barrier();
           }
 
-          if (this->rank == 0) 
+          if (this->rank == 0)
           {
             record_time = this->time;
             start(nt);
@@ -72,7 +72,7 @@ namespace libmpdataxx
         void hook_ante_step()
         {
           parent_t::hook_ante_step();
-         
+
           if (this->var_dt)
           {
             static_assert(parent_t::ct_params_t_::out_intrp_ord == 1 ||
@@ -85,7 +85,7 @@ namespace libmpdataxx
             int curr_idx = std::floor(this->time / outfreq);
 
             do_record_cnt = (do_record_cnt > 0 ? do_record_cnt - 1 : 0);
-            if (next_idx > curr_idx || do_record_cnt > 0) 
+            if (next_idx > curr_idx || do_record_cnt > 0)
             {
               if (do_record_cnt == 0)
               {
@@ -101,7 +101,7 @@ namespace libmpdataxx
           }
         }
 
-        void hook_post_step() 
+        void hook_post_step()
         {
           parent_t::hook_post_step();
 
@@ -133,10 +133,10 @@ namespace libmpdataxx
                     const auto & y0 = intrp_vars[v.first](this->ijk);
                     const auto & y1 = intrp_vars[v.first + parent_t::n_eqns](this->ijk);
                     const auto & y2 = this->mem->advectee(v.first)(this->ijk);
-                    
+
                     intrp_vars[v.first](this->ijk) = y0 +
                                                      (y1 - y0) / (t1 - t0) * (t - t0) +
-                                                     ( (y2 - y1) / ((t2 - t1) * (t2 - t0)) 
+                                                     ( (y2 - y1) / ((t2 - t1) * (t2 - t0))
                                                      - (y1 - y0) / ((t1 - t0) * (t2 - t0)) ) * (t - t0) * (t - t1);
                     break;
                   }
@@ -162,14 +162,14 @@ namespace libmpdataxx
               }
             }
           }
-          
+
           this->mem->barrier(); // waiting for the output to be finished
         }
 
         public:
 
-        struct rt_params_t : parent_t::rt_params_t 
-        { 
+        struct rt_params_t : parent_t::rt_params_t
+        {
           typename parent_t::advance_arg_t outfreq = 1;
           int outwindow = 1;
           std::map<int, info_t> outvars;
@@ -183,7 +183,7 @@ namespace libmpdataxx
           const rt_params_t &p
         ) :
           parent_t(args, p),
-          outfreq(p.outfreq), 
+          outfreq(p.outfreq),
           outwindow(p.outwindow),
           outvars(p.outvars),
           outdir(p.outdir),
@@ -193,9 +193,9 @@ namespace libmpdataxx
           if (this->outvars.size() == 0 && parent_t::n_eqns == 1)
             outvars = {{0, {"", ""}}};
 
-          
+
           // assign 1 to dt, di, dj, dk for output purposes if they are not defined by the user
-          for (auto ref : 
+          for (auto ref :
                 std::vector<std::reference_wrapper<typename parent_t::real_t>>{this->dt, this->di, this->dj, this->dk})
           {
             if (ref.get() == 0)

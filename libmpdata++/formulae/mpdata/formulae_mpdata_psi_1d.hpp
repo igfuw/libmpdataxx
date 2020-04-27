@@ -10,15 +10,15 @@
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 
-namespace libmpdataxx 
-{ 
-  namespace formulae 
-  { 
-    namespace mpdata 
+namespace libmpdataxx
+{
+  namespace formulae
+  {
+    namespace mpdata
     {
       // interpolation of psi to (i+1/2) - positive sign scalar / infinite gauge version
       template<opts_t opts, class arr_1d_t, class ix_t>
-      inline auto psi_bar_x( 
+      inline auto psi_bar_x(
         const arr_1d_t &psi,
         const ix_t &i,
         typename std::enable_if<!opts::isset(opts, opts::abs)>::type* = 0
@@ -30,10 +30,10 @@ namespace libmpdataxx
           ) / 2
         );
       }
-     
+
       // interpolation of psi to (i+1/2) - variable sign scalar version
       template<opts_t opts, class arr_1d_t, class ix_t>
-      inline auto psi_bar_x( 
+      inline auto psi_bar_x(
         const arr_1d_t &psi,
         const ix_t &i,
         typename std::enable_if<opts::isset(opts, opts::abs)>::type* = 0
@@ -47,11 +47,11 @@ namespace libmpdataxx
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2) - positive sign scalar version  
+      // dx/psi * dpsi/dx at (i+1/2) - positive sign scalar version
       template<opts_t opts, class arr_1d_t, class ix_t>
       inline auto ndx_psi(
-        const arr_1d_t &psi, 
-        const ix_t &i, 
+        const arr_1d_t &psi,
+        const ix_t &i,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       )
       {
@@ -66,11 +66,11 @@ namespace libmpdataxx
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2) - variable-sign scalar version 
+      // dx/psi * dpsi/dx at (i+1/2) - variable-sign scalar version
       template<opts_t opts, class arr_1d_t, class ix_t>
       inline auto ndx_psi(
-        const arr_1d_t &psi, 
-        const ix_t &i, 
+        const arr_1d_t &psi,
+        const ix_t &i,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
       {
@@ -80,16 +80,16 @@ namespace libmpdataxx
             abs(psi(i+1)) - abs(psi(i))
             ,// -----------------------
             abs(psi(i+1)) + abs(psi(i))
-          ) 
+          )
         );
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2) - infinite gauge version 
+      // dx/psi * dpsi/dx at (i+1/2) - infinite gauge version
       template<opts_t opts, class arr_1d_t, class ix_t>
       inline auto ndx_psi(
-        const arr_1d_t &psi, 
-        const ix_t &i, 
+        const arr_1d_t &psi,
+        const ix_t &i,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       )
       {
@@ -103,7 +103,7 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised xx derivative of psi i.e.
       // dx^2/psi * dpsi/dxx at (i+1/2) - positive sign scalar version
       template<opts_t opts, class arr_1d_t, class ix_t>
@@ -130,7 +130,7 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const ix_t &i,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
-      ) 
+      )
       {
         return return_helper<ix_t>(
             2 *
@@ -149,7 +149,7 @@ namespace libmpdataxx
         const arr_1d_t &psi,
         const ix_t &i,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) 
+      )
       {
         static_assert(!opts::isset(opts, opts::abs), "iga & abs are mutually exclusive");
         return return_helper<ix_t>(
@@ -161,4 +161,4 @@ namespace libmpdataxx
       }
     } // namespace mpdata
   } // namespace formulae
-} // namespcae libmpdataxx 
+} // namespcae libmpdataxx

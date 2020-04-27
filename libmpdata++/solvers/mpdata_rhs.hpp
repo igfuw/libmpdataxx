@@ -1,10 +1,10 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  *
- * @brief improved Euler inhomogeneous solver  
+ * @brief improved Euler inhomogeneous solver
  *        (cf. eq. 32 in Smolarkiewicz 1998) // TODO cite
  */
 
@@ -16,11 +16,11 @@ namespace libmpdataxx
 {
   namespace solvers
   {
-    enum rhs_scheme_t 
-    { 
+    enum rhs_scheme_t
+    {
       euler_a, // Euler's method, Eulerian spirit:        psi^n+1 = ADV(psi^n) + R^n
       euler_b, // Euler's method, semi-Lagrangian spirit: psi^n+1 = ADV(psi^n + R^n)
-      trapez,  // paraphrase of trapezoidal rule:         psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1 
+      trapez,  // paraphrase of trapezoidal rule:         psi^n+1 = ADV(psi^n + 1/2 * R^n) + 1/2 * R^n+1
       mixed    // allows implementation of arbitrary mixed explicit/implicit schemes
     };
 
@@ -30,7 +30,7 @@ namespace libmpdataxx
       {trapez , "trapez" },
       {mixed  , "mixed"  }
     };
-    
+
     struct mpdata_rhs_family_tag {};
 
     template <class ct_params_t, int minhalo = 0>
@@ -51,17 +51,17 @@ namespace libmpdataxx
       arrvec_t<typename parent_t::arr_t> &rhs;
 
       virtual void update_rhs(
-        arrvec_t<typename parent_t::arr_t> &rhs, 
+        arrvec_t<typename parent_t::arr_t> &rhs,
         const typename parent_t::real_t &dt,
         const int &at
-      ) 
+      )
       {
         assert(at == n || at == n+1);
 #if !defined(NDEBUG)
         update_rhs_called = true;
 #endif
         // zero-out all rhs arrays
-        for (int e = 0; e < parent_t::n_eqns; ++e) 
+        for (int e = 0; e < parent_t::n_eqns; ++e)
         {
           // do nothing for equations with no rhs
           if (opts::isset(ct_params_t::hint_norhs, opts::bit(e))) continue;
@@ -78,7 +78,7 @@ namespace libmpdataxx
         const typename parent_t::real_t &dt_arg
       ) final
       {
-        for (int e = 0; e < parent_t::n_eqns; ++e) 
+        for (int e = 0; e < parent_t::n_eqns; ++e)
         {
           // do nothing for equations with no rhs
           if (opts::isset(ct_params_t::hint_norhs, opts::bit(e))) continue;
@@ -89,13 +89,13 @@ namespace libmpdataxx
       }
 
       public:
-      
+
       // ctor
       mpdata_rhs(
-        typename parent_t::ctor_args_t args, 
+        typename parent_t::ctor_args_t args,
         const typename parent_t::rt_params_t &p
       ) :
-        parent_t(args, p), 
+        parent_t(args, p),
         rhs(args.mem->tmp[__FILE__][0])
       {
         assert(this->dt != 0);
@@ -130,8 +130,8 @@ namespace libmpdataxx
 
         switch ((rhs_scheme_t)ct_params_t::rhs_scheme)
         {
-          case rhs_scheme_t::euler_a: 
-          case rhs_scheme_t::euler_b: 
+          case rhs_scheme_t::euler_a:
+          case rhs_scheme_t::euler_b:
             break;
           case rhs_scheme_t::trapez:
             update_rhs(rhs, this->dt / 2, n);
@@ -139,7 +139,7 @@ namespace libmpdataxx
           case rhs_scheme_t::mixed:
             hook_mixed_rhs_ante_loop();
             break;
-          default: 
+          default:
             assert(false);
         }
       }
@@ -154,20 +154,20 @@ namespace libmpdataxx
 
         switch ((rhs_scheme_t)ct_params_t::rhs_scheme)
         {
-          case rhs_scheme_t::euler_a: 
+          case rhs_scheme_t::euler_a:
             update_rhs(rhs, this->dt, n);
             break;
-          case rhs_scheme_t::euler_b: 
+          case rhs_scheme_t::euler_b:
             update_rhs(rhs, this->dt, n);
-            apply_rhs(this->dt); 
+            apply_rhs(this->dt);
             break;
-          case rhs_scheme_t::trapez: 
-            apply_rhs(this->dt / 2); 
+          case rhs_scheme_t::trapez:
+            apply_rhs(this->dt / 2);
             break;
-          case rhs_scheme_t::mixed: 
+          case rhs_scheme_t::mixed:
             hook_mixed_rhs_ante_step();
             break;
-          default: 
+          default:
             assert(false);
         }
       }
@@ -177,25 +177,25 @@ namespace libmpdataxx
         parent_t::hook_post_step();
         switch ((rhs_scheme_t)ct_params_t::rhs_scheme)
         {
-          case rhs_scheme_t::euler_a: 
+          case rhs_scheme_t::euler_a:
             apply_rhs(this->dt);
             break;
-          case rhs_scheme_t::euler_b: 
+          case rhs_scheme_t::euler_b:
             break;
-          case rhs_scheme_t::trapez: 
+          case rhs_scheme_t::trapez:
             update_rhs(rhs, this->dt / 2, n+1);
             apply_rhs(this->dt / 2);
             break;
-          case rhs_scheme_t::mixed: 
+          case rhs_scheme_t::mixed:
             hook_mixed_rhs_post_step();
             break;
           default:
             assert(false);
         }
-      } 
+      }
 
       static void alloc(
-        typename parent_t::mem_t *mem, 
+        typename parent_t::mem_t *mem,
         const int &n_iters
       ) {
         // TODO: optimise to skip allocs for equations with no rhs

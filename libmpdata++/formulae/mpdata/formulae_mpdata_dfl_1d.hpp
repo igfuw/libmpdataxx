@@ -9,10 +9,10 @@
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 
 namespace libmpdataxx
-{ 
-  namespace formulae 
-  { 
-    namespace mpdata 
+{
+  namespace formulae
+  {
+    namespace mpdata
     {
 
       //divergent flow correction see eq. (30) from @copybrief Smolarkiewicz_and_Margolin_1998)
@@ -22,10 +22,10 @@ namespace libmpdataxx
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const ix_t &i,
-        typename std::enable_if<!opts::isset(opts, opts::dfl)>::type* = 0 
+        typename std::enable_if<!opts::isset(opts, opts::dfl)>::type* = 0
       )
-      { 
-        return 0;  
+      {
+        return 0;
       }
 
       template<opts_t opts, class arr_1d_t, class ix_t>
@@ -34,14 +34,14 @@ namespace libmpdataxx
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const ix_t &i,
-        typename std::enable_if<opts::isset(opts, opts::dfl) && !opts::isset(opts, opts::iga)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::dfl) && !opts::isset(opts, opts::iga)>::type* = 0
       )
       {
         return return_helper<ix_t>(
-          - fconst<arr_1d_t>(0.5) * GC(i+h) 
-          / 
-          (formulae::G<opts>(G, i+1) + formulae::G<opts>(G, i)) 
-          * 
+          - fconst<arr_1d_t>(0.5) * GC(i+h)
+          /
+          (formulae::G<opts>(G, i+1) + formulae::G<opts>(G, i))
+          *
           (GC((i+1)+h) - GC(i-h))
         );
       }
@@ -52,14 +52,14 @@ namespace libmpdataxx
         const arr_1d_t &GC,
         const arr_1d_t &G,
         const ix_t &i,
-        typename std::enable_if<opts::isset(opts, opts::dfl) && opts::isset(opts, opts::iga)>::type* = 0 
+        typename std::enable_if<opts::isset(opts, opts::dfl) && opts::isset(opts, opts::iga)>::type* = 0
       )
       {
         return return_helper<ix_t>(
-          - fconst<arr_1d_t>(0.5) * GC(i+h) 
-          / 
-          (formulae::G<opts>(G, i+1) + formulae::G<opts>(G, i)) 
-          * 
+          - fconst<arr_1d_t>(0.5) * GC(i+h)
+          /
+          (formulae::G<opts>(G, i+1) + formulae::G<opts>(G, i))
+          *
           (GC((i+1)+h) - GC(i-h))
           *
           fconst<arr_1d_t>(0.5) *  (psi(i+1) + psi(i)) //to be compatible with iga formulation

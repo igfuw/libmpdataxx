@@ -1,4 +1,4 @@
-/** 
+/**
   * @file
   * @copyright University of Warsaw
   * @section LICENSE
@@ -20,7 +20,7 @@ namespace libmpdataxx
         using parent_t = detail::mpdata_rhs_vip_prs_sgs_common<ct_params_t, minhalo>;
 
         protected:
-        
+
         typename ct_params_t::real_t eta;
 
         void multiply_sgs_visc() final
@@ -58,7 +58,7 @@ namespace libmpdataxx
         {
           if (eta == 0) throw std::runtime_error("eta == 0");
         }
-      }; 
+      };
     } // namespace detail
   } // namespace solvers
 } // namespace libmpdataxx

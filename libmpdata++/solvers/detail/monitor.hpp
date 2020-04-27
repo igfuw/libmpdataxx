@@ -30,7 +30,7 @@ namespace libmpdataxx
         // ... 10 11 12 13 14 15
         sprintf(
           &name[std::min(len, 10)], // taking care of short thread-names
-          " %3d%%", 
+          " %3d%%",
           int(frac * 100)
         );
 #if defined(__linux__)

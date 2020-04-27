@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -29,14 +29,14 @@ namespace libmpdataxx
         virtual void calc_full_tht(typename parent_t::arr_t&) = 0;
 
         public:
-        struct rt_params_t : parent_t::rt_params_t 
-        { 
+        struct rt_params_t : parent_t::rt_params_t
+        {
           real_t g = 9.81, Tht_ref = 0, hflux_const = 0;
         };
 
         // ctor
-        boussinesq_common( 
-          typename parent_t::ctor_args_t args, 
+        boussinesq_common(
+          typename parent_t::ctor_args_t args,
           const rt_params_t &p
         ) :
           parent_t(args, p),

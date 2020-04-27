@@ -1,4 +1,4 @@
-/** 
+/**
   * @file
   * @copyright University of Warsaw
   * @section LICENSE
@@ -24,7 +24,7 @@ namespace libmpdataxx
         using real_t = typename ct_params_t::real_t;
 
         protected:
-        
+
         real_t smg_c, c_m;
         typename parent_t::arr_t &k_m;
 
@@ -77,13 +77,13 @@ namespace libmpdataxx
         }
 
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // k_m
         }
-      }; 
+      };
     } // namespace detail
   } // namespace solvers
 } // namespace libmpdataxx

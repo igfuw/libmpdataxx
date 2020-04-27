@@ -10,15 +10,15 @@
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 
-namespace libmpdataxx 
-{ 
-  namespace formulae 
-  { 
-    namespace mpdata 
+namespace libmpdataxx
+{
+  namespace formulae
+  {
+    namespace mpdata
     {
       // interpolation of G to (i+1/2) - general case
       template<opts_t opts, class arr_1d_t, class ix_t>
-      inline auto G_bar_x( 
+      inline auto G_bar_x(
         const arr_1d_t &G,
         const ix_t &i,
         typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0
@@ -37,10 +37,10 @@ namespace libmpdataxx
         const arr_1d_t &G,
         const ix_t &i,
         typename std::enable_if<!opts::isset(opts, opts::nug)>::type* = 0
-      ) 
+      )
       {
         return 1;
       }
     } // namespace mpdata
   } // namespace formulae
-} // namespace libmpdataxx 
+} // namespace libmpdataxx

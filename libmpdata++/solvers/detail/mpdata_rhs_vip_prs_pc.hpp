@@ -1,10 +1,10 @@
-/** 
+/**
   * @file
   * @copyright University of Warsaw
   * @section LICENSE
   * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
   *
-  * @brief preconditioned conjugate residual pressure solver 
+  * @brief preconditioned conjugate residual pressure solver
   *   (for more detailed discussion consult Smolarkiewicz & Szmelter 2011
   *    A Nonhydrostatic Unstructured-Mesh Soundproof Model for Simulation of Internal Gravity Waves
   *    Acta Geophysica)
@@ -24,7 +24,7 @@ namespace libmpdataxx
       class mpdata_rhs_vip_prs_pc : public detail::mpdata_rhs_vip_prs_common<ct_params_t, minhalo>
       {
         public:
-        
+
         using real_t = typename ct_params_t::real_t;
 
         private:
@@ -42,10 +42,10 @@ namespace libmpdataxx
           //initail q_err for preconditioner
           q_err(this->ijk) = real_t(0);
 
-          //initail preconditioner error   
+          //initail preconditioner error
           this->pcnd_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk, false, simple) - this->err(this->ijk);
             //TODO does it change with non_const density?
-          
+
           assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
           for (int it=0; it<=pc_iters; it++)
           {
@@ -65,12 +65,12 @@ namespace libmpdataxx
         {
           tmp_den = this->prs_sum(lap_p_err, lap_p_err, this->ijk);
           if (tmp_den != 0) beta = -this->prs_sum(this->err, lap_p_err, this->ijk) / tmp_den;
- 
+
           this->Phi(this->ijk) += beta * p_err(this->ijk);
           this->err(this->ijk) += beta * lap_p_err(this->ijk);
 
           real_t error = std::max(
-            std::abs(this->mem->max(this->rank, this->err(this->ijk))), 
+            std::abs(this->mem->max(this->rank, this->err(this->ijk))),
             std::abs(this->mem->min(this->rank, this->err(this->ijk)))
           );
 
@@ -83,8 +83,8 @@ namespace libmpdataxx
           if (tmp_den != 0) alpha = -this->prs_sum(lap_q_err, lap_p_err, this->ijk) / tmp_den;
 
           p_err(this->ijk) *= alpha;
-          p_err(this->ijk) += q_err(this->ijk);  
- 
+          p_err(this->ijk) += q_err(this->ijk);
+
           lap_p_err(this->ijk) *= alpha;
           lap_p_err(this->ijk) += lap_q_err(this->ijk);
         }
@@ -111,13 +111,13 @@ namespace libmpdataxx
         {}
 
         static void alloc(
-          typename parent_t::mem_t *mem, 
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
           parent_t::alloc_tmp_sclr(mem, __FILE__, 5);
         }
-      }; 
+      };
     } // namespcae detail
   } // namespace solvers
 } // namespace libmpdataxx

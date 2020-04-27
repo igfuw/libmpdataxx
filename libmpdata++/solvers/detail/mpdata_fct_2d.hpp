@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -18,20 +18,20 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <typename ct_params_t, int minhalo> 
+      template <typename ct_params_t, int minhalo>
       class mpdata_fct<
-        ct_params_t, 
+        ct_params_t,
         minhalo,
         typename std::enable_if<ct_params_t::n_dims == 2>::type
-      > : public detail::mpdata_fct_common<ct_params_t, minhalo> 
+      > : public detail::mpdata_fct_common<ct_params_t, minhalo>
       {
-        using parent_t = detail::mpdata_fct_common<ct_params_t, minhalo>; 
+        using parent_t = detail::mpdata_fct_common<ct_params_t, minhalo>;
         using parent_t::parent_t; // inheriting ctors
 
         void fct_init(int e)
         {
           const auto i1 = this->i^1, j1 = this->j^1; // not optimal - with multiple threads some indices are repeated among threads
-          const auto psi = this->mem->psi[e][this->n[e]]; 
+          const auto psi = this->mem->psi[e][this->n[e]];
 
           this->psi_min(i1,j1) = min(min(min(min(
                            psi(i1,j1+1),
@@ -40,9 +40,9 @@ namespace libmpdataxx
           );
           this->psi_max(i1,j1) = max(max(max(max(
                            psi(i1,j1+1),
-            psi(i1-1,j1)), psi(i1,j1  )), psi(i1+1,j1)), 
+            psi(i1-1,j1)), psi(i1,j1  )), psi(i1+1,j1)),
                            psi(i1,j1-1)
-          ); 
+          );
         }
 
         void fct_adjust_antidiff(int e, int iter)
@@ -50,8 +50,8 @@ namespace libmpdataxx
           const auto psi = this->mem->psi[e][this->n[e]];
           auto &GC_corr = parent_t::GC_corr(iter);
           const auto &G = *this->mem->G;
-          const auto i1 = this->i^1, j1 = this->j^1; 
-          const auto im1 = this->im^1, jm1 = this->jm^1; 
+          const auto i1 = this->i^1, j1 = this->j^1;
+          const auto im1 = this->im^1, jm1 = this->jm^1;
           const auto &im(this->im), &jm(this->jm); // calculating once for (i/j)-1/2 and (i/j)+1/2
 
           // fill halos of GC_corr -> mpdata works with halo=1, we need halo=2

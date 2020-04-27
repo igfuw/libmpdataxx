@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -18,14 +18,14 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      template <typename ct_params_t, int minhalo> 
+      template <typename ct_params_t, int minhalo>
       class mpdata_fct<
-        ct_params_t, 
+        ct_params_t,
         minhalo,
         typename std::enable_if<ct_params_t::n_dims == 1>::type
-      > : public detail::mpdata_fct_common<ct_params_t, minhalo> 
+      > : public detail::mpdata_fct_common<ct_params_t, minhalo>
       {
-        using parent_t = detail::mpdata_fct_common<ct_params_t, minhalo>; 
+        using parent_t = detail::mpdata_fct_common<ct_params_t, minhalo>;
         using parent_t::parent_t; // inheriting constructors
 
         void fct_init(int e)
@@ -33,11 +33,11 @@ namespace libmpdataxx
           const auto i1 = this->i^1; // TODO: isn't it a race condition with more than one thread?
           const auto psi = this->mem->psi[e][this->n[e]];
 
-          /// \f$ \psi^{max}_{i}=max_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n  
-          /// \f$ \psi^{min}_{i}=min_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n    
+          /// \f$ \psi^{max}_{i}=max_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n
+          /// \f$ \psi^{min}_{i}=min_{I}(\psi^{n}_{i-1},\psi^{n}_{i},\psi^{n}_{i+1},\psi^{*}_{i-1},\psi^{*}_{i},\psi^{*}_{i+1}) \f$ \n
           /// eq.(20a, 20b) in Smolarkiewicz & Grabowski 1990 (J.Comp.Phys.,86,355-375)
           this->psi_min(i1) = min(min(psi(i1-1), psi(i1)), psi(i1+1));
-          this->psi_max(i1) = max(max(psi(i1-1), psi(i1)), psi(i1+1)); 
+          this->psi_max(i1) = max(max(psi(i1-1), psi(i1)), psi(i1+1));
         }
 
         void fct_adjust_antidiff(int e, int iter)
@@ -47,8 +47,8 @@ namespace libmpdataxx
           auto &GC_corr = parent_t::GC_corr(iter);
           const auto &G = *this->mem->G;
           const auto &im = this->im; // calculating once for i-1/2 and i+1/2
-          const auto i1 = this->i^1; 
-          const auto im1 = this->im^1; 
+          const auto i1 = this->i^1;
+          const auto im1 = this->im^1;
 
           // fill halos in GC_corr
           this->xchng_vctr_alng(GC_corr, true);
@@ -72,7 +72,7 @@ namespace libmpdataxx
           // calculating betas
           formulae::mpdata::beta_up<ct_params_t::opts>(this->beta_up, psi, this->psi_max, flx, G, i1);
           formulae::mpdata::beta_dn<ct_params_t::opts>(this->beta_dn, psi, this->psi_min, flx, G, i1);
-          
+
           // assuring flx, psi_min and psi_max are not overwritten
           this->beta_barrier(iter);
 

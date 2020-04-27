@@ -14,11 +14,11 @@
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 
-namespace libmpdataxx 
-{ 
-  namespace formulae 
-  { 
-    namespace mpdata 
+namespace libmpdataxx
+{
+  namespace formulae
+  {
+    namespace mpdata
     {
       // interpolation of G to (i+1/2, j, k) - general case
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
@@ -40,7 +40,7 @@ namespace libmpdataxx
 
       // interpolation of G to (i+1/2, j, k) - constant G version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
-      inline auto G_bar_x( 
+      inline auto G_bar_x(
         const arr_3d_t &G,
         const ix_t &i,
         const ix_t &j,
@@ -50,7 +50,7 @@ namespace libmpdataxx
       {
           return 1;
       }
-      
+
       // interpolation of G to (i+1/2, j+1/2, k) - general case
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
       inline auto G_bar_xy(
@@ -70,7 +70,7 @@ namespace libmpdataxx
           ) / 4
         );
       }
-      
+
       // interpolation of G to (i+1/2, j+1/2, k) - constant G version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
       inline auto G_bar_xy(
@@ -83,7 +83,7 @@ namespace libmpdataxx
       {
         return 1;
       }
-      
+
       // interpolation of G to (i+1/2, j, k+1/2) - general case
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
       inline auto G_bar_xz(
@@ -103,7 +103,7 @@ namespace libmpdataxx
           ) / 4
         );
       }
-      
+
       // interpolation of G to (i+1/2, j, k+1/2) - constant G version
       template<opts_t opts, int dim, class arr_3d_t, class ix_t>
       inline auto G_bar_xz(
@@ -117,4 +117,4 @@ namespace libmpdataxx
       }
     } // namespace mpdata
   } // namespace formulae
-} // namespace libmpdataxx 
+} // namespace libmpdataxx

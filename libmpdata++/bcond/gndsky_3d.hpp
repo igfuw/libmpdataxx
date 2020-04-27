@@ -13,14 +13,14 @@ namespace libmpdataxx
   {
     // ground
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
-    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,  
+    class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,
       typename std::enable_if<
         knd == gndsky &&
         dir == left &&
         n_dims == 3
       >::type
     > : public bcond<real_t, halo, rigid, dir, n_dims, d>
-    { 
+    {
       using parent_t = bcond<real_t, halo, rigid, dir, n_dims, d>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
@@ -42,14 +42,14 @@ namespace libmpdataxx
         const auto &a = av[offset + d];
         a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * b(pi<d>(this->left_edge_sclr, j, k)) - a(pi<d>(this->left_edge_sclr + h, j, k));
       }
-      
+
       void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &u, const arr_t &div, const rng_t &j, const rng_t &k, const real_t di)
       {
         using namespace idxperm;
         const auto &a = av[d];
         a(pi<d>(this->left_edge_sclr - h, j, k)) = 2 * ( ( 3 * u(pi<d>(this->left_edge_sclr + 1, j, k))
-                                                         - 2 * u(pi<d>(this->left_edge_sclr, j, k)) 
-                                                         -     u(pi<d>(this->left_edge_sclr + 2, j, k)) 
+                                                         - 2 * u(pi<d>(this->left_edge_sclr, j, k))
+                                                         -     u(pi<d>(this->left_edge_sclr + 2, j, k))
                                                          ) / di
                                                        - div(pi<d>(this->left_edge_sclr - h, j, k))
                                                        );

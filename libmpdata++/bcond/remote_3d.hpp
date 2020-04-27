@@ -11,11 +11,11 @@ namespace libmpdataxx
 {
   namespace bcond
   {
-    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>    
+    template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
     class bcond<       real_t,     halo,         knd,         dir,     n_dims,     d,
       typename std::enable_if<
-        knd == remote && 
-        dir == left   && 
+        knd == remote &&
+        dir == left   &&
         n_dims == 3
       >::type
     > : public detail::remote_common<real_t, halo, dir, n_dims>
@@ -39,9 +39,9 @@ namespace libmpdataxx
       {
         fill_halos_sclr(a, j, k);
       }
-      
+
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
-      
+
       void set_edge_pres(arr_t &, const rng_t &, const rng_t &, int) {}
 
 
@@ -59,12 +59,12 @@ namespace libmpdataxx
         else
           this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
       }
-      
+
       void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
       {
         fill_halos_sclr(a, j, k);
       }
-      
+
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {
         using namespace idxperm;
@@ -80,18 +80,18 @@ namespace libmpdataxx
         else
           this->xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
       }
-      
+
       void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
       {
         fill_halos_vctr_alng(av, j, k);
       }
 
       // TODO: move to common? (same in cyclic!)
-      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)                 
-      {                                                                         
-        fill_halos_sclr(a, j, k);                                                  
-      }  
-      
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
+      }
+
       void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
         fill_halos_vctr_alng(av, j, k, ad);
@@ -131,9 +131,9 @@ namespace libmpdataxx
       {
         fill_halos_sclr(a, j, k);
       }
-      
+
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
-      
+
       void set_edge_pres(arr_t &, const rng_t &, const rng_t &, int) {}
 
 
@@ -143,19 +143,19 @@ namespace libmpdataxx
         if(!this->is_cyclic)
         {
           if(halo == 1)
-            this->recv(av[0], pi<d>(this->rght_halo_vctr, j, k)); 
+            this->recv(av[0], pi<d>(this->rght_halo_vctr, j, k));
           else
             this->xchng(av[0], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
         }
         else
           this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
       }
-      
+
       void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
       {
         fill_halos_sclr(a, j, k);
       }
-      
+
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {
         using namespace idxperm;
@@ -170,18 +170,18 @@ namespace libmpdataxx
         else
           this->xchng(av[0 + offset], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
       }
-      
+
       void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
       {
         fill_halos_vctr_alng(av, j, k);
       }
 
       // TODO: move to common? (same in cyclic!)
-      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)                 
-      {                                                                         
-        fill_halos_sclr(a, j, k);                                                  
+      void fill_halos_vctr_nrml(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sclr(a, j, k);
       }
-       
+
       void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
         fill_halos_vctr_alng(av, j, k, ad);

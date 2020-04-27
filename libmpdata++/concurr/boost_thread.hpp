@@ -29,14 +29,14 @@ namespace libmpdataxx
     class boost_thread : public detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
     {
       using parent_t = detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
- 
-      class mem_t : public parent_t::mem_t 
+
+      class mem_t : public parent_t::mem_t
       {
         boost::barrier b;
 
         public:
 
-        static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max()) 
+        static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max())
         {
           const char *env_var("OMP_NUM_THREADS");
 
@@ -53,8 +53,8 @@ namespace libmpdataxx
         // ctor
         mem_t(const std::array<int, solver_t::n_dims> &grid_size) :
           b(size(grid_size[0])),
-          parent_t::mem_t(grid_size, size(grid_size[0])) 
-        {}; 
+          parent_t::mem_t(grid_size, size(grid_size[0]))
+        {};
 
         void barrier()
         {
@@ -68,8 +68,8 @@ namespace libmpdataxx
       void solve(typename parent_t::advance_arg_t nt)
       {
         boost::thread_group threads;
-        for (int i = 0; i < this->algos.size(); ++i) 
-        {  
+        for (int i = 0; i < this->algos.size(); ++i)
+        {
           std::unique_ptr<boost::thread> thp;
           thp.reset(new boost::thread(
             &solver_t::solve, boost::ref(this->algos[i]), nt
@@ -80,7 +80,7 @@ namespace libmpdataxx
       }
 
       // ctor
-      boost_thread(const typename solver_t::rt_params_t &p) : 
+      boost_thread(const typename solver_t::rt_params_t &p) :
         parent_t(p, new mem_t(p.grid_size), mem_t::size(p.grid_size[0]))
       {}
 

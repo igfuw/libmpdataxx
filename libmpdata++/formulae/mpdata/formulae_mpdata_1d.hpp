@@ -12,59 +12,59 @@
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_fdiv_1d.hpp>
 
 namespace libmpdataxx
-{ 
-  namespace formulae 
-  { 
-    namespace mpdata 
+{
+  namespace formulae
+  {
+    namespace mpdata
     {
       // first come helpers for divergence form of antidiffusive velocity
       template <opts_t opts, class arr_1d_t, class ix_t>
       forceinline_macro auto div_2nd(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
-        const arr_1d_t &G, 
+        const arr_1d_t &G,
         const ix_t &i
       )
       {
         return return_helper<ix_t>(
           abs(GC[0](i+h)) / 2
-          * ndx_psi<opts>(psi, i) 
-          - 
+          * ndx_psi<opts>(psi, i)
+          -
           GC[0](i+h) / 2
           * nfdiv<opts>(psi, GC, G, i)
-        );
-      }
-      
-      template <opts_t opts, class arr_1d_t, class ix_t>
-      forceinline_macro auto div_3rd_upwind(
-        const arr_1d_t &psi, 
-        const arrvec_t<arr_1d_t> &GC,
-        const arr_1d_t &G, 
-        const ix_t &i, 
-        typename std::enable_if<!opts::isset(opts, opts::iga)>::type* = 0
-      )
-      {
-        return return_helper<ix_t>(
-          abs(div_2nd<opts>(psi, GC, G, i)) / 2
-          * ndx_psi<opts>(psi, i) 
         );
       }
 
       template <opts_t opts, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd_upwind(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
-        const arr_1d_t &G, 
-        const ix_t &i, 
+        const arr_1d_t &G,
+        const ix_t &i,
+        typename std::enable_if<!opts::isset(opts, opts::iga)>::type* = 0
+      )
+      {
+        return return_helper<ix_t>(
+          abs(div_2nd<opts>(psi, GC, G, i)) / 2
+          * ndx_psi<opts>(psi, i)
+        );
+      }
+
+      template <opts_t opts, class arr_1d_t, class ix_t>
+      forceinline_macro auto div_3rd_upwind(
+        const arr_1d_t &psi,
+        const arrvec_t<arr_1d_t> &GC,
+        const arr_1d_t &G,
+        const ix_t &i,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       )
       {
         return 0;
       }
-      
+
       template <opts_t opts, solvers::tmprl_extrp_t tmprl_extrp, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd_temporal(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &ndtt_GC,
         const ix_t &i,
         typename std::enable_if<tmprl_extrp == solvers::noextrp>::type* = 0
@@ -72,10 +72,10 @@ namespace libmpdataxx
       {
         return ndtt_GC0<opts>(psi, ndtt_GC[0], i);
       }
-      
+
       template <opts_t opts, solvers::tmprl_extrp_t tmprl_extrp, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd_temporal(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &ndtt_GC,
         const ix_t &i,
         typename std::enable_if<tmprl_extrp == solvers::linear2>::type* = 0
@@ -83,10 +83,10 @@ namespace libmpdataxx
       {
         return 10 * ndtt_GC0<opts>(psi, ndtt_GC[0], i);
       }
-      
+
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd_spatial_helper(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
         const ix_t &i,
         typename std::enable_if<sptl_intrp == solvers::exact>::type* = 0
@@ -96,10 +96,10 @@ namespace libmpdataxx
           ndxx_GC0<opts>(psi, GC[0], i)
         );
       }
-      
+
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd_spatial_helper(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
         const ix_t &i,
         typename std::enable_if<sptl_intrp == solvers::aver2>::type* = 0
@@ -109,10 +109,10 @@ namespace libmpdataxx
           4 * ndxx_GC0<opts>(psi, GC[0], i)
         );
       }
-      
+
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd_spatial_helper(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
         const ix_t &i,
         typename std::enable_if<sptl_intrp == solvers::aver4>::type* = 0
@@ -120,12 +120,12 @@ namespace libmpdataxx
       {
         return 0;
       }
-      
+
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd_spatial(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
-        const arr_1d_t &G, 
+        const arr_1d_t &G,
         const ix_t &i
       )
       {
@@ -138,31 +138,31 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       template <opts_t opts, solvers::sptl_intrp_t, solvers::tmprl_extrp_t, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC,
         const arrvec_t<arr_1d_t> &ndtt_GC,
-        const arr_1d_t &G, 
-        const ix_t &i, 
+        const arr_1d_t &G,
+        const ix_t &i,
         typename std::enable_if<!opts::isset(opts, opts::div_3rd)>::type* = 0
       )
       {
         return 0;
       }
-      
+
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, solvers::tmprl_extrp_t tmprl_extrp, class arr_1d_t, class ix_t>
       forceinline_macro auto div_3rd(
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC,
         const arrvec_t<arr_1d_t> &ndtt_GC,
-        const arr_1d_t &G, 
+        const arr_1d_t &G,
         const ix_t &i,
         typename std::enable_if<opts::isset(opts, opts::div_3rd)>::type* = 0
-      ) 
+      )
       {
         return return_helper<ix_t>(
           // upwind differencing correction
@@ -181,12 +181,12 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // antidiffusive velocity - standard version
       template <opts_t opts, solvers::sptl_intrp_t, solvers::tmprl_extrp_t, class arr_1d_t>
       inline void antidiff( // antidiffusive velocity
-        arr_1d_t &res, 
-        const arr_1d_t &psi, 
+        arr_1d_t &res,
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC, // to have consistent interface with the div_3rd version
         const arrvec_t<arr_1d_t> &ndtt_GC, // ditto
@@ -197,11 +197,11 @@ namespace libmpdataxx
       {
         for (int i = ir.first(); i <= ir.last(); ++i)
         {
-          res(i) = 
+          res(i) =
           // second-order terms
           abs(GC[0](i+h)) / 2
           * (1 - abs(GC[0](i+h)) / G_bar_x<opts>(G, i))
-          * ndx_psi<opts>(psi, i) 
+          * ndx_psi<opts>(psi, i)
           // third-order terms
           + TOT<opts>(psi, GC[0], G, i) //higher order term
           // divergent flow terms
@@ -213,12 +213,12 @@ namespace libmpdataxx
       template <opts_t opts, solvers::sptl_intrp_t sptl_intrp, solvers::tmprl_extrp_t tmprl_extrp, class arr_1d_t>
       inline void antidiff(
         arr_1d_t &res,
-        const arr_1d_t &psi, 
+        const arr_1d_t &psi,
         const arrvec_t<arr_1d_t> &GC,
         const arrvec_t<arr_1d_t> &ndt_GC,
         const arrvec_t<arr_1d_t> &ndtt_GC,
-        const arr_1d_t &G, 
-        const rng_t &ir, 
+        const arr_1d_t &G,
+        const rng_t &ir,
         typename std::enable_if<opts::isset(opts, opts::div_2nd)>::type* = 0
       )
       {
@@ -227,11 +227,11 @@ namespace libmpdataxx
 
         for (int i = ir.first(); i <= ir.last(); ++i)
         {
-          res(i + h) = 
+          res(i + h) =
           div_2nd<opts>(psi, GC, G, i) +
           div_3rd<opts, sptl_intrp, tmprl_extrp>(psi, GC, ndt_GC, ndtt_GC, G, i);
         }
-      } 
+      }
 
     } // namespace mpdata
   } // namespace formulae
