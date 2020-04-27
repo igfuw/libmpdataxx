@@ -67,7 +67,7 @@ namespace libmpdataxx
 
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const int offset = 0)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
         if(!this->is_cyclic) 
         {
@@ -162,7 +162,7 @@ namespace libmpdataxx
 
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const int offset = 0)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
         if(!this->is_cyclic)
         {

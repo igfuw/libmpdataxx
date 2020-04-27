@@ -43,27 +43,27 @@ namespace libmpdataxx
 
         // some common 1D/2D settings
         *gp 
-	   << (p.gnuplot_grid ? "" : "un") << "set grid\n"
-	   << "set border " << p.gnuplot_border << "\n"
-	   << "set palette " << p.gnuplot_palette << "\n"
-	   << "set view " << p.gnuplot_view << "\n"
-	   << "set zrange " << p.gnuplot_zrange << "\n"
-	   << "set xlabel '" << p.gnuplot_xlabel << "'\n"
-	   << "set ylabel '" << p.gnuplot_ylabel << "'\n"
-	   << "set term " << p.gnuplot_term << "\n"
-	   << "set size " << p.gnuplot_size << "\n"
+           << (p.gnuplot_grid ? "" : "un") << "set grid\n"
+           << "set border " << p.gnuplot_border << "\n"
+           << "set palette " << p.gnuplot_palette << "\n"
+           << "set view " << p.gnuplot_view << "\n"
+           << "set zrange " << p.gnuplot_zrange << "\n"
+           << "set xlabel '" << p.gnuplot_xlabel << "'\n"
+           << "set ylabel '" << p.gnuplot_ylabel << "'\n"
+           << "set term " << p.gnuplot_term << "\n"
+           << "set size " << p.gnuplot_size << "\n"
            << "set cbtics " << p.gnuplot_cbtics << "\n"
-	   << "set termoption font \"," << p.gnuplot_fontsize << "\"\n"
+           << "set termoption font \"," << p.gnuplot_fontsize << "\"\n"
            << "set termoption solid\n"
         ;
-	if (p.gnuplot_xrange == "[*:*]") 
-	   *gp << "set xrange [" 
+        if (p.gnuplot_xrange == "[*:*]") 
+           *gp << "set xrange [" 
                << this->mem->grid_size[0].first() 
                << ":" 
                << this->mem->grid_size[0].last()
                << "]\n";
-	else 
-	   *gp << "set xrange " << p.gnuplot_xrange << "\n";
+        else 
+           *gp << "set xrange " << p.gnuplot_xrange << "\n";
 
         // 1D settings
         if (parent_t::n_dims == 1) // known at compile time
@@ -71,10 +71,10 @@ namespace libmpdataxx
           if (p.gnuplot_command == "splot") 
           {
             *gp << "set yrange [0:" << nt << "]\n"
-	        << "set xtics out\n"
-	        << "set ytics out\n"
-	        << "set ztics out\n"
-	        << "set ticslevel " << p.gnuplot_ticslevel << "\n";
+                << "set xtics out\n"
+                << "set ytics out\n"
+                << "set ztics out\n"
+                << "set ticslevel " << p.gnuplot_ticslevel << "\n";
             if (p.gnuplot_xyplane_at != "") *gp << "set xyplane at " << p.gnuplot_xyplane_at << "\n";
             if (p.gnuplot_yrange != "[*:*]")
               throw std::runtime_error("gnupot_yrange was specified for a 1D splot where Y axis represents time");
@@ -89,20 +89,20 @@ namespace libmpdataxx
           else throw std::runtime_error("gnuplot_command must equal plot or splot");
           
           *gp 
-	     << "set output '" << p.gnuplot_output;
+             << "set output '" << p.gnuplot_output;
           if (this->mem->distmem.size() > 1) 
             *gp << "." << this->mem->distmem.rank();
           *gp <<"'\n";
           *gp 
-	     << "set title '" << p.gnuplot_title << "'\n"
+             << "set title '" << p.gnuplot_title << "'\n"
              << p.gnuplot_command << " 1/0 notitle" // for the comma below :)
           ;
 
           for (int t = 0; t <= nt; t+=p.outfreq)
           {
-	    for (const auto &v : this->outvars)
+            for (const auto &v : this->outvars)
             {
-	      *gp << ", '-'";
+              *gp << ", '-'";
               if (p.gnuplot_command == "splot") 
               {
                 *gp << " using (((int($0)+1)/2+(int($0)-1)/2)*.5";
@@ -135,12 +135,12 @@ namespace libmpdataxx
              *gp << "set yrange " << p.gnuplot_yrange << "\n";
 
           *gp 
-	     << "set cbrange " << p.gnuplot_cbrange << "\n"
-	     << "set xtics out\n"
-	     << "set ytics out\n"
-	     << (p.gnuplot_surface ? "set" : "unset") << " surface\n"
-	     << (p.gnuplot_contour ? "set" : "unset") << " contour\n"
-	  ;
+             << "set cbrange " << p.gnuplot_cbrange << "\n"
+             << "set xtics out\n"
+             << "set ytics out\n"
+             << (p.gnuplot_surface ? "set" : "unset") << " surface\n"
+             << (p.gnuplot_contour ? "set" : "unset") << " contour\n"
+          ;
 
           if (p.gnuplot_contour)
           {
@@ -171,7 +171,7 @@ namespace libmpdataxx
               tmp(2 * this->mem->grid_size[0].length());
             for (int i = 0; i < tmp.extent(0); ++i) 
               tmp(i) = this->mem->advectee(var)(this->mem->grid_size[0].first() + i/2);
-	    gp->send(tmp);
+            gp->send(tmp);
           }
           else gp->send(this->mem->advectee(var).reindex({0}));
         }
@@ -180,20 +180,20 @@ namespace libmpdataxx
         {
           {
             std::ostringstream tmp;
-	    tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep;
+            tmp << "set output '" << boost::format(p.gnuplot_output)  % this->outvars[var].name  % this->timestep;
             if (this->mem->distmem.size() > 1) 
               tmp << "." << this->mem->distmem.rank();
             tmp << "'\n";
-	    if (p.gnuplot_title == "notitle") 
+            if (p.gnuplot_title == "notitle") 
               tmp << "set title ''\n";
             else
-	      tmp << "set title '"<< this->outvars[var].name << "  (" // TODO: handle the option
+              tmp << "set title '"<< this->outvars[var].name << "  (" // TODO: handle the option
                   << "t/dt=" << std::setprecision(3) << this->timestep << ")'\n";
             *gp << tmp.str();
           }
-	  *gp << p.gnuplot_command;
+          *gp << p.gnuplot_command;
           {
-	    bool imagebg = (p.gnuplot_with == "lines");
+            bool imagebg = (p.gnuplot_with == "lines");
             typename parent_t::real_t ox, oy;
             // ox = oy = .5; // old: x = (i+.5) * dx
             // ox = oy = 0;  // new: x =   i    * dx
@@ -201,22 +201,22 @@ namespace libmpdataxx
             oy = 0; 
             auto data = this->mem->advectee(var).copy();
             data.reindexSelf({0,0});
-	    if (imagebg)
-	    {
-	      float zmin, zmax;
-	      int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
-	      if (count != 2) zmin = 0;
-	      *gp << " '-' binary " << binfmt(data)
-		  << " origin=(" << ox << "," << oy << "," << zmin << ")"     
-		  << " with image failsafe notitle,";
-	    }
-	    *gp << " '-'" 
-		<< " binary" << binfmt(data) 
-		<< " origin=(" << ox << "," << oy << ",0)" 
-		<< " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
+            if (imagebg)
+            {
+              float zmin, zmax;
+              int count = sscanf(p.gnuplot_zrange.c_str(), "[%g:%g]", &zmin, &zmax);
+              if (count != 2) zmin = 0;
+              *gp << " '-' binary " << binfmt(data)
+                  << " origin=(" << ox << "," << oy << "," << zmin << ")"     
+                  << " with image failsafe notitle,";
+            }
+            *gp << " '-'" 
+                << " binary" << binfmt(data) 
+                << " origin=(" << ox << "," << oy << ",0)" 
+                << " with " << p.gnuplot_with << " lt " << p.gnuplot_lt << " notitle\n";
             data = blitz::rint(data * pow(10, precision)) * pow(10, -precision);
-	    gp->sendBinary(data);
-	    if (imagebg) gp->sendBinary(data);
+            gp->sendBinary(data);
+            if (imagebg) gp->sendBinary(data);
           }
         }
       }
@@ -225,12 +225,12 @@ namespace libmpdataxx
 
       struct rt_params_t : parent_t::rt_params_t 
       { 
-	std::string 
+        std::string 
           gnuplot_output = std::string("out.svg"),
           gnuplot_with = ( 
             parent_t::n_dims == 2 
-	      ? std::string("image failsafe") // 2D
-	      : std::string("histeps")
+              ? std::string("image failsafe") // 2D
+              : std::string("histeps")
           ),
           gnuplot_command = std::string("splot"),
           gnuplot_xlabel = std::string("x/dx"),
@@ -270,8 +270,8 @@ namespace libmpdataxx
 
       // ctor
       gnuplot(
-	typename parent_t::ctor_args_t args,
-	const rt_params_t &p
+        typename parent_t::ctor_args_t args,
+        const rt_params_t &p
       ) : parent_t(args, p), p(p)
       {
         if (!this->outdir.empty()) 

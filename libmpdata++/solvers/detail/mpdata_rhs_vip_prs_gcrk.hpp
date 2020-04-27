@@ -24,22 +24,22 @@ namespace libmpdataxx
       {
         public:
 
-	using real_t = typename ct_params_t::real_t;
+        using real_t = typename ct_params_t::real_t;
 
         private:
 
-	using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
+        using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
         using ix = typename ct_params_t::ix;
 
-	real_t beta;
+        real_t beta;
         std::vector<real_t> alpha, tmp_den;
-	typename parent_t::arr_t lap_err;
-	arrvec_t<typename parent_t::arr_t> p_err, lap_p_err;
-	
+        typename parent_t::arr_t lap_err;
+        arrvec_t<typename parent_t::arr_t> p_err, lap_p_err;
+        
         void pressure_solver_loop_init(bool simple) final
         {
-	  p_err[0](this->ijk) = this->err(this->ijk);
-	  lap_p_err[0](this->ijk) = this->lap(p_err[0], this->ijk, this->dijk, false, simple);
+          p_err[0](this->ijk) = this->err(this->ijk);
+          lap_p_err[0](this->ijk) = this->lap(p_err[0], this->ijk, this->dijk, false, simple);
         }
 
         void pressure_solver_loop_body(bool simple) final
@@ -91,33 +91,33 @@ namespace libmpdataxx
           }
         }
 
-	public:
+        public:
 
-	struct rt_params_t : parent_t::rt_params_t { };
+        struct rt_params_t : parent_t::rt_params_t { };
 
-	// ctor
-	mpdata_rhs_vip_prs_gcrk(
-	  typename parent_t::ctor_args_t args,
-	  const rt_params_t &p
-	) :
-	  parent_t(args, p),
+        // ctor
+        mpdata_rhs_vip_prs_gcrk(
+          typename parent_t::ctor_args_t args,
+          const rt_params_t &p
+        ) :
+          parent_t(args, p),
           beta(.25),
           alpha(k_iters, 1.),
           tmp_den(k_iters, 1.),
-	  lap_err(args.mem->tmp[__FILE__][0][0]),
-	  lap_p_err(args.mem->tmp[__FILE__][1]),
-	      p_err(args.mem->tmp[__FILE__][2])
-	{}
+          lap_err(args.mem->tmp[__FILE__][0][0]),
+          lap_p_err(args.mem->tmp[__FILE__][1]),
+              p_err(args.mem->tmp[__FILE__][2])
+        {}
 
-	static void alloc(
+        static void alloc(
           typename parent_t::mem_t *mem, 
           const int &n_iters
         ) {
-	  parent_t::alloc(mem, n_iters);
-	  parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
-	  parent_t::alloc_tmp_sclr(mem, __FILE__, k_iters);
-	  parent_t::alloc_tmp_sclr(mem, __FILE__, k_iters);
-	}
+          parent_t::alloc(mem, n_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, k_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, k_iters);
+        }
       }; 
     } // namespace detail
   } // namespace solvers

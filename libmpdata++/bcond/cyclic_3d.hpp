@@ -28,8 +28,8 @@ namespace libmpdataxx
 
       void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
-	using namespace idxperm;
-	a(pi<d>(this->left_halo_sclr, j, k)) = a(pi<d>(this->rght_intr_sclr, j, k)); 
+        using namespace idxperm;
+        a(pi<d>(this->left_halo_sclr, j, k)) = a(pi<d>(this->rght_intr_sclr, j, k)); 
       }
 
       void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
@@ -43,7 +43,7 @@ namespace libmpdataxx
 
       void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         av[d](pi<d>(this->left_halo_vctr, j, k)) = av[d](pi<d>(this->rght_intr_vctr, j, k));
       }
       
@@ -54,7 +54,7 @@ namespace libmpdataxx
       
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
         av[d + offset](pi<d>(this->left_halo_vctr, j, k)) = av[d + offset](pi<d>(this->rght_intr_vctr, j, k));
       }
@@ -97,8 +97,8 @@ namespace libmpdataxx
 
       void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
-	using namespace idxperm;
-	a(pi<d>(this->rght_halo_sclr, j, k)) = a(pi<d>(this->left_intr_sclr, j, k));
+        using namespace idxperm;
+        a(pi<d>(this->rght_halo_sclr, j, k)) = a(pi<d>(this->left_intr_sclr, j, k));
       }
 
       void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
@@ -112,7 +112,7 @@ namespace libmpdataxx
       
       void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const rng_t &k, const bool ad = false)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         av[d](pi<d>(this->rght_halo_vctr, j, k)) = av[d](pi<d>(this->left_intr_vctr, j, k));
       }
       
@@ -123,7 +123,7 @@ namespace libmpdataxx
       
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         // the same logic as fill_halos_vctr_alng but have to consider offset ... TODO: find a way to reuse !
         av[d + offset](pi<d>(this->rght_halo_vctr, j, k)) = av[d + offset](pi<d>(this->left_intr_vctr, j, k));
       }

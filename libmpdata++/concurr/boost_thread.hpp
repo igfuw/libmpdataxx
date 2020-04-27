@@ -36,18 +36,18 @@ namespace libmpdataxx
 
         public:
 
-	static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max()) 
-	{
-	  const char *env_var("OMP_NUM_THREADS");
+        static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max()) 
+        {
+          const char *env_var("OMP_NUM_THREADS");
 
           int nthreads = std::min((std::getenv(env_var) != NULL) ?
                                     std::atoi(std::getenv(env_var)) // TODO: check if conversion OK?
-	                          : boost::thread::hardware_concurrency()
+                                  : boost::thread::hardware_concurrency()
                                   ,
                                   max_threads);
 
-	  return nthreads;
-	}
+          return nthreads;
+        }
 
 
         // ctor
@@ -56,11 +56,11 @@ namespace libmpdataxx
           parent_t::mem_t(grid_size, size(grid_size[0])) 
         {}; 
 
-	void barrier()
-	{
+        void barrier()
+        {
 // TODO: if (size() != 1) ???
-	  b.wait();
-	}
+          b.wait();
+        }
       };
 
       public:

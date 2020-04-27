@@ -26,21 +26,21 @@ namespace libmpdataxx
       // based on boost barrier's code
       class barrier
       {
-	std::mutex m_mutex;
-	std::condition_variable m_cond;
-	std::size_t m_generation, m_count;
+        std::mutex m_mutex;
+        std::condition_variable m_cond;
+        std::size_t m_generation, m_count;
         const std::size_t m_threshold;
 
-	public:
+        public:
 
-	explicit barrier(const std::size_t count) : 
+        explicit barrier(const std::size_t count) : 
           m_count(count), 
           m_threshold(count),
           m_generation(0) 
         { }
 
-	bool wait()
-	{
+        bool wait()
+        {
           std::unique_lock<std::mutex> lock(m_mutex);
           unsigned int gen = m_generation;
 
@@ -55,7 +55,7 @@ namespace libmpdataxx
           while (gen == m_generation)
             m_cond.wait(lock);
           return false;
-	}
+        }
       };
     };
 
@@ -78,18 +78,18 @@ namespace libmpdataxx
 
         public:
 
-	static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max()) 
-	{
-	  const char *env_var("OMP_NUM_THREADS");
+        static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max()) 
+        {
+          const char *env_var("OMP_NUM_THREADS");
 
           int nthreads = std::min((std::getenv(env_var) != NULL) ?
                                     std::atoi(std::getenv(env_var)) // TODO: check if conversion OK?
-	                          : std::thread::hardware_concurrency()
+                                  : std::thread::hardware_concurrency()
                                   ,
                                   max_threads);
 
-	  return nthreads;
-	}
+          return nthreads;
+        }
 
         // ctor
         mem_t(const std::array<int, solver_t::n_dims> &grid_size) :
@@ -97,10 +97,10 @@ namespace libmpdataxx
           parent_t::mem_t(grid_size, size(grid_size[0])) 
         {}; 
 
-	void barrier()
-	{
-	  b.wait();
-	}
+        void barrier()
+        {
+          b.wait();
+        }
       };
 
       public:

@@ -41,18 +41,18 @@ namespace libmpdataxx
 
         void stop()
         {
-	  tmr->stop();
+          tmr->stop();
         }
 
         void print()
         {
-	  boost::timer::cpu_times t = tmr->elapsed();
-	  std::ostringstream tmp;
-	  tmp << " wall time: " << double(t.wall) * 1e-9 << "s";
-	  tmp << " user time: " << double(t.user) * 1e-9 << "s";
-	  tmp << " system time: " << double(t.system) * 1e-9 << "s";
-	  std::cerr << tmp.str() << std::endl;
-	}
+          boost::timer::cpu_times t = tmr->elapsed();
+          std::ostringstream tmp;
+          tmp << " wall time: " << double(t.wall) * 1e-9 << "s";
+          tmp << " user time: " << double(t.user) * 1e-9 << "s";
+          tmp << " system time: " << double(t.system) * 1e-9 << "s";
+          std::cerr << tmp.str() << std::endl;
+        }
       };
     } // namespace detail
   } // namespace solvers

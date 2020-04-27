@@ -25,23 +25,23 @@ namespace libmpdataxx
 
       template<typename ct_params_t, int minhalo>
       class mpdata_osc<
-	ct_params_t, 
-	minhalo,
-	typename std::enable_if<ct_params_t::n_dims == 2>::type
+        ct_params_t, 
+        minhalo,
+        typename std::enable_if<ct_params_t::n_dims == 2>::type
       > : public detail::mpdata_common<ct_params_t, minhalo>
       {
-	using parent_t = detail::mpdata_common<ct_params_t, minhalo>;
+        using parent_t = detail::mpdata_common<ct_params_t, minhalo>;
 
-	protected:
+        protected:
 
-	// member fields
-	const rng_t im, jm;
+        // member fields
+        const rng_t im, jm;
 
-	void hook_ante_loop(const typename parent_t::advance_arg_t nt)
-	{   
+        void hook_ante_loop(const typename parent_t::advance_arg_t nt)
+        {   
           //  note that it's not needed for upstream
-	  parent_t::hook_ante_loop(nt);
-	  if (opts::isset(ct_params_t::opts, opts::nug))
+          parent_t::hook_ante_loop(nt);
+          if (opts::isset(ct_params_t::opts, opts::nug))
             this->xchng_sclr(*this->mem->G, this->ijk, this->halo);
           
           // filling Y halos for GC_x, and X halos for GC_y
@@ -64,21 +64,21 @@ namespace libmpdataxx
             this->xchng_vctr_nrml(this->mem->ndt_GC, this->ijk, ex);
             this->xchng_vctr_nrml(this->mem->ndtt_GC, this->ijk, ex);
           }
-	} 
+        } 
 
-	// method invoked by the solver
-	void advop(int e)
-	{
-	  this->fct_init(e);
+        // method invoked by the solver
+        void advop(int e)
+        {
+          this->fct_init(e);
 
-	  for (int iter = 0; iter < this->n_iters; ++iter) 
-	  {
-	    if (iter != 0)
-	    {
-	      this->cycle(e);
+          for (int iter = 0; iter < this->n_iters; ++iter) 
+          {
+            if (iter != 0)
+            {
+              this->cycle(e);
               this->xchng(e);
 
-	      // calculating the antidiffusive C 
+              // calculating the antidiffusive C 
               formulae::mpdata::antidiff<ct_params_t::opts, 0,
                                          static_cast<sptl_intrp_t>(ct_params_t::sptl_intrp),
                                          static_cast<tmprl_extrp_t>(ct_params_t::tmprl_extrp)>(
@@ -112,8 +112,8 @@ namespace libmpdataxx
               if (opts::isset(ct_params_t::opts, opts::div_3rd_dt))
                 this->mem->barrier();
 
-	      // filling Y halos for GC_x, and X halos for GC_y
-	      // needed for calculation of antidiffusive velocities in the third and subsequent
+              // filling Y halos for GC_x, and X halos for GC_y
+              // needed for calculation of antidiffusive velocities in the third and subsequent
               // iterations, also needed for fct but it is done there independently hence
               // the following check
               if (!opts::isset(ct_params_t::opts, opts::fct) && iter != (this->n_iters - 1))
@@ -123,12 +123,12 @@ namespace libmpdataxx
                 if (opts::isset(ct_params_t::opts, opts::dfl)) this->xchng_vctr_alng(this->GC_corr(iter));
               }
 
-	      this->fct_adjust_antidiff(e, iter);
+              this->fct_adjust_antidiff(e, iter);
               assert(std::isfinite(sum(this->GC_corr(iter)[0](this->im+h, this->j))));
               assert(std::isfinite(sum(this->GC_corr(iter)[1](this->i, this->jm+h))));
 
-	      // TODO: shouldn't the above halo-filling be repeated here?
-	    }
+              // TODO: shouldn't the above halo-filling be repeated here?
+            }
 
             // calculation of fluxes
             if (!opts::isset(ct_params_t::opts, opts::iga) || iter == 0)
@@ -159,19 +159,19 @@ namespace libmpdataxx
             //assert(std::isfinite(sum(flx[0](i^h, j  ))));
             //assert(std::isfinite(sum(flx[1](i,   j^h))));
 
-	    // donor-cell call 
-	    // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
-	    formulae::donorcell::donorcell_sum<ct_params_t::opts>(
-	      this->mem->khn_tmp,
+            // donor-cell call 
+            // TODO: doing antidiff,upstream,antidiff,upstream (for each dimension separately) could help optimise memory consumption!
+            formulae::donorcell::donorcell_sum<ct_params_t::opts>(
+              this->mem->khn_tmp,
               this->ijk,
-	      this->mem->psi[e][this->n[e]+1](this->ijk), 
-	      this->mem->psi[e][this->n[e]  ](this->ijk), 
+              this->mem->psi[e][this->n[e]+1](this->ijk), 
+              this->mem->psi[e][this->n[e]  ](this->ijk), 
               flx[0](this->i+h, this->j  ),
               flx[0](this->i-h, this->j  ),
               flx[1](this->i,   this->j+h),
               flx[1](this->i,   this->j-h),
               formulae::G<ct_params_t::opts, 0>(*this->mem->G, this->i, this->j)
-	    ); 
+            ); 
 
             if (this->upwind_filter_freq > 0 && this->timestep % this->upwind_filter_freq == 0)
             {
@@ -179,8 +179,8 @@ namespace libmpdataxx
             }
             // sanity check for output // TODO: move to common
             //assert(std::isfinite(sum(this->mem->psi[e][this->n[e]+1](this->ijk))));
-	  }
-	}
+          }
+        }
 
         // performs advection of a given field using the donorcell scheme
         // and stores the result in the same field
@@ -222,17 +222,17 @@ namespace libmpdataxx
           assert(std::isfinite(sum(field(ijk))));
         }
 
-	public:
+        public:
 
-	// ctor
-	mpdata_osc(
-	  typename parent_t::ctor_args_t args,
-	  const typename parent_t::rt_params_t &p
-	) : 
-	  parent_t(args, p),
-	  im(args.i.first() - 1, args.i.last()),
-	  jm(args.j.first() - 1, args.j.last())
-	{ }
+        // ctor
+        mpdata_osc(
+          typename parent_t::ctor_args_t args,
+          const typename parent_t::rt_params_t &p
+        ) : 
+          parent_t(args, p),
+          im(args.i.first() - 1, args.i.last()),
+          jm(args.j.first() - 1, args.j.last())
+        { }
       };
     } // namespace detail
   } // namespace solvers

@@ -29,11 +29,11 @@ namespace libmpdataxx
 
         private:
 
-	using parent_t = mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
+        using parent_t = mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
         using ix = typename ct_params_t::ix;
 
-	real_t beta, tmp_den;
-	typename parent_t::arr_t lap_err;
+        real_t beta, tmp_den;
+        typename parent_t::arr_t lap_err;
 
         void pressure_solver_loop_init(bool simple) final {}
 
@@ -57,26 +57,26 @@ namespace libmpdataxx
 
         public:
 
-	struct rt_params_t : parent_t::rt_params_t { };
+        struct rt_params_t : parent_t::rt_params_t { };
 
-	// ctor
-	mpdata_rhs_vip_prs_mr(
-	  typename parent_t::ctor_args_t args,
-	  const rt_params_t &p
-	) :
-	  parent_t(args, p),
+        // ctor
+        mpdata_rhs_vip_prs_mr(
+          typename parent_t::ctor_args_t args,
+          const rt_params_t &p
+        ) :
+          parent_t(args, p),
           beta(.25),
           tmp_den(1.),
-	  lap_err(args.mem->tmp[__FILE__][0][0])
-	{}
+          lap_err(args.mem->tmp[__FILE__][0][0])
+        {}
 
-	static void alloc(
+        static void alloc(
           typename parent_t::mem_t *mem, 
           const int &n_iters
         ) {
-	  parent_t::alloc(mem, n_iters);
-	  parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
-	}
+          parent_t::alloc(mem, n_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
+        }
       }; 
     } // namespace detail
   } // namespace solvers

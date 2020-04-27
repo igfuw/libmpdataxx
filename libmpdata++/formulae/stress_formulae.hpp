@@ -142,20 +142,20 @@ namespace libmpdataxx
       // 2D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq(
-	const arrvec_t &tau,
+        const arrvec_t &tau,
         const ijk_t &ijk,
         typename std::enable_if<nd == 2>::type* = 0
       ) 
       { 
         return blitz::safeToReturn(
-	  pow2(tau[0](ijk)) / 2 + pow2(tau[1](ijk)) + pow2(tau[2](ijk)) / 2
+          pow2(tau[0](ijk)) / 2 + pow2(tau[1](ijk)) + pow2(tau[2](ijk)) / 2
         );
       }
       
       // 3D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq(
-	const arrvec_t &tau,
+        const arrvec_t &tau,
         const ijk_t &ijk,
         typename std::enable_if<nd == 3>::type* = 0
       ) 
@@ -366,7 +366,7 @@ namespace libmpdataxx
       // 2D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq_cmpct(
-	const arrvec_t &tau,
+        const arrvec_t &tau,
         const ijk_t &ijk,
         typename std::enable_if<nd == 2>::type* = 0
       ) 
@@ -393,7 +393,7 @@ namespace libmpdataxx
       // 3D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq_cmpct(
-	const arrvec_t &tau,
+        const arrvec_t &tau,
         const ijk_t &ijk,
         typename std::enable_if<nd == 3>::type* = 0
       )
@@ -591,17 +591,17 @@ namespace libmpdataxx
       // 2D version
       template <int nd, opts_t opts, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline auto flux_div_cmpct(
-	const arrvec_t &f,
-	const arr_t &rho,
-	const ijk_t &ijk,
-	const dijk_t dijk,
+        const arrvec_t &f,
+        const arr_t &rho,
+        const ijk_t &ijk,
+        const dijk_t dijk,
         typename std::enable_if<nd == 2>::type* = 0
       ) 
       {
         return blitz::safeToReturn(
-	  ( (f[0](ijk[0]+h, ijk[1]) - f[0](ijk[0]-h, ijk[1])) / dijk[0]
-	    +
-	    (f[1](ijk[0], ijk[1]+h) - f[1](ijk[0], ijk[1]-h)) / dijk[1]
+          ( (f[0](ijk[0]+h, ijk[1]) - f[0](ijk[0]-h, ijk[1])) / dijk[0]
+            +
+            (f[1](ijk[0], ijk[1]+h) - f[1](ijk[0], ijk[1]-h)) / dijk[1]
           ) / G<opts>(rho, ijk)
         );
       }
@@ -609,19 +609,19 @@ namespace libmpdataxx
       // 3D version
       template <int nd, opts_t opts, class arrvec_t, class arr_t, class ijk_t, class dijk_t>
       inline auto flux_div_cmpct(
-	const arrvec_t &f,
-	const arr_t &rho,
-	const ijk_t &ijk,
-	const dijk_t dijk,
+        const arrvec_t &f,
+        const arr_t &rho,
+        const ijk_t &ijk,
+        const dijk_t dijk,
         typename std::enable_if<nd == 3>::type* = 0
       ) 
       {
         return blitz::safeToReturn(
-	  ( (f[0](ijk[0]+h, ijk[1], ijk[2]) - f[0](ijk[0]-h, ijk[1], ijk[2])) / dijk[0]
-	    +
-	    (f[1](ijk[0], ijk[1]+h, ijk[2]) - f[1](ijk[0], ijk[1]-h, ijk[2])) / dijk[1]
-	    +
-	    (f[2](ijk[0], ijk[1], ijk[2]+h) - f[2](ijk[0], ijk[1], ijk[2]-h)) / dijk[2]
+          ( (f[0](ijk[0]+h, ijk[1], ijk[2]) - f[0](ijk[0]-h, ijk[1], ijk[2])) / dijk[0]
+            +
+            (f[1](ijk[0], ijk[1]+h, ijk[2]) - f[1](ijk[0], ijk[1]-h, ijk[2])) / dijk[1]
+            +
+            (f[2](ijk[0], ijk[1], ijk[2]+h) - f[2](ijk[0], ijk[1], ijk[2]-h)) / dijk[2]
           ) / G<opts>(rho, ijk)
         );
       }
@@ -724,13 +724,13 @@ namespace libmpdataxx
       // 2D version
       template <int d, class arg_t>
       inline auto pade_helper(
-	const arg_t &x,
-	const rng_t &i,
-	const rng_t &j
+        const arg_t &x,
+        const rng_t &i,
+        const rng_t &j
       ) 
       {
         return blitz::safeToReturn(
-	  x(idxperm::pi<d>(i + 1, j)) + 2 * x(idxperm::pi<d>(i, j)) + x(idxperm::pi<d>(i - 1, j))
+          x(idxperm::pi<d>(i + 1, j)) + 2 * x(idxperm::pi<d>(i, j)) + x(idxperm::pi<d>(i - 1, j))
         );
       }
 
@@ -756,14 +756,14 @@ namespace libmpdataxx
       // 3D version
       template <int d, class arg_t>
       inline auto pade_helper(
-	const arg_t &x,
-	const rng_t &i,
-	const rng_t &j,
-	const rng_t &k
+        const arg_t &x,
+        const rng_t &i,
+        const rng_t &j,
+        const rng_t &k
       ) 
       {
         return blitz::safeToReturn(
-	  x(idxperm::pi<d>(i+1, j, k)) + 2 * x(idxperm::pi<d>(i, j, k)) + x(idxperm::pi<d>(i - 1, j, k))
+          x(idxperm::pi<d>(i+1, j, k)) + 2 * x(idxperm::pi<d>(i, j, k)) + x(idxperm::pi<d>(i - 1, j, k))
         );
       }
 

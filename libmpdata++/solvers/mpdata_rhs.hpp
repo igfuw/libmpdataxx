@@ -61,7 +61,7 @@ namespace libmpdataxx
         update_rhs_called = true;
 #endif
         // zero-out all rhs arrays
-	for (int e = 0; e < parent_t::n_eqns; ++e) 
+        for (int e = 0; e < parent_t::n_eqns; ++e) 
         {
           // do nothing for equations with no rhs
           if (opts::isset(ct_params_t::hint_norhs, opts::bit(e))) continue;
@@ -92,10 +92,10 @@ namespace libmpdataxx
       
       // ctor
       mpdata_rhs(
-	typename parent_t::ctor_args_t args, 
-	const typename parent_t::rt_params_t &p
+        typename parent_t::ctor_args_t args, 
+        const typename parent_t::rt_params_t &p
       ) :
-	parent_t(args, p), 
+        parent_t(args, p), 
         rhs(args.mem->tmp[__FILE__][0])
       {
         assert(this->dt != 0);
@@ -199,7 +199,7 @@ namespace libmpdataxx
         const int &n_iters
       ) {
         // TODO: optimise to skip allocs for equations with no rhs
-	parent_t::alloc(mem, n_iters);
+        parent_t::alloc(mem, n_iters);
         parent_t::alloc_tmp_sclr(mem, __FILE__, parent_t::n_eqns); // rhs array for each equation
       }
     };

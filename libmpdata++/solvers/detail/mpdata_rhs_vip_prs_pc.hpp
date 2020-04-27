@@ -24,41 +24,41 @@ namespace libmpdataxx
       class mpdata_rhs_vip_prs_pc : public detail::mpdata_rhs_vip_prs_common<ct_params_t, minhalo>
       {
         public:
-	
+        
         using real_t = typename ct_params_t::real_t;
 
         private:
 
-	using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
+        using parent_t = detail::mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
         using ix = typename ct_params_t::ix;
 
-	const int pc_iters;
-	real_t beta, alpha, tmp_den;
+        const int pc_iters;
+        real_t beta, alpha, tmp_den;
 
-	typename parent_t::arr_t p_err, q_err, lap_p_err, lap_q_err, pcnd_err;
+        typename parent_t::arr_t p_err, q_err, lap_p_err, lap_q_err, pcnd_err;
 
-	void precond(bool simple)  //Richardson scheme
-	{
-	  //initail q_err for preconditioner
-	  q_err(this->ijk) = real_t(0);
+        void precond(bool simple)  //Richardson scheme
+        {
+          //initail q_err for preconditioner
+          q_err(this->ijk) = real_t(0);
 
-	  //initail preconditioner error   
-	  this->pcnd_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk, false, simple) - this->err(this->ijk);
-	    //TODO does it change with non_const density?
-	  
-	  assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
-	  for (int it=0; it<=pc_iters; it++)
-	  {
-	    q_err(this->ijk)    += real_t(.25) * pcnd_err(this->ijk);
-	    pcnd_err(this->ijk) += real_t(.25) * this->lap(this->pcnd_err, this->ijk, this->dijk);
-	  }
-	}
+          //initail preconditioner error   
+          this->pcnd_err(this->ijk) = this->lap(this->q_err, this->ijk, this->dijk, false, simple) - this->err(this->ijk);
+            //TODO does it change with non_const density?
+          
+          assert(pc_iters >= 0 && pc_iters < 10 && "params.pc_iters not specified?");
+          for (int it=0; it<=pc_iters; it++)
+          {
+            q_err(this->ijk)    += real_t(.25) * pcnd_err(this->ijk);
+            pcnd_err(this->ijk) += real_t(.25) * this->lap(this->pcnd_err, this->ijk, this->dijk);
+          }
+        }
 
         void pressure_solver_loop_init(bool simple) final
         {
-	  precond(simple);
-	  p_err(this->ijk) = q_err(this->ijk);
-	  this->lap_p_err(this->ijk) = this->lap(this->p_err, this->ijk, this->dijk, false, simple);
+          precond(simple);
+          p_err(this->ijk) = q_err(this->ijk);
+          this->lap_p_err(this->ijk) = this->lap(this->p_err, this->ijk, this->dijk, false, simple);
         }
 
         void pressure_solver_loop_body(bool simple) final
@@ -89,34 +89,34 @@ namespace libmpdataxx
           lap_p_err(this->ijk) += lap_q_err(this->ijk);
         }
 
-	public:
+        public:
 
-	struct rt_params_t : parent_t::rt_params_t { int pc_iters; };
+        struct rt_params_t : parent_t::rt_params_t { int pc_iters; };
 
-	// ctor
-	mpdata_rhs_vip_prs_pc(
-	  typename parent_t::ctor_args_t args,
-	  const rt_params_t &p
-	) :
-	  parent_t(args, p),
-	  pc_iters(p.pc_iters),
+        // ctor
+        mpdata_rhs_vip_prs_pc(
+          typename parent_t::ctor_args_t args,
+          const rt_params_t &p
+        ) :
+          parent_t(args, p),
+          pc_iters(p.pc_iters),
           beta(.25),
           alpha(1.),
           tmp_den(1.),
-	  lap_p_err(args.mem->tmp[__FILE__][0][0]),
-	  lap_q_err(args.mem->tmp[__FILE__][0][1]),
-	      p_err(args.mem->tmp[__FILE__][0][2]),
-	      q_err(args.mem->tmp[__FILE__][0][3]),
-	   pcnd_err(args.mem->tmp[__FILE__][0][4])
-	{}
+          lap_p_err(args.mem->tmp[__FILE__][0][0]),
+          lap_q_err(args.mem->tmp[__FILE__][0][1]),
+              p_err(args.mem->tmp[__FILE__][0][2]),
+              q_err(args.mem->tmp[__FILE__][0][3]),
+           pcnd_err(args.mem->tmp[__FILE__][0][4])
+        {}
 
-	static void alloc(
+        static void alloc(
           typename parent_t::mem_t *mem, 
           const int &n_iters
         ) {
-	  parent_t::alloc(mem, n_iters);
-	  parent_t::alloc_tmp_sclr(mem, __FILE__, 5);
-	}
+          parent_t::alloc(mem, n_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 5);
+        }
       }; 
     } // namespcae detail
   } // namespace solvers

@@ -29,7 +29,7 @@ namespace libmpdataxx
       // method invoked by the solver
       void fill_halos_sclr(arr_t &a, const rng_t &j, const bool deriv = false)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         for (int i = 0; i < halo; ++i)
         { 
           for (int jj = j.first(); jj <= j.last(); jj++)
@@ -46,13 +46,13 @@ namespace libmpdataxx
 
       void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const bool ad = false)
       {
-	using namespace idxperm;
-	if (!ad) av[d](pi<d>(this->left_halo_vctr.last(), j)) = 0;
+        using namespace idxperm;
+        if (!ad) av[d](pi<d>(this->left_halo_vctr.last(), j)) = 0;
         if (halo > 1)
         {
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
-	    av[d](pi<d>(this->left_halo_vctr.first(), jj))
+            av[d](pi<d>(this->left_halo_vctr.first(), jj))
             = 
             av[d](pi<d>(this->left_edge_sclr + h, this->polar_neighbours(jj)));
           }
@@ -61,7 +61,7 @@ namespace libmpdataxx
 
       void fill_halos_vctr_nrml(arr_t &a, const rng_t &j)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         for (int i = 0; i < halo; ++i)
         { 
           for (int jj = j.first(); jj <= j.last(); jj++)
@@ -95,7 +95,7 @@ namespace libmpdataxx
       // method invoked by the solver
       void fill_halos_sclr(arr_t &a, const rng_t &j, const bool deriv = false)
       {
-	using namespace idxperm;
+        using namespace idxperm;
 
         for (int i = 0; i < halo; ++i)
         { 
@@ -113,22 +113,22 @@ namespace libmpdataxx
 
       void fill_halos_vctr_alng(arrvec_t<arr_t> &av, const rng_t &j, const bool ad = false)
       {
-	using namespace idxperm;
-	if (!ad) av[d](pi<d>(this->rght_halo_vctr.first(), j)) = 0;
+        using namespace idxperm;
+        if (!ad) av[d](pi<d>(this->rght_halo_vctr.first(), j)) = 0;
         if (halo > 1)
         {
           for (int jj = j.first(); jj <= j.last(); jj++)
           {
-	    av[d](pi<d>(this->rght_halo_vctr.last(), jj))
+            av[d](pi<d>(this->rght_halo_vctr.last(), jj))
             =
-	    av[d](pi<d>(this->rght_edge_sclr - h, this->polar_neighbours(jj)));
+            av[d](pi<d>(this->rght_edge_sclr - h, this->polar_neighbours(jj)));
           }
         }
       }
       
       void fill_halos_vctr_nrml(arr_t &a, const rng_t &j)
       {
-	using namespace idxperm;
+        using namespace idxperm;
         for (int i = 0; i < halo; ++i)
         { 
           for (int jj = j.first(); jj <= j.last(); jj++)

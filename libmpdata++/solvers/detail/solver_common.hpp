@@ -32,7 +32,7 @@ namespace libmpdataxx
       template <typename ct_params_t, int n_tlev_, int minhalo>
       class solver_common
       {
-	public:
+        public:
 
         enum { n_eqns = ct_params_t::n_eqns };
         enum { halo = minhalo }; 
@@ -49,7 +49,7 @@ namespace libmpdataxx
         using advance_arg_t = typename std::conditional<ct_params_t::var_dt, real_t, int>::type;
 
 
-	protected: 
+        protected: 
         // TODO: output common doesnt know about ct_params_t
         static constexpr bool var_dt = ct_params_t::var_dt;
 
@@ -66,17 +66,17 @@ namespace libmpdataxx
         std::array<real_t, div3_mpdata ? 2 : 1> dt_stash;
         std::array<real_t, n_dims> dijk;
 
-	const idx_t<n_dims> ijk;
+        const idx_t<n_dims> ijk;
 
         long long int timestep = 0;
         real_t time = 0;
         std::vector<int> n; 
 
         typedef concurr::detail::sharedmem<real_t, n_dims, n_tlev> mem_t; 
-	mem_t *mem;
+        mem_t *mem;
 
-	// helper methods invoked by solve()
-	virtual void advop(int e) = 0;
+        // helper methods invoked by solve()
+        virtual void advop(int e) = 0;
 
         // helper method telling us if equation e is the last one advected assuming increasing order, 
         // but taking into account possible delay of advection of some equations
@@ -88,13 +88,13 @@ namespace libmpdataxx
             (e == opts::most_significant(ct_params_t::delayed_step)-1);                 // last of the delayed equations
         }
 
-	virtual void cycle(int e) final
-	{ 
-	  n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
+        virtual void cycle(int e) final
+        { 
+          n[e] = (n[e] + 1) % n_tlev - n_tlev;  // -n_tlev so that n+1 does not give out of bounds
           if(is_last_eqn(e)) mem->cycle(rank); 
-	}
+        }
 
-	virtual void xchng(int e) = 0;
+        virtual void xchng(int e) = 0;
         // TODO: implement flagging of valid/invalid halo for optimisations
 
         virtual void xchng_vctr_alng(arrvec_t<arr_t>&, const bool ad = false, const bool cyclic = false) = 0;
@@ -104,15 +104,15 @@ namespace libmpdataxx
           // with distributed memory and cyclic boundary conditions,
           // leftmost node must send left first, as
           // rightmost node is waiting 
-	  if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() == 0)
-	    std::swap(bcl, bcr);
+          if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() == 0)
+            std::swap(bcl, bcr);
 
           bcs[d][0] = std::move(bcl);
           bcs[d][1] = std::move(bcr);
         }
 
-	virtual real_t courant_number(const arrvec_t<arr_t>&) = 0;
-	virtual real_t max_abs_vctr_div(const arrvec_t<arr_t>&) = 0;
+        virtual real_t courant_number(const arrvec_t<arr_t>&) = 0;
+        virtual real_t max_abs_vctr_div(const arrvec_t<arr_t>&) = 0;
        
         // return false if advector does not change in time
         virtual bool calc_gc() {return false;}
@@ -125,11 +125,11 @@ namespace libmpdataxx
         void solve_loop_body(const int e)
         {
           scale(e, ct_params_t::hint_scale(e));
-	  xchng(e);
+          xchng(e);
           advop(e);
           if(!is_last_eqn(e))
             mem->barrier();
-	  cycle(e);  // note: assuming ascending order, mem->cycle is done after the lest eqn
+          cycle(e);  // note: assuming ascending order, mem->cycle is done after the lest eqn
           scale(e, -ct_params_t::hint_scale(e));
         }
 
@@ -208,7 +208,7 @@ namespace libmpdataxx
           }
         }
 
-	public:
+        public:
 
         const real_t time_() const { return time;}
 
@@ -218,8 +218,8 @@ namespace libmpdataxx
           real_t dt=0, max_abs_div_eps = blitz::epsilon(real_t(44)), max_courant = real_t(0.5);
         };
 
-	// ctor
-	solver_common(
+        // ctor
+        solver_common(
           const int &rank, 
           mem_t *mem, 
           const rt_params_t &p, 
@@ -233,12 +233,12 @@ namespace libmpdataxx
           dk(0),
           max_abs_div_eps(p.max_abs_div_eps),
           max_courant(p.max_courant),
-	  n(n_eqns, 0), 
+          n(n_eqns, 0), 
           mem(mem),
           ijk(ijk)
-	{
+        {
           // compile-time sanity checks
-	  static_assert(n_eqns > 0, "!");
+          static_assert(n_eqns > 0, "!");
 
           // run-time sanity checks
           for (int d = 0; d < n_dims; ++d)
@@ -258,15 +258,15 @@ namespace libmpdataxx
             MPI::Finalize();
 #endif
 #if !defined(NDEBUG)
-	  assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
-	  assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
-	  assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
-	  assert(hook_ante_delayed_step_called && "any overriding hook_ante_delayed_step() must call parent_t::hook_ante_delayed_step()");
+          assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");
+          assert(hook_post_step_called && "any overriding hook_post_step() must call parent_t::hook_post_step()");
+          assert(hook_ante_loop_called && "any overriding hook_ante_loop() must call parent_t::hook_ante_loop()");
+          assert(hook_ante_delayed_step_called && "any overriding hook_ante_delayed_step() must call parent_t::hook_ante_delayed_step()");
 #endif
         }
 
-	virtual void solve(advance_arg_t nt) final
-	{   
+        virtual void solve(advance_arg_t nt) final
+        {   
           // multiple calls to sovlve() are meant to advance the solution by nt
           // TODO: does it really work with var_dt ? we do not advance by time exactly ...
           nt += ct_params_t::var_dt ? time : timestep;
@@ -274,26 +274,26 @@ namespace libmpdataxx
           // being generous about out-of-loop barriers 
           if (timestep == 0)
           {
-	    mem->barrier();
+            mem->barrier();
 #if !defined(NDEBUG)
-	    hook_ante_loop_called = false;
+            hook_ante_loop_called = false;
 #endif
-	    hook_ante_loop(nt);
-	    mem->barrier();
+            hook_ante_loop(nt);
+            mem->barrier();
           }
 
           // moved here so that if an exception is thrown from hook_ante_loop these do not cause complaints
 #if !defined(NDEBUG)
-	  hook_ante_step_called = false;
-	  hook_post_step_called = false;
-	  hook_ante_delayed_step_called = false;
+          hook_ante_step_called = false;
+          hook_post_step_called = false;
+          hook_ante_delayed_step_called = false;
 #endif
           // higher-order temporal interpolation for output requires doing a few additional steps
           int additional_steps = ct_params_t::out_intrp_ord;
-	  while (ct_params_t::var_dt ? (time < nt || additional_steps > 0) : timestep < nt)
-	  {   
-	    // progress-bar info through thread name (check top -H)
-	    monitor(float(ct_params_t::var_dt ? time : timestep) / nt);  // TODO: does this value make sanse with repeated advence() calls?
+          while (ct_params_t::var_dt ? (time < nt || additional_steps > 0) : timestep < nt)
+          {   
+            // progress-bar info through thread name (check top -H)
+            monitor(float(ct_params_t::var_dt ? time : timestep) / nt);  // TODO: does this value make sanse with repeated advence() calls?
 
             // might be used to implement multi-threaded signal handling
             mem->barrier();
@@ -328,7 +328,7 @@ namespace libmpdataxx
             
             hook_ante_step();
 
-	    for (int e = 0; e < n_eqns; ++e)
+            for (int e = 0; e < n_eqns; ++e)
             {
               if (opts::isset(ct_params_t::delayed_step, opts::bit(e))) continue;
               solve_loop_body(e);
@@ -336,7 +336,7 @@ namespace libmpdataxx
 
             hook_ante_delayed_step();
 
-	    for (int e = 0; e < n_eqns; ++e)
+            for (int e = 0; e < n_eqns; ++e)
             {
               if (!opts::isset(ct_params_t::delayed_step, opts::bit(e))) continue;
               solve_loop_body(e);
@@ -349,7 +349,7 @@ namespace libmpdataxx
             hook_post_step();
 
             if (time >= nt) additional_steps--;
-	  }   
+          }   
 
           mem->barrier();
           // note: hook_post_loop was removed as conficling with multiple-advance()-call logic
@@ -357,13 +357,13 @@ namespace libmpdataxx
 
         protected:
 
-	// psi[n] getter - just to shorten the code
+        // psi[n] getter - just to shorten the code
         // note that e.g. in hook_post_loop it points rather to 
         // psi^{n+1} than psi^{n} (hence not using the name psi_n)
-	virtual arr_t &state(const int &e) final
-	{
-	  return mem->psi[e][n[e]];
-	}
+        virtual arr_t &state(const int &e) final
+        {
+          return mem->psi[e][n[e]];
+        }
 
         static rng_t rng_vctr(const rng_t &rng) { return rng^h^(halo-1); }
         static rng_t rng_sclr(const rng_t &rng) { return rng^halo; }

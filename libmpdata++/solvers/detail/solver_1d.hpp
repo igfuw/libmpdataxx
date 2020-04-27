@@ -23,15 +23,15 @@ namespace libmpdataxx
         typename std::enable_if<ct_params_t::n_dims == 1 >::type
       > : public solver_common<ct_params_t, n_tlev, minhalo>
       {
-	using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
+        using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
         public:
 
-	using real_t = typename ct_params_t::real_t;
+        using real_t = typename ct_params_t::real_t;
 
-	protected:
+        protected:
 
-	const rng_t i; //TODO: to be removed
+        const rng_t i; //TODO: to be removed
 
         // generic field used for various statistics (currently Courant number and divergence)
         typename parent_t::arr_t &stat_field; // TODO: should be in solver common but cannot be allocated there ?
@@ -50,10 +50,10 @@ namespace libmpdataxx
           xchng_sclr(arr);
         }
 
-	void xchng(int e) final
-	{
+        void xchng(int e) final
+        {
           xchng_sclr(this->mem->psi[e][ this->n[e]]);
-	}
+        }
 
         void xchng_vctr_alng(arrvec_t<typename parent_t::arr_t> &arrvec, const bool ad = false, const bool cyclic = false) final
         {
@@ -108,12 +108,12 @@ namespace libmpdataxx
 
         protected:
 
-	// ctor
-	solver(
+        // ctor
+        solver(
           ctor_args_t args,
           const rt_params_t &p
         ) :
-	  parent_t(
+          parent_t(
             args.rank,
             args.mem, 
             p, 
@@ -121,7 +121,7 @@ namespace libmpdataxx
           ), 
           i(args.i),
           stat_field(args.mem->tmp[__FILE__][0][0])
-	{
+        {
           this->di = p.di;
           this->dijk = {p.di};
           this->set_bcs(0, args.bcxl, args.bcxr);
@@ -131,38 +131,38 @@ namespace libmpdataxx
 
         private:
 
-	static void alloc_tmp(
-	  typename parent_t::mem_t *mem, 
-	  const char * __file__, 
-	  const int n_arr,
-	  const rng_t rng,
+        static void alloc_tmp(
+          typename parent_t::mem_t *mem, 
+          const char * __file__, 
+          const int n_arr,
+          const rng_t rng,
           std::string name = ""
-	)
-	{
-	  mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
+        )
+        {
+          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>()); 
 
           if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
 
           for (int n = 0; n < n_arr; ++n)
           {
-	    mem->tmp[__file__].back().push_back(
+            mem->tmp[__file__].back().push_back(
               mem->old(new typename parent_t::arr_t( rng ))
             ); 
           }
-	}
+        }
 
         public:
 
-	static void alloc(
+        static void alloc(
           typename parent_t::mem_t *mem, 
           const int &n_iters
         ) {
           mem->psi.resize(parent_t::n_eqns);
-	  for (int e = 0; e < parent_t::n_eqns; ++e) // equations
-	    for (int n = 0; n < n_tlev; ++n) // time levels
-	      mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(mem->grid_size[0]))));
+          for (int e = 0; e < parent_t::n_eqns; ++e) // equations
+            for (int n = 0; n < n_tlev; ++n) // time levels
+              mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(mem->grid_size[0]))));
     
-	  mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0])))); 
+          mem->GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0])))); 
 
           // fully third-order accurate mpdata needs also time derivatives of
           // the Courant field
@@ -170,12 +170,12 @@ namespace libmpdataxx
               opts::isset(ct_params_t::opts, opts::div_3rd_dt))
           {
             // TODO: why for (auto f : {mem->ndt_GC, mem->ndtt_GC}) doesn't work ?
-	    mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0]))));
-	    mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0]))));
+            mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0]))));
+            mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(parent_t::rng_vctr(mem->grid_size[0]))));
           }
 
           if (opts::isset(ct_params_t::opts, opts::nug))
-	    mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(mem->grid_size[0]))));
+            mem->G.reset(mem->old(new typename parent_t::arr_t(parent_t::rng_sclr(mem->grid_size[0]))));
 
           // allocate Kahan summation temporary vars
           if (opts::isset(ct_params_t::opts, opts::khn))

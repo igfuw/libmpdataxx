@@ -68,7 +68,7 @@ namespace libmpdataxx
           "more boundary conditions than dimensions"
         );
 
-	protected:
+        protected:
 
         // (cannot be nested due to templates)
         typedef sharedmem<
@@ -77,31 +77,31 @@ namespace libmpdataxx
           solver_t::n_tlev
         > mem_t;
 
-	// member fields
-	boost::ptr_vector<solver_t> algos; 
+        // member fields
+        boost::ptr_vector<solver_t> algos; 
         std::unique_ptr<mem_t> mem;
         timer tmr;
 
-	public:
+        public:
 
         typedef typename solver_t::real_t real_t;
         using advance_arg_t = typename solver_t::advance_arg_t;
 
         // dtor
-	virtual ~concurr_common()
+        virtual ~concurr_common()
         {
           tmr.print();
         }
 
-	// ctor
-	concurr_common(
-	  const typename solver_t::rt_params_t &p,
+        // ctor
+        concurr_common(
+          const typename solver_t::rt_params_t &p,
           mem_t *mem_p,
-	  const int &size
-	) {
+          const int &size
+        ) {
           // allocate the memory to be shared by multiple threads
           mem.reset(mem_p);
-	  solver_t::alloc(mem.get(), p.n_iters);
+          solver_t::alloc(mem.get(), p.n_iters);
 
           // allocate per-thread structures
           init(p, mem->grid_size, size); 
@@ -119,28 +119,28 @@ namespace libmpdataxx
         ) 
         {
           // sanity check - polar coords do not work with MPI yet
-	  if (type == bcond::polar && mem->distmem.size() > 1)
+          if (type == bcond::polar && mem->distmem.size() > 1)
             throw std::runtime_error("Polar boundary conditions do not work with MPI.");
 
           // distmem overrides
-	  if (type != bcond::remote && mem->distmem.size() > 1 && dim == 0)
-	  {
-	    if (
-	      // distmem domain interior
-	      (dir == bcond::left && mem->distmem.rank() > 0)
-	      ||
-	      (dir == bcond::rght && mem->distmem.rank() != mem->distmem.size() - 1)
-	      // cyclic condition for distmem domain (note: will not work if a non-cyclic condition is on the other end)
-	      || 
-	      (type == bcond::cyclic)
-	    ) return bc_set<bcond::remote, dir, dim>(bcp);
-	  }
+          if (type != bcond::remote && mem->distmem.size() > 1 && dim == 0)
+          {
+            if (
+              // distmem domain interior
+              (dir == bcond::left && mem->distmem.rank() > 0)
+              ||
+              (dir == bcond::rght && mem->distmem.rank() != mem->distmem.size() - 1)
+              // cyclic condition for distmem domain (note: will not work if a non-cyclic condition is on the other end)
+              || 
+              (type == bcond::cyclic)
+            ) return bc_set<bcond::remote, dir, dim>(bcp);
+          }
 
           // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
-	  bcp.reset(
+          bcp.reset(
             new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
-	      mem->slab(mem->grid_size[dim]), 
-	      mem->distmem.grid_size
+              mem->slab(mem->grid_size[dim]), 
+              mem->distmem.grid_size
             )
           );
         }
@@ -154,46 +154,46 @@ namespace libmpdataxx
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
 
           bc_set<bcxl, bcond::left, 0>(bxl);
-	  bc_set<bcxr, bcond::rght, 0>(bxr);
+          bc_set<bcxr, bcond::rght, 0>(bxr);
 
-	  for (int i0 = 0; i0 < n0; ++i0) 
+          for (int i0 = 0; i0 < n0; ++i0) 
           {
             shrdl.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>());
             shrdr.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>());
 
-	    algos.push_back(
+            algos.push_back(
               new solver_t(
                 typename solver_t::ctor_args_t({
                   i0,
-		  mem.get(), 
-		  i0 == 0      ? bxl : shrdl,
-		  i0 == n0 - 1 ? bxr : shrdr,
-		  mem->slab(grid_size[0], i0, n0)
+                  mem.get(), 
+                  i0 == 0      ? bxl : shrdl,
+                  i0 == n0 - 1 ? bxr : shrdr,
+                  mem->slab(grid_size[0], i0, n0)
                 }), 
                 p
               )
             );
           }
-	}
+        }
 
         // 2D version
         // TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
         void init(
           const typename solver_t::rt_params_t &p,
-	  const std::array<rng_t, 2> &grid_size, 
+          const std::array<rng_t, 2> &grid_size, 
           const int &n0, const int &n1 = 1
         ) {
           for (int i0 = 0; i0 < n0; ++i0) 
           {
             for (int i1 = 0; i1 < n1; ++i1) 
             {
-	      typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
+              typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
 
               bc_set<bcxl, bcond::left, 0>(bxl);
-	      bc_set<bcxr, bcond::rght, 0>(bxr);
+              bc_set<bcxr, bcond::rght, 0>(bxr);
 
               bc_set<bcyl, bcond::left, 1>(byl);
-	      bc_set<bcyr, bcond::rght, 1>(byr);
+              bc_set<bcyr, bcond::rght, 1>(byr);
 
               shrdl.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
               shrdr.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
@@ -202,11 +202,11 @@ namespace libmpdataxx
                 new solver_t(
                   typename solver_t::ctor_args_t({
                     i0,
-		    mem.get(), 
-		    i0 == 0      ? bxl : shrdl,
-		    i0 == n0 - 1 ? bxr : shrdr,
-		    byl, byr, 
-		    mem->slab(grid_size[0], i0, n0),  
+                    mem.get(), 
+                    i0 == 0      ? bxl : shrdl,
+                    i0 == n0 - 1 ? bxr : shrdr,
+                    byl, byr, 
+                    mem->slab(grid_size[0], i0, n0),  
                     mem->slab(grid_size[1], i1, n1)
                   }), 
                   p
@@ -214,22 +214,22 @@ namespace libmpdataxx
               );
             }
           }
-	}
+        }
 
         // 3D version
         void init(
           const typename solver_t::rt_params_t &p,
-	  const std::array<rng_t, 3> &grid_size, 
+          const std::array<rng_t, 3> &grid_size, 
           const int &n0, const int &n1 = 1, const int &n2 = 1
         ) {
           typename solver_t::bcp_t bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;
 
-	  // TODO: renew pointers only if invalid ?
-	  for (int i0 = 0; i0 < n0; ++i0) 
+          // TODO: renew pointers only if invalid ?
+          for (int i0 = 0; i0 < n0; ++i0) 
           {
-	    for (int i1 = 0; i1 < n1; ++i1) 
+            for (int i1 = 0; i1 < n1; ++i1) 
             {
-	      for (int i2 = 0; i2 < n2; ++i2) 
+              for (int i2 = 0; i2 < n2; ++i2) 
               {
                 bc_set<bcxl, bcond::left, 0>(bxl);
                 bc_set<bcxr, bcond::rght, 0>(bxr);
@@ -243,13 +243,13 @@ namespace libmpdataxx
                 shrdl.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
                 shrdr.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
 
-		algos.push_back(
+                algos.push_back(
                   new solver_t(
                     typename solver_t::ctor_args_t({
                       i0,
                       mem.get(), 
-		      i0 == 0      ? bxl : shrdl,
-		      i0 == n0 - 1 ? bxr : shrdr,
+                      i0 == 0      ? bxl : shrdl,
+                      i0 == n0 - 1 ? bxr : shrdr,
                       byl, byr, 
                       bzl, bzr, 
                       mem->slab(grid_size[0], i0, n0), 
@@ -275,53 +275,53 @@ namespace libmpdataxx
           tmr.stop();
         }  
 
-	typename solver_t::arr_t advectee(int e = 0) final
-	{
-	  return mem->advectee(e);
-	}
+        typename solver_t::arr_t advectee(int e = 0) final
+        {
+          return mem->advectee(e);
+        }
 
-	const typename solver_t::arr_t advectee_global(int e = 0) final
-	{
+        const typename solver_t::arr_t advectee_global(int e = 0) final
+        {
 #if defined(USE_MPI)
           return mem->advectee_global(e);
 #else
-	  return advectee(e);
+          return advectee(e);
 #endif
-	}
+        }
 
-	void advectee_global_set(const typename solver_t::arr_t arr, int e = 0) final
-	{
+        void advectee_global_set(const typename solver_t::arr_t arr, int e = 0) final
+        {
 #if defined(USE_MPI)
           mem->advectee_global_set(arr, e);
 #else
-	  advectee(e) = arr;
+          advectee(e) = arr;
 #endif
-	}
+        }
 
-	typename solver_t::arr_t advector(int d = 0) final
-	{
-	  return mem->advector(d);
-	}
+        typename solver_t::arr_t advector(int d = 0) final
+        {
+          return mem->advector(d);
+        }
 
-	typename solver_t::arr_t g_factor() final
-	{
-	  return mem->g_factor();
-	}
+        typename solver_t::arr_t g_factor() final
+        {
+          return mem->g_factor();
+        }
 
         typename solver_t::arr_t vab_coefficient() final
-	{
-	  return mem->vab_coefficient();
-	}
+        {
+          return mem->vab_coefficient();
+        }
         
         typename solver_t::arr_t vab_relaxed_state(int d = 0) final
-	{
-	  return mem->vab_relaxed_state(d);
-	}
-	
+        {
+          return mem->vab_relaxed_state(d);
+        }
+        
         typename solver_t::arr_t sclr_array(const std::string &name, int n = 0) final
-	{
-	  return mem->sclr_array(name, n);
-	}
+        {
+          return mem->sclr_array(name, n);
+        }
 
         bool *panic_ptr() final
         {
@@ -333,15 +333,15 @@ namespace libmpdataxx
           return algos[0].time_();
         }
 
-	const real_t min(int e = 0) const final
-	{
-	  return mem->min(mem->advectee(e));
-	}
+        const real_t min(int e = 0) const final
+        {
+          return mem->min(mem->advectee(e));
+        }
 
-	const real_t max(int e = 0) const final
-	{
-	  return mem->max(mem->advectee(e));
-	}
+        const real_t max(int e = 0) const final
+        {
+          return mem->max(mem->advectee(e));
+        }
       };
     } // namespace detail
   } // namespace concurr

@@ -49,11 +49,11 @@ namespace libmpdataxx
           full_tht(this->ijk) = this->state(ix::tht)(this->ijk) + this->tht_e(this->ijk);
         }
 
-	void hook_ante_loop(const typename parent_t::advance_arg_t nt) 
-	{   
+        void hook_ante_loop(const typename parent_t::advance_arg_t nt) 
+        {   
           calc_dtht_e();
-	  parent_t::hook_ante_loop(nt);
-	}
+          parent_t::hook_ante_loop(nt);
+        }
 
         virtual void normalize_vip(const arrvec_t<typename parent_t::arr_t> &v)
         {

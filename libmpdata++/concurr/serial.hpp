@@ -28,7 +28,7 @@ namespace libmpdataxx
 
       struct mem_t : parent_t::mem_t
       {
-	static int size() { return 1; }
+        static int size() { return 1; }
 
         void barrier() { }
 

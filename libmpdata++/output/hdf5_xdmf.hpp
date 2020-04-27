@@ -107,8 +107,8 @@ namespace libmpdataxx
 
       // ctor
       hdf5_xdmf(
-	typename parent_t::ctor_args_t args,
-	const typename parent_t::rt_params_t &p
+        typename parent_t::ctor_args_t args,
+        const typename parent_t::rt_params_t &p
       ) : parent_t(args, p)
       {}
     };

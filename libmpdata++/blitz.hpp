@@ -89,7 +89,7 @@ namespace libmpdataxx
     const arr_t &operator[](const int i) const 
     {   
       return this->at(
-	(i + this->size()) % this->size()
+        (i + this->size()) % this->size()
       );  
     }
     
@@ -107,8 +107,8 @@ namespace libmpdataxx
 #if !defined(NDEBUG)
       // filling the array with NaNs to ease debugging
       *arr = blitz::has_signalling_NaN(*arr->dataFirst())
-	? blitz::signalling_NaN(*arr->dataFirst())
-	: blitz::quiet_NaN(*arr->dataFirst());
+        ? blitz::signalling_NaN(*arr->dataFirst())
+        : blitz::quiet_NaN(*arr->dataFirst());
 #endif
     }
   };

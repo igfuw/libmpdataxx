@@ -17,7 +17,7 @@ namespace libmpdataxx
       template <class ct_params_t, int minhalo>
       class mpdata_rhs_vip_prs_sgs_smg : public detail::mpdata_rhs_vip_prs_sgs_common<ct_params_t, minhalo>
       {
-	using parent_t = detail::mpdata_rhs_vip_prs_sgs_common<ct_params_t, minhalo>;
+        using parent_t = detail::mpdata_rhs_vip_prs_sgs_common<ct_params_t, minhalo>;
 
         public:
 
@@ -25,7 +25,7 @@ namespace libmpdataxx
 
         protected:
         
-	real_t smg_c, c_m;
+        real_t smg_c, c_m;
         typename parent_t::arr_t &k_m;
 
         void multiply_sgs_visc()
@@ -56,23 +56,23 @@ namespace libmpdataxx
           }
         }
 
-	public:
+        public:
 
         struct rt_params_t : parent_t::rt_params_t
         {
           real_t smg_c, c_m;
         };
 
-	// ctor
-	mpdata_rhs_vip_prs_sgs_smg(
-	  typename parent_t::ctor_args_t args,
-	  const rt_params_t &p
-	) :
-	  parent_t(args, p),
+        // ctor
+        mpdata_rhs_vip_prs_sgs_smg(
+          typename parent_t::ctor_args_t args,
+          const rt_params_t &p
+        ) :
+          parent_t(args, p),
           smg_c(p.smg_c),
           c_m(p.c_m),
           k_m(args.mem->tmp[__FILE__][0][0])
-	{
+        {
           if (smg_c == 0) throw std::runtime_error("smg_c == 0");
         }
 

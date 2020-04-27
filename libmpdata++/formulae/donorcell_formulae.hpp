@@ -24,10 +24,10 @@ namespace libmpdataxx
 
       template<opts_t opts, class T1, class T2, class T3> 
       inline auto F(
-	const T1 &psi_l, const T2 &psi_r, const T3 &GC
+        const T1 &psi_l, const T2 &psi_r, const T3 &GC
       )
       {
-	return return_helper<rng_t>(
+        return return_helper<rng_t>(
           pospart<opts BOOST_PP_COMMA() rng_t>(GC) * psi_l +
           negpart<opts BOOST_PP_COMMA() rng_t>(GC) * psi_r
         );
@@ -35,47 +35,47 @@ namespace libmpdataxx
 
       template <opts_t opts, class arr_1d_t>
       inline auto make_flux( 
-	const arr_1d_t &psi, 
-	const arr_1d_t &GC, 
-	const rng_t &i
+        const arr_1d_t &psi, 
+        const arr_1d_t &GC, 
+        const rng_t &i
       )
       {
-	return return_helper<rng_t>(F<opts>(
-	  psi(i  ), 
-	  psi(i+1), 
-	  GC(i+h)
+        return return_helper<rng_t>(F<opts>(
+          psi(i  ), 
+          psi(i+1), 
+          GC(i+h)
         ));
       }
 
       template<opts_t opts, int d, class arr_2d_t>  
       inline auto make_flux( 
-	const arr_2d_t &psi, 
-	const arr_2d_t &GC, 
-	const rng_t &i, 
-	const rng_t &j
+        const arr_2d_t &psi, 
+        const arr_2d_t &GC, 
+        const rng_t &i, 
+        const rng_t &j
       ) 
       {
-	return return_helper<rng_t>(F<opts>(
-	  psi(pi<d>(i,   j)), 
-	  psi(pi<d>(i+1, j)), 
-	   GC(pi<d>(i+h, j))
-	));
+        return return_helper<rng_t>(F<opts>(
+          psi(pi<d>(i,   j)), 
+          psi(pi<d>(i+1, j)), 
+           GC(pi<d>(i+h, j))
+        ));
       }
 
       template<opts_t opts, int d, class arr_3d_t>  
       inline auto make_flux( 
-	const arr_3d_t &psi, 
-	const arr_3d_t &GC, 
-	const rng_t &i, 
-	const rng_t &j,
-	const rng_t &k
+        const arr_3d_t &psi, 
+        const arr_3d_t &GC, 
+        const rng_t &i, 
+        const rng_t &j,
+        const rng_t &k
       )
       {
-	return return_helper<rng_t>(F<opts>(
-	  psi(pi<d>(i,   j, k)), 
-	  psi(pi<d>(i+1, j, k)), 
-	   GC(pi<d>(i+h, j, k))
-	));
+        return return_helper<rng_t>(F<opts>(
+          psi(pi<d>(i,   j, k)), 
+          psi(pi<d>(i+1, j, k)), 
+           GC(pi<d>(i+h, j, k))
+        ));
       }
 
       template <opts_t opts, class a_t, class f1_t, class f2_t, class g_t>
@@ -91,7 +91,7 @@ namespace libmpdataxx
       {
         if (!opts::isset(opts, opts::khn))
         {
-	  psi_new = psi_old + (-flx_1 + flx_2) / g;
+          psi_new = psi_old + (-flx_1 + flx_2) / g;
         }
         else
         {
@@ -117,8 +117,8 @@ namespace libmpdataxx
       {
         if (!opts::isset(opts, opts::khn))
         {
-	  // note: the parentheses are intended to minimise chances of numerical errors
-	  psi_new = psi_old + ((-flx_1 + flx_2) + (-flx_3 + flx_4)) / g;
+          // note: the parentheses are intended to minimise chances of numerical errors
+          psi_new = psi_old + ((-flx_1 + flx_2) + (-flx_3 + flx_4)) / g;
         }
         else
         { 
@@ -148,8 +148,8 @@ namespace libmpdataxx
       {
         if (!opts::isset(opts, opts::khn))
         {
-	  // note: the parentheses are intended to minimise chances of numerical errors
-	  psi_new = psi_old + ((-flx_1 + flx_2) + (-flx_3 + flx_4) + (-flx_5 + flx_6)) / g;
+          // note: the parentheses are intended to minimise chances of numerical errors
+          psi_new = psi_old + ((-flx_1 + flx_2) + (-flx_3 + flx_4) + (-flx_5 + flx_6)) / g;
         } 
         else
         {
