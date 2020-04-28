@@ -22,11 +22,11 @@ namespace libmpdataxx
       template <typename real_t, int halo, drctn_e dir, int n_dims>
       class remote_common : public detail::bcond_common<real_t, halo, n_dims>
       {
-	using parent_t = detail::bcond_common<real_t, halo, n_dims>;
+        using parent_t = detail::bcond_common<real_t, halo, n_dims>;
 
         protected:
 
-	using arr_t = blitz::Array<real_t, n_dims>;
+        using arr_t = blitz::Array<real_t, n_dims>;
         using idx_t = blitz::RectDomain<n_dims>;
 
         private:
@@ -54,46 +54,46 @@ namespace libmpdataxx
 
 #  if !defined(NDEBUG)
           const int debug = 2;
-	  std::pair<int, int> buf_rng; 
+          std::pair<int, int> buf_rng;
 #  endif
 #endif
 
         protected:
-        const bool is_cyclic = 
+        const bool is_cyclic =
 #if defined(USE_MPI)
-	  (dir == left && mpicom.rank() == 0) ||
-	  (dir == rght && mpicom.rank() == mpicom.size()-1);
+          (dir == left && mpicom.rank() == 0) ||
+          (dir == rght && mpicom.rank() == mpicom.size()-1);
 #else
           false;
 #endif
 
         void send_hlpr(
-          const arr_t &a, 
-          const idx_t &idx_send 
+          const arr_t &a,
+          const idx_t &idx_send
         )
         {
 #if defined(USE_MPI)
-          // distinguishing between left and right messages 
+          // distinguishing between left and right messages
           // (important e.g. with 2 procs and cyclic bc)
-          const int  
+          const int
             msg_send = dir == left ? left : rght;
 
           // arr_send references part of the send buffer that will be used
           arr_t arr_send(buf_send, a(idx_send).shape(), blitz::neverDeleteData);
           // copying data to be sent
-	  arr_send = a(idx_send);
+          arr_send = a(idx_send);
 
           // launching async data transfer
           if(arr_send.size()!=0)
           {
             // use the pointer+size kind of send instead of serialization of blitz arrays, because
             // serialization caused memory leaks, probably because it breaks blitz reference counting
-	    reqs[0] = mpicom.isend(peer, msg_send, buf_send, arr_send.size()); 
+            reqs[0] = mpicom.isend(peer, msg_send, buf_send, arr_send.size());
 
             // sending debug information
 #  if !defined(NDEBUG)
-	    reqs[1] = mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
-              idx_send[0].first(), 
+            reqs[1] = mpicom.isend(peer, msg_send ^ debug, std::pair<int,int>(
+              idx_send[0].first(),
               idx_send[0].last()
             ));
 #  endif
@@ -104,23 +104,23 @@ namespace libmpdataxx
         };
 
         void recv_hlpr(
-          const arr_t &a, 
+          const arr_t &a,
           const idx_t &idx_recv
         )
         {
 #if defined(USE_MPI)
-          const int  
+          const int
             msg_recv = dir == left ? rght : left;
 
 
           // launching async data transfer
           if(a(idx_recv).size()!=0) // TODO: test directly size of idx_recv
           {
-	    reqs[1+n_dbg_reqs] = mpicom.irecv(peer, msg_recv, buf_recv, a(idx_recv).size());
+            reqs[1+n_dbg_reqs] = mpicom.irecv(peer, msg_recv, buf_recv, a(idx_recv).size());
 
             // sending debug information
 #  if !defined(NDEBUG)
-	    reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
+            reqs[3] = mpicom.irecv(peer, msg_recv ^ debug, buf_rng);
 #  endif
           }
 #else
@@ -129,22 +129,22 @@ namespace libmpdataxx
         }
 
         void send(
-          const arr_t &a, 
-          const idx_t &idx_send 
+          const arr_t &a,
+          const idx_t &idx_send
         )
         {
 #if defined(USE_MPI)
           send_hlpr(a, idx_send);
 
           // waiting for the transfers to finish
-	  boost::mpi::wait_all(reqs.begin(), reqs.begin() + 1 + n_dbg_reqs); // MPI_Waitall is thread-safe?
+          boost::mpi::wait_all(reqs.begin(), reqs.begin() + 1 + n_dbg_reqs); // MPI_Waitall is thread-safe?
 #else
           assert(false);
 #endif
         }
 
         void recv(
-          const arr_t &a, 
+          const arr_t &a,
           const idx_t &idx_recv
         )
         {
@@ -153,28 +153,28 @@ namespace libmpdataxx
           recv_hlpr(a, idx_recv);
 
           // waiting for the transfers to finish
-	  boost::mpi::wait_all(reqs.begin() + 1 + n_dbg_reqs, reqs.end()); // MPI_Waitall is thread-safe?
+          boost::mpi::wait_all(reqs.begin() + 1 + n_dbg_reqs, reqs.end()); // MPI_Waitall is thread-safe?
 
           // a blitz handler for the used part of the receive buffer
           arr_t arr_recv(buf_recv, a(idx_recv).shape(), blitz::neverDeleteData); // TODO: shape directly from idx_recv
 
           // checking debug information
-          
+
           // positive modulo (grid_size_0 - 1)
 //          auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
 //          assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
 //          assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
 
           // writing received data to the array
-	  a(idx_recv) = arr_recv;
+          a(idx_recv) = arr_recv;
 #else
           assert(false);
 #endif
         }
 
         void xchng(
-          const arr_t &a, 
-          const idx_t &idx_send, 
+          const arr_t &a,
+          const idx_t &idx_send,
           const idx_t &idx_recv
         )
         {
@@ -183,20 +183,20 @@ namespace libmpdataxx
           recv_hlpr(a, idx_recv);
 
           // waiting for the transfers to finish
-	  boost::mpi::wait_all(reqs.begin(), reqs.end()); 
+          boost::mpi::wait_all(reqs.begin(), reqs.end());
 
           // a blitz handler for the used part of the receive buffer
           arr_t arr_recv(buf_recv, a(idx_recv).shape(), blitz::neverDeleteData);
 
           // checking debug information
-          
+
           // positive modulo (grid_size_0 - 1)
          // auto wrap = [this](int n) {return (n % (grid_size_0 - 1) + grid_size_0 - 1) % (grid_size_0 - 1);};
-	 // assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
+         // assert(wrap(buf_rng.first) == wrap(idx_recv[0].first()));
          // assert(wrap(buf_rng.second) == wrap(idx_recv[0].last()));
 
           // writing received data to the array
-	  a(idx_recv) = arr_recv;
+          a(idx_recv) = arr_recv;
 #else
           assert(false);
 #endif
@@ -204,8 +204,8 @@ namespace libmpdataxx
 
         public:
 
-        // ctor                                  
-        remote_common(                                                           
+        // ctor
+        remote_common(
           const rng_t &i,
           const std::array<int, n_dims> &grid_size
         ) :
@@ -218,9 +218,9 @@ namespace libmpdataxx
           buf_send = (real_t *) malloc(halo * slice_size * sizeof(real_t));
           buf_recv = (real_t *) malloc(halo * slice_size * sizeof(real_t));
 #endif
-        } 
+        }
 
-        // dtor                                  
+        // dtor
         ~remote_common()
         {
 #if defined(USE_MPI)

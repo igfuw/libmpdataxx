@@ -18,7 +18,7 @@
 
 // force use of #pragma ivdep even if Blitz thinks the compiler does not support it
 // (as of gcc 20140212, it gives an ICE: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=60198) - TODO: check in CMake
-//#define BZ_USE_ALIGNMENT_PRAGMAS  
+//#define BZ_USE_ALIGNMENT_PRAGMAS
 
 //#if defined(USE_MPI)
 //#  define BZ_HAVE_BOOST_SERIALIZATION
@@ -27,7 +27,7 @@
 #include <blitz/tv2fastiter.h> // otherwise Clang fails in debug mode
 #include <blitz/array.h>
 
-  
+
 #include <libmpdata++/kahan_reduction.hpp>
 
 //////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@
 {                                        \
   init                                   \
   return safeToReturn(expr);             \
-} 
+}
 
 namespace libmpdataxx
 {
@@ -73,31 +73,31 @@ namespace libmpdataxx
   {
     using type = typename expr_t::T_numtype;
   };
-  
+
   template <class expr_t>
   struct real_t_helper<int, expr_t>
   {
     using type = expr_t;
   };
 
-  // Boost ptr_vector 
+  // Boost ptr_vector
   template <class arr_t>
-  struct arrvec_t : boost::ptr_vector<arr_t> 
+  struct arrvec_t : boost::ptr_vector<arr_t>
   {
     using parent_t = boost::ptr_vector<arr_t>;
 
-    const arr_t &operator[](const int i) const 
-    {   
-      return this->at(
-	(i + this->size()) % this->size()
-      );  
-    }
-    
-    arr_t &operator[](const int i)
-    {   
+    const arr_t &operator[](const int i) const
+    {
       return this->at(
         (i + this->size()) % this->size()
-      );  
+      );
+    }
+
+    arr_t &operator[](const int i)
+    {
+      return this->at(
+        (i + this->size()) % this->size()
+      );
     }
 
     void push_back(arr_t *arr)
@@ -107,8 +107,8 @@ namespace libmpdataxx
 #if !defined(NDEBUG)
       // filling the array with NaNs to ease debugging
       *arr = blitz::has_signalling_NaN(*arr->dataFirst())
-	? blitz::signalling_NaN(*arr->dataFirst())
-	: blitz::quiet_NaN(*arr->dataFirst());
+        ? blitz::signalling_NaN(*arr->dataFirst())
+        : blitz::quiet_NaN(*arr->dataFirst());
 #endif
     }
   };

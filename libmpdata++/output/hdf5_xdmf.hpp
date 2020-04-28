@@ -29,12 +29,12 @@ namespace libmpdataxx
     class hdf5_xdmf : public hdf5<solver_t>
     {
       protected:
-      
+
       using output_t = hdf5_xdmf<solver_t>;
       using parent_t = hdf5<solver_t>;
-      
+
       static_assert(parent_t::n_dims > 1, "only 2D and 3D output supported");
-      
+
       std::vector<std::string> timesteps;
       //xdmf writer
       detail::xdmf_writer<parent_t::n_dims> xdmfw;
@@ -53,7 +53,7 @@ namespace libmpdataxx
           {
             attr_names.push_back(v.second.name);
           }
-          
+
           if (this->mem->G.get() != nullptr) xdmfw.add_const_attribute("G", this->const_name, this->mem->distmem.grid_size.data());
 
           xdmfw.setup(this->const_name, this->dim_names, attr_names, this->mem->distmem.grid_size.data());
@@ -88,10 +88,10 @@ namespace libmpdataxx
 #if defined(USE_MPI)
         if (this->mem->distmem.rank() == 0)
 #endif
-          xdmfw.add_attribute(name, this->hdf_name(), this->mem->distmem.grid_size.data()); 
+          xdmfw.add_attribute(name, this->hdf_name(), this->mem->distmem.grid_size.data());
         parent_t::record_aux(name, data);
       }
-      
+
       void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
       {
         auto shape = this->mem->distmem.grid_size;
@@ -99,7 +99,7 @@ namespace libmpdataxx
 #if defined(USE_MPI)
         if (this->mem->distmem.rank() == 0)
 #endif
-          xdmfw.add_attribute(name, this->hdf_name(), shape.data()); 
+          xdmfw.add_attribute(name, this->hdf_name(), shape.data());
         parent_t::record_aux_dsc(name, arr, srfc);
       }
 
@@ -107,8 +107,8 @@ namespace libmpdataxx
 
       // ctor
       hdf5_xdmf(
-	typename parent_t::ctor_args_t args,
-	const typename parent_t::rt_params_t &p
+        typename parent_t::ctor_args_t args,
+        const typename parent_t::rt_params_t &p
       ) : parent_t(args, p)
       {}
     };

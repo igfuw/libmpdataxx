@@ -13,20 +13,20 @@
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 
-namespace libmpdataxx 
-{ 
-  namespace formulae 
-  { 
-    namespace mpdata 
+namespace libmpdataxx
+{
+  namespace formulae
+  {
+    namespace mpdata
     {
       // interpolation of psi to (i+1/2, j) - positive sign scalar / infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto psi_bar_x( 
+      inline auto psi_bar_x(
         const arr_2d_t &psi,
         const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::abs)>::type* = 0
-      ) 
+      )
       {
         return return_helper<ix_t>(
           (
@@ -34,15 +34,15 @@ namespace libmpdataxx
           ) / 2
         );
       }
-     
+
       // interpolation of psi to (i+1/2, j) - variable sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto psi_bar_x( 
+      inline auto psi_bar_x(
         const arr_2d_t &psi,
         const ix_t &i,
         const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::abs)>::type* = 0
-      ) 
+      )
       {
         return return_helper<ix_t>(
           (
@@ -50,10 +50,10 @@ namespace libmpdataxx
           ) / 2
         );
       }
-      
+
       // interpolation of psi to (i, j+1/2) - positive sign scalar / infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto psi_bar_y( 
+      inline auto psi_bar_y(
         const arr_2d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -69,7 +69,7 @@ namespace libmpdataxx
 
       // interpolation of psi to (i, j+1/2) - variable sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto psi_bar_y( 
+      inline auto psi_bar_y(
         const arr_2d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -82,10 +82,10 @@ namespace libmpdataxx
           ) / 2
         );
       }
-      
+
       // interpolation of psi to (i+1/2, j+1/2) - positive sign scalar / infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto psi_bar_xy( 
+      inline auto psi_bar_xy(
         const arr_2d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -94,7 +94,7 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            psi(pi<dim>(i+1, j  )) + 
+            psi(pi<dim>(i+1, j  )) +
             psi(pi<dim>(i  , j  )) +
             psi(pi<dim>(i  , j+1)) +
             psi(pi<dim>(i+1, j+1))
@@ -104,7 +104,7 @@ namespace libmpdataxx
 
       // interpolation of psi to (i+1/2, j+1/2) - variable sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto psi_bar_xy( 
+      inline auto psi_bar_xy(
         const arr_2d_t &psi,
         const ix_t &i,
         const ix_t &j,
@@ -113,7 +113,7 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           (
-            abs(psi(pi<dim>(i+1, j  ))) + 
+            abs(psi(pi<dim>(i+1, j  ))) +
             abs(psi(pi<dim>(i  , j  ))) +
             abs(psi(pi<dim>(i  , j+1))) +
             abs(psi(pi<dim>(i+1, j+1)))
@@ -122,14 +122,14 @@ namespace libmpdataxx
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2, j) - positive sign scalar version  
+      // dx/psi * dpsi/dx at (i+1/2, j) - positive sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto ndx_psi(
-        const arr_2d_t &psi, 
-        const ix_t &i, 
+        const arr_2d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
-      ) 
+      )
       {
         return return_helper<ix_t>(
           2 *
@@ -142,11 +142,11 @@ namespace libmpdataxx
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2, j) - variable-sign scalar version 
+      // dx/psi * dpsi/dx at (i+1/2, j) - variable-sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto ndx_psi(
-        const arr_2d_t &psi, 
-        const ix_t &i, 
+        const arr_2d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
@@ -157,16 +157,16 @@ namespace libmpdataxx
             abs(psi(pi<dim>(i+1, j))) - abs(psi(pi<dim>(i, j)))
             ,// -------------------------------------------
             abs(psi(pi<dim>(i+1, j))) + abs(psi(pi<dim>(i, j)))
-          ) 
+          )
         );
       }
 
       // nondimensionalised x derivative of psi i.e.
-      // dx/psi * dpsi/dx at (i+1/2, j) - infinite gauge version 
+      // dx/psi * dpsi/dx at (i+1/2, j) - infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto ndx_psi(
-        const arr_2d_t &psi, 
-        const ix_t &i, 
+        const arr_2d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       )
@@ -181,19 +181,19 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised y derivative of psi i.e.
       // dy/psi * dpsi/dy at (i+1/2, j) - positive sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto ndy_psi(
-        const arr_2d_t &psi, 
-        const ix_t &i, 
+        const arr_2d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       )
       {
         return return_helper<ix_t>(
-          frac<opts, ix_t>( 
+          frac<opts, ix_t>(
             psi(pi<dim>(i+1, j+1)) + psi(pi<dim>(i, j+1)) - psi(pi<dim>(i+1, j-1)) - psi(pi<dim>(i, j-1))
             ,// ---------------------------------------------------------------------------------
             psi(pi<dim>(i+1, j+1)) + psi(pi<dim>(i, j+1)) + psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1))
@@ -205,14 +205,14 @@ namespace libmpdataxx
       // dy/psi * dpsi/dy at (i+1/2, j) - variable sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto ndy_psi(
-        const arr_2d_t &psi, 
-        const ix_t &i, 
+        const arr_2d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
       {
         return return_helper<ix_t>(
-          frac<opts, ix_t>( 
+          frac<opts, ix_t>(
             abs(psi(pi<dim>(i+1, j+1))) + abs(psi(pi<dim>(i, j+1))) - abs(psi(pi<dim>(i+1, j-1))) - abs(psi(pi<dim>(i, j-1)))
             ,// -----------------------------------------------------------------------------------------------------
             abs(psi(pi<dim>(i+1, j+1))) + abs(psi(pi<dim>(i, j+1))) + abs(psi(pi<dim>(i+1, j-1))) + abs(psi(pi<dim>(i, j-1)))
@@ -224,8 +224,8 @@ namespace libmpdataxx
       // dy/psi * dpsi/dy at (i+1/2, j) - infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto ndy_psi(
-        const arr_2d_t &psi, 
-        const ix_t &i, 
+        const arr_2d_t &psi,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       )
@@ -239,7 +239,7 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised xx derivative of psi i.e.
       // dx^2/psi * dpsi/dxx at (i+1/2, j) - positive sign scalar version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
@@ -312,7 +312,7 @@ namespace libmpdataxx
         return return_helper<ix_t>(
             2 *
             frac<opts, ix_t>(
-              psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) - psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1))            
+              psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) - psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1))
               ,//-----------------------------------------------------------------------------------------
               psi(pi<dim>(i+1, j+1)) + psi(pi<dim>(i, j+1)) + psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1))
           )
@@ -332,7 +332,7 @@ namespace libmpdataxx
         return return_helper<ix_t>(
             2 *
             frac<opts, ix_t>(
-              abs(psi(pi<dim>(i+1, j+1))) - abs(psi(pi<dim>(i, j+1))) - abs(psi(pi<dim>(i+1, j-1))) + abs(psi(pi<dim>(i, j-1)))            
+              abs(psi(pi<dim>(i+1, j+1))) - abs(psi(pi<dim>(i, j+1))) - abs(psi(pi<dim>(i+1, j-1))) + abs(psi(pi<dim>(i, j-1)))
               ,//-------------------------------------------------------------------------------------------------------------
               abs(psi(pi<dim>(i+1, j+1))) + abs(psi(pi<dim>(i, j+1))) + abs(psi(pi<dim>(i+1, j-1))) + abs(psi(pi<dim>(i, j-1)))
           )
@@ -352,7 +352,7 @@ namespace libmpdataxx
         static_assert(!opts::isset(opts, opts::abs), "iga & abs options are mutually exclusive");
         return return_helper<ix_t>(
           2 *
-          (psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) - psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1)))            
+          (psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) - psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1)))
           / //-------------------------------------------------------------------------------------------
           (1 + 1 + 1 + 1)
         );
@@ -374,7 +374,7 @@ namespace libmpdataxx
           (1 + 1 + 1 + 1)
         );
       }
-      
+
       // nondimensionalised xxy derivative of psi i.e.
       // dx^2*dy/psi * dpsi/dxxy at (i+1/2, j) - infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
@@ -383,16 +383,16 @@ namespace libmpdataxx
         const ix_t &i,
         const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
-      ) 
+      )
       {
         return return_helper<ix_t>(
-          (  psi(pi<dim>(i+2, j+1)) - psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) + psi(pi<dim>(i-1, j+1)) 
+          (  psi(pi<dim>(i+2, j+1)) - psi(pi<dim>(i+1, j+1)) - psi(pi<dim>(i, j+1)) + psi(pi<dim>(i-1, j+1))
             -psi(pi<dim>(i+2, j-1)) + psi(pi<dim>(i+1, j-1)) + psi(pi<dim>(i, j-1)) - psi(pi<dim>(i-1, j-1)) )
           / //------------------------------------------------------------------------------------------------
           (1 + 1 + 1 + 1 + 1 + 1 + 1 + 1)
         );
       }
-      
+
       // nondimensionalised xyy derivative of psi i.e.
       // dx*dy^2/psi * dpsi/dxyy at (i+1/2, j) - infinite gauge version
       template <opts_t opts, int dim, class arr_2d_t, class ix_t>
@@ -412,12 +412,12 @@ namespace libmpdataxx
       }
 
       // nondimensionalised tx derivative of psi i.e.
-      // dx*dt/psi * dpsi/dtx at (i+1/2, j) - positive sign scalar version  
+      // dx*dt/psi * dpsi/dtx at (i+1/2, j) - positive sign scalar version
       template<opts_t opts, int d, class arr_2d_t, class ix_t>
       inline auto ndtx_psi(
-        const arr_2d_t &psi_np1, 
-        const arr_2d_t &psi_n, 
-        const ix_t &i, 
+        const arr_2d_t &psi_np1,
+        const arr_2d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       )
@@ -437,14 +437,14 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised tx derivative of psi i.e.
-      // dx*dt/psi * dpsi/dtx at (i+1/2, j) - variable sign scalar version  
+      // dx*dt/psi * dpsi/dtx at (i+1/2, j) - variable sign scalar version
       template<opts_t opts, int d, class arr_2d_t, class ix_t>
       inline auto ndtx_psi(
-        const arr_2d_t &psi_np1, 
-        const arr_2d_t &psi_n, 
-        const ix_t &i, 
+        const arr_2d_t &psi_np1,
+        const arr_2d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
@@ -464,14 +464,14 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised tx derivative of psi i.e.
-      // dx*dt/psi * dpsi/dtx at (i+1/2, j) - infinite gauge version  
+      // dx*dt/psi * dpsi/dtx at (i+1/2, j) - infinite gauge version
       template<opts_t opts, int d, class arr_2d_t, class ix_t>
       inline auto ndtx_psi(
-        const arr_2d_t &psi_np1, 
-        const arr_2d_t &psi_n, 
-        const ix_t &i, 
+        const arr_2d_t &psi_np1,
+        const arr_2d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       )
@@ -485,12 +485,12 @@ namespace libmpdataxx
       }
 
       // nondimensionalised t derivative of psi i.e.
-      // dt/psi * dpsi/dt at (i+1/2, j) - positive sign scalar version  
+      // dt/psi * dpsi/dt at (i+1/2, j) - positive sign scalar version
       template<opts_t opts, int d, class arr_2d_t, class ix_t>
       inline auto ndt_psi(
-        const arr_2d_t &psi_np1, 
-        const arr_2d_t &psi_n, 
-        const ix_t &i, 
+        const arr_2d_t &psi_np1,
+        const arr_2d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && !opts::isset(opts, opts::abs)>::type* = 0
       )
@@ -510,14 +510,14 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised t derivative of psi i.e.
-      // dt/psi * dpsi/dt at (i+1/2, j) - variable sign scalar version  
+      // dt/psi * dpsi/dt at (i+1/2, j) - variable sign scalar version
       template<opts_t opts, int d, class arr_2d_t, class ix_t>
       inline auto ndt_psi(
-        const arr_2d_t &psi_np1, 
-        const arr_2d_t &psi_n, 
-        const ix_t &i, 
+        const arr_2d_t &psi_np1,
+        const arr_2d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<!opts::isset(opts, opts::iga) && opts::isset(opts, opts::abs)>::type* = 0
       )
@@ -537,14 +537,14 @@ namespace libmpdataxx
           )
         );
       }
-      
+
       // nondimensionalised t derivative of psi i.e.
-      // dt/psi * dpsi/dt at (i+1/2, j) - infinite gauge version  
+      // dt/psi * dpsi/dt at (i+1/2, j) - infinite gauge version
       template<opts_t opts, int d, class arr_2d_t, class ix_t>
       inline auto ndt_psi(
-        const arr_2d_t &psi_np1, 
-        const arr_2d_t &psi_n, 
-        const ix_t &i, 
+        const arr_2d_t &psi_np1,
+        const arr_2d_t &psi_n,
+        const ix_t &i,
         const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::iga)>::type* = 0
       )
@@ -560,4 +560,4 @@ namespace libmpdataxx
       }
     } // namespace mpdata
   } // namespace formulae
-} // namespcae libmpdataxx 
+} // namespcae libmpdataxx

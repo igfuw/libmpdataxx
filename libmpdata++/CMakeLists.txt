@@ -5,7 +5,7 @@ project(libmpdata++ CXX)
 # using include() istead of find_package(libmpdata++) to use local CMake code
 # and not the system-installed one
 include(${CMAKE_SOURCE_DIR}/../libmpdata++-config.cmake)
-if (NOT libmpdataxx_FOUND) 
+if (NOT libmpdataxx_FOUND)
   message(FATAL_ERROR "local libmpdata++-config.cmake not found!")
 endif()
 
@@ -13,20 +13,20 @@ endif()
 if (EXISTS "${CMAKE_SOURCE_DIR}/../.git")
   execute_process(COMMAND
    bash -c "git log -1 --format=\"format:#define LIBMPDATAXX_GIT_REVISION \\\"%H\\\"%n\" HEAD > git_revision.hpp"
-   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} 
+   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   )
 endif()
 
 install(
   DIRECTORY
     bcond concurr formulae output solvers
-  DESTINATION 
+  DESTINATION
     include/libmpdata++
 )
 install(
   FILES
     blitz.hpp git_revision.hpp kahan_reduction.hpp opts.hpp
-  DESTINATION 
+  DESTINATION
     include/libmpdata++
 )
 install(

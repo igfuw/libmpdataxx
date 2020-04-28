@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -30,8 +30,8 @@ namespace libmpdataxx
         using ix = typename ct_params_t::ix;
         bool buoy_filter;
         typename parent_t::arr_t &tmp1, &tmp2;
-        
-        template <int nd = ct_params_t::n_dims> 
+
+        template <int nd = ct_params_t::n_dims>
         void filter(typename std::enable_if<nd == 2>::type* = 0)
         {
           const auto &i(this->i), &j(this->j);
@@ -39,14 +39,14 @@ namespace libmpdataxx
           tmp2(i, j) = real_t(0.25) * (tmp1(i, j + 1) + 2 * tmp1(i, j) + tmp1(i, j - 1));
         }
 
-        template <int nd = ct_params_t::n_dims> 
+        template <int nd = ct_params_t::n_dims>
         void filter(typename std::enable_if<nd == 3>::type* = 0)
         {
           const auto &i(this->i), &j(this->j), &k(this->k);
           this->xchng_sclr(tmp1, this->ijk);
           tmp2(i, j, k) = real_t(0.25) * (tmp1(i, j, k + 1) + 2 * tmp1(i, j, k) + tmp1(i, j, k - 1));
         }
-        
+
         // helpers for buoyancy forces
         template<class ijk_t>
         inline auto buoy_at_0(const ijk_t &ijk)
@@ -55,7 +55,7 @@ namespace libmpdataxx
             this->g * (this->state(ix::tht)(ijk) - this->tht_e(ijk)) / this->Tht_ref
           );
         }
-        
+
         template<class ijk_t>
         inline auto buoy_at_1(const ijk_t &ijk)
         {
@@ -74,17 +74,17 @@ namespace libmpdataxx
           full_tht(this->ijk) = this->state(ix::tht)(this->ijk);
         }
 
-        // explicit forcings 
+        // explicit forcings
         void update_rhs(
           libmpdataxx::arrvec_t<
             typename parent_t::arr_t
-          > &rhs, 
-          const real_t &dt, 
-          const int &at 
+          > &rhs,
+          const real_t &dt,
+          const int &at
         ) {
-          parent_t::update_rhs(rhs, dt, at); 
+          parent_t::update_rhs(rhs, dt, at);
 
-          const auto &tht = this->state(ix::tht); 
+          const auto &tht = this->state(ix::tht);
           const auto &ijk = this->ijk;
 
           auto ix_w = this->vip_ixs[ct_params_t::n_dims - 1];
@@ -94,7 +94,7 @@ namespace libmpdataxx
             case (0):
             {
               rhs.at(ix::tht)(ijk) += this->hflux_frc(ijk) - this->tht_abs(ijk) * (tht(ijk) - this->tht_e(ijk));
-              
+
               if (!buoy_filter)
               {
                 rhs.at(ix_w)(ijk) += buoy_at_0(ijk);
@@ -128,16 +128,16 @@ namespace libmpdataxx
             }
           }
         }
-        
+
         public:
-        struct rt_params_t : parent_t::rt_params_t 
-        { 
-          bool buoy_filter = false; 
+        struct rt_params_t : parent_t::rt_params_t
+        {
+          bool buoy_filter = false;
         };
 
         // ctor
-        boussinesq_expl( 
-          typename parent_t::ctor_args_t args, 
+        boussinesq_expl(
+          typename parent_t::ctor_args_t args,
           const rt_params_t &p
         ) :
           parent_t(args, p),

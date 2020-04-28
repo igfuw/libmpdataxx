@@ -13,21 +13,21 @@
 
 #include <libmpdata++/formulae/mpdata/formulae_mpdata_common.hpp>
 
-namespace libmpdataxx 
-{ 
-  namespace formulae 
-  { 
-    namespace mpdata 
+namespace libmpdataxx
+{
+  namespace formulae
+  {
+    namespace mpdata
     {
       // interpolation of G to (i+1/2, j) - general case
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
-      inline auto G_bar_x( 
+      inline auto G_bar_x(
         const arr_2d_t &G,
         const ix_t &i,
         const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0
-      ) 
-      { 
+      )
+      {
         return return_helper<ix_t>(
           (
             formulae::G<opts, dim>(G, i+1, j) + formulae::G<opts, dim>(G, i, j)
@@ -45,7 +45,7 @@ namespace libmpdataxx
       ) {
         return 1;
       }
-      
+
       // interpolation of G to (i+1/2, j+1/2) - general case
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto G_bar_xy(
@@ -54,7 +54,7 @@ namespace libmpdataxx
         const ix_t &j,
         typename std::enable_if<opts::isset(opts, opts::nug)>::type* = 0
       )
-      { 
+      {
         return return_helper<ix_t>(
           (
             formulae::G<opts, dim>(G, i  , j  ) +
@@ -64,7 +64,7 @@ namespace libmpdataxx
           ) / 4
         );
       }
-      
+
       // interpolation of G to (i+1/2, j+1/2) - constant G version
       template<opts_t opts, int dim, class arr_2d_t, class ix_t>
       inline auto G_bar_xy(
@@ -77,4 +77,4 @@ namespace libmpdataxx
       }
     } // namespace mpdata
   } // namespace formulae
-} // namespace libmpdataxx 
+} // namespace libmpdataxx

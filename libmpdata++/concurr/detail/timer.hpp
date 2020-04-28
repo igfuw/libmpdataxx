@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -14,15 +14,15 @@ namespace libmpdataxx
 {
   namespace concurr
   {
-    namespace detail 
+    namespace detail
     {
-      class timer 
+      class timer
       {
-        std::unique_ptr<boost::timer::cpu_timer> tmr; 
+        std::unique_ptr<boost::timer::cpu_timer> tmr;
         bool started = false;
 
         public:
-      
+
         // ctor
         timer()
         {
@@ -30,9 +30,9 @@ namespace libmpdataxx
         }
 
         void resume()
-        { 
+        {
           if (started) tmr->resume();
-          else 
+          else
           {
             started = true;
             tmr->start();
@@ -41,18 +41,18 @@ namespace libmpdataxx
 
         void stop()
         {
-	  tmr->stop();
+          tmr->stop();
         }
 
         void print()
         {
-	  boost::timer::cpu_times t = tmr->elapsed();
-	  std::ostringstream tmp;
-	  tmp << " wall time: " << double(t.wall) * 1e-9 << "s";
-	  tmp << " user time: " << double(t.user) * 1e-9 << "s";
-	  tmp << " system time: " << double(t.system) * 1e-9 << "s";
-	  std::cerr << tmp.str() << std::endl;
-	}
+          boost::timer::cpu_times t = tmr->elapsed();
+          std::ostringstream tmp;
+          tmp << " wall time: " << double(t.wall) * 1e-9 << "s";
+          tmp << " user time: " << double(t.user) * 1e-9 << "s";
+          tmp << " system time: " << double(t.system) * 1e-9 << "s";
+          std::cerr << tmp.str() << std::endl;
+        }
       };
     } // namespace detail
   } // namespace solvers

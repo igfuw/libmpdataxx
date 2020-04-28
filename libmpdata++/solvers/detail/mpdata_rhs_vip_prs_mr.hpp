@@ -1,12 +1,12 @@
-/** 
+/**
   * @file
   * @copyright University of Warsaw
   * @section LICENSE
   * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
   *
-  * @brief minimum residual pressure solver 
-  *   (for more detailed discussion consult Smolarkiewicz & Margolin 1994 
-  *  Appl. Math and Comp. Sci. 
+  * @brief minimum residual pressure solver
+  *   (for more detailed discussion consult Smolarkiewicz & Margolin 1994
+  *  Appl. Math and Comp. Sci.
   *  Variational solver for elliptic problems in atmospheric flows)
 */
 
@@ -29,11 +29,11 @@ namespace libmpdataxx
 
         private:
 
-	using parent_t = mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
+        using parent_t = mpdata_rhs_vip_prs_common<ct_params_t, minhalo>;
         using ix = typename ct_params_t::ix;
 
-	real_t beta, tmp_den;
-	typename parent_t::arr_t lap_err;
+        real_t beta, tmp_den;
+        typename parent_t::arr_t lap_err;
 
         void pressure_solver_loop_init(bool simple) final {}
 
@@ -48,7 +48,7 @@ namespace libmpdataxx
           this->err(this->ijk) += beta * this->lap_err(this->ijk);
 
           real_t error = std::max(
-            std::abs(this->mem->max(this->rank, this->err(this->ijk))), 
+            std::abs(this->mem->max(this->rank, this->err(this->ijk))),
             std::abs(this->mem->min(this->rank, this->err(this->ijk)))
           );
 
@@ -57,27 +57,27 @@ namespace libmpdataxx
 
         public:
 
-	struct rt_params_t : parent_t::rt_params_t { };
+        struct rt_params_t : parent_t::rt_params_t { };
 
-	// ctor
-	mpdata_rhs_vip_prs_mr(
-	  typename parent_t::ctor_args_t args,
-	  const rt_params_t &p
-	) :
-	  parent_t(args, p),
+        // ctor
+        mpdata_rhs_vip_prs_mr(
+          typename parent_t::ctor_args_t args,
+          const rt_params_t &p
+        ) :
+          parent_t(args, p),
           beta(.25),
           tmp_den(1.),
-	  lap_err(args.mem->tmp[__FILE__][0][0])
-	{}
+          lap_err(args.mem->tmp[__FILE__][0][0])
+        {}
 
-	static void alloc(
-          typename parent_t::mem_t *mem, 
+        static void alloc(
+          typename parent_t::mem_t *mem,
           const int &n_iters
         ) {
-	  parent_t::alloc(mem, n_iters);
-	  parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
-	}
-      }; 
+          parent_t::alloc(mem, n_iters);
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1);
+        }
+      };
     } // namespace detail
   } // namespace solvers
 } // namespace libmpdataxx

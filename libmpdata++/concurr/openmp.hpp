@@ -30,26 +30,26 @@ namespace libmpdataxx
     class openmp : public detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
     {
       using parent_t = detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
- 
+
 
       struct mem_t : parent_t::mem_t
       {
-	static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max())
-	{
+        static int size(const unsigned max_threads = std::numeric_limits<unsigned>::max())
+        {
 #if defined(_OPENMP)
-	  const char *env_var("OMP_NUM_THREADS");
+          const char *env_var("OMP_NUM_THREADS");
 
-	  int nthreads = std::min(max_threads, static_cast<unsigned>(
+          int nthreads = std::min(max_threads, static_cast<unsigned>(
             (std::getenv(env_var) != NULL) ?  std::atoi(std::getenv(env_var)) : omp_get_max_threads()
           ));
 
           omp_set_num_threads(nthreads);
 
-	  return omp_get_max_threads();
+          return omp_get_max_threads();
 #else
-	  return 1;
+          return 1;
 #endif
-	}
+        }
 
         void barrier()
         {
@@ -70,13 +70,13 @@ namespace libmpdataxx
           i = omp_get_thread_num();
 #endif
           this->algos[i].solve(nt);
-        } 
+        }
       }
 
       public:
 
       // ctor
-      openmp(const typename solver_t::rt_params_t &p) : 
+      openmp(const typename solver_t::rt_params_t &p) :
         parent_t(p, new mem_t(p.grid_size), mem_t::size(p.grid_size[0]))
       {}
 

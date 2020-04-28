@@ -13,7 +13,7 @@
 namespace blitz
 {
   template<typename P_sourcetype, typename P_resulttype = BZ_SUMTYPE(P_sourcetype)>
-  class ReduceKahanSum 
+  class ReduceKahanSum
   {
     public:
 
@@ -23,33 +23,33 @@ namespace blitz
 
     static const bool needIndex = false, needInit = false;
 
-    ReduceKahanSum() { } 
+    ReduceKahanSum() { }
 
 #pragma GCC push_options
 #pragma GCC optimize ("O3") // assuming -Ofast could optimise out the algorithm
-    bool operator()(const T_sourcetype& x, const int=0) const 
-    { 
+    bool operator()(const T_sourcetype& x, const int=0) const
+    {
 #if defined(__FAST_MATH__) && defined(__llvm__)
       volatile // without volatile clang optimises the algorithm out with -Ofast
 #endif
-      T_resulttype t, y; 
+      T_resulttype t, y;
       y = x - c_;
       t = sum_ + y;
       c_ = (t - sum_) - y;
       sum_ = t;
       return true;
-    }   
+    }
 #pragma GCC pop_options
 
     T_resulttype result(const int) const { return sum_; }
 
-    void reset() const 
-    { 
-      sum_ = c_ = zero(T_resulttype()); 
+    void reset() const
+    {
+      sum_ = c_ = zero(T_resulttype());
     }
- 
+
     static const char* name() { return "sum"; }
- 
+
     protected:
 
     mutable T_resulttype sum_, c_;

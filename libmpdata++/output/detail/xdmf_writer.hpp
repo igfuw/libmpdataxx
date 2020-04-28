@@ -130,7 +130,7 @@ namespace libmpdataxx
             attrs.insert(make_attribute(n, dimensions + 1));
           }
         }
-        
+
 
         void add_attribute(const std::string& name,
                                  const std::string& hdf_name,
@@ -171,7 +171,7 @@ namespace libmpdataxx
 
           for (auto a : attrs)
             a.add(grid_node);
-          
+
           for (auto ca : c_attrs)
             ca.add(grid_node);
 

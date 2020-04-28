@@ -24,17 +24,17 @@ namespace libmpdataxx
     class serial : public detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
     {
       using parent_t = detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
- 
+
 
       struct mem_t : parent_t::mem_t
       {
-	static int size() { return 1; }
+        static int size() { return 1; }
 
         void barrier() { }
 
         // ctors
-        mem_t(const std::array<int, solver_t::n_dims> &grid_size) 
-          : parent_t::mem_t(grid_size, size()) 
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size)
+          : parent_t::mem_t(grid_size, size())
         {};
       };
 
@@ -46,7 +46,7 @@ namespace libmpdataxx
       public:
 
       // ctor
-      serial(const typename solver_t::rt_params_t &p) : 
+      serial(const typename solver_t::rt_params_t &p) :
         parent_t(p, new mem_t(p.grid_size), mem_t::size())
       {}
 

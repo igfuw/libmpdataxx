@@ -1,4 +1,4 @@
-/** 
+/**
  * @file
  * @copyright University of Warsaw
  * @section LICENSE
@@ -27,7 +27,7 @@ namespace libmpdataxx
         typename parent_t::arr_t &rcdsn_num, &full_tht, &tdef_sq, &mix_len, &hflux_srfc;
         arrvec_t<typename parent_t::arr_t> &grad_tht;
 
-        template <int nd = ct_params_t::n_dims> 
+        template <int nd = ct_params_t::n_dims>
         void calc_rcdsn_num(typename std::enable_if<nd == 2>::type* = 0)
         {
           rcdsn_num(this->ijk) = this->g * real_t(0.5) * (
@@ -36,7 +36,7 @@ namespace libmpdataxx
                                            ) / (this->Tht_ref * tdef_sq(this->ijk));
         }
 
-        template <int nd = ct_params_t::n_dims> 
+        template <int nd = ct_params_t::n_dims>
         void calc_rcdsn_num(typename std::enable_if<nd == 3>::type* = 0)
         {
           rcdsn_num(this->ijk) = this->g * real_t(0.5) * (
@@ -69,7 +69,7 @@ namespace libmpdataxx
 
           this->xchng_pres(full_tht, this->ijk);
           formulae::nabla::calc_grad_cmpct<parent_t::n_dims>(grad_tht, this->full_tht, this->ijk, this->ijkm, this->dijk);
-          
+
           tdef_sq(this->ijk) = formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk);
 
           calc_rcdsn_num();
@@ -86,7 +86,7 @@ namespace libmpdataxx
           ijp1.ubound(ct_params_t::n_dims - 1) = 1;
 
           this->k_m(ij) = this->k_m(ijp1);
-          
+
           this->xchng_sclr(this->k_m, this->ijk, 1);
 
           // havo to use modified ijkm due to shared-memory parallelisation, otherwise overlapping ranges
@@ -120,14 +120,14 @@ namespace libmpdataxx
         }
 
         public:
-        struct rt_params_t : parent_t::rt_params_t 
-        { 
+        struct rt_params_t : parent_t::rt_params_t
+        {
           real_t prandtl_num = 0;
         };
 
         // ctor
-        boussinesq_sgs_common( 
-          typename parent_t::ctor_args_t args, 
+        boussinesq_sgs_common(
+          typename parent_t::ctor_args_t args,
           const rt_params_t &p
         ) :
           parent_t(args, p),

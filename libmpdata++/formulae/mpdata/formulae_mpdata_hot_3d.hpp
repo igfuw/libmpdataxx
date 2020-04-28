@@ -99,11 +99,11 @@ namespace libmpdataxx
       {
         return return_helper<ix_t>(
           ndxx_psi<opts, dim>(psi, i, j, k) * ndxx_psi_coeff<opts, dim>(GC[dim], G, i, j, k)
-          + 
+          +
           ndxy_psi<opts, dim>(psi, i, j, k) * ndxy_psi_coeff<opts, dim>(GC, G, i, j, k)
-          + 
+          +
           ndxz_psi<opts, dim>(psi, i, j, k) * ndxz_psi_coeff<opts, dim>(GC, G, i, j, k)
-          + 
+          +
           ndyz_psi<opts, dim>(psi, i, j, k) * ndyz_psi_coeff<opts, dim>(GC, G, i, j, k)
         );
       }

@@ -14,54 +14,54 @@
 //#include <boost/preprocessor/control/if.hpp>
 
 namespace libmpdataxx
-{ 
+{
   // in namespace solvers to be consistent with other options
   namespace solvers
   {
     enum sptl_intrp_t
-    { 
+    {
       exact,
       aver2,
       aver4,
     };
-    
+
     enum tmprl_extrp_t
-    { 
+    {
       noextrp,
       linear2,
     };
   }
 
-  namespace formulae 
-  { 
-    namespace mpdata 
+  namespace formulae
+  {
+    namespace mpdata
     {
       using namespace arakawa_c;
       using idxperm::pi;
       using opts::opts_t;
       using std::abs;
-      
+
       using blitz::pow2;
       using blitz::pow3;
       using blitz::pow4;
 
       const int n_tlev = 2;
 
-      constexpr const int halo(const opts_t &opts) 
+      constexpr const int halo(const opts_t &opts)
       {
         return (
           opts::isset(opts, opts::tot)        || // see psi 2-nd derivatives in eq. (36) in PKS & LGM 1998
           opts::isset(opts, opts::dfl)        || // see +3/2 in eq. (30) in PKS & LGM 1998
-          opts::isset(opts, opts::div_2nd)    || 
+          opts::isset(opts, opts::div_2nd)    ||
           opts::isset(opts, opts::div_3rd)    ||
           opts::isset(opts, opts::div_3rd_dt)
-        ) ? 2 : 1; 
+        ) ? 2 : 1;
       }
 
       // frac: implemented using blitz::where()
       template<opts_t opts, class ix_t, class nom_t, class den_t>
       forceinline_macro auto frac(
-        const nom_t &nom, 
+        const nom_t &nom,
         const den_t &den,
         typename std::enable_if<opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == true
       )
@@ -75,7 +75,7 @@ namespace libmpdataxx
       //       if den == 0, then adding a smallest representable positive number
       template<opts_t opts, class ix_t, class nom_t, class den_t>
       forceinline_macro auto frac(
-        const nom_t &nom, 
+        const nom_t &nom,
         const den_t &den,
         typename std::enable_if<!opts::isset(opts, opts::pfc)>::type* = 0 // enabled if pfc == false
       )
@@ -88,7 +88,7 @@ namespace libmpdataxx
       // a bigger-epsilon version for FCT (used regardless of opts::eps setting)
       template<class ix_t, class nom_t, class den_t>
       forceinline_macro auto fct_frac(
-        const nom_t &nom, 
+        const nom_t &nom,
         const den_t &den
       )
       {

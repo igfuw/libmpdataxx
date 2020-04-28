@@ -35,7 +35,7 @@ namespace libmpdataxx
                                                                   mpdata_boussinesq_family_tag,
                                                                   mpdata_boussinesq_sgs_family_tag>::type;
     };
-    
+
     template<typename ct_params_t>
     class boussinesq<
       ct_params_t,
@@ -44,7 +44,7 @@ namespace libmpdataxx
     {
       using parent_t = detail::boussinesq_impl<ct_params_t>;
       using parent_t::parent_t; // inheriting constructors
-      
+
       protected:
       using solver_family = typename std::conditional<static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == iles,
                                                       mpdata_boussinesq_family_tag,

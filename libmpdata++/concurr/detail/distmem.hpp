@@ -49,8 +49,8 @@ public: // TODO: just a temp measure, make it private again
 
         std::array<int, n_dims> grid_size;
 
-        int rank() 
-        { 
+        int rank()
+        {
 #if defined(USE_MPI)
           return mpicom.rank();  // is it thread-safe? TODO: init once in ctor?
 #else
@@ -58,7 +58,7 @@ public: // TODO: just a temp measure, make it private again
 #endif
         }
 
-        int size() 
+        int size()
         {
 #if defined(USE_MPI)
           return mpicom.size();   // is it thread-safe? TODO: init once in ctor?
@@ -102,8 +102,8 @@ public: // TODO: just a temp measure, make it private again
         }
 
         // ctor
-        distmem(const std::array<int, n_dims> &grid_size) 
-          : grid_size(grid_size) 
+        distmem(const std::array<int, n_dims> &grid_size)
+          : grid_size(grid_size)
         {
 #if !defined(USE_MPI)
           if (
