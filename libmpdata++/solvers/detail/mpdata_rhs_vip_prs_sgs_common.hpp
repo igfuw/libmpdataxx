@@ -50,8 +50,17 @@ namespace libmpdataxx
         arrvec_t<typename parent_t::arr_t> &drv;
         arrvec_t<typename parent_t::arr_t> &wrk;
 
+        // like ijk, but containing vectors at the lower/left/fre edge
+        // CAUTION: on sharedmem, ijkm contains overlapping ranges
         std::array<rng_t, ct_params_t::n_dims> ijkm;
-        std::array<rng_t, ct_params_t::n_dims> ijk_vec; // like ijk, but with range in x direction extended by 1 for rank=0 for MPI compliance (c.f. remote_2d.hpp fill_halos_vctr_alng), TODO: change MPI logic?
+
+        // ijkm with non-overlapping ranges
+        std::array<rng_t, ct_params_t::n_dims> ijkm_sep;
+
+        // like ijk, but with range in x direction extended by 1 to the left for rank=0 for MPI compliance.
+        // MPI requires that vector between two process domains is calculated by the process to the right of it  (c.f. remote_2d.hpp fill_halos_vctr_alng)
+        // TODO: change MPI logic to assume that it is calculated by the process to the left? then, ijk_vec would not be needed(?)
+        std::array<rng_t, ct_params_t::n_dims> ijk_vec;
         real_t cdrag;
 
         virtual void multiply_sgs_visc() = 0;
@@ -192,6 +201,10 @@ namespace libmpdataxx
           }
           if (this->rank == 0)
             ijk_vec[0] = rng_t(this->ijk[0].first() - 1, this->ijk[0].last());
+
+          ijkm_sep = ijkm;
+          if (this->rank > 0)
+            ijkm_sep[0] = this->ijk[0];
         }
 
         static void alloc(
