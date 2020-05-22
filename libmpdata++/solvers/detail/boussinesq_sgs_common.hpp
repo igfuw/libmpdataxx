@@ -92,15 +92,15 @@ namespace libmpdataxx
           // havo to use modified ijkm due to shared-memory parallelisation, otherwise overlapping ranges
           // would lead to double multiplications
           // TODO: better way ?
-          auto ijkm_aux = this->ijkm;
-          if (this->rank > 0)
-            ijkm_aux[0] = this->ijk[0];
+          //auto ijkm_aux = this->ijkm;
+          //if (this->rank > 0)
+          //  ijkm_aux[0] = this->ijk[0];
 
           formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims, ct_params_t::opts>(this->tau,
                                                                                         real_t(1.0),
                                                                                         this->k_m,
                                                                                         *this->mem->G,
-                                                                                        ijkm_aux);
+                                                                                        this->ijk_vec);
 
           this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
 
