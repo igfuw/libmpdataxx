@@ -52,11 +52,9 @@ namespace libmpdataxx
 
         // like ijk, but containing vectors at the lower/left/fre edge
         // CAUTION: on sharedmem, ijkm contains overlapping ranges
-        //std::array<rng_t, ct_params_t::n_dims> ijkm;
         idx_t<ct_params_t::n_dims> ijkm;
 
         // ijkm with non-overlapping ranges
-        //std::array<rng_t, ct_params_t::n_dims> ijkm_sep;
         idx_t<ct_params_t::n_dims> ijkm_sep;
 
         // like ijk, but with range in x direction extended by 1 to the left for rank=0 for MPI compliance.
@@ -98,33 +96,23 @@ namespace libmpdataxx
 
         void vip_rhs_expl_calc()
         {
-std::cerr << "prs_sgs_common start of vip_rhs_expl_calc vip[0]: " << this->vips()[0];
-
           parent_t::vip_rhs_expl_calc();
-
-std::cerr << "prs_sgs_common post parent::vip_rhs_expl_calc vip[0]: " << this->vips()[0];
 
           using ix = typename ct_params_t::ix;
           using namespace arakawa_c;
 
           // TODO: get rid of superfluous barriers
           for (auto& vip : this->vips())
-            this->xchng_sclr(vip, this->ijk, 1); // ext=2 needed for MPI. ext=1 leads to NaNs in the corners of the halo, which gives NaN tau in a corner to the left of the domain and in MPI process needs to calculate vecotrs to the left of its domain
-
-std::cerr << "prs_sgs_common post xchng_sclr vip[0]: " << this->vips()[0];
+            this->xchng_sclr(vip, this->ijk, 1);
 
           if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
             calc_drag_cmpct();
 
-std::cerr << "post calc_drag_cmpct tau[0]: " << tau[0];
-
             if (this->mem->G)
             {
               formulae::stress::calc_vip_div_cmpct<ct_params_t::n_dims>(vip_div, this->vips(), *this->mem->G, this->ijk, this->dijk);
-std::cerr << "post calc vip div cmpct vip_div: " << this->vip_div;
               this->xchng_sgs_div(vip_div, this->ijk);
-std::cerr << "post xchng sgs div vip_div: " << this->vip_div;
             }
             else
             {
@@ -133,16 +121,10 @@ std::cerr << "post xchng sgs div vip_div: " << this->vip_div;
               this->xchng_sgs_div(vip_div, this->ijk);
             }
 
-std::cerr << "pre calc_deform_cmpct vip[0]: " << this->vips()[0];
-
             formulae::stress::calc_deform_cmpct<ct_params_t::n_dims>(tau, this->vips(), vip_div, this->ijk, ijkm, this->dijk);
 
-std::cerr << "post calc_deform_cmpct tau[0]: " << tau[0];
-
             this->xchng_sgs_tnsr_diag(tau, this->vips()[ct_params_t::n_dims - 1], vip_div, this->ijk);
-std::cerr << "post xchng sgs tnsr diag tau[0]: " << tau[0];
             this->xchng_sgs_tnsr_offdiag(tau, tau_srfc, this->ijk, this->ijkm);
-std::cerr << "post xchng sgs tnsr offdiag tau[0]: " << tau[0];
 
             // multiply deformation tensor by sgs viscosity to obtain stress tensor
             multiply_sgs_visc();
@@ -215,7 +197,6 @@ std::cerr << "post xchng sgs tnsr offdiag tau[0]: " << tau[0];
         {
           for (int d = 0; d < ct_params_t::n_dims; ++d)
           {
-            //ijkm[d]    = rng_t(this->ijk[d].first() - 1, this->ijk[d].last());
             ijkm.lbound()(d) = this->ijk[d].first() - 1;
             ijkm.ubound()(d) = this->ijk[d].last();
 
@@ -224,19 +205,12 @@ std::cerr << "post xchng sgs tnsr offdiag tau[0]: " << tau[0];
           if (this->rank == 0)
             ijk_vec[0] = rng_t(this->ijk[0].first() - 1, this->ijk[0].last());
 
-          std::cerr << "ijkm[0]: " << ijkm[0].first() << ", " << ijkm[0].last() << std::endl;
-          std::cerr << "ijkm[1]: " << ijkm[1].first() << ", "  << ijkm[1].last() << std::endl;
-
           ijkm_sep = ijkm;
           if (this->rank > 0)
           {
             ijkm.lbound()(0) = this->ijk[0].first();
             ijkm.ubound()(0) = this->ijk[0].last();
           }
-          std::cerr << "ijkm_sep[0]: " << ijkm_sep[0].first() << ", "  << ijkm_sep[0].last() << std::endl;
-          std::cerr << "ijkm_sep[1]: " << ijkm_sep[1].first() << ", "  << ijkm_sep[1].last() << std::endl;
-          std::cerr << "ijkm[0]: " << ijkm[0].first() << ", "  << ijkm[0].last() << std::endl;
-          std::cerr << "ijkm[1]: " << ijkm[1].first() << ", "  << ijkm[1].last() << std::endl;
         }
 
         static void alloc(
