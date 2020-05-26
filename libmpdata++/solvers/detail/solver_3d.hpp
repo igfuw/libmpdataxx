@@ -87,9 +87,9 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_div(arr, range_ijk[1], range_ijk[2]^h);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div(arr, range_ijk[2]^h, range_ijk[0]);
           for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_div(arr, range_ijk[0], range_ijk[1]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div(arr, range_ijk[2]^h, range_ijk[0]);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_div(arr, range_ijk[1], range_ijk[2]^h);
           this->mem->barrier();
         }
 
@@ -121,7 +121,7 @@ namespace libmpdataxx
         virtual void xchng_sgs_tnsr_offdiag(arrvec_t<typename parent_t::arr_t> &av,
                                             const arrvec_t<typename parent_t::arr_t> &bv,
                                             const idx_t<3> &range_ijk,
-                                            const std::array<rng_t, 3> &range_ijkm
+                                            const idx_t<3> &range_ijkm
         ) final
         {
           // off-diagonal components of stress tensor are treated the same as a vector
