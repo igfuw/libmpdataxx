@@ -95,7 +95,7 @@ namespace libmpdataxx
                                                                                         real_t(1.0),
                                                                                         this->k_m,
                                                                                         *this->mem->G,
-                                                                                        this->ijk_vec);
+                                                                                        this->ijkm_sep);
 
           this->xchng_sgs_tnsr_offdiag(this->tau, this->tau_srfc, this->ijk, this->ijkm);
 
