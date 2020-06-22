@@ -56,7 +56,10 @@ namespace libmpdataxx
         virtual void fill_halos_vctr_alng_cyclic(arrvec_t<blitz::Array<real_t, 1>> &, const bool ad = false)
         {};
 
-        virtual void avg_edge_sclr(arr_1d_t &)
+        virtual void copy_edge_sclr_to_halo1_cyclic(arr_1d_t &)
+        {};
+
+        virtual void avg_edge_and_halo1_sclr_cyclic(arr_1d_t &)
         {};
 
         // 2D
@@ -114,7 +117,10 @@ namespace libmpdataxx
         virtual void fill_halos_flux(arrvec_t<blitz::Array<real_t, 2>> &, const rng_t &)
         {};
 
-        virtual void avg_edge_sclr(arr_2d_t &, const rng_t &)
+        virtual void copy_edge_sclr_to_halo1_cyclic(arr_2d_t &, const rng_t &)
+        {};
+
+        virtual void avg_edge_and_halo1_sclr_cyclic(arr_2d_t &, const rng_t &)
         {};
 
         // 3D
@@ -181,7 +187,10 @@ namespace libmpdataxx
         virtual void fill_halos_flux(arrvec_t<blitz::Array<real_t, 3>> &, const rng_t &, const rng_t &)
         {};
 
-        virtual void avg_edge_sclr(arr_3d_t &, const rng_t &, const rng_t &)
+        virtual void copy_edge_sclr_to_halo1_cyclic(arr_3d_t &, const rng_t &, const rng_t &)
+        {};
+
+        virtual void avg_edge_and_halo1_sclr_cyclic(arr_3d_t &, const rng_t &, const rng_t &)
         {};
 
         protected:

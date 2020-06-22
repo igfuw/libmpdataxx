@@ -79,10 +79,20 @@ namespace libmpdataxx
         fill_halos_vctr_nrml(a, j);
       }
 
-      void avg_edge_sclr(arr_t &a, const rng_t &j) final
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
-        a(pi<d>(this->left_edge_sclr, j)) = ( a(pi<d>(this->left_edge_sclr, j)) + a(pi<d>(this->rght_edge_sclr, j)) ) / real_t(2);
+        assert(halo>=1);
+
+        a(pi<d>(this->left_halo_sclr.last(), j)) = a(pi<d>(this->rght_edge_sclr, j));
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a, const rng_t &j)
+      {
+        using namespace idxperm;
+        assert(halo>=1);
+
+        a(pi<d>(this->left_edge_sclr, j)) = ( a(pi<d>(this->left_edge_sclr, j)) + a(pi<d>(this->left_halo_sclr.last(), j)) ) / real_t(2); 
       }
     };
 
@@ -154,10 +164,20 @@ namespace libmpdataxx
         fill_halos_vctr_nrml(a, j);
       }
 
-      void avg_edge_sclr(arr_t &a, const rng_t &j) final
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a, const rng_t &j)
       {
         using namespace idxperm;
-        a(pi<d>(this->rght_edge_sclr, j)) = a(pi<d>(this->left_edge_sclr, j)); // assuming that left avg_edge_sclr has been called before
+        assert(halo>=1);
+
+        a(pi<d>(this->rght_halo_sclr.first(), j)) = a(pi<d>(this->left_edge_sclr, j));
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a, const rng_t &j)
+      {
+        using namespace idxperm;
+        assert(halo>=1);
+
+        a(pi<d>(this->rght_edge_sclr, j)) = ( a(pi<d>(this->rght_edge_sclr, j)) + a(pi<d>(this->rght_halo_sclr.first(), j)) ) / real_t(2); 
       }
     };
   } // namespace bcond

@@ -41,9 +41,18 @@ namespace libmpdataxx
         fill_halos_vctr_alng(av, ad);
       }
 
-      void avg_edge_sclr(arr_t &a) final
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a)
       {
-        a(this->left_edge_sclr) = (a(this->left_edge_sclr) + a(this->rght_edge_sclr)) / real_t(2);
+        assert(halo>=1);
+
+        a(this->left_halo_sclr.last()) = a(this->rght_edge_sclr);
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a)
+      {
+        assert(halo>=1);
+
+        a(this->left_edge_sclr) = ( a(this->left_edge_sclr) + a(this->left_halo_sclr.last()) ) / real_t(2); 
       }
     };
 
@@ -77,9 +86,18 @@ namespace libmpdataxx
         fill_halos_vctr_alng(av, ad);
       }
 
-      void avg_edge_sclr(arr_t &a) final
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a)
       {
-        a(this->rght_edge_sclr) = a(this->left_edge_sclr); // assuming that left avg_edge_sclr has been called before
+        assert(halo>=1);
+
+        a(this->rght_halo_sclr.first()) = a(this->left_edge_sclr);
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a)
+      {
+        assert(halo>=1);
+
+        a(this->rght_edge_sclr) = ( a(this->rght_edge_sclr) + a(this->rght_halo_sclr.first()) ) / real_t(2); 
       }
     };
   } // namespace bcond

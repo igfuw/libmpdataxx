@@ -87,8 +87,6 @@ namespace libmpdataxx
         fill_halos_vctr_alng(av, j);
       }
 
-      // TODO: sgs fill_halos
-
       // TODO: move to common? (same in cyclic!)
       void fill_halos_vctr_nrml(arr_t &a, const rng_t &j)
       {
@@ -104,7 +102,6 @@ namespace libmpdataxx
       {
         fill_halos_vctr_nrml(a, j);
       }
-
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>

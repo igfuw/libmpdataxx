@@ -189,11 +189,14 @@ namespace libmpdataxx
                        const idx_t<2> &range_ijk
         ) final
         {
-          this->bcs[0][0]->avg_edge_sclr(arr, range_ijk[1]);
-          this->mem->barrier(); // left bc needs to finish processing before right is started
-          this->bcs[0][1]->avg_edge_sclr(arr, range_ijk[1]);
-          this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->avg_edge_sclr(arr, range_ijk[0]); // no domain decomposition in y direction - no need for barrier
+          for (auto &bc : this->bcs[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1]);
+          // TODO: Barrier in case of distmem?
+          for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1]);
+
+          for (auto &bc : this->bcs[1]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0]);
+          // TODO: Barrier in case of distmem?
+          for (auto &bc : this->bcs[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0]);
+
           this->mem->barrier();
         }
 
