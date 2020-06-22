@@ -78,6 +78,11 @@ namespace libmpdataxx
       {
         fill_halos_vctr_nrml(a, j);
       }
+
+      void avg_edge_sclr(arr_t &a, const rng_t &j) final
+      {
+        a(pi<d>(this->left_edge_sclr, j)) = ( a(pi<d>(this->left_edge_sclr, j)) + a(pi<d>(this->rght_edge_sclr, j)) ) / real_t(2);
+      }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
@@ -146,6 +151,11 @@ namespace libmpdataxx
       void fill_halos_vctr_nrml_cyclic(arr_t &a, const rng_t &j)
       {
         fill_halos_vctr_nrml(a, j);
+      }
+
+      void avg_edge_sclr(arr_t &a, const rng_t &j) final
+      {
+        a(pi<d>(this->rght_edge_sclr, j)) = a(pi<d>(this->left_edge_sclr, j)); // assuming that left avg_edge_sclr has been called before
       }
     };
   } // namespace bcond

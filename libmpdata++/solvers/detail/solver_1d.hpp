@@ -69,6 +69,12 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
+        virtual void avg_edge_sclr(typename parent_t::arr_t &arr) final
+        {
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr);
+          this->mem->barrier();
+        }
+
         real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final
         {
           stat_field(this->ijk) = real_t(0.5) * (abs(arrvec[0](i+h) + arrvec[0](i-h)));
