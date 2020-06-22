@@ -71,10 +71,8 @@ namespace libmpdataxx
 
         virtual void avg_edge_sclr(typename parent_t::arr_t &arr) final
         {
-          this->bcs[0][0]->avg_edge_sclr(arr);
-          this->mem->barrier(); // left bc needs to finish processing before right is started
-          this->bcs[0][1]->avg_edge_sclr(arr);
-          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr);
+          for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr);
         }
 
         real_t courant_number(const arrvec_t<typename parent_t::arr_t> &arrvec) final

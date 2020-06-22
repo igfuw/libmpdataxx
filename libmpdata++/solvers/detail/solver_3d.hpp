@@ -232,13 +232,14 @@ namespace libmpdataxx
                        const idx_t<3> &range_ijk
         ) final
         {
-          this->bcs[0][0]->avg_edge_sclr(arr, range_ijk[1], range_ijk[2]);
-          this->mem->barrier(); // left bc needs to finish processing before right is started
-          this->bcs[0][1]->avg_edge_sclr(arr, range_ijk[1], range_ijk[2]);
-          this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->avg_edge_sclr(arr, range_ijk[2], range_ijk[0]); // no domain decomposition in y and z directions
-          for (auto &bc : this->bcs[2]) bc->avg_edge_sclr(arr, range_ijk[0], range_ijk[1]);
-          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
+
+          for (auto &bc : this->bcs[1]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[2], range_ijk[0]);
+
+          for (auto &bc : this->bcs[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
+          for (auto &bc : this->bcs[2]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0], range_ijk[1]);
         }
 
         void hook_ante_loop(const typename parent_t::advance_arg_t nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
