@@ -102,6 +102,26 @@ namespace libmpdataxx
       {
         fill_halos_vctr_nrml(a, j);
       }
+
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a, const rng_t &j)
+      {
+        if(!this->is_cyclic)
+          return;
+
+        using namespace idxperm;
+        assert(halo>=1);
+        this->xchng(a, pi<d>(this->left_edge_sclr, j), pi<d>(this->left_halo_sclr.last(), j));
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a, const rng_t &j)
+      {
+        if(!this->is_cyclic)
+          return;
+
+        using namespace idxperm;
+        assert(halo>=1);
+        a(pi<d>(this->left_edge_sclr, j)) = ( a(pi<d>(this->left_edge_sclr, j)) + a(pi<d>(this->left_halo_sclr.last(), j)) ) / real_t(2);
+      }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int d>
@@ -193,6 +213,26 @@ namespace libmpdataxx
       void fill_halos_vctr_nrml_cyclic(arr_t &a, const rng_t &j)
       {
         fill_halos_vctr_nrml(a, j);
+      }
+
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a, const rng_t &j)
+      {
+        if(!this->is_cyclic)
+          return;
+
+        using namespace idxperm;
+        assert(halo>=1);
+        this->xchng(a, pi<d>(this->rght_edge_sclr, j), pi<d>(this->rght_halo_sclr.first(), j));
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a, const rng_t &j)
+      {
+        if(!this->is_cyclic)
+          return;
+
+        using namespace idxperm;
+        assert(halo>=1);
+        a(pi<d>(this->rght_edge_sclr, j)) = ( a(pi<d>(this->rght_edge_sclr, j)) + a(pi<d>(this->rght_halo_sclr.first(), j)) ) / real_t(2);
       }
     };
   } // namespace bcond

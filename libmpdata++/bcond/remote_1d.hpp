@@ -100,6 +100,24 @@ namespace libmpdataxx
       {
         fill_halos_vctr_nrml(a);
       }
+
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a)
+      {
+        if(!this->is_cyclic)
+          return;
+
+        assert(halo>=1);
+        this->xchng(a, idx_t(idx_ctor_arg_t(this->left_edge_sclr)), idx_t(idx_ctor_arg_t(this->left_halo_sclr.last())));
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a, const rng_t &j)
+      {
+        if(!this->is_cyclic)
+          return;
+
+        assert(halo>=1);
+        a(this->left_edge_sclr) = ( a(this->left_edge_sclr) + a(this->left_halo_sclr.last()) ) / real_t(2);
+      }
     };
 
 
@@ -189,6 +207,24 @@ namespace libmpdataxx
       void fill_halos_vctr_nrml_cyclic(arr_t &a)
       {
         fill_halos_vctr_nrml(a);
+      }
+
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a)
+      {
+        if(!this->is_cyclic)
+          return;
+
+        assert(halo>=1);
+        this->xchng(a, idx_t(idx_ctor_arg_t(this->rght_edge_sclr)), idx_t(idx_ctor_arg_t(this->rght_halo_sclr.first())));
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a, const rng_t &j)
+      {
+        if(!this->is_cyclic)
+          return;
+
+        assert(halo>=1);
+        a(this->rght_edge_sclr) = ( a(this->rght_edge_sclr) + a(this->rght_halo_sclr.first()) ) / real_t(2);
       }
     };
   } // namespace bcond
