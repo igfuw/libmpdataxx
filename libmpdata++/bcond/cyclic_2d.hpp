@@ -81,6 +81,7 @@ namespace libmpdataxx
 
       void avg_edge_sclr(arr_t &a, const rng_t &j) final
       {
+        using namespace idxperm;
         a(pi<d>(this->left_edge_sclr, j)) = ( a(pi<d>(this->left_edge_sclr, j)) + a(pi<d>(this->rght_edge_sclr, j)) ) / real_t(2);
       }
     };
@@ -155,6 +156,7 @@ namespace libmpdataxx
 
       void avg_edge_sclr(arr_t &a, const rng_t &j) final
       {
+        using namespace idxperm;
         a(pi<d>(this->rght_edge_sclr, j)) = a(pi<d>(this->left_edge_sclr, j)); // assuming that left avg_edge_sclr has been called before
       }
     };

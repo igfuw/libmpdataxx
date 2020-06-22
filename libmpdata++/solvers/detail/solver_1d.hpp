@@ -71,7 +71,9 @@ namespace libmpdataxx
 
         virtual void avg_edge_sclr(typename parent_t::arr_t &arr) final
         {
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr);
+          this->bcs[0][0]->avg_edge_sclr(arr);
+          this->mem->barrier(); // left bc needs to finish processing before right is started
+          this->bcs[0][1]->avg_edge_sclr(arr);
           this->mem->barrier();
         }
 

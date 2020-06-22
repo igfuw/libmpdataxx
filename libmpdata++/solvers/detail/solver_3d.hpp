@@ -232,9 +232,12 @@ namespace libmpdataxx
                        const idx_t<3> &range_ijk
         ) final
         {
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk[1], range_ijk[2]);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2], range_ijk[0]);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk[0], range_ijk[1]);
+          this->bcs[0][0]->avg_edge_sclr(arr, range_ijk[1], range_ijk[2]);
+          this->mem->barrier(); // left bc needs to finish processing before right is started
+          this->bcs[0][1]->avg_edge_sclr(arr, range_ijk[1], range_ijk[2]);
+          this->mem->barrier();
+          for (auto &bc : this->bcs[1]) bc->avg_edge_sclr(arr, range_ijk[2], range_ijk[0]); // no domain decomposition in y and z directions
+          for (auto &bc : this->bcs[2]) bc->avg_edge_sclr(arr, range_ijk[0], range_ijk[1]);
           this->mem->barrier();
         }
 
