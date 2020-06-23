@@ -28,9 +28,6 @@ namespace libmpdataxx
 
       const int off = this->is_cyclic ? 0 : -1;
 
-      const rng_t left_edge_sclr_rng(this->left_edge_sclr, this->left_edge_sclr);
-      const rng_t rght_edge_sclr_rng(this->rght_edge_sclr, this->rght_edge_sclr);
-
       public:
 
       void fill_halos_sclr(arr_t &a, const bool deriv = false)
@@ -110,6 +107,7 @@ namespace libmpdataxx
           return;
 
         assert(halo>=1);
+        const rng_t left_edge_sclr_rng(this->left_edge_sclr, this->left_edge_sclr);
         this->xchng(a, idx_t(idx_ctor_arg_t(left_edge_sclr_rng)), idx_t(idx_ctor_arg_t(this->left_halo_sclr.last())));
       }
 
@@ -119,6 +117,7 @@ namespace libmpdataxx
           return;
 
         assert(halo>=1);
+        const rng_t left_edge_sclr_rng(this->left_edge_sclr, this->left_edge_sclr);
         a(left_edge_sclr_rng) = ( a(left_edge_sclr_rng) + a(this->left_halo_sclr.last()) ) / real_t(2);
       }
     };
@@ -218,6 +217,7 @@ namespace libmpdataxx
           return;
 
         assert(halo>=1);
+        const rng_t rght_edge_sclr_rng(this->rght_edge_sclr, this->rght_edge_sclr);
         this->xchng(a, idx_t(idx_ctor_arg_t(rght_edge_sclr_rng)), idx_t(idx_ctor_arg_t(this->rght_halo_sclr.first())));
       }
 
@@ -227,6 +227,7 @@ namespace libmpdataxx
           return;
 
         assert(halo>=1);
+        const rng_t rght_edge_sclr_rng(this->rght_edge_sclr, this->rght_edge_sclr);
         a(rght_edge_sclr_rng) = ( a(rght_edge_sclr_rng) + a(this->rght_halo_sclr.first()) ) / real_t(2);
       }
     };
