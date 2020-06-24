@@ -12,12 +12,13 @@ sudo make install
 cd ../..
 
 # making Python 2 back the default if needed - TODO: support Python3 in libcloudph++
-if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
-if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 10; fi
+# if [[ $PY3DEB != '' ]]; then sudo update-alternatives --remove python /usr/bin/python3; fi
+# if [[ $PY3DEB != '' ]]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 10; fi
 
 # libcloudph++'s dependencies
 #if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install libboost-python1.55-dev python-numpy; fi
-if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python-numpy; fi
+if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo $apt_get_install python3-numpy; fi
+
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install boost-python; fi
 
 # odeint
