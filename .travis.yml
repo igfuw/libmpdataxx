@@ -89,12 +89,12 @@ jobs:
         env: TEST_SUITE=pbl MPI=mvapich2
       - <<: *precache_default
         env: TEST_SUITE=bconds_div MPI=mvapich2
-      - <<: *precache_default
-        env: TEST_SUITE=UWLCM_MT MPI=none
-      - <<: *precache_default
-        env: TEST_SUITE=UWLCM_unit_iles MPI=none
-      - <<: *precache_default
-        env: TEST_SUITE=UWLCM_unit_smg MPI=none
+#      - <<: *precache_default
+#        env: TEST_SUITE=UWLCM_MT MPI=none
+#      - <<: *precache_default
+#        env: TEST_SUITE=UWLCM_unit_iles MPI=none
+#      - <<: *precache_default
+#        env: TEST_SUITE=UWLCM_unit_smg MPI=none
 
     # excluded jobs
     exclude:
