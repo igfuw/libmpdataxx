@@ -40,6 +40,20 @@ namespace libmpdataxx
       {
         fill_halos_vctr_alng(av, ad);
       }
+
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a)
+      {
+        assert(halo>=1);
+
+        a(this->left_halo_sclr.last()) = a(this->rght_edge_sclr);
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a)
+      {
+        assert(halo>=1);
+
+        a(this->left_edge_sclr) = ( a(this->left_edge_sclr) + a(this->left_halo_sclr.last()) ) / real_t(2); 
+      }
     };
 
     template <typename real_t, int halo, bcond_e knd, drctn_e dir, int n_dims, int dim>
@@ -70,6 +84,20 @@ namespace libmpdataxx
       void fill_halos_vctr_alng_cyclic(arrvec_t<arr_t> &av, const bool ad = false)
       {
         fill_halos_vctr_alng(av, ad);
+      }
+
+      void copy_edge_sclr_to_halo1_cyclic(arr_t &a)
+      {
+        assert(halo>=1);
+
+        a(this->rght_halo_sclr.first()) = a(this->left_edge_sclr);
+      }
+
+      void avg_edge_and_halo1_sclr_cyclic(arr_t &a)
+      {
+        assert(halo>=1);
+
+        a(this->rght_edge_sclr) = ( a(this->rght_edge_sclr) + a(this->rght_halo_sclr.first()) ) / real_t(2); 
       }
     };
   } // namespace bcond
