@@ -232,6 +232,7 @@ namespace libmpdataxx
                        const idx_t<3> &range_ijk
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
           for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
 
@@ -240,6 +241,7 @@ namespace libmpdataxx
 
           for (auto &bc : this->bcs[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
           for (auto &bc : this->bcs[2]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0], range_ijk[1]);
+          this->mem->barrier();
         }
 
         void hook_ante_loop(const typename parent_t::advance_arg_t nt) // TODO: this nt conflicts in fact with multiple-advance()-call logic!
