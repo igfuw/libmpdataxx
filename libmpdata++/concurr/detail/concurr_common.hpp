@@ -216,11 +216,11 @@ namespace libmpdataxx
           }
         }
 
-        // 3D version
+        // 3D version, note sharedmem in y direction!
         void init(
           const typename solver_t::rt_params_t &p,
           const std::array<rng_t, 3> &grid_size,
-          const int &n0, const int &n1 = 1, const int &n2 = 1
+          const int &n1, const int &n0 = 1, const int &n2 = 1
         ) {
           typename solver_t::bcp_t bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;
 
@@ -246,11 +246,11 @@ namespace libmpdataxx
                 algos.push_back(
                   new solver_t(
                     typename solver_t::ctor_args_t({
-                      i0,
+                      i1,
                       mem.get(),
-                      i0 == 0      ? bxl : shrdl,
-                      i0 == n0 - 1 ? bxr : shrdr,
-                      byl, byr,
+                      bxl, bxr,
+                      i1 == 0      ? byl : shrdl,
+                      i1 == n1 - 1 ? byr : shrdr,
                       bzl, bzr,
                       mem->slab(grid_size[0], i0, n0),
                       mem->slab(grid_size[1], i1, n1),
