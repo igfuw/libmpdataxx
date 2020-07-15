@@ -57,7 +57,7 @@ namespace libmpdataxx
         // ijkm with non-overlapping ranges
         idx_t<ct_params_t::n_dims> ijkm_sep;
 
-        // like ijk, but with range in x direction extended by 1 to the left for rank=0 for MPI compliance.
+        // like ijk, but with range in x direction extended by 1 to the left for MPI compliance.
         // MPI requires that vector between two process domains is calculated by the process to the right of it  (c.f. remote_2d.hpp fill_halos_vctr_alng)
         // TODO: change MPI logic to assume that it is calculated by the process to the left? then, ijk_vec would not be needed(?)
         std::array<rng_t, ct_params_t::n_dims> ijk_vec;
@@ -202,7 +202,13 @@ namespace libmpdataxx
 
             ijk_vec[d] = rng_t(this->ijk[d].first(),     this->ijk[d].last());
           }
-          if (this->rank == 0)
+
+          if(ct_params_t::n_dims < 3) // 1D and 2D - sharedmem in x direction
+          {
+            if (this->rank == 0)
+              ijk_vec[0] = rng_t(this->ijk[0].first() - 1, this->ijk[0].last());
+          }
+          else // 3D - sharedmem in y direction
             ijk_vec[0] = rng_t(this->ijk[0].first() - 1, this->ijk[0].last());
 
           ijkm_sep = ijkm;
