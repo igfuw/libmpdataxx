@@ -208,8 +208,16 @@ namespace libmpdataxx
           ijkm_sep = ijkm;
           if (this->rank > 0)
           {
-            ijkm_sep.lbound()(0) = this->ijk[0].first();
-            ijkm_sep.ubound()(0) = this->ijk[0].last();
+            if(ct_params_t::n_dims < 3)
+            {
+              ijkm_sep.lbound()(0) = this->ijk[0].first();
+              ijkm_sep.ubound()(0) = this->ijk[0].last();
+            }
+            else
+            {
+              ijkm_sep.lbound()(1) = this->ijk[1].first();
+              ijkm_sep.ubound()(1) = this->ijk[1].last();
+            }
           }
         }
 
