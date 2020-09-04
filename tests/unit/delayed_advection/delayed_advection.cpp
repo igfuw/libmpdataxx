@@ -109,7 +109,7 @@ int main()
 
   for(int i=1;i<4;++i){
     std::cerr << "comparing error values in the test " << test_description[i] << " and in the test " << test_description[0] << "..." << std::endl;
-    if(!almost_equal(err[i], err[0], 3e-15))
+    if(!almost_equal(err[i], err[0], 1e-13))
     {
       throw std::runtime_error("delay error");
     }
