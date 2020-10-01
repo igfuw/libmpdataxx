@@ -273,7 +273,9 @@ namespace libmpdataxx
         public:
         arr_t *never_delete(arr_t *arg)
         {
-          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData);
+          blitz::GeneralArrayStorage<3> storage;
+          storage.ordering() = blitz::thirdDim, blitz::firstDim, blitz::secondDim;
+          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData, storage);
           ret->reindexSelf(arg->base());
           return ret;
         }
