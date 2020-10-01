@@ -29,7 +29,6 @@ namespace libmpdataxx
       >
       class sharedmem_common
       {
-        using arr_t = blitz::Array<real_t, n_dims>;
 
         static_assert(n_dims > 0, "n_dims <= 0");
         static_assert(n_tlev > 0, "n_tlev <= 0");
@@ -39,6 +38,7 @@ namespace libmpdataxx
 
         protected:
 
+        using arr_t = blitz::Array<real_t, n_dims>;
         blitz::TinyVector<int, n_dims> origin;
 
         public:
@@ -271,9 +271,9 @@ namespace libmpdataxx
         boost::ptr_vector<arr_t> tobefreed;
 
         public:
-        arr_t *never_delete(arr_t *arg)
+        virtual arr_t *never_delete(arr_t *arg)
         {
-          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData, arr3D_storage);
+          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData);
           ret->reindexSelf(arg->base());
           return ret;
         }
@@ -281,7 +281,7 @@ namespace libmpdataxx
         arr_t *old(arr_t *arg)
         {
           tobefreed.push_back(arg);
-          arr_t *ret = never_delete(arg);
+          arr_t *ret = this->never_delete(arg);
           return ret;
         }
 
@@ -579,9 +579,17 @@ namespace libmpdataxx
       class sharedmem<real_t, 3, n_tlev> : public sharedmem_common<real_t, 3, n_tlev>
       {
         using parent_t = sharedmem_common<real_t, 3, n_tlev>;
+        using arr_t = typename parent_t::arr_t;
         using parent_t::parent_t; // inheriting ctors
 
         public:
+
+        virtual arr_t *never_delete(arr_t *arg) override
+        {
+          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData, arr3D_storage);
+          ret->reindexSelf(arg->base());
+          return ret;
+        }
 
         blitz::Array<real_t, 3> advectee(int e = 0)
         {
