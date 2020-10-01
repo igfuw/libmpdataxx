@@ -347,8 +347,6 @@ namespace libmpdataxx
           const int &n_iters
         )
         {
-          static blitz::GeneralArrayStorage<3> storage;
-          storage.ordering() = blitz::thirdDim, blitz::firstDim, blitz::secondDim;
           // psi
           mem->psi.resize(parent_t::n_eqns);
           for (int e = 0; e < parent_t::n_eqns; ++e) // equations
@@ -357,7 +355,7 @@ namespace libmpdataxx
                 parent_t::rng_sclr(mem->grid_size[0]),
                 parent_t::rng_sclr(mem->grid_size[1]),
                 parent_t::rng_sclr(mem->grid_size[2]),
-                storage
+                arr3D_storage
               )));
 
           // Courant field components (Arakawa-C grid)
@@ -365,19 +363,19 @@ namespace libmpdataxx
             parent_t::rng_vctr(mem->grid_size[0]),
             parent_t::rng_sclr(mem->grid_size[1]),
             parent_t::rng_sclr(mem->grid_size[2]),
-            storage
+            arr3D_storage
           )));
           mem->GC.push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_sclr(mem->grid_size[0]),
             parent_t::rng_vctr(mem->grid_size[1]),
             parent_t::rng_sclr(mem->grid_size[2]),
-            storage
+            arr3D_storage
           )));
           mem->GC.push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_sclr(mem->grid_size[0]),
             parent_t::rng_sclr(mem->grid_size[1]),
             parent_t::rng_vctr(mem->grid_size[2]),
-            storage
+            arr3D_storage
           )));
 
           // fully third-order accurate mpdata needs also time derivatives of
@@ -390,38 +388,38 @@ namespace libmpdataxx
               parent_t::rng_vctr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
               parent_t::rng_sclr(mem->grid_size[2]),
-              storage
+              arr3D_storage
             )));
             mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_vctr(mem->grid_size[1]),
               parent_t::rng_sclr(mem->grid_size[2]),
-              storage
+              arr3D_storage
             )));
             mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
               parent_t::rng_vctr(mem->grid_size[2]),
-              storage
+              arr3D_storage
             )));
 
             mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_vctr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
               parent_t::rng_sclr(mem->grid_size[2]),
-              storage
+              arr3D_storage
             )));
             mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_vctr(mem->grid_size[1]),
               parent_t::rng_sclr(mem->grid_size[2]),
-              storage
+              arr3D_storage
             )));
             mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
               parent_t::rng_vctr(mem->grid_size[2]),
-              storage
+              arr3D_storage
             )));
           }
 
@@ -431,7 +429,7 @@ namespace libmpdataxx
                     parent_t::rng_sclr(mem->grid_size[0]),
                     parent_t::rng_sclr(mem->grid_size[1]),
                     parent_t::rng_sclr(mem->grid_size[2]),
-                    storage
+                    arr3D_storage
             )));
 
           // allocate Kahan summation temporary vars
@@ -441,7 +439,7 @@ namespace libmpdataxx
                 parent_t::rng_sclr(mem->grid_size[0]),
                 parent_t::rng_sclr(mem->grid_size[1]),
                 parent_t::rng_sclr(mem->grid_size[2]),
-                storage
+                arr3D_storage
               )));
           // courant field
           alloc_tmp_sclr(mem, __FILE__, 1);
@@ -456,8 +454,6 @@ namespace libmpdataxx
           bool srfc = false // allocate only surface data
         )
         {
-          static blitz::GeneralArrayStorage<3> storage;
-          storage.ordering() = blitz::thirdDim, blitz::firstDim, blitz::secondDim;
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
           for (int n = 0; n < n_arr; ++n)
           {
@@ -467,7 +463,7 @@ namespace libmpdataxx
               srfc ? rng_t(0, 0) :
                 stgr[n][2] ? parent_t::rng_vctr(mem->grid_size[2]) :
                   parent_t::rng_sclr(mem->grid_size[2]),
-              storage
+              arr3D_storage
             )));
           }
         }
@@ -489,8 +485,6 @@ namespace libmpdataxx
           bool srfc = false // allocate only surface data
         )
         {
-          static blitz::GeneralArrayStorage<3> storage;
-          storage.ordering() = blitz::thirdDim, blitz::firstDim, blitz::secondDim;
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
 
           if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
@@ -500,7 +494,7 @@ namespace libmpdataxx
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
               srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[2]),
-              storage
+              arr3D_storage
             )));
         }
       };
