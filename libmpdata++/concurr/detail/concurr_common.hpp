@@ -115,7 +115,8 @@ namespace libmpdataxx
           int dim
         >
         void bc_set(
-          typename solver_t::bcp_t &bcp
+          typename solver_t::bcp_t &bcp,
+          const int thread_rank = 0 // required only by remote (MPI) bcond
         )
         {
           // sanity check - polar coords do not work with MPI yet
@@ -123,7 +124,7 @@ namespace libmpdataxx
             throw std::runtime_error("Polar boundary conditions do not work with MPI.");
 
           // distmem overrides
-          if (type != bcond::remote && mem->distmem.size() > 1 && dim == 0)
+          if (mem->distmem.size() > 1 && dim == 0)
           {
             if (
               // distmem domain interior
@@ -133,7 +134,17 @@ namespace libmpdataxx
               // cyclic condition for distmem domain (note: will not work if a non-cyclic condition is on the other end)
               ||
               (type == bcond::cyclic)
-            ) return bc_set<bcond::remote, dir, dim>(bcp);
+            )
+            {
+              bcp.reset(
+                new bcond::bcond<real_t, solver_t::halo, bcond::remote, dir, solver_t::n_dims, dim>(
+                  mem->slab(mem->grid_size[dim]),
+                  mem->distmem.grid_size,
+                  thread_rank
+                )
+              );
+              return;
+            }
           }
 
           // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
@@ -153,6 +164,7 @@ namespace libmpdataxx
         {
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
 
+          // NOTE: for remote bcond, thread_rank set to 0 on purpose in 1D to have propre left/right message tags 
           bc_set<bcxl, bcond::left, 0>(bxl);
           bc_set<bcxr, bcond::rght, 0>(bxr);
 
@@ -189,6 +201,7 @@ namespace libmpdataxx
             {
               typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
 
+              // NOTE: for remote bcond, thread_rank set to 0 on purpose in 2D to have propre left/right message tags 
               bc_set<bcxl, bcond::left, 0>(bxl);
               bc_set<bcxr, bcond::rght, 0>(bxr);
 
@@ -231,8 +244,10 @@ namespace libmpdataxx
             {
               for (int i2 = 0; i2 < n2; ++i2)
               {
-                bc_set<bcxl, bcond::left, 0>(bxl);
-                bc_set<bcxr, bcond::rght, 0>(bxr);
+                // i1 is the local thread rank, needed by remote bcond to distinguish mpi messages sent by different threads
+                // multiple threads send left/right mpi messages, because we use sharedmem domain decomposition along x axis
+                bc_set<bcxl, bcond::left, 0>(bxl, i1);
+                bc_set<bcxr, bcond::rght, 0>(bxr, i1);
 
                 bc_set<bcyl, bcond::left, 1>(byl);
                 bc_set<bcyr, bcond::rght, 1>(byr);

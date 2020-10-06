@@ -48,9 +48,10 @@ namespace libmpdataxx
         std::array<rng_t, n_dims> grid_size;
         bool panic = false; // for multi-threaded SIGTERM handling
 
+        // dimension in which sharedmem domain decomposition is done
         // 1D and 2D - domain decomposed in 0-th dimension (x)
         // 3D - domain decomposed in 1-st dimension (y) for better workload balance in MPI runs (MPI is decomposed in x)
-        const int decomp_dim;
+        const int shmem_decomp_dim;
 
         detail::distmem<real_t, n_dims> distmem;
 
@@ -88,21 +89,19 @@ namespace libmpdataxx
         // ctors
         // TODO: fill reducetmp with NaNs (or use 1-element arrvec_t - it's NaN-filled by default)
         sharedmem_common(const std::array<int, n_dims> &grid_size, const int &size)
-          : n(0), distmem(grid_size), size(size), decomp_dim(n_dims < 3 ? 0 : 1) // TODO: is n(0) needed?
+          : n(0), distmem(grid_size), size(size), shmem_decomp_dim(n_dims < 3 ? 0 : 1) // TODO: is n(0) needed?
         {
           for (int d = 0; d < n_dims; ++d)
           {
             this->grid_size[d] = slab(
               rng_t(0, grid_size[d]-1),
-              d == decomp_dim ? distmem.rank() : 0,
-              d == decomp_dim ? distmem.size() : 1
+              d == 0 ? distmem.rank() : 0,          // decomposition along x, because that's MPI decomposition
+              d == 0 ? distmem.size() : 1
+             // d == shmem_decomp_dim ? distmem.rank() : 0,
+             // d == shmem_decomp_dim ? distmem.size() : 1
             );
             origin[d] = this->grid_size[d].first();
           }
-
-          std::ostringstream oss;
-          oss << "grid_size[0]: " << this->grid_size[0] << " origin[0]: " << origin[0] << std::endl;
-          std::cerr << oss.str() << std::endl;
 
           if (size > grid_size[0])
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
@@ -117,11 +116,11 @@ namespace libmpdataxx
         {
           // doing a two-step sum to reduce numerical error
           // and make parallel results reproducible
-          for (int c = ijk[decomp_dim].first(); c <= ijk[decomp_dim].last(); ++c) // TODO: optimise for i.count() == 1
+          for (int c = ijk[shmem_decomp_dim].first(); c <= ijk[shmem_decomp_dim].last(); ++c) // TODO: optimise for i.count() == 1
           {
             auto slice_idx = ijk;
-            slice_idx.lbound(decomp_dim) = c;
-            slice_idx.ubound(decomp_dim) = c;
+            slice_idx.lbound(shmem_decomp_dim) = c;
+            slice_idx.ubound(shmem_decomp_dim) = c;
 
             if (sum_khn)
               (*sumtmp)(c) = blitz::kahan_sum(arr(slice_idx));
@@ -142,14 +141,14 @@ namespace libmpdataxx
           {
             // master thread calculates the sum from this process, stores in shared array
             if (sum_khn)
-              (*sumtmp)(grid_size[decomp_dim].first())= blitz::kahan_sum(*sumtmp); // inplace?!
+              (*sumtmp)(grid_size[shmem_decomp_dim].first())= blitz::kahan_sum(*sumtmp); // inplace?!
             else
-              (*sumtmp)(grid_size[decomp_dim].first())= blitz::sum(*sumtmp); // inplace?!
+              (*sumtmp)(grid_size[shmem_decomp_dim].first())= blitz::sum(*sumtmp); // inplace?!
             // master thread calculates sum of sums from all processes
-            (*sumtmp)(grid_size[decomp_dim].first()) = this->distmem.sum((*sumtmp)(grid_size[decomp_dim].first())); // inplace?!
+            (*sumtmp)(grid_size[shmem_decomp_dim].first()) = this->distmem.sum((*sumtmp)(grid_size[shmem_decomp_dim].first())); // inplace?!
           }
           barrier();
-          double res = (*sumtmp)(grid_size[decomp_dim].first()); // propagate the total sum to all threads of the process
+          double res = (*sumtmp)(grid_size[shmem_decomp_dim].first()); // propagate the total sum to all threads of the process
           barrier(); // to avoid sumtmp being overwritten by next call to sum from other thread
           return res;
 #endif
@@ -160,11 +159,11 @@ namespace libmpdataxx
         {
           // doing a two-step sum to reduce numerical error
           // and make parallel results reproducible
-          for (int c = ijk[decomp_dim].first(); c <= ijk[decomp_dim].last(); ++c)
+          for (int c = ijk[shmem_decomp_dim].first(); c <= ijk[shmem_decomp_dim].last(); ++c)
           {
             auto slice_idx = ijk;
-            slice_idx.lbound(decomp_dim) = c;
-            slice_idx.ubound(decomp_dim) = c;
+            slice_idx.lbound(shmem_decomp_dim) = c;
+            slice_idx.ubound(shmem_decomp_dim) = c;
 
             if (sum_khn)
               (*sumtmp)(c) = blitz::kahan_sum(arr1(slice_idx) * arr2(slice_idx));
@@ -186,14 +185,14 @@ namespace libmpdataxx
           {
             // master thread calculates the sum from this process, stores in shared array
             if (sum_khn)
-              (*sumtmp)(grid_size[decomp_dim].first())= blitz::kahan_sum(*sumtmp); // inplace?!
+              (*sumtmp)(grid_size[shmem_decomp_dim].first())= blitz::kahan_sum(*sumtmp); // inplace?!
             else
-              (*sumtmp)(grid_size[decomp_dim].first())= blitz::sum(*sumtmp); // inplace?!
+              (*sumtmp)(grid_size[shmem_decomp_dim].first())= blitz::sum(*sumtmp); // inplace?!
             // master thread calculates sum of sums from all processes
-            (*sumtmp)(grid_size[decomp_dim].first()) = this->distmem.sum((*sumtmp)(grid_size[decomp_dim].first())); // inplace?!
+            (*sumtmp)(grid_size[shmem_decomp_dim].first()) = this->distmem.sum((*sumtmp)(grid_size[shmem_decomp_dim].first())); // inplace?!
           }
           barrier();
-          double res = (*sumtmp)(grid_size[decomp_dim].first()); // propagate the total sum to all threads of the process
+          double res = (*sumtmp)(grid_size[shmem_decomp_dim].first()); // propagate the total sum to all threads of the process
           barrier(); // to avoid sumtmp being overwritten by next call to sum from other thread
           return res;
 #endif
@@ -211,12 +210,12 @@ namespace libmpdataxx
 #else
           if(rank == 0)
           {
-            (*xtmtmp)(decomp_dim) = blitz::min(*xtmtmp);
+            (*xtmtmp)(shmem_decomp_dim) = blitz::min(*xtmtmp);
             // min across mpi processes
-            (*xtmtmp)(decomp_dim) = this->distmem.min((*xtmtmp)(decomp_dim));
+            (*xtmtmp)(shmem_decomp_dim) = this->distmem.min((*xtmtmp)(shmem_decomp_dim));
           }
           barrier();
-          real_t res = (*xtmtmp)(decomp_dim); // propagate the total min to all threads of the process
+          real_t res = (*xtmtmp)(shmem_decomp_dim); // propagate the total min to all threads of the process
           barrier(); // to avoid xtmtmp being overwritten by some other threads' next sum call
           return res;
 #endif
@@ -235,12 +234,12 @@ namespace libmpdataxx
 #else
           if(rank == 0)
           {
-            (*xtmtmp)(decomp_dim) = blitz::max(*xtmtmp);
+            (*xtmtmp)(shmem_decomp_dim) = blitz::max(*xtmtmp);
             // max across mpi processes
-            (*xtmtmp)(decomp_dim) = this->distmem.max((*xtmtmp)(decomp_dim));
+            (*xtmtmp)(shmem_decomp_dim) = this->distmem.max((*xtmtmp)(shmem_decomp_dim));
           }
           barrier();
-          real_t res = (*xtmtmp)(decomp_dim); // propagate the total max to all threads of the process
+          real_t res = (*xtmtmp)(shmem_decomp_dim); // propagate the total max to all threads of the process
           barrier(); // to avoid xtmtmp being overwritten by some other threads' next sum call
           return res;
 #endif
