@@ -31,9 +31,6 @@ namespace libmpdataxx
 
         private:
 
-//        const int grid_size_0;
-        const int thread_rank;
-
 #if defined(USE_MPI)
         boost::mpi::communicator mpicom;
         real_t *buf_send,
@@ -78,7 +75,7 @@ namespace libmpdataxx
           // distinguishing between left and right messages
           // (important e.g. with 2 procs and cyclic bc)
           const int
-            msg_send = (2 + n_dbg_tags) * thread_rank + (dir == left ? left : rght); // (n_tags_per_thread) * thread_rank to distinguish between messages sent by different threads
+            msg_send = dir == left ? left : rght;
 
           // arr_send references part of the send buffer that will be used
           arr_t arr_send(buf_send, a(idx_send).shape(), blitz::neverDeleteData);
@@ -112,7 +109,7 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           const int
-            msg_recv = (2 + n_dbg_tags) * thread_rank + (dir == left ? rght : left);
+            msg_recv = dir == left ? rght : left;
 
           // launching async data transfer
           if(a(idx_recv).size()!=0) // TODO: test directly size of idx_recv
@@ -208,15 +205,12 @@ namespace libmpdataxx
         // ctor
         remote_common(
           const rng_t &i,
-          const std::array<int, n_dims> &grid_size,
-          const int thread_rank
+          const std::array<int, n_dims> &distmem_grid_size
         ) :
-          parent_t(i, grid_size),
-//          grid_size_0(grid_size[0]),
-          thread_rank(thread_rank)
+          parent_t(i, distmem_grid_size)
         {
 #if defined(USE_MPI)
-          const int slice_size = n_dims==1 ? 1 : (n_dims==2? grid_size[1]+6 : (grid_size[1]+6) * (grid_size[2]+6) ); // 3 is the max halo size (?), so 6 on both sides
+          const int slice_size = n_dims==1 ? 1 : (n_dims==2? distmem_grid_size[1]+6 : (distmem_grid_size[1]+6) * (distmem_grid_size[2]+6) ); // 3 is the max halo size (?), so 6 on both sides
           // allocate enough memory in buffers to store largest halos to be sent
           buf_send = (real_t *) malloc(halo * slice_size * sizeof(real_t));
           buf_recv = (real_t *) malloc(halo * slice_size * sizeof(real_t));

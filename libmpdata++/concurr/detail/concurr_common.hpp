@@ -40,6 +40,53 @@ namespace libmpdataxx
   {
     namespace detail
     {
+      template <
+        class real_t,
+        class mem_t,
+        bcond::drctn_e dir,
+        int dim,
+        int n_dims,
+        int halo
+      >
+      void bc_set_remote(
+        typename solver_t::bcp_t &bcp,
+        const std::unique_ptr<mem_t> &mem;
+        const int thread_rank,
+        const int thread_count
+      )
+      {
+        bcp.reset(
+          new bcond::bcond<real_t, halo, bcond::remote, dir, n_dims, dim>(
+            mem->slab(mem->grid_size[dim]),
+            mem->distmem.grid_size
+          )
+        );
+      }
+
+      template <
+        class real_t,
+        class mem_t,
+        bcond::drctn_e dir,
+        int dim,
+        int halo
+      >
+      void bc_set_remote<real_t, mem_t, dir, dim, 3, halo>(
+        typename solver_t::bcp_t &bcp,
+        const std::unique_ptr<mem_t> &mem;
+        const int thread_rank,
+        const int thread_count
+      )
+      {
+        bcp.reset(
+          new bcond::bcond<real_t, solver_t::halo, bcond::remote, dir, solver_t::n_dims, dim>(
+            mem->slab(mem->grid_size[dim]),
+            mem->distmem.grid_size,
+            mem->slab(mem->grid_size[1], thread_rank, thread_count),
+            thread_rank
+          )
+        );
+      }
+
       template<
         class solver_t_,
         bcond::bcond_e bcxl, bcond::bcond_e bcxr,
@@ -116,7 +163,8 @@ namespace libmpdataxx
         >
         void bc_set(
           typename solver_t::bcp_t &bcp,
-          const int thread_rank = 0 // required only by remote (MPI) bcond
+          const int thread_rank  = 0, // required only by 3D remote (MPI) bcond
+          const int thread_count = 0  // required only by 3D remote (MPI) bcond
         )
         {
           // sanity check - polar coords do not work with MPI yet
@@ -136,10 +184,12 @@ namespace libmpdataxx
               (type == bcond::cyclic)
             )
             {
-              bcp.reset(
+              // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
+              bc_set_remote<real_t, mem_t, dir, dim, solver_t::n_dims, solver_t::halo>(
                 new bcond::bcond<real_t, solver_t::halo, bcond::remote, dir, solver_t::n_dims, dim>(
                   mem->slab(mem->grid_size[dim]),
                   mem->distmem.grid_size,
+                  mem->slab(mem->grid_size[1], thread_rank, thread_count),
                   thread_rank
                 )
               );
@@ -147,7 +197,6 @@ namespace libmpdataxx
             }
           }
 
-          // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
           bcp.reset(
             new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
               mem->slab(mem->grid_size[dim]),
@@ -244,10 +293,9 @@ namespace libmpdataxx
             {
               for (int i2 = 0; i2 < n2; ++i2)
               {
-                // i1 is the local thread rank, needed by remote bcond to distinguish mpi messages sent by different threads
-                // multiple threads send left/right mpi messages, because we use sharedmem domain decomposition along x axis
-                bc_set<bcxl, bcond::left, 0>(bxl, i1);
-                bc_set<bcxr, bcond::rght, 0>(bxr, i1);
+                // i1 is the local thread rank, n1 is the number of threads. These are needed by remote bcond, because only rank=0 does mpi communication
+                bc_set<bcxl, bcond::left, 0>(bxl, i1, n1);
+                bc_set<bcxr, bcond::rght, 0>(bxr, i1, n1);
 
                 bc_set<bcyl, bcond::left, 1>(byl);
                 bc_set<bcyr, bcond::rght, 1>(byr);
