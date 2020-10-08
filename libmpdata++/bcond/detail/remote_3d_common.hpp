@@ -60,7 +60,8 @@ namespace libmpdataxx
         ) :
           parent_t(i, distmem_grid_size),
           thread_rank(thread_rank),
-          thread_j(thread_j)
+          thread_j(thread_j),
+          grid_size_y(distmem_grid_size[1])
         {
 #if defined(USE_MPI)
           // only thread 0 does mpi, others don't need buffers

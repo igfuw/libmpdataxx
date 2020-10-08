@@ -55,7 +55,7 @@ namespace libmpdataxx
           bcp_t &bcp,
           const std::unique_ptr<mem_t> &mem,
           const int thread_rank,
-          const int thread_count
+          const int thread_size
         )
         {
           bcp.reset(
@@ -81,14 +81,14 @@ namespace libmpdataxx
           bcp_t &bcp,
           const std::unique_ptr<mem_t> &mem,
           const int thread_rank,
-          const int thread_count
+          const int thread_size
         )
         {
           bcp.reset(
-            new bcond::bcond<real_t, solver_t::halo, bcond::remote, dir, solver_t::n_dims, dim>(
+            new bcond::bcond<real_t, halo, bcond::remote, dir, 3, dim>(
               mem->slab(mem->grid_size[dim]),
               mem->distmem.grid_size,
-              mem->slab(mem->grid_size[1], thread_rank, thread_count),
+              mem->slab(mem->grid_size[1], thread_rank, thread_size),
               thread_rank
             )
           );
@@ -108,10 +108,10 @@ namespace libmpdataxx
         bcp_t &bcp,
         const std::unique_ptr<mem_t> &mem,
         const int thread_rank,
-        const int thread_count
+        const int thread_size
       )
       {
-        bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t>::_(bcp, mem, thread_rank, thread_count);
+        bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t>::_(bcp, mem, thread_rank, thread_size);
       }
 
       template<
@@ -191,7 +191,7 @@ namespace libmpdataxx
         void bc_set(
           typename solver_t::bcp_t &bcp,
           const int thread_rank  = 0, // required only by 3D remote (MPI) bcond
-          const int thread_count = 0  // required only by 3D remote (MPI) bcond
+          const int thread_size = 0  // required only by 3D remote (MPI) bcond
         )
         {
           // sanity check - polar coords do not work with MPI yet
@@ -213,12 +213,10 @@ namespace libmpdataxx
             {
               // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
               bc_set_remote<real_t, dir, dim, solver_t::n_dims, solver_t::halo>(
-                new bcond::bcond<real_t, solver_t::halo, bcond::remote, dir, solver_t::n_dims, dim>(
-                  mem->slab(mem->grid_size[dim]),
-                  mem->distmem.grid_size,
-                  mem->slab(mem->grid_size[1], thread_rank, thread_count),
-                  thread_rank
-                )
+                bcp,
+                mem,
+                thread_rank,
+                thread_size
               );
               return;
             }

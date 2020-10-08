@@ -29,12 +29,13 @@ namespace libmpdataxx
         using arr_t = blitz::Array<real_t, n_dims>;
         using idx_t = blitz::RectDomain<n_dims>;
 
+        real_t *buf_send,
+               *buf_recv;
+
         private:
 
 #if defined(USE_MPI)
         boost::mpi::communicator mpicom;
-        real_t *buf_send,
-               *buf_recv;
 
 #  if defined(NDEBUG)
         static const int n_reqs = 2; // data, reqs for recv only is enough?
