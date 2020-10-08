@@ -127,7 +127,7 @@ namespace libmpdataxx
 #endif
         }
 
-        void send(
+        virtual void send(
           const arr_t &a,
           const idx_t &idx_send
         )
@@ -142,7 +142,7 @@ namespace libmpdataxx
 #endif
         }
 
-        void recv(
+        virtual void recv(
           const arr_t &a,
           const idx_t &idx_recv
         )
@@ -171,7 +171,7 @@ namespace libmpdataxx
 #endif
         }
 
-        void xchng(
+        virtual void xchng(
           const arr_t &a,
           const idx_t &idx_send,
           const idx_t &idx_recv
