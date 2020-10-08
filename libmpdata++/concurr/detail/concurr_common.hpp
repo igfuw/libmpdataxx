@@ -42,49 +42,76 @@ namespace libmpdataxx
     {
       template <
         class real_t,
-        class mem_t,
         bcond::drctn_e dir,
         int dim,
         int n_dims,
-        int halo
+        int halo,
+        class bcp_t,
+        class mem_t
       >
-      void bc_set_remote(
-        typename solver_t::bcp_t &bcp,
-        const std::unique_ptr<mem_t> &mem;
-        const int thread_rank,
-        const int thread_count
-      )
+      struct bc_set_remote_impl
       {
-        bcp.reset(
-          new bcond::bcond<real_t, halo, bcond::remote, dir, n_dims, dim>(
-            mem->slab(mem->grid_size[dim]),
-            mem->distmem.grid_size
-          )
-        );
-      }
+        static void _(
+          bcp_t &bcp,
+          const std::unique_ptr<mem_t> &mem,
+          const int thread_rank,
+          const int thread_count
+        )
+        {
+          bcp.reset(
+            new bcond::bcond<real_t, halo, bcond::remote, dir, n_dims, dim>(
+              mem->slab(mem->grid_size[dim]),
+              mem->distmem.grid_size
+            )
+          );
+        }
+      };
 
       template <
         class real_t,
-        class mem_t,
         bcond::drctn_e dir,
         int dim,
-        int halo
+        int halo,
+        class bcp_t,
+        class mem_t
       >
-      void bc_set_remote<real_t, mem_t, dir, dim, 3, halo>(
-        typename solver_t::bcp_t &bcp,
-        const std::unique_ptr<mem_t> &mem;
+      struct bc_set_remote_impl<real_t, dir, dim, 3, halo, bcp_t, mem_t>
+      {
+        static void _(
+          bcp_t &bcp,
+          const std::unique_ptr<mem_t> &mem,
+          const int thread_rank,
+          const int thread_count
+        )
+        {
+          bcp.reset(
+            new bcond::bcond<real_t, solver_t::halo, bcond::remote, dir, solver_t::n_dims, dim>(
+              mem->slab(mem->grid_size[dim]),
+              mem->distmem.grid_size,
+              mem->slab(mem->grid_size[1], thread_rank, thread_count),
+              thread_rank
+            )
+          );
+        }
+      };
+
+      template <
+        class real_t,
+        bcond::drctn_e dir,
+        int dim,
+        int n_dims,
+        int halo,
+        class bcp_t,
+        class mem_t
+      >
+      void bc_set_remote(
+        bcp_t &bcp,
+        const std::unique_ptr<mem_t> &mem,
         const int thread_rank,
         const int thread_count
       )
       {
-        bcp.reset(
-          new bcond::bcond<real_t, solver_t::halo, bcond::remote, dir, solver_t::n_dims, dim>(
-            mem->slab(mem->grid_size[dim]),
-            mem->distmem.grid_size,
-            mem->slab(mem->grid_size[1], thread_rank, thread_count),
-            thread_rank
-          )
-        );
+        bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t>::_(bcp, mem, thread_rank, thread_count);
       }
 
       template<
@@ -185,7 +212,7 @@ namespace libmpdataxx
             )
             {
               // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
-              bc_set_remote<real_t, mem_t, dir, dim, solver_t::n_dims, solver_t::halo>(
+              bc_set_remote<real_t, dir, dim, solver_t::n_dims, solver_t::halo>(
                 new bcond::bcond<real_t, solver_t::halo, bcond::remote, dir, solver_t::n_dims, dim>(
                   mem->slab(mem->grid_size[dim]),
                   mem->distmem.grid_size,
