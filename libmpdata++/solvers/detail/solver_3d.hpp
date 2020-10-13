@@ -43,7 +43,8 @@ namespace libmpdataxx
                        const bool deriv = false
         ) final // for a given array
         {
-          const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
+          //const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
+          const auto range_ijk_1__ext = range_ijk[1]^ext;
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk_1__ext, range_ijk[2]^ext, deriv);
           for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
@@ -154,8 +155,10 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          const auto range_ijk_1__ext_h = this->extend_range(range_ijk[1], ext, h);
-          const auto range_ijk_1__ext_1 = this->extend_range(range_ijk[1], ext, 1);
+         // const auto range_ijk_1__ext_h = this->extend_range(range_ijk[1], ext, h);
+         // const auto range_ijk_1__ext_1 = this->extend_range(range_ijk[1], ext, 1);
+          const auto range_ijk_1__ext_h = range_ijk[1]^h;
+          const auto range_ijk_1__ext_1 = range_ijk[1]^1;
           if (!cyclic)
           {
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[2]^ext^1, range_ijk[0]^ext^h);
@@ -197,7 +200,8 @@ namespace libmpdataxx
           const int ext = 0
         ) final
         {
-          const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
+         // const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
+          const auto range_ijk_1__ext = range_ijk[1]^ext;
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk_1__ext, range_ijk[2]^ext);
           for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2]^ext, range_ijk[0]^ext);

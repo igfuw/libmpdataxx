@@ -133,7 +133,7 @@ namespace libmpdataxx
           scale(e, -ct_params_t::hint_scale(e));
         }
 
-        // thread-aware range extension
+        // thread-aware range extension, messes range guessing in remote_3d bcond
         template <class n_t>
         rng_t extend_range(const rng_t &r, const n_t n) const
         {

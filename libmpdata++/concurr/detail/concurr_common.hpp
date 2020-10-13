@@ -88,8 +88,9 @@ namespace libmpdataxx
             new bcond::bcond<real_t, halo, bcond::remote, dir, 3, dim>(
               mem->slab(mem->grid_size[dim]),
               mem->distmem.grid_size,
-              mem->slab(mem->grid_size[1], thread_rank, thread_size),
-              thread_rank
+              mem->slab(mem->grid_size[1], thread_rank, thread_size), // NOTE: we assume here remote 3d bcond is only on the edges perpendicular to x
+              thread_rank,
+              thread_size
             )
           );
         }
