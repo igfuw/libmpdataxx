@@ -46,7 +46,7 @@ namespace libmpdataxx
           const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
     //      const auto range_ijk_1__ext = range_ijk[1]^ext;
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk_1__ext, range_ijk[2]^ext, deriv);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv);
           for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
           for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, range_ijk_1__ext, deriv);
           this->mem->barrier();
@@ -174,10 +174,10 @@ namespace libmpdataxx
 
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[0]^ext^h, range_ijk_1__ext_1);
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[0]^ext^1, range_ijk_1__ext_h);
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
           }
           else
@@ -185,10 +185,10 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk[2]^ext^1, range_ijk[0]^ext^h);
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk[0]^ext^h, range_ijk_1__ext_1);
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[0]^ext^1, range_ijk_1__ext_h);
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
           }
           this->mem->barrier();
@@ -203,7 +203,7 @@ namespace libmpdataxx
           const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
          // const auto range_ijk_1__ext = range_ijk[1]^ext;
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk_1__ext, range_ijk[2]^ext);
+          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1]^ext, range_ijk[2]^ext);
           for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2]^ext, range_ijk[0]^ext);
           for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk[0]^ext, range_ijk_1__ext);
           this->mem->barrier();
