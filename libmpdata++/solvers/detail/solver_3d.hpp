@@ -80,6 +80,7 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[0]) bc->fill_halos_flux(arrvec, j, k);
           for (auto &bc : this->bcs[1]) bc->fill_halos_flux(arrvec, k, i);
           for (auto &bc : this->bcs[2]) bc->fill_halos_flux(arrvec, i, j);
+          this->mem->barrier();
         }
 
         virtual void xchng_sgs_div(
@@ -215,6 +216,7 @@ namespace libmpdataxx
           const int &sign
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->set_edge_pres(av[0], range_ijk[1], range_ijk[2], sign);
           for (auto &bc : this->bcs[1]) bc->set_edge_pres(av[1], range_ijk[2], range_ijk[0], sign);
           for (auto &bc : this->bcs[2]) bc->set_edge_pres(av[2], range_ijk[0], range_ijk[1], sign);
@@ -226,6 +228,7 @@ namespace libmpdataxx
           const idx_t<3> &range_ijk
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->save_edge_vel(av[0], range_ijk[1], range_ijk[2]);
           for (auto &bc : this->bcs[1]) bc->save_edge_vel(av[1], range_ijk[2], range_ijk[0]);
           for (auto &bc : this->bcs[2]) bc->save_edge_vel(av[2], range_ijk[0], range_ijk[1]);
