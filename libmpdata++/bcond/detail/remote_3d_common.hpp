@@ -34,10 +34,10 @@ namespace libmpdataxx
         // based on the difference between idx to be sent by this thread and idx of this process
         idx_t extend_idx(idx_t idx)
         {
-std::cerr << "extend idx start idx(1): " << idx.lbound(1) << ", " << idx.ubound(1) << std::endl;
+//std::cerr << "extend idx start idx(1): " << idx.lbound(1) << ", " << idx.ubound(1) << std::endl;
           idx.lbound(1) = 0                 + idx.lbound(1) - thread_j.first(); // does it have to start at 0?
           idx.ubound(1) = (grid_size_y - 1) + idx.ubound(1) - thread_j.last();  // does it have to end at grid_size_y - 1?
-std::cerr << "extend idx end idx(1): " << idx.lbound(1) << ", " << idx.ubound(1) << std::endl;
+//std::cerr << "extend idx end idx(1): " << idx.lbound(1) << ", " << idx.ubound(1) << std::endl;
           return idx;
         }
 
@@ -89,10 +89,10 @@ std::cerr << "extend idx end idx(1): " << idx.lbound(1) << ", " << idx.ubound(1)
             free(parent_t::buf_send);
             free(parent_t::buf_recv);
           }
-std::cerr << "remote_3d_common ctor thread_j: " << thread_j.lbound(0) << ", " << thread_j.ubound(0) << std::endl;
-std::cerr << "remote_3d_common ctor _thread_j: " << _thread_j.lbound(0) << ", " << _thread_j.ubound(0) << std::endl;
-std::cerr << "remote_3d_common ctor f-l thread_j: " << thread_j.first() << ", " << thread_j.last() << std::endl;
-std::cerr << "remote_3d_common ctor f-l _thread_j: " << _thread_j.first() << ", " << _thread_j.last() << std::endl;
+//std::cerr << "remote_3d_common ctor thread_j: " << thread_j.lbound(0) << ", " << thread_j.ubound(0) << std::endl;
+//std::cerr << "remote_3d_common ctor _thread_j: " << _thread_j.lbound(0) << ", " << _thread_j.ubound(0) << std::endl;
+//std::cerr << "remote_3d_common ctor f-l thread_j: " << thread_j.first() << ", " << thread_j.last() << std::endl;
+//std::cerr << "remote_3d_common ctor f-l _thread_j: " << _thread_j.first() << ", " << _thread_j.last() << std::endl;
 #endif
         }
 
