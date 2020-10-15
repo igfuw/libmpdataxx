@@ -76,7 +76,7 @@ namespace libmpdataxx
           const int thread_rank,
           const int thread_size
         ) :
-          parent_t(i, distmem_grid_size),
+          parent_t(i, distmem_grid_size, true), // true indicating that this is a bcond done with a single thread
           thread_rank(thread_rank),
           thread_size(thread_size),
           thread_j(_thread_j),

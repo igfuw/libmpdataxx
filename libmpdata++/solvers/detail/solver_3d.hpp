@@ -44,11 +44,11 @@ namespace libmpdataxx
         ) final // for a given array
         {
           const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
-    //      const auto range_ijk_1__ext = range_ijk[1]^ext;
           this->mem->barrier();
           for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
           for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, range_ijk_1__ext, deriv);
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv);
+          for (auto &bc : this->bcs[0]) 
+            bc->single_threaded ? bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv) : bc->fill_halos_sclr(arr, range_ijk_1__ext, range_ijk[2]^ext, deriv); // single-threaded bcond (currently only remote_3d) don't like extend_range and need more barriers.
           this->mem->barrier();
         }
         void xchng(int e) final
@@ -143,7 +143,7 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[0])
           {
             bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[1], range_ijk[2]^1, 3);
-            this->mem->barrier();
+            if(bc->single_threaded) this->mem->barrier();
             bc->fill_halos_sgs_vctr(av, bv[1], range_ijk[1]^1, range_ijkm[2], 4);
           }
           this->mem->barrier();
@@ -159,8 +159,6 @@ namespace libmpdataxx
           this->mem->barrier();
           const auto range_ijk_1__ext_h = this->extend_range(range_ijk[1], ext, h);
           const auto range_ijk_1__ext_1 = this->extend_range(range_ijk[1], ext, 1);
-         // const auto range_ijk_1__ext_h = range_ijk[1]^h;
-         // const auto range_ijk_1__ext_1 = range_ijk[1]^1;
           if (!cyclic)
           {
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[2]^ext^1, range_ijk[0]^ext^h);
@@ -180,9 +178,16 @@ namespace libmpdataxx
 
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
-            this->mem->barrier();
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
+            for (auto &bc : this->bcs[0])
+              if(bc->single_threaded) 
+              {
+                bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
+                this->mem->barrier(); 
+              }
+              else bc->fill_halos_vctr_nrml(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
+
+            for (auto &bc : this->bcs[0])
+              bc->single_threaded ? bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h) : bc->fill_halos_vctr_nrml(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
           }
           else
           {
@@ -193,9 +198,15 @@ namespace libmpdataxx
 
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
-            this->mem->barrier();
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
+            for (auto &bc : this->bcs[0])
+              if (bc->single_threaded)
+              {
+                bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
+                this->mem->barrier();
+              }
+              else bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
+            for (auto &bc : this->bcs[0])
+              bc->single_threaded ? bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h) : bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
           }
           this->mem->barrier();
         }
@@ -207,11 +218,11 @@ namespace libmpdataxx
         ) final
         {
           const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
-         // const auto range_ijk_1__ext = range_ijk[1]^ext;
           this->mem->barrier();
           for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2]^ext, range_ijk[0]^ext);
           for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk[0]^ext, range_ijk_1__ext);
-          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1]^ext, range_ijk[2]^ext);
+          for (auto &bc : this->bcs[0])
+            bc->single_threaded ? bc->fill_halos_pres(arr, range_ijk[1]^ext, range_ijk[2]^ext) : bc->fill_halos_pres(arr, range_ijk_1__ext, range_ijk[2]^ext);
           this->mem->barrier();
         }
 
@@ -251,8 +262,11 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
           for (auto &bc : this->bcs[2]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0], range_ijk[1]);
 
-          for (auto &bc : this->bcs[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
-          this->mem->barrier();
+          for (auto &bc : this->bcs[0])
+          {
+            bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
+            if(bc->single_threaded) this->mem->barrier();
+          }
           for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
           this->mem->barrier();
         }

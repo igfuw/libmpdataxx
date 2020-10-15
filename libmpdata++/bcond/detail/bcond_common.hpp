@@ -193,6 +193,8 @@ namespace libmpdataxx
         virtual void avg_edge_and_halo1_sclr_cyclic(arr_3d_t &, const rng_t &, const rng_t &)
         {};
 
+        const bool single_threaded;
+
         protected:
           // sclr
         int
@@ -207,7 +209,7 @@ namespace libmpdataxx
         public:
 
         // ctor
-        bcond_common(const rng_t &i, const std::array<int, n_dims> &) :
+        bcond_common(const rng_t &i, const std::array<int, n_dims> &, bool single_threaded = false) :
           // sclr
           left_edge_sclr(
             i.first()
@@ -247,7 +249,8 @@ namespace libmpdataxx
           rght_intr_vctr(
             (i^h^(-1)).last() - (halo - 1),
             (i^h^(-1)).last()
-          )
+          ),
+          single_threaded(single_threaded)
         {}
 
         // the one for use in shared
