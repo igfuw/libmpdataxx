@@ -203,12 +203,10 @@ namespace libmpdataxx
             ijk_vec[d] = rng_t(this->ijk[d].first(),     this->ijk[d].last());
           }
 
-          if(ct_params_t::n_dims < 3) // 1D and 2D - sharedmem in x direction
-          {
-            if (this->rank == 0)
-              ijk_vec[0] = rng_t(this->ijk[0].first() - 1, this->ijk[0].last());
-          }
-          else // 3D - sharedmem in y direction
+          if(ct_params_t::n_dims < 3 && this->rank == 0 // 1D and 2D - sharedmem in x direction
+             ||
+             ct_params_t::n_dims == 3                   // 3D - sharedmem in y direction
+          )
             ijk_vec[0] = rng_t(this->ijk[0].first() - 1, this->ijk[0].last());
 
           ijkm_sep = ijkm;

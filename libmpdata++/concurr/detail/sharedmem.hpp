@@ -107,7 +107,7 @@ namespace libmpdataxx
             throw std::runtime_error("number of subdomains greater than number of gridpoints");
 
           if (n_dims != 1)
-            sumtmp.reset(new blitz::Array<double, 1>(this->grid_size[n_dims-2])); 
+            sumtmp.reset(new blitz::Array<double, 1>(this->grid_size[shmem_decomp_dim])); 
           xtmtmp.reset(new blitz::Array<real_t, 1>(size));
         }
 
@@ -585,7 +585,7 @@ namespace libmpdataxx
 
         virtual arr_t *never_delete(arr_t *arg) override
         {
-          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData, arr3D_storage);
+          arr_t *ret = new arr_t(arg->dataFirst(), arg->shape(), blitz::neverDeleteData, blitz::GeneralArrayStorage<3>(arg->ordering(), {true, true, true}));
           ret->reindexSelf(arg->base());
           return ret;
         }
