@@ -97,6 +97,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_div(arr, range_ijk[0], range_ijk[1]);
           for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div(arr, range_ijk[2]^h, range_ijk[0]);
+          if(bc->single_threaded) this->mem->barrier(); // to make sure that all threads have filled range_ijk[2]^h before it is used to fill along x 
           for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_div(arr, range_ijk[1], range_ijk[2]^h);
           this->mem->barrier();
         }
@@ -184,6 +185,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0])
               if(bc->single_threaded) 
               {
+                this->mem->barrier(); 
                 bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
                 this->mem->barrier(); 
               }
@@ -194,14 +196,13 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0])
               if(bc->single_threaded)
               {
+                this->mem->barrier(); 
                 bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
                 this->mem->barrier();
               }
               else
                 bc->fill_halos_vctr_nrml(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
-
-
           }
           else
           {
@@ -211,6 +212,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0])
               if (bc->single_threaded)
               {
+                this->mem->barrier(); 
                 bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
                 this->mem->barrier();
               }
@@ -221,6 +223,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0])
               if(bc->single_threaded)
               {
+                this->mem->barrier(); 
                 bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
                 this->mem->barrier();
               }
