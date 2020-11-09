@@ -26,9 +26,9 @@ namespace libmpdataxx
       {
         using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
-        bool barrier_if_single_threaded_bc0()
+        void barrier_if_single_threaded_bc0()
         {
-          return this->bcs[0].at(0)->single_threaded || this->bcs[0].at(1)->single_threaded;
+          if(this->bcs[0].at(0)->single_threaded || this->bcs[0].at(1)->single_threaded) this->mem->barrier();
         }
 
         public:
