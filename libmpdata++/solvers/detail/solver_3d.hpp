@@ -66,10 +66,11 @@ namespace libmpdataxx
           this->mem->barrier();
           if (!cyclic)
           {
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k, ad);
-            barrier_if_single_threaded_bc0();
+            // order matters! see open_3d bcond
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i, ad);
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i, j, ad);
+            barrier_if_single_threaded_bc0();
+            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k, ad);
           }
           else
           {
@@ -79,6 +80,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng_cyclic(arrvec, i, j, ad);
           }
           this->mem->barrier();
+
         }
 
         virtual void xchng_flux(arrvec_t<typename parent_t::arr_t> &arrvec) final
