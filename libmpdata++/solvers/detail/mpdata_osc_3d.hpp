@@ -254,7 +254,7 @@ namespace libmpdataxx
         ) :
           parent_t(args, p),
           im(args.i.first() - 1, args.i.last()),
-          jm(args.j.first() - 1, args.j.last()),
+          jm(this->rank == 0 ? args.j.first() - 1 : args.j.first(), args.j.last()),
           km(args.k.first() - 1, args.k.last())
         { }
       };
