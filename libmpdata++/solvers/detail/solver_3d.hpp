@@ -240,6 +240,7 @@ namespace libmpdataxx
           const int &sign
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->set_edge_pres(av[0], range_ijk[1], range_ijk[2], sign);
           barrier_if_single_threaded_bc0();
           for (auto &bc : this->bcs[1]) bc->set_edge_pres(av[1], range_ijk[2], range_ijk[0], sign);
@@ -252,6 +253,7 @@ namespace libmpdataxx
           const idx_t<3> &range_ijk
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->save_edge_vel(av[0], range_ijk[1], range_ijk[2]);
           barrier_if_single_threaded_bc0();
           for (auto &bc : this->bcs[1]) bc->save_edge_vel(av[1], range_ijk[2], range_ijk[0]);
