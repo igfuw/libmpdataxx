@@ -125,7 +125,8 @@ public: // TODO: just a temp measure, make it private again
           if(!mpi_initialized)
           {
             mpi_initialized_before = false;
-            MPI_Init_thread(nullptr, nullptr, MPI_THREAD_MULTIPLE, nullptr);
+            int th_lvl_provided;
+            MPI_Init_thread(nullptr, nullptr, MPI_THREAD_MULTIPLE, &th_lvl_provided);
           }
           if (boost::mpi::environment::thread_level() != boost::mpi::threading::multiple)
           {
