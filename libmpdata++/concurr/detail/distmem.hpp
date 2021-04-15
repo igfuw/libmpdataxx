@@ -120,10 +120,10 @@ public: // TODO: just a temp measure, make it private again
           // init mpi here, since distmem is constructed before hdf5
           // will be finalized in slvr_common dtor, since distmem is destructed before hdf5;
           // boost::mpi::enviro being global var caused deadlocks when freeing memory
-          if(!MPI::Is_initialized())
+          if(!MPI_Is_initialized())
           {
             mpi_initialized_before = false;
-            MPI::Init_thread(MPI_THREAD_MULTIPLE);
+            MPI_Init_thread(MPI_THREAD_MULTIPLE);
           }
           if (boost::mpi::environment::thread_level() != boost::mpi::threading::multiple)
           {
