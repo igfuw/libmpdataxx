@@ -11,8 +11,8 @@ cd libmpdata++/build
 sudo make install
 cd ../..
 
-# newest thrust
-git clone --depth=1 git://github.com/thrust/thrust.git;
+# working thrust version
+git clone --depth=1 git://github.com/thrust/thrust.git --branch 1.9.10-1;
 sudo ln -s `pwd`/thrust/thrust /usr/local/include/thrust;
 
 # libcloudph++ 

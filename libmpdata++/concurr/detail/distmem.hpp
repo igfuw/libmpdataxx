@@ -108,22 +108,22 @@ public: // TODO: just a temp measure, make it private again
 #if !defined(USE_MPI)
           if (
             // mvapich2
-            std::getenv("MV2_COMM_WORLD_RANK") != NULL ||
+            std::getenv("MV2_COMM_WORLD_RANK") != NULL && std::atoi(std::getenv("MV2_COMM_WORLD_SIZE")) > 1 ||
             // mpich
-            std::getenv("PMI_RANK") != NULL ||
+            std::getenv("PMI_RANK") != NULL && std::atoi(std::getenv("PMI_SIZE")) > 1 ||
             // openmpi
-            std::getenv("OMPI_COMM_WORLD_RANK") != NULL ||
+            std::getenv("OMPI_COMM_WORLD_RANK") != NULL && std::atoi(std::getenv("OMPI_COMM_WORLD_SIZE")) > 1 ||
             // lam
-            std::getenv("LAMRANK") != NULL
+            std::getenv("LAMRANK") != NULL && std::atoi(std::getenv("LAMSIZE")) > 1
           ) throw std::runtime_error("mpirun environment variable detected but libmpdata++ was compiled with MPI disabled");
 #else
           // init mpi here, since distmem is constructed before hdf5
           // will be finalized in slvr_common dtor, since distmem is destructed before hdf5;
           // boost::mpi::enviro being global var caused deadlocks when freeing memory
-          if(!MPI::Is_initialized())
+          if(!MPI_Is_initialized())
           {
             mpi_initialized_before = false;
-            MPI::Init_thread(MPI_THREAD_MULTIPLE);
+            MPI_Init_thread(MPI_THREAD_MULTIPLE);
           }
           if (boost::mpi::environment::thread_level() != boost::mpi::threading::multiple)
           {
