@@ -273,8 +273,10 @@ namespace libmpdataxx
           }
           case 3:
           {
-            typename solver_t::arr_t contiguous_arr(this->mem->grid_size[0], this->mem->grid_size[1], zro);
-            contiguous_arr = arr(this->mem->grid_size[0], this->mem->grid_size[1], zro); // create a copy that is contiguous
+            // create a copy that is contiguous and has the C-style (kji) storage order as required by HDF5
+            typename solver_t::arr_t contiguous_arr(this->mem->grid_size[0], this->mem->grid_size[1], zro); 
+            contiguous_arr = arr(this->mem->grid_size[0], this->mem->grid_size[1], zro);
+
             dset.write(contiguous_arr.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, srfcshape.data()), space, dxpl_id);
             break;
           }
@@ -304,7 +306,10 @@ namespace libmpdataxx
           }
           case 3:
           {
-            typename solver_t::arr_t contiguous_arr = arr(this->mem->grid_size[0], this->mem->grid_size[1], this->mem->grid_size[2]).copy(); // create a copy that is contiguous
+            // create a copy that is contiguous and has the C-style (kji) storage order as required by HDF5
+            typename solver_t::arr_t contiguous_arr(this->mem->grid_size[0], this->mem->grid_size[1], this->mem->grid_size[2]); 
+            contiguous_arr = arr(this->mem->grid_size[0], this->mem->grid_size[1], this->mem->grid_size[2]);
+
             dset.write(contiguous_arr.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
             break;
           }
@@ -312,7 +317,7 @@ namespace libmpdataxx
         };
       }
 
-      // data is assumed to be contiguous and in the same layout as hdf variable
+      // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
       void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, H5::H5File hdf)
       {
         assert(this->rank == 0);
@@ -329,6 +334,7 @@ namespace libmpdataxx
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
       }
 
+      // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
       void record_aux(const std::string &name, typename solver_t::real_t *data)
       {
         record_aux_hlpr(name, data, *hdfp);

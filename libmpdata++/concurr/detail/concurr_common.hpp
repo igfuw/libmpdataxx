@@ -40,6 +40,81 @@ namespace libmpdataxx
   {
     namespace detail
     {
+      template <
+        class real_t,
+        bcond::drctn_e dir,
+        int dim,
+        int n_dims,
+        int halo,
+        class bcp_t,
+        class mem_t
+      >
+      struct bc_set_remote_impl
+      {
+        static void _(
+          bcp_t &bcp,
+          const std::unique_ptr<mem_t> &mem,
+          const int thread_rank,
+          const int thread_size
+        )
+        {
+          bcp.reset(
+            new bcond::bcond<real_t, halo, bcond::remote, dir, n_dims, dim>(
+              mem->slab(mem->grid_size[dim]),
+              mem->distmem.grid_size
+            )
+          );
+        }
+      };
+
+      template <
+        class real_t,
+        bcond::drctn_e dir,
+        int dim,
+        int halo,
+        class bcp_t,
+        class mem_t
+      >
+      struct bc_set_remote_impl<real_t, dir, dim, 3, halo, bcp_t, mem_t>
+      {
+        static void _(
+          bcp_t &bcp,
+          const std::unique_ptr<mem_t> &mem,
+          const int thread_rank,
+          const int thread_size
+        )
+        {
+          bcp.reset(
+            new bcond::bcond<real_t, halo, bcond::remote, dir, 3, dim>(
+              mem->slab(mem->grid_size[dim]),
+              mem->distmem.grid_size,
+              mem->slab(mem->grid_size[1], thread_rank, thread_size), // NOTE: we assume here remote 3d bcond is only on the edges perpendicular to x
+              thread_rank,
+              thread_size
+            )
+          );
+        }
+      };
+
+      template <
+        class real_t,
+        bcond::drctn_e dir,
+        int dim,
+        int n_dims,
+        int halo,
+        class bcp_t,
+        class mem_t
+      >
+      void bc_set_remote(
+        bcp_t &bcp,
+        const std::unique_ptr<mem_t> &mem,
+        const int thread_rank,
+        const int thread_size
+      )
+      {
+        bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t>::_(bcp, mem, thread_rank, thread_size);
+      }
+
       template<
         class solver_t_,
         bcond::bcond_e bcxl, bcond::bcond_e bcxr,
@@ -115,7 +190,9 @@ namespace libmpdataxx
           int dim
         >
         void bc_set(
-          typename solver_t::bcp_t &bcp
+          typename solver_t::bcp_t &bcp,
+          const int thread_rank  = 0, // required only by 3D remote (MPI) bcond
+          const int thread_size = 0  // required only by 3D remote (MPI) bcond
         )
         {
           // sanity check - polar coords do not work with MPI yet
@@ -123,7 +200,7 @@ namespace libmpdataxx
             throw std::runtime_error("Polar boundary conditions do not work with MPI.");
 
           // distmem overrides
-          if (type != bcond::remote && mem->distmem.size() > 1 && dim == 0)
+          if (mem->distmem.size() > 1 && dim == 0)
           {
             if (
               // distmem domain interior
@@ -133,10 +210,19 @@ namespace libmpdataxx
               // cyclic condition for distmem domain (note: will not work if a non-cyclic condition is on the other end)
               ||
               (type == bcond::cyclic)
-            ) return bc_set<bcond::remote, dir, dim>(bcp);
+            )
+            {
+              // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
+              bc_set_remote<real_t, dir, dim, solver_t::n_dims, solver_t::halo>(
+                bcp,
+                mem,
+                thread_rank,
+                thread_size
+              );
+              return;
+            }
           }
 
-          // bc allocation, all mpi routines called by the remote bcnd ctor are thread-safe (?)
           bcp.reset(
             new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
               mem->slab(mem->grid_size[dim]),
@@ -153,6 +239,7 @@ namespace libmpdataxx
         {
           typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
 
+          // NOTE: for remote bcond, thread_rank set to 0 on purpose in 1D to have propre left/right message tags 
           bc_set<bcxl, bcond::left, 0>(bxl);
           bc_set<bcxr, bcond::rght, 0>(bxr);
 
@@ -189,6 +276,7 @@ namespace libmpdataxx
             {
               typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
 
+              // NOTE: for remote bcond, thread_rank set to 0 on purpose in 2D to have propre left/right message tags 
               bc_set<bcxl, bcond::left, 0>(bxl);
               bc_set<bcxr, bcond::rght, 0>(bxr);
 
@@ -216,11 +304,11 @@ namespace libmpdataxx
           }
         }
 
-        // 3D version
+        // 3D version, note sharedmem in y direction!
         void init(
           const typename solver_t::rt_params_t &p,
           const std::array<rng_t, 3> &grid_size,
-          const int &n0, const int &n1 = 1, const int &n2 = 1
+          const int &n1, const int &n0 = 1, const int &n2 = 1
         ) {
           typename solver_t::bcp_t bxl, bxr, byl, byr, bzl, bzr, shrdl, shrdr;
 
@@ -231,8 +319,9 @@ namespace libmpdataxx
             {
               for (int i2 = 0; i2 < n2; ++i2)
               {
-                bc_set<bcxl, bcond::left, 0>(bxl);
-                bc_set<bcxr, bcond::rght, 0>(bxr);
+                // i1 is the local thread rank, n1 is the number of threads. These are needed by remote bcond, because only rank=0 does mpi communication
+                bc_set<bcxl, bcond::left, 0>(bxl, i1, n1);
+                bc_set<bcxr, bcond::rght, 0>(bxr, i1, n1);
 
                 bc_set<bcyl, bcond::left, 1>(byl);
                 bc_set<bcyr, bcond::rght, 1>(byr);
@@ -246,11 +335,11 @@ namespace libmpdataxx
                 algos.push_back(
                   new solver_t(
                     typename solver_t::ctor_args_t({
-                      i0,
+                      i1,
                       mem.get(),
-                      i0 == 0      ? bxl : shrdl,
-                      i0 == n0 - 1 ? bxr : shrdr,
-                      byl, byr,
+                      bxl, bxr,
+                      i1 == 0      ? byl : shrdl,
+                      i1 == n1 - 1 ? byr : shrdr,
                       bzl, bzr,
                       mem->slab(grid_size[0], i0, n0),
                       mem->slab(grid_size[1], i1, n1),
