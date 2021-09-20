@@ -190,14 +190,15 @@ install:
     #- if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo pip install mpi4py; fi 
     - |
       if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then
-        sudo pip$PY3DEB install Cython # to generate the C wrappers
+        #sudo pip$PY3DEB install Cython # to generate the C wrappers
         #sudo pip install https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz
-        mkdir mpi4py
-        cd mpi4py
-        travis_retry wget --no-check-certificate --quiet -O - https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz | tar --strip-components=1 -xz 
-        python setup.py build
-        sudo python setup.py install
-        cd ..
+        python -m pip install mpi4py #sudo pip install https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz
+#        mkdir mpi4py
+#        cd mpi4py
+#        travis_retry wget --no-check-certificate --quiet -O - https://bitbucket.org/mpi4py/mpi4py/get/master.tar.gz | tar --strip-components=1 -xz 
+#        python setup.py build
+#        sudo python setup.py install
+#        cd ..
       fi
     # h5py uninstallation following https://github.com/h5py/h5py/issues/672
     - if [[ $TRAVIS_OS_NAME == 'linux' && $MPI != 'none' ]]; then sudo -H pip$PY3DEB uninstall h5py; fi 
