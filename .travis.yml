@@ -24,16 +24,16 @@ env:
 #    - MPI=lam    
 #    - MPI=mpich  
 
-    - TEST_SUITE=unit MPI=none
-    - TEST_SUITE=sandbox MPI=none
-    - TEST_SUITE=paper MPI=none
-    - TEST_SUITE=elliptic_drop MPI=none
-    - TEST_SUITE=nair_jablonowski_2008 MPI=none
-    - TEST_SUITE=UWLCM_MT MPI=none
-    - TEST_SUITE=UWLCM_unit_iles MPI=none
-    - TEST_SUITE=UWLCM_unit_smg MPI=none
-    - TEST_SUITE=pbl MPI=none 
-    - TEST_SUITE=osx_local_clang MPI=none
+#    - TEST_SUITE=unit MPI=none
+#    - TEST_SUITE=sandbox MPI=none
+#    - TEST_SUITE=paper MPI=none
+#    - TEST_SUITE=elliptic_drop MPI=none
+#    - TEST_SUITE=nair_jablonowski_2008 MPI=none
+#    - TEST_SUITE=UWLCM_MT MPI=none
+#    - TEST_SUITE=UWLCM_unit_iles MPI=none
+#    - TEST_SUITE=UWLCM_unit_smg MPI=none
+#    - TEST_SUITE=pbl MPI=none 
+#    - TEST_SUITE=osx_local_clang MPI=none
     - TEST_SUITE=unit MPI=mvapich2
     - TEST_SUITE=sandbox MPI=mvapich2
 # MPI paper tests don't do file comparison and plotting; TODO: fix them
