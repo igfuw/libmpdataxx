@@ -143,3 +143,4 @@ This will open an interactive `bash` in the container
 and your working directory will be `/usr/local/src/libmpdataxx`.
 You can repeat the [step 2](#2-to-perform-unit-tests)
 and the [step 3](#3-to-reproduce-all-results-from-the-gmd-paper) from the previous part to run the tests.
+
