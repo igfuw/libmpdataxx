@@ -1,0 +1,39 @@
+name: Test libmpdata++
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        build_type: ["Debug", "RelWithDebInfo"]
+        mpi: ["none", "mvapich2"]
+        include:
+        - mpi: "none"
+          tag: "ubuntu_20_04_cuda_11_4"
+          cxx: "g++"
+        - mpi: "mvapich2"
+          tag: "ubuntu_20_04_cuda_11_4_mvapich2"
+          cxx: "mpic++"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Debugging with a ssh session
+#    - name: Setup tmate session
+#      uses: mxschmitt/action-tmate@v3
+
+    - name: Install libmpdata++
+      uses: ./.github/actions/libmpdataxx_install
+      with:
+        build_type: ${{matrix.build_type}}
+        threads: ${{matrix.threads}}
+        path: ${{ github.workspace }}
+        install_prefix: ${{ github.workspace }}/installed 
+        tag: ${{ matrix.tag }}
+        cxx: ${{ matrix.cxx }}
