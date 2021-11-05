@@ -34,18 +34,19 @@ runs:
       path: ${{ inputs.path }}/singularity_images
       tag: ${{ inputs.tag }}
     
-  - name: Configure CMake
-    shell: bash
-    # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-    # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-    run: singularity exec $SI cmake -B ${{inputs.path}}/build -DCMAKE_BUILD_TYPE=${{inputs.build_type}} -DCMAKE_INSTALL_PREFIX=${{inputs.install_prefix}} -DCMAKE_CXX_COMPILER=${{inputs.cxx}}
 
-  - name: Build libmpdata++
-    shell: bash
-    # Build your program with the given configuration
-    run: VERBOSE=1 singularity exec $SI cmake --build ${{inputs.path}}/build --config ${{inputs.build_type}} -j${{inputs.threads}}
+#  - name: Configure CMake
+#    shell: bash
+#    run: singularity exec $SI cmake -B ${{inputs.path}}/build -DCMAKE_BUILD_TYPE=${{inputs.build_type}} -DCMAKE_INSTALL_PREFIX=${{inputs.install_prefix}} -DCMAKE_CXX_COMPILER=${{inputs.cxx}};
 
-  - name: Install libmpdata++
+#  - name: Build libmpdata++
+#    shell: bash
+#    run: VERBOSE=1 singularity exec $SI cmake --build ${{inputs.path}}/build --config ${{inputs.build_type}} -j${{inputs.threads}}
+#
+#  - name: Install libmpdata++
+#    shell: bash
+#    run: VERBOSE=1 singularity exec $SI cmake --install ${{inputs.path}}/build --config ${{inputs.build_type}}
+
+  - name: configure, build and install libmpdata++
     shell: bash
-    # Build your program with the given configuration
-    run: VERBOSE=1 singularity exec $SI cmake --install ${{inputs.path}}/build --config ${{inputs.build_type}}
+    run: VERBOSE=1 singularity exec $SI bash -c "cmake -B ${{inputs.path}}/build -DCMAKE_BUILD_TYPE=${{inputs.build_type}} -DCMAKE_INSTALL_PREFIX=${{inputs.install_prefix}} -DCMAKE_CXX_COMPILER=${{inputs.cxx}};cmake --build ${{inputs.path}}/build --config ${{inputs.build_type}} -j${{inputs.threads}};cmake --install ${{inputs.path}}/build --config ${{inputs.build_type}}"

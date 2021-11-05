@@ -33,7 +33,7 @@ jobs:
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
-        path: ${{ github.workspace }}
+        path: ${{ github.workspace }}/libmpdata++
         install_prefix: ${{ github.workspace }}/installed 
         tag: ${{ matrix.tag }}
         cxx: ${{ matrix.cxx }}
