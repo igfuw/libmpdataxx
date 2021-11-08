@@ -7,11 +7,11 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  unit:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        build_type: ["Debug", "RelWithDebInfo"]
+        build_type: ["Debug", "Release"]
         mpi: ["none", "mvapich2"]
         include:
         - mpi: "none"
@@ -37,3 +37,13 @@ jobs:
         install_prefix: ${{ github.workspace }}/installed 
         tag: ${{ matrix.tag }}
         cxx: ${{ matrix.cxx }}
+
+    - run: mkdir ${{ github.workspace }}/tests/unit/build
+
+    - name: make unit tests
+      working-directory: ${{ github.workspace }}/tests/unit/build
+      run: VERBOSE=1 singularity exec $SI make -j4
+
+    - name: run unit tests
+      working-directory: ${{ github.workspace }}/tests/unit/build
+      run: OMP_NUM_THREADS=4 singularity exec $SI ctest -C ${{matrix.build_type}} || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
