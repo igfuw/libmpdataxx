@@ -42,7 +42,8 @@ jobs:
 
     - name: configure,make and run unit tests
       working-directory: ${{ github.workspace }}/tests/unit
-      run: VERBOSE=1 singularity exec $SI "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}}; cmake --build build --config ${{matrix.build_type}} -j4; ctest -C ${{matrix.build_type}} || cat build/Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 singularity exec $SI "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}}; cmake --build build --config ${{matrix.build_type}} -j4; ctest -C ${{matrix.build_type}}"
+#      run: VERBOSE=1 singularity exec $SI "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}}; cmake --build build --config ${{matrix.build_type}} -j4; ctest -C ${{matrix.build_type}} || cat build/Testing/Temporary/LastTest.log /"
 
 #    - name: run unit tests
 #      working-directory: ${{ github.workspace }}/tests/unit/build
