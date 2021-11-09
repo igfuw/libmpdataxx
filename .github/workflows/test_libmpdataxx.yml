@@ -7,6 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
+  # run unit tests
   unit:
     runs-on: ubuntu-20.04
     strategy:
@@ -24,10 +25,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # Debugging with a ssh session
-#    - name: Setup tmate session
-#      uses: mxschmitt/action-tmate@v3
-
     - name: Install libmpdata++
       uses: ./.github/actions/libmpdataxx_install
       with:
@@ -40,15 +37,104 @@ jobs:
 
     - run: mkdir ${{ github.workspace }}/tests/unit/build
 
-    # Debugging with a ssh session
-#    - name: Setup tmate session
-#      uses: mxschmitt/action-tmate@v3
-
-    - name: configure,make and run unit tests
+    - name: configure,make and run unit tests #all in one call, because singularity always creates a sandbox, what takes ca. 1 min. TODO: fix this (newer singularity from apt?)
       working-directory: ${{ github.workspace }}/tests/unit
-#      run: VERBOSE=1 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}}; cmake --build build --config ${{matrix.build_type}} -j4; ctest --test-dir build -C ${{matrix.build_type}}"
-      run: VERBOSE=1 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
 
-#    - name: run unit tests
-#      working-directory: ${{ github.workspace }}/tests/unit/build
-#      run: OMP_NUM_THREADS=4 singularity exec $SI ctest -C ${{matrix.build_type}} || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
+  # run selected (fast enough) sandbox tests
+  sandbox:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        build_type: ["Release"] # Debug would be too slow
+        mpi: ["none", "mvapich2"]
+        include:
+        - mpi: "none"
+          tag: "ubuntu_20_04_cuda_11_4"
+          cxx: "g++"
+        - mpi: "mvapich2"
+          tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
+          cxx: "mpic++"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install libmpdata++
+      uses: ./.github/actions/libmpdataxx_install
+      with:
+        build_type: ${{matrix.build_type}}
+        threads: ${{matrix.threads}}
+        path: ${{ github.workspace }}/libmpdata++
+        install_prefix: ${{ github.workspace }}/installed 
+        tag: ${{ matrix.tag }}
+        cxx: ${{ matrix.cxx }}
+
+    - run: mkdir ${{ github.workspace }}/tests/sandbox/build
+
+    - name: configure,make and run selected sandbox tests
+      working-directory: ${{ github.workspace }}/tests/sandbox
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
+
+  # run tests from the 2015 GMD paper
+  paper:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        build_type: ["Debug", "Release"] 
+        mpi: ["none", "mvapich2"]
+        include:
+        - mpi: "none"
+          tag: "ubuntu_20_04_cuda_11_4"
+          cxx: "g++"
+        - mpi: "mvapich2"
+          tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
+          cxx: "mpic++"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install libmpdata++
+      uses: ./.github/actions/libmpdataxx_install
+      with:
+        build_type: ${{matrix.build_type}}
+        threads: ${{matrix.threads}}
+        path: ${{ github.workspace }}/libmpdata++
+        install_prefix: ${{ github.workspace }}/installed 
+        tag: ${{ matrix.tag }}
+        cxx: ${{ matrix.cxx }}
+
+    - run: mkdir ${{ github.workspace }}/tests/paper_2015_GMD/build
+
+    - name: configure,make and run selected sandbox tests
+      working-directory: ${{ github.workspace }}/tests/paper_2015_GMD
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
+
+  nair_jablonowski_2008:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        build_type: ["Release"] 
+        mpi: ["none"]
+        include:
+        - mpi: "none"
+          tag: "ubuntu_20_04_cuda_11_4"
+          cxx: "g++"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install libmpdata++
+      uses: ./.github/actions/libmpdataxx_install
+      with:
+        build_type: ${{matrix.build_type}}
+        threads: ${{matrix.threads}}
+        path: ${{ github.workspace }}/libmpdata++
+        install_prefix: ${{ github.workspace }}/installed 
+        tag: ${{ matrix.tag }}
+        cxx: ${{ matrix.cxx }}
+
+    - run: mkdir ${{ github.workspace }}/tests/nair_jablonowski_2008/build
+
+    - name: configure,make and run selected sandbox tests
+      working-directory: ${{ github.workspace }}/tests/nair_jablonowski_2008
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
