@@ -18,7 +18,7 @@ jobs:
           tag: "ubuntu_20_04_cuda_11_4"
           cxx: "g++"
         - mpi: "mvapich2"
-          tag: "ubuntu_20_04_cuda_11_4_mvapich2"
+          tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
           cxx: "mpic++"
 
     steps:
