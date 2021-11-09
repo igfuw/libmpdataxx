@@ -79,6 +79,10 @@ T test()
 
 int main()
 {
+#if defined(USE_MPI)
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+#endif
+
   double err[4];
   {
     enum { delayed_step = 0 };
@@ -114,4 +118,8 @@ int main()
       throw std::runtime_error("delay error");
     }
   }
+
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }
