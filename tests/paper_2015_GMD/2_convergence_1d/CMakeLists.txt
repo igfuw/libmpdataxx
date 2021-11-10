@@ -15,7 +15,7 @@ if(NOT USE_MPI)
     NAME convergence_1d_plot
     COMMAND bash -c "
       for i in ${CMAKE_CURRENT_SOURCE_DIR}/refdata/*.txt.gz; do
-        python ${CMAKE_CURRENT_SOURCE_DIR}/plot.py ${CMAKE_CURRENT_BINARY_DIR}/`basename \${i/.gz/}`;
+        python3 ${CMAKE_CURRENT_SOURCE_DIR}/plot.py ${CMAKE_CURRENT_BINARY_DIR}/`basename \${i/.gz/}`;
       done;
     "
   )
