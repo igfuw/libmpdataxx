@@ -11,10 +11,11 @@
 import matplotlib
 matplotlib.use('Svg')
 
-from numpy import loadtxt, zeros, linspace
+from numpy import loadtxt, zeros, mgrid
 from sys import argv
 from math import pi, log, cos, sin, sqrt
-from matplotlib.mlab import griddata
+from scipy.interpolate import griddata
+from scipy.interpolate import interp2d
 from matplotlib.patches import Circle, Path, PathPatch
 
 import matplotlib.pyplot as plt
@@ -42,9 +43,8 @@ for i in range(theta.shape[0]) :
 ngrid = 800 * 2
 levels = range(-32,-3) #[-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7]
 
-xi = linspace(mn, mx, ngrid)
-yi = linspace(mn, mx, ngrid)
-zi = griddata(x,y,err,xi,yi,interp='linear')
+xi, yi = mgrid[mn:mx:complex(ngrid), mn:mx:complex(ngrid)]
+zi = griddata((x,y),err,(xi,yi),method='linear')
 
 fig = plt.gcf()
 fig.gca().set_xlim(mn,mx)
