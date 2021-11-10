@@ -2,27 +2,27 @@ libmpdataxx_add_test(pbl_iles)
 libmpdataxx_add_test(pbl_smg)
 
 add_test(pbl_iles_profiles bash -c "
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_iles
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_iles
 ")
 add_test(pbl_smg_profiles bash -c "
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_smg
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_smg
 ")
 
 add_test(pbl_iles_budget bash -c "
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_iles
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_iles
 ")
 add_test(pbl_smg_budget bash -c "
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_smg
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_smg
 ")
 
 libmpdataxx_add_test_travis(pbl_smg_travis)
 libmpdataxx_add_test_travis(pbl_iles_travis)
 
 add_test(pbl_iles_travis_profiles bash -c "
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_iles_travis
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_iles_travis
 ")
 add_test(pbl_smg_travis_profiles bash -c "
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_smg_travis
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_smg_travis
 ")
 
 add_test(pbl_iles_travis_prof_diff
@@ -31,10 +31,10 @@ add_test(pbl_smg_travis_prof_diff
         zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/profiles_pbl_smg_travis.txt.gz profiles_pbl_smg_travis.txt)
 
 add_test(pbl_iles_travis_budget bash -c "
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_iles_travis
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_iles_travis
 ")
 add_test(pbl_smg_travis_budget bash -c "
-    python  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_smg_travis
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_smg_travis
 ")
 
 add_test(pbl_iles_travis_budget_diff
