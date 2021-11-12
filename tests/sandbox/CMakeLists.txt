@@ -48,6 +48,3 @@ add_subdirectory(bconds_div)
 add_subdirectory(shear_layer)
 add_subdirectory(convergence_vip_1d)
 add_subdirectory(convergence_adv_diffusion)
-
-# label tests that are too slow for CI
-set_property(TEST pbl_iles pbl_smg pbl_iles_budget pbl_smg_budget pbl_iles_profiles pbl_smg_profiles PROPERTY LABELS NotInCI) # tgv_3d ?

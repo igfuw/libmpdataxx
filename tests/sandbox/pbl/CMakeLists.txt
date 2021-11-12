@@ -73,3 +73,6 @@ add_test(pbl_smg_short_diff bash -c "
     echo   'comparing timestep0000000600.xmf'                                                                          &&
     diff    $dir/timestep0000000600.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000600.xmf                || exit 1;
 ")
+
+# label tests that are too slow for CI
+set_property(TEST pbl_iles pbl_smg pbl_iles_budget pbl_smg_budget pbl_iles_profiles pbl_smg_profiles PROPERTY LABELS NotInCI)
