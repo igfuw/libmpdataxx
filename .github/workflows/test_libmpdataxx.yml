@@ -40,7 +40,7 @@ jobs:
 
     - name: configure,make and run unit tests #all in one call, because singularity always creates a sandbox, what takes ca. 1 min. TODO: fix this (newer singularity from apt?)
       working-directory: ${{ github.workspace }}/tests/unit
-      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
 
 # Alternative command, but it does not run tests. Need to specify --test-command, but to what?
 #    - name: configure,make and run unit tests #all in one call, because singularity always creates a sandbox, what takes ca. 1 min. TODO: fix this (newer singularity from apt?)
@@ -79,7 +79,7 @@ jobs:
 
     - name: configure,make and run selected sandbox tests
       working-directory: ${{ github.workspace }}/tests/sandbox
-      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest -LE NotInCI || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest -LE NotInCI || cat Testing/Temporary/LastTest.log /"
 
   # run tests from the 2015 GMD paper
   paper:
@@ -113,7 +113,7 @@ jobs:
 
     - name: configure,make and run selected sandbox tests
       working-directory: ${{ github.workspace }}/tests/paper_2015_GMD
-      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest || cat Testing/Temporary/LastTest.log /"
 
   nair_jablonowski_2008:
     runs-on: ubuntu-20.04
@@ -143,7 +143,7 @@ jobs:
 
     - name: configure,make and run selected sandbox tests
       working-directory: ${{ github.workspace }}/tests/nair_jablonowski_2008
-      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest || cat Testing/Temporary/LastTest.log /"
 
   elliptic_drop:
     runs-on: ubuntu-20.04
@@ -179,4 +179,4 @@ jobs:
 
     - name: configure,make and run tests
       working-directory: ${{ github.workspace }}/shallow-water-elliptic-drop/numerical
-      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest || cat Testing/Temporary/LastTest.log /"
