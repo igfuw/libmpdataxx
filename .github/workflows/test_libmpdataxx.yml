@@ -178,5 +178,5 @@ jobs:
     - run: mkdir ${{ github.workspace }}/shallow-water-elliptic-drop/numerical/build
 
     - name: configure,make and run tests
-      working-directory: ${{ github.workspace }}/shallow-water-elliptic-drop/numerical/build
+      working-directory: ${{ github.workspace }}/shallow-water-elliptic-drop/numerical
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}; cmake --build build --config ${{matrix.build_type}} -j4; cd build; ctest || cat Testing/Temporary/LastTest.log /"
