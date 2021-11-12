@@ -22,7 +22,7 @@ jobs:
         - mpi: "mvapich2"
           tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
           cxx: "mpic++"
-          ctest_options: "-LE NotWithMpi"  # exclude tests with the label NotWithMpi
+          ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
     steps:
     - uses: actions/checkout@v2
 
@@ -45,7 +45,7 @@ jobs:
 # Alternative command, but it does not run tests. Need to specify --test-command, but to what?
 #    - name: configure,make and run unit tests #all in one call, because singularity always creates a sandbox, what takes ca. 1 min. TODO: fix this (newer singularity from apt?)
 #      working-directory: ${{ github.workspace }}/tests/unit/build
-#      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI ctest --build-and-test .. . --build-generator "Unix Makefiles"  -LE NotWithMpi --build-options  "-DCMAKE_CXX_COMPILER=${{matrix.cxx}}" "-DCMAKE_BUILD_TYPE=${{matrix.build_type}}" || cat Testing/Temporary/LastTest.log /
+#      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI ctest --build-and-test .. . --build-generator "Unix Makefiles"  -LE SlowWithMpi --build-options  "-DCMAKE_CXX_COMPILER=${{matrix.cxx}}" "-DCMAKE_BUILD_TYPE=${{matrix.build_type}}" || cat Testing/Temporary/LastTest.log /
       
   # run selected (fast enough) sandbox tests
   sandbox:
@@ -86,15 +86,13 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        build_type: ["Debug", "Release"] 
+        build_type: ["Release"] 
         mpi: ["none", "mvapich2"]
         include:
-        - mpi: "none"
-          tag: "ubuntu_20_04_cuda_11_4"
-          cxx: "g++"
         - mpi: "mvapich2"
           tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
           cxx: "mpic++"
+          ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
 
     steps:
     - uses: actions/checkout@v2
@@ -113,7 +111,7 @@ jobs:
 
     - name: configure,make and run selected sandbox tests
       working-directory: ${{ github.workspace }}/tests/paper_2015_GMD
-      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
 
   nair_jablonowski_2008:
     runs-on: ubuntu-20.04

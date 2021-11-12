@@ -5,3 +5,5 @@ if(NOT USE_MPI)
     COMMAND zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/stats.txt.gz stats.txt
   )
 endif()
+
+set_property(TEST init_boussinesq_2d calc_boussinesq_2d clean_boussinesq_2d PROPERTY LABELS SlowWithMpi) 

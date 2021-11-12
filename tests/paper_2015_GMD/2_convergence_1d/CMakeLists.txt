@@ -20,3 +20,4 @@ if(NOT USE_MPI)
     "
   )
 endif()
+set_property(TEST convergence_1d PROPERTY LABELS SlowWithMpi) # the test is super slow with MPI, make it easy to disable it
