@@ -1,4 +1,4 @@
-libmpdataxx_add_test_gi(boussinesq_2d)
+libmpdataxx_add_test_gi(boussinesq_2d true)
 if(NOT USE_MPI)
   add_test(
     NAME boussinesq_stats_diff 
