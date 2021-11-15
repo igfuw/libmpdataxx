@@ -89,6 +89,9 @@ jobs:
         build_type: ["Release"] 
         mpi: ["none", "mvapich2"]
         include:
+        - mpi: "none"
+          tag: "ubuntu_20_04_cuda_11_4"
+          cxx: "g++"
         - mpi: "mvapich2"
           tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
           cxx: "mpic++"
