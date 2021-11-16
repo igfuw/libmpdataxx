@@ -62,7 +62,7 @@ jobs:
         - mpi: "mvapich2"
           tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
           cxx: "mpic++"
-          ctest_options: "-LE \"NotInCI|SlowWithMpi\""  # exclude tests with either label
+          ctest_options: "-LE 'NotInCI|SlowWithMpi'"  # exclude tests with either label
 
     steps:
     - uses: actions/checkout@v2
