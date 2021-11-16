@@ -58,11 +58,11 @@ jobs:
         - mpi: "none"
           tag: "ubuntu_20_04_cuda_11_4"
           cxx: "g++"
-          ctest_options: ""
+          ctest_options: "-LE NotInCI"
         - mpi: "mvapich2"
           tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
           cxx: "mpic++"
-          ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
+          ctest_options: "-LE \"NotInCI|SlowWithMpi\""  # exclude tests with either label
 
     steps:
     - uses: actions/checkout@v2
@@ -81,7 +81,7 @@ jobs:
 
     - name: configure,make and run selected sandbox tests
       working-directory: ${{ github.workspace }}/tests/sandbox
-      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest -LE NotInCI ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
 
   # run tests from the 2015 GMD paper
   paper:
