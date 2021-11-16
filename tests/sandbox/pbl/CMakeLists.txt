@@ -45,11 +45,11 @@ add_test(pbl_smg_short_budget_diff
 add_test(pbl_iles_short_diff bash -c "
     dir=out_pbl_iles_short
     echo   'comparing const.h5'                                                                                        &&
-    h5diff -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5                            &&
+    h5diff --use-system-epsilon -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5                            &&
     echo   'comparing temp.xmf'                                                                                        &&
     diff    $dir/temp.xmf               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                              &&
     echo   'comparing timestep0000000000.h5'                                                                           &&
-    h5diff -v $dir/timestep0000000000.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5               &&
+    h5diff --use-system-epsilon -v $dir/timestep0000000000.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5               &&
     echo   'comparing timestep0000000000.xmf'                                                                          &&
     diff    $dir/timestep0000000000.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                &&
     echo   'comparing timestep0000000600.h5'                                                                           &&
@@ -61,11 +61,11 @@ add_test(pbl_iles_short_diff bash -c "
 add_test(pbl_smg_short_diff bash -c "
     dir=out_pbl_smg_short
     echo   'comparing const.h5'                                                                                        &&
-    h5diff -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5                            &&
+    h5diff --use-system-epsilon -v $dir/const.h5               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/const.h5                            &&
     echo   'comparing temp.xmf'                                                                                        &&
     diff    $dir/temp.xmf               ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/temp.xmf                              &&
     echo   'comparing timestep0000000000.h5'                                                                           &&
-    h5diff -v $dir/timestep0000000000.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5               &&
+    h5diff --use-system-epsilon -v $dir/timestep0000000000.h5  ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.h5               &&
     echo   'comparing timestep0000000000.xmf'                                                                          &&
     diff    $dir/timestep0000000000.xmf ${CMAKE_CURRENT_SOURCE_DIR}/refdata/$dir/timestep0000000000.xmf                &&
     echo   'comparing timestep0000000600.h5'                                                                           &&
