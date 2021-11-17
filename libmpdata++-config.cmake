@@ -7,6 +7,8 @@ else()
   cmake_minimum_required(VERSION 2.8.8) 
 endif()
 
+cmake_minimum_required(VERSION 3.14) # for setting output variable of try_compile 
+
 # the policies we care about:
 # - CMP0025 - make CMake distinguis between Apple and LLVM clang
 # - CMP0042 - make CMake use RPATHs on OSX
@@ -216,7 +218,7 @@ if(HDF5_FOUND)
     set(msg "Checking if MPI-HDF5 is usable from C++...")
     set(pfx "HDF5/MPI/C++ check")
     message(STATUS ${msg})
-    execute_process(COMMAND "mktemp" "-d" RESULT_VARIABLE status OUTPUT_VARIABLE tmpdir)
+    execute_process(COMMAND "mktemp" "-d" RESULT_VARIABLE status OUTPUT_VARIABLE tmpdir OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (NOT status EQUAL 0)                                                       
       message(FATAL_ERROR "${pfx}: mkdtemp failed")                               
     endif()                                                                       
@@ -229,27 +231,40 @@ if(HDF5_FOUND)
       int main() 
       { 
         boost::mpi::environment e; 
-	hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);                                
-	H5Pset_fapl_mpio(plist_id, MPI_COMM_WORLD, MPI_INFO_NULL);                  
-	H5::H5File(\"test.h5\", H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);                
-	H5Pclose(plist_id); 
+        hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);                                
+        H5Pset_fapl_mpio(plist_id, MPI_COMM_WORLD, MPI_INFO_NULL);                  
+        H5::H5File(\"test.h5\", H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);                
+        H5Pclose(plist_id); 
       }
     ")
 
-    execute_process(
-      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-I${HDF5_INCLUDE_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
-      # Boost_LIBRARY_DIRS has to be in LD_RUN_PATH, tried to specify it through rpath/rpath-link but failed; at runtime it correctly finds libboost-mpi (direct dependency), but fails on boost-serialization (which is a dependency of boost-mpi)
-      #COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS},-rpath-link,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
-      WORKING_DIRECTORY ${tmpdir} 
-      RESULT_VARIABLE status 
-      ERROR_VARIABLE error
-    )
-    if (NOT status EQUAL 0)                                                       
-      message(FATAL_ERROR "${pfx}: compilation failed\n ${error}")                               
+#    message("${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-I${HDF5_INCLUDE_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES})
+
+#    execute_process(
+#      COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-I${HDF5_INCLUDE_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
+#      # Boost_LIBRARY_DIRS has to be in LD_RUN_PATH, tried to specify it through rpath/rpath-link but failed; at runtime it correctly finds libboost-mpi (direct dependency), but fails on boost-serialization (which is a dependency of boost-mpi)
+#      #COMMAND "${CMAKE_CXX_COMPILER}" "test.cpp" "-I${Boost_INCLUDE_DIRS}" "-Wl,-rpath,${Boost_LIBRARY_DIRS},-rpath-link,${Boost_LIBRARY_DIRS}" ${HDF5_LIBRARIES} ${Boost_LIBRARIES}# the order of HDF/Boost matters here!
+#      WORKING_DIRECTORY ${tmpdir} 
+#      RESULT_VARIABLE status 
+#      ERROR_VARIABLE error
+#    )
+
+    try_compile(status ${CMAKE_BINARY_DIR} "${tmpdir}/test.cpp" 
+                OUTPUT_VARIABLE error
+                CMAKE_FLAGS INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS},{HDF5_INCLUDE_DIRS}
+                LINK_LIBRARIES ${Boost_LIBRARIES}
+                LINK_LIBRARIES ${HDF5_LIBRARIES}
+                COPY_FILE ${tmpdir}/test_hdf5_mpi
+                COPY_FILE_ERROR copy_error
+               )
+
+    if (status EQUAL 0)                                                       
+      message(FATAL_ERROR "${pfx}: compilation failed\n status: ${status}\n copy file error: ${copy_error}\n output: ${error}")                               
     endif()                                                                       
     message(STATUS "${msg} - compilation OK")
+
     execute_process(
-      COMMAND "mpiexec" "-np" "1" "./a.out" 
+      COMMAND "mpiexec" "-np" "1" "./test_hdf5_mpi" 
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status
       ERROR_VARIABLE error
@@ -266,7 +281,7 @@ if(HDF5_FOUND)
     # detecting if it runs under mpirun (missing libhwloc-plugins issue:
     # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=790540
     # )
-    execute_process(COMMAND ${libmpdataxx_MPIRUN} "-np" "2" "./a.out" 
+    execute_process(COMMAND ${libmpdataxx_MPIRUN} "-np" "2" "./test_hdf5_mpi" 
       WORKING_DIRECTORY ${tmpdir} 
       RESULT_VARIABLE status
       ERROR_VARIABLE error

@@ -26,7 +26,7 @@ set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CXX_FLAGS}")
 
 # macro to be used in the subdirectories
 function(libmpdataxx_add_test test)
-  message("libmpdataxx_LIBRARIES: ${libmpdataxx_LIBRARIES}")
+#  message("libmpdataxx_LIBRARIES: ${libmpdataxx_LIBRARIES}")
   add_executable(${test} ${test}.cpp)
   target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
   target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})

@@ -1,1 +1,2 @@
 libmpdataxx_add_test(convergence_adv_diffusion)
+set_property(TEST convergence_adv_diffusion PROPERTY LABELS SlowWithMpi)
