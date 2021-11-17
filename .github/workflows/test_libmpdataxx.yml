@@ -27,7 +27,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install libmpdata++
-      uses: ./.github/actions/libmpdataxx_install
+      uses: igfuw/libmpdataxx_install@v0.1
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -67,7 +67,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install libmpdata++
-      uses: ./.github/actions/libmpdataxx_install
+      uses: igfuw/libmpdataxx_install@v0.1
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -98,7 +98,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install libmpdata++
-      uses: ./.github/actions/libmpdataxx_install
+      uses: igfuw/libmpdataxx_install@v0.1
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -133,7 +133,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install libmpdata++
-      uses: ./.github/actions/libmpdataxx_install
+      uses: igfuw/libmpdataxx_install@v0.1
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -163,7 +163,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install libmpdata++
-      uses: ./.github/actions/libmpdataxx_install
+      uses: igfuw/libmpdataxx_install@v0.1
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -193,7 +193,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install libmpdata++
-      uses: ./.github/actions/libmpdataxx_install
+      uses: igfuw/libmpdataxx_install@v0.1
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
