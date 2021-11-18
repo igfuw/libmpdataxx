@@ -36,18 +36,6 @@ function(libmpdataxx_add_test test)
   endif()
 endfunction()
 
-# same as above but for travis only tests that should be excluded from make all
-function(libmpdataxx_add_test_travis test)
-  add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test} ${libmpdataxx_LIBRARIES})
-  target_include_directories(${test} PUBLIC ${libmpdataxx_INCLUDE_DIRS})
-  if(USE_MPI)
-    add_test(NAME ${test} COMMAND ${libmpdataxx_MPIRUN} -np 3 ${CMAKE_CURRENT_BINARY_DIR}/${test}) # TODO: why 3? :)
-  else()
-    add_test(${test} ${test})
-  endif()
-endfunction()
-
 enable_testing()
 
 add_subdirectory(mpi_adv)

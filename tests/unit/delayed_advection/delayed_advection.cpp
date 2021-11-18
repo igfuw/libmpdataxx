@@ -62,23 +62,27 @@ T test()
   run.advectee(0) = 2 + sin(2 * pi * i * dx);
   run.advectee(1) = 2 + sin(4 * pi * i * dx);
 
-  decltype(run.advectee()) true_solution0(run.advectee().shape());
-  decltype(run.advectee()) true_solution1(run.advectee().shape());
-  true_solution0 = run.advectee(0);
-  true_solution1 = run.advectee(1);
+  decltype(run.advectee()) true_solution0(run.advectee_global().shape());
+  decltype(run.advectee()) true_solution1(run.advectee_global().shape());
+  true_solution0 = run.advectee_global(0);
+  true_solution1 = run.advectee_global(1);
 
   run.advector(0) = 1.0 * dt/dx;
 
   run.advance(nt);
 
-  auto L2_error0 = sqrt(sum(pow2(run.advectee(0) - true_solution0)) / (np * np)) / time;
-  auto L2_error1 = sqrt(sum(pow2(run.advectee(1) - true_solution1)) / (np * np)) / time;
+  auto L2_error0 = sqrt(sum(pow2(run.advectee_global(0) - true_solution0)) / (np * np)) / time;
+  auto L2_error1 = sqrt(sum(pow2(run.advectee_global(1) - true_solution1)) / (np * np)) / time;
 
   return L2_error0 + L2_error1;
 }
 
 int main()
 {
+#if defined(USE_MPI)
+  MPI::Init_thread(MPI_THREAD_MULTIPLE);
+#endif
+
   double err[4];
   {
     enum { delayed_step = 0 };
@@ -114,4 +118,8 @@ int main()
       throw std::runtime_error("delay error");
     }
   }
+
+#if defined(USE_MPI)
+  MPI::Finalize();
+#endif
 }
