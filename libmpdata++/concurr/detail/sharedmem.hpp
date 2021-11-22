@@ -623,9 +623,12 @@ namespace libmpdataxx
             std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
             // a vector that will store the received data, relevant only on process rank=0
             std::vector<real_t> out_values(this->distmem.grid_size[0] * this->grid_size[1].length() * this->grid_size[2].length());
-            // create an array that will store advectee to be sent in a contiguous memory block
-            std::vector<real_t> in_values_vec(advectee(e).size());
-            std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
+            // create an array that will store advectee to be sent in a contiguous memory block using the (default) kji storage order
+            // NOTE: libmpdata++ 3d blitz arrays, like advectee, are in the kij order
+            blitz::Array<real_t, 3> in_values_arr(advectee(e).shape());
+            in_values_arr = advectee(e);
+            // wrap in_values_arr in a std::vector
+            std::vector<real_t> in_values_vec(in_values_arr.begin(), in_values_arr.end());
 
             // gather the data from all processes on rank=0
             boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
@@ -634,7 +637,8 @@ namespace libmpdataxx
 
             blitz::Array<real_t, 3> res(out_values.data(), blitz::shape(
               this->distmem.grid_size[0], this->grid_size[1].length(), this->grid_size[2].length()),
-              blitz::duplicateData);
+              blitz::duplicateData
+              );
             return res;
           }
           else
