@@ -87,7 +87,9 @@ int main()
   slv.advance(nt);
 
   auto err_cyclic = max(abs(slv.advectee_global(ix::u)(0, all, all) - slv.advectee_global(ix::u)(nx - 1, all, all)));
-  // TODO: why MPI run has larger error?
+  // For some reason, MPI run has larger error.
+  // It is the case since sharedmem decomposition is along y axis (and blitz storage order is kij).
+  // Before that, MPI had similar error as non-MPI.
   const real_t cyclic_tolerance = 
   #if defined(USE_MPI)
     1e-6;
