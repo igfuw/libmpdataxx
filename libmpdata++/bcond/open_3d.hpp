@@ -78,15 +78,15 @@ namespace libmpdataxx
         // TODO: exactly the same code below!
         switch (d) // note: order and lack of breaks intentional!
         {
-          case 0:
+          case 1:
           av[d+2](pi<d>(i, j, (k-h).first())) = 0;
           av[d+2](pi<d>(i, j, (k+h).last() )) = 0;
 
-          case 1:
+          case 2:
           av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
           av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
 
-          case 2:
+          case 0:
           break;
 
           default: assert(false);
@@ -190,15 +190,15 @@ namespace libmpdataxx
 
         switch (d) // note: order and lack of breaks intentional!
         {
-          case 0:
+          case 1:
           av[d+2](pi<d>(i, j, (k-h).first())) = 0;
           av[d+2](pi<d>(i, j, (k+h).last() )) = 0;
 
-          case 1:
+          case 2:
           av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
           av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
 
-          case 2:
+          case 0:
           break;
 
           default: assert(false);
