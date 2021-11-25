@@ -191,8 +191,8 @@ namespace libmpdataxx
         >
         void bc_set(
           typename solver_t::bcp_t &bcp,
-          const int thread_rank  = 0, // required only by 3D remote (MPI) bcond
-          const int thread_size = 0  // required only by 3D remote (MPI) bcond
+          const int thread_rank  = 0, // required only by 3D remote (MPI) and open bconds
+          const int thread_size = 0  // required only by 3D remote (MPI) and open bconds
         )
         {
           // sanity check - polar coords do not work with MPI yet
@@ -223,12 +223,23 @@ namespace libmpdataxx
             }
           }
 
-          bcp.reset(
-            new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
-              mem->slab(mem->grid_size[dim]),
-              mem->distmem.grid_size
-            )
-          );
+          // 3d open bcond needs to know thread rank and size, because it zeroes perpendicular vectors
+          if (type == bcond::open && solver_t::n_dims == 3)
+            bcp.reset(
+              new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
+                mem->slab(mem->grid_size[dim]),
+                mem->distmem.grid_size,
+                thread_rank,
+                thread_size
+              )
+            );
+          else
+            bcp.reset(
+              new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
+                mem->slab(mem->grid_size[dim]),
+                mem->distmem.grid_size
+              )
+            );
         }
 
         // 1D version
