@@ -220,9 +220,11 @@ namespace libmpdataxx
         remote_common(
           const rng_t &i,
           const std::array<int, n_dims> &distmem_grid_size,
-          bool single_threaded = false
+          bool single_threaded = false,
+          const int thread_rank = -1, 
+          const int thread_size = -1 
         ) :
-          parent_t(i, distmem_grid_size, single_threaded)
+          parent_t(i, distmem_grid_size, single_threaded, thread_rank, thread_size)
         {
 #if defined(USE_MPI)
   

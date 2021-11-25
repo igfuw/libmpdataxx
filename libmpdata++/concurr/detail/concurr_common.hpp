@@ -40,6 +40,7 @@ namespace libmpdataxx
   {
     namespace detail
     {
+      // helpers for setting remote bcond
       template <
         class real_t,
         bcond::drctn_e dir,
@@ -61,12 +62,15 @@ namespace libmpdataxx
           bcp.reset(
             new bcond::bcond<real_t, halo, bcond::remote, dir, n_dims, dim>(
               mem->slab(mem->grid_size[dim]),
-              mem->distmem.grid_size
+              mem->distmem.grid_size,
+              thread_rank,
+              thread_size
             )
           );
         }
       };
 
+      // 3d specialization
       template <
         class real_t,
         bcond::drctn_e dir,
@@ -114,6 +118,82 @@ namespace libmpdataxx
       {
         bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t>::_(bcp, mem, thread_rank, thread_size);
       }
+
+//      // helpers for setting open 3d bconds, same logic as in remote - constructors need additional information
+//      template <
+//        class real_t,
+//        bcond::drctn_e dir,
+//        int dim,
+//        int n_dims,
+//        int halo,
+//        class bcp_t,
+//        class mem_t
+//      >
+//      struct bc_set_open_3d_impl
+//      {
+//        static void _(
+//          bcp_t &bcp,
+//          const std::unique_ptr<mem_t> &mem,
+//          const int thread_rank,
+//          const int thread_size
+//        )
+//        {
+//          bcp.reset(
+//            new bcond::bcond<real_t, halo, bcond::open, dir, n_dims, dim>(
+//              mem->slab(mem->grid_size[dim]),
+//              mem->distmem.grid_size
+//            )
+//          );
+//        }
+//      };
+//
+//      // specialization for 3d
+//      template <
+//        class real_t,
+//        bcond::drctn_e dir,
+//        int dim,
+//        int halo,
+//        class bcp_t,
+//        class mem_t
+//      >
+//      struct bc_set_open_3d_impl<real_t, dir, dim, 3, halo, bcp_t, mem_t>
+//      {
+//        static void _(
+//          bcp_t &bcp,
+//          const std::unique_ptr<mem_t> &mem,
+//          const int thread_rank,
+//          const int thread_size
+//        )
+//        {
+//          bcp.reset(
+//            new bcond::bcond<real_t, halo, bcond::open, dir, 3, dim>(
+//              mem->slab(mem->grid_size[dim]),
+//              mem->distmem.grid_size,
+//              thread_rank,
+//              thread_size
+//            )
+//          );
+//        }
+//      };
+//
+//      template <
+//        class real_t,
+//        bcond::drctn_e dir,
+//        int dim,
+//        int n_dims,
+//        int halo,
+//        class bcp_t,
+//        class mem_t
+//      >
+//      void bc_set_open_3d(
+//        bcp_t &bcp,
+//        const std::unique_ptr<mem_t> &mem,
+//        const int thread_rank,
+//        const int thread_size
+//      )
+//      {
+//        bc_set_open_3d_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t>::_(bcp, mem, thread_rank, thread_size);
+//      }
 
       template<
         class solver_t_,
@@ -225,21 +305,32 @@ namespace libmpdataxx
 
           // 3d open bcond needs to know thread rank and size, because it zeroes perpendicular vectors
           if (type == bcond::open && solver_t::n_dims == 3)
+          {
             bcp.reset(
               new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
                 mem->slab(mem->grid_size[dim]),
                 mem->distmem.grid_size,
+                false,
                 thread_rank,
                 thread_size
               )
             );
-          else
-            bcp.reset(
-              new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
-                mem->slab(mem->grid_size[dim]),
-                mem->distmem.grid_size
-              )
-            );
+            //bc_set_open_3d<real_t, dir, dim, solver_t::n_dims, solver_t::halo>(
+            //  bcp,
+            //  mem,
+            //  thread_rank,
+            //  thread_size
+            //);
+            return;
+          }
+
+          // else: not remote and not open_3d
+          bcp.reset(
+            new bcond::bcond<real_t, solver_t::halo, type, dir, solver_t::n_dims, dim>(
+              mem->slab(mem->grid_size[dim]),
+              mem->distmem.grid_size
+            )
+          );
         }
 
         // 1D version

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <libmpdata++/bcond/detail/open_3d_common.hpp>
+#include <libmpdata++/bcond/detail/bcond_common.hpp>
 
 namespace libmpdataxx
 {
@@ -18,9 +18,9 @@ namespace libmpdataxx
         dir == left &&
         n_dims == 3
       >::type
-    > : public detail::open_3d_common<real_t, halo>
+    > : public detail::bcond_common<real_t, halo, 3>
     {
-      using parent_t = detail::open_3d_common<real_t, halo>;
+      using parent_t = detail::bcond_common<real_t, halo, 3>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -140,9 +140,9 @@ namespace libmpdataxx
         dir == rght &&
         n_dims == 3
       >::type
-    > : public detail::open_3d_common<real_t, halo>
+    > : public detail::bcond_common<real_t, halo, 3>
     {
-      using parent_t = detail::open_3d_common<real_t, halo>;
+      using parent_t = detail::bcond_common<real_t, halo, 3>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
 

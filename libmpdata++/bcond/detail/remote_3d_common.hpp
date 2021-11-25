@@ -23,8 +23,6 @@ namespace libmpdataxx
         using arr_t = typename parent_t::arr_t;
         using idx_t = typename parent_t::idx_t;
 
-        const int thread_rank, thread_size;
-
         private:
 
         const rng_t thread_j;
@@ -76,23 +74,17 @@ namespace libmpdataxx
           const int thread_rank,
           const int thread_size
         ) :
-          parent_t(i, distmem_grid_size, true), // true indicating that this is a bcond done with a single thread
-          thread_rank(thread_rank),
-          thread_size(thread_size),
+          parent_t(i, distmem_grid_size, true, thread_rank, thread_size), // true indicating that this is a bcond done with a single thread
           thread_j(_thread_j),
           grid_size_y(distmem_grid_size[1])
         {
 #if defined(USE_MPI)
           // only 2 threads do mpi, others don't need buffers
-          if(thread_rank != 0 && thread_rank != thread_size-1)
+          if(this->thread_rank != 0 && this->thread_rank != this->thread_size-1)
           {
             free(parent_t::buf_send);
             free(parent_t::buf_recv);
           }
-//std::cerr << "remote_3d_common ctor thread_j: " << thread_j.lbound(0) << ", " << thread_j.ubound(0) << std::endl;
-//std::cerr << "remote_3d_common ctor _thread_j: " << _thread_j.lbound(0) << ", " << _thread_j.ubound(0) << std::endl;
-//std::cerr << "remote_3d_common ctor f-l thread_j: " << thread_j.first() << ", " << thread_j.last() << std::endl;
-//std::cerr << "remote_3d_common ctor f-l _thread_j: " << _thread_j.first() << ", " << _thread_j.last() << std::endl;
 #endif
         }
 
@@ -100,7 +92,7 @@ namespace libmpdataxx
         ~remote_3d_common()
         {
 #if defined(USE_MPI)
-          if(thread_rank == 0 || thread_rank == thread_size-1)
+          if(this->thread_rank == 0 || this->thread_rank == this->thread_size-1)
           {
             free(parent_t::buf_send);
             free(parent_t::buf_recv);

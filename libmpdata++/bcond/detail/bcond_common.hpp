@@ -40,6 +40,9 @@ namespace libmpdataxx
         using arr_2d_t = blitz::Array<real_t, 2>;
         using arr_3d_t = blitz::Array<real_t, 3>;
 
+        // needed by remote_3d and open_3d, stored here for convenience and potential use in other bconds
+        const int thread_rank, thread_size;
+
         public:
 
         // 1D
@@ -209,7 +212,13 @@ namespace libmpdataxx
         public:
 
         // ctor
-        bcond_common(const rng_t &i, const std::array<int, n_dims> &, bool single_threaded = false) :
+        bcond_common(
+          const rng_t &i,
+          const std::array<int, n_dims> &,
+          bool single_threaded = false,
+          const int thread_rank = -1, // -1 to indicate undefined
+          const int thread_size = -1  // ditto
+        ) :
           // sclr
           left_edge_sclr(
             i.first()
@@ -250,11 +259,9 @@ namespace libmpdataxx
             (i^h^(-1)).last() - (halo - 1),
             (i^h^(-1)).last()
           ),
-          single_threaded(single_threaded)
-        {}
-
-        // the one for use in shared
-        bcond_common()
+          single_threaded(single_threaded),
+          thread_rank(thread_rank),
+          thread_size(thread_size)
         {}
       };
     } // namespace detail
