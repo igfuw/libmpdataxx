@@ -57,11 +57,11 @@ jobs:
         - mpi: "none"
           tag: "ubuntu_20_04_cuda_11_4"
           cxx: "g++"
-          ctest_options: "-LE NotInCI"
+          ctest_options: "-LE ShorterVersion"  # don't run pbl_short because full pbl is ran
         - mpi: "mvapich2"
           tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
           cxx: "mpic++"
-          ctest_options: "-LE 'NotInCI|SlowWithMpi'"  # exclude tests with either label
+          ctest_options: "-LE SlowWithMpi"  
 
     steps:
     - uses: actions/checkout@v2

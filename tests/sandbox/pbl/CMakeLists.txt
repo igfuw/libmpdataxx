@@ -75,7 +75,7 @@ add_test(pbl_smg_short_diff bash -c "
 ")
 
 # test labels
-set_property(TEST pbl_iles       pbl_smg       pbl_iles_budget       pbl_smg_budget       pbl_iles_profiles       pbl_smg_profiles       PROPERTY LABELS NotInCI)
+#set_property(TEST pbl_iles       pbl_smg       pbl_iles_budget       pbl_smg_budget       pbl_iles_profiles       pbl_smg_profiles       PROPERTY LABELS NotInCI)
 set_property(TEST pbl_iles       pbl_smg       pbl_iles_budget       pbl_smg_budget       pbl_iles_profiles       pbl_smg_profiles       PROPERTY LABELS SlowWithMpi)
-set_property(TEST pbl_iles_short pbl_smg_short pbl_iles_short_budget pbl_smg_short_budget pbl_iles_short_profiles pbl_smg_short_profiles PROPERTY LABELS SlowWithMpi)
-set_property(TEST pbl_iles_short_diff pbl_smg_short_diff pbl_iles_short_budget_diff pbl_smg_short_budget_diff pbl_iles_short_prof_diff pbl_smg_short_prof_diff PROPERTY LABELS SlowWithMpi)
+set_property(TEST pbl_iles_short pbl_smg_short pbl_iles_short_budget pbl_smg_short_budget pbl_iles_short_profiles pbl_smg_short_profiles PROPERTY LABELS SlowWithMpi ShorterVersion)
+set_property(TEST pbl_iles_short_diff pbl_smg_short_diff pbl_iles_short_budget_diff pbl_smg_short_budget_diff pbl_iles_short_prof_diff pbl_smg_short_prof_diff PROPERTY LABELS SlowWithMpi ShorterVersion)
