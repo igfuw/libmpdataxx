@@ -234,13 +234,11 @@ namespace libmpdataxx
         {
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
           this->mem->barrier(); // wait for all threads to copy edge to halo before modifying edge. note: shmem decomposition in x
           for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
-
-          for (auto &bc : this->bcs[1]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[2], range_ijk[0]);
           for (auto &bc : this->bcs[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[2], range_ijk[0]);
-
-          for (auto &bc : this->bcs[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
           for (auto &bc : this->bcs[2]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0], range_ijk[1]);
           this->mem->barrier();
         }
