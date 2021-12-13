@@ -266,15 +266,13 @@ namespace libmpdataxx
           this->mem->barrier();
 
           for (auto &bc : this->bcs[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
-          barrier_if_single_threaded_bc0();
-          for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
-          barrier_if_single_threaded_bc0();
-
+//          barrier_if_single_threaded_bc0(); // not necessary?
           for (auto &bc : this->bcs[1]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[2], range_ijk[0]);
-          this->mem->barrier(); // wait for all threads to copy edge to halo before modifying edge. note: shmem decomposition in y
-          for (auto &bc : this->bcs[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[2], range_ijk[0]);
-
           for (auto &bc : this->bcs[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
+          this->mem->barrier(); // wait for all threads to copy edge to halo before modifying edge. 
+          // NOTE: averaging this way gives different weights to different points in corners depending on the order (corners are averaged twice and each averaging is dividing by 2)
+          for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[2], range_ijk[0]);
           for (auto &bc : this->bcs[2]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0], range_ijk[1]);
 
           this->mem->barrier();
