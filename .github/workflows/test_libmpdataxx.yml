@@ -213,3 +213,10 @@ jobs:
     - name: configure,make and run tests
       working-directory: ${{ github.workspace }}/shallow-water-elliptic-drop/numerical
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec -B ${{ github.workspace }}/installed/ $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} -Dlibmpdata++_DIR=${{ github.workspace }}/installed/share/libmpdata++ && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest || cat Testing/Temporary/LastTest.log /"
+
+  call_test_uwlcm_hlpr:
+    uses: igfuw/UWLCM/.github/workflows/test_uwlcm_hlpr.yml@master
+    with:
+      UWLCM_sha: "master"
+      libcloudphxx_sha: "master"
+      libmpdataxx_sha: ${{ github.sha }} # merge PR SHA
