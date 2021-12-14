@@ -52,6 +52,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->single_threaded ? bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv) : bc->fill_halos_sclr(arr, range_ijk_1__ext, range_ijk[2]^ext, deriv);
           barrier_if_single_threaded_bc0();
+          this->mem->barrier();
           for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
           for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, range_ijk_1__ext, deriv);
           this->mem->barrier();
