@@ -42,6 +42,8 @@ namespace libmpdataxx
         // generic field used for various statistics (currently Courant number and divergence)
         typename parent_t::arr_t &stat_field; // TODO:/: should be in solver common but cannot be allocated there ?
 
+        // NOTE: for ext > 0 fill_halos_sclr in different directions could lead to race conditions when different bconds try to write to the same point of halo?
+        //       this does not seem to happen...
         virtual void xchng_sclr(typename parent_t::arr_t &arr,
                        const idx_t<3> &range_ijk,
                        const int ext = 0,
@@ -50,10 +52,10 @@ namespace libmpdataxx
         {
           const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
           this->mem->barrier();
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
+          barrier_if_single_threaded_bc0();
           for (auto &bc : this->bcs[0]) bc->single_threaded ? bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv) : bc->fill_halos_sclr(arr, range_ijk_1__ext, range_ijk[2]^ext, deriv);
           barrier_if_single_threaded_bc0();
-          this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
           for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, range_ijk_1__ext, deriv);
           this->mem->barrier();
         }
