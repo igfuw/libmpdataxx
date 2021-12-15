@@ -52,7 +52,7 @@ jobs:
         - mpi: "none"
           tag: "ubuntu_20_04_cuda_11_4"
           cxx: "g++"
-          ctest_options: "-R bconds_div -LE ShorterVersion"  # don't run pbl_short because full pbl is ran
+          ctest_options: ""
         - mpi: "mvapich2"
           tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
           cxx: "mpic++"
