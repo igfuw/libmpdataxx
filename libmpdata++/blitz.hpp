@@ -112,5 +112,7 @@ namespace libmpdataxx
 #endif
     }
   };
-} // namespace libmpdataxx
 
+  // 3D blitz++ array storage with the k,i,j order for improved performance of sharedmem decomposition along j
+  const blitz::GeneralArrayStorage<3> arr3D_storage({blitz::thirdDim, blitz::firstDim, blitz::secondDim}, {true, true, true});
+} // namespace libmpdataxx

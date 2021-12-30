@@ -18,9 +18,9 @@ namespace libmpdataxx
         dir == left &&
         n_dims == 3
       >::type
-    > : public detail::bcond_common<real_t, halo, n_dims>
+    > : public detail::bcond_common<real_t, halo, 3>
     {
-      using parent_t = detail::bcond_common<real_t, halo, n_dims>;
+      using parent_t = detail::bcond_common<real_t, halo, 3>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -82,9 +82,19 @@ namespace libmpdataxx
           av[d+2](pi<d>(i, j, (k-h).first())) = 0;
           av[d+2](pi<d>(i, j, (k+h).last() )) = 0;
 
+          // sharedmem decomposition in y direction:
+          // zero-out perpendicular components outside of the whole domain
+          // and not those between sub-domains of different threads
+          if(this->thread_rank == 0)
+            av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
+          if(this->thread_rank == this->thread_size -1)
+            av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+          break;
+
           case 1:
           av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
           av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+          break;
 
           case 2:
           break;
@@ -130,9 +140,9 @@ namespace libmpdataxx
         dir == rght &&
         n_dims == 3
       >::type
-    > : public detail::bcond_common<real_t, halo, n_dims>
+    > : public detail::bcond_common<real_t, halo, 3>
     {
-      using parent_t = detail::bcond_common<real_t, halo, n_dims>;
+      using parent_t = detail::bcond_common<real_t, halo, 3>;
       using arr_t = blitz::Array<real_t, 3>;
       using parent_t::parent_t; // inheriting ctor
 
@@ -188,15 +198,25 @@ namespace libmpdataxx
         using namespace idxperm;
         const int i = this->rght_edge_sclr;
 
-        switch (d) // note: order and lack of breaks intentional!
+        switch (d) 
         {
           case 0:
           av[d+2](pi<d>(i, j, (k-h).first())) = 0;
           av[d+2](pi<d>(i, j, (k+h).last() )) = 0;
 
+          // sharedmem decomposition in y direction:
+          // zero-out perpendicular components outside of the whole domain
+          // and not those between sub-domains of different threads
+          if(this->thread_rank == 0)
+            av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
+          if(this->thread_rank == this->thread_size -1)
+            av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+          break;
+
           case 1:
           av[d+1](pi<d>(i, (j-h).first(), k)) = 0;
           av[d+1](pi<d>(i, (j+h).last(),  k)) = 0;
+          break;
 
           case 2:
           break;

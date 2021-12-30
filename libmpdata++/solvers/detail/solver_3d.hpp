@@ -26,6 +26,11 @@ namespace libmpdataxx
       {
         using parent_t = solver_common<ct_params_t, n_tlev, minhalo>;
 
+        void barrier_if_single_threaded_bc0()
+        {
+          if(this->bcs[0].at(0)->single_threaded || this->bcs[0].at(1)->single_threaded) this->mem->barrier();
+        }
+
         public:
 
         using real_t = typename ct_params_t::real_t;
@@ -37,17 +42,21 @@ namespace libmpdataxx
         // generic field used for various statistics (currently Courant number and divergence)
         typename parent_t::arr_t &stat_field; // TODO:/: should be in solver common but cannot be allocated there ?
 
+        // NOTE: for ext > 0 fill_halos_sclr in different directions could lead to race conditions when different bconds try to write to the same point of halo?
+        //       this does not seem to happen...
         virtual void xchng_sclr(typename parent_t::arr_t &arr,
                        const idx_t<3> &range_ijk,
                        const int ext = 0,
                        const bool deriv = false
         ) final // for a given array
         {
-          const auto range_ijk_0__ext = this->extend_range(range_ijk[0], ext);
+          const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk_0__ext, deriv);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk_0__ext, range_ijk[1]^ext, deriv);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sclr(arr, range_ijk[2]^ext, range_ijk[0]^ext, deriv);
+          barrier_if_single_threaded_bc0();
+          for (auto &bc : this->bcs[0]) bc->single_threaded ? bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv) : bc->fill_halos_sclr(arr, range_ijk_1__ext, range_ijk[2]^ext, deriv);
+          barrier_if_single_threaded_bc0();
+          for (auto &bc : this->bcs[2]) bc->fill_halos_sclr(arr, range_ijk[0]^ext, range_ijk_1__ext, deriv);
           this->mem->barrier();
         }
         void xchng(int e) final
@@ -61,12 +70,14 @@ namespace libmpdataxx
           if (!cyclic)
           {
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng(arrvec, j, k, ad);
+            barrier_if_single_threaded_bc0();
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng(arrvec, k, i, ad);
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng(arrvec, i, j, ad);
           }
           else
           {
             for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_alng_cyclic(arrvec, j, k, ad);
+            barrier_if_single_threaded_bc0();
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_alng_cyclic(arrvec, k, i, ad);
             for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_alng_cyclic(arrvec, i, j, ad);
           }
@@ -77,8 +88,10 @@ namespace libmpdataxx
         {
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_flux(arrvec, j, k);
+          barrier_if_single_threaded_bc0();
           for (auto &bc : this->bcs[1]) bc->fill_halos_flux(arrvec, k, i);
           for (auto &bc : this->bcs[2]) bc->fill_halos_flux(arrvec, i, j);
+          this->mem->barrier();
         }
 
         virtual void xchng_sgs_div(
@@ -89,6 +102,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_div(arr, range_ijk[0], range_ijk[1]);
           for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div(arr, range_ijk[2]^h, range_ijk[0]);
+          barrier_if_single_threaded_bc0(); // to make sure that all threads have filled range_ijk[2]^h before it is used to fill along x 
           for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_div(arr, range_ijk[1], range_ijk[2]^h);
           this->mem->barrier();
         }
@@ -100,6 +114,7 @@ namespace libmpdataxx
         {
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_vctr(av, b, range_ijk[1], range_ijk[2]);
+          barrier_if_single_threaded_bc0();
           for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_vctr(av, b, range_ijk[2], range_ijk[0]);
           for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_vctr(av, b, range_ijk[0], range_ijk[1]);
           this->mem->barrier();
@@ -113,6 +128,7 @@ namespace libmpdataxx
         {
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_tnsr(av, w, vip_div, range_ijk[1], range_ijk[2], this->dijk[0]);
+          barrier_if_single_threaded_bc0();
           for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_tnsr(av, w, vip_div, range_ijk[2], range_ijk[0], this->dijk[1]);
           for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_tnsr(av, w, vip_div, range_ijk[0], range_ijk[1], this->dijk[2]);
           this->mem->barrier();
@@ -131,6 +147,7 @@ namespace libmpdataxx
             bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[1], range_ijk[2]^1, 3);
             bc->fill_halos_sgs_vctr(av, bv[1], range_ijk[1]^1, range_ijkm[2], 4);
           }
+          barrier_if_single_threaded_bc0();
 
           for (auto &bc : this->bcs[1])
           {
@@ -154,8 +171,8 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          const auto range_ijk_0__ext_h = this->extend_range(range_ijk[0], ext, h);
-          const auto range_ijk_0__ext_1 = this->extend_range(range_ijk[0], ext, 1);
+          const auto range_ijk_1__ext_h = this->extend_range(range_ijk[1], ext, h);
+          const auto range_ijk_1__ext_1 = this->extend_range(range_ijk[1], ext, 1);
           if (!cyclic)
           {
             for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[2]^ext^1, range_ijk[0]^ext^h);
@@ -169,24 +186,36 @@ namespace libmpdataxx
               this->mem->barrier();
             }
 
-            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk_0__ext_h, range_ijk[1]^ext^1);
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[0], range_ijk[0]^ext^h, range_ijk_1__ext_1);
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
-            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk_0__ext_1, range_ijk[1]^ext^h);
+            barrier_if_single_threaded_bc0();
+            for (auto &bc : this->bcs[0]) bc->single_threaded ? bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1) : bc->fill_halos_vctr_nrml(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
+            barrier_if_single_threaded_bc0();
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[2]^ext^h, range_ijk_0__ext_1);
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[0]^ext^1, range_ijk_1__ext_h);
+
+            barrier_if_single_threaded_bc0();
+            for (auto &bc : this->bcs[0]) bc->single_threaded ? bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h) : bc->fill_halos_vctr_nrml(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
+            barrier_if_single_threaded_bc0();
+
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
           }
           else
           {
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk[2]^ext^1, range_ijk_0__ext_h);
-            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk_0__ext_h, range_ijk[1]^ext^1);
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk[2]^ext^1, range_ijk[0]^ext^h);
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[0], range_ijk[0]^ext^h, range_ijk_1__ext_1);
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1);
-            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk_0__ext_1, range_ijk[1]^ext^h);
+            barrier_if_single_threaded_bc0();
+            for (auto &bc : this->bcs[0]) bc->single_threaded ? bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1) : bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
+            barrier_if_single_threaded_bc0();
 
-            for (auto &bc : this->bcs[0]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h);
-            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[2]^ext^h, range_ijk_0__ext_1);
+            for (auto &bc : this->bcs[2]) bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[0]^ext^1, range_ijk_1__ext_h);
+
+            barrier_if_single_threaded_bc0();
+            for (auto &bc : this->bcs[0]) bc->single_threaded ? bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h) : bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
+            barrier_if_single_threaded_bc0();
+
+            for (auto &bc : this->bcs[1]) bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[2]^ext^h, range_ijk[0]^ext^1);
           }
           this->mem->barrier();
         }
@@ -197,11 +226,12 @@ namespace libmpdataxx
           const int ext = 0
         ) final
         {
-          const auto range_ijk_0__ext = this->extend_range(range_ijk[0], ext);
+          const auto range_ijk_1__ext = this->extend_range(range_ijk[1], ext);
           this->mem->barrier();
-          for (auto &bc : this->bcs[0]) bc->fill_halos_pres(arr, range_ijk[1]^ext, range_ijk[2]^ext);
-          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2]^ext, range_ijk_0__ext);
-          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk_0__ext, range_ijk[1]^ext);
+          for (auto &bc : this->bcs[0]) bc->single_threaded ? bc->fill_halos_pres(arr, range_ijk[1]^ext, range_ijk[2]^ext) : bc->fill_halos_pres(arr, range_ijk_1__ext, range_ijk[2]^ext);
+          barrier_if_single_threaded_bc0();
+          for (auto &bc : this->bcs[1]) bc->fill_halos_pres(arr, range_ijk[2]^ext, range_ijk[0]^ext);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_pres(arr, range_ijk[0]^ext, range_ijk_1__ext);
           this->mem->barrier();
         }
 
@@ -211,7 +241,9 @@ namespace libmpdataxx
           const int &sign
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->set_edge_pres(av[0], range_ijk[1], range_ijk[2], sign);
+          barrier_if_single_threaded_bc0();
           for (auto &bc : this->bcs[1]) bc->set_edge_pres(av[1], range_ijk[2], range_ijk[0], sign);
           for (auto &bc : this->bcs[2]) bc->set_edge_pres(av[2], range_ijk[0], range_ijk[1], sign);
           this->mem->barrier();
@@ -222,7 +254,9 @@ namespace libmpdataxx
           const idx_t<3> &range_ijk
         ) final
         {
+          this->mem->barrier();
           for (auto &bc : this->bcs[0]) bc->save_edge_vel(av[0], range_ijk[1], range_ijk[2]);
+          barrier_if_single_threaded_bc0();
           for (auto &bc : this->bcs[1]) bc->save_edge_vel(av[1], range_ijk[2], range_ijk[0]);
           for (auto &bc : this->bcs[2]) bc->save_edge_vel(av[2], range_ijk[0], range_ijk[1]);
           this->mem->barrier();
@@ -233,15 +267,17 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
+
           for (auto &bc : this->bcs[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
-          this->mem->barrier(); // wait for all threads to copy edge to halo before modifying edge. note: shmem decomposition in x
-          for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
-
+//          barrier_if_single_threaded_bc0(); // not necessary?
           for (auto &bc : this->bcs[1]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[2], range_ijk[0]);
-          for (auto &bc : this->bcs[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[2], range_ijk[0]);
-
           for (auto &bc : this->bcs[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
+          this->mem->barrier(); // wait for all threads to copy edge to halo before modifying edge. 
+          // NOTE: averaging this way gives different weights to different points in corners depending on the order (corners are averaged twice and each averaging is dividing by 2)
+          for (auto &bc : this->bcs[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[2], range_ijk[0]);
           for (auto &bc : this->bcs[2]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0], range_ijk[1]);
+
           this->mem->barrier();
         }
 
@@ -340,6 +376,7 @@ namespace libmpdataxx
           this->set_bcs(2, args.bczl, args.bczr);
         }
 
+
         public:
 
         static void alloc(
@@ -354,24 +391,28 @@ namespace libmpdataxx
               mem->psi[e].push_back(mem->old(new typename parent_t::arr_t(
                 parent_t::rng_sclr(mem->grid_size[0]),
                 parent_t::rng_sclr(mem->grid_size[1]),
-                parent_t::rng_sclr(mem->grid_size[2])
+                parent_t::rng_sclr(mem->grid_size[2]),
+                arr3D_storage
               )));
 
           // Courant field components (Arakawa-C grid)
           mem->GC.push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_vctr(mem->grid_size[0]),
             parent_t::rng_sclr(mem->grid_size[1]),
-            parent_t::rng_sclr(mem->grid_size[2])
+            parent_t::rng_sclr(mem->grid_size[2]),
+            arr3D_storage
           )));
           mem->GC.push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_sclr(mem->grid_size[0]),
             parent_t::rng_vctr(mem->grid_size[1]),
-            parent_t::rng_sclr(mem->grid_size[2])
+            parent_t::rng_sclr(mem->grid_size[2]),
+            arr3D_storage
           )));
           mem->GC.push_back(mem->old(new typename parent_t::arr_t(
             parent_t::rng_sclr(mem->grid_size[0]),
             parent_t::rng_sclr(mem->grid_size[1]),
-            parent_t::rng_vctr(mem->grid_size[2])
+            parent_t::rng_vctr(mem->grid_size[2]),
+            arr3D_storage
           )));
 
           // fully third-order accurate mpdata needs also time derivatives of
@@ -383,33 +424,39 @@ namespace libmpdataxx
             mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_vctr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
-              parent_t::rng_sclr(mem->grid_size[2])
+              parent_t::rng_sclr(mem->grid_size[2]),
+              arr3D_storage
             )));
             mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_vctr(mem->grid_size[1]),
-              parent_t::rng_sclr(mem->grid_size[2])
+              parent_t::rng_sclr(mem->grid_size[2]),
+              arr3D_storage
             )));
             mem->ndt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
-              parent_t::rng_vctr(mem->grid_size[2])
+              parent_t::rng_vctr(mem->grid_size[2]),
+              arr3D_storage
             )));
 
             mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_vctr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
-              parent_t::rng_sclr(mem->grid_size[2])
+              parent_t::rng_sclr(mem->grid_size[2]),
+              arr3D_storage
             )));
             mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_vctr(mem->grid_size[1]),
-              parent_t::rng_sclr(mem->grid_size[2])
+              parent_t::rng_sclr(mem->grid_size[2]),
+              arr3D_storage
             )));
             mem->ndtt_GC.push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
-              parent_t::rng_vctr(mem->grid_size[2])
+              parent_t::rng_vctr(mem->grid_size[2]),
+              arr3D_storage
             )));
           }
 
@@ -418,7 +465,8 @@ namespace libmpdataxx
             mem->G.reset(mem->old(new typename parent_t::arr_t(
                     parent_t::rng_sclr(mem->grid_size[0]),
                     parent_t::rng_sclr(mem->grid_size[1]),
-                    parent_t::rng_sclr(mem->grid_size[2])
+                    parent_t::rng_sclr(mem->grid_size[2]),
+                    arr3D_storage
             )));
 
           // allocate Kahan summation temporary vars
@@ -427,7 +475,8 @@ namespace libmpdataxx
               mem->khn_tmp.push_back(mem->old(new typename parent_t::arr_t(
                 parent_t::rng_sclr(mem->grid_size[0]),
                 parent_t::rng_sclr(mem->grid_size[1]),
-                parent_t::rng_sclr(mem->grid_size[2])
+                parent_t::rng_sclr(mem->grid_size[2]),
+                arr3D_storage
               )));
           // courant field
           alloc_tmp_sclr(mem, __FILE__, 1);
@@ -450,7 +499,8 @@ namespace libmpdataxx
               stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) : parent_t::rng_sclr(mem->grid_size[1]),
               srfc ? rng_t(0, 0) :
                 stgr[n][2] ? parent_t::rng_vctr(mem->grid_size[2]) :
-                  parent_t::rng_sclr(mem->grid_size[2])
+                  parent_t::rng_sclr(mem->grid_size[2]),
+              arr3D_storage
             )));
           }
         }
@@ -480,7 +530,8 @@ namespace libmpdataxx
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
               parent_t::rng_sclr(mem->grid_size[0]),
               parent_t::rng_sclr(mem->grid_size[1]),
-              srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[2])
+              srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[2]),
+              arr3D_storage
             )));
         }
       };

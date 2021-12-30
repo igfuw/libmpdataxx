@@ -10,6 +10,7 @@ using namespace libmpdataxx;
 template <bcond::bcond_e bcond_x, bcond::bcond_e bcond_y, bcond::bcond_e bcond_z>
 void test(const std::string &error_str)
 {
+  std::cerr << error_str << std::endl;
   struct ct_params_t : ct_params_default_t
   {
     using real_t = double;

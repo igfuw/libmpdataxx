@@ -133,7 +133,7 @@ namespace libmpdataxx
           scale(e, -ct_params_t::hint_scale(e));
         }
 
-        // thread-aware range extension
+        // thread-aware range extension, messes range guessing in remote_3d bcond
         template <class n_t>
         rng_t extend_range(const rng_t &r, const n_t n) const
         {
@@ -255,7 +255,7 @@ namespace libmpdataxx
           // TODO: MPI standard requires that the same thread that called mpi_init
           // calls mpi_finalize, we don't ensure it
           if(!libmpdataxx::concurr::detail::mpi_initialized_before && rank==0)
-            MPI::Finalize();
+            MPI_Finalize();
 #endif
 #if !defined(NDEBUG)
           assert(hook_ante_step_called && "any overriding hook_ante_step() must call parent_t::hook_ante_step()");

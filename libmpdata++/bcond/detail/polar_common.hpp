@@ -37,10 +37,13 @@ namespace libmpdataxx
         // ctor
         polar_common(
           const rng_t &i,
-          const std::array<int, n_dims> &grid_size
+          const std::array<int, n_dims> &distmem_grid_size,
+          bool = false,
+          const int = -1,
+          const int = -1
         ) :
-          parent_t(i, grid_size),
-          pole((grid_size[0] - 1) / 2)
+          parent_t(i, distmem_grid_size),
+          pole((distmem_grid_size[0] - 1) / 2)
         {}
       };
     } // namespace detail

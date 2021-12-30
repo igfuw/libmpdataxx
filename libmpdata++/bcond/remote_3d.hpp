@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <libmpdata++/bcond/detail/remote_common.hpp>
+#include <libmpdata++/bcond/detail/remote_3d_common.hpp>
 
 namespace libmpdataxx
 {
@@ -18,21 +18,50 @@ namespace libmpdataxx
         dir == left   &&
         n_dims == 3
       >::type
-    > : public detail::remote_common<real_t, halo, dir, n_dims>
+    > : public detail::remote_3d_common<real_t, halo, dir>
     {
 
-      using parent_t = detail::remote_common<real_t, halo, dir, n_dims>;
-      using arr_t = blitz::Array<real_t, 3>;
+      using parent_t = detail::remote_3d_common<real_t, halo, dir>;
+      using arr_t = typename parent_t::arr_t;
+      using idx_t = typename parent_t::idx_t;
       using parent_t::parent_t; // inheriting ctor
 
       const int off = this->is_cyclic ? 0 : -1;
+
+      void xchng (
+        const arr_t &a,
+        const idx_t &idx_send,
+        const idx_t &idx_recv
+      )
+      {
+        if(this->thread_rank!=0) return; // left MPI calls only done by thread rank 0
+        parent_t::xchng(a, idx_send, idx_recv);
+      }
+
+      void send (
+        const arr_t &a,
+        const idx_t &idx_send
+      )
+      {
+        if(this->thread_rank!=0) return; // left MPI calls only done by thread rank 0
+        parent_t::send(a, idx_send);
+      }
+
+      void recv (
+        const arr_t &a,
+        const idx_t &idx_recv
+      )
+      {
+        if(this->thread_rank!=0) return; // left MPI calls only done by thread rank 0
+        parent_t::recv(a, idx_recv);
+      }
 
       public:
 
       void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
         using namespace idxperm;
-        this->xchng(a, pi<d>(this->left_intr_sclr + off, j, k), pi<d>(this->left_halo_sclr, j, k));
+        xchng(a, pi<d>(this->left_intr_sclr + off, j, k), pi<d>(this->left_halo_sclr, j, k));
       }
 
       void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
@@ -52,12 +81,12 @@ namespace libmpdataxx
         {
           if(halo == 1)
             // see remote_2d
-            this->send(av[0], pi<d>(this->left_intr_vctr + off, j, k)); // TODO: no need to receive? the vector in halo was calculated anyway?
+            send(av[0], pi<d>(this->left_intr_vctr + off, j, k)); // TODO: no need to receive? the vector in halo was calculated anyway?
           else
-            this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k)); // ditto
+            xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k)); // ditto
         }
         else
-          this->xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
+          xchng(av[0], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
       }
 
       void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
@@ -73,12 +102,12 @@ namespace libmpdataxx
         {
           if(halo == 1)
             // see remote_2d
-            this->send(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k));
+            send(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k));
           else
-            this->xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k));
+            xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k), pi<d>((this->left_halo_vctr^h)^(-1), j, k));
         }
         else
-          this->xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
+          xchng(av[0 + offset], pi<d>(this->left_intr_vctr + off, j, k), pi<d>(this->left_halo_vctr, j, k));
       }
 
       void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
@@ -109,7 +138,7 @@ namespace libmpdataxx
 
         using namespace idxperm;
         assert(halo>=1);
-        this->xchng(a, pi<d>(this->left_edge_sclr, j, k), pi<d>(this->left_halo_sclr.last(), j, k));
+        xchng(a, pi<d>(this->left_edge_sclr, j, k), pi<d>(this->left_halo_sclr.last(), j, k));
       }
 
       void avg_edge_and_halo1_sclr_cyclic(arr_t &a, const rng_t &j, const rng_t &k)
@@ -131,20 +160,52 @@ namespace libmpdataxx
         dir == rght   &&
         n_dims == 3
       >::type
-    > : public detail::remote_common<real_t, halo, dir, n_dims>
+    > : public detail::remote_3d_common<real_t, halo, dir>
     {
-      using parent_t = detail::remote_common<real_t, halo, dir, n_dims>;
-      using arr_t = blitz::Array<real_t, 3>;
+      using parent_t = detail::remote_3d_common<real_t, halo, dir>;
+      using arr_t = typename parent_t::arr_t;
+      using idx_t = typename parent_t::idx_t;
       using parent_t::parent_t; // inheriting ctor
 
       const int off = this->is_cyclic ? 0 : 1;
+
+      void xchng (
+        const arr_t &a,
+        const idx_t &idx_send,
+        const idx_t &idx_recv
+      )
+      {
+        if(this->thread_rank != this->thread_size-1) return; // right MPI calls only done by the highest ranked thread
+      //  if(this->thread_rank != 0) return; // temporary 
+        parent_t::xchng(a, idx_send, idx_recv);
+      }
+
+      void send (
+        const arr_t &a,
+        const idx_t &idx_send
+      )
+      {
+        if(this->thread_rank != this->thread_size-1) return; // right MPI calls only done by the highest ranked thread
+       // if(this->thread_rank != 0) return; // temporary 
+        parent_t::send(a, idx_send);
+      }
+
+      void recv (
+        const arr_t &a,
+        const idx_t &idx_recv
+      )
+      {
+        if(this->thread_rank != this->thread_size-1) return; // right MPI calls only done by the highest ranked thread
+       // if(this->thread_rank != 0) return; // temporary 
+        parent_t::recv(a, idx_recv);
+      }
 
       public:
 
       void fill_halos_sclr(arr_t &a, const rng_t &j, const rng_t &k, const bool deriv = false)
       {
         using namespace idxperm;
-        this->xchng(a, pi<d>(this->rght_intr_sclr + off, j, k), pi<d>(this->rght_halo_sclr, j, k));
+        xchng(a, pi<d>(this->rght_intr_sclr + off, j, k), pi<d>(this->rght_halo_sclr, j, k));
       }
 
       void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
@@ -163,12 +224,12 @@ namespace libmpdataxx
         if(!this->is_cyclic)
         {
           if(halo == 1)
-            this->recv(av[0], pi<d>(this->rght_halo_vctr, j, k));
+            recv(av[0], pi<d>(this->rght_halo_vctr, j, k));
           else
-            this->xchng(av[0], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
+            xchng(av[0], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
         }
         else
-          this->xchng(av[0], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
+          xchng(av[0], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
       }
 
       void fill_halos_sgs_div(arr_t &a, const rng_t &j, const rng_t &k)
@@ -183,12 +244,12 @@ namespace libmpdataxx
         if(!this->is_cyclic)
         {
           if(halo == 1)
-            this->recv(av[0 + offset], pi<d>(this->rght_halo_vctr, j, k));
+            recv(av[0 + offset], pi<d>(this->rght_halo_vctr, j, k));
           else
-            this->xchng(av[0 + offset], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
+            xchng(av[0 + offset], pi<d>(((this->rght_intr_vctr + off)^h)^(-1), j, k), pi<d>(this->rght_halo_vctr, j, k));
         }
         else
-          this->xchng(av[0 + offset], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
+          xchng(av[0 + offset], pi<d>(this->rght_intr_vctr + off, j, k), pi<d>(this->rght_halo_vctr, j, k));
       }
 
       void fill_halos_sgs_tnsr(arrvec_t<arr_t> &av, const arr_t &, const arr_t &, const rng_t &j, const rng_t &k, const real_t)
@@ -219,7 +280,7 @@ namespace libmpdataxx
 
         using namespace idxperm;
         assert(halo>=1);
-        this->xchng(a, pi<d>(this->rght_edge_sclr, j, k), pi<d>(this->rght_halo_sclr.first(), j, k));
+        xchng(a, pi<d>(this->rght_edge_sclr, j, k), pi<d>(this->rght_halo_sclr.first(), j, k));
       }
 
       void avg_edge_and_halo1_sclr_cyclic(arr_t &a, const rng_t &j, const rng_t &k)

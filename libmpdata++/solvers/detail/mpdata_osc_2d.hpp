@@ -230,7 +230,7 @@ namespace libmpdataxx
           const typename parent_t::rt_params_t &p
         ) :
           parent_t(args, p),
-          im(args.i.first() - 1, args.i.last()),
+          im(this->rank == 0 ? args.i.first() - 1 : args.i.first(), args.i.last()),
           jm(args.j.first() - 1, args.j.last())
         { }
       };
