@@ -85,6 +85,11 @@ namespace libmpdataxx
                                                    -   a(pi<d>(this->left_edge_sclr + 1 + h, j, k));
       }
 
+      void fill_halos_sgs_div_stgr(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sgs_div(a, j, k);
+      }
+
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)
       {
         // fill halos for a staggered field so that it has zero value on the edge
@@ -176,6 +181,11 @@ namespace libmpdataxx
         using namespace idxperm;
         a(pi<d>(this->rght_edge_sclr + h, j, k)) = 2 * a(pi<d>(this->rght_edge_sclr - h, j, k))
                                                    -   a(pi<d>(this->rght_edge_sclr - 1 - h, j, k));
+      }
+
+      void fill_halos_sgs_div_stgr(arr_t &a, const rng_t &j, const rng_t &k)
+      {
+        fill_halos_sgs_div(a, j, k);
       }
 
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const rng_t &k, const int offset = 0)

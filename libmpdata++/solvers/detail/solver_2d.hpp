@@ -86,7 +86,7 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div(arr, range_ijk[0]);
+          for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div_stgr(arr, range_ijk[0]); // vip_div is staggered in vertical
           for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_div(arr, range_ijk[1]^h);
           this->mem->barrier();
         }

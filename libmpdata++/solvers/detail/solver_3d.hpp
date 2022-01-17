@@ -100,7 +100,7 @@ namespace libmpdataxx
         ) final
         {
           this->mem->barrier();
-          for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_div(arr, range_ijk[0], range_ijk[1]);
+          for (auto &bc : this->bcs[2]) bc->fill_halos_sgs_div_stgr(arr, range_ijk[0], range_ijk[1]); // vip_div is staggered in vertical
           for (auto &bc : this->bcs[1]) bc->fill_halos_sgs_div(arr, range_ijk[2]^h, range_ijk[0]);
           barrier_if_single_threaded_bc0(); // to make sure that all threads have filled range_ijk[2]^h before it is used to fill along x 
           for (auto &bc : this->bcs[0]) bc->fill_halos_sgs_div(arr, range_ijk[1], range_ijk[2]^h);

@@ -64,6 +64,11 @@ namespace libmpdataxx
         fill_halos_sclr(a);
       }
 
+      void fill_halos_sgs_div_stgr(arr_t &a)
+      {
+        fill_halos_sgs_div(a);
+      }
+
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const int offset = 0)
       {
         using namespace idxperm;
@@ -175,6 +180,11 @@ namespace libmpdataxx
       void fill_halos_sgs_div(arr_t &a)
       {
         fill_halos_sclr(a);
+      }
+
+      void fill_halos_sgs_div_stgr(arr_t &a)
+      {
+        fill_halos_sgs_div(a);
       }
 
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const int offset = 0)
