@@ -65,6 +65,11 @@ namespace libmpdataxx
         fill_halos_sclr(a, j);
       }
 
+      void fill_halos_sgs_div_stgr(arr_t &a, const rng_t &j)
+      {
+        fill_halos_sgs_div(a, j); // NOTE: probably should be replaced with fill_halos_vctr_alng, but not an issue right now because there is no remote bcond in the vertical and vip_div is staggered only in the vertical (?)
+      }
+
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const int offset = 0)
       {
         using namespace idxperm;
@@ -175,6 +180,11 @@ namespace libmpdataxx
       void fill_halos_sgs_div(arr_t &a, const rng_t &j)
       {
         fill_halos_sclr(a, j);
+      }
+
+      void fill_halos_sgs_div_stgr(arr_t &a, const rng_t &j)
+      {
+        fill_halos_sgs_div(a, j);
       }
 
       void fill_halos_sgs_vctr(arrvec_t<arr_t> &av, const arr_t &, const rng_t &j, const int offset = 0)
