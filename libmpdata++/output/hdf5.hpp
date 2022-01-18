@@ -248,6 +248,9 @@ namespace libmpdataxx
         }
       }
 
+
+      // ---- output helpers ----
+
       void record_dsc_srfc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
       {
         H5::DataSpace space = dset.getSpace();
@@ -334,12 +337,6 @@ namespace libmpdataxx
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
       }
 
-      // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
-      void record_aux(const std::string &name, typename solver_t::real_t *data)
-      {
-        record_aux_hlpr(name, data, *hdfp);
-      }
-
       // for discontiguous array with halos
       void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc = false)
       {
@@ -365,12 +362,6 @@ namespace libmpdataxx
           record_dsc_helper(aux, arr);
       }
 
-      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
-      {
-        record_aux_dsc_hlpr(name, arr, *hdfp, srfc);
-      }
-
-
       void record_scalar_hlpr(const std::string &name, const std::string &group_name, typename solver_t::real_t data, H5::H5File hdf)
       {
         assert(this->rank == 0);
@@ -389,18 +380,57 @@ namespace libmpdataxx
         group.createAttribute(name, flttype_output, H5::DataSpace(1, &one)).write(flttype_output, &data_f);
       }
 
+      void record_string_hlpr(const std::string &name, const std::string &group_name, const std::string &data, H5::H5File hdf)
+      {
+        assert(this->rank == 0);
+
+        const auto type = H5::StrType(H5::PredType::C_S1, data.size());
+
+        H5::Group group;
+        // open a group if it exists, create it if it doesn't exist
+        // based on: https://stackoverflow.com/questions/35668056/test-group-existence-in-hdf5-c
+        // note: pre Hdf5-1.10, H5Lexists returns 0 for root group, hence we check directly if it is the root group
+        // (https://support.hdfgroup.org/HDF5/doc/RM/RM_H5L.html#Link-Exists)
+        if (group_name == "/" || H5Lexists(hdf.getId(), group_name.c_str(), H5P_DEFAULT) > 0)
+          group = hdf.openGroup(group_name);
+        else
+          group = hdf.createGroup(group_name);
+
+        group.createAttribute(name, type, H5::DataSpace(1, &one)).write(type, data.data());
+      }
+
+
+      // ---- functions for auxiliary output in timestep files ----
+
+      // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
+      void record_aux(const std::string &name, typename solver_t::real_t *data)
+      {
+        record_aux_hlpr(name, data, *hdfp);
+      }
+
+      void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
+      {
+        record_aux_dsc_hlpr(name, arr, *hdfp, srfc);
+      }
+
+      void record_aux_scalar(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
+      {
+        record_scalar_hlpr(name, group_name, data, *hdfp);
+      }
+
+      void record_aux_scalar(const std::string &name, typename solver_t::real_t data)
+      {
+        record_aux_scalar(name, "/", data);
+      }
+
+
+      // ---- functions for auxiliary output in const.h5 file ----
+
       // has to be called after const file was created (i.e. after start())
       void record_aux_const(const std::string &name, typename solver_t::real_t *data)
       {
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
         record_aux_hlpr(name, data, hdfcp);
-      }
-
-      // has to be called after const file was created (i.e. after start())
-      void record_aux_dsc_const(const std::string &name,  const typename solver_t::arr_t &arr)
-      {
-        H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
-        record_aux_dsc_hlpr(name, arr, hdfcp);
       }
 
       void record_aux_const(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
@@ -413,19 +443,31 @@ namespace libmpdataxx
         record_scalar_hlpr(name, group_name, data, hdfcp);
       }
 
+      void record_aux_const(const std::string &name, const std::string &group_name, const std::string &data)
+      {
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
+#if defined(USE_MPI)
+          , H5P_DEFAULT, fapl_id
+#endif
+        ); // reopen the const file
+        record_string_hlpr(name, group_name, data, hdfcp);
+      }
+
       void record_aux_const(const std::string &name, typename solver_t::real_t data)
       {
         record_aux_const(name, "/", data);
       }
 
-      void record_aux_scalar(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
+      void record_aux_const(const std::string &name, const std::string &data)
       {
-        record_scalar_hlpr(name, group_name, data, *hdfp);
+        record_aux_const(name, "/", data);
       }
 
-      void record_aux_scalar(const std::string &name, typename solver_t::real_t data)
+      // has to be called after const file was created (i.e. after start())
+      void record_aux_dsc_const(const std::string &name,  const typename solver_t::arr_t &arr)
       {
-        record_aux_scalar(name, "/", data);
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
+        record_aux_dsc_hlpr(name, arr, hdfcp);
       }
 
       // see above, also assumes that z is the last dimension
@@ -454,6 +496,9 @@ namespace libmpdataxx
           aux.write(data, flttype_solver, H5::DataSpace(1, &shape[parent_t::n_dims - 1]), space);
         }
       }
+
+
+      // ---- recording libmpdata++ parameters ----
 
       // parameters saved for pure advection solvers
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_family_tag)
