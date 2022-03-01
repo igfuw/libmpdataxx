@@ -22,7 +22,7 @@ namespace libmpdataxx
     template<typename ct_params_t, int minhalo>
     class mpdata_rhs_vip_prs_sgs_fra<
       ct_params_t, minhalo,
-      typename std::enable_if<(int)ct_params_t::fra_rec == 0>::type // fra_rec is the number of fractal reconstructions
+      typename std::enable_if<(int)ct_params_t::n_fra_rec == 0>::type
     > : public mpdata_rhs_vip_prs_sgs<ct_params_t, minhalo>
     {
       using parent_t = mpdata_rhs_vip_prs_sgs<ct_params_t, minhalo>;
@@ -32,7 +32,7 @@ namespace libmpdataxx
     template <class ct_params_t, int minhalo>
     class mpdata_rhs_vip_prs_sgs_fra<
       ct_params_t, minhalo,
-      typename std::enable_if<(int)ct_params_t::fra_rec > 0>::type
+      typename std::enable_if<(int)ct_params_t::n_fra_rec > 0>::type
     > : public detail::mpdata_rhs_vip_prs_sgs_fra<ct_params_t, minhalo>
     {
       using parent_t = detail::mpdata_rhs_vip_prs_sgs_fra<ct_params_t, minhalo>;

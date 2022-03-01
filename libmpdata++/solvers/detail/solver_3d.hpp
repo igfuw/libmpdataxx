@@ -488,18 +488,19 @@ namespace libmpdataxx
           const char * __file__,
           const int n_arr,
           const std::vector<std::vector<bool>> &stgr,
-          bool srfc = false // allocate only surface data
+          bool srfc = false, // allocate only surface data
+          const std::array<rng_t, 3> grid_size = mem->grid_size // custom grid size
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
           for (int n = 0; n < n_arr; ++n)
           {
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-              stgr[n][0] ? parent_t::rng_vctr(mem->grid_size[0]) : parent_t::rng_sclr(mem->grid_size[0]),
-              stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) : parent_t::rng_sclr(mem->grid_size[1]),
+              stgr[n][0] ? parent_t::rng_vctr(grid_size[0]) : parent_t::rng_sclr(grid_size[0]),
+              stgr[n][1] ? parent_t::rng_vctr(grid_size[1]) : parent_t::rng_sclr(grid_size[1]),
               srfc ? rng_t(0, 0) :
-                stgr[n][2] ? parent_t::rng_vctr(mem->grid_size[2]) :
-                  parent_t::rng_sclr(mem->grid_size[2]),
+                stgr[n][2] ? parent_t::rng_vctr(grid_size[2]) :
+                  parent_t::rng_sclr(grid_size[2]),
               arr3D_storage
             )));
           }
@@ -508,10 +509,11 @@ namespace libmpdataxx
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
           typename parent_t::mem_t *mem,
-          const char * __file__
+          const char * __file__,
+          const std::array<rng_t, 3> grid_size = mem->grid_size // custom grid size
         )
         {
-          alloc_tmp_stgr(mem, __file__, 3, {{true, false, false}, {false, true, false}, {false, false, true}});
+          alloc_tmp_stgr(mem, __file__, 3, {{true, false, false}, {false, true, false}, {false, false, true}, false, grid_size});
         }
 
         // helper method to allocate n_arr scalar temporary arrays
@@ -519,7 +521,8 @@ namespace libmpdataxx
           typename parent_t::mem_t *mem,
           const char * __file__, const int n_arr,
           std::string name = "",
-          bool srfc = false // allocate only surface data
+          bool srfc = false, // allocate only surface data
+          const std::array<rng_t, 3> grid_size = mem->grid_size // custom grid size
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
@@ -528,9 +531,9 @@ namespace libmpdataxx
 
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-              parent_t::rng_sclr(mem->grid_size[0]),
-              parent_t::rng_sclr(mem->grid_size[1]),
-              srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[2]),
+              parent_t::rng_sclr(grid_size[0]),
+              parent_t::rng_sclr(grid_size[1]),
+              srfc ? rng_t(0, 0) : parent_t::rng_sclr(grid_size[2]),
               arr3D_storage
             )));
         }
