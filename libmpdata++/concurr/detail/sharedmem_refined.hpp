@@ -60,7 +60,7 @@ namespace libmpdataxx
         ) {
           return rng_t(
             grid_size.first() * n_ref,
-            grid_size.first() + (grid_size.last() - grid_size.first()) * n_ref
+            (grid_size.last() + 1) * n_ref - 1
           );
         }
       };
