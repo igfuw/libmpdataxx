@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include <numeric>
-#include <libmpdata++/formulae/idxperm.hpp>
+#include <libmpdata++/solvers/mpdata_rhs_vip_prs_sgs.hpp>
+//#include <numeric>
+//#include <libmpdata++/formulae/idxperm.hpp>
 
 namespace libmpdataxx
 {
@@ -45,12 +46,8 @@ namespace libmpdataxx
           typename parent_t::ctor_args_t args,
           const rt_params_t &p
         ) :
-          parent_t(args, p),
-          mem->psi_ref(args.mem->tmp[__FILE__][0]),
-          mem->GC_ref(args.mem->tmp[__FILE__][1])
+          parent_t(args, p)
         {
-          std::cerr << "psi_ref: " << mem->psi_ref << std::endl;
-          std::cerr << "GC_ref: " << mem->psi_ref << std::endl;
         //  for (int d = 0; d < ct_params_t::n_dims; ++d)
         }
 
@@ -59,8 +56,14 @@ namespace libmpdataxx
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
-          parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_eqns, "", false, mem->grid_size_ref); // rec_psi
-          parent_t::alloc_tmp_vctr(mem, __FILE__, false, mem->grid_size_ref);                      // rec_GC
+          parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_eqns, mem->grid_size_ref, "", false); // rec_psi
+          parent_t::alloc_tmp_vctr(mem, __FILE__, mem->grid_size_ref);                      // rec_GC
+
+          mem->psi_ref = mem->tmp[__FILE__][0];
+          mem->GC_ref = mem->tmp[__FILE__][1];
+
+          std::cerr << "psi_ref: " << mem->psi_ref[0] << std::endl;
+          std::cerr << "GC_ref: " << mem->GC_ref[0] << std::endl;
         }
       };
     } // namespace detail

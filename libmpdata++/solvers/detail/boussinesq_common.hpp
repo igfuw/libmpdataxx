@@ -5,7 +5,7 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 #pragma once
-#include <libmpdata++/solvers/mpdata_rhs_vip_prs_sgs.hpp>
+#include <libmpdata++/solvers/mpdata_rhs_vip_prs_sgs_fra.hpp>
 
 namespace libmpdataxx
 {
@@ -14,9 +14,9 @@ namespace libmpdataxx
     namespace detail
     {
       template <class ct_params_t>
-      class boussinesq_common : public libmpdataxx::solvers::mpdata_rhs_vip_prs_sgs<ct_params_t>
+      class boussinesq_common : public libmpdataxx::solvers::mpdata_rhs_vip_prs_sgs_fra<ct_params_t>
       {
-        using parent_t = libmpdataxx::solvers::mpdata_rhs_vip_prs_sgs<ct_params_t>;
+        using parent_t = libmpdataxx::solvers::mpdata_rhs_vip_prs_sgs_fra<ct_params_t>;
 
         public:
         using real_t = typename ct_params_t::real_t;

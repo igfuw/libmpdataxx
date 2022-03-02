@@ -488,8 +488,8 @@ namespace libmpdataxx
           const char * __file__,
           const int n_arr,
           const std::vector<std::vector<bool>> &stgr,
-          bool srfc = false, // allocate only surface data
-          const std::array<rng_t, 3> grid_size = mem->grid_size // custom grid size
+          const std::array<rng_t, 3> grid_size,
+          bool srfc = false // allocate only surface data
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
@@ -506,23 +506,43 @@ namespace libmpdataxx
           }
         }
 
+        // version with default grid size
+        static void alloc_tmp_stgr(
+          typename parent_t::mem_t *mem,
+          const char * __file__,
+          const int n_arr,
+          const std::vector<std::vector<bool>> &stgr,
+          bool srfc = false // allocate only surface data
+        )
+        {
+          alloc_tmp_stgr(mem, __file__, n_arr, stgr, mem->grid_size, srfc);
+        }
+
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
           typename parent_t::mem_t *mem,
           const char * __file__,
-          const std::array<rng_t, 3> grid_size = mem->grid_size // custom grid size
+          const std::array<rng_t, 3> grid_size
         )
         {
-          alloc_tmp_stgr(mem, __file__, 3, {{true, false, false}, {false, true, false}, {false, false, true}, false, grid_size});
+          alloc_tmp_stgr(mem, __file__, 3, {{true, false, false}, {false, true, false}, {false, false, true}}, grid_size, false);
+        }
+
+        static void alloc_tmp_vctr(
+          typename parent_t::mem_t *mem,
+          const char * __file__
+        )
+        {
+          alloc_tmp_stgr(mem, __file__, 3, {{true, false, false}, {false, true, false}, {false, false, true}}, false);
         }
 
         // helper method to allocate n_arr scalar temporary arrays
         static void alloc_tmp_sclr(
           typename parent_t::mem_t *mem,
           const char * __file__, const int n_arr,
+          const std::array<rng_t, 3> grid_size,
           std::string name = "",
-          bool srfc = false, // allocate only surface data
-          const std::array<rng_t, 3> grid_size = mem->grid_size // custom grid size
+          bool srfc = false // allocate only surface data
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
@@ -536,6 +556,17 @@ namespace libmpdataxx
               srfc ? rng_t(0, 0) : parent_t::rng_sclr(grid_size[2]),
               arr3D_storage
             )));
+        }
+
+        // with default grid_size
+        static void alloc_tmp_sclr(
+          typename parent_t::mem_t *mem,
+          const char * __file__, const int n_arr,
+          std::string name = "",
+          bool srfc = false 
+        )
+        {
+          alloc_tmp_sclr(mem, __file__, n_arr, mem->grid_size, name, srfc);
         }
       };
     } // namespace detail

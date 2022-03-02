@@ -8,7 +8,7 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/formulae/arakawa_c.hpp>
-#include <libmpdata++/concurr/detail/sharedmem.hpp>
+#include <libmpdata++/concurr/detail/sharedmem_refined.hpp>
 
 #include <libmpdata++/solvers/detail/monitor.hpp>
 
@@ -72,7 +72,7 @@ namespace libmpdataxx
         real_t time = 0;
         std::vector<int> n;
 
-        typedef concurr::detail::sharedmem<real_t, n_dims, n_tlev> mem_t;
+        typedef concurr::detail::sharedmem_refined_common<real_t, n_dims, n_tlev> mem_t;
         mem_t *mem;
 
         // helper methods invoked by solve()

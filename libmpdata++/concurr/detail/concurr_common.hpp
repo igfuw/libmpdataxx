@@ -15,6 +15,7 @@
 #include <libmpdata++/blitz.hpp>
 
 #include <libmpdata++/concurr/detail/sharedmem.hpp>
+#include <libmpdata++/concurr/detail/sharedmem_refined.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
 #include <libmpdata++/concurr/any.hpp>
 
@@ -150,11 +151,12 @@ namespace libmpdataxx
         protected:
 
         // (cannot be nested due to templates)
-        typedef sharedmem<
+        typedef sharedmem_refined_common<
+        //typedef sharedmem<
           typename solver_t::real_t,
           solver_t::n_dims,
           solver_t::n_tlev
-          if solver family is _fra use sharedmem_rec, else use sharedmem
+//          if solver family is _fra use sharedmem_rec, else use sharedmem
         > mem_t;
 
         // member fields

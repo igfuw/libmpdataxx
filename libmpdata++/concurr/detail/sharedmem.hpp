@@ -579,8 +579,10 @@ namespace libmpdataxx
       class sharedmem<real_t, 3, n_tlev> : public sharedmem_common<real_t, 3, n_tlev>
       {
         using parent_t = sharedmem_common<real_t, 3, n_tlev>;
-        using arr_t = typename parent_t::arr_t;
         using parent_t::parent_t; // inheriting ctors
+
+        protected:
+        using arr_t = typename parent_t::arr_t;
 
         public:
 
