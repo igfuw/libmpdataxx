@@ -21,17 +21,10 @@ namespace libmpdataxx
   {
     namespace detail
     {
-      // helper function that detect if the solver uses fractal reconstruction
-      template< class, class = void >
-      struct slvr_with_frac_recn : std::false_type { };
-      
-      template< class solver_t >
-      struct slvr_with_frac_recn<solver_t, std::void_t<typename solver_t::mpdata_rhs_vip_prs_sgs_fra_family_tag>> : std::true_type { };
-
       template< class mem_t, class solver_t>
       mem_t* mem_factory(const typename solver_t::rt_params_t &p)
       {
-        if constexpr (slvr_with_frac_recn<solver_t>())
+        if constexpr (libmpdataxx::solvers::detail::slvr_with_frac_recn<solver_t>())
           return new mem_t(p.grid_size, pow(2, p.n_fra_iter));
         else
           return new mem_t(p.grid_size);
@@ -50,7 +43,6 @@ namespace libmpdataxx
     class openmp : public detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
     {
       using parent_t = detail::concurr_common<solver_t, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
-
 
       struct mem_t : parent_t::mem_t
       {

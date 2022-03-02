@@ -35,6 +35,8 @@
 #include <libmpdata++/bcond/remote_3d.hpp>
 #include <libmpdata++/bcond/gndsky_3d.hpp>
 
+#include <libmpdata++/solvers/detail/solver_type_traits.hpp>
+
 namespace libmpdataxx
 {
   namespace concurr
@@ -150,14 +152,24 @@ namespace libmpdataxx
 
         protected:
 
+        using shmem_ref_t = 
+          sharedmem_refined_common<
+            typename solver_t::real_t,
+            solver_t::n_dims,
+            solver_t::n_tlev
+          >;
+
+        using shmem_t = 
+          sharedmem<
+            typename solver_t::real_t,
+            solver_t::n_dims,
+            solver_t::n_tlev
+          >;
+
         // (cannot be nested due to templates)
-        typedef sharedmem_refined_common<
-        //typedef sharedmem<
-          typename solver_t::real_t,
-          solver_t::n_dims,
-          solver_t::n_tlev
-//          if solver family is _fra use sharedmem_rec, else use sharedmem
-        > mem_t;
+        using mem_t = typename std::conditional<libmpdataxx::solvers::detail::slvr_with_frac_recn<solver_t>::value, shmem_ref_t, shmem_t>::type;
+        //using mem_t = typename std::conditional<true, shmem_ref_t, shmem_t>::type;
+        //using mem_t = shmem_ref_t;
 
         // member fields
         boost::ptr_vector<solver_t> algos;
