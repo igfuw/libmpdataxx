@@ -48,10 +48,8 @@ namespace libmpdataxx
           }
         }
 
-      //  virtual arr_t advectee_ref(int e = 0) = 0;
-      //  virtual const arr_t advectee_global_ref(int e = 0) = 0;
-  //      using parent_t::advectee;
-//        using parent_t::sclr_array;
+      //  virtual arr_t refinee(int e = 0) = 0;
+      //  virtual const arr_t refinee_global_ref(int e = 0) = 0;
 
         public:
         static rng_t refine_grid_size(
