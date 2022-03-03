@@ -37,13 +37,12 @@ namespace libmpdataxx
       typename std::enable_if_t<(int)ct_params_t::fractal_recon != (int)0>
       //typename std::enable_if_t<(int)ct_params_t::fractal_recon != (int) 0>
     //  std::enable_if_t<(int)ct_params_t::fractal_recon > 0, bool> = true
-    > : public detail::mpdata_rhs_vip_prs_sgs_fra<ct_params_t, minhalo>,
-        public mpdata_rhs_vip_prs_sgs_fra_family_tag        // allows checking if derived solvers use fractal reconstruction
+    > : public detail::mpdata_rhs_vip_prs_sgs_fra<ct_params_t, minhalo>
     {
       using parent_t = detail::mpdata_rhs_vip_prs_sgs_fra<ct_params_t, minhalo>;
       using parent_t::parent_t; // inheriting constructors
 
-      private:
+      protected:
       using solver_family = mpdata_rhs_vip_prs_sgs_fra_family_tag;
     };
 

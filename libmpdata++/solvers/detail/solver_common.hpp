@@ -85,7 +85,6 @@ namespace libmpdataxx
 
         protected:
 
-        //typedef concurr::detail::sharedmem<real_t, n_dims, n_tlev> mem_t;
         mem_t *mem;
 
         // helper methods invoked by solve()

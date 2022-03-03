@@ -35,7 +35,7 @@ namespace libmpdataxx
       using parent_t = detail::mpdata_osc<ct_params_t, minhalo>;
       using parent_t::parent_t; // inheriting constructors
 
-      public:
+      protected:
       using solver_family = mpdata_family_tag;
     };
 
@@ -49,7 +49,7 @@ namespace libmpdataxx
       using parent_t = detail::mpdata_fct<ct_params_t, minhalo>;
       using parent_t::parent_t; // inheriting constructors
 
-      public:
+      protected:
       using solver_family = mpdata_family_tag;
     };
   } // namespace solvers

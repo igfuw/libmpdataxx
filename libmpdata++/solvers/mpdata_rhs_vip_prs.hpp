@@ -48,7 +48,7 @@ namespace libmpdataxx
       using parent_t = detail::mpdata_rhs_vip_prs_mr<ct_params_t, minhalo>;
       using parent_t::parent_t; // inheriting constructors
 
-      public:
+      protected:
       using solver_family = mpdata_rhs_vip_prs_family_tag;
     };
 
@@ -62,7 +62,7 @@ namespace libmpdataxx
       using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, 1, minhalo>;
       using parent_t::parent_t; // inheriting constructors
 
-      public:
+      protected:
       using solver_family = mpdata_rhs_vip_prs_family_tag;
     };
 
@@ -76,7 +76,7 @@ namespace libmpdataxx
       using parent_t = detail::mpdata_rhs_vip_prs_gcrk<ct_params_t, ct_params_t::prs_k_iters, minhalo>;
       using parent_t::parent_t; // inheriting constructors
 
-      public:
+      protected:
       using solver_family = mpdata_rhs_vip_prs_family_tag;
     };
 
@@ -90,7 +90,7 @@ namespace libmpdataxx
       using parent_t = detail::mpdata_rhs_vip_prs_pc<ct_params_t, minhalo>;
       using parent_t::parent_t; // inheriting constructors
 
-      public:
+      protected:
       using solver_family = mpdata_rhs_vip_prs_family_tag;
     };
   } // namespace solvers

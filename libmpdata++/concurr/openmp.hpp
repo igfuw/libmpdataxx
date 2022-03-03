@@ -9,7 +9,6 @@
 #include <libmpdata++/concurr/detail/concurr_common.hpp>
 
 #include <limits>
-#include <type_traits>
 
 #ifdef _OPENMP
 # include <omp.h>
