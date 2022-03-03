@@ -364,6 +364,7 @@ namespace libmpdataxx
           const char * __file__,
           const int n_arr,
           const std::vector<std::vector<bool>> &stgr,
+          const std::array<rng_t, 2> grid_size,
           bool srfc = false
         )
         {
@@ -371,27 +372,49 @@ namespace libmpdataxx
           for (int n = 0; n < n_arr; ++n)
           {
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-              stgr[n][0] ? parent_t::rng_vctr(mem->grid_size[0]) : parent_t::rng_sclr(mem->grid_size[0]),
+              stgr[n][0] ? parent_t::rng_vctr(grid_size[0]) : parent_t::rng_sclr(grid_size[0]),
               srfc ? rng_t(0, 0) :
-                stgr[n][1] ? parent_t::rng_vctr(mem->grid_size[1]) :
-                  parent_t::rng_sclr(mem->grid_size[1])
+                stgr[n][1] ? parent_t::rng_vctr(grid_size[1]) :
+                  parent_t::rng_sclr(grid_size[1])
             )));
           }
+        }
+
+        // version with default grid size
+        static void alloc_tmp_stgr(
+          typename parent_t::mem_t *mem,
+          const char * __file__,
+          const int n_arr,
+          const std::vector<std::vector<bool>> &stgr,
+          bool srfc = false // allocate only surface data
+        )
+        {
+          alloc_tmp_stgr(mem, __file__, n_arr, stgr, mem->grid_size, srfc);
         }
 
         // helper method to allocate a temporary space composed of vector-component arrays
         static void alloc_tmp_vctr(
           typename parent_t::mem_t *mem,
+          const char * __file__,
+          const std::array<rng_t, 2> grid_size
+        )
+        {
+          alloc_tmp_stgr(mem, __file__, 2, {{true, false}, {false, true}}, grid_size, false);
+        }
+
+        static void alloc_tmp_vctr(
+          typename parent_t::mem_t *mem,
           const char * __file__
         )
         {
-          alloc_tmp_stgr(mem, __file__, 2, {{true, false}, {false, true}});
+          alloc_tmp_stgr(mem, __file__, 2, {{true, false}, {false, true}}, false);
         }
 
         // helper method to allocate n_arr scalar temporary arrays
         static void alloc_tmp_sclr(
           typename parent_t::mem_t *mem,
           const char * __file__, const int n_arr,
+          const std::array<rng_t, 2> grid_size,
           std::string name = "",
           bool srfc = false
         )
@@ -405,6 +428,17 @@ namespace libmpdataxx
               parent_t::rng_sclr(mem->grid_size[0]),
               srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[1])
             )));
+        }
+
+        // with default grid_size
+        static void alloc_tmp_sclr(
+          typename parent_t::mem_t *mem,
+          const char * __file__, const int n_arr,
+          std::string name = "",
+          bool srfc = false 
+        )
+        {
+          alloc_tmp_sclr(mem, __file__, n_arr, mem->grid_size, name, srfc);
         }
       };
     } // namespace detail
