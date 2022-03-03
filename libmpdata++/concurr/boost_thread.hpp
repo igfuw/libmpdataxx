@@ -81,7 +81,7 @@ namespace libmpdataxx
 
       // ctor
       boost_thread(const typename solver_t::rt_params_t &p) :
-        parent_t(p, new mem_t(p.grid_size), mem_t::size(p.grid_size[solver_t::n_dims < 3 ? 0 : 1])) // note 3D domain decomposition in y direction
+        parent_t(p, detail::mem_factory<mem_t, solver_t>(p), mem_t::size(p.grid_size[solver_t::n_dims < 3 ? 0 : 1])) // note 3D domain decomposition in y direction
       {}
 
     };

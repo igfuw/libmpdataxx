@@ -47,7 +47,7 @@ namespace libmpdataxx
 
       // ctor
       serial(const typename solver_t::rt_params_t &p) :
-        parent_t(p, new mem_t(p.grid_size), mem_t::size())
+        parent_t(p, detail::mem_factory<mem_t, solver_t>(p), mem_t::size())
       {}
 
     };

@@ -18,18 +18,6 @@ namespace libmpdataxx
 {
   namespace concurr
   {
-    namespace detail
-    {
-      template< class mem_t, class solver_t>
-      mem_t* mem_factory(const typename solver_t::rt_params_t &p)
-      {
-        if constexpr (solvers::detail::slvr_with_frac_recn<typename solver_t::ct_params_t_>())
-          return new mem_t(p.grid_size, pow(2, p.n_fra_iter));
-        else
-          return new mem_t(p.grid_size);
-      }
-    };
-
     template <
       class solver_t,
       bcond::bcond_e bcxl,
@@ -69,11 +57,8 @@ namespace libmpdataxx
         }
 
         // ctors
-        // TODO: n_ref only for a run with grid refinement?
         mem_t(const std::array<int, solver_t::n_dims> &grid_size, const int n_ref) : parent_t::mem_t(grid_size, size(grid_size[0]), n_ref) {};
         mem_t(const std::array<int, solver_t::n_dims> &grid_size) : parent_t::mem_t(grid_size, size(grid_size[0])) {};
-
-//        using parent_t::mem_t::mem_t;
       };
 
       void solve(typename parent_t::advance_arg_t nt)

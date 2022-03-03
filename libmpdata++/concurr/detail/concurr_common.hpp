@@ -449,6 +449,15 @@ namespace libmpdataxx
           return mem->max(mem->advectee(e));
         }
       };
+
+      template< class mem_t, class solver_t>
+      mem_t* mem_factory(const typename solver_t::rt_params_t &p)
+      {
+        if constexpr (solvers::detail::slvr_with_frac_recn<typename solver_t::ct_params_t_>())
+          return new mem_t(p.grid_size, pow(2, p.n_fra_iter));
+        else
+          return new mem_t(p.grid_size);
+      }
     } // namespace detail
   } // namespace concurr
 } // namespace libmpdataxx
