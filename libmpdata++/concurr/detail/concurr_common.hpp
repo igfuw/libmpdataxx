@@ -152,22 +152,29 @@ namespace libmpdataxx
 
         protected:
 
-        using shmem_ref_t = 
-          sharedmem_refined_common<
-            typename solver_t::real_t,
-            solver_t::n_dims,
-            solver_t::n_tlev
-          >;
+//        using shmem_ref_t = 
+//          sharedmem_refined_common<
+//            typename solver_t::real_t,
+//            solver_t::n_dims,
+//            solver_t::n_tlev
+//          >;
+//
+//        using shmem_t = 
+//          sharedmem<
+//            typename solver_t::real_t,
+//            solver_t::n_dims,
+//            solver_t::n_tlev
+//          >;
+//
+//        // if solver is derived from mpdata_rhs_vip_prs_sgs_fra, use sharedmem version with grid refinement
+//        using mem_t = typename std::conditional_t<
+//          libmpdataxx::solvers::detail::slvr_with_frac_recn_v<solver_t>,
+//          shmem_ref_t, shmem_t>;
 
-        using shmem_t = 
-          sharedmem<
-            typename solver_t::real_t,
-            solver_t::n_dims,
-            solver_t::n_tlev
-          >;
-
-        // (cannot be nested due to templates)
-        using mem_t = typename std::conditional<libmpdataxx::solvers::detail::slvr_with_frac_recn<solver_t>::value, shmem_ref_t, shmem_t>::type;
+        using mem_t = typename solver_t::mem_t;
+          
+//        libmpdataxx::solvers::detail::slvr_with_frac_recn<solver_t>::value, shmem_ref_t, shmem_t>::type;
+//        using mem_t = typename std::conditional<libmpdataxx::solvers::detail::slvr_with_frac_recn<solver_t>::value, shmem_ref_t, shmem_t>::type;
         //using mem_t = typename std::conditional<true, shmem_ref_t, shmem_t>::type;
         //using mem_t = shmem_ref_t;
 

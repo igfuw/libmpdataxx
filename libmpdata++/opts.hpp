@@ -83,6 +83,7 @@ namespace libmpdataxx
     enum { opts = opts::iga | opts::fct };
     enum { hint_norhs = 0 };
     enum { delayed_step = 0 };
+    enum { fractal_recon = 0 };
     struct ix {};
     static constexpr int hint_scale(const int &e) { return 0; } // base-2 logarithm
     enum { var_dt = false};

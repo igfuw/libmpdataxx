@@ -28,9 +28,11 @@ namespace libmpdataxx
     {
       using ix = typename ct_params_t::ix;
 
+      public:
+      using solver_family = mpdata_rhs_vip_family_tag;
+
       protected:
 
-      using solver_family = mpdata_rhs_vip_family_tag;
       using parent_t = detail::mpdata_rhs_vip_common<ct_params_t, minhalo>;
 
       // member fields
@@ -87,9 +89,11 @@ namespace libmpdataxx
     {
       using ix = typename ct_params_t::ix;
 
+      public:
+      using solver_family = mpdata_rhs_vip_family_tag;
+
       protected:
 
-      using solver_family = mpdata_rhs_vip_family_tag;
       using parent_t = detail::mpdata_rhs_vip_common<ct_params_t, minhalo>;
 
       // member fields
@@ -197,9 +201,11 @@ namespace libmpdataxx
     {
       using ix = typename ct_params_t::ix;
 
+      public:
+      using solver_family = mpdata_rhs_vip_family_tag;
+
       protected:
 
-      using solver_family = mpdata_rhs_vip_family_tag;
       using parent_t = detail::mpdata_rhs_vip_common<ct_params_t, minhalo>;
 
       // member fields

@@ -71,7 +71,10 @@ namespace libmpdataxx
 
         // ctors
         // TODO: n_ref only for a run with grid refinement?
-        mem_t(const std::array<int, solver_t::n_dims> &grid_size, const int n_ref=1) : parent_t::mem_t(grid_size, size(grid_size[0]), n_ref) {};
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size, const int n_ref) : parent_t::mem_t(grid_size, size(grid_size[0]), n_ref) {};
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size) : parent_t::mem_t(grid_size, size(grid_size[0])) {};
+
+//        using parent_t::mem_t::mem_t;
       };
 
       void solve(typename parent_t::advance_arg_t nt)

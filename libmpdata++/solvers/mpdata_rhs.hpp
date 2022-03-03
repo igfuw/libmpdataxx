@@ -44,8 +44,11 @@ namespace libmpdataxx
       bool update_rhs_called = true; // so that it nt=0 there's no complain
 #endif
 
-      protected:
+      public:
+
       using solver_family = mpdata_rhs_family_tag;
+
+      protected:
 
       // member fields
       arrvec_t<typename parent_t::arr_t> &rhs;
