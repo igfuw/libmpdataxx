@@ -51,10 +51,8 @@ namespace libmpdataxx
 
 
         // ctor
-        mem_t(const std::array<int, solver_t::n_dims> &grid_size) :
-          b(size(grid_size[0])),
-          parent_t::mem_t(grid_size, size(grid_size[0]))
-        {};
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size, const int n_ref) : b(size(grid_size[0])), parent_t::mem_t(grid_size, size(grid_size[0]), n_ref) {};
+        mem_t(const std::array<int, solver_t::n_dims> &grid_size)                  : b(size(grid_size[0])), parent_t::mem_t(grid_size, size(grid_size[0]))        {};
 
         void barrier()
         {
