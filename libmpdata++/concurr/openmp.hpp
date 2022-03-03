@@ -24,7 +24,7 @@ namespace libmpdataxx
       template< class mem_t, class solver_t>
       mem_t* mem_factory(const typename solver_t::rt_params_t &p)
       {
-        if constexpr (libmpdataxx::solvers::detail::slvr_with_frac_recn<solver_t>())
+        if constexpr (solvers::detail::slvr_with_frac_recn<typename solver_t::ct_params_t_>())
           return new mem_t(p.grid_size, pow(2, p.n_fra_iter));
         else
           return new mem_t(p.grid_size);
