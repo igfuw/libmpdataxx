@@ -70,10 +70,14 @@ namespace libmpdataxx
           std::string xmf_name = this->base_name() + ".xmf";
           xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->record_time);
 
+          std::string xmf_ref_name = this->base_name() + "_ref.xmf";
+          xdmfw.write_refined(this->outdir + "/" + xmf_ref_name, this->hdf_name(), this->record_time);
+
           // save the xmf filename for temporal write
-          timesteps.push_back(xmf_name);
+          timesteps.push_back(this->base_name());
           // write temporal xmf
-          xdmfw.write_temporal(this->outdir + "/temp.xmf", timesteps);
+          xdmfw.write_temporal(this->outdir + "/temp.xmf", timesteps, ".xmf");
+          xdmfw.write_temporal(this->outdir + "/temp_ref.xmf", timesteps, "_ref.xmf"); // separate temporal with refined data
         }
       }
 
@@ -109,7 +113,7 @@ namespace libmpdataxx
 #if defined(USE_MPI)
         if (this->mem->distmem.rank() == 0)
 #endif
-          xdmfw.add_attribute(name, this->hdf_name(), shape.data());
+          xdmfw.add_attribute(name, this->hdf_name(), shape.data(), true);
         parent_t::record_aux_dsc_refined(name, arr);
       }
 
