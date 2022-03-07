@@ -103,6 +103,16 @@ namespace libmpdataxx
         parent_t::record_aux_dsc(name, arr, srfc);
       }
 
+      void record_aux_dsc_refined(const std::string &name, const typename solver_t::arr_t &arr)
+      {
+        auto shape = this->mem->distmem.grid_size_ref;
+#if defined(USE_MPI)
+        if (this->mem->distmem.rank() == 0)
+#endif
+          xdmfw.add_attribute(name, this->hdf_name(), shape.data());
+        parent_t::record_aux_dsc_refined(name, arr);
+      }
+
       public:
 
       // ctor
