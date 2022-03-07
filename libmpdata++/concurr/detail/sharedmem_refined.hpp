@@ -29,10 +29,11 @@ namespace libmpdataxx
 
         using arr_t = typename parent_t::arr_t;
 
-        const int n_ref; // number of equal divisions of the large cell (in each direction)
         blitz::TinyVector<int, n_dims> origin_ref;
 
         public:
+
+        const int n_ref; // number of equal divisions of the large cell (in each direction)
 
         std::array<rng_t, n_dims> grid_size_ref;
         // TODO: these are public because used from outside in alloc - could friendship help?

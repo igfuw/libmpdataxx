@@ -55,10 +55,10 @@ namespace libmpdataxx
               H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst, shape_ref, cshape_ref, chunk_ref, offst_ref;
+      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst, shape_ref, cshape_ref, chunk_ref, offst_ref; // what if grid refinement is not done???
       H5::DSetCreatPropList params;
 
-      H5::DataSpace sspace, cspace, srfcspace, sspace_ref;
+      H5::DataSpace sspace, cspace, srfcspace, sspace_ref, cspace_ref;
 #if defined(USE_MPI)
       hid_t fapl_id;
 #endif
@@ -117,6 +117,7 @@ namespace libmpdataxx
           cspace = H5::DataSpace(parent_t::n_dims, cshape.data());
           srfcspace = H5::DataSpace(parent_t::n_dims, srfcshape.data());
           sspace_ref = H5::DataSpace(parent_t::n_dims, shape_ref.data());
+          cspace_ref = H5::DataSpace(parent_t::n_dims, cshape_ref.data());
 
 #if defined(USE_MPI)
           if (this->mem->distmem.size() > 1)
@@ -186,6 +187,39 @@ namespace libmpdataxx
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, cshape.data(), offst.data());
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space, dxpl_id);
+            }
+
+            // refined X, Y, Z, TODO: very similar to X, Y, Z
+            for (int i = 0; i < parent_t::n_dims; ++i)
+            {
+
+              blitz::Array<typename solver_t::real_t, parent_t::n_dims> coord(cshape_ref);
+#if defined(USE_MPI)
+              coord.reindexSelf(offst_ref);
+#endif
+              std::string name;
+              switch (i)
+              {
+                case 0 : coord = this->di / this->mem->n_ref * blitz::firstIndex();
+                         name = "X refined";
+                         dim_names[i] = name;
+                         break;
+                case 1 : coord = this->dj / this->mem->n_ref * blitz::secondIndex();
+                         name = "Y refined";
+                         dim_names[i] = name;
+                         break;
+                case 2 : coord = this->dk / this->mem->n_ref * blitz::thirdIndex();
+                         name = "Z refined";
+                         dim_names[i] = name;
+                         break;
+                default : break;
+              }
+
+              auto curr_dim = (*hdfp).createDataSet(name, flttype_output, cspace_ref);
+
+              H5::DataSpace dim_space = curr_dim.getSpace();
+              dim_space.selectHyperslab(H5S_SELECT_SET, cshape_ref.data(), offst_ref.data());
+              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape_ref.data()), dim_space, dxpl_id);
             }
 
             // T
