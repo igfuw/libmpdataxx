@@ -109,10 +109,10 @@ namespace libmpdataxx
 
         const std::string name = "Grid";
         const std::string grid_type = "Uniform";
-        topology<dim> top, top_ref;
-        geometry<dim> geo, geo_ref;
-        std::set<attribute> attrs, attrs_ref;
-        std::set<attribute> c_attrs, c_attrs_ref;
+        topology<dim> top;
+        geometry<dim> geo;
+        std::set<attribute> attrs;
+        std::set<attribute> c_attrs;
 
         attribute make_attribute(const std::string& name,
                                  const blitz::TinyVector<int, dim>& dimensions)
@@ -147,13 +147,11 @@ namespace libmpdataxx
 
         void add_attribute(const std::string& name,
                                  const std::string& hdf_name,
-                                 const blitz::TinyVector<int, dim>& dimensions,
-                                 const bool refined = false)
+                                 const blitz::TinyVector<int, dim>& dimensions)
         {
-          auto &_attrs(refined ? attrs_ref : attrs);
           attribute a = make_attribute(name, dimensions);
           a.item.data = hdf_name + ":/" + a.name;
-          _attrs.insert(a);
+          attrs.insert(a);
         }
 
         void add_const_attribute(const std::string& name,
@@ -166,15 +164,9 @@ namespace libmpdataxx
           c_attrs.insert(a);
         }
 
-        void write_helper(const std::string& xmf_name, const std::string& hdf_name, const double time, const bool refined)
+        void write(const std::string& xmf_name, const std::string& hdf_name, const double time)
         {
-          const auto &_attrs(refined ? attrs_ref : attrs);
-          const auto &_c_attrs(refined ? c_attrs_ref : c_attrs);
-          auto &_top(refined ? top_ref : top);
-          auto &_geo(refined ? geo_ref : geo);
-
-
-          for (auto& a : _attrs)
+          for (auto& a : attrs)
           {
             a.item.data = hdf_name + ":/" + a.name;
           }
@@ -186,28 +178,18 @@ namespace libmpdataxx
           grid_node.put("<xmlattr>.xml:id", "gid");
           grid_node.put("Time.<xmlattr>.Value", std::to_string(time));
 
-          _top.add(grid_node);
+          top.add(grid_node);
 
-          _geo.add(grid_node);
+          geo.add(grid_node);
 
-          for (auto a : _attrs)
+          for (auto a : attrs)
             a.add(grid_node);
 
-          for (auto ca : _c_attrs)
+          for (auto ca : c_attrs)
             ca.add(grid_node);
 
           xml_writer_settings settings('\t', 1);
           write_xml(xmf_name, pt, std::locale(), settings);
-        }
-
-        void write(const std::string& xmf_name, const std::string& hdf_name, const double time)
-        {
-          write_helper(xmf_name, hdf_name, time, false);
-        }
-
-        void write_refined(const std::string& xmf_name, const std::string& hdf_name, const double time)
-        {
-          write_helper(xmf_name, hdf_name, time, true);
         }
 
         void write_temporal(const std::string& xmf_name, const std::vector<std::string>& timesteps, const std::string &timesteps_suffix = "")
@@ -224,14 +206,13 @@ namespace libmpdataxx
           for (auto ts : timesteps)
           {
             ptree& ts_node = grid_node.add("xi:include", "");
-            ts_node.put("<xmlattr>.href", ts+timesteps_suffix);
+            ts_node.put("<xmlattr>.href", ts + timesteps_suffix);
             ts_node.put("<xmlattr>.xpointer", "gid");
           }
 
           xml_writer_settings settings('\t', 1);
           write_xml(xmf_name, pt, std::locale(), settings);
         }
-
       };
 
     }

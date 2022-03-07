@@ -40,7 +40,7 @@ namespace libmpdataxx
       using output_t = hdf5<solver_t>;
 
       std::unique_ptr<H5::H5File> hdfp;
-      std::map<int, std::string> dim_names;
+      std::map<int, std::string> dim_names, dim_names_ref;
       const std::string const_name = "const.h5";
       std::string const_file;
       const hsize_t zero = 0, one = 1;
@@ -202,15 +202,15 @@ namespace libmpdataxx
               {
                 case 0 : coord = this->di / this->mem->n_ref * blitz::firstIndex();
                          name = "X refined";
-                         dim_names[i] = name;
+                         dim_names_ref[i] = name;
                          break;
                 case 1 : coord = this->dj / this->mem->n_ref * blitz::secondIndex();
                          name = "Y refined";
-                         dim_names[i] = name;
+                         dim_names_ref[i] = name;
                          break;
                 case 2 : coord = this->dk / this->mem->n_ref * blitz::thirdIndex();
                          name = "Z refined";
-                         dim_names[i] = name;
+                         dim_names_ref[i] = name;
                          break;
                 default : break;
               }
