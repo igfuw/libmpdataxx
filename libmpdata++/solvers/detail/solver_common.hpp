@@ -73,7 +73,7 @@ namespace libmpdataxx
         real_t time = 0;
         std::vector<int> n;
 
-        using shmem_ref_t = concurr::detail::sharedmem_refined_common<real_t, n_dims, n_tlev>;
+        using shmem_ref_t = concurr::detail::sharedmem_refined<real_t, n_dims, n_tlev>;
         using shmem_t = concurr::detail::sharedmem<real_t, n_dims, n_tlev>;
 
         public:

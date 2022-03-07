@@ -61,9 +61,6 @@ namespace libmpdataxx
 
           mem->psi_ref = mem->tmp[__FILE__][0];
           mem->GC_ref = mem->tmp[__FILE__][1];
-
-          std::cerr << "psi_ref: " << mem->psi_ref[0] << std::endl;
-          std::cerr << "GC_ref: " << mem->GC_ref[0] << std::endl;
         }
       };
     } // namespace detail

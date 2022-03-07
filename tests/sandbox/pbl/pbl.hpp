@@ -68,6 +68,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
           this->record_aux_dsc("tke", this->tke);
         }
         this->record_aux_dsc("p", this->Phi);
+        this->record_aux_dsc_refined("tht refined", this->mem->refinee(ix::tht));
       }
       this->mem->barrier();
     }
