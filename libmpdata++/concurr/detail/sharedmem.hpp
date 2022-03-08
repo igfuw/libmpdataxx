@@ -344,7 +344,7 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           if(this->distmem.size() > 1)
-            return this->distmem.get_global_array(advectee(e));
+            return this->distmem.get_global_array(advectee(e), false);
           else
 #endif
             return advectee(e);
@@ -422,7 +422,7 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           if(this->distmem.size() > 1)
-            return this->distmem.get_global_array(advectee(e));
+            return this->distmem.get_global_array(advectee(e), false);
           else
 #endif
             return advectee(e);
@@ -534,7 +534,7 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           if(this->distmem.size() > 1)
-            return this->distmem.get_global_array(advectee(e));
+            return this->distmem.get_global_array(advectee(e), true);
           else
 #endif
             return advectee(e);

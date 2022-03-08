@@ -108,7 +108,7 @@ public: // TODO: just a temp measure, make it private again
         }
 
         template<class arr_t>
-        const arr_t get_global_array(arr_t arr)
+        const arr_t get_global_array(arr_t arr, const bool kij_to_kji)
         {
 #if defined(USE_MPI)
           // a vector of number of elements to be sent by each non-root process
@@ -128,9 +128,24 @@ public: // TODO: just a temp measure, make it private again
           std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
           // a vector that will store the received data, relevant only on process rank=0
           std::vector<real_t> out_values(std::accumulate(grid_size.begin(), grid_size.end(), 1, std::multiplies<int>()));
-          // create an array that will store arr to be sent in a contiguous memory block
-          std::vector<real_t> in_values_vec(arr.size());
-          std::copy(arr.begin(), arr.end(), in_values_vec.begin());
+
+          std::vector<real_t> in_values_vec;
+
+          if(kij_to_kji)
+          {
+            // create an array that will store advectee to be sent in a contiguous memory block using the (default) kji storage order
+            // NOTE: libmpdata++ 3d blitz arrays, like advectee, are in the kij order
+            arr_t in_values_arr(arr.shape());
+            in_values_arr = arr;
+            // wrap in_values_arr in a std::vector
+            in_values_vec = std::vector<real_t>(in_values_arr.begin(), in_values_arr.end());
+          }
+          else
+          {
+            // create an array that will store arr to be sent in a contiguous memory block
+            in_values_vec = std::vector<real_t>(arr.size());
+            std::copy(arr.begin(), arr.end(), in_values_vec.begin());
+          }
 
           // gather the data from all processes on rank=0
           boost::mpi::gatherv(mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
