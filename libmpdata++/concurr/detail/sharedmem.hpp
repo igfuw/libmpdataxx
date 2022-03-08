@@ -15,7 +15,6 @@
 #include <libmpdata++/concurr/detail/distmem.hpp>
 
 #include <array>
-#include <numeric>
 
 namespace libmpdataxx
 {

@@ -8,6 +8,8 @@
 #  include <cstdlib>
 #endif
 
+#include <numeric>
+
 namespace libmpdataxx
 {
   namespace concurr
