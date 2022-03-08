@@ -20,13 +20,13 @@ namespace libmpdataxx
       namespace
       {
         bool mpi_initialized_before = true; // flag if MPI was initialized before distmem ctor
+
+        // helpers that convert std::array into blitz::TinyVector, TODO: move them to formulas?
+        blitz::TinyVector<int, 1> get_shape(std::array<int, 1> grid_size) {return blitz::shape(grid_size[0]);}
+        blitz::TinyVector<int, 2> get_shape(std::array<int, 2> grid_size) {return blitz::shape(grid_size[0], grid_size[1]);}
+        blitz::TinyVector<int, 3> get_shape(std::array<int, 3> grid_size) {return blitz::shape(grid_size[0], grid_size[1], grid_size[2]);}
       };
 #endif
-
-      // helpers that convert std::array into blitz::TinyVector, TODO: move them to formulas?
-      blitz::TinyVector<int, 1> get_shape(std::array<int, 1> grid_size) {return blitz::shape(grid_size[0]);}
-      blitz::TinyVector<int, 2> get_shape(std::array<int, 2> grid_size) {return blitz::shape(grid_size[0], grid_size[1]);}
-      blitz::TinyVector<int, 3> get_shape(std::array<int, 3> grid_size) {return blitz::shape(grid_size[0], grid_size[1], grid_size[2]);}
 
       template <typename real_t, int n_dims>
       class distmem
