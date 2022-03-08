@@ -110,6 +110,7 @@ public: // TODO: just a temp measure, make it private again
         template<class arr_t>
         const arr_t get_global_array(arr_t arr)
         {
+#if defined(USE_MPI)
           // a vector of number of elements to be sent by each non-root process
           std::vector<int> sizes(size());
           std::iota(sizes.begin(), sizes.end(), 0); // fill with 0,1,2,3,...
@@ -138,6 +139,9 @@ public: // TODO: just a temp measure, make it private again
 
           blitz::Array<real_t, n_dims> res(out_values.data(), get_shape(grid_size), blitz::duplicateData);
           return res;
+#else
+          return arr;
+#endif
         }
 
         // ctor
