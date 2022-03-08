@@ -11,6 +11,7 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/formulae/arakawa_c.hpp>
+#include <libmpdata++/formulae/domain_decomposition.hpp>
 #include <libmpdata++/concurr/detail/distmem.hpp>
 
 #include <array>
@@ -284,28 +285,13 @@ namespace libmpdataxx
           return ret;
         }
 
-        private:
-        // helper methods to define subdomain ranges
-        static int min(const int &span, const int &rank, const int &size)
-        {
-          return rank * span / size;
-        }
-
-        static int max(const int &span, const int &rank, const int &size)
-        {
-          return min(span, rank + 1, size) - 1;
-        }
-
         public:
         static rng_t slab(
           const rng_t &span,
           const int &rank = 0,
           const int &size = 1
         ) {
-          return rng_t(
-            span.first() + min(span.length(), rank, size),
-            span.first() + max(span.length(), rank, size)
-          );
+          return domain_decomposition::slab(span, rank, size);
         }
 
         virtual arr_t advectee(int e = 0) = 0;
@@ -359,6 +345,8 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           if(this->distmem.size() > 1)
+//            return this->distmem.get_global_array<blitz::Array<real_t, 1>(advectee(e));
+
           {
 // TODO: move some of that to distmem...
 // TODO: a lot of common code betwee 1,2 and 3 dimensions...
