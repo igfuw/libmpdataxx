@@ -471,9 +471,11 @@ namespace libmpdataxx
       }
 
       // see above, also assumes that z is the last dimension
-      void record_prof_const(const std::string &name, typename solver_t::real_t *data)
+      void record_prof_const_hlpr(const std::string &name, typename solver_t::real_t *data, const bool vctr)
       {
         assert(this->rank == 0);
+
+        auto &_shape(vctr ? cshape : shape);
 
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR
 #if defined(USE_MPI)
@@ -484,7 +486,7 @@ namespace libmpdataxx
         auto aux = hdfcp.createDataSet(
           name,
           flttype_output,
-          H5::DataSpace(1, &shape[parent_t::n_dims - 1])
+          H5::DataSpace(1, &_shape[parent_t::n_dims - 1])
         );
 
 #if defined(USE_MPI)
@@ -492,11 +494,20 @@ namespace libmpdataxx
 #endif
         {
           auto space = aux.getSpace();
-          space.selectHyperslab(H5S_SELECT_SET, &shape[parent_t::n_dims - 1], &offst[parent_t::n_dims - 1]);
-          aux.write(data, flttype_solver, H5::DataSpace(1, &shape[parent_t::n_dims - 1]), space);
+          space.selectHyperslab(H5S_SELECT_SET, &_shape[parent_t::n_dims - 1], &offst[parent_t::n_dims - 1]);
+          aux.write(data, flttype_solver, H5::DataSpace(1, &_shape[parent_t::n_dims - 1]), space);
         }
       }
 
+      void record_prof_const(const std::string &name, typename solver_t::real_t *data)
+      {
+        record_prof_const_hlpr(name, data, false);
+      }
+
+      void record_prof_vctr_const(const std::string &name, typename solver_t::real_t *data)
+      {
+        record_prof_const_hlpr(name, data, true);
+      }
 
       // ---- recording libmpdata++ parameters ----
 
