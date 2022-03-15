@@ -11,10 +11,10 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/formulae/arakawa_c.hpp>
+#include <libmpdata++/formulae/domain_decomposition.hpp>
 #include <libmpdata++/concurr/detail/distmem.hpp>
 
 #include <array>
-#include <numeric>
 
 namespace libmpdataxx
 {
@@ -284,28 +284,13 @@ namespace libmpdataxx
           return ret;
         }
 
-        private:
-        // helper methods to define subdomain ranges
-        static int min(const int &span, const int &rank, const int &size)
-        {
-          return rank * span / size;
-        }
-
-        static int max(const int &span, const int &rank, const int &size)
-        {
-          return min(span, rank + 1, size) - 1;
-        }
-
         public:
         static rng_t slab(
           const rng_t &span,
           const int &rank = 0,
           const int &size = 1
         ) {
-          return rng_t(
-            span.first() + min(span.length(), rank, size),
-            span.first() + max(span.length(), rank, size)
-          );
+          return domain_decomposition::slab(span, rank, size);
         }
 
         virtual arr_t advectee(int e = 0) = 0;
@@ -360,32 +345,7 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           if(this->distmem.size() > 1)
-          {
-// TODO: move some of that to distmem...
-// TODO: a lot of common code betwee 1,2 and 3 dimensions...
-
-            // a vector of number of elements to be sent by each non-root process
-            std::vector<int> sizes(this->distmem.size());
-            std::iota(sizes.begin(), sizes.end(), 0); // fill with 1,2,3,...
-            for(auto &size : sizes) { size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length();}
-            // calc displacement
-            std::vector<int> displ(sizes.size());
-            std::partial_sum(sizes.begin(), sizes.end(), displ.begin());
-            std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
-            // a vector that will store the received data, relevant only on process rank=0
-            std::vector<real_t> out_values(this->distmem.grid_size[0]);
-            // create an array that will store advectee to be sent in a contiguous memory block
-            std::vector<real_t> in_values_vec(advectee(e).size());
-            std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
-
-            // gather the data from all processes on rank=0
-            boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
-            // send the result to other processes
-            boost::mpi::broadcast(this->distmem.mpicom, out_values, 0);
-
-            blitz::Array<real_t, 1> res(out_values.data(), blitz::shape(this->distmem.grid_size[0]), blitz::duplicateData);
-            return res;
-          }
+            return this->distmem.get_global_array(advectee(e), false);
           else
 #endif
             return advectee(e);
@@ -463,38 +423,7 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           if(this->distmem.size() > 1)
-          {
-// TODO: move some of that to distmem...
-// TODO: a lot of common code betwee 1,2 and 3 dimensions...
-
-            // a vector of number of elements to be sent by each non-root process
-            std::vector<int> sizes(this->distmem.size());
-            std::iota(sizes.begin(), sizes.end(), 0); // fill with 1,2,3,...
-            for(auto &size : sizes)
-            {
-              size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length()
-                      * this->grid_size[1].length();
-            }
-            // calc displacement
-            std::vector<int> displ(sizes.size());
-            std::partial_sum(sizes.begin(), sizes.end(), displ.begin());
-            std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
-            // a vector that will store the received data, relevant only on process rank=0
-            std::vector<real_t> out_values(this->distmem.grid_size[0] * this->grid_size[1].length());
-            // create an array that will store advectee to be sent in a contiguous memory block
-            std::vector<real_t> in_values_vec(advectee(e).size());
-            std::copy(advectee(e).begin(), advectee(e).end(), in_values_vec.begin());
-
-            // gather the data from all processes on rank=0
-            boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
-            // send the result to other processes
-            boost::mpi::broadcast(this->distmem.mpicom, out_values, 0);
-
-            blitz::Array<real_t, 2> res(out_values.data(), blitz::shape(
-              this->distmem.grid_size[0], this->grid_size[1].length()),
-              blitz::duplicateData);
-            return res;
-          }
+            return this->distmem.get_global_array(advectee(e), false);
           else
 #endif
             return advectee(e);
@@ -608,42 +537,7 @@ namespace libmpdataxx
         {
 #if defined(USE_MPI)
           if(this->distmem.size() > 1)
-          {
-// TODO: move some of that to distmem...
-// TODO: a lot of common code betwee 1,2 and 3 dimensions...
-
-            // a vector of number of elements to be sent by each non-root process
-            std::vector<int> sizes(this->distmem.size());
-            std::iota(sizes.begin(), sizes.end(), 0); // fill with 1,2,3,...
-            for(auto &size : sizes)
-            {
-              size = this->slab(rng_t(0, this->distmem.grid_size[0]-1), size, this->distmem.size()).length()
-                      * this->grid_size[1].length() * this->grid_size[2].length();
-            }
-            // calc displacement
-            std::vector<int> displ(sizes.size());
-            std::partial_sum(sizes.begin(), sizes.end(), displ.begin());
-            std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
-            // a vector that will store the received data, relevant only on process rank=0
-            std::vector<real_t> out_values(this->distmem.grid_size[0] * this->grid_size[1].length() * this->grid_size[2].length());
-            // create an array that will store advectee to be sent in a contiguous memory block using the (default) kji storage order
-            // NOTE: libmpdata++ 3d blitz arrays, like advectee, are in the kij order
-            blitz::Array<real_t, 3> in_values_arr(advectee(e).shape());
-            in_values_arr = advectee(e);
-            // wrap in_values_arr in a std::vector
-            std::vector<real_t> in_values_vec(in_values_arr.begin(), in_values_arr.end());
-
-            // gather the data from all processes on rank=0
-            boost::mpi::gatherv(this->distmem.mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
-            // send the result to other processes
-            boost::mpi::broadcast(this->distmem.mpicom, out_values, 0);
-
-            blitz::Array<real_t, 3> res(out_values.data(), blitz::shape(
-              this->distmem.grid_size[0], this->grid_size[1].length(), this->grid_size[2].length()),
-              blitz::duplicateData
-              );
-            return res;
-          }
+            return this->distmem.get_global_array(advectee(e), true);
           else
 #endif
             return advectee(e);

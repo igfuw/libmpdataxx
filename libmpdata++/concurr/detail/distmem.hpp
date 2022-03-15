@@ -8,6 +8,7 @@
 #  include <cstdlib>
 #endif
 
+#include <numeric>
 
 namespace libmpdataxx
 {
@@ -19,6 +20,11 @@ namespace libmpdataxx
       namespace
       {
         bool mpi_initialized_before = true; // flag if MPI was initialized before distmem ctor
+
+        // helpers that convert std::array into blitz::TinyVector, TODO: move them to formulas?
+        blitz::TinyVector<int, 1> get_shape(std::array<int, 1> grid_size) {return blitz::shape(grid_size[0]);}
+        blitz::TinyVector<int, 2> get_shape(std::array<int, 2> grid_size) {return blitz::shape(grid_size[0], grid_size[1]);}
+        blitz::TinyVector<int, 3> get_shape(std::array<int, 3> grid_size) {return blitz::shape(grid_size[0], grid_size[1], grid_size[2]);}
       };
 #endif
 
@@ -100,6 +106,58 @@ public: // TODO: just a temp measure, make it private again
         double sum(const double &val)
         {
           return reduce_hlpr<std::plus<double>>(val);
+        }
+
+        template<class arr_t>
+        const arr_t get_global_array(arr_t arr, const bool kij_to_kji)
+        {
+#if defined(USE_MPI)
+          // a vector of number of elements to be sent by each non-root process
+          std::vector<int> sizes(size());
+          std::iota(sizes.begin(), sizes.end(), 0); // fill with 0,1,2,3,...
+
+          for(auto &_size : sizes) 
+          { 
+            _size = domain_decomposition::slab(rng_t(0, grid_size[0]-1), _size, size()).length();
+            for(int i=1; i<n_dims; ++i)
+              _size *= grid_size[i];
+          }
+
+          // calc displacement
+          std::vector<int> displ(sizes.size());
+          std::partial_sum(sizes.begin(), sizes.end(), displ.begin());
+          std::transform(displ.begin(), displ.end(), sizes.begin(), displ.begin(), std::minus<int>()); // exclusive_scan is c++17
+          // a vector that will store the received data, relevant only on process rank=0
+          std::vector<real_t> out_values(std::accumulate(grid_size.begin(), grid_size.end(), 1, std::multiplies<int>()));
+
+          std::vector<real_t> in_values_vec;
+
+          if(kij_to_kji)
+          {
+            // create an array that will store advectee to be sent in a contiguous memory block using the (default) kji storage order
+            // NOTE: libmpdata++ 3d blitz arrays, like advectee, are in the kij order
+            arr_t in_values_arr(arr.shape());
+            in_values_arr = arr;
+            // wrap in_values_arr in a std::vector
+            in_values_vec = std::vector<real_t>(in_values_arr.begin(), in_values_arr.end());
+          }
+          else
+          {
+            // create an array that will store arr to be sent in a contiguous memory block
+            in_values_vec = std::vector<real_t>(arr.size());
+            std::copy(arr.begin(), arr.end(), in_values_vec.begin());
+          }
+
+          // gather the data from all processes on rank=0
+          boost::mpi::gatherv(mpicom, in_values_vec, out_values.data(), sizes, displ, 0);
+          // send the result to other processes
+          boost::mpi::broadcast(mpicom, out_values, 0);
+
+          blitz::Array<real_t, n_dims> res(out_values.data(), get_shape(grid_size), blitz::duplicateData);
+          return res;
+#else
+          return arr;
+#endif
         }
 
         // ctor
