@@ -33,7 +33,12 @@ namespace libmpdataxx
 
         public:
 
-        const int n_ref; // number of equal divisions of the large cell (in each direction)
+        const int n_ref; // number of equal divisions of the large cell (in each direction), refined resolution is dx / n_ref;
+                         // every n_ref scalar of the refined grid is at the same position as a scalar of the normal grid
+                         // no refinement done in the halo, because there are no SD in the halo (it's not real space)
+                         // what about MPI boundaries? there are refined points exactly at the boundary (since n_ref has to be even)
+                         // note: if there is a refined cell that is divided by the MPI boundary, o we need to add contributions from microphysics to both processes on both sides?
+                         //       maybe not, because microphysics contrbutions will affect the large cells, which are not divided by the MPI boundary...
 
         std::array<rng_t, n_dims> grid_size_ref;
         // TODO: these are public because used from outside in alloc - could friendship help?
@@ -43,11 +48,18 @@ namespace libmpdataxx
         sharedmem_refined_common(const std::array<int, n_dims> &grid_size, const int &size, const int &n_ref)
           : parent_t(grid_size, size), n_ref(n_ref)
         {
+          assert(n_ref % 2 == 0); // only division into even number of cells, because we assume that one of the refined scalar points is at the MPI boundary, which is in the middle between normal grid scalars
           for (int d = 0; d < n_dims; ++d)
           {
-            grid_size_ref[d] = refine_grid_size(this->grid_size[d], n_ref);
+            grid_size_ref[d] = refine_grid_size(
+              this->grid_size[d],
+              n_ref,
+              d == 0 ? this->distmem.rank() : 0,
+              d == 0 ? this->distmem.size() : 1
+            );
             origin_ref[d] = grid_size_ref[d].first();
-            this->distmem.grid_size_ref[d] = grid_size_ref[d].last() - grid_size_ref[d].first() + 1;
+
+            this->distmem.grid_size_ref[d] = refine_grid_size(rng_t(0,grid_size[d]-1), n_ref, 0, 1).length();
           }
         }
 
@@ -57,11 +69,14 @@ namespace libmpdataxx
         public:
         static rng_t refine_grid_size(
           const rng_t &grid_size,
-          const int &n_ref
+          const int &n_ref,
+          const int &mpi_rank,
+          const int &mpi_size
         ) {
+          assert(n_ref % 2 == 0);
           return rng_t(
-            grid_size.first() * n_ref,
-            (grid_size.last() + 1) * n_ref - 1
+            mpi_rank == 0          ? grid_size.first() * n_ref : grid_size.first() * n_ref - (n_ref / 2),
+            mpi_rank == mpi_size-1 ? grid_size.last()  * n_ref : grid_size.last()  * n_ref + (n_ref / 2)
           );
         }
       };
@@ -84,12 +99,6 @@ namespace libmpdataxx
         public:
         arr_t refinee(int e = 0) override
         {
-          std::cerr << "refinee: " << this->psi_ref[e](
-            this->grid_size_ref[0],
-            this->grid_size_ref[1],
-            this->grid_size_ref[2]
-          ).reindex(this->origin_ref);
-
           return this->psi_ref[e](
             this->grid_size_ref[0],
             this->grid_size_ref[1],

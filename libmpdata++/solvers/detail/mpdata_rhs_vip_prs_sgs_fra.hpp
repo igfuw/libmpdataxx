@@ -56,8 +56,8 @@ namespace libmpdataxx
           const int &n_iters
         ) {
           parent_t::alloc(mem, n_iters);
-          parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_eqns, mem->grid_size_ref, "", false); // rec_psi
-          parent_t::alloc_tmp_vctr(mem, __FILE__, mem->grid_size_ref);                      // rec_GC
+          parent_t::alloc_tmp_sclr(mem, __FILE__, ct_params_t::n_eqns, mem->grid_size_ref, "", false); // psi_ref
+          parent_t::alloc_tmp_vctr(mem, __FILE__, mem->grid_size_ref);                                 // GC_ref
 
           mem->psi_ref = mem->tmp[__FILE__][0];
           mem->GC_ref = mem->tmp[__FILE__][1];

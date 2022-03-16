@@ -97,8 +97,6 @@ namespace libmpdataxx
               rng_t(0, grid_size[d]-1),
               d == 0 ? distmem.rank() : 0,          // decomposition along x, because that's MPI decomposition
               d == 0 ? distmem.size() : 1
-             // d == shmem_decomp_dim ? distmem.rank() : 0,
-             // d == shmem_decomp_dim ? distmem.size() : 1
             );
             origin[d] = this->grid_size[d].first();
           }
