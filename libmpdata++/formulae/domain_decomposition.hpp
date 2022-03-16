@@ -15,19 +15,19 @@ namespace libmpdataxx
     namespace detail
     {
       // helper methods to define subdomain ranges
-      static int min(const int &span, const int &rank, const int &size)
+      int min(const int &span, const int &rank, const int &size)
       {
         return rank * span / size;
       }
 
-      static int max(const int &span, const int &rank, const int &size)
+      int max(const int &span, const int &rank, const int &size)
       {
         return min(span, rank + 1, size) - 1;
       }
     };
 
     // get part of 'span' assigned to 'rank' (out of 'size' ranks)
-    static rng_t slab(
+    rng_t slab(
       const rng_t &span,
       const int &rank = 0,
       const int &size = 1

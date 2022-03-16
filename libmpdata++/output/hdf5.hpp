@@ -200,15 +200,15 @@ namespace libmpdataxx
               std::string name;
               switch (i)
               {
-                case 0 : coord = this->di / this->mem->n_ref * blitz::firstIndex();
+                case 0 : coord = this->di / 4. +  this->di / this->mem->n_ref * blitz::firstIndex();
                          name = "X refined";
                          dim_names_ref[i] = name;
                          break;
-                case 1 : coord = this->dj / this->mem->n_ref * blitz::secondIndex();
+                case 1 : coord = this->dj / 4. +  this->dj / this->mem->n_ref * blitz::secondIndex();
                          name = "Y refined";
                          dim_names_ref[i] = name;
                          break;
-                case 2 : coord = this->dk / this->mem->n_ref * blitz::thirdIndex();
+                case 2 : coord = this->dk / 4. +  this->dk / this->mem->n_ref * blitz::thirdIndex();
                          name = "Z refined";
                          dim_names_ref[i] = name;
                          break;

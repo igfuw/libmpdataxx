@@ -60,6 +60,16 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     if (this->timestep % static_cast<int>(this->outfreq) == 0)
     {
       if (this->rank == 0) std::cout << this->timestep << std::endl;
+
+      // test filling of refinee
+      this->mem->refinee(ix::tht)(this->ijk_ref) = blitz::tensor::k; // anything
+      //this->mem->refinee(ix::tht) = blitz::tensor::k; // anything
+      // copy tht to refined tht at position where they overlap
+      std::cerr << "refinee: " << this->mem->refinee(ix::tht);
+      std::cerr << "refinee(ijk_ref): " << this->mem->refinee(ix::tht)(this->ijk_ref);
+      std::cerr << "refinee(ijk_r2r): " << this->mem->refinee(ix::tht)(this->ijk_r2r);
+      this->mem->refinee(ix::tht)(this->ijk_r2r) = this->mem->advectee(ix::tht)(this->ijk);
+
       this->mem->barrier();
       if (this->rank == 0)
       {
@@ -68,7 +78,6 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
           this->record_aux_dsc("tke", this->tke);
         }
         this->record_aux_dsc("p", this->Phi);
-        this->mem->refinee(ix::tht) = blitz::tensor::k;
         this->record_aux_dsc_refined("tht refined", this->mem->refinee(ix::tht));
       }
       this->mem->barrier();

@@ -50,6 +50,8 @@ namespace libmpdataxx
         arrvec_t<typename parent_t::arr_t> &drv;
         arrvec_t<typename parent_t::arr_t> &wrk;
 
+        // TODO: make all ijk... objects const
+
         // like ijk, but containing vectors at the lower/left/fre edge
         // CAUTION: on sharedmem, ijkm contains overlapping ranges
         idx_t<ct_params_t::n_dims> ijkm;
@@ -60,7 +62,7 @@ namespace libmpdataxx
         // like ijk, but with range in x direction extended by 1 to the left for MPI compliance.
         // MPI requires that vector between two process domains is calculated by the process to the right of it  (c.f. remote_2d.hpp fill_halos_vctr_alng)
         // TODO: change MPI logic to assume that it is calculated by the process to the left? then, ijk_vec would not be needed(?)
-        std::array<rng_t, ct_params_t::n_dims> ijk_vec;
+        std::array<rng_t, ct_params_t::n_dims> ijk_vec; // TODO: replace std::array with idx_t
 
         real_t cdrag;
 

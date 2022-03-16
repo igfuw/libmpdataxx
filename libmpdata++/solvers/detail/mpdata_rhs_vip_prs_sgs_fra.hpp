@@ -6,6 +6,8 @@
  *
  */
 
+// solver with fractal reconstruction of SGS fields
+
 #pragma once
 
 #include <libmpdata++/solvers/mpdata_rhs_vip_prs_sgs.hpp>
@@ -30,9 +32,11 @@ namespace libmpdataxx
         protected:
 
 //        const int n_fra; // number of fields with fractal reconstruction
-//        constexpr int n_rec_cell = pow(2, ct_params::n_fra_rec) ; // number of reconstructed cells in each direction
+        const int n_ref; // number of refinements; refined resolution is dx / n_ref
 
-  //      idx_t<ct_params_t::n_dims> ijkm;
+        // TODO: make these const!
+        idx_t<ct_params_t::n_dims>  ijk_ref; // range of refinee handled by given solver, excluding halos
+        const idxs_t<ct_params_t::n_dims> ijk_r2r; // resolved to refined; refined scalars at the same position as resolved scalars
 
         public:
 
@@ -46,9 +50,42 @@ namespace libmpdataxx
           typename parent_t::ctor_args_t args,
           const rt_params_t &p
         ) :
-          parent_t(args, p)
+          parent_t(args, p),
+          n_ref(this->mem->n_ref),
+          ijk_r2r{
+            {this->ijk[0].first() * n_ref, this->ijk[1].first() * n_ref, this->ijk[2].first() * n_ref}, // lbound
+            {this->ijk[0].last() * n_ref, this->ijk[1].last() * n_ref, this->ijk[2].last() * n_ref},    // ubound
+            {n_ref, n_ref, n_ref}, // stride
+            }
         {
-        //  for (int d = 0; d < ct_params_t::n_dims; ++d)
+          for (int d = 0; d < ct_params_t::n_dims; ++d)
+          {
+            // ijk_ref init below assumes 3D (shmem decomp dim along y);
+            // TODO: move this to concurr_common::init()? add something to ctor_args_t?
+
+            if(d==1)
+            {
+              ijk_ref.lbound(d) = this->mem->slab(this->mem->grid_size_ref[d], this->rank, this->mem->size).first();// this->ijk.lbound(d) * n_ref;
+              ijk_ref.ubound(d) = this->mem->slab(this->mem->grid_size_ref[d], this->rank, this->mem->size).last();
+            }
+            else
+            {
+              ijk_ref.lbound(d) = this->mem->grid_size_ref[d].first();
+              ijk_ref.ubound(d) = this->mem->grid_size_ref[d].last();
+            }
+
+            std::cerr << "ijk_ref: " <<  ijk_ref[d] << std::endl;
+            std::cerr << "grid_size_ref: " <<  this->mem->grid_size_ref[d] << std::endl;
+
+// StidedDomain can only be constructed, cant be modified
+//            ijk_r2r.lbound(d) = this->ijk[d].first() * n_ref;
+//            ijk_r2r.ubound(d) = this->ijk[d].last() * n_ref;
+//            ijk_r2r.stride(d) = n_ref;
+
+            std::cerr << "ijk_r2r: " <<  ijk_r2r[d] << std::endl;
+
+            std::cerr << this->ijk[d].first() * n_ref << " " << this->ijk[d].last() * n_ref << " " << n_ref << std::endl;
+          }
         }
 
         static void alloc(
