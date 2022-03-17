@@ -219,15 +219,6 @@ namespace libmpdataxx
         // helper method to allocate n_arr scalar temporary arrays
         static void alloc_tmp_sclr(
           typename parent_t::mem_t *mem,
-          const char * __file__, const int n_arr,
-          const std::array<rng_t, 1> grid_size
-        )
-        {
-          alloc_tmp(mem, __file__, n_arr, parent_t::rng_sclr(grid_size[0]));
-        }
-
-        static void alloc_tmp_sclr(
-          typename parent_t::mem_t *mem,
           const char * __file__, const int n_arr
         )
         {

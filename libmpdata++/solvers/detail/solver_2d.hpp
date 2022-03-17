@@ -414,9 +414,8 @@ namespace libmpdataxx
         static void alloc_tmp_sclr(
           typename parent_t::mem_t *mem,
           const char * __file__, const int n_arr,
-          const std::array<rng_t, 2> grid_size,
           std::string name = "",
-          bool srfc = false
+          bool srfc = false 
         )
         {
           mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
@@ -428,17 +427,6 @@ namespace libmpdataxx
               parent_t::rng_sclr(mem->grid_size[0]),
               srfc ? rng_t(0, 0) : parent_t::rng_sclr(mem->grid_size[1])
             )));
-        }
-
-        // with default grid_size
-        static void alloc_tmp_sclr(
-          typename parent_t::mem_t *mem,
-          const char * __file__, const int n_arr,
-          std::string name = "",
-          bool srfc = false 
-        )
-        {
-          alloc_tmp_sclr(mem, __file__, n_arr, mem->grid_size, name, srfc);
         }
       };
     } // namespace detail
