@@ -34,8 +34,8 @@ namespace libmpdataxx
 //        const int n_fra; // number of fields with fractal reconstruction
         const int n_ref; // number of refinements; refined resolution is dx / n_ref
         
-        // TODO: do refined arrays really need to have halos?
-        const int halo_ref; // size of halos of refined scalar (and vector?) arrays
+        // refined arrays have no halo, because halo size needs to be known at compile time (why is it so? probably not really necessary?)
+//        const int halo_ref; // size of halos of refined scalar (and vector?) arrays
 
         // TODO: make these const!
         idx_t<ct_params_t::n_dims>  ijk_ref; // range of refinee handled by given solver
@@ -57,7 +57,7 @@ namespace libmpdataxx
         ) :
           parent_t(args, p),
           n_ref(this->mem->n_ref),
-          halo_ref(n_ref / 2),
+//          halo_ref(n_ref / 2),
           // ijk_ref init below assumes 3D (shmem decomp dim along y);
           // TODO: move this to concurr_common::init()? add something to ctor_args_t?
           ijk_r2r{

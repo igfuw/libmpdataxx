@@ -83,9 +83,9 @@ namespace libmpdataxx
 
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-              mem->grid_size_ref[0]^(mem->n_ref/2), // NOTE: halo of size n_ref / 2
-              mem->grid_size_ref[1]^(mem->n_ref/2),
-              srfc ? rng_t(0, 0) : mem->grid_size_ref[2]^(mem->n_ref/2),
+              mem->grid_size_ref[0], // NOTE: no halo
+              mem->grid_size_ref[1],
+              srfc ? rng_t(0, 0) : mem->grid_size_ref[2],
               arr3D_storage
             )));
         }
