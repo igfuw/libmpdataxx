@@ -34,7 +34,7 @@ namespace libmpdataxx
 //        const int n_fra; // number of fields with fractal reconstruction
         const int n_ref; // number of refinements; refined resolution is dx / n_ref
         
-        // refined arrays have no halo, because halo size needs to be known at compile time (why is it so? probably not really necessary?)
+        // refined arrays have no halos (do they need them? halos can be added by extending grid_size in alloc() in mpdata_rhs_vip_prs_sgs_fra.hpp by e.g. mem->n_ref/2)
 //        const int halo_ref; // size of halos of refined scalar (and vector?) arrays
 
         // TODO: make these const!
@@ -42,6 +42,13 @@ namespace libmpdataxx
         const idxs_t<ct_params_t::n_dims> ijk_r2r; // resolved to refined; refined scalars at the same position as resolved scalars
 
 //        static rng_t rng_sclr_ref(const rng_t &rng) { return rng^halo_ref; }
+
+        // what if 
+        static rng_t rng_midpoints(const rng_t &rng) 
+        {
+          if(rng.last() - rng.first() < rng.stride()) return rng;
+          else return rng_t(rng.first() + rng.stride() / 2, rng.last() - rng.stride() / 2, rng.stride()); 
+        }
 
         public:
 

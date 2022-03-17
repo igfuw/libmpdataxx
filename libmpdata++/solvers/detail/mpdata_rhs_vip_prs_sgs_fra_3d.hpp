@@ -35,8 +35,7 @@ namespace libmpdataxx
         // interpolation similar to mpdata_rhs_vip...
         template<int d, class arr_t>
         void intrp(
-          arr_t &dst,
-          const arr_t &src,
+          arr_t arr,
           const rng_t &i,
           const rng_t &j,
           const rng_t &k,
@@ -47,24 +46,40 @@ namespace libmpdataxx
           using namespace arakawa_c;
           using real_t = typename ct_params_t::real_t;
 
-          dst(pi<d>(i, j, k)) = real_t(.5) * (
-            src(pi<d>(i - dist, j, k)) +
-            src(pi<d>(i + dist, j, k))
+          arr(pi<d>(i, j, k)) = real_t(.5) * (
+            arr(pi<d>(i - dist, j, k)) +
+            arr(pi<d>(i + dist, j, k))
           );
         }
 
-        void interpolate_refinee(arrvec_t<typename parent_t::arr_t> &dst,
-                                 const arrvec_t<typename parent_t::arr_t> &src,
-                                 const int stride)
+        void interpolate_refinee(const int e = 0)
+//        arrvec_t<typename parent_t::arr_t> &dst,
+//                                 const arrvec_t<typename parent_t::arr_t> &src,
+//                                 const int stride)
         {
           using namespace arakawa_c; // for rng_t operator^
-          assert(dist % 2 == 0);
+          const auto stride = this->ijk_r2r[0].stride();
+          assert(stride % 2 == 0);
+          assert(this->ijk_r2r[0].stride() == this->ijk_r2r[1].stride() == this->ijk_r2r[2].stride());
           const auto hstride = stride / 2;
 
-//          auto ex = this->halo - 1;
-          intrp<0>(dst[0], src[0], this->ijk_r2r[0]^hstride, this->ijk_r2r[1], this->ijk_r2r[2], hstride);
-          intrp<1>(dst[1], src[1], this->ijk_r2r[1]^hstride, this->ijk_r2r[2], this->ijk_r2r[0], hstride);
-          intrp<2>(dst[2], src[2], this->ijk_r2r[2]^hstride, this->ijk_r2r[0], this->ijk_r2r[1], hstride);
+          // first round of interpolation
+//          interpolate_refinee_on_edges(); // with MPI, some refined points are at the edges of the domain; calculate them using halos of non-refined arrays
+
+          // interpolate between points of the large grid
+          intrp<0>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[0]), this->ijk_r2r[1], this->ijk_r2r[2], hstride);
+//          intrp<1>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[1]), this->ijk_r2r[2], this->ijk_r2r[0], hstride);
+//          intrp<2>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[2]), this->ijk_r2r[0], this->ijk_r2r[1], hstride);
+
+//          std::cerr << "midpoints 0: " << this->rng_midpoints(this->ijk_r2r[0]) << std::endl;
+//          std::cerr << "midpoints 1: " << this->rng_midpoints(this->ijk_r2r[1]) << std::endl;
+//          std::cerr << "midpoints 2: " << this->rng_midpoints(this->ijk_r2r[2]) << std::endl;
+
+          // interpolate between points calculated in the previous step
+
+          // interpolate between points calculated in the previous step
+
+          // subsequent rounds of interpolation ...
         }
 
         public:
