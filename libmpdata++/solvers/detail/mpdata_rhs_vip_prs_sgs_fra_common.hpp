@@ -43,11 +43,24 @@ namespace libmpdataxx
 
 //        static rng_t rng_sclr_ref(const rng_t &rng) { return rng^halo_ref; }
 
-        // what if 
         static rng_t rng_midpoints(const rng_t &rng) 
         {
+          assert(rng.stride() % 2 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
           else return rng_t(rng.first() + rng.stride() / 2, rng.last() - rng.stride() / 2, rng.stride()); 
+        }
+
+        static rng_t rng_midpoints_out(const rng_t &rng) 
+        {
+          assert(rng.stride() % 4 == 0);
+          if(rng.last() - rng.first() < rng.stride()) return rng;
+          else return rng_t(rng.first() - rng.stride() / 4, rng.last() + rng.stride() / 4, rng.stride() / 2); 
+        }
+
+        static rng_t rng_half_stride(const rng_t &rng) 
+        {
+          assert(rng.stride() % 2 == 0);
+          return rng_t(rng.first(), rng.last(), rng.stride() / 2); 
         }
 
         public:

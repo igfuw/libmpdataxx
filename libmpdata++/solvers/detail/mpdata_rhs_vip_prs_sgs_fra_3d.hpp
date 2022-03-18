@@ -70,30 +70,67 @@ namespace libmpdataxx
 //                                 const int stride)
         {
           using namespace arakawa_c; // for rng_t operator^
-          const auto stride = this->ijk_r2r[0].stride();
-          assert(stride % 2 == 0);
-          assert(this->ijk_r2r[0].stride() == this->ijk_r2r[1].stride() == this->ijk_r2r[2].stride());
-          const auto hstride = stride / 2;
-//          std::cerr << "hstride: " << hstride << std::endl;
 
-          // first round of interpolation
 //          interpolate_refinee_on_edges(); // with MPI, some refined points are at the edges of the domain; calculate them using halos of non-refined arrays
 
+          // first round of interpolation
+          auto stride = this->ijk_r2r[0].stride();
+          assert(stride % 2 == 0);
+          assert(this->ijk_r2r[0].stride() == this->ijk_r2r[1].stride() == this->ijk_r2r[2].stride());
+          auto hstride = stride / 2;
+
+          const auto mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0]);
+          const auto mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1]);
+          const auto mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
+
           // interpolate between points of the large grid
-          intrp<0>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[0]), this->ijk_r2r[1], this->ijk_r2r[2], hstride);
-          intrp<1>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[1]), this->ijk_r2r[2], this->ijk_r2r[0], hstride);
-          intrp<2>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[2]), this->ijk_r2r[0], this->ijk_r2r[1], hstride);
+          intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, this->ijk_r2r[1], this->ijk_r2r[2], hstride);
+          intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, this->ijk_r2r[2], this->ijk_r2r[0], hstride);
+          intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, this->ijk_r2r[0], this->ijk_r2r[1], hstride);
 
-//          std::cerr << "midpoints 0: " << this->rng_midpoints(this->ijk_r2r[0]) << std::endl;
-//          std::cerr << "refinee at midpoints 0: " << this->mem->refinee(e)(this->rng_midpoints(this->ijk_r2r[0]), this->ijk_r2r[1], this->ijk_r2r[2]) << std::endl;
-//          std::cerr << "midpoints 1: " << this->rng_midpoints(this->ijk_r2r[1]) << std::endl;
-//          std::cerr << "midpoints 2: " << this->rng_midpoints(this->ijk_r2r[2]) << std::endl;
+          // interpolate between just interpolated points
+          intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, mid_ijk_r2r_1, this->ijk_r2r[2], hstride);
+          intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, this->ijk_r2r[0], hstride);
+          intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, this->ijk_r2r[1], hstride);
 
-          // interpolate between points calculated in the previous step
+          intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, this->ijk_r2r[1], mid_ijk_r2r_2, hstride);
+          intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, this->ijk_r2r[2], mid_ijk_r2r_0, hstride);
+          intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, this->ijk_r2r[0], mid_ijk_r2r_1, hstride);
 
-          // interpolate between points calculated in the previous step
+          intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2, hstride);
+          intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, mid_ijk_r2r_0, hstride);
+          intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
 
           // subsequent rounds of interpolation ...
+
+          stride = mid_ijk_r2r_0_2.stride();
+          assert(stride % 2 == 0);
+          assert(mid_ijk_r2r_0_2.stride() == mid_ijk_r2r_1_2.stride() == mid_ijk_r2r_2_2.stride());
+          hstride = stride / 2;
+
+          const auto mid_ijk_r2r_0_2 = this->rng_midpoints_out(mid_ijk_r2r_0);
+          const auto mid_ijk_r2r_1_2 = this->rng_midpoints_out(mid_ijk_r2r_1);
+          const auto mid_ijk_r2r_2_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
+
+          const auto ijk_r2r_0_h = this->rng_half_stride(this->ijk_r2r[0]);
+          const auto ijk_r2r_1_h = this->rng_half_stride(this->ijk_r2r[1]);
+          const auto ijk_r2r_2_h = this->rng_half_stride(this->ijk_r2r[2]);
+
+          intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0_2, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+          intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1_2, ijk_r2r_2_h, ijk_r2r_0_h, hstride);
+          intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2_2, ijk_r2r_0_h, ijk_r2r_1_h, hstride);
+
+          intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0_2, mid_ijk_r2r_1_2, ijk_r2r_2_h, hstride);
+          intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1_2, mid_ijk_r2r_2_2, ijk_r2r_0_h, hstride);
+          intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2_2, mid_ijk_r2r_0_2, ijk_r2r_1_h, hstride);
+
+          intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0_2, ijk_r2r_1_h, mid_ijk_r2r_2_2, hstride);
+          intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1_2, ijk_r2r_2_h, mid_ijk_r2r_0_2, hstride);
+          intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2_2, ijk_r2r_0_h, mid_ijk_r2r_1_2, hstride);
+
+          intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0_2, mid_ijk_r2r_1_2, mid_ijk_r2r_2_2, hstride);
+          intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1_2, mid_ijk_r2r_2_2, mid_ijk_r2r_0_2, hstride);
+          intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2_2, mid_ijk_r2r_0_2, mid_ijk_r2r_1_2, hstride);
         }
 
         public:
