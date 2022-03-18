@@ -42,13 +42,25 @@ namespace libmpdataxx
           const int &dist
         )
         {
-          using idxperm::pi;
-          using namespace arakawa_c;
+          using idxperm::pis;
+//          using namespace arakawa_c;
           using real_t = typename ct_params_t::real_t;
 
-          arr(pi<d>(i, j, k)) = real_t(.5) * (
-            arr(pi<d>(i - dist, j, k)) +
-            arr(pi<d>(i + dist, j, k))
+//          std::cerr << "range: " << i << " " << j << " " << k << std::endl;
+//          std::cerr << "range - dist: " << i - dist << " " << j << " " << k << std::endl;
+//          std::cerr << "range + dist: " << i + dist << " " << j << " " << k << std::endl;
+//
+//          std::cerr << "arr range: " << arr(i, j, k) << std::endl;
+//          std::cerr << "arr range - dist: " << arr(i - dist, j, k) << std::endl;
+//          std::cerr << "arr range + dist: " << arr(i + dist, j, k) << std::endl;
+//
+//          std::cerr << "arr range pi: " << arr(pis<d>(i, j, k)) << std::endl;
+//          std::cerr << "arr range - dist pi: " << arr(pis<d>(i - dist, j, k)) << std::endl;
+//          std::cerr << "arr range + dist pi: " << arr(pis<d>(i + dist, j, k)) << std::endl;
+
+          arr(pis<d>(i, j, k)) = real_t(.5) * (
+            arr(pis<d>(i - dist, j, k)) +
+            arr(pis<d>(i + dist, j, k))
           );
         }
 
@@ -62,16 +74,18 @@ namespace libmpdataxx
           assert(stride % 2 == 0);
           assert(this->ijk_r2r[0].stride() == this->ijk_r2r[1].stride() == this->ijk_r2r[2].stride());
           const auto hstride = stride / 2;
+//          std::cerr << "hstride: " << hstride << std::endl;
 
           // first round of interpolation
 //          interpolate_refinee_on_edges(); // with MPI, some refined points are at the edges of the domain; calculate them using halos of non-refined arrays
 
           // interpolate between points of the large grid
           intrp<0>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[0]), this->ijk_r2r[1], this->ijk_r2r[2], hstride);
-//          intrp<1>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[1]), this->ijk_r2r[2], this->ijk_r2r[0], hstride);
-//          intrp<2>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[2]), this->ijk_r2r[0], this->ijk_r2r[1], hstride);
+          intrp<1>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[1]), this->ijk_r2r[2], this->ijk_r2r[0], hstride);
+          intrp<2>(this->mem->refinee(e), this->rng_midpoints(this->ijk_r2r[2]), this->ijk_r2r[0], this->ijk_r2r[1], hstride);
 
 //          std::cerr << "midpoints 0: " << this->rng_midpoints(this->ijk_r2r[0]) << std::endl;
+//          std::cerr << "refinee at midpoints 0: " << this->mem->refinee(e)(this->rng_midpoints(this->ijk_r2r[0]), this->ijk_r2r[1], this->ijk_r2r[2]) << std::endl;
 //          std::cerr << "midpoints 1: " << this->rng_midpoints(this->ijk_r2r[1]) << std::endl;
 //          std::cerr << "midpoints 2: " << this->rng_midpoints(this->ijk_r2r[2]) << std::endl;
 

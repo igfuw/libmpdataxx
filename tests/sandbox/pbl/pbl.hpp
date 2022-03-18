@@ -62,13 +62,16 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
       if (this->rank == 0) std::cout << this->timestep << std::endl;
 
       // test filling of refinee
-      this->mem->refinee(ix::tht)(this->ijk_ref) = blitz::tensor::k; // anything
+      //this->mem->refinee(ix::tht)(this->ijk_ref) = blitz::tensor::k * 1e-3; // anything
+      this->mem->refinee(ix::tht)(this->ijk_ref) = -1;
       //this->mem->refinee(ix::tht) = blitz::tensor::k; // anything
-      std::cerr << "refinee: " << this->mem->refinee(ix::tht);
-      std::cerr << "refinee(ijk_ref): " << this->mem->refinee(ix::tht)(this->ijk_ref);
-      std::cerr << "refinee(ijk_r2r): " << this->mem->refinee(ix::tht)(this->ijk_r2r);
+
       // copy tht to refined tht at position where they overlap
       this->mem->refinee(ix::tht)(this->ijk_r2r) = this->mem->advectee(ix::tht)(this->ijk);
+
+//      std::cerr << "refinee: " << this->mem->refinee(ix::tht);
+//      std::cerr << "refinee(ijk_ref): " << this->mem->refinee(ix::tht)(this->ijk_ref);
+//      std::cerr << "refinee(ijk_r2r): " << this->mem->refinee(ix::tht)(this->ijk_r2r);
 
       this->interpolate_refinee(ix::tht);
 
