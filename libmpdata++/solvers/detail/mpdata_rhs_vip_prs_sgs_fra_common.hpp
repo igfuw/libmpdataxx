@@ -32,7 +32,8 @@ namespace libmpdataxx
         protected:
 
 //        const int n_fra; // number of fields with fractal reconstruction
-        const int n_ref; // number of refinements; refined resolution is dx / n_ref
+        const int n_ref, // number of refinements; refined resolution is dx / n_ref
+                  n_fra_iter;
         
         // refined arrays have no halos (do they need them? halos can be added by extending grid_size in alloc() in mpdata_rhs_vip_prs_sgs_fra.hpp by e.g. mem->n_ref/2)
 //        const int halo_ref; // size of halos of refined scalar (and vector?) arrays
@@ -43,11 +44,14 @@ namespace libmpdataxx
 
 //        static rng_t rng_sclr_ref(const rng_t &rng) { return rng^halo_ref; }
 
-        static rng_t rng_midpoints(const rng_t &rng) 
+        static rng_t rng_midpoints(const rng_t &rng, const int rank = 0, const int size = 1) 
         {
           assert(rng.stride() % 2 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
-          else return rng_t(rng.first() + rng.stride() / 2, rng.last() - rng.stride() / 2, rng.stride()); 
+          else return rng_t(
+            rank == 0 ? rng.first() + rng.stride() / 2 : rng.first() - rng.stride() / 2,
+            rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
+            rng.stride()); 
         }
 
         static rng_t rng_midpoints_out(const rng_t &rng) 
@@ -76,6 +80,7 @@ namespace libmpdataxx
           const rt_params_t &p
         ) :
           parent_t(args, p),
+          n_fra_iter(p.n_fra_iter),
           n_ref(this->mem->n_ref),
 //          halo_ref(n_ref / 2),
           // ijk_ref init below assumes 3D (shmem decomp dim along y);
