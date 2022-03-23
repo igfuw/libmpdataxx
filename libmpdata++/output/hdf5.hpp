@@ -523,12 +523,11 @@ namespace libmpdataxx
           group.createAttribute("opts", type, H5::DataSpace(1, &one)).write(type, opts_str.data());
         }
         {
-          const auto type = flttype_solver;
-          group.createAttribute("dt", type, H5::DataSpace(1, &one)).write(type, &this->dt);
+          group.createAttribute("dt", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->dt);
           const auto names = std::vector<std::string>{"di", "dj", "dk"};
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            group.createAttribute(names[d], type, H5::DataSpace(1, &one)).write(type, &this->dijk[d]);
+            group.createAttribute(names[d], flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->dijk[d]);
           }
         }
         {
@@ -538,8 +537,7 @@ namespace libmpdataxx
         }
         if (parent_t::ct_params_t_::var_dt)
         {
-          const auto type = flttype_solver;
-          group.createAttribute("max_courant", type, H5::DataSpace(1, &one)).write(type, &this->max_courant);
+          group.createAttribute("max_courant", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->max_courant);
         }
         {
           const auto type = H5::PredType::NATIVE_INT;
@@ -585,8 +583,7 @@ namespace libmpdataxx
           group.createAttribute("prs_scheme", type, H5::DataSpace(1, &one)).write(type, prs_scheme_str.data());
         }
         {
-          const auto type = flttype_solver;
-          group.createAttribute("prs_tol", type, H5::DataSpace(1, &one)).write(type, &this->prs_tol);
+          group.createAttribute("prs_tol", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->prs_tol);
         }
       }
 
@@ -608,8 +605,7 @@ namespace libmpdataxx
           group.createAttribute("stress_diff", type, H5::DataSpace(1, &one)).write(type, sdiff_str.data());
         }
         {
-          const auto type = flttype_solver;
-          group.createAttribute("cdrag", type, H5::DataSpace(1, &one)).write(type, &this->cdrag);
+          group.createAttribute("cdrag", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->cdrag);
         }
       }
 
@@ -620,8 +616,7 @@ namespace libmpdataxx
 
         const auto &group = hdfcp.openGroup("sgs");
         {
-          const auto type = flttype_solver;
-          group.createAttribute("eta", type, H5::DataSpace(1, &one)).write(type, &this->eta);
+          group.createAttribute("eta", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->eta);
         }
       }
 
@@ -632,9 +627,8 @@ namespace libmpdataxx
 
         const auto &group = hdfcp.openGroup("sgs");
         {
-          const auto type = flttype_solver;
-          group.createAttribute("smg_c", type, H5::DataSpace(1, &one)).write(type, &this->smg_c);
-          group.createAttribute("c_m", type, H5::DataSpace(1, &one)).write(type, &this->c_m);
+          group.createAttribute("smg_c", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->smg_c);
+          group.createAttribute("c_m", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->c_m);
         }
       }
 
@@ -648,10 +642,9 @@ namespace libmpdataxx
         hdfcp.createGroup("boussinesq");
         const auto &group = hdfcp.openGroup("boussinesq");
         {
-          const auto type = flttype_solver;
-          group.createAttribute("g", type, H5::DataSpace(1, &one)).write(type, &this->g);
-          group.createAttribute("Tht_ref", type, H5::DataSpace(1, &one)).write(type, &this->Tht_ref);
-          group.createAttribute("hflux_const", type, H5::DataSpace(1, &one)).write(type, &this->hflux_const);
+          group.createAttribute("g", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->g);
+          group.createAttribute("Tht_ref", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->Tht_ref);
+          group.createAttribute("hflux_const", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->hflux_const);
         }
         {
           auto dset = group.createDataSet("tht_e", flttype_output, sspace);
@@ -666,8 +659,7 @@ namespace libmpdataxx
 
         const auto &group = hdfcp.openGroup("boussinesq");
         {
-          const auto type = flttype_solver;
-          group.createAttribute("prandtl_num", type, H5::DataSpace(1, &one)).write(type, &this->prandtl_num);
+          group.createAttribute("prandtl_num", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->prandtl_num);
         }
         {
           auto dset = group.createDataSet("mix_len", flttype_output, sspace);
