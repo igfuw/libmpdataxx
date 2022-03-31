@@ -54,11 +54,14 @@ namespace libmpdataxx
             rng.stride()); 
         }
 
-        static rng_t rng_midpoints_out(const rng_t &rng) 
+        static rng_t rng_midpoints_out(const rng_t &rng, const int rank = 0, const int size = 1) 
         {
           assert(rng.stride() % 4 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
-          else return rng_t(rng.first() - rng.stride() / 4, rng.last() + rng.stride() / 4, rng.stride() / 2); 
+          else return rng_t(
+            rank == 0 ? rng.first() - rng.stride() / 4 : rng.first() + rng.stride() / 4,
+            rank == size - 1 ? rng.last() + rng.stride() / 4 : rng.last() - rng.stride() / 4, 
+            rng.stride() / 2); 
         }
 
         static rng_t rng_half_stride(const rng_t &rng) 

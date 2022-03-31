@@ -46,7 +46,13 @@ namespace libmpdataxx
 //          using namespace arakawa_c;
           using real_t = typename ct_params_t::real_t;
 
-//          std::cerr << "range: " << i << " " << j << " " << k << std::endl;
+//          if(d==0)
+//            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+//          if(d==1)
+//            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+//          if(d==2)
+//            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+
 //          std::cerr << "range - dist: " << i - dist << " " << j << " " << k << std::endl;
 //          std::cerr << "range + dist: " << i + dist << " " << j << " " << k << std::endl;
 //
@@ -80,10 +86,11 @@ namespace libmpdataxx
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
+            // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
             if(i==0)
             {
-              mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0]);//, this->mem->distmem.rank(), this->mem->distmem.size());
-              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1]);//, this->rank, this->mem->size);
+              mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
+              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size);
               mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
 
               ijk_r2r_0_h = this->ijk_r2r[0];
@@ -92,9 +99,18 @@ namespace libmpdataxx
             }
             else
             {
-              mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
-              mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
-              mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
+              if(i==1)
+              {
+                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0, this->mem->distmem.rank(), this->mem->distmem.size());
+                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1, this->rank, this->mem->size);
+                mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
+              }
+              else
+              {
+                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
+                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
+                mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
+              }
 
               ijk_r2r_0_h = this->rng_half_stride(ijk_r2r_0_h);
               ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h);
@@ -115,12 +131,12 @@ namespace libmpdataxx
             intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
 
             intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, mid_ijk_r2r_2, hstride);
-            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
-            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
+//            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
+//            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
 
             intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2, hstride);
-            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, mid_ijk_r2r_0, hstride);
-            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
+//            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, mid_ijk_r2r_0, hstride);
+//            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
           }
         }
 
