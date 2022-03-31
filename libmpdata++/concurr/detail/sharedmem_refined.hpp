@@ -49,6 +49,13 @@ namespace libmpdataxx
           : parent_t(grid_size, size), n_ref(n_ref)
         {
           assert(n_ref % 2 == 0); // only division into even number of cells, because we assume that one of the refined scalar points is at the MPI boundary, which is in the middle between normal grid scalars
+
+          // for now, require a grid_size that is convenient for fractal reconstruction (which calculates 2 points based on 3 points)
+          // NOTE: fix this with proper halos (cyclic is easy, but what about rigid?)
+          // NOTE2: this is actually a requirement for fractal reconstruction, not for any grid refinement, so move this somewhere else
+          for (int d = 0; d < n_dims; ++d)
+            if((grid_size[d] - 3) % 2 != 0) throw std::runtime_error("Fractal grid refinement requires nx/ny/nz = 3 + 2 * i, where i = 0,1,2,3,...");
+
           for (int d = 0; d < n_dims; ++d)
           {
             grid_size_ref[d] = refine_grid_size(
