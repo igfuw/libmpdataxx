@@ -67,7 +67,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
       //this->mem->refinee(ix::tht) = blitz::tensor::k; // anything
 
       // copy tht to refined tht at position where they overlap
-      this->mem->refinee(ix::tht)(this->ijk_r2r) = this->mem->advectee(ix::tht)(this->ijk);
+//      this->mem->refinee(ix::tht)(this->ijk_r2r) = this->mem->advectee(ix::tht)(this->ijk);
 
 //      std::cerr << "refinee: " << this->mem->refinee(ix::tht);
 //      std::cerr << "refinee(ijk_ref): " << this->mem->refinee(ix::tht)(this->ijk_ref);
