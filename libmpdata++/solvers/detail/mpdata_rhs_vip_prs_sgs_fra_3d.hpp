@@ -46,12 +46,12 @@ namespace libmpdataxx
 //          using namespace arakawa_c;
           using real_t = typename ct_params_t::real_t;
 
-          if(d==0)
-            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
-          if(d==1)
-            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
-          if(d==2)
-            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+//          if(d==0)
+//            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+//          if(d==1)
+//            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+//          if(d==2)
+//            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
 
 //          std::cerr << "range - dist: " << i - dist << " " << j << " " << k << std::endl;
 //          std::cerr << "range + dist: " << i + dist << " " << j << " " << k << std::endl;
