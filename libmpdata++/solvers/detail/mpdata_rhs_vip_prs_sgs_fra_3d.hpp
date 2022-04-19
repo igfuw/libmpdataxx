@@ -46,12 +46,12 @@ namespace libmpdataxx
 //          using namespace arakawa_c;
           using real_t = typename ct_params_t::real_t;
 
-//          if(d==0)
-//            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
-//          if(d==1)
-//            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
-//          if(d==2)
-//            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+          if(d==0)
+            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+          if(d==1)
+            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+          if(d==2)
+            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
 
 //          std::cerr << "range - dist: " << i - dist << " " << j << " " << k << std::endl;
 //          std::cerr << "range + dist: " << i + dist << " " << j << " " << k << std::endl;
@@ -81,11 +81,12 @@ namespace libmpdataxx
           // TODO: fill halos of advectee perpendicular to axis x? (distmem)
 
           this->mem->psi_ref[e] = -1000;
+            this->mem->barrier();
 
           // fill distmem halos of refinee
           // TODO: move to bcond or sth? would be filled only by remote bcond
           this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].first()-1,
+            this->mem->grid_size_ref[0].first() - this->mem->n_ref/2,
             this->ijk_r2r[1],
             this->ijk_r2r[2]
           ) = 
@@ -95,7 +96,7 @@ namespace libmpdataxx
             this->ijk[2]
           );
           this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].last()+1,
+            this->mem->grid_size_ref[0].last() + this->mem->n_ref/2,
             this->ijk_r2r[1],
             this->ijk_r2r[2]
           ) = 
@@ -131,7 +132,7 @@ namespace libmpdataxx
             if(i==0)
             {
               mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
-              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size);
+              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size, false); 
               mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
 
               ijk_r2r_0_h = this->ijk_r2r[0];
@@ -143,6 +144,8 @@ namespace libmpdataxx
               if(i==1)
               {
                 mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0, this->mem->distmem.rank(), this->mem->distmem.size());
+                if(this->rank > 0)
+                  mid_ijk_r2r_1 = rng_t(mid_ijk_r2r_1.first() - mid_ijk_r2r_1.stride(), mid_ijk_r2r_1.last(), mid_ijk_r2r_1.stride()); // shift back to an overlapping range along y
                 mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1, this->rank, this->mem->size);
                 mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
               }
@@ -153,8 +156,8 @@ namespace libmpdataxx
                 mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
               }
 
-              ijk_r2r_0_h = this->rng_half_stride(ijk_r2r_0_h);
-              ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h);
+              ijk_r2r_0_h = this->rng_half_stride(ijk_r2r_0_h, this->mem->distmem.rank(), this->mem->distmem.size());
+              ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size, false);
               ijk_r2r_2_h = this->rng_half_stride(ijk_r2r_2_h);
             }
 
@@ -168,17 +171,51 @@ namespace libmpdataxx
             intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, ijk_r2r_1_h, hstride);
 
             intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
-            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, ijk_r2r_0_h, hstride);
-//            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, mid_ijk_r2r_1, ijk_r2r_2_h, hstride);
-
-//            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, mid_ijk_r2r_2, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
+            this->mem->barrier(); // necessary before interpolation along sharedmem y direction
             intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
-//            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
 
-// necessary?
-            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, mid_ijk_r2r_0, hstride);
-//            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2, hstride);
-//            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
+
+/*
+            if(this->rank == 0)
+            {
+
+            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, ijk_r2r_0_h, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, ijk_r2r_1_h, hstride);
+
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
+            //intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, ijk_r2r_0_h, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
+            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
+
+            //intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, mid_ijk_r2r_0, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
+
+              std::cerr << std::endl;
+            }
+            this->mem->barrier();
+            if(this->rank == 1)
+            {
+
+            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, ijk_r2r_0_h, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, ijk_r2r_1_h, hstride);
+
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
+            //intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, ijk_r2r_0_h, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
+            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
+
+            //intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, mid_ijk_r2r_0, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
+
+              std::cerr << std::endl;
+            }
+            */
+
+            this->mem->barrier();
           }
         }
 

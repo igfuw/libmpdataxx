@@ -44,14 +44,20 @@ namespace libmpdataxx
 
 //        static rng_t rng_sclr_ref(const rng_t &rng) { return rng^halo_ref; }
 
-        static rng_t rng_midpoints(const rng_t &rng, const int rank = 0, const int size = 1) 
+        static rng_t rng_midpoints(const rng_t &rng, const int rank = 0, const int size = 1, const bool overlap = true) // input range, rank and size of thread / MPI process, should created ranges have overlaps between different ranks 
         {
           assert(rng.stride() % 2 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
-          else return rng_t(
-            rank == 0 ? rng.first() + rng.stride() / 2 : rng.first() - rng.stride() / 2,
-            rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
-            rng.stride()); 
+          else if (overlap)
+            return rng_t(
+              rank == 0 ? rng.first() + rng.stride() / 2 : rng.first() - rng.stride() / 2,
+              rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
+              rng.stride()); 
+          else
+            return rng_t(
+              rng.first() + rng.stride() / 2,
+              rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
+              rng.stride()); 
         }
 
         static rng_t rng_midpoints_out(const rng_t &rng, const int rank = 0, const int size = 1) 
@@ -64,10 +70,19 @@ namespace libmpdataxx
             rng.stride() / 2); 
         }
 
-        static rng_t rng_half_stride(const rng_t &rng) 
+        static rng_t rng_half_stride(const rng_t &rng, const int rank = 0, const int size = 1, const bool overlap = true) 
         {
           assert(rng.stride() % 2 == 0);
-          return rng_t(rng.first(), rng.last(), rng.stride() / 2); 
+          if(overlap)
+            return rng_t(
+              rank > 0 ? rng.first() - rng.stride() / 2 : rng.first(), 
+              rank < size - 1 ? rng.last() + rng.stride() / 2 : rng.last(), 
+              rng.stride() / 2); 
+          else
+            return rng_t(
+              rng.first(), 
+              rank < size - 1 ? rng.last() + rng.stride() / 2 : rng.last(), 
+              rng.stride() / 2); 
         }
 
         public:
