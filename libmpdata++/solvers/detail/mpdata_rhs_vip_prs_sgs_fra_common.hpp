@@ -31,18 +31,25 @@ namespace libmpdataxx
 
         protected:
 
+        typename parent_t::arr_t c_j, f_j; // parameters used in fractal reconstruction, Akinlabi et al. 2019
+
+
 //        const int n_fra; // number of fields with fractal reconstruction
-        const int n_ref, // number of refinements; refined resolution is dx / n_ref
-                  n_fra_iter;
+        const int n_ref,         // number of refinements; refined resolution is dx / n_ref
+                  n_fra_iter;    // number of iterations of grid refinement
         
         // refined arrays have no halos (do they need them? halos can be added by extending grid_size in alloc() in mpdata_rhs_vip_prs_sgs_fra.hpp by e.g. mem->n_ref/2)
 //        const int halo_ref; // size of halos of refined scalar (and vector?) arrays
 
+        // herlper ranges
         // TODO: make these const!
         idx_t<ct_params_t::n_dims>  ijk_ref; // range of refinee handled by given solver
         const idxs_t<ct_params_t::n_dims> ijk_r2r; // resolved to refined; refined scalars at the same position as resolved scalars
 
 //        static rng_t rng_sclr_ref(const rng_t &rng) { return rng^halo_ref; }
+
+
+        // range modifying methods used in grid refinement
 
         static rng_t rng_midpoints(const rng_t &rng, const int rank = 0, const int size = 1, const bool overlap = true) // input range, rank and size of thread / MPI process, should created ranges have overlaps between different ranks 
         {
@@ -85,9 +92,18 @@ namespace libmpdataxx
               rng.stride() / 2); 
         }
 
+        // reconstruction based on 3 points
+        // input is an array pointing to midpoints (to be reconstructed), but with a stride jumping on each one
+        // returned range points to the first from the pair of reconstructed points
+        // to avoid boundary conditions, in y and z directions it is assumed that the number of points is 3+i*2, i=0,1,2,... (this check is somewhere else)
+        // however in the x direction there can be any number of points, because the domain is divided between mpi processes...
         static rng_t rng_dbl_stride(const rng_t &rng) 
         {
-          return rng_t(rng.first(), rng.last(), 2*rng.stride());
+          assert(rng.last() != rng.first()); // we need at least 2 midpoints
+          if( ((rng.last() - rng.first()) / rng.stride() + 1) % 2 == 0) // even number of midpoints; y and z directions (and sometimes x)
+            return rng_t(rng.first(), rng.last() - rng.stride(), 2*rng.stride());
+          else // uneven number of midpoints
+            return rng_t(rng.first(), rng.last(), 2*rng.stride()); // rely on the halo along x direction
         }
 
         static rng_t rng_merge(const rng_t &rng1, const rng_t &rng2) 
@@ -113,7 +129,7 @@ namespace libmpdataxx
         ) :
           parent_t(args, p),
           n_fra_iter(p.n_fra_iter),
-          n_ref(this->mem->n_ref),
+          n_ref(args.mem->n_ref),
 //          halo_ref(n_ref / 2),
           // ijk_ref init below assumes 3D (shmem decomp dim along y);
           // TODO: move this to concurr_common::init()? add something to ctor_args_t?
@@ -124,7 +140,7 @@ namespace libmpdataxx
             }
         {
           assert(p.n_fra_iter > 0);
-          assert(n_ref & 2 == 0);
+          assert(n_ref % 2 == 0);
 
           for (int d = 0; d < ct_params_t::n_dims; ++d)
           {
