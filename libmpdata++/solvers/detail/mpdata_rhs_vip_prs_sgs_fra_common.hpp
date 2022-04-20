@@ -90,6 +90,15 @@ namespace libmpdataxx
           return rng_t(rng.first(), rng.last(), 2*rng.stride());
         }
 
+        static rng_t rng_merge(const rng_t &rng1, const rng_t &rng2) 
+        {
+          assert(rng1.stride() == rng2.stride());
+          return rng_t(
+            std::min(rng1.first(), rng2.first()),
+            std::max(rng1.last(), rng2.last()),
+            rng1.stride() / 2);
+        }
+
         public:
 
         struct rt_params_t : parent_t::rt_params_t
