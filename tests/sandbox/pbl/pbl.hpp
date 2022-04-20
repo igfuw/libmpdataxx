@@ -88,6 +88,14 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
         this->record_aux_dsc_refined("u refined", this->mem->refinee(ix::u));
       }
       this->mem->barrier();
+
+
+      this->reconstruct_refinee(ix::tht);
+      this->mem->barrier();
+      if (this->rank == 0)
+      {
+        this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(ix::tht));
+      }
     }
   }
 

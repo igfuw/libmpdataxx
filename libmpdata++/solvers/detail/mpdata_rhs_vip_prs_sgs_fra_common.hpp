@@ -85,6 +85,11 @@ namespace libmpdataxx
               rng.stride() / 2); 
         }
 
+        static rng_t rng_dbl_stride(const rng_t &rng) 
+        {
+          return rng_t(rng.first(), rng.last(), 2*rng.stride());
+        }
+
         public:
 
         struct rt_params_t : parent_t::rt_params_t

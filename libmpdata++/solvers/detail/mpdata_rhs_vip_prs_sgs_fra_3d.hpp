@@ -70,6 +70,36 @@ namespace libmpdataxx
           );
         }
 
+        // fractral reconstruction (calculate 2 points based on 3)
+        template<int d, class arr_t>
+        void rcnstrct(
+          arr_t arr,
+          const rng_t &i,
+          const rng_t &j,
+          const rng_t &k,
+          const int &dist
+        )
+        {
+
+          // TODO: move some to formulas::
+
+          using idxperm::pis;
+//          using namespace arakawa_c;
+          using real_t = typename ct_params_t::real_t;
+
+          const rng_t i_next = i + 2*dist;
+
+          arr(pis<d>(i, j, k)) = real_t(.5) * (
+            arr(pis<d>(i - dist, j, k)) +
+            arr(pis<d>(i + dist, j, k))
+          );
+
+          arr(pis<d>(i_next, j, k)) = real_t(.5) * (
+            arr(pis<d>(i_next - dist, j, k)) +
+            arr(pis<d>(i_next + dist, j, k))
+          );
+        }
+
         void interpolate_refinee(const int e = 0)
         {
           using namespace arakawa_c; // for rng_t operator^
@@ -78,8 +108,7 @@ namespace libmpdataxx
           rng_t ijk_r2r_0_h, ijk_r2r_1_h, ijk_r2r_2_h;       // all positions at resolution of given iteration
           int stride, hstride;
 
-          // TODO: fill halos of advectee perpendicular to axis x? (distmem)
-
+          // TEMPORARY
           this->mem->psi_ref[e] = -1000;
             this->mem->barrier();
 
@@ -122,9 +151,6 @@ namespace libmpdataxx
 
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
-
-//          interpolate_refinee_on_edges(); // with MPI, some refined points are at the edges of the domain; calculate them using halos of non-refined arrays
-// TODO: fill halo sclr ?
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
@@ -176,6 +202,151 @@ namespace libmpdataxx
             intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
 
             intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
+
+/*
+            if(this->rank == 0)
+            {
+
+            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, ijk_r2r_0_h, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, ijk_r2r_1_h, hstride);
+
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
+            //intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, ijk_r2r_0_h, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
+            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
+
+            //intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, mid_ijk_r2r_0, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
+
+              std::cerr << std::endl;
+            }
+            this->mem->barrier();
+            if(this->rank == 1)
+            {
+
+            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, ijk_r2r_0_h, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, ijk_r2r_1_h, hstride);
+
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
+            //intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, ijk_r2r_0_h, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
+            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
+
+            //intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, mid_ijk_r2r_2, mid_ijk_r2r_0, hstride);
+            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
+
+              std::cerr << std::endl;
+            }
+            */
+
+            this->mem->barrier();
+          }
+        }
+
+        void reconstruct_refinee(const int e = 0)
+        {
+          using namespace arakawa_c; // for rng_t operator^
+
+          rng_t mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2; // positions between already known values (to be filled during given iteration)
+          rng_t ijk_r2r_0_h, ijk_r2r_1_h, ijk_r2r_2_h;       // all positions at resolution of given iteration
+          int stride, hstride;
+
+          // TEMPORARY
+          this->mem->psi_ref[e] = -1000;
+            this->mem->barrier();
+
+          // fill distmem halos of refinee
+          // TODO: move to bcond or sth? would be filled only by remote bcond
+          this->mem->psi_ref[e](
+            this->mem->grid_size_ref[0].first() - this->mem->n_ref/2,
+            this->ijk_r2r[1],
+            this->ijk_r2r[2]
+          ) = 
+          this->mem->psi[e][0](
+            this->ijk[0].first()-1,
+            this->ijk[1],
+            this->ijk[2]
+          );
+          this->mem->psi_ref[e](
+            this->mem->grid_size_ref[0].last() + this->mem->n_ref/2,
+            this->ijk_r2r[1],
+            this->ijk_r2r[2]
+          ) = 
+          this->mem->psi[e][0](
+            this->ijk[0].last()+1,
+            this->ijk[1],
+            this->ijk[2]
+          );
+
+//          std::cerr << "post left halo fill psi_ref: " << this->mem->psi_ref[e];
+//          std::cerr << "post left halo fill psi: " << this->mem->psi[e][0];
+//          std::cerr << this->mem->psi_ref[e](
+//            this->ijk_r2r[0].first()-1,
+//            this->ijk_r2r[1],
+//            this->ijk_r2r[2]
+//          );
+//          std::cerr <<           this->mem->psi[e][0](
+//            this->ijk[0].first()-1,
+//            this->ijk[1],
+//            this->ijk[2]
+//          );
+
+
+          // fill refined array at position where it overlaps with the resolved array
+          this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
+
+          for(int i=0; i<this->n_fra_iter; ++i)
+          {
+            // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
+            if(i==0)
+            {
+              mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
+              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size, false); 
+              mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
+
+              ijk_r2r_0_h = this->ijk_r2r[0];
+              ijk_r2r_1_h = this->ijk_r2r[1];
+              ijk_r2r_2_h = this->ijk_r2r[2];
+            }
+            else
+            {
+              if(i==1)
+              {
+                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0, this->mem->distmem.rank(), this->mem->distmem.size());
+                if(this->rank > 0)
+                  mid_ijk_r2r_1 = rng_t(mid_ijk_r2r_1.first() - mid_ijk_r2r_1.stride(), mid_ijk_r2r_1.last(), mid_ijk_r2r_1.stride()); // shift back to an overlapping range along y
+                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1, this->rank, this->mem->size);
+                mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
+              }
+              else
+              {
+                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
+                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
+                mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
+              }
+
+              ijk_r2r_0_h = this->rng_half_stride(ijk_r2r_0_h, this->mem->distmem.rank(), this->mem->distmem.size());
+              ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size, false);
+              ijk_r2r_2_h = this->rng_half_stride(ijk_r2r_2_h);
+            }
+
+            stride = ijk_r2r_0_h.stride();
+            assert(ijk_r2r_0_h.stride() == ijk_r2r_1_h.stride() == ijk_r2r_2_h.stride());
+            assert(stride % 2 == 0);
+            hstride = stride / 2;
+
+            rcnstrct<0>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+            rcnstrct<1>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_1), ijk_r2r_2_h, ijk_r2r_0_h, hstride);
+            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), ijk_r2r_0_h, ijk_r2r_1_h, hstride);
+
+            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
+            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
+            this->mem->barrier(); // necessary before interpolation along sharedmem y direction
+            rcnstrct<1>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_1), ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
+
+            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
 
 /*
             if(this->rank == 0)
