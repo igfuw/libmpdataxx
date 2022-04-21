@@ -102,7 +102,7 @@ namespace libmpdataxx
           assert(rng.last() != rng.first()); // we need at least 2 midpoints
           if( ((rng.last() - rng.first()) / rng.stride() + 1) % 2 == 0) // even number of midpoints; y and z directions (and sometimes x)
             return rng_t(rng.first(), rng.last() - rng.stride(), 2*rng.stride());
-          else // uneven number of midpoints
+          else // odd number of midpoints
             return rng_t(rng.first(), rng.last(), 2*rng.stride()); // rely on the halo along x direction
         }
 

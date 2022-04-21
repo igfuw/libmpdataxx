@@ -46,12 +46,14 @@ namespace libmpdataxx
 //          using namespace arakawa_c;
           using real_t = typename ct_params_t::real_t;
 
-//          if(d==0)
-//            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
-//          if(d==1)
-//            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
-//          if(d==2)
-//            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+          // debug output
+          std::cerr << "ranges in interpolation" << std::endl;
+          if(d==0)
+            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+          if(d==1)
+            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+          if(d==2)
+            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
 
 //          std::cerr << "range - dist: " << i - dist << " " << j << " " << k << std::endl;
 //          std::cerr << "range + dist: " << i + dist << " " << j << " " << k << std::endl;
@@ -87,16 +89,95 @@ namespace libmpdataxx
 //          using namespace arakawa_c;
           using real_t = typename ct_params_t::real_t;
 
+          // second reconstructed position (j=2, between i=1 and i=2)
+          const rng_t i_next = i + 2*dist;
+          
+          // debug output
+          std::cerr << "ranges in rcnstrct" << std::endl;
+          if(d==0)
+            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+          if(d==1)
+            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+          if(d==2)
+            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+          // do interpolation, useful for testing if ranges are correct
+          /*
+          arr(pis<d>(i, j, k)) = real_t(.5) * (
+            arr(pis<d>(i - dist, j, k)) +
+            arr(pis<d>(i + dist, j, k))
+            );
+          arr(pis<d>(i_next, j, k)) = real_t(.5) * (
+            arr(pis<d>(i_next - dist, j, k)) +
+            arr(pis<d>(i_next + dist, j, k))
+            );
+          return;
+          */
+          // end of the interpolation test
+
+
           // stretching parameter, TODO: draw it from the distribution
           const real_t d_1 = -pow(2, -1./3.),
                        d_2 =  pow(2, -1./3.);
 
+
+// solution following Scotti and Meneveau Physica D 1999
+
+          // helper references
+          // NOTE: these are actually the resolved values only in the first iteration, in the subsequent iterations some of these are reconstructed values
+          //       should we point to the resolved values in all iterations?? 
+          const arr_t u_im1 = arr(pis<d>(i      - dist, j, k)), // resolved u_(i-1)
+                      u_i   = arr(pis<d>(i      + dist, j, k)), // resolved u_(i)
+                      u_ip1 = arr(pis<d>(i_next + dist, j, k)); // resolved u_(i+1)
+
+          // c_j and f_j naming comes from the Akinlabi paper, TODO: rename to a_i b_i
+          // NOTE: in multiple iterations of reconstruction, they only change due to random stretching parameters? 
+          //       or the stretching parameter should be drawn from the distro once? then no need for c_j and f_j to have the same size as reconstructed fields...
+          arr_t a_1 = this->c_j(pis<d>(i,      j, k)),
+                a_2 = this->c_j(pis<d>(i_next, j, k)),
+                b_1 = this->f_j(pis<d>(i,      j, k)),
+                b_2 = this->f_j(pis<d>(i_next, j, k));
+
+          // Eqs. (13) and (14) from Scotti Meneveau 1999 
+          a_1 = u_i - u_im1 - d_1*(u_ip1 - u_im1);
+          a_2 = u_ip1 - u_i - d_2*(u_ip1 - u_im1);
+          b_1 = u_im1*(real_t(1) - d_1); 
+          b_2 = u_i - d_2*u_im1; 
+
+          // W(u_0(xi)) at xi=1/4, between u_i-1 and u_i
+          // u_0(2*xi) = u_i-1 + 1/2 * (u_i+1 - u_i-1)
+          // Eq. (6) and caption of fig. 1 Scotti 1999
+          // NOTE: in multiple iterations, should xi be between the 3 resolved points? or should we consider the reconstructed points as new resolved points?
+          arr(pis<d>(i,      j, k)) = d_1 * 
+//                                      (u_im1 + 0.5 * (u_ip1 - u_im1)) + // u_0(2*xi)
+                                      u_i + 
+                                      0.5 * a_1 + b_1;                  // q_1(2*xi)
+          // W(u_0(xi)) at xi=3/4, between u_i and u_i+1
+          // u_0(2*xi-1) = u_i-1 + 1/2 * (u_i+1 - u_i-1)
+          // NOTE: u_0(2*3/4-1) == u_0(2*1/4), so calculate it once in the previous step and store it...
+          arr(pis<d>(i_next, j, k)) = d_2 * 
+//                                      (u_im1 + 0.5 * (u_ip1 - u_im1)) + // u_0(2*xi-1)
+                                      u_i + 
+                                      0.5 * a_2 + b_2;                  // q_2(2*xi-1)
+
+          // Eq. (5) Scotti and Meneveau PRL 1997, a_1 and a_2 differ from Scotti Meneveau 1999 !
+          // NOTE: in the 1999 paper, a_1 and a_2 are multipled by 2*xi and 2*xi-1, respectively
+          //       in the 1997 paper, the are both multipled by xi
+          /*
+          a_1 = 2 * (u_im1 - u_i - d_1*(u_ip1 - u_im1));
+          a_2 = 2 * (u_ip1 - u_i - d_2*(u_ip1 - u_im1));
+          b_1 = u_im1*(real_t(1) - d_1); 
+          b_2 = u_i - d_2*u_im1; 
+          */
+
+          //const real_t xi[3] = {0, 0.5, 1};
+
+
+// solution following Akinlabi et al.
+/*
+
           const int x[3] = {0, 1, 2};
 
-          // second interpolated position (j=2, between i=1 and i=2)
-          const rng_t i_next = i + 2*dist;
-
-          // helper references, follows Akinlabi et al.
+          // helper references
           const arr_t u_0 = arr(pis<d>(i      - dist, j, k)),
                       u_1 = arr(pis<d>(i      + dist, j, k)),
                       u_2 = arr(pis<d>(i_next + dist, j, k));
@@ -117,6 +198,7 @@ namespace libmpdataxx
           // new u, at j=2, between i=1 and i=2, result of w_j=2(u_i=1), Eq. (1) in Akinlabi et al.
           arr(pis<d>(i_next, j, k)) = c_2 * 2*dist + d_2 * u_1 + f_2;
           // not sure about * 2*dist here (is x_1 == 2*dist?)
+          */
 
 /*
             c_j(pis<d>(i, j, k)) * x_j + 
