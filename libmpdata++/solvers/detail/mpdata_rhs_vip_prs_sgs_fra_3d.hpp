@@ -313,8 +313,8 @@ namespace libmpdataxx
             // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
             if(i==0)
             {
-              mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size(), false);
-              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size, false); 
+              mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
+              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size); 
               mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
 
   //            ijk_r2r_0_h = this->ijk_r2r[0];
@@ -325,10 +325,8 @@ namespace libmpdataxx
             {
               if(i==1)
               {
-                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0, this->mem->distmem.rank(), this->mem->distmem.size());
-//                if(this->rank > 0)
-  //                mid_ijk_r2r_1 = rng_t(mid_ijk_r2r_1.first() - mid_ijk_r2r_1.stride(), mid_ijk_r2r_1.last(), mid_ijk_r2r_1.stride()); // shift back to an overlapping range along y
-                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1, this->rank, this->mem->size);
+                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
+                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
                 mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
               }
               else
@@ -339,7 +337,7 @@ namespace libmpdataxx
               }
 
 //              ijk_r2r_0_h = this->rng_half_stride(ijk_r2r_0_h, this->mem->distmem.rank(), this->mem->distmem.size());
-              ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size, false);
+              ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size);
               ijk_r2r_2_h = this->rng_half_stride(ijk_r2r_2_h);
             }
 
@@ -350,30 +348,27 @@ namespace libmpdataxx
             assert(stride % 2 == 0);
             hstride = stride / 2;
 
+            const int halo_size = 1; // 2 for reconstruction
+            const rng_t ijk_r2r_0_h_with_halo(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride);
+
 
 //            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
 //            this->mem->barrier();
 //            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), hstride);
 //            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
-std::cerr << "this->mem->grid_size[0]: " << this->mem->grid_size[0] << std::endl;
-std::cerr << "this->mem->grid_size_ref[0]: " << this->mem->grid_size_ref[0] << std::endl;
-std::cerr << "this->ijk_r2r[0]: " << this->ijk_r2r[0] << std::endl;
-std::cerr << "mid_ijk_r2r_0: " << mid_ijk_r2r_0 << std::endl;
+//std::cerr << "this->mem->grid_size[0]: " << this->mem->grid_size[0] << std::endl;
+//std::cerr << "this->mem->grid_size_ref[0]: " << this->mem->grid_size_ref[0] << std::endl;
+//std::cerr << "this->ijk_r2r[0]: " << this->ijk_r2r[0] << std::endl;
+//std::cerr << "mid_ijk_r2r_0: " << mid_ijk_r2r_0 << std::endl;
 
-if(this->rank==0)
-  std::cerr << "(63,2,0) before intrp iter " << i << " : " << this->mem->psi_ref[e](63,2,0) << std::endl;
             intrp<0>(this->mem->psi_ref[e], mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
-  std::cerr << "(63,2,0) after intrp<0> iter " << i << " : " << this->mem->psi_ref[e](63,2,0) << std::endl;
             this->mem->barrier();
 
 //            intrp<1>(this->mem->psi_ref[e], mid_ijk_r2r_1, ijk_r2r_2_h, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), hstride);
-            const int halo_size = 1; // 2 for reconstruction
-            const rng_t ijk_0_with_halo_h(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride);
-            intrp<1>(this->mem->psi_ref[e], mid_ijk_r2r_1, ijk_r2r_2_h, ijk_0_with_halo_h, hstride);
+            intrp<1>(this->mem->psi_ref[e], mid_ijk_r2r_1, ijk_r2r_2_h, ijk_r2r_0_h_with_halo, hstride);
 
-  std::cerr << "(63,2,0) after intrp<1> iter " << i << " : " << this->mem->psi_ref[e](63,2,0) << std::endl;
             //intrp<2>(this->mem->psi_ref[e], mid_ijk_r2r_2, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
-            intrp<2>(this->mem->psi_ref[e], mid_ijk_r2r_2, ijk_0_with_halo_h, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
+            intrp<2>(this->mem->psi_ref[e], mid_ijk_r2r_2, ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
 
 
 /*

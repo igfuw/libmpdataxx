@@ -52,48 +52,33 @@ namespace libmpdataxx
 
         // range modifying methods used in grid refinement
 
-        static rng_t rng_midpoints(const rng_t &rng, const int rank = 0, const int size = 1, const bool overlap = true) // input range, rank and size of thread / MPI process, should created ranges have overlaps between different ranks 
+        static rng_t rng_midpoints(const rng_t &rng, const int rank = 0, const int size = 1) 
         {
           assert(rng.stride() % 2 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
-          if (overlap)
-            return rng_t(
-              rank == 0 ? rng.first() + rng.stride() / 2 : rng.first() - rng.stride() / 2,
-              rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
-              rng.stride()); 
-          else
-            return rng_t(
-              rng.first() + rng.stride() / 2,
-              rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
-              rng.stride()); 
+          return rng_t(
+            rng.first() + rng.stride() / 2,
+            rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
+            rng.stride()); 
         }
 
-        static rng_t rng_midpoints_out(const rng_t &rng, const int rank = 0, const int size = 1) 
+        static rng_t rng_midpoints_out(const rng_t &rng) 
         {
           assert(rng.stride() % 4 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
           else return rng_t(
-            //rank == 0 ? rng.first() - rng.stride() / 4 : rng.first() + rng.stride() / 4,
             rng.first() - rng.stride() / 4,
-            //rank == size - 1 ? rng.last() + rng.stride() / 4 : rng.last() - rng.stride() / 4, 
             rng.last() + rng.stride() / 4, 
             rng.stride() / 2); 
         }
 
-        static rng_t rng_half_stride(const rng_t &rng, const int rank = 0, const int size = 1, const bool overlap = true) 
+        static rng_t rng_half_stride(const rng_t &rng, const int rank = 0, const int size = 1) 
         {
           assert(rng.stride() % 2 == 0);
-          if(overlap)
-            return rng_t(
-//              rank > 0 ? rng.first() - rng.stride() / 2 : rng.first(), 
-              rng.first(),
-              rank < size - 1 ? rng.last() + rng.stride() / 2 : rng.last(), 
-              rng.stride() / 2); 
-          else
-            return rng_t(
-              rng.first(), 
-              rank < size - 1 ? rng.last() + rng.stride() / 2 : rng.last(), 
-              rng.stride() / 2); 
+          return rng_t(
+            rng.first(), 
+            rank < size - 1 ? rng.last() + rng.stride() / 2 : rng.last(), 
+            rng.stride() / 2); 
         }
 
         // reconstruction based on 3 points
