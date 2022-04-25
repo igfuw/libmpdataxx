@@ -47,9 +47,6 @@ namespace libmpdataxx
         idx_t<ct_params_t::n_dims>  ijk_ref; // range of refinee handled by given solver
         const idxs_t<ct_params_t::n_dims> ijk_r2r; // resolved to refined; refined scalars at the same position as resolved scalars
 
-//        static rng_t rng_sclr_ref(const rng_t &rng) { return rng^halo_ref; }
-
-
         // range modifying methods used in grid refinement
 
         static rng_t rng_midpoints(const rng_t &rng, const int rank = 0, const int size = 1) 
