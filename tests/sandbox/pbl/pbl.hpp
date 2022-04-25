@@ -90,12 +90,12 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
       this->mem->barrier();
 
 
-      this->reconstruct_refinee(ix::tht);
-      this->mem->barrier();
-      if (this->rank == 0)
-      {
-        this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(ix::tht));
-      }
+//      this->reconstruct_refinee(ix::tht);
+//      this->mem->barrier();
+//      if (this->rank == 0)
+//      {
+//        this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(ix::tht));
+//      }
     }
   }
 

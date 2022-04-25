@@ -20,6 +20,7 @@ namespace libmpdataxx
   {
     namespace detail
     {
+      // TODO: minimum halo size is 2
       template <class ct_params_t, int minhalo>
       class mpdata_rhs_vip_prs_sgs_fra_common : public mpdata_rhs_vip_prs_sgs<ct_params_t, minhalo>
       {
@@ -72,8 +73,10 @@ namespace libmpdataxx
           assert(rng.stride() % 4 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
           else return rng_t(
-            rank == 0 ? rng.first() - rng.stride() / 4 : rng.first() + rng.stride() / 4,
-            rank == size - 1 ? rng.last() + rng.stride() / 4 : rng.last() - rng.stride() / 4, 
+            //rank == 0 ? rng.first() - rng.stride() / 4 : rng.first() + rng.stride() / 4,
+            rng.first() - rng.stride() / 4,
+            //rank == size - 1 ? rng.last() + rng.stride() / 4 : rng.last() - rng.stride() / 4, 
+            rng.last() + rng.stride() / 4, 
             rng.stride() / 2); 
         }
 
@@ -82,7 +85,8 @@ namespace libmpdataxx
           assert(rng.stride() % 2 == 0);
           if(overlap)
             return rng_t(
-              rank > 0 ? rng.first() - rng.stride() / 2 : rng.first(), 
+//              rank > 0 ? rng.first() - rng.stride() / 2 : rng.first(), 
+              rng.first(),
               rank < size - 1 ? rng.last() + rng.stride() / 2 : rng.last(), 
               rng.stride() / 2); 
           else
