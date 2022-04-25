@@ -237,6 +237,43 @@ namespace libmpdataxx
 
           // fill distmem halos of refinee
           // TODO: move to bcond or sth? would be filled only by remote bcond
+//if(this->mem->distmem.rank < size-1)
+//{
+          this->mem->psi_ref[e](
+            this->mem->grid_size_ref[0].last() + 1,
+            this->ijk_r2r[1],
+            this->ijk_r2r[2]
+          ) = 
+          this->mem->psi[e][0](
+            this->ijk[0].last()+1,
+            this->ijk[1],
+            this->ijk[2]
+          );
+          this->mem->psi_ref[e](
+            this->mem->grid_size_ref[0].last() + 1 + this->mem->n_ref ,
+            this->ijk_r2r[1],
+            this->ijk_r2r[2]
+          ) = 
+          this->mem->psi[e][0](
+            this->ijk[0].last()+2, // MPI halo size 2 needed!
+            this->ijk[1],
+            this->ijk[2]
+          );
+//}
+
+//if(this->mem->distmem.rank > 0)
+//{
+          this->mem->psi_ref[e](
+            this->mem->grid_size_ref[0].first() - this->mem->n_ref,
+            this->ijk_r2r[1],
+            this->ijk_r2r[2]
+          ) = 
+          this->mem->psi[e][0](
+            this->ijk[0].first()-1, // MPI halo size 2 needed!
+            this->ijk[1],
+            this->ijk[2]
+          );
+          /*
           this->mem->psi_ref[e](
             this->mem->grid_size_ref[0].first() - this->mem->n_ref/2,
             this->ijk_r2r[1],
@@ -247,16 +284,8 @@ namespace libmpdataxx
             this->ijk[1],
             this->ijk[2]
           );
-          this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].last() + this->mem->n_ref/2,
-            this->ijk_r2r[1],
-            this->ijk_r2r[2]
-          ) = 
-          this->mem->psi[e][0](
-            this->ijk[0].last()+1,
-            this->ijk[1],
-            this->ijk[2]
-          );
+          */
+//}
 
 //          std::cerr << "post left halo fill psi_ref: " << this->mem->psi_ref[e];
 //          std::cerr << "post left halo fill psi: " << this->mem->psi[e][0];
@@ -316,10 +345,18 @@ namespace libmpdataxx
             hstride = stride / 2;
 
 
-            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+//            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+//            this->mem->barrier();
+//            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), hstride);
+//            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
+std::cerr << "this->mem->grid_size[0]: " << this->mem->grid_size[0] << std::endl;
+std::cerr << "this->mem->grid_size_ref[0]: " << this->mem->grid_size_ref[0] << std::endl;
+std::cerr << "this->ijk_r2r[0]: " << this->ijk_r2r[0] << std::endl;
+std::cerr << "mid_ijk_r2r_0: " << mid_ijk_r2r_0 << std::endl;
+            intrp<0>(this->mem->psi_ref[e], mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
             this->mem->barrier();
-            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), hstride);
-            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
+            intrp<1>(this->mem->psi_ref[e], mid_ijk_r2r_1, ijk_r2r_2_h, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), hstride);
+            intrp<2>(this->mem->psi_ref[e], mid_ijk_r2r_2, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
 
 
 /*
@@ -393,18 +430,9 @@ namespace libmpdataxx
 
           // fill distmem halos of refinee
           // TODO: move to bcond or sth? would be filled only by remote bcond
+
           this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].first() - this->mem->n_ref/2,
-            this->ijk_r2r[1],
-            this->ijk_r2r[2]
-          ) = 
-          this->mem->psi[e][0](
-            this->ijk[0].first()-1,
-            this->ijk[1],
-            this->ijk[2]
-          );
-          this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].last() + this->mem->n_ref/2,
+            this->mem->grid_size_ref[0].last() + 1,
             this->ijk_r2r[1],
             this->ijk_r2r[2]
           ) = 
@@ -413,6 +441,32 @@ namespace libmpdataxx
             this->ijk[1],
             this->ijk[2]
           );
+          this->mem->psi_ref[e](
+            this->mem->grid_size_ref[0].last() + 1 + this->mem->n_ref ,
+            this->ijk_r2r[1],
+            this->ijk_r2r[2]
+          ) = 
+          this->mem->psi[e][0](
+            this->ijk[0].last()+2, // MPI halo size 2 needed!
+            this->ijk[1],
+            this->ijk[2]
+          );
+//}
+
+//if(this->mem->distmem.rank > 0)
+//{
+          this->mem->psi_ref[e](
+            this->mem->grid_size_ref[0].first() - this->mem->n_ref,
+            this->ijk_r2r[1],
+            this->ijk_r2r[2]
+          ) = 
+          this->mem->psi[e][0](
+            this->ijk[0].first()-1, // MPI halo size 2 needed!
+            this->ijk[1],
+            this->ijk[2]
+          );
+
+
 
 //          std::cerr << "post left halo fill psi_ref: " << this->mem->psi_ref[e];
 //          std::cerr << "post left halo fill psi: " << this->mem->psi[e][0];
@@ -429,7 +483,7 @@ namespace libmpdataxx
 
 
           // fill refined array at position where it overlaps with the resolved array
-          this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
+//          this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
@@ -472,10 +526,10 @@ namespace libmpdataxx
             hstride = stride / 2;
 
 
-            rcnstrct<0>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+            rcnstrct<0>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h, ijk_r2r_2_h, hstride);
             this->mem->barrier();
-            rcnstrct<1>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_1), ijk_r2r_2_h, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), hstride);
-            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
+//            rcnstrct<1>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_1), ijk_r2r_2_h, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), hstride);
+//            rcnstrct<2>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_2), this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
 
 
 //            rcnstrct<0>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h, ijk_r2r_2_h, hstride);
@@ -547,7 +601,7 @@ namespace libmpdataxx
 
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-              mem->grid_size_ref[0]^(mem->n_ref/2), // NOTE: halo size 1 along x, because in distmem reconstructed point is at the edge of a domain
+              mem->grid_size_ref[0]^(mem->n_ref+1), // reconstruction based on 3 points, we need up to 2 resolved points outside of the domain
               mem->grid_size_ref[1],
               srfc ? rng_t(0, 0) : mem->grid_size_ref[2],
               arr3D_storage

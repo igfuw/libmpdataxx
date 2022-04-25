@@ -81,9 +81,10 @@ namespace libmpdataxx
           const int &mpi_size
         ) {
           assert(n_ref % 2 == 0);
+          // NOTE: overlapping points inbetween MPI domains
           return rng_t(
-            mpi_rank == 0          ? grid_size.first() * n_ref : grid_size.first() * n_ref - (n_ref / 2),
-            mpi_rank == mpi_size-1 ? grid_size.last()  * n_ref : grid_size.last()  * n_ref + (n_ref / 2)
+            mpi_rank == 0          ? grid_size.first() * n_ref : grid_size.first() * n_ref,
+            mpi_rank == mpi_size-1 ? grid_size.last()  * n_ref : grid_size.last()  * n_ref + n_ref - 1 // refined points between MPI domains belong to the MPI process on the left
           );
         }
       };

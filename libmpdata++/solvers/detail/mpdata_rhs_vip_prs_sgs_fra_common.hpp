@@ -55,7 +55,7 @@ namespace libmpdataxx
         {
           assert(rng.stride() % 2 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
-          else if (overlap)
+          if (overlap)
             return rng_t(
               rank == 0 ? rng.first() + rng.stride() / 2 : rng.first() - rng.stride() / 2,
               rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
