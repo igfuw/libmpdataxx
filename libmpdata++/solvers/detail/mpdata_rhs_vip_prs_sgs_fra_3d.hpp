@@ -109,6 +109,7 @@ namespace libmpdataxx
 
 
 // solution following Scotti and Meneveau Physica D 1999
+/*
 
           // helper references
           // NOTE: these are actually the resolved values only in the first iteration, in the subsequent iterations some of these are reconstructed values
@@ -146,7 +147,7 @@ namespace libmpdataxx
 //                                      (u_im1 + 0.5 * (u_ip1 - u_im1)) + // u_0(2*xi-1)
                                       u_i + 
                                       0.5 * a_2 + b_2;                  // q_2(2*xi-1)
-
+*/
           // Eq. (5) Scotti and Meneveau PRL 1997, a_1 and a_2 differ from Scotti Meneveau 1999 !
           // NOTE: in the 1999 paper, a_1 and a_2 are multipled by 2*xi and 2*xi-1, respectively
           //       in the 1997 paper, the are both multipled by xi
@@ -161,7 +162,7 @@ namespace libmpdataxx
 
 
 // solution following Akinlabi et al.
-/*
+
 
           const int x[3] = {0, 1, 2};
 
@@ -176,17 +177,21 @@ namespace libmpdataxx
                 f_2 = this->f_j(pis<d>(i_next, j, k));
 
           // Eqs. (5) and (6) Akinlabi et al.
-          c_1 = (u_1 - u_0) / (4 * dist) - d_1 * (u_2 - u_0) / (4 * dist);
-          c_2 = (u_2 - u_1) / (4 * dist) - d_2 * (u_2 - u_0) / (4 * dist);
-          f_1 = (x[2] * u_0 - x[0] * u_1) / (4 * dist) - d_1 * (x[2] * u_0 - x[0] * u_2) / (4 * dist);
-          f_2 = (x[2] * u_1 - x[0] * u_2) / (4 * dist) - d_2 * (x[2] * u_0 - x[0] * u_2) / (4 * dist);
+          c_1 = (u_1 - u_0) / (2.) - d_1 * (u_2 - u_0) / (2.);
+          c_2 = (u_2 - u_1) / (2.) - d_2 * (u_2 - u_0) / (2.);
+          f_1 = (x[2] * u_0 - x[0] * u_1) / (2.) - d_1 * (x[2] * u_0 - x[0] * u_2) / (2.);
+          f_2 = (x[2] * u_1 - x[0] * u_2) / (2.) - d_2 * (x[2] * u_0 - x[0] * u_2) / (2.);
+//          c_1 = (u_1 - u_0) / (4 * dist) - d_1 * (u_2 - u_0) / (4 * dist);
+//          c_2 = (u_2 - u_1) / (4 * dist) - d_2 * (u_2 - u_0) / (4 * dist);
+//          f_1 = (x[2] * u_0 - x[0] * u_1) / (4 * dist) - d_1 * (x[2] * u_0 - x[0] * u_2) / (4 * dist);
+//          f_2 = (x[2] * u_1 - x[0] * u_2) / (4 * dist) - d_2 * (x[2] * u_0 - x[0] * u_2) / (4 * dist);
 
           // new u, at j=1, between i=0 and i=1, result of w_j=1(u_i=1), Eq. (1) in Akinlabi et al.
-          arr(pis<d>(i    , j, k)) = c_1 * 2*dist + d_1 * u_1 + f_1; 
+          arr(pis<d>(i    , j, k)) = c_1 * 1 + d_1 * u_1 + f_1; 
           // new u, at j=2, between i=1 and i=2, result of w_j=2(u_i=1), Eq. (1) in Akinlabi et al.
-          arr(pis<d>(i_next, j, k)) = c_2 * 2*dist + d_2 * u_1 + f_2;
+          arr(pis<d>(i_next, j, k)) = c_2 * 1 + d_2 * u_1 + f_2;
           // not sure about * 2*dist here (is x_1 == 2*dist?)
-          */
+          
 
 /*
             c_j(pis<d>(i, j, k)) * x_j + 
