@@ -267,18 +267,9 @@ namespace libmpdataxx
             }
             else
             {
-              if(i==1)
-              {
-                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
-                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
-                mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
-              }
-              else
-              {
-                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
-                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
-                mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
-              }
+              mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
+              mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
+              mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
 
               ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size);
               ijk_r2r_2_h = this->rng_half_stride(ijk_r2r_2_h);
@@ -289,8 +280,10 @@ namespace libmpdataxx
             assert(stride % 2 == 0);
             hstride = stride / 2;
 
-            const int halo_size = 1; // 2 for reconstruction
-            const rng_t ijk_r2r_0_h_with_halo(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride);
+            const int halo_size = 1; 
+            const rng_t ijk_r2r_0_h_with_halo = this->mem->distmem.rank() < this->mem->distmem.size() - 1 ?
+              rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride) :
+              rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last(),                                hstride);
 
             intrp<0>(this->mem->psi_ref[e], mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
             this->mem->barrier();
@@ -365,6 +358,8 @@ namespace libmpdataxx
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
 
+          int offset;
+
           // TODO: starting point of ranges of each MPI process should be at an odd number!
           for(int i=0; i<this->n_fra_iter; ++i)
           {
@@ -380,18 +375,9 @@ namespace libmpdataxx
             }
             else
             {
-              if(i==1)
-              {
-                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
-                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
-                mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
-              }
-              else
-              {
-                mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
-                mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
-                mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
-              }
+              mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
+              mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
+              mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
 
               ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size);
               ijk_r2r_2_h = this->rng_half_stride(ijk_r2r_2_h);
@@ -402,13 +388,20 @@ namespace libmpdataxx
             assert(stride % 2 == 0);
             hstride = stride / 2;
 
-            const int halo_size = 2;
-            const rng_t ijk_r2r_0_h_with_halo(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride);
+            if(i==0 && this->mem->grid_size_ref[0].first() > 0 && (this->mem->grid_size_ref[0].first() / stride) % 2 != 0)
+              offset = stride; // MPI domain starts with a point in the middle of a triple - we need to start calculating from a point to the left (in halo)
+            else 
+              offset = 0;
 
-            rcnstrct<0>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h, ijk_r2r_2_h, hstride);
+            const int halo_size = 2;
+            const rng_t ijk_r2r_0_h_with_halo = this->mem->distmem.rank() < this->mem->distmem.size() - 1 ?
+              rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride) :
+              rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last(),                                hstride);
+
+            rcnstrct<0>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_0, offset), ijk_r2r_1_h,           ijk_r2r_2_h,                                 hstride);
             this->mem->barrier();
-            rcnstrct<1>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_1), ijk_r2r_2_h, this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), hstride);
-            rcnstrct<2>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_2), this->rng_merge(ijk_r2r_0_h, mid_ijk_r2r_0), this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
+            rcnstrct<1>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_1)        , ijk_r2r_2_h,           ijk_r2r_0_h_with_halo,                       hstride);
+            rcnstrct<2>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_2)        , ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
 
 
 //            rcnstrct<0>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h, ijk_r2r_2_h, hstride);

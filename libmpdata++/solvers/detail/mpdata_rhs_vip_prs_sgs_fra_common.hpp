@@ -83,13 +83,15 @@ namespace libmpdataxx
         // returned range points to the first from the pair of reconstructed points
         // to avoid boundary conditions, in y and z directions it is assumed that the number of points is 3+i*2, i=0,1,2,... (this check is somewhere else)
         // however in the x direction there can be any number of points, because the domain is divided between mpi processes...
-        static rng_t rng_dbl_stride(const rng_t &rng) 
+        static rng_t rng_dbl_stride(const rng_t &rng, const int offset = 0) 
         {
           assert(rng.last() != rng.first()); // we need at least 2 midpoints
-          if( ((rng.last() - rng.first()) / rng.stride() + 1) % 2 == 0) // even number of midpoints; y and z directions (and sometimes x)
-            return rng_t(rng.first(), rng.last() - rng.stride(), 2*rng.stride());
+
+//          return rng_t(rng.first() - offset, rng.last(), 2*rng.stride());
+          if( ((rng.last() - rng.first() - offset) / rng.stride() + 1) % 2 == 0) // even number of midpoints; y and z directions (and sometimes x)
+            return rng_t(rng.first() - offset, rng.last() - rng.stride(), 2*rng.stride());
           else // odd number of midpoints
-            return rng_t(rng.first(), rng.last(), 2*rng.stride()); // rely on the halo along x direction
+            return rng_t(rng.first() - offset, rng.last(), 2*rng.stride()); // rely on the halo along x direction
         }
 
         static rng_t rng_merge(const rng_t &rng1, const rng_t &rng2) 
