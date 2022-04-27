@@ -31,6 +31,11 @@ namespace libmpdataxx
         using parent_t::parent_t; // inheriting constructors
 
         protected:
+  
+        // helper variables for grid refinement
+        rng_t mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2;     // positions between already known values (to be filled during given iteration)
+        rng_t ijk_r2r_0_h_with_halo, ijk_r2r_1_h, ijk_r2r_2_h; // all positions at resolution of given iteration
+        int stride, hstride;                                   // stride and half stride
 
         // interpolation similar to mpdata_rhs_vip...
         template<int d, class arr_t>
@@ -216,212 +221,141 @@ namespace libmpdataxx
           */
         }
 
-        void interpolate_refinee(const int e = 0)
+        // fill distmem halos of refinee
+        // TODO: move to bcond or sth? would be filled only by remote bcond
+        void fill_refinee_distmem_halos(const int e, const int halo_size)
         {
-          using namespace arakawa_c; // for rng_t operator^
-
-          rng_t mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2; // positions between already known values (to be filled during given iteration)
-          rng_t ijk_r2r_1_h, ijk_r2r_2_h;       // all positions at resolution of given iteration
-          int stride, hstride;
-
-          // TEMPORARY
-          this->mem->psi_ref[e] = -1000;
-            this->mem->barrier();
-
-          // fill distmem halos of refinee
-          // TODO: move to bcond or sth? would be filled only by remote bcond
           // TODO: we only need to xchng along distmem direction (x)
           this->xchng(e);
 
-          this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].last() + 1,
-            this->ijk_r2r[1],
-            this->ijk_r2r[2]
-          ) = 
-            this->mem->psi[e][0](
-              this->ijk[0].last()+1,
-              this->ijk[1],
-              this->ijk[2]
-            );
+          // TODO: assert halo_size <= solver halo size
 
-          this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].first() - this->mem->n_ref,
-            this->ijk_r2r[1],
-            this->ijk_r2r[2]
-          ) = 
-            this->mem->psi[e][0](
-              this->ijk[0].first()-1,
-              this->ijk[1],
-              this->ijk[2]
-            );
+          switch(halo_size)
+          {
+            case 2:
+              this->mem->psi_ref[e](
+                this->mem->grid_size_ref[0].last() + 1 + this->mem->n_ref ,
+                this->ijk_r2r[1],
+                this->ijk_r2r[2]
+              ) = 
+                this->mem->psi[e][0](
+                  this->ijk[0].last()+2,
+                  this->ijk[1],
+                  this->ijk[2]
+                );
+              // no break intentionally
+            case 1:
+              this->mem->psi_ref[e](
+                this->mem->grid_size_ref[0].first() - this->mem->n_ref,
+                this->ijk_r2r[1],
+                this->ijk_r2r[2]
+              ) = 
+                this->mem->psi[e][0](
+                  this->ijk[0].first()-1,
+                  this->ijk[1],
+                  this->ijk[2]
+                );
+
+              this->mem->psi_ref[e](
+                this->mem->grid_size_ref[0].last() + 1,
+                this->ijk_r2r[1],
+                this->ijk_r2r[2]
+              ) = 
+                this->mem->psi[e][0](
+                  this->ijk[0].last()+1,
+                  this->ijk[1],
+                  this->ijk[2]
+                );
+              break;
+            default:
+              assert(false);
+              break;
+          }
+        }
+
+        void refinement_ranges(const int iter, const int halo_size)
+        {
+          // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
+          if(iter==0)
+          {
+            mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
+            mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size); 
+            mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
+
+            ijk_r2r_1_h = this->ijk_r2r[1];
+            ijk_r2r_2_h = this->ijk_r2r[2];
+          }
+          else
+          {
+            mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
+            mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
+            mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
+
+            ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size);
+            ijk_r2r_2_h = this->rng_half_stride(ijk_r2r_2_h);
+          }
+
+          stride = ijk_r2r_1_h.stride();
+          assert(ijk_r2r_1_h.stride() == ijk_r2r_2_h.stride());
+          assert(stride % 2 == 0);
+          hstride = stride / 2;
+
+          ijk_r2r_0_h_with_halo = this->mem->distmem.rank() < this->mem->distmem.size() - 1 ?
+            rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride) :
+            rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last(),                                hstride);
+        }
+
+        void interpolate_refinee(const int e = 0)
+        {
+          const int halo_size = 1;
+
+          // TEMPORARY
+          this->mem->psi_ref[e] = -1000;
+          this->mem->barrier();
+
+          fill_refinee_distmem_halos(e, halo_size);
 
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
-            // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
-            if(i==0)
-            {
-              mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
-              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size); 
-              mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
-
-              ijk_r2r_1_h = this->ijk_r2r[1];
-              ijk_r2r_2_h = this->ijk_r2r[2];
-            }
-            else
-            {
-              mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
-              mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
-              mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
-
-              ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size);
-              ijk_r2r_2_h = this->rng_half_stride(ijk_r2r_2_h);
-            }
-
-            stride = ijk_r2r_1_h.stride();
-            assert(ijk_r2r_1_h.stride() == ijk_r2r_2_h.stride());
-            assert(stride % 2 == 0);
-            hstride = stride / 2;
-
-            const int halo_size = 1; 
-            const rng_t ijk_r2r_0_h_with_halo = this->mem->distmem.rank() < this->mem->distmem.size() - 1 ?
-              rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride) :
-              rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last(),                                hstride);
+            refinement_ranges(i, halo_size);
 
             intrp<0>(this->mem->psi_ref[e], mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
             this->mem->barrier();
             intrp<1>(this->mem->psi_ref[e], mid_ijk_r2r_1, ijk_r2r_2_h, ijk_r2r_0_h_with_halo, hstride);
             intrp<2>(this->mem->psi_ref[e], mid_ijk_r2r_2, ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
-
-/*
-
-            intrp<0>(this->mem->refinee(e), mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
-            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, ijk_r2r_0_h, hstride);
-            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, ijk_r2r_1_h, hstride);
-
-            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
-            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
-            this->mem->barrier(); // necessary before interpolation along sharedmem y direction
-            intrp<1>(this->mem->refinee(e), mid_ijk_r2r_1, ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
-
-            intrp<2>(this->mem->refinee(e), mid_ijk_r2r_2, mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
-            */
-            this->mem->barrier();
           }
+          this->mem->barrier();
         }
 
-        // TODO: very similar to interpolate refinee
         void reconstruct_refinee(const int e = 0)
         {
-          using namespace arakawa_c; // for rng_t operator^
-
-          rng_t mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2; // positions between already known values (to be filled during given iteration)
-          rng_t ijk_r2r_0_h, ijk_r2r_1_h, ijk_r2r_2_h;       // all positions at resolution of given iteration
-          int stride, hstride;
+          const int halo_size = 2;
 
           // TEMPORARY
           this->mem->psi_ref[e] = -1000;
-            this->mem->barrier();
+          this->mem->barrier();
 
-          // fill distmem halos of refinee
-          // TODO: move to bcond or sth? would be filled only by remote bcond
-          // TODO: we only need to xchng along distmem direction (x)
-          this->xchng(e);
-          this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].last() + 1,
-            this->ijk_r2r[1],
-            this->ijk_r2r[2]
-          ) = 
-          this->mem->psi[e][0](
-            this->ijk[0].last()+1,
-            this->ijk[1],
-            this->ijk[2]
-          );
-          this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].last() + 1 + this->mem->n_ref ,
-            this->ijk_r2r[1],
-            this->ijk_r2r[2]
-          ) = 
-          this->mem->psi[e][0](
-            this->ijk[0].last()+2, // MPI halo size 2 needed!
-            this->ijk[1],
-            this->ijk[2]
-          );
-          this->mem->psi_ref[e](
-            this->mem->grid_size_ref[0].first() - this->mem->n_ref,
-            this->ijk_r2r[1],
-            this->ijk_r2r[2]
-          ) = 
-          this->mem->psi[e][0](
-            this->ijk[0].first()-1,
-            this->ijk[1],
-            this->ijk[2]
-          );
+          fill_refinee_distmem_halos(e, halo_size);
 
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
 
-          int offset;
-
-          // TODO: starting point of ranges of each MPI process should be at an odd number!
           for(int i=0; i<this->n_fra_iter; ++i)
           {
-            // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
-            if(i==0)
-            {
-              mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
-              mid_ijk_r2r_1 = this->rng_midpoints(this->ijk_r2r[1], this->rank, this->mem->size); 
-              mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
+            refinement_ranges(i, halo_size);
 
-              ijk_r2r_1_h = this->ijk_r2r[1];
-              ijk_r2r_2_h = this->ijk_r2r[2];
-            }
-            else
-            {
-              mid_ijk_r2r_0 = this->rng_midpoints_out(mid_ijk_r2r_0);
-              mid_ijk_r2r_1 = this->rng_midpoints_out(mid_ijk_r2r_1);
-              mid_ijk_r2r_2 = this->rng_midpoints_out(mid_ijk_r2r_2);
-
-              ijk_r2r_1_h = this->rng_half_stride(ijk_r2r_1_h, this->rank, this->mem->size);
-              ijk_r2r_2_h = this->rng_half_stride(ijk_r2r_2_h);
-            }
-
-            stride = ijk_r2r_1_h.stride();
-            assert(ijk_r2r_1_h.stride() == ijk_r2r_2_h.stride());
-            assert(stride % 2 == 0);
-            hstride = stride / 2;
-
-            if(i==0 && this->mem->grid_size_ref[0].first() > 0 && (this->mem->grid_size_ref[0].first() / stride) % 2 != 0)
-              offset = stride; // MPI domain starts with a point in the middle of a triple - we need to start calculating from a point to the left (in halo)
-            else 
-              offset = 0;
-
-            const int halo_size = 2;
-            const rng_t ijk_r2r_0_h_with_halo = this->mem->distmem.rank() < this->mem->distmem.size() - 1 ?
-              rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last() + halo_size * this->mem->n_ref, hstride) :
-              rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last(),                                hstride);
+            // if MPI domain starts with a point in the middle of a triple - we need to start calculating from a point to the left (in halo)
+            const int offset = (i==0 && this->mem->grid_size_ref[0].first() > 0 && (this->mem->grid_size_ref[0].first() / stride) % 2 != 0) ? stride : 0;
 
             rcnstrct<0>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_0, offset), ijk_r2r_1_h,           ijk_r2r_2_h,                                 hstride);
             this->mem->barrier();
             rcnstrct<1>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_1)        , ijk_r2r_2_h,           ijk_r2r_0_h_with_halo,                       hstride);
             rcnstrct<2>(this->mem->psi_ref[e], this->rng_dbl_stride(mid_ijk_r2r_2)        , ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
-
-
-//            rcnstrct<0>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h, ijk_r2r_2_h, hstride);
-//            rcnstrct<1>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_1), ijk_r2r_2_h, ijk_r2r_0_h, hstride);
-//            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), ijk_r2r_0_h, ijk_r2r_1_h, hstride);
-//
-//            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), mid_ijk_r2r_0, ijk_r2r_1_h, hstride);
-//            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), ijk_r2r_0_h, mid_ijk_r2r_1, hstride);
-//            this->mem->barrier(); // necessary before interpolation along sharedmem y direction
-//            rcnstrct<1>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_1), ijk_r2r_2_h, mid_ijk_r2r_0, hstride);
-//
-//            rcnstrct<2>(this->mem->refinee(e), this->rng_dbl_stride(mid_ijk_r2r_2), mid_ijk_r2r_0, mid_ijk_r2r_1, hstride);
-
-            this->mem->barrier();
           }
+          this->mem->barrier();
         }
 
         public:
