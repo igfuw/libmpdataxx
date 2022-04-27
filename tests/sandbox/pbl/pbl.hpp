@@ -75,6 +75,8 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
 
       this->interpolate_refinee(ix::tht);
       this->interpolate_refinee(ix::u);
+      this->interpolate_refinee(ix::v);
+      this->interpolate_refinee(ix::w);
 
       this->mem->barrier();
       if (this->rank == 0)
@@ -86,15 +88,23 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
         this->record_aux_dsc("p", this->Phi);
         this->record_aux_dsc_refined("tht refined", this->mem->refinee(ix::tht));
         this->record_aux_dsc_refined("u refined", this->mem->refinee(ix::u));
+        this->record_aux_dsc_refined("v refined", this->mem->refinee(ix::v));
+        this->record_aux_dsc_refined("w refined", this->mem->refinee(ix::w));
       }
       this->mem->barrier();
 
 
       this->reconstruct_refinee(ix::tht);
+      this->reconstruct_refinee(ix::u);
+      this->reconstruct_refinee(ix::v);
+      this->reconstruct_refinee(ix::w);
       this->mem->barrier();
       if (this->rank == 0)
       {
         this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(ix::tht));
+        this->record_aux_dsc_refined("u reconstructed", this->mem->refinee(ix::u));
+        this->record_aux_dsc_refined("v reconstructed", this->mem->refinee(ix::v));
+        this->record_aux_dsc_refined("w reconstructed", this->mem->refinee(ix::w));
       }
     }
   }
