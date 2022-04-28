@@ -32,7 +32,7 @@ namespace libmpdataxx
 
         protected:
 
-        typename parent_t::arr_t c_j, f_j; // parameters used in fractal reconstruction, Akinlabi et al. 2019
+        typename parent_t::arr_t c_j, d_j, f_j; // parameters used in fractal reconstruction, Akinlabi et al. 2019
 
 
 //        const int n_fra; // number of fields with fractal reconstruction

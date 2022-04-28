@@ -50,7 +50,8 @@ namespace libmpdataxx
         parent_t(args, p)
       {
         this->c_j.reference(args.mem->tmp[__FILE__][1][0]);
-        this->f_j.reference(args.mem->tmp[__FILE__][1][1]);
+        this->d_j.reference(args.mem->tmp[__FILE__][1][1]);
+        this->f_j.reference(args.mem->tmp[__FILE__][1][2]);
       }
 
       // why alloc here?
@@ -61,7 +62,7 @@ namespace libmpdataxx
         parent_t::alloc(mem, n_iters);
         // TODO: allocate only for fields that we want to reconstruct, defined in ct_params_t::fractal_recon, will this mess with field numbering? e.g. ix::tht_ref....
         parent_t::alloc_tmp_sclr_ref(mem, __FILE__, ct_params_t::n_eqns); // psi_ref
-        parent_t::alloc_tmp_sclr_ref(mem, __FILE__, 2); // c_j, f_j
+        parent_t::alloc_tmp_sclr_ref(mem, __FILE__, 3); // c_j, d_j, f_j
 //        parent_t::alloc_tmp_vctr(mem, __FILE__, mem->grid_size_ref);                                 // GC_ref
 
         mem->psi_ref = mem->tmp[__FILE__][0];

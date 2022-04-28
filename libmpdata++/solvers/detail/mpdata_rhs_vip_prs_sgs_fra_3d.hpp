@@ -29,6 +29,7 @@ namespace libmpdataxx
       {
         using parent_t = detail::mpdata_rhs_vip_prs_sgs_fra_common<ct_params_t, minhalo>;
         using parent_t::parent_t; // inheriting constructors
+        using real_t = typename ct_params_t::real_t;
 
         protected:
   
@@ -36,6 +37,29 @@ namespace libmpdataxx
         rng_t mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2;     // positions between already known values (to be filled during given iteration)
         rng_t ijk_r2r_0_h_with_halo, ijk_r2r_1_h, ijk_r2r_2_h; // all positions at resolution of given iteration
         int stride, hstride;                                   // stride and half stride
+
+        // CDF of stretching parameter d; assuming CDF = A d^B + C under condition that CDF(0.5)=0 and CDF(1)=1
+        static real_t CDF_of_d(const real_t &d)
+        {
+          const real_t B = -0.39091161; // comes from a fit to the E. Akinlabi data
+          return (pow(d,B) - pow(0.5,B)) / (1. - pow(0.5,B));
+        }
+        // inverse function: d of a CDF
+        static real_t d_of_CDF(const real_t &CDF)
+        {
+          const real_t B = -0.39091161; // comes from a fit to the E. Akinlabi data
+          return pow((1.-pow(0.5,B))*CDF + pow(0.5,B), 1./B);
+        }
+
+        struct d_of_CDF_fctr
+        {
+          real_t operator()(const real_t &CDF) const
+          {
+            return CDF < 0 ? -d_of_CDF(-CDF) : d_of_CDF(CDF);
+          }
+          BZ_DECLARE_FUNCTOR(d_of_CDF_fctr);
+        };
+
 
         // interpolation similar to mpdata_rhs_vip...
         template<int d, class arr_t>
@@ -48,8 +72,6 @@ namespace libmpdataxx
         )
         {
           using idxperm::pis;
-//          using namespace arakawa_c;
-          using real_t = typename ct_params_t::real_t;
 
           // debug output
           std::cerr << "ranges in interpolation" << std::endl;
@@ -78,9 +100,7 @@ namespace libmpdataxx
         )
         {
           // TODO: move some to formulas::
-
           using idxperm::pis;
-          using real_t = typename ct_params_t::real_t;
 
           // second reconstructed position (j=2, between i=1 and i=2)
           const rng_t i_next = i + 2*dist;
@@ -109,8 +129,8 @@ namespace libmpdataxx
 
 
           // stretching parameter, TODO: draw it from the distribution
-          const real_t d_1 = -pow(2, -1./3.),
-                       d_2 =  pow(2, -1./3.);
+//          const real_t d_1 = -pow(2, -1./3.),
+//                       d_2 =  pow(2, -1./3.);
 
 
 // solution following Scotti and Meneveau Physica D 1999
@@ -178,8 +198,13 @@ namespace libmpdataxx
 
           arr_t c_1 = this->c_j(pis<d>(i,      j, k)),
                 c_2 = this->c_j(pis<d>(i_next, j, k)),
+                d_1 = this->d_j(pis<d>(i,      j, k)),
+                d_2 = this->d_j(pis<d>(i_next, j, k)),
                 f_1 = this->f_j(pis<d>(i,      j, k)),
                 f_2 = this->f_j(pis<d>(i_next, j, k));
+
+
+
 
           // Eqs. (5) and (6) Akinlabi et al.
           c_1 = (u_1 - u_0) / (2.) - d_1 * (u_2 - u_0) / (2.);
@@ -305,6 +330,18 @@ namespace libmpdataxx
             rng_t(this->ijk_r2r[0].first(), this->ijk_r2r[0].last(),                                hstride);
         }
 
+        // TODO: move some formulas
+        // TODO: move to common?
+        void generate_stretching_parameters(const int rng_seed = 44)
+        {
+          std::mt19937 gen(rng_seed); 
+          std::uniform_real_distribution<> dis(-1, 1); // [-1,1), but whatever
+          auto rand = std::bind(dis, gen);
+          std::generate(this->d_j(this->ijk_ref).begin(), this->d_j(this->ijk_ref).end(), rand);
+          this->d_j(this->ijk_ref) = d_of_CDF_fctr{}(this->d_j(this->ijk_ref));
+          // TODO: randomly convert to negative
+        }
+
         void interpolate_refinee(const int e = 0)
         {
           const int halo_size = 1;
@@ -317,6 +354,8 @@ namespace libmpdataxx
 
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
+
+          generate_stretching_parameters();
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
@@ -342,6 +381,8 @@ namespace libmpdataxx
 
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
+
+          generate_stretching_parameters();
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
