@@ -33,6 +33,7 @@ void set_sgs_specific(params_t &p, smg_tag)
   p.smg_c = 0.165;
   p.prandtl_num = 0.42;
   p.cdrag = 0.1;
+  p.n_fra_iter = 10;
 }
 
 template <typename sgs_t>
