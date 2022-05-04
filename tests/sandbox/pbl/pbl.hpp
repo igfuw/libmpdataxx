@@ -59,24 +59,9 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     
     if (this->timestep % static_cast<int>(this->outfreq) == 0)
     {
+      this->reconstruct_refinee(ix::w);
+
       if (this->rank == 0) std::cout << this->timestep << std::endl;
-
-      // test filling of refinee
-      //this->mem->refinee(ix::tht)(this->ijk_ref) = blitz::tensor::k * 1e-3; // anything
-//      this->mem->refinee(ix::tht)(this->ijk_ref) = -1;
-      //this->mem->refinee(ix::tht) = blitz::tensor::k; // anything
-
-      // copy tht to refined tht at position where they overlap
-//      this->mem->refinee(ix::tht)(this->ijk_r2r) = this->mem->advectee(ix::tht)(this->ijk);
-
-//      std::cerr << "refinee: " << this->mem->refinee(ix::tht);
-//      std::cerr << "refinee(ijk_ref): " << this->mem->refinee(ix::tht)(this->ijk_ref);
-//      std::cerr << "refinee(ijk_r2r): " << this->mem->refinee(ix::tht)(this->ijk_r2r);
-
-      this->interpolate_refinee(ix::tht);
-      this->interpolate_refinee(ix::u);
-      this->interpolate_refinee(ix::v);
-      this->interpolate_refinee(ix::w);
 
       this->mem->barrier();
       if (this->rank == 0)
@@ -86,26 +71,9 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
           this->record_aux_dsc("tke", this->tke);
         }
         this->record_aux_dsc("p", this->Phi);
-        this->record_aux_dsc_refined("tht refined", this->mem->refinee(ix::tht));
-        this->record_aux_dsc_refined("u refined", this->mem->refinee(ix::u));
-        this->record_aux_dsc_refined("v refined", this->mem->refinee(ix::v));
-        this->record_aux_dsc_refined("w refined", this->mem->refinee(ix::w));
+        this->record_aux_dsc_refined("w reconstructed", this->mem->refinee(this->ix_r2r.at(ix::w)));
       }
       this->mem->barrier();
-
-
-      this->reconstruct_refinee(ix::tht);
-      this->reconstruct_refinee(ix::u);
-      this->reconstruct_refinee(ix::v);
-      this->reconstruct_refinee(ix::w);
-      this->mem->barrier();
-      if (this->rank == 0)
-      {
-        this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(ix::tht));
-        this->record_aux_dsc_refined("u reconstructed", this->mem->refinee(ix::u));
-        this->record_aux_dsc_refined("v reconstructed", this->mem->refinee(ix::v));
-        this->record_aux_dsc_refined("w reconstructed", this->mem->refinee(ix::w));
-      }
     }
   }
 

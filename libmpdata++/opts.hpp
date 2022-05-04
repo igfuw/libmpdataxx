@@ -31,6 +31,17 @@ namespace libmpdataxx
       return x == 0 ? 0. : int(log(x)/log(2)) + 1;
     }
 
+    // https://www.geeksforgeeks.org/count-set-bits-in-an-integer/
+    constexpr unsigned int nset(opts_t x)
+    {
+      unsigned int count = 0;
+      while (x) {
+        count += x & 1;
+        x >>= 1;
+      }
+      return count;
+    }
+
     enum
     {
       fct = opts::bit(0), // flux-corrected transport

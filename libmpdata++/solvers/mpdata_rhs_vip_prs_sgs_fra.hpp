@@ -37,7 +37,6 @@ namespace libmpdataxx
     > : public detail::mpdata_rhs_vip_prs_sgs_fra_dim<ct_params_t, minhalo>
     {
       using parent_t = detail::mpdata_rhs_vip_prs_sgs_fra_dim<ct_params_t, minhalo>;
-//      using parent_t::parent_t; // inheriting constructors
 
       protected:
       using solver_family = mpdata_rhs_vip_prs_sgs_fra_family_tag;
@@ -60,8 +59,7 @@ namespace libmpdataxx
         const int &n_iters
       ) {
         parent_t::alloc(mem, n_iters);
-        // TODO: allocate only for fields that we want to reconstruct, defined in ct_params_t::fractal_recon, will this mess with field numbering? e.g. ix::tht_ref....
-        parent_t::alloc_tmp_sclr_ref(mem, __FILE__, ct_params_t::n_eqns); // psi_ref
+        parent_t::alloc_tmp_sclr_ref(mem, __FILE__, opts::nset(ct_params_t::fractal_recon));
         parent_t::alloc_tmp_sclr_ref(mem, __FILE__, 3); // c_j, d_j, f_j
 //        parent_t::alloc_tmp_vctr(mem, __FILE__, mem->grid_size_ref);                                 // GC_ref
 

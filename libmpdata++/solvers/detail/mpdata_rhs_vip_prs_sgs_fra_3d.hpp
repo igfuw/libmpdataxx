@@ -32,7 +32,7 @@ namespace libmpdataxx
         using parent_t::parent_t; // inheriting constructors
         using real_t = typename ct_params_t::real_t;
 
-        protected:
+        private:
   
         // helper variables for grid refinement
         rng_t mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2;     // positions between already known values (to be filled during given iteration)
@@ -132,13 +132,13 @@ namespace libmpdataxx
           this->d_j(this->ijk_ref) = formulae::fractal::d_of_CDF_fctr<real_t>{}(this->d_j(this->ijk_ref));
         }
 
-        void interpolate_refinee(const int e = 0)
-        {
-          const int halo_size = 1;
+        protected:
 
-          // TEMPORARY
-          this->mem->psi_ref[e] = -1000;
-          this->mem->barrier();
+        void interpolate_refinee(const int _e = 0)
+        {
+          assert(opts::isset(ct_params_t::fractal_recon, opts::bit(_e)));
+          const int halo_size = 1;
+          const int e = this->ix_r2r.at(_e);
 
           fill_refinee_distmem_halos(e, halo_size);
 
@@ -159,13 +159,11 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        void reconstruct_refinee(const int e = 0)
+        void reconstruct_refinee(const int _e = 0)
         {
+          assert(opts::isset(ct_params_t::fractal_recon, opts::bit(_e)));
           const int halo_size = 2;
-
-          // TEMPORARY
-          this->mem->psi_ref[e] = -1000;
-          this->mem->barrier();
+          const int e = this->ix_r2r.at(_e);
 
           fill_refinee_distmem_halos(e, halo_size);
 

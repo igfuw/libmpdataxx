@@ -42,7 +42,8 @@ namespace libmpdataxx
 
         std::array<rng_t, n_dims> grid_size_ref;
         // TODO: these are public because used from outside in alloc - could friendship help?
-        arrvec_t<arr_t> GC_ref, psi_ref; 
+        //arrvec_t<arr_t> GC_ref, psi_ref; 
+        arrvec_t<arr_t> psi_ref; 
 
         // ctors
         sharedmem_refined_common(const std::array<int, n_dims> &grid_size, const int &size, const int &n_ref)
@@ -70,6 +71,7 @@ namespace libmpdataxx
           }
         }
 
+        // NOTE: not all advectees are refined, so e (numbering) in refinee is different than in advectee
         virtual arr_t refinee(int e = 0) = 0;
       //  virtual const arr_t refinee_global_ref(int e = 0) = 0;
 

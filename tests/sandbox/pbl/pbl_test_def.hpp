@@ -56,7 +56,7 @@ void test(const std::string &dirname, const int np, const int nt)
       u, v, w, tht,
       vip_i=u, vip_j=v, vip_k=w, vip_den=-1
     }; };
-    enum { fractal_recon = libmpdataxx::opts::bit(ix::tht) | libmpdataxx::opts::bit(ix::u) };
+    enum { fractal_recon = libmpdataxx::opts::bit(ix::w) };
   }; 
 
   using ix = typename ct_params_t::ix;

@@ -42,6 +42,18 @@ namespace libmpdataxx
         // refined arrays have no halos (do they need them? halos can be added by extending grid_size in alloc() in mpdata_rhs_vip_prs_sgs_fra.hpp by e.g. mem->n_ref/2)
 //        const int halo_ref; // size of halos of refined scalar (and vector?) arrays
 
+        const std::array<int, ct_params_t::n_eqns> ix_r2r;
+        constexpr std::array<int, ct_params_t::n_eqns> get_ix_r2r()
+        {
+          std::array<int, ct_params_t::n_eqns> ix_r2r{};
+          int j = 0;
+          for(opts::opts_t e=0; e<ct_params_t::n_eqns; ++e)
+          {
+            ix_r2r.at(e) = opts::isset(ct_params_t::fractal_recon, opts::bit(e)) ? j++ : -1; // -1 index should give segfaults
+          }
+          return ix_r2r;
+        }
+
         // herlper ranges
         // TODO: make these const!
         idx_t<ct_params_t::n_dims>  ijk_ref; // range of refinee handled by given solver
@@ -119,6 +131,7 @@ namespace libmpdataxx
           n_fra_iter(p.n_fra_iter),
           n_ref(args.mem->n_ref),
 //          halo_ref(n_ref / 2),
+          ix_r2r(get_ix_r2r()),
           // ijk_ref init below assumes 3D (shmem decomp dim along y);
           // TODO: move this to concurr_common::init()? add something to ctor_args_t?
           ijk_r2r{
