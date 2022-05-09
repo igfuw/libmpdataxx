@@ -35,11 +35,9 @@ namespace libmpdataxx
         typename parent_t::arr_t c_j, d_j, f_j; // parameters used in fractal reconstruction, Akinlabi et al. 2019
 
 
-//        const int n_fra; // number of fields with fractal reconstruction
         const int n_ref,         // number of refinements; refined resolution is dx / n_ref
                   n_fra_iter;    // number of iterations of grid refinement
         
-        // refined arrays have no halos (do they need them? halos can be added by extending grid_size in alloc() in mpdata_rhs_vip_prs_sgs_fra.hpp by e.g. mem->n_ref/2)
 //        const int halo_ref; // size of halos of refined scalar (and vector?) arrays
 
         const std::array<int, ct_params_t::n_eqns> ix_r2r;

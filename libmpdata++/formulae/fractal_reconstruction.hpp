@@ -53,13 +53,13 @@ namespace libmpdataxx
         using idxperm::pis;
 
         // debug output
-          std::cerr << "ranges in interpolation" << std::endl;
-          if(d==0)
-            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
-          if(d==1)
-            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
-          if(d==2)
-            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+         // std::cerr << "ranges in interpolation" << std::endl;
+         // if(d==0)
+         //   std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+         // if(d==1)
+         //   std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+         // if(d==2)
+         //   std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
 
         arr(pis<d>(i, j, k)) = real_t(.5) * (
           arr(pis<d>(i - dist, j, k)) +
@@ -83,13 +83,13 @@ namespace libmpdataxx
       )
       {
           // debug output
-          std::cerr << "ranges in rcnstrct" << std::endl;
-          if(d==0)
-            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
-          if(d==1)
-            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
-          if(d==2)
-            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+//          std::cerr << "ranges in rcnstrct" << std::endl;
+//          if(d==0)
+//            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+//          if(d==1)
+//            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+//          if(d==2)
+//            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
 
           using idxperm::pis;
 
@@ -124,11 +124,6 @@ namespace libmpdataxx
           // DEBUG: do interpolation, useful for testing if ranges are correct
 //          arr(pis<d>(i, j, k)) = real_t(.5) * (u_0 + u_1);
 //          arr(pis<d>(i_next, j, k)) = real_t(.5) * (u_1 + u_2);
-//
-//          std::cerr << "new u_j=1:" << arr(pis<d>(i, j, k));
-//          std::cerr << "new u_j=2:" << arr(pis<d>(i_next, j, k));
-//          return;
-          // end of the interpolation test
 
 
 // alternative solution following Scotti and Meneveau Physica D 1999

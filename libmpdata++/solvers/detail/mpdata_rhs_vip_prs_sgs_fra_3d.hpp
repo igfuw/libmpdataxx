@@ -104,28 +104,6 @@ namespace libmpdataxx
               assert(false);
               break;
           }
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 - this->mem->n_ref , this->ijk_r2r[1],  this->ijk_r2r[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 - this->mem->n_ref ,
-//                this->ijk_r2r[1],
-//                this->ijk_r2r[2]
-//              ) << std::endl;
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 , this->ijk_r2r[1],  this->ijk_r2r[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 ,
-//                this->ijk_r2r[1],
-//                this->ijk_r2r[2]
-//              ) << std::endl;
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2  , this->ijk_r2r[1],  this->ijk_r2r[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2  ,
-//                this->ijk_r2r[1],
-//                this->ijk_r2r[2]
-//              ) << std::endl;
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2 + this->mem->n_ref , this->ijk_r2r[1],  this->ijk_r2r[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2 + this->mem->n_ref ,
-//                this->ijk_r2r[1],
-//                this->ijk_r2r[2]
-//              ) << std::endl;
         }
 
         void refinement_ranges(const int iter, const int halo_size)
@@ -180,15 +158,13 @@ namespace libmpdataxx
 
         void interpolate_refinee(const int e = 0)
         {
-return;
-
           assert(opts::isset(ct_params_t::fractal_recon, opts::bit(e)));
           const int halo_size = 1;
           const int e_ref = this->ix_r2r.at(e);
 
-          // TEMPORARY
-          this->mem->psi_ref[e_ref] = -1000;
-          this->mem->barrier();
+          //// TEMPORARY
+          //this->mem->psi_ref[e_ref] = -1000;
+          //this->mem->barrier();
 
 
           fill_refinee_distmem_halos(e, halo_size);
@@ -216,9 +192,9 @@ return;
           const int halo_size = 2;
           const int e_ref = this->ix_r2r.at(e);
 
-          // TEMPORARY
-          this->mem->psi_ref[e_ref] = -1000;
-          this->mem->barrier();
+          //// TEMPORARY
+          //this->mem->psi_ref[e_ref] = -1000;
+          //this->mem->barrier();
 
           //std::cerr << "mem->grid_size_ref[0]: " << this->mem->grid_size_ref[0] << std::endl;
 
@@ -231,91 +207,12 @@ return;
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
-//            if(i>0) continue;
             refinement_ranges(i, halo_size);
 
             formulae::fractal::rcnstrct<0, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h,           ijk_r2r_2_h,                                 hstride, this->c_j, this->d_j, this->f_j);
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 - this->mem->n_ref , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 - this->mem->n_ref ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2  , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2  ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2 + this->mem->n_ref , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2 + this->mem->n_ref ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-
             this->mem->barrier();
             formulae::fractal::rcnstrct<1, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_1)        , ijk_r2r_2_h,           ijk_r2r_0_h_with_halo,                       hstride, this->c_j, this->d_j, this->f_j);
-
- //std::cerr << "this->c_j: " <<  this->c_j << std::endl;
- //           formulae::fractal::rcnstrct<1, real_t>(this->mem->psi_ref[e_ref], 
- //             rng_t(this->rng_dbl_stride(mid_ijk_r2r_1).first(), this->rng_dbl_stride(mid_ijk_r2r_1).first()), 
- //             rng_t(ijk_r2r_2_h.first(), ijk_r2r_2_h.first()), 
- //             rng_t(ijk_r2r_0_h_with_halo.first(), ijk_r2r_0_h_with_halo.first()) ,                       hstride, this->c_j, this->d_j, this->f_j);
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 - this->mem->n_ref , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 - this->mem->n_ref ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2  , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2  ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2 + this->mem->n_ref , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2 + this->mem->n_ref ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-
             formulae::fractal::rcnstrct<2, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_2)        , ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride, this->c_j, this->d_j, this->f_j);
-
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 - this->mem->n_ref , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 - this->mem->n_ref ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].first() - this->mem->n_ref / 2 ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2  , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2  ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-//          std::cerr << "this->mem->psi_ref[e_ref](this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2 + this->mem->n_ref , this->ijk_ref[1],  this->ijk_ref[2])" << this->mem->psi_ref[e_ref](
-//                this->mem->grid_size_ref[0].last() + this->mem->n_ref / 2 + this->mem->n_ref ,
-//                this->ijk_ref[1],
-//                this->ijk_ref[2]
-//              ) << std::endl;
-
           }
           this->mem->barrier();
         }

@@ -84,7 +84,7 @@ void test(const std::string &dirname, const int np, const int nt)
   double mixed_length = 500;
   double st = 1e-4 / p.g;
 
-  p.outfreq = 1;
+  p.outfreq = 150;
   p.outwindow = 1;
   p.outvars = {
     {ix::u,   { "u",    "m/s"}}, 
