@@ -56,7 +56,8 @@ void test(const std::string &dirname, const int np, const int nt)
       u, v, w, tht,
       vip_i=u, vip_j=v, vip_k=w, vip_den=-1
     }; };
-    enum { fractal_recon = libmpdataxx::opts::bit(ix::w) };
+    //enum { fractal_recon = libmpdataxx::opts::bit(ix::w) };
+    enum { fractal_recon = libmpdataxx::opts::bit(ix::tht) };
   }; 
 
   using ix = typename ct_params_t::ix;
@@ -83,7 +84,7 @@ void test(const std::string &dirname, const int np, const int nt)
   double mixed_length = 500;
   double st = 1e-4 / p.g;
 
-  p.outfreq = 150;
+  p.outfreq = 1;
   p.outwindow = 1;
   p.outvars = {
     {ix::u,   { "u",    "m/s"}}, 

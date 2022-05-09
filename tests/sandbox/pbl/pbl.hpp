@@ -59,7 +59,8 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     
     if (this->timestep % static_cast<int>(this->outfreq) == 0)
     {
-      this->reconstruct_refinee(ix::w);
+      //this->reconstruct_refinee(ix::w);
+      this->reconstruct_refinee(ix::tht);
 
       if (this->rank == 0) std::cout << this->timestep << std::endl;
 
@@ -71,7 +72,17 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
           this->record_aux_dsc("tke", this->tke);
         }
         this->record_aux_dsc("p", this->Phi);
-        this->record_aux_dsc_refined("w reconstructed", this->mem->refinee(this->ix_r2r.at(ix::w)));
+        //this->record_aux_dsc_refined("w reconstructed", this->mem->refinee(this->ix_r2r.at(ix::w)));
+        this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(this->ix_r2r.at(ix::tht)));
+      }
+      this->mem->barrier();
+
+      this->interpolate_refinee(ix::tht);
+
+      this->mem->barrier();
+      if (this->rank == 0)
+      {
+        this->record_aux_dsc_refined("tht interpolated", this->mem->refinee(this->ix_r2r.at(ix::tht)));
       }
       this->mem->barrier();
     }

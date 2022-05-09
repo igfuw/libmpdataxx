@@ -124,8 +124,10 @@ namespace libmpdataxx
           {
             shape[0] = this->mem->grid_size[0].length();
             cshape[0] = this->mem->grid_size[0].length();
-            shape_ref[0] = this->mem->grid_size_ref[0].length();
-            cshape_ref[0] = this->mem->grid_size_ref[0].length();
+            shape_ref[0] = this->mem->distmem.rank() < this->mem->distmem.size() - 1 ? 
+              this->mem->grid_size_ref[0].length()-1 : // -1 to make ranges nonoverlapping
+              this->mem->grid_size_ref[0].length();
+            cshape_ref[0] = shape_ref[0];
 
             if (this->mem->distmem.rank() == this->mem->distmem.size() - 1)
             {

@@ -53,13 +53,13 @@ namespace libmpdataxx
         using idxperm::pis;
 
         // debug output
-//          std::cerr << "ranges in interpolation" << std::endl;
-//          if(d==0)
-//            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
-//          if(d==1)
-//            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
-//          if(d==2)
-//            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+          std::cerr << "ranges in interpolation" << std::endl;
+          if(d==0)
+            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+          if(d==1)
+            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+          if(d==2)
+            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
 
         arr(pis<d>(i, j, k)) = real_t(.5) * (
           arr(pis<d>(i - dist, j, k)) +
@@ -82,7 +82,16 @@ namespace libmpdataxx
         arr_t f_j        // parameter f
       )
       {
-        using idxperm::pis;
+          // debug output
+          std::cerr << "ranges in rcnstrct" << std::endl;
+          if(d==0)
+            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
+          if(d==1)
+            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
+          if(d==2)
+            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
+
+          using idxperm::pis;
 
           // second reconstructed position (j=2, between i=1 and i=2)
           const rng_t i_next = i + 2*dist;
@@ -111,28 +120,14 @@ namespace libmpdataxx
           arr(pis<d>(i    , j, k)) = c_1 * 1 + d_1 * u_1 + f_1; 
           // new u, at j=2, between i=1 and i=2, result of w_j=2(u_i=1), Eq. (1) in Akinlabi et al.
           arr(pis<d>(i_next, j, k)) = c_2 * 1 + d_2 * u_1 + f_2;
-          
-          // debug output
-//          std::cerr << "ranges in rcnstrct" << std::endl;
-//          if(d==0)
-//            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
-//          if(d==1)
-//            std::cerr << "range<" << d << ">: " << k << " " << i << " " << j << std::endl;
-//          if(d==2)
-//            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
 
-          // do interpolation, useful for testing if ranges are correct
-          /*
-          arr(pis<d>(i, j, k)) = real_t(.5) * (
-            arr(pis<d>(i - dist, j, k)) +
-            arr(pis<d>(i + dist, j, k))
-            );
-          arr(pis<d>(i_next, j, k)) = real_t(.5) * (
-            arr(pis<d>(i_next - dist, j, k)) +
-            arr(pis<d>(i_next + dist, j, k))
-            );
-          return;
-          */
+          // DEBUG: do interpolation, useful for testing if ranges are correct
+//          arr(pis<d>(i, j, k)) = real_t(.5) * (u_0 + u_1);
+//          arr(pis<d>(i_next, j, k)) = real_t(.5) * (u_1 + u_2);
+//
+//          std::cerr << "new u_j=1:" << arr(pis<d>(i, j, k));
+//          std::cerr << "new u_j=2:" << arr(pis<d>(i_next, j, k));
+//          return;
           // end of the interpolation test
 
 

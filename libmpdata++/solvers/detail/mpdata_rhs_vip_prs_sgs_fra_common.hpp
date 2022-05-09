@@ -56,19 +56,41 @@ namespace libmpdataxx
 
         // herlper ranges
         // TODO: make these const!
-        idx_t<ct_params_t::n_dims>  ijk_ref; // range of refinee handled by given solver
+        idx_t<ct_params_t::n_dims>  ijk_ref, // range of refinee handled by given solver
+                                    ijk_ref_with_halo; // same but with a halo in x direction between MPI processes
         const idxs_t<ct_params_t::n_dims> ijk_r2r; // resolved to refined; refined scalars at the same position as resolved scalars
 
         // range modifying methods used in grid refinement
+        // TODO: unify
 
         static rng_t rng_midpoints(const rng_t &rng, const int rank = 0, const int size = 1) 
         {
           assert(rng.stride() % 2 == 0);
           if(rng.last() - rng.first() < rng.stride()) return rng;
           return rng_t(
-            rng.first() + rng.stride() / 2,
-            rank == size - 1 ? rng.last() - rng.stride() / 2 : rng.last() + rng.stride() / 2, 
+            rank == 0 ?        rng.first() + rng.stride() / 2 : rng.first() - rng.stride() / 2,
+            rank == size - 1 ? rng.last()  - rng.stride() / 2 : rng.last()  + rng.stride() / 2, 
             rng.stride()); 
+        }
+
+        static rng_t rng_midpoints_in_out(const rng_t &rng, const int rank = 0, const int size = 1) 
+        {
+          assert(rng.stride() % 2 == 0);
+          if(rng.last() - rng.first() < rng.stride()) return rng;
+          return rng_t(
+            rng.first() + rng.stride() / 2,
+            rank == size - 1 ? rng.last()  - rng.stride() / 2 : rng.last()  + rng.stride() / 2, 
+            rng.stride()); 
+        }
+
+        static rng_t rng_midpoints_in(const rng_t &rng, const int rank = 0, const int size = 1) 
+        {
+          assert(rng.stride() % 4 == 0);
+          if(rng.last() - rng.first() < rng.stride()) return rng;
+          else return rng_t(
+            rank == 0        ? rng.first() - rng.stride() / 4 : rng.first() + rng.stride() / 4,
+            rank == size - 1 ? rng.last()  + rng.stride() / 4 : rng.last()  - rng.stride() / 4,
+            rng.stride() / 2); 
         }
 
         static rng_t rng_midpoints_out(const rng_t &rng) 
@@ -95,15 +117,19 @@ namespace libmpdataxx
         // returned range points to the first from the pair of reconstructed points
         // to avoid boundary conditions, in y and z directions it is assumed that the number of points is 3+i*2, i=0,1,2,... (this check is somewhere else)
         // however in the x direction there can be any number of points, because the domain is divided between mpi processes...
-        static rng_t rng_dbl_stride(const rng_t &rng, const int offset = 0) 
+        static rng_t rng_dbl_stride(const rng_t &rng) 
         {
           assert(rng.last() != rng.first()); // we need at least 2 midpoints
+          assert(rng.stride() % 2 == 0);
 
-//          return rng_t(rng.first() - offset, rng.last(), 2*rng.stride());
-          if( ((rng.last() - rng.first() - offset) / rng.stride() + 1) % 2 == 0) // even number of midpoints; y and z directions (and sometimes x)
-            return rng_t(rng.first() - offset, rng.last() - rng.stride(), 2*rng.stride());
+          // if domain starts with a point in the middle of a triple - we need to start calculating from a point to the left
+          const int offset = ( (rng.first() - rng.stride() / 2) / rng.stride() ) % 2 == 0 ? 0 : - rng.stride();
+          const auto first = rng.first() + offset;
+
+          if( ((rng.last() - first) / rng.stride() + 1) % 2 == 0) // even number of midpoints; y and z directions (and sometimes x)
+            return rng_t(first, rng.last() - rng.stride(), 2*rng.stride());
           else // odd number of midpoints
-            return rng_t(rng.first() - offset, rng.last(), 2*rng.stride()); // rely on the halo along x direction
+            return rng_t(first, rng.last(),                2*rng.stride()); // rely on the halo along x direction
         }
 
         static rng_t rng_merge(const rng_t &rng1, const rng_t &rng2) 
@@ -113,6 +139,15 @@ namespace libmpdataxx
             std::min(rng1.first(), rng2.first()),
             std::max(rng1.last(), rng2.last()),
             rng1.stride() / 2);
+        }
+
+        // reconstruction based on 3 points, we need up to 2 resolved points between MPI domains
+        static rng_t rng_ref_distmem_halo(const rng_t &rng, const int &n_ref, const int rank = 0, const int size = 1)
+        {
+          return rng_t(
+            rank == 0       ? rng.first()                              : rng.first() - (n_ref + n_ref/2),
+            rank < size - 1 ? rng.last() + (n_ref + n_ref/2) : rng.last(),
+            rng.stride());
         }
 
         public:
@@ -156,6 +191,10 @@ namespace libmpdataxx
               ijk_ref.ubound(d) = this->mem->grid_size_ref[d].last();
             }
           }
+          ijk_ref_with_halo = ijk_ref;
+          const auto ijk_ref_with_halo_rng_0 = rng_ref_distmem_halo(ijk_ref[0], this->mem->n_ref, this->mem->distmem.rank(), this->mem->distmem.size());
+          ijk_ref_with_halo.lbound(0) = ijk_ref_with_halo_rng_0.first();
+          ijk_ref_with_halo.ubound(0) = ijk_ref_with_halo_rng_0.last();
         }
       };
     } // namespace detail
