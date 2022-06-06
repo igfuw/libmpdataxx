@@ -145,6 +145,7 @@ namespace libmpdataxx
         }
 
         // TODO: stretching parameters at the overlaps of the reconstructed and resolved arrays (ijk_r2r) are not used, do not generate them
+        //       also not all parameters in the halo are needed (but some are!)
         void generate_stretching_parameters(const int rng_seed = 44)
         {
           std::mt19937 gen(rng_seed); 
