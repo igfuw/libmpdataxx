@@ -28,6 +28,8 @@ namespace libmpdataxx
         typename std::enable_if_t<ct_params_t::n_dims == 3>
       > : public detail::mpdata_rhs_vip_prs_sgs_fra_common<ct_params_t, minhalo>
       {
+        public:
+
         using parent_t = detail::mpdata_rhs_vip_prs_sgs_fra_common<ct_params_t, minhalo>;
         using parent_t::parent_t; // inheriting constructors
         using real_t = typename ct_params_t::real_t;
