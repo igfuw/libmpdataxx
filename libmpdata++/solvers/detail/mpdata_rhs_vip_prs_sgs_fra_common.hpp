@@ -13,6 +13,7 @@
 #include <libmpdata++/solvers/mpdata_rhs_vip_prs_sgs.hpp>
 //#include <numeric>
 //#include <libmpdata++/formulae/idxperm.hpp>
+#include <random>
 
 namespace libmpdataxx
 {
