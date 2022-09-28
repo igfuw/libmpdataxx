@@ -160,6 +160,7 @@ namespace libmpdataxx
             {
               if ((this->timestep - t) % static_cast<int>(outfreq) == 0)
               {
+                this->mem->barrier();
                 hook_ante_record_all();
                 if (this->rank == 0)
                   record_all();
