@@ -153,7 +153,7 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          unsigned int n_fra_iter = 1; // number of iterations of fractal reconstruction
+          int n_fra_iter = 1; // number of iterations of fractal reconstruction
         };
 
         // ctor

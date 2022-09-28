@@ -687,13 +687,32 @@ namespace libmpdataxx
         }
       }
 
+      // as above but for solvers with fractal grid refinement
+      void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_fra_family_tag)
+      {
+        record_params(hdfcp, typename std::conditional<static_cast<solvers::sgs_scheme_t>
+                               (parent_t::ct_params_t_::sgs_scheme) == solvers::iles,
+                               typename solvers::mpdata_rhs_vip_prs_family_tag,                  // iles
+                               typename std::conditional<static_cast<solvers::sgs_scheme_t>
+                                 (parent_t::ct_params_t_::sgs_scheme) == solvers::smg,
+                                 typename solvers::mpdata_rhs_vip_prs_sgs_smg_family_tag,        // smg
+                                 typename solvers::mpdata_rhs_vip_prs_sgs_dns_family_tag         // dns
+                               >::type
+                             >::type{}
+                     );
+        hdfcp.createGroup("fractal");
+        const auto &group = hdfcp.openGroup("fractal");
+        {
+          const auto type = H5::PredType::NATIVE_INT;
+          group.createAttribute("n_fra_iter", type, H5::DataSpace(1, &one)).write(type, &this->n_fra_iter);
+        }
+      }
+
       // as above but for the boussinesq solver
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_boussinesq_family_tag)
       {
-        record_params(hdfcp, typename std::conditional<static_cast<solvers::sgs_scheme_t>
-                                                        (parent_t::ct_params_t_::sgs_scheme) == solvers::iles,
-                                                       typename solvers::mpdata_rhs_vip_prs_family_tag,
-                                                       typename solvers::mpdata_rhs_vip_prs_sgs_smg_family_tag>::type{});
+        record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_fra_family_tag{});
+
         hdfcp.createGroup("boussinesq");
         const auto &group = hdfcp.openGroup("boussinesq");
         {
