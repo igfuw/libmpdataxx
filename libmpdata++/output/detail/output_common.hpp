@@ -38,7 +38,7 @@ namespace libmpdataxx
 
         virtual void record(const int var) {}
         virtual void start(const typename parent_t::advance_arg_t nt) {}
-        virtual void hook_pre_record_all() {}
+        virtual void hook_ante_record_all() {}
 
         typename parent_t::arr_t out_data(const int var)
         {
@@ -56,7 +56,7 @@ namespace libmpdataxx
             this->mem->barrier();
           }
 
-          hook_pre_record_all();
+          hook_ante_record_all();
           if (this->rank == 0)
           {
             record_time = this->time;
@@ -149,7 +149,7 @@ namespace libmpdataxx
 
           if (this->var_dt && do_record_cnt == 1)
           {
-            hook_pre_record_all();
+            hook_ante_record_all();
             if (this->rank == 0)
               record_all();
           }
@@ -160,7 +160,7 @@ namespace libmpdataxx
             {
               if ((this->timestep - t) % static_cast<int>(outfreq) == 0)
               {
-                hook_pre_record_all();
+                hook_ante_record_all();
                 if (this->rank == 0)
                   record_all();
               }
