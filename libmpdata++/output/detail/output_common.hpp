@@ -38,6 +38,7 @@ namespace libmpdataxx
 
         virtual void record(const int var) {}
         virtual void start(const typename parent_t::advance_arg_t nt) {}
+        virtual void hook_pre_record_all() {}
 
         typename parent_t::arr_t out_data(const int var)
         {
@@ -55,6 +56,7 @@ namespace libmpdataxx
             this->mem->barrier();
           }
 
+          hook_pre_record_all();
           if (this->rank == 0)
           {
             record_time = this->time;
@@ -145,20 +147,22 @@ namespace libmpdataxx
               this->mem->barrier();
           }
 
-          if (this->rank == 0)
+          if (this->var_dt && do_record_cnt == 1)
           {
-            //TODO: output of solver statistics every timesteps could probably go here
-
-            if (this->var_dt && do_record_cnt == 1)
-            {
+            hook_pre_record_all();
+            if (this->rank == 0)
               record_all();
-            }
-            else if (!this->var_dt)
+          }
+          else if (!this->var_dt)
+          {
+            record_time = this->time;
+            for (int t = 0; t < outwindow; ++t)
             {
-              record_time = this->time;
-              for (int t = 0; t < outwindow; ++t)
+              if ((this->timestep - t) % static_cast<int>(outfreq) == 0)
               {
-                if ((this->timestep - t) % static_cast<int>(outfreq) == 0) record_all();
+                hook_pre_record_all();
+                if (this->rank == 0)
+                  record_all();
               }
             }
           }
