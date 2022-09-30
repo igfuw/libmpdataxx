@@ -175,7 +175,7 @@ namespace libmpdataxx
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e_ref)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
 
-          generate_stretching_parameters();
+//          generate_stretching_parameters();
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
