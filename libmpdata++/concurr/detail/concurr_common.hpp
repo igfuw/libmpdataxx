@@ -14,7 +14,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <libmpdata++/blitz.hpp>
 
-#include <libmpdata++/concurr/detail/sharedmem.hpp>
+#include <libmpdata++/concurr/detail/sharedmem_refined.hpp>
 #include <libmpdata++/concurr/detail/timer.hpp>
 #include <libmpdata++/concurr/any.hpp>
 
@@ -33,6 +33,8 @@
 #include <libmpdata++/bcond/remote_2d.hpp>
 #include <libmpdata++/bcond/remote_3d.hpp>
 #include <libmpdata++/bcond/gndsky_3d.hpp>
+
+#include <libmpdata++/solvers/detail/solver_type_traits.hpp>
 
 namespace libmpdataxx
 {
@@ -149,12 +151,7 @@ namespace libmpdataxx
 
         protected:
 
-        // (cannot be nested due to templates)
-        typedef sharedmem<
-          typename solver_t::real_t,
-          solver_t::n_dims,
-          solver_t::n_tlev
-        > mem_t;
+        using mem_t = typename solver_t::mem_t;
 
         // member fields
         boost::ptr_vector<solver_t> algos;
@@ -452,6 +449,15 @@ namespace libmpdataxx
           return mem->max(mem->advectee(e));
         }
       };
+
+      template< class mem_t, class solver_t>
+      mem_t* mem_factory(const typename solver_t::rt_params_t &p)
+      {
+        if constexpr (solvers::detail::slvr_with_frac_recn<typename solver_t::ct_params_t_>())
+          return new mem_t(p.grid_size, pow(2, p.n_fra_iter));
+        else
+          return new mem_t(p.grid_size);
+      }
     } // namespace detail
   } // namespace concurr
 } // namespace libmpdataxx

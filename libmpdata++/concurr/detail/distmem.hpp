@@ -54,6 +54,7 @@ public: // TODO: just a temp measure, make it private again
         public:
 
         std::array<int, n_dims> grid_size;
+        std::array<int, n_dims> grid_size_ref;
 
         int rank()
         {

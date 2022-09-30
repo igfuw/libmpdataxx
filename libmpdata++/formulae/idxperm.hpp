@@ -69,5 +69,18 @@ namespace libmpdataxx
 
     template<>
     inline int_idx_t<3> pi<2>(const int k, const int i, const int j) { return int_idx_t<3>({i,j,k}); }
+
+    // 3D - strided ranges
+    template<int d>
+    inline idxs_t<3> pis(const rng_t &i, const rng_t &j, const rng_t &k);
+
+    template<>
+    inline idxs_t<3> pis<0>(const rng_t &i, const rng_t &j, const rng_t &k) { return idxs_t<3>{{i.first(), j.first(), k.first()}, {i.last(), j.last(), k.last()}, {i.stride(), j.stride(), k.stride()}}; }
+
+    template<>
+    inline idxs_t<3> pis<1>(const rng_t &j, const rng_t &k, const rng_t &i) { return idxs_t<3>{{i.first(), j.first(), k.first()}, {i.last(), j.last(), k.last()}, {i.stride(), j.stride(), k.stride()}}; }
+
+    template<>
+    inline idxs_t<3> pis<2>(const rng_t &k, const rng_t &i, const rng_t &j) { return idxs_t<3>{{i.first(), j.first(), k.first()}, {i.last(), j.last(), k.last()}, {i.stride(), j.stride(), k.stride()}}; }
   } // namespace idxperm
 } // namespace libmpdataxx

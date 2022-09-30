@@ -36,8 +36,8 @@ namespace libmpdataxx
       static_assert(parent_t::n_dims > 1, "only 2D and 3D output supported");
 
       std::vector<std::string> timesteps;
-      //xdmf writer
-      detail::xdmf_writer<parent_t::n_dims> xdmfw;
+      //xdmf writer, additional one for refined data (separate .xmf files describing the refined grid, TODO: use two grids in one file? Paraview AMR dataset could help?)
+      detail::xdmf_writer<parent_t::n_dims> xdmfw, xdmfw_ref;
 
       void start(const typename parent_t::advance_arg_t nt)
       {
@@ -56,7 +56,8 @@ namespace libmpdataxx
 
           if (this->mem->G.get() != nullptr) xdmfw.add_const_attribute("G", this->const_name, this->mem->distmem.grid_size.data());
 
-          xdmfw.setup(this->const_name, this->dim_names, attr_names, this->mem->distmem.grid_size.data());
+          xdmfw.setup(    this->const_name, this->dim_names,     attr_names, this->mem->distmem.grid_size.data()    );
+          xdmfw_ref.setup(this->const_name, this->dim_names_ref, {},         this->mem->distmem.grid_size_ref.data());
         }
       }
 
@@ -70,10 +71,14 @@ namespace libmpdataxx
           std::string xmf_name = this->base_name() + ".xmf";
           xdmfw.write(this->outdir + "/" + xmf_name, this->hdf_name(), this->record_time);
 
+          std::string xmf_ref_name = this->base_name() + "_ref.xmf";
+          xdmfw_ref.write(this->outdir + "/" + xmf_ref_name, this->hdf_name(), this->record_time);
+
           // save the xmf filename for temporal write
-          timesteps.push_back(xmf_name);
+          timesteps.push_back(this->base_name());
           // write temporal xmf
-          xdmfw.write_temporal(this->outdir + "/temp.xmf", timesteps);
+          xdmfw.write_temporal(this->outdir + "/temp.xmf", timesteps, ".xmf");
+          xdmfw_ref.write_temporal(this->outdir + "/temp_ref.xmf", timesteps, "_ref.xmf"); 
         }
       }
 
@@ -101,6 +106,16 @@ namespace libmpdataxx
 #endif
           xdmfw.add_attribute(name, this->hdf_name(), shape.data());
         parent_t::record_aux_dsc(name, arr, srfc);
+      }
+
+      void record_aux_dsc_refined(const std::string &name, const typename solver_t::arr_t &arr)
+      {
+        auto shape = this->mem->distmem.grid_size_ref;
+#if defined(USE_MPI)
+        if (this->mem->distmem.rank() == 0)
+#endif
+          xdmfw_ref.add_attribute(name, this->hdf_name(), shape.data());
+        parent_t::record_aux_dsc_refined(name, arr);
       }
 
       public:

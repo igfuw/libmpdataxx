@@ -8,9 +8,10 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/formulae/arakawa_c.hpp>
-#include <libmpdata++/concurr/detail/sharedmem.hpp>
+#include <libmpdata++/concurr/detail/sharedmem_refined.hpp>
 
 #include <libmpdata++/solvers/detail/monitor.hpp>
+#include <libmpdata++/solvers/detail/solver_type_traits.hpp>
 
 #include <libmpdata++/bcond/detail/bcond_common.hpp>
 
@@ -72,7 +73,18 @@ namespace libmpdataxx
         real_t time = 0;
         std::vector<int> n;
 
-        typedef concurr::detail::sharedmem<real_t, n_dims, n_tlev> mem_t;
+        using shmem_ref_t = concurr::detail::sharedmem_refined<real_t, n_dims, n_tlev>;
+        using shmem_t = concurr::detail::sharedmem<real_t, n_dims, n_tlev>;
+
+        public:
+
+        // if fractal reconstruction of some variables is required in ct_params, use special type of sharedmem
+        using mem_t = typename std::conditional_t<
+          detail::slvr_with_frac_recn_v<ct_params_t>,
+          shmem_ref_t, shmem_t>;
+
+        protected:
+
         mem_t *mem;
 
         // helper methods invoked by solve()

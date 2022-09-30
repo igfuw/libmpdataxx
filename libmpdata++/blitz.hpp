@@ -51,6 +51,7 @@
 namespace libmpdataxx
 {
   template <int n_dims> using idx_t = blitz::RectDomain<n_dims>;
+  template <int n_dims> using idxs_t = blitz::StridedDomain<n_dims>;
   using rng_t = blitz::Range;
 
   // non-int ix_t means either rng_t or idx_t

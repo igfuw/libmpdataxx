@@ -32,7 +32,7 @@ set(libmpdataxx_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../include/")
 
 ############################################################################################
 # debug mode compiler flags
-set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++14 -DBZ_DEBUG -g -Wno-enum-compare") #TODO: -Og if compiler supports it?
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++17 -DBZ_DEBUG -g -Wno-enum-compare -Wfatal-errors") #TODO: -Og if compiler supports it?
 
 
 ############################################################################################
@@ -42,7 +42,7 @@ if(
   CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
   CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" 
 )
-  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++14 -DNDEBUG -Ofast -march=native -Wno-enum-compare")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=c++17 -DNDEBUG -Ofast -march=native -Wno-enum-compare")
 
   # preventing Kahan summation from being optimised out
   if (
@@ -58,7 +58,7 @@ if(
   CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
 )
   # flags taken from -fast but without -static
-  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=gnu++14 -DNDEBUG -xHOST -O3 -ipo -no-prec-div -fp-model fast=2")
+  set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -std=gnu++17 -DNDEBUG -xHOST -O3 -ipo -no-prec-div -fp-model fast=2")
 endif()
 
 
