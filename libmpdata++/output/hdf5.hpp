@@ -531,9 +531,11 @@ namespace libmpdataxx
       }
 
       // see above, also assumes that z is the last dimension
-      void record_prof_const(const std::string &name, typename solver_t::real_t *data)
+      void record_prof_const(const std::string &name, typename solver_t::real_t *data, const bool refined = false)
       {
         assert(this->rank == 0);
+        const auto _shape(refined ? shape_ref : shape);
+        const auto _offst(refined ? offst_ref : offst);
 
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR
 #if defined(USE_MPI)
@@ -544,7 +546,7 @@ namespace libmpdataxx
         auto aux = hdfcp.createDataSet(
           name,
           flttype_output,
-          H5::DataSpace(1, &shape[parent_t::n_dims - 1])
+          H5::DataSpace(1, &_shape[parent_t::n_dims - 1])
         );
 
 #if defined(USE_MPI)
@@ -552,8 +554,8 @@ namespace libmpdataxx
 #endif
         {
           auto space = aux.getSpace();
-          space.selectHyperslab(H5S_SELECT_SET, &shape[parent_t::n_dims - 1], &offst[parent_t::n_dims - 1]);
-          aux.write(data, flttype_solver, H5::DataSpace(1, &shape[parent_t::n_dims - 1]), space);
+          space.selectHyperslab(H5S_SELECT_SET, &_shape[parent_t::n_dims - 1], &_offst[parent_t::n_dims - 1]);
+          aux.write(data, flttype_solver, H5::DataSpace(1, &_shape[parent_t::n_dims - 1]), space);
         }
       }
 
