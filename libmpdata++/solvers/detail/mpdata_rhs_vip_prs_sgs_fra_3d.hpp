@@ -37,6 +37,7 @@ namespace libmpdataxx
         private:
   
         // helper variables for grid refinement
+        // TODO: replace with idx_t: mid_ijk_r2r ijk_r2r_h
         rng_t mid_ijk_r2r_0, mid_ijk_r2r_1, mid_ijk_r2r_2;     // positions between already known values (to be filled during given iteration)
         rng_t ijk_r2r_0_h_with_halo, ijk_r2r_1_h, ijk_r2r_2_h; // all positions at resolution of given iteration
         int stride, hstride;                                   // stride and half stride
