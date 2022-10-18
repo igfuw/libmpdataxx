@@ -201,6 +201,8 @@ namespace libmpdataxx
           //this->mem->barrier();
 
           //std::cerr << "mem->grid_size_ref[0]: " << this->mem->grid_size_ref[0] << std::endl;
+          //std::cerr << "mem->grid_size_ref[1]: " << this->mem->grid_size_ref[1] << std::endl;
+          //std::cerr << "mem->grid_size_ref[2]: " << this->mem->grid_size_ref[2] << std::endl;
 
           fill_refinee_distmem_halos(e, halo_size);
 
