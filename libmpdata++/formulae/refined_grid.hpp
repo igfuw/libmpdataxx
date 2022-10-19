@@ -17,12 +17,16 @@ namespace libmpdataxx
       // calculate regular grid scalar as an average from the refined grid
       // modifies the refined grid scalar!
       // 3d version
+      // averaged only from points within the domain, halos outside of the modeled domain are not used
+      // however, halos between MPI domains are used;
+      // it is assumed that these are halos are large enough!
+      // currently, the halo between MPI domains is n_ref+n_ref/2
       template<class real_t, class arr_t, class ijk_t>
       void spatial_average_ref2reg(
         arr_t arr,
         const ijk_t &ijk,                    // index of the refined point that overlaps with the regular point
         const int &dist,                     // average calculate from the box (i-dist, i+dist)(j-dist,j+dist)(k-dist.k+dist)
-        const std::array<int, 3> grid_size,  // number of points in each direction (total, not for this MPI process), needed for averaging on edges so that it does not go out of the domain; refined arrays have no halos on domain edgs, only halos between MPI subdomains
+        const std::array<int, 3> grid_size,  // number of cells in the domain in each direction (total, not for this MPI process), needed for averaging on edges so that it does not go out of the domain
         const bool volume_avg                // should averaging account weights proportional to cell volume (refined cells at box edges are only partially within the regular cell)
       )
       {

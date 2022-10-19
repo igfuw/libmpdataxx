@@ -38,9 +38,9 @@ namespace libmpdataxx
 
         const int n_ref,         // number of refinements; refined resolution is dx / n_ref
                   n_fra_iter;    // number of iterations of grid refinement
-        
-//        const int halo_ref; // size of halos of refined scalar (and vector?) arrays
 
+        static const int halo_ref = 1; // halo size of refined scalar arrays
+        
         const std::array<int, ct_params_t::n_eqns> ix_r2r;
         constexpr std::array<int, ct_params_t::n_eqns> get_ix_r2r()
         {
@@ -141,11 +141,12 @@ namespace libmpdataxx
         }
 
         // reconstruction based on 3 points, we need up to 2 resolved points between MPI domains
-        static rng_t rng_ref_distmem_halo(const rng_t &rng, const int &n_ref, const int rank = 0, const int size = 1)
+        static rng_t rng_ref_distmem_halo(const rng_t &rng, const int &n_ref, const int rank, const int size)
         {
+          const int halo = max(halo_ref, n_ref + n_ref/2);
           return rng_t(
-            rank == 0       ? rng.first()                              : rng.first() - (n_ref + n_ref/2),
-            rank < size - 1 ? rng.last() + (n_ref + n_ref/2) : rng.last(),
+            rank == 0       ? rng.first()       : rng.first() - halo,
+            rank < size - 1 ? rng.last() + halo : rng.last(),
             rng.stride());
         }
 

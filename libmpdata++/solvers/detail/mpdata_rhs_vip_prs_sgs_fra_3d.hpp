@@ -239,9 +239,9 @@ namespace libmpdataxx
 
           for (int n = 0; n < n_arr; ++n)
             mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-              parent_t::rng_ref_distmem_halo(mem->grid_size_ref[0], mem->n_ref, mem->distmem.rank(), mem->distmem.size()), 
-              mem->grid_size_ref[1],
-              srfc ? rng_t(0, 0) : mem->grid_size_ref[2],
+              parent_t::rng_ref_distmem_halo(mem->grid_size_ref[0]^parent_t::halo_ref, mem->n_ref, mem->distmem.rank(), mem->distmem.size()), 
+              mem->grid_size_ref[1]^parent_t::halo_ref,
+              srfc ? rng_t(0, 0) : mem->grid_size_ref[2]^parent_t::halo_ref,
               arr3D_storage
             )));
         }
