@@ -373,20 +373,26 @@ namespace libmpdataxx
       }
 
       // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
-      void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, H5::H5File hdf)
+      void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, H5::H5File hdf, bool refined = false)
       {
         assert(this->rank == 0);
+        const auto _shape(refined ? shape_ref : shape);
+        const auto _offst(refined ? offst_ref : offst);
+        if(refined) params.setChunk(parent_t::n_dims, chunk_ref.data());
 
         auto aux = hdf.createDataSet(
           name,
           flttype_output,
-          sspace,
+          refined ? sspace_ref : sspace,
           params
         );
 
         auto space = aux.getSpace();
-        space.selectHyperslab(H5S_SELECT_SET, shape.data(), offst.data());
-        aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
+        space.selectHyperslab(H5S_SELECT_SET, _shape.data(), _offst.data());
+        aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, _shape.data()), space, dxpl_id);
+
+        // revert to default chunk
+        if(refined) params.setChunk(parent_t::n_dims, chunk.data());
       }
 
       // for discontiguous array with halos
@@ -460,7 +466,12 @@ namespace libmpdataxx
       // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
       void record_aux(const std::string &name, typename solver_t::real_t *data)
       {
-        record_aux_hlpr(name, data, *hdfp);
+        record_aux_hlpr(name, data, *hdfp, false);
+      }
+
+      void record_aux_refined(const std::string &name, typename solver_t::real_t *data)
+      {
+        record_aux_hlpr(name, data, *hdfp, true);
       }
 
       void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
