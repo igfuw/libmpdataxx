@@ -371,9 +371,9 @@ namespace libmpdataxx
           this->dj = p.dj;
           this->dk = p.dk;
           this->dijk = {p.di, p.dj, p.dk};
-          this->set_bcs(0, args.bcxl, args.bcxr);
-          this->set_bcs(1, args.bcyl, args.bcyr);
-          this->set_bcs(2, args.bczl, args.bczr);
+          this->set_bcs(this->bcs, 0, args.bcxl, args.bcxr);
+          this->set_bcs(this->bcs, 1, args.bcyl, args.bcyr);
+          this->set_bcs(this->bcs, 2, args.bczl, args.bczr);
         }
 
 

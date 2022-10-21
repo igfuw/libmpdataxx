@@ -29,7 +29,10 @@ namespace libmpdataxx
 
         public:
 
+        static constexpr int halo_ref = 1; // halo size of refined scalar arrays
         using real_t = typename ct_params_t::real_t;
+        using bcp_ref_t = std::unique_ptr<bcond::detail::bcond_common<real_t, halo_ref, ct_params_t::n_dims>>;
+        using bcs_ref_t = std::array<std::array<bcp_ref_t, 2>, ct_params_t::n_dims>;
 
         protected:
 
@@ -38,8 +41,6 @@ namespace libmpdataxx
 
         const int n_ref,         // number of refinements; refined resolution is dx / n_ref
                   n_fra_iter;    // number of iterations of grid refinement
-
-        static const int halo_ref = 1; // halo size of refined scalar arrays
         
         const std::array<int, ct_params_t::n_eqns> ix_r2r;
         constexpr std::array<int, ct_params_t::n_eqns> get_ix_r2r()
@@ -58,6 +59,9 @@ namespace libmpdataxx
         idx_t<ct_params_t::n_dims>  ijk_ref, // range of refinee handled by given solver
                                     ijk_ref_with_halo; // same but with a halo in x direction between MPI processes
         const idxs_t<ct_params_t::n_dims> ijk_r2r; // resolved to refined; refined scalars at the same position as resolved scalars
+
+        // boundary conditions for refined arrays
+        bcs_ref_t bcs_ref;
 
         // range modifying methods used in grid refinement
         // TODO: unify

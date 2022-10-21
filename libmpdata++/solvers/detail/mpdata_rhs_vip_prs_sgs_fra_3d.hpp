@@ -31,8 +31,17 @@ namespace libmpdataxx
         public:
 
         using parent_t = detail::mpdata_rhs_vip_prs_sgs_fra_common<ct_params_t, minhalo>;
-        using parent_t::parent_t; // inheriting constructors
+//        using parent_t::parent_t; // inheriting constructors
         using real_t = typename ct_params_t::real_t;
+
+        struct ctor_args_t : parent_t::ctor_args_t
+        {
+          typename parent_t::bcp_ref_t
+            &bcxl_ref, &bcxr_ref,
+            &bcyl_ref, &bcyr_ref,
+            &bczl_ref, &bczr_ref;
+        };
+
 
         private:
   
@@ -42,9 +51,10 @@ namespace libmpdataxx
         rng_t ijk_r2r_0_h_with_halo, ijk_r2r_1_h, ijk_r2r_2_h; // all positions at resolution of given iteration
         int stride, hstride;                                   // stride and half stride
 
-        // fill distmem halos of refinee
+        // fill distmem halos of refinee, only at points overlapping with resolved points
+        // and not outside of the modeled domain (e.g. in periodic case)
         // TODO: move to bcond or sth? would be filled only by remote bcond
-        void fill_refinee_distmem_halos(const int e, const int halo_size)
+        void fill_refinee_r2r_distmem_halos(const int e, const int halo_size)
         {
           const int e_ref = this->ix_r2r.at(e);
           // TODO: we only need to xchng along distmem direction (x)
@@ -109,6 +119,23 @@ namespace libmpdataxx
           }
         }
 
+        virtual void xchng_sclr_ref(typename parent_t::arr_t &arr,
+                       const idx_t<3> &range_ijk
+        ) final // for a given array
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs_ref[1]) bc->fill_halos_sclr(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs_ref[2]) bc->fill_halos_sclr(arr, range_ijk[0], range_ijk[1]);
+          for (auto &bc : this->bcs_ref[0]) bc->fill_halos_sclr(arr, range_ijk[1], range_ijk[2]);
+          this->mem->barrier();
+        }
+
+        void xchng_ref(int e)
+        {
+          const int e_ref = this->ix_r2r.at(e);
+          this->xchng_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref, this->halo_ref);
+        }
+
         void refinement_ranges(const int iter, const int halo_size)
         {
           // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
@@ -171,7 +198,7 @@ namespace libmpdataxx
           //this->mem->barrier();
 
 
-          fill_refinee_distmem_halos(e, halo_size);
+          fill_refinee_r2r_distmem_halos(e, halo_size);
 
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e_ref)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
@@ -204,7 +231,7 @@ namespace libmpdataxx
           //std::cerr << "mem->grid_size_ref[1]: " << this->mem->grid_size_ref[1] << std::endl;
           //std::cerr << "mem->grid_size_ref[2]: " << this->mem->grid_size_ref[2] << std::endl;
 
-          fill_refinee_distmem_halos(e, halo_size);
+          fill_refinee_r2r_distmem_halos(e, halo_size);
 
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e_ref)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
@@ -224,6 +251,32 @@ namespace libmpdataxx
         }
 
         public:
+
+        mpdata_rhs_vip_prs_sgs_fra_dim(
+          ctor_args_t args,
+          const typename parent_t::rt_params_t &p
+        ) :
+          parent_t(args, p)
+        {
+          this->set_bcs(this->bcs_ref, 0, args.bcxl_ref, args.bcxr_ref);
+          this->set_bcs(this->bcs_ref, 1, args.bcyl_ref, args.bcyr_ref);
+          this->set_bcs(this->bcs_ref, 2, args.bczl_ref, args.bczr_ref);
+
+        /*
+          this->bcs_ref[0][0].reset(
+            new bcond::bcond<real_t, parent_t::halo_ref, bcond::open, bcond::left, ct_params_t::n_dims, 0>(
+              this->ijk_ref[0],
+              this->mem->distmem.grid_size_ref
+            )
+          );
+          */
+
+        /*
+          this->set_bcs(this->bcs_ref, 0, args.bcxl_ref, args.bcxr_ref);
+          this->set_bcs(this->bcs_ref, 1, args.bcyl_ref, args.bcyr_ref);
+          this->set_bcs(this->bcs_ref, 2, args.bczl_ref, args.bczr_ref);
+          */
+        }
 
         // helper method to allocate n_arr refined scalar temporary arrays
         static void alloc_tmp_sclr_ref(
