@@ -22,7 +22,7 @@ template <typename params_t>
 void set_sgs_specific(params_t &p, iles_tag)
 {
   p.iles_cdrag = 0.1;
-  p.n_fra_iter = 2;
+  p.n_fra_iter = 1;
 }
 
 // smagorinsky
