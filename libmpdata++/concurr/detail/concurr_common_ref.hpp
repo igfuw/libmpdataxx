@@ -4,6 +4,8 @@
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
 
+// for solvers with both a refined and regular grid
+
 #pragma once
 
 #include <libmpdata++/concurr/detail/concurr_common_hlpr.hpp>
@@ -20,7 +22,7 @@ namespace libmpdataxx
         bcond::bcond_e bcyl, bcond::bcond_e bcyr,
         bcond::bcond_e bczl, bcond::bcond_e bczr
       >
-      class concurr_ref_common_hlpr : public concurr_common_hlpr<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
+      class concurr_common_ref : public concurr_common_hlpr<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
       {
         private:
 
@@ -29,11 +31,10 @@ namespace libmpdataxx
 
         protected:
         // 3D version, note sharedmem in y direction!
-        virtual void init(
+        void init(
           const typename solver_t_::rt_params_t &p,
-          const std::array<rng_t, 3> &grid_size,
           const int &n1, const int &n0 = 1, const int &n2 = 1
-        ) override {
+        ) {
 
           typename solver_t_::bcp_ref_t bxl_ref, bxr_ref, byl_ref, byr_ref, bzl_ref, bzr_ref, shrdl_ref, shrdr_ref;
 
@@ -45,7 +46,7 @@ namespace libmpdataxx
               for (int i2 = 0; i2 < n2; ++i2)
               {
                 // i1 is the local thread rank, n1 is the number of threads. These are needed by remote bcond, because only rank=0 does mpi communication
-                this->init_bcs(i1, n1);
+                this->init_bcs_3d(i1, n1);
 
                 this->template bc_set<bcxl, bcond::left, 0, solver_t_::halo_ref>(bxl_ref, this->mem->grid_size_ref, this->mem->distmem.grid_size_ref, i1, n1);
                 this->template bc_set<bcxr, bcond::rght, 0, solver_t_::halo_ref>(bxr_ref, this->mem->grid_size_ref, this->mem->distmem.grid_size_ref, i1, n1);
@@ -69,9 +70,9 @@ namespace libmpdataxx
                         i1 == 0      ? this->byl : this->shrdl,
                         i1 == n1 - 1 ? this->byr : this->shrdr,
                         this->bzl, this->bzr,
-                        this->mem->slab(grid_size[0], i0, n0),
-                        this->mem->slab(grid_size[1], i1, n1),
-                        this->mem->slab(grid_size[2], i2, n2)
+                        this->mem->slab(this->mem->grid_size[0], i0, n0),
+                        this->mem->slab(this->mem->grid_size[1], i1, n1),
+                        this->mem->slab(this->mem->grid_size[2], i2, n2)
                       },
                       bxl_ref, bxr_ref,
                       i1 == 0      ? byl_ref : shrdl_ref,

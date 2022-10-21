@@ -180,9 +180,6 @@ namespace libmpdataxx
           // allocate the memory to be shared by multiple threads
           mem.reset(mem_p);
           solver_t::alloc(mem.get(), p.n_iters);
-
-          // allocate per-thread structures
-//          this->init(p, mem->grid_size, size);
         }
 
         protected:
@@ -256,81 +253,8 @@ namespace libmpdataxx
           );
         }
 
-        // 1D version
-        virtual void init(
-          const typename solver_t::rt_params_t &p,
-          const std::array<rng_t, 1> &grid_size, const int &n0
-        )
-        {
-          typename solver_t::bcp_t bxl, bxr, shrdl, shrdr;
-
-          // NOTE: for remote bcond, thread_rank set to 0 on purpose in 1D to have propre left/right message tags 
-          bc_set<bcxl, bcond::left, 0, solver_t::halo>(bxl, mem->grid_size, mem->distmem.grid_size);
-          bc_set<bcxr, bcond::rght, 0, solver_t::halo>(bxr, mem->grid_size, mem->distmem.grid_size);
-
-          for (int i0 = 0; i0 < n0; ++i0)
-          {
-            shrdl.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>());
-            shrdr.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>());
-
-            algos.push_back(
-              new solver_t(
-                typename solver_t::ctor_args_t({
-                  i0,
-                  mem.get(),
-                  i0 == 0      ? bxl : shrdl,
-                  i0 == n0 - 1 ? bxr : shrdr,
-                  mem->slab(grid_size[0], i0, n0)
-                }),
-                p
-              )
-            );
-          }
-        }
-
-        // 2D version
-        // TODO: assert parallelisation in the right dimensions! (blitz::assertContiguous)
-        virtual void init(
-          const typename solver_t::rt_params_t &p,
-          const std::array<rng_t, 2> &grid_size,
-          const int &n0, const int &n1 = 1
-        ) {
-          for (int i0 = 0; i0 < n0; ++i0)
-          {
-            for (int i1 = 0; i1 < n1; ++i1)
-            {
-              typename solver_t::bcp_t bxl, bxr, byl, byr, shrdl, shrdr;
-
-              // NOTE: for remote bcond, thread_rank set to 0 on purpose in 2D to have propre left/right message tags 
-              bc_set<bcxl, bcond::left, 0, solver_t::halo>(bxl, mem->grid_size, mem->distmem.grid_size);
-              bc_set<bcxr, bcond::rght, 0, solver_t::halo>(bxr, mem->grid_size, mem->distmem.grid_size);
-
-              bc_set<bcyl, bcond::left, 1, solver_t::halo>(byl, mem->grid_size, mem->distmem.grid_size);
-              bc_set<bcyr, bcond::rght, 1, solver_t::halo>(byr, mem->grid_size, mem->distmem.grid_size);
-
-              shrdl.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
-              shrdr.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
-
-              algos.push_back(
-                new solver_t(
-                  typename solver_t::ctor_args_t({
-                    i0,
-                    mem.get(),
-                    i0 == 0      ? bxl : shrdl,
-                    i0 == n0 - 1 ? bxr : shrdr,
-                    byl, byr,
-                    mem->slab(grid_size[0], i0, n0),
-                    mem->slab(grid_size[1], i1, n1)
-                  }),
-                  p
-                )
-              );
-            }
-          }
-        }
-
-        // 3D version, note sharedmem in y direction!
-        void init_bcs(const int &i1, const int &n1)
+        // 3D version
+        void init_bcs_3d(const int &i1, const int &n1)
         {
           // i1 is the local thread rank, n1 is the number of threads. These are needed by remote bcond, because only rank=0 does mpi communication
           bc_set<bcxl, bcond::left, 0, solver_t::halo>(bxl, mem->grid_size, mem->distmem.grid_size, i1, n1);
@@ -344,41 +268,6 @@ namespace libmpdataxx
 
           shrdl.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
           shrdr.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
-        }
-
-        virtual void init(
-          const typename solver_t::rt_params_t &p,
-          const std::array<rng_t, 3> &grid_size,
-          const int &n1, const int &n0 = 1, const int &n2 = 1
-        ) {
-          // TODO: renew pointers only if invalid ?
-          for (int i0 = 0; i0 < n0; ++i0)
-          {
-            for (int i1 = 0; i1 < n1; ++i1)
-            {
-              for (int i2 = 0; i2 < n2; ++i2)
-              {
-                init_bcs(i1, n1);
-
-                algos.push_back(
-                  new solver_t(
-                    typename solver_t::ctor_args_t({
-                      i1,
-                      mem.get(),
-                      bxl, bxr,
-                      i1 == 0      ? byl : shrdl,
-                      i1 == n1 - 1 ? byr : shrdr,
-                      bzl, bzr,
-                      mem->slab(grid_size[0], i0, n0),
-                      mem->slab(grid_size[1], i1, n1),
-                      mem->slab(grid_size[2], i2, n2)
-                    }),
-                    p
-                  )
-                );
-              }
-            }
-          }
         }
 
         private:

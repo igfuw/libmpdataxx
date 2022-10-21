@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include <libmpdata++/concurr/detail/concurr_ref_common_hlpr.hpp>
+#include <libmpdata++/concurr/detail/concurr_common_ref.hpp>
+#include <libmpdata++/concurr/detail/concurr_common_reg.hpp>
 
 namespace libmpdataxx
 {
@@ -40,6 +41,8 @@ namespace libmpdataxx
       }
       */
 
+ 
+      // default - for solvers with regular grid only
       template<
         class solver_t_,
         bcond::bcond_e bcxl, bcond::bcond_e bcxr,
@@ -47,10 +50,10 @@ namespace libmpdataxx
         bcond::bcond_e bczl, bcond::bcond_e bczr,
         class enableif = void
       >
-      class concurr_common : public concurr_ref_common_hlpr<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
+      class concurr_common : public concurr_common_reg<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
       {
         public:
-        using parent_t = concurr_ref_common_hlpr<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
+        using parent_t = concurr_common_reg<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
 
         // ctor
         concurr_common(
@@ -61,7 +64,7 @@ namespace libmpdataxx
           parent_t(p, mem_p, size)
         {
           // allocate per-thread structures
-          this->init(p, mem_p->grid_size, size);
+          this->init(p, size);
         }
       };
 /*
@@ -104,11 +107,11 @@ namespace libmpdataxx
         //typename std::enable_if_t<true>
         //typename std::enable_if_t<not is_derived_from_fra<solver_t_>()>
         //typename std::enable_if_t<not is_derived_from_fra<solver_t_>()>
-        typename std::enable_if_t<solver_t_::grid_refinement>
-      > : public concurr_ref_common_hlpr<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
+        typename std::enable_if_t<(solver_t_::halo_ref > 0)>
+      > : public concurr_common_ref<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>
       {
         public:
-        using parent_t = concurr_ref_common_hlpr<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
+        using parent_t = concurr_common_ref<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
 
         // ctor
         concurr_common(
@@ -119,7 +122,7 @@ namespace libmpdataxx
           parent_t(p, mem_p, size)
         {
           // allocate per-thread structures
-          this->init(p, mem_p->grid_size, size);
+          this->init(p, size);
         }
       };
     } // namespace detail
