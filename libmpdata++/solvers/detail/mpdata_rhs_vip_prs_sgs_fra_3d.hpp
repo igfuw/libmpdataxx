@@ -119,23 +119,6 @@ namespace libmpdataxx
           }
         }
 
-        virtual void xchng_sclr_ref(typename parent_t::arr_t &arr,
-                       const idx_t<3> &range_ijk
-        ) final // for a given array
-        {
-          this->mem->barrier();
-          for (auto &bc : this->bcs_ref[1]) bc->fill_halos_sclr(arr, range_ijk[2], range_ijk[0]);
-          for (auto &bc : this->bcs_ref[2]) bc->fill_halos_sclr(arr, range_ijk[0], range_ijk[1]);
-          for (auto &bc : this->bcs_ref[0]) bc->fill_halos_sclr(arr, range_ijk[1], range_ijk[2]);
-          this->mem->barrier();
-        }
-
-        void xchng_ref(int e)
-        {
-          const int e_ref = this->ix_r2r.at(e);
-          this->xchng_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref, this->halo_ref);
-        }
-
         void refinement_ranges(const int iter, const int halo_size)
         {
           // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
@@ -187,6 +170,7 @@ namespace libmpdataxx
 
         protected:
 
+        // calculate refined points using (tri?)linear interpolation
         void interpolate_refinee(const int e = 0)
         {
           assert(opts::isset(ct_params_t::fractal_recon, opts::bit(e)));
@@ -250,6 +234,36 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
+        virtual void xchng_vctr_ref(
+                       arrvec_t<typename parent_t::arr_t> &arrvec,
+                       const idx_t<3> &range_ijk
+        ) final 
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs_ref[1]) bc->fill_halos_sclr(arrvec[1], range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs_ref[2]) bc->fill_halos_sclr(arrvec[2], range_ijk[0], range_ijk[1]);
+          for (auto &bc : this->bcs_ref[0]) bc->fill_halos_sclr(arrvec[0], range_ijk[1], range_ijk[2]);
+          this->mem->barrier();
+        }
+
+//        void xchng_ref(int e)
+//        {
+//          const int e_ref = this->ix_r2r.at(e);
+//          this->xchng_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref);
+//        }
+
+        // calculate courant numbers at refined cell edges using a
+        // linear interpolation of a refined uvw (src) from cell centers to cell edges (dste
+        void interpolate_refined_courants(arrvec_t<typename parent_t::arr_t> &dst,
+                                          arrvec_t<typename parent_t::arr_t> &src)
+        {
+          this->xchng_vctr_ref(src, this->ijk_ref);
+          this->template intrp<0>(dst[0], src[0], this->ijk_ref[0]^h, this->ijk_ref[1], this->ijk_ref[2], this->dijk_ref[0], true);
+          this->template intrp<1>(dst[1], src[1], this->ijk_ref[1]^h, this->ijk_ref[2], this->ijk_ref[0], this->dijk_ref[1], true);
+          this->template intrp<2>(dst[2], src[2], this->ijk_ref[2]^h, this->ijk_ref[0], this->ijk_ref[1], this->dijk_ref[2], true);
+          this->mem->barrier();
+        }
+
         public:
 
         mpdata_rhs_vip_prs_sgs_fra_dim(
@@ -258,6 +272,12 @@ namespace libmpdataxx
         ) :
           parent_t(args, p)
         {
+          this->dijk_ref = {this->di / this->n_ref, this->dj / this->n_ref, this->dk / this->n_ref};
+          this->ijkm_ref = this->ijk_ref;
+          this->ijkm_ref.lbound(0) = this->ijkm_ref.lbound(0) - 1;
+          this->ijkm_ref.lbound(1) = this->ijkm_ref.lbound(1) - 1;
+          this->ijkm_ref.lbound(2) = this->ijkm_ref.lbound(2) - 1;
+
           this->set_bcs(this->bcs_ref, 0, args.bcxl_ref, args.bcxr_ref);
           this->set_bcs(this->bcs_ref, 1, args.bcyl_ref, args.bcyr_ref);
           this->set_bcs(this->bcs_ref, 2, args.bczl_ref, args.bczr_ref);
@@ -298,6 +318,27 @@ namespace libmpdataxx
               arr3D_storage
             )));
         }
+
+        static void alloc_tmp_vctr_ref(
+          typename parent_t::mem_t *mem,
+          const char * __file__
+        )
+        {
+          const int n_arr = 3;
+          const std::vector<std::vector<bool>> stgr{{true, false, false}, {false, true, false}, {false, false, true}};
+
+          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+          for (int n = 0; n < n_arr; ++n)
+          {
+            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
+              stgr[n][0] ? mem->grid_size_ref[0]^h : mem->grid_size_ref[0],
+              stgr[n][1] ? mem->grid_size_ref[1]^h : mem->grid_size_ref[1],
+              stgr[n][2] ? mem->grid_size_ref[2]^h : mem->grid_size_ref[2],
+              arr3D_storage
+            )));
+          }
+        }
+
       };
     } // namespace detail
   } // namespace solvers

@@ -212,14 +212,15 @@ namespace libmpdataxx
         const rng_t &i,
         const rng_t &j,
         const rng_t &k,
-        const typename ct_params_t::real_t &di
+        const typename ct_params_t::real_t &di,
+        const bool &noG = false
       )
       {
         using idxperm::pi;
         using namespace arakawa_c;
         using real_t = typename ct_params_t::real_t;
 
-        if (!this->mem->G)
+        if (!this->mem->G || noG)
         {
           dst(pi<d>(i+h, j, k)) = this->dt / di * real_t(.5) * (
             src(pi<d>(i,     j, k)) +

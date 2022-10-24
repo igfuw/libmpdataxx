@@ -56,12 +56,16 @@ namespace libmpdataxx
 
         // herlper ranges
         // TODO: make these const!
-        idx_t<ct_params_t::n_dims>  ijk_ref, // range of refinee handled by given solver
-                                    ijk_ref_with_halo; // same but with a halo in x direction between MPI processes
+        idx_t<ct_params_t::n_dims>  ijk_ref,           // range of refinee handled by given solver
+                                    ijkm_ref,          // same but starting at 1 to the left
+                                    ijk_ref_with_halo; // as ijk_ref but with a halo in x direction between MPI processes
         const idxs_t<ct_params_t::n_dims> ijk_r2r; // resolved to refined; refined scalars at the same position as resolved scalars
 
         // boundary conditions for refined arrays
         bcs_ref_t bcs_ref;
+
+        std::array<real_t, ct_params_t::n_dims> dijk_ref;
+
 
         // range modifying methods used in grid refinement
         // TODO: unify
