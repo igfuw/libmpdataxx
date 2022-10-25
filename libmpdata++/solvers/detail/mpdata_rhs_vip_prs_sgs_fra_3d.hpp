@@ -221,6 +221,7 @@ namespace libmpdataxx
           this->mem->refinee(e_ref)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
 
           generate_stretching_parameters();
+          this->mem->barrier();
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
@@ -228,7 +229,7 @@ namespace libmpdataxx
 
             formulae::fractal::rcnstrct<0, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h,           ijk_r2r_2_h,                                 hstride, this->c_j, this->d_j, this->f_j);
             this->mem->barrier();
-            formulae::fractal::rcnstrct<1, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_1)        , ijk_r2r_2_h,           ijk_r2r_0_h_with_halo,                       hstride, this->c_j, this->d_j, this->f_j);
+            formulae::fractal::rcnstrct<1, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_1)        , ijk_r2r_2_h,           ijk_r2r_0_h_with_halo,                       hstride, this->c_j, this->d_j, this->f_j); // NOTE: rng_dbl_stride(mid_ijk_r2r_1) gives overlapping ranges between thread subdomains... however it seems to work and naive fixes didnt work
             formulae::fractal::rcnstrct<2, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_2)        , ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride, this->c_j, this->d_j, this->f_j);
           }
           this->mem->barrier();
