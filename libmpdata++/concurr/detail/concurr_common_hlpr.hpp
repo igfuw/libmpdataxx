@@ -50,21 +50,25 @@ namespace libmpdataxx
         int n_dims,
         int halo,
         class bcp_t,
-        class mem_t
+        class mem_t,
+        class grid_size_t,
+        class distmem_grid_size_t
       >
       struct bc_set_remote_impl
       {
         static void _(
           bcp_t &bcp,
           const std::unique_ptr<mem_t> &mem,
+          const grid_size_t grid_size,
+          const distmem_grid_size_t distmem_grid_size,
           const int thread_rank,
           const int thread_size
         )
         {
           bcp.reset(
             new bcond::bcond<real_t, halo, bcond::remote, dir, n_dims, dim>(
-              mem->slab(mem->grid_size[dim]),
-              mem->distmem.grid_size,
+              mem->slab(grid_size[dim]),
+              distmem_grid_size,
               thread_rank,
               thread_size
             )
@@ -79,22 +83,26 @@ namespace libmpdataxx
         int dim,
         int halo,
         class bcp_t,
-        class mem_t
+        class mem_t,
+        class grid_size_t,
+        class distmem_grid_size_t
       >
-      struct bc_set_remote_impl<real_t, dir, dim, 3, halo, bcp_t, mem_t>
+      struct bc_set_remote_impl<real_t, dir, dim, 3, halo, bcp_t, mem_t, grid_size_t, distmem_grid_size_t>
       {
         static void _(
           bcp_t &bcp,
           const std::unique_ptr<mem_t> &mem,
+          const grid_size_t grid_size,
+          const distmem_grid_size_t distmem_grid_size,
           const int thread_rank,
           const int thread_size
         )
         {
           bcp.reset(
             new bcond::bcond<real_t, halo, bcond::remote, dir, 3, dim>(
-              mem->slab(mem->grid_size[dim]),
-              mem->distmem.grid_size,
-              mem->slab(mem->grid_size[1], thread_rank, thread_size), // NOTE: we assume here remote 3d bcond is only on the edges perpendicular to x
+              mem->slab(grid_size[dim]),
+              distmem_grid_size,
+              mem->slab(grid_size[1], thread_rank, thread_size), // NOTE: we assume here remote 3d bcond is only on the edges perpendicular to x
               thread_rank,
               thread_size
             )
@@ -109,16 +117,20 @@ namespace libmpdataxx
         int n_dims,
         int halo,
         class bcp_t,
-        class mem_t
+        class mem_t,
+        class grid_size_t,
+        class distmem_grid_size_t
       >
       void bc_set_remote(
         bcp_t &bcp,
         const std::unique_ptr<mem_t> &mem,
+        const grid_size_t grid_size,
+        const distmem_grid_size_t distmem_grid_size,
         const int thread_rank,
         const int thread_size
       )
       {
-        bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t>::_(bcp, mem, thread_rank, thread_size);
+        bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t, grid_size_t, distmem_grid_size_t>::_(bcp, mem, grid_size, distmem_grid_size, thread_rank, thread_size);
       }
 
       template<
@@ -222,6 +234,8 @@ namespace libmpdataxx
               bc_set_remote<real_t, dir, dim, solver_t::n_dims, halo>(
                 bcp,
                 mem,
+                grid_size,
+                distmem_grid_size,
                 thread_rank,
                 thread_size
               );
