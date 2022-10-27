@@ -62,11 +62,13 @@ namespace libmpdataxx
           const grid_size_t grid_size,
           const distmem_grid_size_t distmem_grid_size,
           const int thread_rank,
-          const int thread_size
+          const int thread_size,
+          boost::mpi::communicator &mpic
         )
         {
           bcp.reset(
             new bcond::bcond<real_t, halo, bcond::remote, dir, n_dims, dim>(
+              mpic,
               mem->slab(grid_size[dim]),
               distmem_grid_size,
               thread_rank,
@@ -95,11 +97,13 @@ namespace libmpdataxx
           const grid_size_t grid_size,
           const distmem_grid_size_t distmem_grid_size,
           const int thread_rank,
-          const int thread_size
+          const int thread_size,
+          boost::mpi::communicator &mpic
         )
         {
           bcp.reset(
             new bcond::bcond<real_t, halo, bcond::remote, dir, 3, dim>(
+              mpic,
               mem->slab(grid_size[dim]),
               distmem_grid_size,
               mem->slab(grid_size[1], thread_rank, thread_size), // NOTE: we assume here remote 3d bcond is only on the edges perpendicular to x
@@ -127,10 +131,11 @@ namespace libmpdataxx
         const grid_size_t grid_size,
         const distmem_grid_size_t distmem_grid_size,
         const int thread_rank,
-        const int thread_size
+        const int thread_size,
+        boost::mpi::communicator &mpic
       )
       {
-        bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t, grid_size_t, distmem_grid_size_t>::_(bcp, mem, grid_size, distmem_grid_size, thread_rank, thread_size);
+        bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t, grid_size_t, distmem_grid_size_t>::_(bcp, mem, grid_size, distmem_grid_size, thread_rank, thread_size, mpic);
       }
 
       template<
@@ -203,14 +208,16 @@ namespace libmpdataxx
           int halo,
           class bcp_t,
           class grid_size_t,
-          class distmem_grid_size_t
+          class distmem_grid_size_t,
+          class mpicomm_t
         >
         void bc_set(
           bcp_t &bcp,
           const grid_size_t grid_size,
           const distmem_grid_size_t distmem_grid_size,
-          const int thread_rank  = 0, // required only by 3D remote (MPI) and open bconds
-          const int thread_size = 0   // required only by 3D remote (MPI) and open bconds
+          mpicomm_t &mpic,
+          const int thread_rank  = 0,  // required only by 3D remote (MPI) and open bconds
+          const int thread_size = 0    // required only by 3D remote (MPI) and open bconds
         )
         {
           // sanity check - polar coords do not work with MPI yet
@@ -237,7 +244,8 @@ namespace libmpdataxx
                 grid_size,
                 distmem_grid_size,
                 thread_rank,
-                thread_size
+                thread_size,
+                mpic
               );
               return;
             }
@@ -268,20 +276,40 @@ namespace libmpdataxx
         }
 
         // 3D version
-        void init_bcs_3d(const int &i1, const int &n1)
+        template<int halo, class bcp_t, class grid_size_t, class distmem_grid_size_t>
+        void init_bcs_3d(
+          bcp_t &bxl, bcp_t &bxr, bcp_t &byl, bcp_t &byr, bcp_t &bzl, bcp_t &bzr, bcp_t &shrdl, bcp_t &shrdr,
+          const grid_size_t &grid_size,
+          const distmem_grid_size_t &distmem_grid_size,
+          const int &i1, const int &n1,
+          boost::mpi::communicator &mpic)
         {
           // i1 is the local thread rank, n1 is the number of threads. These are needed by remote bcond, because only rank=0 does mpi communication
-          bc_set<bcxl, bcond::left, 0, solver_t::halo>(bxl, mem->grid_size, mem->distmem.grid_size, i1, n1);
-          bc_set<bcxr, bcond::rght, 0, solver_t::halo>(bxr, mem->grid_size, mem->distmem.grid_size, i1, n1);
+#if defined(USE_MPI)
+          //boost::mpi::communicator mpic(MPI_COMM_WORLD, boost::mpi::comm_duplicate);
+          //boost::mpi::communicator mpic(MPI_COMM_WORLD, boost::mpi::comm_attach);
 
-          bc_set<bcyl, bcond::left, 1, solver_t::halo>(byl, mem->grid_size, mem->distmem.grid_size);
-          bc_set<bcyr, bcond::rght, 1, solver_t::halo>(byr, mem->grid_size, mem->distmem.grid_size);
+          bc_set<bcxl, bcond::left, 0, halo>(bxl, grid_size, distmem_grid_size, mpic, i1, n1);
+          bc_set<bcxr, bcond::rght, 0, halo>(bxr, grid_size, distmem_grid_size, mpic, i1, n1);
+                                                                                    
+          bc_set<bcyl, bcond::left, 1, halo>(byl, grid_size, distmem_grid_size, mpic);
+          bc_set<bcyr, bcond::rght, 1, halo>(byr, grid_size, distmem_grid_size, mpic);
+                                                                                    
+          bc_set<bczl, bcond::left, 2, halo>(bzl, grid_size, distmem_grid_size, mpic);
+          bc_set<bczr, bcond::rght, 2, halo>(bzr, grid_size, distmem_grid_size, mpic);
+#else
+          bc_set<bcxl, bcond::left, 0, halo>(bxl, grid_size, distmem_grid_size, i1, n1);
+          bc_set<bcxr, bcond::rght, 0, halo>(bxr, grid_size, distmem_grid_size, i1, n1);
 
-          bc_set<bczl, bcond::left, 2, solver_t::halo>(bzl, mem->grid_size, mem->distmem.grid_size);
-          bc_set<bczr, bcond::rght, 2, solver_t::halo>(bzr, mem->grid_size, mem->distmem.grid_size);
+          bc_set<bcyl, bcond::left, 1, halo>(byl, grid_size, distmem_grid_size);
+          bc_set<bcyr, bcond::rght, 1, halo>(byr, grid_size, distmem_grid_size);
 
-          shrdl.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
-          shrdr.reset(new bcond::shared<real_t, solver_t::halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
+          bc_set<bczl, bcond::left, 2, halo>(bzl, grid_size, distmem_grid_size);
+          bc_set<bczr, bcond::rght, 2, halo>(bzr, grid_size, distmem_grid_size);
+#endif
+
+          shrdl.reset(new bcond::shared<real_t, halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
+          shrdr.reset(new bcond::shared<real_t, halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
         }
 
         private:
