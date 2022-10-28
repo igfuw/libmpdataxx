@@ -235,10 +235,23 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
-        virtual void xchng_vctr_ref(
+        void xchng_ref(
+                       typename parent_t::arr_t &arr,
+                       const idx_t<3> &range_ijk
+        )
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs_ref[1]) bc->fill_halos_sclr(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs_ref[2]) bc->fill_halos_sclr(arr, range_ijk[0], range_ijk[1]);
+          for (auto &bc : this->bcs_ref[0]) bc->fill_halos_sclr(arr, range_ijk[1], range_ijk[2]);
+          this->mem->barrier();
+        }
+
+
+        void xchng_vctr_ref(
                        arrvec_t<typename parent_t::arr_t> &arrvec,
                        const idx_t<3> &range_ijk
-        ) final 
+        )
         {
           this->mem->barrier();
           for (auto &bc : this->bcs_ref[1]) bc->fill_halos_sclr(arrvec[1], range_ijk[2], range_ijk[0]);
