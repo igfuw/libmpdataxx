@@ -32,10 +32,8 @@ namespace libmpdataxx
         // based on the difference between idx to be sent by this thread and idx of this process
         idx_t extend_idx(idx_t idx)
         {
-std::cerr << "extend idx start idx(1): " << idx.lbound(1) << ", " << idx.ubound(1) << std::endl;
           idx.lbound(1) = 0                 + idx.lbound(1) - thread_j.first(); // does it have to start at 0?
           idx.ubound(1) = (grid_size_y - 1) + idx.ubound(1) - thread_j.last();  // does it have to end at grid_size_y - 1?
-std::cerr << "extend idx end idx(1): " << idx.lbound(1) << ", " << idx.ubound(1) << std::endl;
           return idx;
         }
 

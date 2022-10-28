@@ -78,19 +78,10 @@ namespace libmpdataxx
           const int
             msg_send = dir == left ? left : rght;
 
-          std::cerr << "send_hlpr idx dir " << dir << " : " 
-            << " (" << idx_send.lbound(0) << ", " << idx_send.ubound(0) << ")"  
-            << " (" << idx_send.lbound(1) << ", " << idx_send.ubound(1) << ")"  
-            << " (" << idx_send.lbound(2) << ", " << idx_send.ubound(2) << ")"  
-            << std::endl;
-
-          std::cerr << "buf_send: " << buf_send << std::endl;
-
           // arr_send references part of the send buffer that will be used
           arr_t arr_send(buf_send, a(idx_send).shape(), blitz::neverDeleteData);
           // copying data to be sent
           arr_send = a(idx_send);
-          std::cerr << "arr_send: " << arr_send << std::endl;
 
           // launching async data transfer
           if(arr_send.size()!=0)
@@ -120,13 +111,6 @@ namespace libmpdataxx
 #if defined(USE_MPI)
           const int
             msg_recv = dir == left ? rght : left;
-
-          std::cerr << "recv_hlpr idx dir " << dir << " : " 
-            << " (" << idx_recv.lbound(0) << ", " << idx_recv.ubound(0) << ")"  
-            << " (" << idx_recv.lbound(1) << ", " << idx_recv.ubound(1) << ")"  
-            << " (" << idx_recv.lbound(2) << ", " << idx_recv.ubound(2) << ")"  
-            << std::endl;
-
 
           // launching async data transfer
           if(a(idx_recv).size()!=0) // TODO: test directly size of idx_recv
@@ -235,13 +219,6 @@ namespace libmpdataxx
 #if defined(USE_MPI)
   
           const int slice_size = n_dims==1 ? 1 : (n_dims==2? distmem_grid_size[1]+6 : (distmem_grid_size[1]+6) * (distmem_grid_size[2]+6) ); // 3 is the max halo size (?), so 6 on both sides
-std::cerr << "remote_common ctor, " 
-  << " distmem_grid_size[0]: " << distmem_grid_size[0]
-  << " distmem_grid_size[1]: " << distmem_grid_size[1]
-  << " distmem_grid_size[2]: " << distmem_grid_size[2]
-  << " slice_size: " << slice_size 
-  << " halo: " << halo
-  << std::endl;
           // allocate enough memory in buffers to store largest halos to be sent
           buf_send = (real_t *) malloc(halo * slice_size * sizeof(real_t));
           buf_recv = (real_t *) malloc(halo * slice_size * sizeof(real_t));

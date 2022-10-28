@@ -271,11 +271,7 @@ namespace libmpdataxx
         void interpolate_refined_courants(arrvec_t<typename parent_t::arr_t> &dst,
                                           arrvec_t<typename parent_t::arr_t> &src)
         {
-          std::cerr << "interpolate_refined_courants src[0](ijk_ref): " << src[0](this->ijk_ref) << std::endl;
-          std::cerr << "interpolate_refined_courants src[1](ijk_ref): " << src[1](this->ijk_ref) << std::endl;
-          std::cerr << "interpolate_refined_courants src[2](ijk_ref): " << src[2](this->ijk_ref) << std::endl;
           this->xchng_vctr_ref(src, this->ijk_ref);
-          std::cerr << "post xchng vctr ref" << std::endl;
           this->template intrp<0>(dst[0], src[0], this->ijk_ref[0]^h, this->ijk_ref[1], this->ijk_ref[2], this->dijk_ref[0], true);
           this->template intrp<1>(dst[1], src[1], this->ijk_ref[1]^h, this->ijk_ref[2], this->ijk_ref[0], this->dijk_ref[1], true);
           this->template intrp<2>(dst[2], src[2], this->ijk_ref[2]^h, this->ijk_ref[0], this->ijk_ref[1], this->dijk_ref[2], true);
