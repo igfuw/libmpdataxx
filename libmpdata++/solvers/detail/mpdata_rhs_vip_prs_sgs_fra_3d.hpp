@@ -33,6 +33,7 @@ namespace libmpdataxx
         using parent_t = detail::mpdata_rhs_vip_prs_sgs_fra_common<ct_params_t, minhalo>;
 //        using parent_t::parent_t; // inheriting constructors
         using real_t = typename ct_params_t::real_t;
+        using gen_t = typename std::conditional_t<std::is_same_v<real_t, float>, std::mt19937, std::mt19937_64>; // NOTE: we assume that if real_t is not float it has to be double
 
         struct ctor_args_t : parent_t::ctor_args_t
         {
@@ -161,7 +162,7 @@ namespace libmpdataxx
         //       also not all parameters in the halo are needed (but some are!)
         void generate_stretching_parameters(const int rng_seed = 44)
         {
-          std::mt19937 gen(rng_seed); 
+          gen_t gen(rng_seed); 
           std::uniform_real_distribution<> dis(-1, 1); // [-1,1), but whatever
           auto rand = std::bind(dis, gen);
           std::generate(this->d_j(this->ijk_ref_with_halo).begin(), this->d_j(this->ijk_ref_with_halo).end(), rand);
