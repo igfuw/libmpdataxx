@@ -158,18 +158,19 @@ namespace libmpdataxx
           );
         }
 
+        protected:
+
         // TODO: stretching parameters at the overlaps of the reconstructed and resolved arrays (ijk_r2r) are not used, do not generate them
         //       also not all parameters in the halo are needed (but some are!)
-        void generate_stretching_parameters(const int rng_seed = 44)
+        void generate_stretching_parameters(const typename gen_t::result_type rng_seed = 44)
         {
           gen_t gen(rng_seed); 
           std::uniform_real_distribution<> dis(-1, 1); // [-1,1), but whatever
           auto rand = std::bind(dis, gen);
           std::generate(this->d_j(this->ijk_ref_with_halo).begin(), this->d_j(this->ijk_ref_with_halo).end(), rand);
           this->d_j(this->ijk_ref_with_halo) = formulae::fractal::d_of_CDF_fctr<real_t>{}(this->d_j(this->ijk_ref_with_halo));
+          this->mem->barrier();
         }
-
-        protected:
 
         // calculate refined points using (tri?)linear interpolation
         void interpolate_refinee(const int e = 0)
@@ -221,8 +222,8 @@ namespace libmpdataxx
           // fill refined array at position where it overlaps with the resolved array
           this->mem->refinee(e_ref)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
 
-          generate_stretching_parameters();
-          this->mem->barrier();
+//          generate_stretching_parameters();
+//          this->mem->barrier();
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
