@@ -29,7 +29,9 @@ namespace libmpdataxx
         using parent_t = concurr_common_hlpr<solver_t_, bcxl, bcxr, bcyl, bcyr, bczl, bczr>;
 //        using parent_t::parent_t;
 
+#if defined(USE_MPI)
         boost::mpi::communicator mpic, mpic_ref;
+#endif
 
         public:
         // ctor
@@ -38,9 +40,11 @@ namespace libmpdataxx
           typename solver_t_::mem_t *mem_p,
           const int &size
         ) :
-          parent_t(p, mem_p, size),
-          mpic(MPI_COMM_WORLD, boost::mpi::comm_duplicate),
-          mpic_ref(MPI_COMM_WORLD, boost::mpi::comm_duplicate)
+          parent_t(p, mem_p, size)
+#if defined(USE_MPI)
+          ,mpic(MPI_COMM_WORLD, boost::mpi::comm_duplicate)
+          ,mpic_ref(MPI_COMM_WORLD, boost::mpi::comm_duplicate)
+#endif
         {}
 
         protected:
@@ -64,13 +68,21 @@ namespace libmpdataxx
                   this->bxl, this->bxr, this->byl, this->byr, this->bzl, this->bzr, this->shrdl, this->shrdr,
                   this->mem->grid_size,
                   this->mem->distmem.grid_size,
-                  i1, n1, mpic);
+                  i1, n1
+#if defined(USE_MPI)
+		  ,mpic
+#endif
+		  );
 
                 this->template init_bcs_3d<solver_t_::halo_ref>(
                   bxl_ref, bxr_ref, byl_ref, byr_ref, bzl_ref, bzr_ref, shrdl_ref, shrdr_ref,
                   this->mem->grid_size_ref,
                   this->mem->distmem.grid_size_ref,
-                  i1, n1, mpic_ref);
+                  i1, n1
+#if defined(USE_MPI)
+		  ,mpic_ref
+#endif
+		  );
 
                 /*
                 this->init_bcs_3d(i1, n1);

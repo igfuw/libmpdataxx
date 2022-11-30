@@ -29,9 +29,11 @@
 #include <libmpdata++/bcond/polar_3d.hpp>
 #include <libmpdata++/bcond/rigid_2d.hpp>
 #include <libmpdata++/bcond/rigid_3d.hpp>
-#include <libmpdata++/bcond/remote_1d.hpp>
-#include <libmpdata++/bcond/remote_2d.hpp>
-#include <libmpdata++/bcond/remote_3d.hpp>
+#if defined(USE_MPI)
+  #include <libmpdata++/bcond/remote_1d.hpp>
+  #include <libmpdata++/bcond/remote_2d.hpp>
+  #include <libmpdata++/bcond/remote_3d.hpp>
+#endif
 #include <libmpdata++/bcond/gndsky_3d.hpp>
 
 #include <libmpdata++/solvers/detail/solver_type_traits.hpp>
@@ -43,6 +45,7 @@ namespace libmpdataxx
     namespace detail
     {
       // helpers for setting remote bcond
+#if defined(USE_MPI)
       template <
         class real_t,
         bcond::drctn_e dir,
@@ -137,6 +140,7 @@ namespace libmpdataxx
       {
         bc_set_remote_impl<real_t, dir, dim, n_dims, halo, bcp_t, mem_t, grid_size_t, distmem_grid_size_t>::_(bcp, mem, grid_size, distmem_grid_size, thread_rank, thread_size, mpic);
       }
+#endif
 
       template<
         class solver_t_,
@@ -225,6 +229,7 @@ namespace libmpdataxx
             throw std::runtime_error("Polar boundary conditions do not work with MPI.");
 
           // distmem overrides
+#if defined(USE_MPI)
           if (mem->distmem.size() > 1 && dim == 0)
           {
             if (
@@ -250,6 +255,7 @@ namespace libmpdataxx
               return;
             }
           }
+#endif
 
           // 3d open bcond needs to know thread rank and size, because it zeroes perpendicular vectors
           if (type == bcond::open && solver_t::n_dims == 3)
@@ -275,7 +281,7 @@ namespace libmpdataxx
           );
         }
 
-        // 3D version
+#if defined(USE_MPI)
         template<int halo, class bcp_t, class grid_size_t, class distmem_grid_size_t>
         void init_bcs_3d(
           bcp_t &bxl, bcp_t &bxr, bcp_t &byl, bcp_t &byr, bcp_t &bzl, bcp_t &bzr, bcp_t &shrdl, bcp_t &shrdr,
@@ -285,7 +291,6 @@ namespace libmpdataxx
           boost::mpi::communicator &mpic)
         {
           // i1 is the local thread rank, n1 is the number of threads. These are needed by remote bcond, because only rank=0 does mpi communication
-#if defined(USE_MPI)
           //boost::mpi::communicator mpic(MPI_COMM_WORLD, boost::mpi::comm_duplicate);
           //boost::mpi::communicator mpic(MPI_COMM_WORLD, boost::mpi::comm_attach);
 
@@ -297,20 +302,34 @@ namespace libmpdataxx
                                                                                     
           bc_set<bczl, bcond::left, 2, halo>(bzl, grid_size, distmem_grid_size, mpic);
           bc_set<bczr, bcond::rght, 2, halo>(bzr, grid_size, distmem_grid_size, mpic);
-#else
-          bc_set<bcxl, bcond::left, 0, halo>(bxl, grid_size, distmem_grid_size, i1, n1);
-          bc_set<bcxr, bcond::rght, 0, halo>(bxr, grid_size, distmem_grid_size, i1, n1);
-
-          bc_set<bcyl, bcond::left, 1, halo>(byl, grid_size, distmem_grid_size);
-          bc_set<bcyr, bcond::rght, 1, halo>(byr, grid_size, distmem_grid_size);
-
-          bc_set<bczl, bcond::left, 2, halo>(bzl, grid_size, distmem_grid_size);
-          bc_set<bczr, bcond::rght, 2, halo>(bzr, grid_size, distmem_grid_size);
-#endif
 
           shrdl.reset(new bcond::shared<real_t, halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
           shrdr.reset(new bcond::shared<real_t, halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
         }
+
+#else
+
+        template<int halo, class bcp_t, class grid_size_t, class distmem_grid_size_t>
+        void init_bcs_3d(
+          bcp_t &bxl, bcp_t &bxr, bcp_t &byl, bcp_t &byr, bcp_t &bzl, bcp_t &bzr, bcp_t &shrdl, bcp_t &shrdr,
+          const grid_size_t &grid_size,
+          const distmem_grid_size_t &distmem_grid_size,
+          const int &i1, const int &n1)
+        {
+          // i1 is the local thread rank, n1 is the number of threads. These are needed by remote bcond, because only rank=0 does mpi communication
+          bc_set<bcxl, bcond::left, 0, halo>(bxl, grid_size, distmem_grid_size, i1, n1);
+          bc_set<bcxr, bcond::rght, 0, halo>(bxr, grid_size, distmem_grid_size, i1, n1);
+
+          bc_set<bcyl, bcond::left, 1, halo>(byl, grid_size, distmem_grid_size, i1, n1);
+          bc_set<bcyr, bcond::rght, 1, halo>(byr, grid_size, distmem_grid_size, i1, n1);
+
+          bc_set<bczl, bcond::left, 2, halo>(bzl, grid_size, distmem_grid_size, i1, n1);
+          bc_set<bczr, bcond::rght, 2, halo>(bzr, grid_size, distmem_grid_size, i1, n1);
+
+          shrdl.reset(new bcond::shared<real_t, halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
+          shrdr.reset(new bcond::shared<real_t, halo, solver_t::n_dims>()); // TODO: shrdy if n1 != 1
+        }
+#endif
 
         private:
         virtual void solve(advance_arg_t nt) = 0;
