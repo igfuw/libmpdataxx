@@ -135,6 +135,12 @@ void test(const std::string &dirname, const int np, const int nt)
     slv.advectee(ix::u) = 0;
     slv.advectee(ix::v) = 0; 
 
+    // for explicit boussinesq (impl_tht == false), ix::tht needs to be full theta (not perturbation)
+    /*
+     *  blitz::thirdIndex k;
+     *  slv.advectee(ix::tht) += 300 * where(k * p.dk <= mixed_length, 1, 1 + (k * p.dk - mixed_length) * st);
+    */
+
     {
       blitz::thirdIndex k;
       // environmental potential temperature profile
