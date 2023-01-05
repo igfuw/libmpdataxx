@@ -151,6 +151,7 @@ namespace libmpdataxx
         // reconstruction based on 3 points, we need up to 2 resolved points between MPI domains
         static rng_t rng_ref_distmem_halo(const rng_t &rng, const int &n_ref, const int rank, const int size)
         {
+          assert(n_ref % 2 == 0);
           const int halo = max(halo_ref, n_ref + n_ref/2);
           return rng_t(
             rank == 0       ? rng.first()       : rng.first() - halo,
@@ -183,8 +184,8 @@ namespace libmpdataxx
             {n_ref, n_ref, n_ref}, // stride
             }
         {
-          assert(p.n_fra_iter > 0);
-          assert(n_ref % 2 == 0);
+          assert(p.n_fra_iter >= 0);
+          assert(n_ref % 2 == 0 || n_ref == 1);
 
           for (int d = 0; d < ct_params_t::n_dims; ++d)
           {

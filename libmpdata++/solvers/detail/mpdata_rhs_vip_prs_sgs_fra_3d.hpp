@@ -57,6 +57,8 @@ namespace libmpdataxx
         // TODO: move to bcond or sth? would be filled only by remote bcond
         void fill_refinee_r2r_distmem_halos(const int e, const int halo_size)
         {
+          assert(this->mem->n_ref % 2 == 0);
+
           const int e_ref = this->ix_r2r.at(e);
           // TODO: we only need to xchng along distmem direction (x)
           this->xchng(e);
@@ -164,6 +166,7 @@ namespace libmpdataxx
         //       also not all parameters in the halo are needed (but some are!)
         void generate_stretching_parameters(const typename gen_t::result_type rng_seed)
         {
+          assert(this->n_ref % 2 == 0);
           gen_t gen(rng_seed); 
           std::uniform_real_distribution<> dis(-1, 1); // [-1,1), but whatever
           auto rand = std::bind(dis, gen);
@@ -175,6 +178,7 @@ namespace libmpdataxx
         // calculate refined points using (tri?)linear interpolation
         void interpolate_refinee(const int e = 0)
         {
+          if(this->mem->n_ref == 1) return;
           assert(opts::isset(ct_params_t::fractal_recon, opts::bit(e)));
           const int halo_size = 1;
           const int e_ref = this->ix_r2r.at(e);
@@ -205,6 +209,7 @@ namespace libmpdataxx
 
         void reconstruct_refinee(const int e = 0)
         {
+          if(this->mem->n_ref == 1) return;
           assert(opts::isset(ct_params_t::fractal_recon, opts::bit(e)));
           const int halo_size = 2;
           const int e_ref = this->ix_r2r.at(e);
@@ -322,17 +327,25 @@ namespace libmpdataxx
           bool srfc = false
         )
         {
-          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+          if(mem->n_ref == 1)
+          {
+            parent_t::alloc_tmp_sclr(mem, __file__, n_arr, name, srfc);
+          }
+          else
+          {
+            assert(mem->n_ref % 2 == 0);
+            mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
 
-          if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
+            if (!name.empty()) mem->avail_tmp[name] = std::make_pair(__file__, mem->tmp[__file__].size() - 1);
 
-          for (int n = 0; n < n_arr; ++n)
-            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-              parent_t::rng_ref_distmem_halo(mem->grid_size_ref[0]^parent_t::halo_ref, mem->n_ref, mem->distmem.rank(), mem->distmem.size()), 
-              mem->grid_size_ref[1]^parent_t::halo_ref,
-              srfc ? rng_t(0, 0) : mem->grid_size_ref[2]^parent_t::halo_ref,
-              arr3D_storage
-            )));
+            for (int n = 0; n < n_arr; ++n)
+              mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
+                parent_t::rng_ref_distmem_halo(mem->grid_size_ref[0]^parent_t::halo_ref, mem->n_ref, mem->distmem.rank(), mem->distmem.size()), 
+                mem->grid_size_ref[1]^parent_t::halo_ref,
+                srfc ? rng_t(0, 0) : mem->grid_size_ref[2]^parent_t::halo_ref,
+                arr3D_storage
+              )));
+          }
         }
 
         static void alloc_tmp_vctr_ref(
@@ -340,18 +353,26 @@ namespace libmpdataxx
           const char * __file__
         )
         {
-          const int n_arr = 3;
-          const std::vector<std::vector<bool>> stgr{{true, false, false}, {false, true, false}, {false, false, true}};
-
-          mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
-          for (int n = 0; n < n_arr; ++n)
+          if(mem->n_ref == 1)
           {
-            mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
-              stgr[n][0] ? mem->grid_size_ref[0]^h : mem->grid_size_ref[0],
-              stgr[n][1] ? mem->grid_size_ref[1]^h : mem->grid_size_ref[1],
-              stgr[n][2] ? mem->grid_size_ref[2]^h : mem->grid_size_ref[2],
-              arr3D_storage
-            )));
+            parent_t::alloc_tmp_vctr(mem, __file__);
+          }
+          else
+          {
+            assert(mem->n_ref % 2 == 0);
+            const int n_arr = 3;
+            const std::vector<std::vector<bool>> stgr{{true, false, false}, {false, true, false}, {false, false, true}};
+
+            mem->tmp[__file__].push_back(new arrvec_t<typename parent_t::arr_t>());
+            for (int n = 0; n < n_arr; ++n)
+            {
+              mem->tmp[__file__].back().push_back(mem->old(new typename parent_t::arr_t(
+                stgr[n][0] ? mem->grid_size_ref[0]^h : mem->grid_size_ref[0],
+                stgr[n][1] ? mem->grid_size_ref[1]^h : mem->grid_size_ref[1],
+                stgr[n][2] ? mem->grid_size_ref[2]^h : mem->grid_size_ref[2],
+                arr3D_storage
+              )));
+            }
           }
         }
 

@@ -48,9 +48,12 @@ namespace libmpdataxx
       ) :
         parent_t(args, p)
       {
-        this->c_j.reference(args.mem->tmp[__FILE__][1][0]);
-        this->d_j.reference(args.mem->tmp[__FILE__][1][1]);
-        this->f_j.reference(args.mem->tmp[__FILE__][1][2]);
+        if(args.mem->n_ref > 1) // n_ref==1 doesnt do refinement
+        {
+          this->c_j.reference(args.mem->tmp[__FILE__][1][0]);
+          this->d_j.reference(args.mem->tmp[__FILE__][1][1]);
+          this->f_j.reference(args.mem->tmp[__FILE__][1][2]);
+        }
       }
 
       // why alloc here?
@@ -59,12 +62,25 @@ namespace libmpdataxx
         const int &n_iters
       ) {
         parent_t::alloc(mem, n_iters);
-        parent_t::alloc_tmp_sclr_ref(mem, __FILE__, opts::nset(ct_params_t::fractal_recon));
-        parent_t::alloc_tmp_sclr_ref(mem, __FILE__, 3); // c_j, d_j, f_j
-//        parent_t::alloc_tmp_vctr(mem, __FILE__, mem->grid_size_ref);                                 // GC_ref
 
-        mem->psi_ref = mem->tmp[__FILE__][0];
+        if(mem->n_ref > 1)
+        {
+          parent_t::alloc_tmp_sclr_ref(mem, __FILE__, opts::nset(ct_params_t::fractal_recon));
+          parent_t::alloc_tmp_sclr_ref(mem, __FILE__, 3); // c_j, d_j, f_j
+          mem->psi_ref = mem->tmp[__FILE__][0];
+//        parent_t::alloc_tmp_vctr(mem, __FILE__, mem->grid_size_ref);                                 // GC_ref
 //        mem->GC_ref = mem->tmp[__FILE__][1];
+        }
+        else if(mem->n_ref == 1) // no refinement, dont allocate anything, psi_ref is a reference for psi
+        {
+          for(opts::opts_t e=0; e<ct_params_t::n_eqns; ++e) // loop over all variables
+          {
+            if(opts::isset(ct_params_t::fractal_recon, opts::bit(e))) // if the variable can be refined
+            {
+              mem->psi_ref.at(ix_r2r.at(e)).reference(mem->psi.at(e));
+            }
+          }
+        }
       }
     };
   } // namespace solvers

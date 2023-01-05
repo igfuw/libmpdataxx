@@ -49,25 +49,37 @@ namespace libmpdataxx
         sharedmem_refined_common(const std::array<int, n_dims> &grid_size, const int &size, const int &n_ref)
           : parent_t(grid_size, size), n_ref(n_ref)
         {
-          assert(n_ref % 2 == 0); // only division into even number of cells, because we assume that one of the refined scalar points is at the MPI boundary, which is in the middle between normal grid scalars
+          assert(n_ref % 2 == 0 || n_ref == 1); // only division into even number of cells, because we assume that one of the refined scalar points is at the MPI boundary, which is in the middle between normal grid scalars
 
-          // for now, require a grid_size that is convenient for fractal reconstruction (which calculates 2 points based on 3 points)
-          // NOTE: fix this with proper halos (cyclic is easy, but what about rigid?)
-          // NOTE2: this is actually a requirement for fractal reconstruction, not for any grid refinement, so move this somewhere else
-          for (int d = 0; d < n_dims; ++d)
-            if((grid_size[d] - 3) % 2 != 0) throw std::runtime_error("Fractal grid refinement requires nx/ny/nz = 3 + 2 * i, where i = 0,1,2,3,...");
-
-          for (int d = 0; d < n_dims; ++d)
+          if(n_ref % 2 == 0) // refinemenet actually done
           {
-            grid_size_ref[d] = refine_grid_size(
-              this->grid_size[d],
-              n_ref,
-              d == 0 ? this->distmem.rank() : 0,
-              d == 0 ? this->distmem.size() : 1
-            );
-            origin_ref[d] = grid_size_ref[d].first();
+            // for now, require a grid_size that is convenient for fractal reconstruction (which calculates 2 points based on 3 points)
+            // NOTE: fix this with proper halos (cyclic is easy, but what about rigid?)
+            // NOTE2: this is actually a requirement for fractal reconstruction, not for any grid refinement, so move this somewhere else
+            for (int d = 0; d < n_dims; ++d)
+              if((grid_size[d] - 3) % 2 != 0) throw std::runtime_error("Fractal grid refinement requires nx/ny/nz = 3 + 2 * i, where i = 0,1,2,3,...");
 
-            this->distmem.grid_size_ref[d] = refine_grid_size(rng_t(0,grid_size[d]-1), n_ref, 0, 1).length();
+            for (int d = 0; d < n_dims; ++d)
+            {
+              grid_size_ref[d] = refine_grid_size(
+                this->grid_size[d],
+                n_ref,
+                d == 0 ? this->distmem.rank() : 0,
+                d == 0 ? this->distmem.size() : 1
+              );
+              origin_ref[d] = grid_size_ref[d].first();
+
+              this->distmem.grid_size_ref[d] = refine_grid_size(rng_t(0,grid_size[d]-1), n_ref, 0, 1).length();
+            }
+          }
+          else if(n_ref == 1) // no refinement
+          {
+            for (int d = 0; d < n_dims; ++d)
+            {
+              grid_size_ref[d] = this->grid_size[d];
+              origin_ref[d] = this->origin[d];
+              this->distmem.grid_size_ref[d] = this->distmem.grid_size[d];
+            }
           }
         }
 
