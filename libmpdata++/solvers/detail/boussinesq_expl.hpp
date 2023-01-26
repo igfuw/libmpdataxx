@@ -4,6 +4,9 @@
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
+
+// explicit - ix::tht is theta
+
 #pragma once
 #include <libmpdata++/solvers/detail/boussinesq_sgs_common.hpp>
 

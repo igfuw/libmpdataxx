@@ -4,6 +4,11 @@
  * @section LICENSE
  * GPLv3+ (see the COPYING file or http://www.gnu.org/licenses/)
  */
+
+// implicit - ix::tht is the perturbation of theta, i.e. (theta - theta_env)
+//            compared with explicit modeling of theta, this leads to additional forcing
+//            w * dz(theta_env)
+
 #pragma once
 #include <libmpdata++/solvers/detail/boussinesq_sgs_common.hpp>
 

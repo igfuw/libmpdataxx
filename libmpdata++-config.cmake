@@ -32,7 +32,7 @@ set(libmpdataxx_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../include/")
 
 ############################################################################################
 # debug mode compiler flags
-set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++14 -DBZ_DEBUG -g -Wno-enum-compare") #TODO: -Og if compiler supports it?
+set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -std=c++14 -DBZ_DEBUG -g -Wno-enum-compare -Wfatal-errors") #TODO: -Og if compiler supports it?
 
 
 ############################################################################################
