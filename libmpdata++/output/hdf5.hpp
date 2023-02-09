@@ -55,10 +55,10 @@ namespace libmpdataxx
               H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst;
+      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst, shape_h, chunk_h, offst_h;
       H5::DSetCreatPropList params;
 
-      H5::DataSpace sspace, cspace, srfcspace;
+      H5::DataSpace sspace, cspace, srfcspace, sspace_h;
 #if defined(USE_MPI)
       hid_t fapl_id;
 #endif
@@ -95,21 +95,28 @@ namespace libmpdataxx
         {
           // creating the dimensions
           // x,y,z
-          offst = 0;
+          offst   = 0;
+          offst_h = 0;
 
           for (int d = 0; d < parent_t::n_dims; ++d)
-            shape[d] = this->mem->distmem.grid_size[d];
+          {
+            shape[d]   = this->mem->distmem.grid_size[d];
+            shape_h[d] = this->mem->distmem.grid_size[d] + 2 * this->halo;
+          }
 
-          chunk = shape;
+          chunk   = shape;
+          chunk_h = shape_h;
 
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
 
           srfcshape = shape;
           *(srfcshape.end()-1) = 1;
-          sspace = H5::DataSpace(parent_t::n_dims, shape.data());
+
+          sspace    = H5::DataSpace(parent_t::n_dims, shape.data());
+          sspace_h  = H5::DataSpace(parent_t::n_dims, shape_h.data());
           srfcspace = H5::DataSpace(parent_t::n_dims, srfcshape.data());
-          cspace = H5::DataSpace(parent_t::n_dims, cshape.data());
+          cspace    = H5::DataSpace(parent_t::n_dims, cshape.data());
 
 #if defined(USE_MPI)
           if (this->mem->distmem.size() > 1)
@@ -120,10 +127,11 @@ namespace libmpdataxx
             if (this->mem->distmem.rank() == this->mem->distmem.size() - 1)
               cshape[0] += 1;
 
-            offst[0] = this->mem->grid_size[0].first();
+            offst[0] = this->mem->grid_size[0].first(); // TODO: same for offst_h
 
             // chunk size has to be common to all processes !
             // TODO: something better ?
+            // TODO: same for chunk_h
             chunk[0] = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
           }
 #endif
@@ -135,6 +143,7 @@ namespace libmpdataxx
           *(srfcchunk.end()-1) = 1;
 
           params.setChunk(parent_t::n_dims, chunk.data());
+
 #if !defined(USE_MPI)
           params.setDeflate(5); // TODO: move such constant to the header
 #endif
@@ -203,10 +212,10 @@ namespace libmpdataxx
         }
       }
 
-      std::string base_name()
+      std::string base_name(const std::string &name = "timestep")
       {
         std::stringstream ss;
-        ss << "timestep" << std::setw(10) << std::setfill('0') << this->timestep;
+        ss << name << std::setw(10) << std::setfill('0') << this->timestep;
         return ss.str();
       }
 
@@ -214,6 +223,12 @@ namespace libmpdataxx
       {
         // TODO: add option of .nc extension for Paraview sake ?
         return base_name() + ".h5";
+      }
+
+      std::string hdf_name(const std::string &base_name)
+      {
+        // TODO: add option of .nc extension for Paraview sake ?
+        return base_name + ".h5";
       }
 
       void record_all()
@@ -360,6 +375,30 @@ namespace libmpdataxx
         }
         else
           record_dsc_helper(aux, arr);
+      }
+
+      // for array + halo 
+      void record_aux_halo_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
+      {
+        assert(this->rank == 0);
+
+        params.setChunk(parent_t::n_dims, chunk_h.data());
+
+        auto aux = hdf.createDataSet(
+          name,
+          flttype_output,
+          sspace_h,
+          params
+        );
+
+        // revert to default chunk
+        params.setChunk(parent_t::n_dims, chunk.data());
+
+        record_dsc_helper(aux, arr);
+
+        auto space = aux.getSpace();
+        space.selectHyperslab(H5S_SELECT_SET, shape_h.data(), offst_h.data());
+        aux.write(arr.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, shape_h.data()), space, dxpl_id);
       }
 
       void record_scalar_hlpr(const std::string &name, const std::string &group_name, typename solver_t::real_t data, H5::H5File hdf)
