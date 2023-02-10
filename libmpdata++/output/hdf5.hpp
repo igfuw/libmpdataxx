@@ -137,7 +137,7 @@ namespace libmpdataxx
             offst_h[0] = this->mem->distmem.rank() == 0 ? 0 : this->mem->grid_size[0].first() + this->halo;
 
             // chunk size has to be common to all processes !
-            // TODO: something better ?
+            // TODO: set to 1? Test performance...
             chunk[0]   = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
             chunk_h[0] = 1;//chunk[0];
           }
@@ -152,7 +152,8 @@ namespace libmpdataxx
           params.setChunk(parent_t::n_dims, chunk.data());
 
 #if !defined(USE_MPI)
-          params.setDeflate(5); // TODO: move such constant to the header
+          params.setDeflate(5); // TODO:  move such constant to the header
+                                // TODO2: why not deflate without MPI?
 #endif
 
           // creating variables
