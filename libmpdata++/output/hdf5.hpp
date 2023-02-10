@@ -124,15 +124,22 @@ namespace libmpdataxx
             shape[0] = this->mem->grid_size[0].length();
             cshape[0] = this->mem->grid_size[0].length();
 
+            shape_h[0] = 
+              this->mem->distmem.rank() == 0 || this->mem->distmem.rank() == this->mem->distmem.size()-1 ? 
+                this->mem->grid_size[0].length() + this->halo : 
+                this->mem->grid_size[0].length(); 
+
+
             if (this->mem->distmem.rank() == this->mem->distmem.size() - 1)
               cshape[0] += 1;
 
-            offst[0] = this->mem->grid_size[0].first(); // TODO: same for offst_h
+            offst[0]   = this->mem->grid_size[0].first();
+            offst_h[0] = this->mem->distmem.rank() == 0 ? 0 : this->mem->grid_size[0].first() + this->halo;
 
             // chunk size has to be common to all processes !
             // TODO: something better ?
-            // TODO: same for chunk_h
-            chunk[0] = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
+            chunk[0]   = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
+            chunk_h[0] = 1;//chunk[0];
           }
 #endif
 
