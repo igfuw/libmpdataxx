@@ -411,7 +411,15 @@ namespace libmpdataxx
         space.selectHyperslab(H5S_SELECT_SET, shape_h.data(), offst_h.data());
         sspace_mem_h.selectHyperslab(H5S_SELECT_SET, shape_h.data(), offst_mem_h.data());
 
-        aux.write(arr.data(), flttype_solver, sspace_mem_h, space, dxpl_id);
+        // in 3D convert from kij to kji storage order
+        if(parent_t::n_dims == 3)
+        {
+          typename solver_t::arr_t kji_arr(shape_h);
+          kji_arr = arr;
+          aux.write(kji_arr.data(), flttype_solver, sspace_mem_h, space, dxpl_id);
+        }
+        else
+          aux.write(arr.data(), flttype_solver, sspace_mem_h, space, dxpl_id);
       }
 
       void record_scalar_hlpr(const std::string &name, const std::string &group_name, typename solver_t::real_t data, H5::H5File hdf)
