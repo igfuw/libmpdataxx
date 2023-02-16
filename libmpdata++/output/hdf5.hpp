@@ -459,6 +459,28 @@ namespace libmpdataxx
         group.createAttribute(name, type, H5::DataSpace(1, &one)).write(type, data.data());
       }
 
+      // record 1D profiles, assumes that z is the last dimension
+      void record_prof_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data, const bool vctr)
+      {
+        assert(this->rank == 0);
+
+        auto &_shape(vctr ? cshape : shape);
+
+        auto aux = hdff.createDataSet(
+          name,
+          flttype_output,
+          H5::DataSpace(1, &_shape[parent_t::n_dims - 1])
+        );
+
+#if defined(USE_MPI)
+        if (this->mem->distmem.rank() == 0)
+#endif
+        {
+          auto space = aux.getSpace();
+          space.selectHyperslab(H5S_SELECT_SET, &_shape[parent_t::n_dims - 1], &offst[parent_t::n_dims - 1]);
+          aux.write(data, flttype_solver, H5::DataSpace(1, &_shape[parent_t::n_dims - 1]), space);
+        }
+      }
 
       // ---- functions for auxiliary output in timestep files ----
 
@@ -481,6 +503,11 @@ namespace libmpdataxx
       void record_aux_scalar(const std::string &name, typename solver_t::real_t data)
       {
         record_aux_scalar(name, "/", data);
+      }
+
+      void record_aux_prof(const std::string &name, typename solver_t::real_t *data, const bool vctr = false)
+      {
+        record_prof_hlpr(*hdfp, name, data, vctr);
       }
 
 
@@ -530,33 +557,16 @@ namespace libmpdataxx
         record_aux_dsc_hlpr(name, arr, hdfcp);
       }
 
-      // see above, also assumes that z is the last dimension
+      // see above
       void record_prof_const_hlpr(const std::string &name, typename solver_t::real_t *data, const bool vctr)
       {
-        assert(this->rank == 0);
-
-        auto &_shape(vctr ? cshape : shape);
-
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR
 #if defined(USE_MPI)
           , H5P_DEFAULT, fapl_id
 #endif
         ); // reopen the const file
 
-        auto aux = hdfcp.createDataSet(
-          name,
-          flttype_output,
-          H5::DataSpace(1, &_shape[parent_t::n_dims - 1])
-        );
-
-#if defined(USE_MPI)
-        if (this->mem->distmem.rank() == 0)
-#endif
-        {
-          auto space = aux.getSpace();
-          space.selectHyperslab(H5S_SELECT_SET, &_shape[parent_t::n_dims - 1], &offst[parent_t::n_dims - 1]);
-          aux.write(data, flttype_solver, H5::DataSpace(1, &_shape[parent_t::n_dims - 1]), space);
-        }
+        record_prof_hlpr(hdfcp, name, data, vctr);
       }
 
       void record_prof_const(const std::string &name, typename solver_t::real_t *data)
