@@ -203,6 +203,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
+        // TODO: now that we have xchng_ref, use halo (other than distmem halos) in reconstruction?
         void reconstruct_refinee(const int e = 0)
         {
           assert(opts::isset(ct_params_t::fractal_recon, opts::bit(e)));
