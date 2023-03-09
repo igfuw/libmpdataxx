@@ -121,9 +121,13 @@ namespace libmpdataxx
           // new u, at j=2, between i=1 and i=2, result of w_j=2(u_i=1), Eq. (1) in Akinlabi et al.
           arr(pis<d>(i_next, j, k)) = c_2 * 1 + d_2 * u_1 + f_2;
 
-	  if(arr(pis<d>(i    , j, k)) < 0)
+	  if(blitz::min(arr(pis<d>(i    , j, k))) < 0)
 	  {
-            std::cerr << "negative reonstruction @ i: " << arr(pis<d>(i    , j, k)) <<
+      std::cerr << "negative reonstruction @ i: " << 
+        "i:   " << i <<
+        "j:   " << j <<
+        "k:   " << k <<
+        "arr: " << arr(pis<d>(i    , j, k)) <<
 	      "u_0: " << u_0 <<
 	      "u_1: " << u_1 <<
 	      "u_2: " << u_2 <<
@@ -133,9 +137,13 @@ namespace libmpdataxx
 	      std::endl;
 	  }
 
-	  if(arr(pis<d>(i_next, j, k)) < 0)
+	  if(blitz::min(arr(pis<d>(i_next, j, k))) < 0)
 	  {
-            std::cerr << "negative reonstruction @ i_next: " << arr(pis<d>(i_next, j, k)) <<
+      std::cerr << "negative reonstruction @ i_next: " << 
+        "i_next:" << i_next <<
+        "j:   " << j <<
+        "k:   " << k <<
+        "arr: " << arr(pis<d>(i_next, j, k)) <<
 	      "u_0: " << u_0 <<
 	      "u_1: " << u_1 <<
 	      "u_2: " << u_2 <<
