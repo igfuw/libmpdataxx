@@ -55,10 +55,10 @@ namespace libmpdataxx
               H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst, shape_ref, cshape_ref, chunk_ref, offst_ref; // what if grid refinement is not done???
+      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst, shape_h, chunk_h, offst_h, shape_mem_h, offst_mem_h, shape_ref, cshape_ref, chunk_ref, offst_ref; // what if grid refinement is not done???
       H5::DSetCreatPropList params;
 
-      H5::DataSpace sspace, cspace, srfcspace, sspace_ref, cspace_ref;
+      H5::DataSpace sspace, cspace, srfcspace, sspace_h, sspace_mem_h, sspace_ref, cspace_ref;
 #if defined(USE_MPI)
       hid_t fapl_id;
 #endif
@@ -95,16 +95,21 @@ namespace libmpdataxx
         {
           // creating the dimensions
           // x,y,z
-          offst = 0;
+          offst   = 0;
+          offst_h = 0;
+          offst_mem_h = 0;
           offst_ref = 0;
 
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            shape[d] = this->mem->distmem.grid_size[d];
+            shape[d]   = this->mem->distmem.grid_size[d];                        // shape of arrays stored in file
+            shape_h[d] = this->mem->distmem.grid_size[d] + 2 * this->halo;       // shape of arrays with halos stored in files
             shape_ref[d] = this->mem->distmem.grid_size_ref[d];
+            shape_mem_h[d] = this->mem->grid_size[d].length() + 2 * this->halo;  // shape of the array with halo stored in memory of given MPI rank
           }
 
-          chunk = shape;
+          chunk   = shape;
+          chunk_h = shape_h;
           chunk_ref = shape_ref;
 
           // there is one more coordinate than cell index in each dimension
@@ -113,11 +118,14 @@ namespace libmpdataxx
 
           srfcshape = shape;
           *(srfcshape.end()-1) = 1;
-          sspace = H5::DataSpace(parent_t::n_dims, shape.data());
-          cspace = H5::DataSpace(parent_t::n_dims, cshape.data());
-          srfcspace = H5::DataSpace(parent_t::n_dims, srfcshape.data());
-          sspace_ref = H5::DataSpace(parent_t::n_dims, shape_ref.data());
-          cspace_ref = H5::DataSpace(parent_t::n_dims, cshape_ref.data());
+
+          sspace        = H5::DataSpace(parent_t::n_dims, shape.data());
+          sspace_h      = H5::DataSpace(parent_t::n_dims, shape_h.data());
+          sspace_mem_h  = H5::DataSpace(parent_t::n_dims, shape_mem_h.data());
+          srfcspace     = H5::DataSpace(parent_t::n_dims, srfcshape.data());
+          cspace        = H5::DataSpace(parent_t::n_dims, cshape.data());
+          sspace_ref    = H5::DataSpace(parent_t::n_dims, shape_ref.data());
+          cspace_ref    = H5::DataSpace(parent_t::n_dims, cshape_ref.data());
 
 #if defined(USE_MPI)
           if (this->mem->distmem.size() > 1)
@@ -129,18 +137,29 @@ namespace libmpdataxx
               this->mem->grid_size_ref[0].length();
             cshape_ref[0] = shape_ref[0];
 
+            shape_h[0] = 
+              this->mem->distmem.rank() == 0 || this->mem->distmem.rank() == this->mem->distmem.size()-1 ? 
+                this->mem->grid_size[0].length() + this->halo : 
+                this->mem->grid_size[0].length(); 
+
+
             if (this->mem->distmem.rank() == this->mem->distmem.size() - 1)
             {
               cshape[0] += 1;
               cshape_ref[0] += 1;
             }
 
-            offst[0] = this->mem->grid_size[0].first();
+            offst[0]     = this->mem->grid_size[0].first();
+            offst_h[0]   = this->mem->distmem.rank() == 0 ? 0 : this->mem->grid_size[0].first() + this->halo;
             offst_ref[0] = this->mem->grid_size_ref[0].first();
 
+            if (this->mem->distmem.rank() > 0)
+              offst_mem_h[0] = this->halo;
+
             // chunk size has to be common to all processes !
-            // TODO: something better ?
-            chunk[0] = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
+            // TODO: set to 1? Test performance...
+            chunk[0]     = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
+            chunk_h[0]   = 1;//chunk[0];
             chunk_ref[0] = ( (typename solver_t::real_t) (this->mem->distmem.grid_size_ref[0])) / this->mem->distmem.size() + 0.5 ;
           }
 #endif
@@ -152,8 +171,10 @@ namespace libmpdataxx
           *(srfcchunk.end()-1) = 1;
 
           params.setChunk(parent_t::n_dims, chunk.data());
+
 #if !defined(USE_MPI)
-          params.setDeflate(5); // TODO: move such constant to the header
+          params.setDeflate(5); // TODO:  move such constant to the header
+                                // TODO2: why not deflate without MPI?
 #endif
 
           // creating variables
@@ -253,10 +274,10 @@ namespace libmpdataxx
         }
       }
 
-      std::string base_name()
+      std::string base_name(const std::string &name = "timestep")
       {
         std::stringstream ss;
-        ss << "timestep" << std::setw(10) << std::setfill('0') << this->timestep;
+        ss << name << std::setw(10) << std::setfill('0') << this->timestep;
         return ss.str();
       }
 
@@ -264,6 +285,12 @@ namespace libmpdataxx
       {
         // TODO: add option of .nc extension for Paraview sake ?
         return base_name() + ".h5";
+      }
+
+      std::string hdf_name(const std::string &base_name)
+      {
+        // TODO: add option of .nc extension for Paraview sake ?
+        return base_name + ".h5";
       }
 
       void record_all()
@@ -423,6 +450,38 @@ namespace libmpdataxx
           params.setChunk(parent_t::n_dims, chunk.data());
       }
 
+      // for array + halo 
+      void record_aux_halo_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
+      {
+        assert(this->rank == 0);
+
+        params.setChunk(parent_t::n_dims, chunk_h.data());
+
+        auto aux = hdf.createDataSet(
+          name,
+          flttype_output,
+          sspace_h,
+          params
+        );
+
+        // revert to default chunk
+        params.setChunk(parent_t::n_dims, chunk.data());
+
+        auto space = aux.getSpace();
+        space.selectHyperslab(H5S_SELECT_SET, shape_h.data(), offst_h.data());
+        sspace_mem_h.selectHyperslab(H5S_SELECT_SET, shape_h.data(), offst_mem_h.data());
+
+        // in 3D convert from kij to kji storage order
+        if(parent_t::n_dims == 3)
+        {
+          typename solver_t::arr_t kji_arr(shape_h);
+          kji_arr = arr;
+          aux.write(kji_arr.data(), flttype_solver, sspace_mem_h, space, dxpl_id);
+        }
+        else
+          aux.write(arr.data(), flttype_solver, sspace_mem_h, space, dxpl_id);
+      }
+
       void record_scalar_hlpr(const std::string &name, const std::string &group_name, typename solver_t::real_t data, H5::H5File hdf)
       {
         assert(this->rank == 0);
@@ -460,6 +519,30 @@ namespace libmpdataxx
         group.createAttribute(name, type, H5::DataSpace(1, &one)).write(type, data.data());
       }
 
+      // record 1D profiles, assumes that z is the last dimension
+      void record_prof_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data, const bool vctr, const bool refined)
+      {
+        assert(this->rank == 0);
+        assert((vctr && refined == false) && "record prof hlpr cant save refined vector profiles");
+
+        const auto _shape(refined ? shape_ref : vctr ? cshape : shape);
+        const auto _offst(refined ? offst_ref : offst);
+
+        auto aux = hdff.createDataSet(
+          name,
+          flttype_output,
+          H5::DataSpace(1, &_shape[parent_t::n_dims - 1])
+        );
+
+#if defined(USE_MPI)
+        if (this->mem->distmem.rank() == 0)
+#endif
+        {
+          auto space = aux.getSpace();
+          space.selectHyperslab(H5S_SELECT_SET, &_shape[parent_t::n_dims - 1], &_offst[parent_t::n_dims - 1]);
+          aux.write(data, flttype_solver, H5::DataSpace(1, &_shape[parent_t::n_dims - 1]), space);
+        }
+      }
 
       // ---- functions for auxiliary output in timestep files ----
 
@@ -492,6 +575,11 @@ namespace libmpdataxx
       void record_aux_scalar(const std::string &name, typename solver_t::real_t data)
       {
         record_aux_scalar(name, "/", data);
+      }
+
+      void record_aux_prof(const std::string &name, typename solver_t::real_t *data, const bool vctr = false, const bool refined = false)
+      {
+        record_prof_hlpr(*hdfp, name, data, vctr, refined);
       }
 
 
@@ -542,34 +630,26 @@ namespace libmpdataxx
       }
 
       // see above, also assumes that z is the last dimension
-      void record_prof_const(const std::string &name, typename solver_t::real_t *data, const bool refined = false)
+      void record_prof_const_hlpr(const std::string &name, typename solver_t::real_t *data, const bool vctr, const bool refined = false)
       {
-        assert(this->rank == 0);
-        const auto _shape(refined ? shape_ref : shape);
-        const auto _offst(refined ? offst_ref : offst);
-
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR
 #if defined(USE_MPI)
           , H5P_DEFAULT, fapl_id
 #endif
         ); // reopen the const file
 
-        auto aux = hdfcp.createDataSet(
-          name,
-          flttype_output,
-          H5::DataSpace(1, &_shape[parent_t::n_dims - 1])
-        );
-
-#if defined(USE_MPI)
-        if (this->mem->distmem.rank() == 0)
-#endif
-        {
-          auto space = aux.getSpace();
-          space.selectHyperslab(H5S_SELECT_SET, &_shape[parent_t::n_dims - 1], &_offst[parent_t::n_dims - 1]);
-          aux.write(data, flttype_solver, H5::DataSpace(1, &_shape[parent_t::n_dims - 1]), space);
-        }
+        record_prof_hlpr(hdfcp, name, data, vctr, refined);
       }
 
+      void record_prof_const(const std::string &name, typename solver_t::real_t *data)
+      {
+        record_prof_const_hlpr(name, data, false);
+      }
+
+      void record_prof_vctr_const(const std::string &name, typename solver_t::real_t *data)
+      {
+        record_prof_const_hlpr(name, data, true);
+      }
 
       // ---- recording libmpdata++ parameters ----
 
@@ -585,12 +665,11 @@ namespace libmpdataxx
           group.createAttribute("opts", type, H5::DataSpace(1, &one)).write(type, opts_str.data());
         }
         {
-          const auto type = flttype_solver;
-          group.createAttribute("dt", type, H5::DataSpace(1, &one)).write(type, &this->dt);
+          group.createAttribute("dt", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->dt);
           const auto names = std::vector<std::string>{"di", "dj", "dk"};
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
-            group.createAttribute(names[d], type, H5::DataSpace(1, &one)).write(type, &this->dijk[d]);
+            group.createAttribute(names[d], flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->dijk[d]);
           }
         }
         {
@@ -600,8 +679,7 @@ namespace libmpdataxx
         }
         if (parent_t::ct_params_t_::var_dt)
         {
-          const auto type = flttype_solver;
-          group.createAttribute("max_courant", type, H5::DataSpace(1, &one)).write(type, &this->max_courant);
+          group.createAttribute("max_courant", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->max_courant);
         }
         {
           const auto type = H5::PredType::NATIVE_INT;
@@ -647,8 +725,7 @@ namespace libmpdataxx
           group.createAttribute("prs_scheme", type, H5::DataSpace(1, &one)).write(type, prs_scheme_str.data());
         }
         {
-          const auto type = flttype_solver;
-          group.createAttribute("prs_tol", type, H5::DataSpace(1, &one)).write(type, &this->prs_tol);
+          group.createAttribute("prs_tol", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->prs_tol);
         }
       }
 
@@ -670,8 +747,7 @@ namespace libmpdataxx
           group.createAttribute("stress_diff", type, H5::DataSpace(1, &one)).write(type, sdiff_str.data());
         }
         {
-          const auto type = flttype_solver;
-          group.createAttribute("cdrag", type, H5::DataSpace(1, &one)).write(type, &this->cdrag);
+          group.createAttribute("cdrag", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->cdrag);
         }
       }
 
@@ -682,8 +758,7 @@ namespace libmpdataxx
 
         const auto &group = hdfcp.openGroup("sgs");
         {
-          const auto type = flttype_solver;
-          group.createAttribute("eta", type, H5::DataSpace(1, &one)).write(type, &this->eta);
+          group.createAttribute("eta", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->eta);
         }
       }
 
@@ -694,9 +769,8 @@ namespace libmpdataxx
 
         const auto &group = hdfcp.openGroup("sgs");
         {
-          const auto type = flttype_solver;
-          group.createAttribute("smg_c", type, H5::DataSpace(1, &one)).write(type, &this->smg_c);
-          group.createAttribute("c_m", type, H5::DataSpace(1, &one)).write(type, &this->c_m);
+          group.createAttribute("smg_c", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->smg_c);
+          group.createAttribute("c_m", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->c_m);
         }
       }
 
@@ -729,10 +803,9 @@ namespace libmpdataxx
         hdfcp.createGroup("boussinesq");
         const auto &group = hdfcp.openGroup("boussinesq");
         {
-          const auto type = flttype_solver;
-          group.createAttribute("g", type, H5::DataSpace(1, &one)).write(type, &this->g);
-          group.createAttribute("Tht_ref", type, H5::DataSpace(1, &one)).write(type, &this->Tht_ref);
-          group.createAttribute("hflux_const", type, H5::DataSpace(1, &one)).write(type, &this->hflux_const);
+          group.createAttribute("g", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->g);
+          group.createAttribute("Tht_ref", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->Tht_ref);
+          group.createAttribute("hflux_const", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->hflux_const);
         }
         {
           auto dset = group.createDataSet("tht_e", flttype_output, sspace);
@@ -747,8 +820,7 @@ namespace libmpdataxx
 
         const auto &group = hdfcp.openGroup("boussinesq");
         {
-          const auto type = flttype_solver;
-          group.createAttribute("prandtl_num", type, H5::DataSpace(1, &one)).write(type, &this->prandtl_num);
+          group.createAttribute("prandtl_num", flttype_output, H5::DataSpace(1, &one)).write(flttype_solver, &this->prandtl_num);
         }
         {
           auto dset = group.createDataSet("mix_len", flttype_output, sspace);
