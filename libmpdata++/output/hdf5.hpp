@@ -641,9 +641,9 @@ namespace libmpdataxx
         record_prof_hlpr(hdfcp, name, data, vctr, refined);
       }
 
-      void record_prof_const(const std::string &name, typename solver_t::real_t *data)
+      void record_prof_const(const std::string &name, typename solver_t::real_t *data, const bool refined = false)
       {
-        record_prof_const_hlpr(name, data, false);
+        record_prof_const_hlpr(name, data, false, refined);
       }
 
       void record_prof_vctr_const(const std::string &name, typename solver_t::real_t *data)
