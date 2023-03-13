@@ -523,7 +523,7 @@ namespace libmpdataxx
       void record_prof_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data, const bool vctr, const bool refined)
       {
         assert(this->rank == 0);
-        assert((vctr && refined == false) && "record prof hlpr cant save refined vector profiles");
+        assert(((vctr && refined) == false) && "record prof hlpr cant save refined vector profiles");
 
         const auto _shape(refined ? shape_ref : vctr ? cshape : shape);
         const auto _offst(refined ? offst_ref : offst);
