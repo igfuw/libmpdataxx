@@ -124,6 +124,7 @@ namespace libmpdataxx
         if(blitz::min(arr(pis<d>(i    , j, k))) < 0)
         {
           std::cerr << "negative reonstruction @ i: " << 
+            " d:   " << d <<
             " i:   " << i <<
             " j:   " << j <<
             " k:   " << k <<
@@ -140,6 +141,7 @@ namespace libmpdataxx
         if(blitz::min(arr(pis<d>(i_next, j, k))) < 0)
         {
           std::cerr << "negative reonstruction @ i_next: " << 
+            " d:   " << d <<
             " i_next:" << i_next <<
             " j:   " << j <<
             " k:   " << k <<
