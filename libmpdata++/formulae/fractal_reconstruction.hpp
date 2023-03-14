@@ -82,7 +82,7 @@ namespace libmpdataxx
         arr_t f_j        // parameter f
       )
       {
-          // debug output
+        // debug output
 //          std::cerr << "ranges in rcnstrct" << std::endl;
 //          if(d==0)
 //            std::cerr << "range<" << d << ">: " << i << " " << j << " " << k << std::endl;
@@ -91,67 +91,67 @@ namespace libmpdataxx
 //          if(d==2)
 //            std::cerr << "range<" << d << ">: " << j << " " << k << " " << i << std::endl;
 
-          using idxperm::pis;
+        using idxperm::pis;
 
-          // second reconstructed position (j=2, between i=1 and i=2)
-          const rng_t i_next = i + 2*dist;
+        // second reconstructed position (j=2, between i=1 and i=2)
+        const rng_t i_next = i + 2*dist;
 
-          const int x[3] = {0, 1, 2};
+        const int x[3] = {0, 1, 2};
 
-          // helper references
-          const arr_t u_0 = arr(pis<d>(i      - dist, j, k)),
-                      u_1 = arr(pis<d>(i      + dist, j, k)),
-                      u_2 = arr(pis<d>(i_next + dist, j, k));
+        // helper references
+        const arr_t u_0 = arr(pis<d>(i      - dist, j, k)),
+                    u_1 = arr(pis<d>(i      + dist, j, k)),
+                    u_2 = arr(pis<d>(i_next + dist, j, k));
 
-          arr_t c_1 = c_j(pis<d>(i,      j, k)),
-                c_2 = c_j(pis<d>(i_next, j, k)),
-                d_1 = d_j(pis<d>(i,      j, k)),
-                d_2 = d_j(pis<d>(i_next, j, k)),
-                f_1 = f_j(pis<d>(i,      j, k)),
-                f_2 = f_j(pis<d>(i_next, j, k));
+        arr_t c_1 = c_j(pis<d>(i,      j, k)),
+              c_2 = c_j(pis<d>(i_next, j, k)),
+              d_1 = d_j(pis<d>(i,      j, k)),
+              d_2 = d_j(pis<d>(i_next, j, k)),
+              f_1 = f_j(pis<d>(i,      j, k)),
+              f_2 = f_j(pis<d>(i_next, j, k));
 
-          // Eqs. (5) and (6) Akinlabi et al.
-          c_1 = (u_1 - u_0) / (2.) - d_1 * (u_2 - u_0) / (2.);
-          c_2 = (u_2 - u_1) / (2.) - d_2 * (u_2 - u_0) / (2.);
-          f_1 = (x[2] * u_0 - x[0] * u_1) / (2.) - d_1 * (x[2] * u_0 - x[0] * u_2) / (2.);
-          f_2 = (x[2] * u_1 - x[0] * u_2) / (2.) - d_2 * (x[2] * u_0 - x[0] * u_2) / (2.);
+        // Eqs. (5) and (6) Akinlabi et al.
+        c_1 = (u_1 - u_0) / (2.) - d_1 * (u_2 - u_0) / (2.);
+        c_2 = (u_2 - u_1) / (2.) - d_2 * (u_2 - u_0) / (2.);
+        f_1 = (x[2] * u_0 - x[0] * u_1) / (2.) - d_1 * (x[2] * u_0 - x[0] * u_2) / (2.);
+        f_2 = (x[2] * u_1 - x[0] * u_2) / (2.) - d_2 * (x[2] * u_0 - x[0] * u_2) / (2.);
 
-          // new u, at j=1, between i=0 and i=1, result of w_j=1(u_i=1), Eq. (1) in Akinlabi et al.
-          arr(pis<d>(i    , j, k)) = c_1 * 1 + d_1 * u_1 + f_1; 
-          // new u, at j=2, between i=1 and i=2, result of w_j=2(u_i=1), Eq. (1) in Akinlabi et al.
-          arr(pis<d>(i_next, j, k)) = c_2 * 1 + d_2 * u_1 + f_2;
+        // new u, at j=1, between i=0 and i=1, result of w_j=1(u_i=1), Eq. (1) in Akinlabi et al.
+        arr(pis<d>(i    , j, k)) = c_1 * 1 + d_1 * u_1 + f_1; 
+        // new u, at j=2, between i=1 and i=2, result of w_j=2(u_i=1), Eq. (1) in Akinlabi et al.
+        arr(pis<d>(i_next, j, k)) = c_2 * 1 + d_2 * u_1 + f_2;
 
-	  if(blitz::min(arr(pis<d>(i    , j, k))) < 0)
-	  {
-      std::cerr << "negative reonstruction @ i: " << 
-        "i:   " << i <<
-        "j:   " << j <<
-        "k:   " << k <<
-        "arr: " << arr(pis<d>(i    , j, k)) <<
-	      "u_0: " << u_0 <<
-	      "u_1: " << u_1 <<
-	      "u_2: " << u_2 <<
-	      "c_1: " << c_1 <<
-	      "d_1: " << d_1 <<
-	      "f_1: " << f_1 <<
-	      std::endl;
-	  }
+        if(blitz::min(arr(pis<d>(i    , j, k))) < 0)
+        {
+          std::cerr << "negative reonstruction @ i: " << 
+            " i:   " << i <<
+            " j:   " << j <<
+            " k:   " << k <<
+            " arr: " << arr(pis<d>(i    , j, k)) <<
+                  " u_0: " << u_0 <<
+                  " u_1: " << u_1 <<
+                  " u_2: " << u_2 <<
+                  " c_1: " << c_1 <<
+                  " d_1: " << d_1 <<
+                  " f_1: " << f_1 <<
+                  std::endl;
+        }
 
-	  if(blitz::min(arr(pis<d>(i_next, j, k))) < 0)
-	  {
-      std::cerr << "negative reonstruction @ i_next: " << 
-        "i_next:" << i_next <<
-        "j:   " << j <<
-        "k:   " << k <<
-        "arr: " << arr(pis<d>(i_next, j, k)) <<
-	      "u_0: " << u_0 <<
-	      "u_1: " << u_1 <<
-	      "u_2: " << u_2 <<
-	      "c_2: " << c_2 <<
-	      "d_2: " << d_2 <<
-	      "f_2: " << f_2 <<
-	      std::endl;
-	  }
+        if(blitz::min(arr(pis<d>(i_next, j, k))) < 0)
+        {
+          std::cerr << "negative reonstruction @ i_next: " << 
+            " i_next:" << i_next <<
+            " j:   " << j <<
+            " k:   " << k <<
+            " arr: " << arr(pis<d>(i_next, j, k)) <<
+                  " u_0: " << u_0 <<
+                  " u_1: " << u_1 <<
+                  " u_2: " << u_2 <<
+                  " c_2: " << c_2 <<
+                  " d_2: " << d_2 <<
+                  " f_2: " << f_2 <<
+                  std::endl;
+        }
 
           // DEBUG: do interpolation, useful for testing if ranges are correct
 //          arr(pis<d>(i, j, k)) = real_t(.5) * (u_0 + u_1);
