@@ -120,6 +120,9 @@ namespace libmpdataxx
         arr(pis<d>(i    , j, k)) = c_1 * 1 + d_1 * u_1 + f_1; 
         // new u, at j=2, between i=1 and i=2, result of w_j=2(u_i=1), Eq. (1) in Akinlabi et al.
         arr(pis<d>(i_next, j, k)) = c_2 * 1 + d_2 * u_1 + f_2;
+/*
+        // Debug negative values in reconstructed arrays (e.g. negative rv)
+        // Didn't show errors in reconstruction, simply bad luck
 
         if(blitz::min(arr(pis<d>(i    , j, k))) < 0)
         {
@@ -154,6 +157,7 @@ namespace libmpdataxx
                   " f_2: " << f_2 <<
                   std::endl;
         }
+*/
 
           // DEBUG: do interpolation, useful for testing if ranges are correct
 //          arr(pis<d>(i, j, k)) = real_t(.5) * (u_0 + u_1);
