@@ -118,6 +118,10 @@ namespace libmpdataxx
     {
       protected:
       using output_t = hdf5_xdmf<solver_t>;
+      using parent_t = hdf5_xdmf_common<solver_t>;
+
+      public:
+      using parent_t::parent_t;
     };
 
     // specialization for solvers with grid refinemenet
