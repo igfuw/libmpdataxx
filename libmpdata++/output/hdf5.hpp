@@ -54,10 +54,10 @@ namespace libmpdataxx
               H5::PredType::NATIVE_FLOAT,
         flttype_output = H5::PredType::NATIVE_FLOAT; // using floats not to waste disk space
 
-      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst, shape_h, chunk_h, offst_h, shape_mem_h, offst_mem_h, shape_ref, cshape_ref, chunk_ref, offst_ref; // what if grid refinement is not done???
+      blitz::TinyVector<hsize_t, parent_t::n_dims> cshape, shape, chunk, srfcshape, srfcchunk, offst, shape_h, chunk_h, offst_h, shape_mem_h, offst_mem_h;
       H5::DSetCreatPropList params;
 
-      H5::DataSpace sspace, cspace, srfcspace, sspace_h, sspace_mem_h, sspace_ref, cspace_ref;
+      H5::DataSpace sspace, cspace, srfcspace, sspace_h, sspace_mem_h;
 #if defined(USE_MPI)
       hid_t fapl_id;
 #endif
@@ -97,23 +97,19 @@ namespace libmpdataxx
           offst   = 0;
           offst_h = 0;
           offst_mem_h = 0;
-          offst_ref = 0;
 
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             shape[d]   = this->mem->distmem.grid_size[d];                        // shape of arrays stored in file
             shape_h[d] = this->mem->distmem.grid_size[d] + 2 * this->halo;       // shape of arrays with halos stored in files
-            shape_ref[d] = this->mem->distmem.grid_size_ref[d];
             shape_mem_h[d] = this->mem->grid_size[d].length() + 2 * this->halo;  // shape of the array with halo stored in memory of given MPI rank
           }
 
           chunk   = shape;
           chunk_h = shape_h;
-          chunk_ref = shape_ref;
 
           // there is one more coordinate than cell index in each dimension
           cshape = shape + 1;
-          cshape_ref = shape_ref + 1;
 
           srfcshape = shape;
           *(srfcshape.end()-1) = 1;
@@ -123,18 +119,12 @@ namespace libmpdataxx
           sspace_mem_h  = H5::DataSpace(parent_t::n_dims, shape_mem_h.data());
           srfcspace     = H5::DataSpace(parent_t::n_dims, srfcshape.data());
           cspace        = H5::DataSpace(parent_t::n_dims, cshape.data());
-          sspace_ref    = H5::DataSpace(parent_t::n_dims, shape_ref.data());
-          cspace_ref    = H5::DataSpace(parent_t::n_dims, cshape_ref.data());
 
 #if defined(USE_MPI)
           if (this->mem->distmem.size() > 1)
           {
             shape[0] = this->mem->grid_size[0].length();
             cshape[0] = this->mem->grid_size[0].length();
-            shape_ref[0] = this->mem->distmem.rank() < this->mem->distmem.size() - 1 ? 
-              this->mem->grid_size_ref[0].length()-1 : // -1 to make ranges nonoverlapping
-              this->mem->grid_size_ref[0].length();
-            cshape_ref[0] = shape_ref[0];
 
             shape_h[0] = 
               this->mem->distmem.rank() == 0 || this->mem->distmem.rank() == this->mem->distmem.size()-1 ? 
@@ -143,14 +133,10 @@ namespace libmpdataxx
 
 
             if (this->mem->distmem.rank() == this->mem->distmem.size() - 1)
-            {
               cshape[0] += 1;
-              cshape_ref[0] += 1;
-            }
 
             offst[0]     = this->mem->grid_size[0].first();
             offst_h[0]   = this->mem->distmem.rank() == 0 ? 0 : this->mem->grid_size[0].first() + this->halo;
-            offst_ref[0] = this->mem->grid_size_ref[0].first();
 
             if (this->mem->distmem.rank() > 0)
               offst_mem_h[0] = this->halo;
@@ -159,7 +145,6 @@ namespace libmpdataxx
             // TODO: set to 1? Test performance...
             chunk[0]     = ( (typename solver_t::real_t) (this->mem->distmem.grid_size[0])) / this->mem->distmem.size() + 0.5 ;
             chunk_h[0]   = 1;//chunk[0];
-            chunk_ref[0] = ( (typename solver_t::real_t) (this->mem->distmem.grid_size_ref[0])) / this->mem->distmem.size() + 0.5 ;
           }
 #endif
 
@@ -330,13 +315,16 @@ namespace libmpdataxx
         };
       }
 
-      void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr, const bool refined = false)
+      void record_dsc_helper(
+        const H5::DataSet &dset, const typename solver_t::arr_t &arr, 
+        const std::array<blitz::Range, solver_t::n_dims> &_grid_size, 
+        const blitz::TinyVector<hsize_t, parent_t::n_dims> &_shape,
+        const blitz::TinyVector<hsize_t, parent_t::n_dims> &_offst
+      )
       {
         H5::DataSpace space = dset.getSpace();
-        const auto _grid_size(refined ? this->mem->grid_size_ref : this->mem->grid_size);
-        const auto _shape(refined ? shape_ref : shape);
 
-        space.selectHyperslab(H5S_SELECT_SET, _shape.data(), refined ? offst_ref.data() : offst.data());
+        space.selectHyperslab(H5S_SELECT_SET, _shape.data(), _offst.data());
 
         // TODO: some permutation of grid_size instead of the switch
         switch (int(solver_t::n_dims))
@@ -363,6 +351,11 @@ namespace libmpdataxx
           }
           default: assert(false);
         };
+      }
+
+      void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
+      {
+        record_dsc_helper(dset, arr, this->mem->grid_size, shape, offst);
       }
 
       // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
@@ -847,13 +840,40 @@ namespace libmpdataxx
       using parent_t = hdf5_common<solver_t>;
       using parent_t::parent_t;
       using output_t = hdf5<solver_t>;
-//      using n_dims = typename parent_t::n_dims;
+
+      blitz::TinyVector<hsize_t, parent_t::n_dims> shape_ref, cshape_ref, chunk_ref, offst_ref;
+      H5::DataSpace sspace_ref, cspace_ref;
 
       std::map<int, std::string> dim_names_ref;
 
       void start(const typename parent_t::advance_arg_t nt) override
       {
         parent_t::start(nt);
+
+        offst_ref = 0;
+        for (int d = 0; d < parent_t::n_dims; ++d)
+          shape_ref[d] = this->mem->distmem.grid_size_ref[d];
+
+        chunk_ref  = shape_ref;
+        cshape_ref = shape_ref + 1;
+        sspace_ref = H5::DataSpace(parent_t::n_dims, shape_ref.data());
+        cspace_ref = H5::DataSpace(parent_t::n_dims, cshape_ref.data());
+
+#if defined(USE_MPI)
+        if (this->mem->distmem.size() > 1)
+        {
+          shape_ref[0] = this->mem->distmem.rank() < this->mem->distmem.size() - 1 ? 
+            this->mem->grid_size_ref[0].length()-1 : // -1 to make ranges nonoverlapping
+            this->mem->grid_size_ref[0].length();
+          cshape_ref[0] = shape_ref[0];
+
+          if (this->mem->distmem.rank() == this->mem->distmem.size() - 1)
+            cshape_ref[0] += 1;
+
+          offst_ref[0] = this->mem->grid_size_ref[0].first();
+          chunk_ref[0] = ( (typename solver_t::real_t) (this->mem->distmem.grid_size_ref[0])) / this->mem->distmem.size() + 0.5 ;
+        }
+#endif
 
         // refined X, Y, Z, TODO: very similar to X, Y, Z
         for (int i = 0; i < parent_t::n_dims; ++i)
@@ -885,6 +905,19 @@ namespace libmpdataxx
           dim_space.selectHyperslab(H5S_SELECT_SET, this->cshape_ref.data(), this->offst_ref.data());
           curr_dim.write(coord.data(), this->flttype_solver, H5::DataSpace(parent_t::n_dims, this->cshape_ref.data()), dim_space, this->dxpl_id);
         }
+      }
+
+      void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr, const bool refined=false)
+      {
+        const auto _grid_size(refined ? this->mem->grid_size_ref : this->mem->grid_size);
+        const auto _shape(refined ? shape_ref : shape);
+        space.selectHyperslab(H5S_SELECT_SET, _shape.data(), refined ? offst_ref.data() : offst.data());
+
+        record_dsc_helper(dset, arr, 
+          refined ? this->mem->grid_size_ref : this->mem->grid_size, 
+          refined ? shape_ref : this->shape,
+          refined ? offst_ref : this->offst,
+        );
       }
     };
 
