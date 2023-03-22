@@ -64,19 +64,19 @@ endif()
 
 ############################################################################################
 # C++14
-include(CheckCXXSourceCompiles)
-set(CMAKE_REQUIRED_FLAGS "-std=c++14")
-check_cxx_source_compiles("
-  #include <type_traits>
-  auto f() { return 1;}
-  template <bool a, class b> using ei=std::enable_if<a,b>; 
-  struct a {a(int){}};struct b:a {using a::a;};  
-  int main(){b i(1);}
-" CXX14_SUPPORTED)
-if (NOT CXX14_SUPPORTED)
-  message(FATAL_ERROR "C++14 compatibility test failed - please update your compiler or point CMake to another one with -DCMAKE_CXX_COMPILER=...")
-endif()
-unset(CMAKE_REQUIRED_FLAGS)
+#include(CheckCXXSourceCompiles)
+#set(CMAKE_REQUIRED_FLAGS "-std=c++14")
+#check_cxx_source_compiles("
+#  #include <type_traits>
+#  auto f() { return 1;}
+#  template <bool a, class b> using ei=std::enable_if<a,b>; 
+#  struct a {a(int){}};struct b:a {using a::a;};  
+#  int main(){b i(1);}
+#" CXX14_SUPPORTED)
+#if (NOT CXX14_SUPPORTED)
+#  message(FATAL_ERROR "C++14 compatibility test failed - please update your compiler or point CMake to another one with -DCMAKE_CXX_COMPILER=...")
+#endif()
+#unset(CMAKE_REQUIRED_FLAGS)
 
 
 ############################################################################################

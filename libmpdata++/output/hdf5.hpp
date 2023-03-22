@@ -30,17 +30,16 @@ namespace libmpdataxx
 {
   namespace output
   {
+    // output class common for simulations with and without grid refinement
     template <class solver_t>
-    class hdf5 : public detail::output_common<solver_t>
+    class hdf5_common : public detail::output_common<solver_t>
     {
       using parent_t = detail::output_common<solver_t>;
 
       protected:
 
-      using output_t = hdf5<solver_t>;
-
       std::unique_ptr<H5::H5File> hdfp;
-      std::map<int, std::string> dim_names, dim_names_ref;
+      std::map<int, std::string> dim_names;
       const std::string const_name = "const.h5";
       std::string const_file;
       const hsize_t zero = 0, one = 1;
@@ -64,7 +63,7 @@ namespace libmpdataxx
 #endif
       hid_t dxpl_id;
 
-      void start(const typename parent_t::advance_arg_t nt)
+      virtual void start(const typename parent_t::advance_arg_t nt)
       {
         const_file = this->outdir + "/" + const_name;
 
@@ -210,39 +209,6 @@ namespace libmpdataxx
               H5::DataSpace dim_space = curr_dim.getSpace();
               dim_space.selectHyperslab(H5S_SELECT_SET, cshape.data(), offst.data());
               curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape.data()), dim_space, dxpl_id);
-            }
-
-            // refined X, Y, Z, TODO: very similar to X, Y, Z
-            for (int i = 0; i < parent_t::n_dims; ++i)
-            {
-
-              blitz::Array<typename solver_t::real_t, parent_t::n_dims> coord(cshape_ref);
-#if defined(USE_MPI)
-              coord.reindexSelf(offst_ref);
-#endif
-              std::string name;
-              switch (i)
-              {
-                case 0 : coord = this->di / 2. + this->di / this->mem->n_ref * (blitz::firstIndex() - .5);
-                         name = "X refined";
-                         dim_names_ref[i] = name;
-                         break;
-                case 1 : coord = this->dj / 2. + this->dj / this->mem->n_ref * (blitz::secondIndex() - .5);
-                         name = "Y refined";
-                         dim_names_ref[i] = name;
-                         break;
-                case 2 : coord = this->dk / 2. + this->dk / this->mem->n_ref * (blitz::thirdIndex() - .5);
-                         name = "Z refined";
-                         dim_names_ref[i] = name;
-                         break;
-                default : break;
-              }
-
-              auto curr_dim = (*hdfp).createDataSet(name, flttype_output, cspace_ref);
-
-              H5::DataSpace dim_space = curr_dim.getSpace();
-              dim_space.selectHyperslab(H5S_SELECT_SET, cshape_ref.data(), offst_ref.data());
-              curr_dim.write(coord.data(), flttype_solver, H5::DataSpace(parent_t::n_dims, cshape_ref.data()), dim_space, dxpl_id);
             }
 
             // T
@@ -831,7 +797,7 @@ namespace libmpdataxx
       public:
 
       // ctor
-      hdf5(
+      hdf5_common(
         typename parent_t::ctor_args_t args,
         const typename parent_t::rt_params_t &p
       ) : parent_t(args, p)
@@ -848,7 +814,7 @@ namespace libmpdataxx
       }
 
       // dtor
-      virtual ~hdf5()
+      virtual ~hdf5_common()
       {
         H5Pclose(dxpl_id);
 #if defined(USE_MPI)
@@ -856,5 +822,71 @@ namespace libmpdataxx
 #endif
       }
     };
+
+
+    // for solvers without grid refinemenet
+    template<class solver_t, class enableif = void>
+    class hdf5 : public hdf5_common<solver_t>
+    {
+      protected:
+
+      using parent_t = hdf5_common<solver_t>;
+      using parent_t::parent_t;
+      using output_t = hdf5<solver_t>;
+//      using n_dims = typename parent_t::n_dims;
+    };
+
+    // specialization for solvers with grid refinemenet
+    template <class solver_t>
+    class hdf5<solver_t,
+      typename std::enable_if_t<(int)solver_t::ct_params_t::fractal_recon != (int)0>
+    > : public hdf5_common<solver_t>
+    {
+      protected:
+
+      using parent_t = hdf5_common<solver_t>;
+      using parent_t::parent_t;
+      using output_t = hdf5<solver_t>;
+//      using n_dims = typename parent_t::n_dims;
+
+      std::map<int, std::string> dim_names_ref;
+
+      void start(const typename parent_t::advance_arg_t nt) override
+      {
+        parent_t::start(nt);
+
+        // refined X, Y, Z, TODO: very similar to X, Y, Z
+        for (int i = 0; i < parent_t::n_dims; ++i)
+        {
+          blitz::Array<typename solver_t::real_t, parent_t::n_dims> coord(this->cshape_ref);
+#if defined(USE_MPI)
+          coord.reindexSelf(this->offst_ref);
+#endif
+          std::string name;
+          switch (i)
+          {
+            case 0 : coord = this->di / 2. + this->di / this->mem->n_ref * (blitz::firstIndex() - .5);
+                     name = "X refined";
+                     dim_names_ref[i] = name;
+                     break;
+            case 1 : coord = this->dj / 2. + this->dj / this->mem->n_ref * (blitz::secondIndex() - .5);
+                     name = "Y refined";
+                     dim_names_ref[i] = name;
+                     break;
+            case 2 : coord = this->dk / 2. + this->dk / this->mem->n_ref * (blitz::thirdIndex() - .5);
+                     name = "Z refined";
+                     dim_names_ref[i] = name;
+                     break;
+            default : break;
+          }
+          auto curr_dim = (*(this->hdfp)).createDataSet(name, this->flttype_output, this->cspace_ref);
+
+          H5::DataSpace dim_space = curr_dim.getSpace();
+          dim_space.selectHyperslab(H5S_SELECT_SET, this->cshape_ref.data(), this->offst_ref.data());
+          curr_dim.write(coord.data(), this->flttype_solver, H5::DataSpace(parent_t::n_dims, this->cshape_ref.data()), dim_space, this->dxpl_id);
+        }
+      }
+    };
+
   } // namespace output
 } // namespace libmpdataxx
