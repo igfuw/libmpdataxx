@@ -117,6 +117,12 @@ namespace libmpdataxx
         );
       }
 
+      void record_prof_ref_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data)
+      {
+        record_prof_hlpr(hdff, name, data, shape_ref, offst_ref);
+      }
+
+
 
 
 

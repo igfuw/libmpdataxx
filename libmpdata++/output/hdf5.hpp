@@ -387,7 +387,7 @@ namespace libmpdataxx
 
       // for discontiguous array with halos
       void record_aux_dsc_hlpr(
-        const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc, 
+        const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf,
         std::function<void(H5::DataSet, const typename solver_t::arr_t&)> &_record_dsc_helper,
         blitz::TinyVector<hsize_t, parent_t::n_dims> _chunk,
         const H5::DataSpace &_sspace
@@ -395,30 +395,29 @@ namespace libmpdataxx
       {
         assert(this->rank == 0);
 
-        if(srfc)
-          params.setChunk(parent_t::n_dims, srfcchunk.data());
-        else
-          params.setChunk(parent_t::n_dims, _chunk.data());
+        params.setChunk(parent_t::n_dims, _chunk.data());
 
         auto aux = hdf.createDataSet(
           name,
           flttype_output,
-          srfc ? srfcspace : _sspace,
+          _sspace,
           params
         );
 
-        if(srfc)
-          record_dsc_srfc_helper(aux, arr);
-        else
-          _record_dsc_helper(aux, arr);
+        _record_dsc_helper(aux, arr);
 
         // revert to default chunk
         params.setChunk(parent_t::n_dims, chunk.data());
       }
 
-      void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc = false)
+      void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
       {
-        record_aux_dsc_hlpr(name, arr, hdf, srfc, record_dsc_helper, chunk, sspace);
+        record_aux_dsc_hlpr(name, arr, hdf, record_dsc_helper, chunk, sspace);
+      }
+
+      void record_aux_dsc_srfc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
+      {
+        record_aux_dsc_hlpr(name, arr, hdf, record_dsc_srfc_helper, srfcchunk, srfcsspace);
       }
 
 
@@ -492,13 +491,12 @@ namespace libmpdataxx
       }
 
       // record 1D profiles, assumes that z is the last dimension
-      void record_prof_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data, const bool vctr, const bool refined)
+      void record_prof_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data, 
+        const blitz::TinyVector<hsize_t, parent_t::n_dims> &_shape,
+        const blitz::TinyVector<hsize_t, parent_t::n_dims> &_offst
+      )
       {
         assert(this->rank == 0);
-        assert(((vctr && refined) == false) && "record prof hlpr cant save refined vector profiles");
-
-        const auto _shape(refined ? shape_ref : vctr ? cshape : shape);
-        const auto _offst(refined ? offst_ref : offst);
 
         auto aux = hdff.createDataSet(
           name,
@@ -516,6 +514,16 @@ namespace libmpdataxx
         }
       }
 
+      void record_prof_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data)
+      {
+        record_prof_hlpr(hdff, name, data, shape, offst);
+      }
+
+      void record_prof_vctr_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data)
+      {
+        record_prof_hlpr(hdff, name, data, cshape, offst);
+      }
+
       // ---- functions for auxiliary output in timestep files ----
 
       // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
@@ -526,7 +534,10 @@ namespace libmpdataxx
 
       void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
       {
-        record_aux_dsc_hlpr(name, arr, *hdfp, srfc);
+        if(srfc)  
+          record_aux_dsc_hlpr(name, arr, *hdfp);
+        else      
+          record_aux_dsc_srfc_hlpr(name, arr, *hdfp);
       }
 
       void record_aux_scalar(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
