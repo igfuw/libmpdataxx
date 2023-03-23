@@ -359,26 +359,30 @@ namespace libmpdataxx
       }
 
       // data is assumed to be contiguous and in the same layout as hdf variable and in the C-style storage order
-      void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, H5::H5File hdf, bool refined = false)
+      void record_aux_hlpr(
+        const std::string &name, typename solver_t::real_t *data, H5::H5File &hdf,
+        const H5::DataSpace &_sspace,
+        const blitz::TinyVector<hsize_t, parent_t::n_dims> &_shape,
+        const blitz::TinyVector<hsize_t, parent_t::n_dims> &_offst
+      )
       {
         assert(this->rank == 0);
-        const auto _shape(refined ? shape_ref : shape);
-        const auto _offst(refined ? offst_ref : offst);
-        if(refined) params.setChunk(parent_t::n_dims, chunk_ref.data());
 
         auto aux = hdf.createDataSet(
           name,
           flttype_output,
-          refined ? sspace_ref : sspace,
+          _sspace,
           params
         );
 
         auto space = aux.getSpace();
         space.selectHyperslab(H5S_SELECT_SET, _shape.data(), _offst.data());
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, _shape.data()), space, dxpl_id);
-
-        // revert to default chunk
-        if(refined) params.setChunk(parent_t::n_dims, chunk.data());
+      }
+      
+      void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, H5::H5File &hdf)
+      {
+        record_aux_hlpr(name, data, hdf5, sspace, shape, offst);
       }
 
       // for discontiguous array with halos
@@ -918,6 +922,20 @@ namespace libmpdataxx
           refined ? shape_ref : this->shape,
           refined ? offst_ref : this->offst,
         );
+      }
+
+      void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, H5::H5File &hdf, bool refined = false)
+      {
+        if(refined) this->params.setChunk(parent_t::n_dims, chunk_ref.data());
+
+        record_aux_hlpr(name, data, hdf5, 
+          refined ? sspace_ref : this->sspace, 
+          refined ? shape_ref : this->shape,
+          refined ? offst_ref : this->offst
+        );
+
+        // revert to default chunk
+        if(refined) this->params.setChunk(parent_t::n_dims, this->chunk.data());
       }
     };
 
