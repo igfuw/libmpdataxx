@@ -382,36 +382,45 @@ namespace libmpdataxx
       
       void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, H5::H5File &hdf)
       {
-        record_aux_hlpr(name, data, hdf5, sspace, shape, offst);
+        record_aux_hlpr(name, data, hdf, sspace, shape, offst);
       }
 
       // for discontiguous array with halos
-      void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc = false, bool refined = false)
+      void record_aux_dsc_hlpr(
+        const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc, 
+        std::function<void(H5::DataSet, const typename solver_t::arr_t&)> &_record_dsc_helper,
+        blitz::TinyVector<hsize_t, parent_t::n_dims> _chunk,
+        const H5::DataSpace &_sspace
+      )
       {
         assert(this->rank == 0);
-        assert(!(refined && srfc));
 
         if(srfc)
           params.setChunk(parent_t::n_dims, srfcchunk.data());
-        else if (refined)
-          params.setChunk(parent_t::n_dims, chunk_ref.data());
+        else
+          params.setChunk(parent_t::n_dims, _chunk.data());
 
         auto aux = hdf.createDataSet(
           name,
           flttype_output,
-          srfc ? srfcspace : refined ? sspace_ref : sspace,
+          srfc ? srfcspace : _sspace,
           params
         );
 
         if(srfc)
           record_dsc_srfc_helper(aux, arr);
         else
-          record_dsc_helper(aux, arr, refined);
+          _record_dsc_helper(aux, arr);
 
         // revert to default chunk
-        if(srfc || refined)
-          params.setChunk(parent_t::n_dims, chunk.data());
+        params.setChunk(parent_t::n_dims, chunk.data());
       }
+
+      void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc = false)
+      {
+        record_aux_dsc_hlpr(name, arr, hdf, srfc, record_dsc_helper, chunk, sspace);
+      }
+
 
       // for array + halo 
       void record_aux_halo_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
@@ -936,6 +945,48 @@ namespace libmpdataxx
 
         // revert to default chunk
         if(refined) this->params.setChunk(parent_t::n_dims, this->chunk.data());
+      }
+
+      // for discontiguous array with halos
+      void record_aux_dsc_hlpr(
+        const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc, 
+        blitz::TinyVector<hsize_t, parent_t::n_dims> _chunk,
+        const H5::DataSpace &_sspace
+      {
+        assert(this->rank == 0);
+//        assert(!(refined && srfc));
+
+/*
+        if(srfc)
+          params.setChunk(parent_t::n_dims, srfcchunk.data());
+        else if (refined)
+          params.setChunk(parent_t::n_dims, chunk_ref.data());
+          */
+        if(srfc)
+          params.setChunk(parent_t::n_dims, srfcchunk.data());
+        else
+          params.setChunk(parent_t::n_dims, _chunk.data());
+
+        auto aux = hdf.createDataSet(
+          name,
+          flttype_output,
+          srfc ? srfcspace : _sspace,
+          params
+        );
+
+        if(srfc)
+          record_dsc_srfc_helper(aux, arr);
+        else
+          record_dsc_helper(aux, arr);
+          //record_dsc_helper(aux, arr, refined);
+
+        // revert to default chunk
+        params.setChunk(parent_t::n_dims, chunk.data());
+      }
+
+      void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool refined = false)
+      {
+        parent_t::record_aux_dsc_hlpr(name, arr, hdf, false, std::bind(&record_dsc_helper, this, std::placeholders::_1, std::placeholders::_2, refined), refined ? chunk_ref : chunk, refined ? sspace_ref : sspace);
       }
     };
 
