@@ -136,6 +136,21 @@ namespace libmpdataxx
         record_aux_ref_hlpr(name, data, *hdfp);
       }
 
+      void record_aux_prof_refined(const std::string &name, typename solver_t::real_t *data)
+      {
+        record_prof_ref_hlpr(*hdfp, name, data);
+      }
+        
+      void record_prof_refined_const(const std::string &name, typename solver_t::real_t *data)
+      {
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
+#if defined(USE_MPI)
+          , H5P_DEFAULT, fapl_id
+#endif
+        ); // reopen the const file
+
+        record_prof_ref_hlpr(hdfcp, name, data);
+      }
     };
 
   } // namespace output

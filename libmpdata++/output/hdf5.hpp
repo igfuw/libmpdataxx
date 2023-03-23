@@ -216,7 +216,7 @@ namespace libmpdataxx
             if (this->mem->G.get() != nullptr)
             {
               auto g_set = (*hdfp).createDataSet("G", flttype_output, sspace);
-              record_dsc_helper(g_set, *this->mem->G);
+              record_dsc_hlpr(g_set, *this->mem->G);
             }
 
             // save selected compile and runtime parameters, the choice depends on the solver family
@@ -271,7 +271,7 @@ namespace libmpdataxx
             );
             // TODO: units attribute
 
-            record_dsc_helper(vars[v.first], this->out_data(v.first));
+            record_dsc_hlpr(vars[v.first], this->out_data(v.first));
           }
         }
       }
@@ -353,7 +353,7 @@ namespace libmpdataxx
         };
       }
 
-      void record_dsc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
+      void record_dsc_hlpr(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
       {
         record_dsc_helper(dset, arr, this->mem->grid_size, shape, offst);
       }
@@ -388,7 +388,7 @@ namespace libmpdataxx
       // for discontiguous array with halos
       void record_aux_dsc_hlpr(
         const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf,
-        std::function<void(H5::DataSet, const typename solver_t::arr_t&)> &_record_dsc_helper,
+        void(*_record_dsc_helper)(const H5::DataSet &, const typename solver_t::arr_t&) ,
         blitz::TinyVector<hsize_t, parent_t::n_dims> _chunk,
         const H5::DataSpace &_sspace
       )
@@ -412,12 +412,12 @@ namespace libmpdataxx
 
       void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
       {
-        record_aux_dsc_hlpr(name, arr, hdf, record_dsc_helper, chunk, sspace);
+        record_aux_dsc_hlpr(name, arr, hdf, &hdf5_common<solver_t>::record_dsc_hlpr, chunk, sspace);
       }
 
       void record_aux_dsc_srfc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
       {
-        record_aux_dsc_hlpr(name, arr, hdf, record_dsc_srfc_helper, srfcchunk, srfcsspace);
+        record_aux_dsc_hlpr(name, arr, hdf, &record_dsc_srfc_helper, srfcchunk, srfcspace);
       }
 
 
@@ -550,9 +550,12 @@ namespace libmpdataxx
         record_aux_scalar(name, "/", data);
       }
 
-      void record_aux_prof(const std::string &name, typename solver_t::real_t *data, const bool vctr = false, const bool refined = false)
+      void record_aux_prof(const std::string &name, typename solver_t::real_t *data, const bool vctr = false)
       {
-        record_prof_hlpr(*hdfp, name, data, vctr, refined);
+        if(vctr)
+          record_prof_vctr_hlpr(*hdfp, name, data);
+        else
+          record_prof_hlpr(*hdfp, name, data);
       }
 
       // ---- functions for auxiliary output in const.h5 file ----
@@ -602,7 +605,7 @@ namespace libmpdataxx
       }
 
       // see above, also assumes that z is the last dimension
-      void record_prof_const_hlpr(const std::string &name, typename solver_t::real_t *data, const bool vctr, const bool refined = false)
+      void record_prof_const_hlpr(const std::string &name, typename solver_t::real_t *data, const bool vctr)
       {
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR
 #if defined(USE_MPI)
@@ -610,12 +613,15 @@ namespace libmpdataxx
 #endif
         ); // reopen the const file
 
-        record_prof_hlpr(hdfcp, name, data, vctr, refined);
+        if(vctr)
+          record_prof_vctr_hlpr(hdfcp, name, data);
+        else
+          record_prof_hlpr(hdfcp, name, data);
       }
 
-      void record_prof_const(const std::string &name, typename solver_t::real_t *data, const bool refined = false)
+      void record_prof_const(const std::string &name, typename solver_t::real_t *data)
       {
-        record_prof_const_hlpr(name, data, false, refined);
+        record_prof_const_hlpr(name, data, false);
       }
 
       void record_prof_vctr_const(const std::string &name, typename solver_t::real_t *data)
