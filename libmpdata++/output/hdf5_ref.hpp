@@ -111,7 +111,7 @@ namespace libmpdataxx
       void record_aux_dsc_ref_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
       {
         parent_t::record_aux_dsc_hlpr(name, arr, hdf, false, 
-          record_dsc_ref_helper, 
+          this, &hdf5<solver_t>::record_dsc_ref_helper, 
           chunk_ref, 
           sspace_ref
         );

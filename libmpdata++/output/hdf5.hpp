@@ -279,7 +279,7 @@ namespace libmpdataxx
 
       // ---- output helpers ----
 
-      void record_dsc_srfc_helper(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
+      void record_dsc_srfc_hlpr(const H5::DataSet &dset, const typename solver_t::arr_t &arr)
       {
         H5::DataSpace space = dset.getSpace();
         space.selectHyperslab(H5S_SELECT_SET, srfcshape.data(), offst.data());
@@ -386,9 +386,11 @@ namespace libmpdataxx
       }
 
       // for discontiguous array with halos
+      template<class out_t, class record_dsc_helper_t>
       void record_aux_dsc_hlpr(
         const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf,
-        void(*_record_dsc_helper)(const H5::DataSet &, const typename solver_t::arr_t&) ,
+        out_t *out,
+        record_dsc_helper_t _record_dsc_helper,
         blitz::TinyVector<hsize_t, parent_t::n_dims> _chunk,
         const H5::DataSpace &_sspace
       )
@@ -404,20 +406,22 @@ namespace libmpdataxx
           params
         );
 
-        _record_dsc_helper(aux, arr);
+        (out->*_record_dsc_helper)(aux, arr);
 
         // revert to default chunk
         params.setChunk(parent_t::n_dims, chunk.data());
       }
 
+      void foo() {}
+
       void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
       {
-        record_aux_dsc_hlpr(name, arr, hdf, &hdf5_common<solver_t>::record_dsc_hlpr, chunk, sspace);
+        record_aux_dsc_hlpr(name, arr, hdf, this, &hdf5_common<solver_t>::record_dsc_hlpr, chunk, sspace);
       }
 
       void record_aux_dsc_srfc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
       {
-        record_aux_dsc_hlpr(name, arr, hdf, &record_dsc_srfc_helper, srfcchunk, srfcspace);
+        record_aux_dsc_hlpr(name, arr, hdf, this, &hdf5_common<solver_t>::record_dsc_srfc_hlpr, srfcchunk, srfcspace);
       }
 
 
