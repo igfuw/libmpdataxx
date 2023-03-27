@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <libmpdata++/output/hdf5.hpp>
+#include <libmpdata++/output/hdf5_ref.hpp>
 #include <libmpdata++/output/detail/xdmf_writer.hpp>
 
 #include <boost/filesystem.hpp>
@@ -111,10 +111,19 @@ namespace libmpdataxx
       ) : parent_t(args, p)
       {}
     };
+
+    //template<class solver_t, class enableif = void>
+    //class hdf5_xdmf;
            
     // for solvers without grid refinemenet
+    //template <class solver_t>
+    //class hdf5_xdmf<solver_t,
+    //  typename std::enable_if_t<~libmpdataxx::solvers::detail::slvr_with_frac_recn_v<solver_t::ct_params_t>>
+    //>
+    
     template<class solver_t, class enableif = void>
-    class hdf5_xdmf : public hdf5_xdmf_common<solver_t>
+    class hdf5_xdmf
+    : public hdf5_xdmf_common<solver_t>
     {
       protected:
       using output_t = hdf5_xdmf<solver_t>;
@@ -127,7 +136,7 @@ namespace libmpdataxx
     // specialization for solvers with grid refinemenet
     template <class solver_t>
     class hdf5_xdmf<solver_t,
-      typename std::enable_if_t<(int)solver_t::ct_params_t::fractal_recon != (int)0>
+      typename std::enable_if_t<(int)solver_t::ct_params_t_::fractal_recon != (int)0>
     > : public hdf5_xdmf_common<solver_t>
     {
       protected:

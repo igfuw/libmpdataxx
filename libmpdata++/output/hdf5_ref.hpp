@@ -18,7 +18,7 @@ namespace libmpdataxx
     // specialization for solvers with grid refinemenet
     template <class solver_t>
     class hdf5<solver_t,
-      typename std::enable_if_t<(int)solver_t::ct_params_t::fractal_recon != (int)0>
+      typename std::enable_if_t<(int)solver_t::ct_params_t_::fractal_recon != (int)0>
     > : public hdf5_common<solver_t>
     {
       protected:
@@ -102,7 +102,7 @@ namespace libmpdataxx
       {
         this->params.setChunk(parent_t::n_dims, chunk_ref.data());
 
-        record_aux_hlpr(name, data, hdf5, sspace_ref, shape_ref, offst_ref);
+        parent_t::record_aux_hlpr(name, data, hdf, sspace_ref, shape_ref, offst_ref);
 
         // revert to default chunk
         this->params.setChunk(parent_t::n_dims, this->chunk.data());
@@ -110,7 +110,7 @@ namespace libmpdataxx
 
       void record_aux_dsc_ref_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
       {
-        parent_t::record_aux_dsc_hlpr(name, arr, hdf, false, 
+        parent_t::record_aux_dsc_hlpr(name, arr, hdf, 
           this, &hdf5<solver_t>::record_dsc_ref_helper, 
           chunk_ref, 
           sspace_ref
@@ -119,33 +119,29 @@ namespace libmpdataxx
 
       void record_prof_ref_hlpr(H5::H5File hdff, const std::string &name, typename solver_t::real_t *data)
       {
-        record_prof_hlpr(hdff, name, data, shape_ref, offst_ref);
+        this->record_prof_hlpr(hdff, name, data, shape_ref, offst_ref);
       }
-
-
-
-
 
       void record_aux_dsc_refined(const std::string &name, const typename solver_t::arr_t &arr)
       {
-        record_aux_dsc_ref_hlpr(name, arr, *hdfp);
+        record_aux_dsc_ref_hlpr(name, arr, *this->hdfp);
       }
 
       void record_aux_refined(const std::string &name, typename solver_t::real_t *data)
       {
-        record_aux_ref_hlpr(name, data, *hdfp);
+        record_aux_ref_hlpr(name, data, *this->hdfp);
       }
 
       void record_aux_prof_refined(const std::string &name, typename solver_t::real_t *data)
       {
-        record_prof_ref_hlpr(*hdfp, name, data);
+        record_prof_ref_hlpr(*this->hdfp, name, data);
       }
         
       void record_prof_refined_const(const std::string &name, typename solver_t::real_t *data)
       {
-        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
+        H5::H5File hdfcp(this->const_file, H5F_ACC_RDWR
 #if defined(USE_MPI)
-          , H5P_DEFAULT, fapl_id
+          , H5P_DEFAULT, this->fapl_id
 #endif
         ); // reopen the const file
 

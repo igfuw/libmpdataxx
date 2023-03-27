@@ -412,8 +412,6 @@ namespace libmpdataxx
         params.setChunk(parent_t::n_dims, chunk.data());
       }
 
-      void foo() {}
-
       void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf)
       {
         record_aux_dsc_hlpr(name, arr, hdf, this, &hdf5_common<solver_t>::record_dsc_hlpr, chunk, sspace);
@@ -539,9 +537,9 @@ namespace libmpdataxx
       void record_aux_dsc(const std::string &name, const typename solver_t::arr_t &arr, bool srfc = false)
       {
         if(srfc)  
-          record_aux_dsc_hlpr(name, arr, *hdfp);
-        else      
           record_aux_dsc_srfc_hlpr(name, arr, *hdfp);
+        else      
+          record_aux_dsc_hlpr(name, arr, *hdfp);
       }
 
       void record_aux_scalar(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
