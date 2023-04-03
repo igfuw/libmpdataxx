@@ -8,9 +8,10 @@
 
 #include <libmpdata++/blitz.hpp>
 #include <libmpdata++/formulae/arakawa_c.hpp>
-#include <libmpdata++/concurr/detail/sharedmem.hpp>
+#include <libmpdata++/concurr/detail/sharedmem_refined.hpp>
 
 #include <libmpdata++/solvers/detail/monitor.hpp>
+#include <libmpdata++/solvers/detail/solver_type_traits.hpp>
 
 #include <libmpdata++/bcond/detail/bcond_common.hpp>
 
@@ -57,7 +58,8 @@ namespace libmpdataxx
         static constexpr bool div3_mpdata = opts::isset(ct_params_t::opts, opts::div_3rd)    ||
                                             opts::isset(ct_params_t::opts, opts::div_3rd_dt)  ;
 
-        std::array<std::array<bcp_t, 2>, n_dims> bcs;
+        using bcs_t = std::array<std::array<bcp_t, 2>, n_dims>;
+        bcs_t bcs;
 
         const int rank;
 
@@ -72,7 +74,18 @@ namespace libmpdataxx
         real_t time = 0;
         std::vector<int> n;
 
-        typedef concurr::detail::sharedmem<real_t, n_dims, n_tlev> mem_t;
+        using shmem_ref_t = concurr::detail::sharedmem_refined<real_t, n_dims, n_tlev>;
+        using shmem_t = concurr::detail::sharedmem<real_t, n_dims, n_tlev>;
+
+        public:
+
+        // if fractal reconstruction of some variables is required in ct_params, use special type of sharedmem
+        using mem_t = typename std::conditional_t<
+          detail::slvr_with_frac_recn_v<ct_params_t>,
+          shmem_ref_t, shmem_t>;
+
+        protected:
+
         mem_t *mem;
 
         // helper methods invoked by solve()
@@ -99,7 +112,8 @@ namespace libmpdataxx
 
         virtual void xchng_vctr_alng(arrvec_t<arr_t>&, const bool ad = false, const bool cyclic = false) = 0;
 
-        void set_bcs(const int &d, bcp_t &bcl, bcp_t &bcr)
+        template<class bcs_t_, class bcp_t_>
+        void set_bcs(bcs_t_ &_bcs, const int &d, bcp_t_ &bcl, bcp_t_ &bcr)
         {
           // with distributed memory and cyclic boundary conditions,
           // leftmost node must send left first, as
@@ -107,8 +121,8 @@ namespace libmpdataxx
           if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() == 0)
             std::swap(bcl, bcr);
 
-          bcs[d][0] = std::move(bcl);
-          bcs[d][1] = std::move(bcr);
+          _bcs[d][0] = std::move(bcl);
+          _bcs[d][1] = std::move(bcr);
         }
 
         virtual real_t courant_number(const arrvec_t<arr_t>&) = 0;

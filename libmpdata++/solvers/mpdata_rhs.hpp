@@ -45,6 +45,7 @@ namespace libmpdataxx
 #endif
 
       protected:
+
       using solver_family = mpdata_rhs_family_tag;
 
       // member fields

@@ -18,6 +18,85 @@ namespace libmpdataxx
     namespace detail
     {
       template<int dim>
+      struct data_item
+      {
+        using ptree = boost::property_tree::ptree;
+
+        blitz::TinyVector<int, dim> dimensions;
+        const std::string number_type = "Float";
+        const std::string format = "HDF";
+        std::string data;
+        void add(ptree& node)
+        {
+          std::stringstream ss;
+          for (auto d : dimensions)
+            ss << d << ' ';
+          ptree& dat_node = node.add("DataItem", data);
+          dat_node.put("<xmlattr>.Dimensions", ss.str());
+          dat_node.put("<xmlattr>.NumberType", number_type);
+          dat_node.put("<xmlattr>.Format", format);
+        }
+      };
+
+      template<int dim>
+      struct topology
+      {
+        using ptree = boost::property_tree::ptree;
+
+        const std::string topology_type = dim == 2 ? "2DSMesh" : "3DSMesh";
+        blitz::TinyVector<int, dim> dimensions;
+        void add(ptree& node)
+        {
+          node.put("Topology.<xmlattr>.TopologyType", topology_type);
+          std::stringstream ss;
+          for (auto d : dimensions)
+            ss << d << ' ';
+          node.put("Topology.<xmlattr>.Dimensions", ss.str());
+        }
+      };
+
+      template<int dim>
+      struct geometry
+      {
+        using ptree = boost::property_tree::ptree;
+
+        const std::string geometry_type = dim == 2 ? "X_Y" : "X_Y_Z";
+        std::array<data_item<dim>, dim> coords;
+        void add(ptree& node)
+        {
+          ptree& geo_node = node.add("Geometry", "");
+          geo_node.put("<xmlattr>.GeometryType", geometry_type);
+          for (auto &c : coords)
+            c.add(geo_node);
+        }
+      };
+
+      template<int dim>
+      struct attribute_t
+      {
+        using ptree = boost::property_tree::ptree;
+
+        std::string name;
+        const std::string attribute_type = "Scalar";
+        const std::string center = "Cell";
+        mutable data_item<dim> item;
+        void add(ptree& node)
+        {
+          ptree& attr_node = node.add("Attribute", "");
+          attr_node.put("<xmlattr>.Name", name);
+          attr_node.put("<xmlattr>.AttributeType", attribute_type);
+          attr_node.put("<xmlattr>.Center", center);
+          item.add(attr_node);
+        }
+
+        // to allow storing attributes in std::set
+        friend bool operator<(const attribute_t &lhs, const attribute_t &rhs)
+        {
+          return lhs.name < rhs.name;
+        }
+      };
+
+      template<int dim>
       class xdmf_writer
       {
         using ptree = boost::property_tree::ptree;
@@ -26,78 +105,12 @@ namespace libmpdataxx
 #else
         using xml_writer_settings = boost::property_tree::xml_writer_settings<char>;
 #endif
-
-        struct data_item
-        {
-          blitz::TinyVector<int, dim> dimensions;
-          const std::string number_type = "Float";
-          const std::string format = "HDF";
-          std::string data;
-          void add(ptree& node)
-          {
-            std::stringstream ss;
-            for (auto d : dimensions)
-              ss << d << ' ';
-            ptree& dat_node = node.add("DataItem", data);
-            dat_node.put("<xmlattr>.Dimensions", ss.str());
-            dat_node.put("<xmlattr>.NumberType", number_type);
-            dat_node.put("<xmlattr>.Format", format);
-          }
-        };
-
-        struct topology
-        {
-          const std::string topology_type = dim == 2 ? "2DSMesh" : "3DSMesh";
-          blitz::TinyVector<int, dim> dimensions;
-          void add(ptree& node)
-          {
-            node.put("Topology.<xmlattr>.TopologyType", topology_type);
-            std::stringstream ss;
-            for (auto d : dimensions)
-              ss << d << ' ';
-            node.put("Topology.<xmlattr>.Dimensions", ss.str());
-          }
-        };
-
-        struct geometry
-        {
-          const std::string geometry_type = dim == 2 ? "X_Y" : "X_Y_Z";
-          std::array<data_item, dim> coords;
-          void add(ptree& node)
-          {
-            ptree& geo_node = node.add("Geometry", "");
-            geo_node.put("<xmlattr>.GeometryType", geometry_type);
-            for (auto &c : coords)
-              c.add(geo_node);
-          }
-        };
-
-        struct attribute
-        {
-          std::string name;
-          const std::string attribute_type = "Scalar";
-          const std::string center = "Cell";
-          mutable data_item item;
-          void add(ptree& node)
-          {
-            ptree& attr_node = node.add("Attribute", "");
-            attr_node.put("<xmlattr>.Name", name);
-            attr_node.put("<xmlattr>.AttributeType", attribute_type);
-            attr_node.put("<xmlattr>.Center", center);
-            item.add(attr_node);
-          }
-
-          // to allow storing attributes in std::set
-          friend bool operator<(const attribute &lhs, const attribute &rhs)
-          {
-            return lhs.name < rhs.name;
-          }
-        };
+        using attribute = attribute_t<dim>;
 
         const std::string name = "Grid";
         const std::string grid_type = "Uniform";
-        topology top;
-        geometry geo;
+        topology<dim> top;
+        geometry<dim> geo;
         std::set<attribute> attrs;
         std::set<attribute> c_attrs;
 
@@ -179,7 +192,7 @@ namespace libmpdataxx
           write_xml(xmf_name, pt, std::locale(), settings);
         }
 
-        void write_temporal(const std::string& xmf_name, const std::vector<std::string>& timesteps)
+        void write_temporal(const std::string& xmf_name, const std::vector<std::string>& timesteps, const std::string &timesteps_suffix = "")
         {
 
           ptree pt;
@@ -193,14 +206,13 @@ namespace libmpdataxx
           for (auto ts : timesteps)
           {
             ptree& ts_node = grid_node.add("xi:include", "");
-            ts_node.put("<xmlattr>.href", ts);
+            ts_node.put("<xmlattr>.href", ts + timesteps_suffix);
             ts_node.put("<xmlattr>.xpointer", "gid");
           }
 
           xml_writer_settings settings('\t', 1);
           write_xml(xmf_name, pt, std::locale(), settings);
         }
-
       };
 
     }

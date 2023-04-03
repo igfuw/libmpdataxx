@@ -22,6 +22,7 @@ template <typename params_t>
 void set_sgs_specific(params_t &p, iles_tag)
 {
   p.iles_cdrag = 0.1;
+  p.n_fra_iter = 1;
 }
 
 // smagorinsky
@@ -32,6 +33,7 @@ void set_sgs_specific(params_t &p, smg_tag)
   p.smg_c = 0.165;
   p.prandtl_num = 0.42;
   p.cdrag = 0.1;
+  p.n_fra_iter = 4;
 }
 
 template <typename sgs_t>
@@ -54,6 +56,8 @@ void test(const std::string &dirname, const int np, const int nt)
       u, v, w, tht,
       vip_i=u, vip_j=v, vip_k=w, vip_den=-1
     }; };
+    //enum { fractal_recon = libmpdataxx::opts::bit(ix::w) };
+    enum { fractal_recon = libmpdataxx::opts::bit(ix::tht) };
   }; 
 
   using ix = typename ct_params_t::ix;

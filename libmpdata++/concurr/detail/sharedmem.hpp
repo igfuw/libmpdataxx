@@ -97,8 +97,6 @@ namespace libmpdataxx
               rng_t(0, grid_size[d]-1),
               d == 0 ? distmem.rank() : 0,          // decomposition along x, because that's MPI decomposition
               d == 0 ? distmem.size() : 1
-             // d == shmem_decomp_dim ? distmem.rank() : 0,
-             // d == shmem_decomp_dim ? distmem.size() : 1
             );
             origin[d] = this->grid_size[d].first();
           }
@@ -294,6 +292,7 @@ namespace libmpdataxx
         }
 
         virtual arr_t advectee(int e = 0) = 0;
+        virtual const arr_t advectee_global(int e = 0) = 0;
 
         void advectee_global_set(const arr_t arr, int e = 0)
         {
@@ -507,8 +506,10 @@ namespace libmpdataxx
       class sharedmem<real_t, 3, n_tlev> : public sharedmem_common<real_t, 3, n_tlev>
       {
         using parent_t = sharedmem_common<real_t, 3, n_tlev>;
-        using arr_t = typename parent_t::arr_t;
         using parent_t::parent_t; // inheriting ctors
+
+        protected:
+        using arr_t = typename parent_t::arr_t;
 
         public:
 

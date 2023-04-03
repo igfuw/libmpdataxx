@@ -9,20 +9,21 @@
 
 #include <libmpdata++/solvers/boussinesq.hpp>
 #include <libmpdata++/output/hdf5_xdmf.hpp>
+#include <libmpdata++/formulae/refined_grid.hpp>
 #include <cmath>
 
 template <class ct_params_t>
 class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussinesq<ct_params_t>>
 {
-  using parent_t = libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussinesq<ct_params_t>>;
   using ix = typename ct_params_t::ix;
 
   public:
   using real_t = typename ct_params_t::real_t;
+  using parent_t = libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussinesq<ct_params_t>>;
 
   private:
   real_t hscale, iles_cdrag;
-  typename parent_t::arr_t &tke;
+  typename parent_t::arr_t &tke, &r2r_avg;
 
   void multiply_sgs_visc()
   {
@@ -60,6 +61,13 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     if (this->timestep % static_cast<int>(this->outfreq) == 0)
     {
       if (this->rank == 0) std::cout << this->timestep << std::endl;
+
+      // output tht refined with fractal reconstruction
+      //this->generate_stretching_parameters(std::random_device{}());
+      //this->reconstruct_refinee(ix::w);
+      this->generate_stretching_parameters(std::random_device{}());
+      this->reconstruct_refinee(ix::tht);
+
       this->mem->barrier();
       if (this->rank == 0)
       {
@@ -68,6 +76,32 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
           this->record_aux_dsc("tke", this->tke);
         }
         this->record_aux_dsc("p", this->Phi);
+        //this->record_aux_dsc_refined("w reconstructed", this->mem->refinee(this->ix_r2r.at(ix::w)));
+        this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(this->ix_r2r.at(ix::tht)));
+      }
+      this->mem->barrier();
+
+      // output tht refined with linear interpolation
+      this->interpolate_refinee(ix::tht);
+
+      this->mem->barrier();
+      if (this->rank == 0)
+      {
+        this->record_aux_dsc_refined("tht interpolated", this->mem->refinee(this->ix_r2r.at(ix::tht)));
+      }
+      this->mem->barrier();
+
+      // output tht on refined grid after averaging from interpolated refined tht to regular grid tht
+      // TODO: fill refined grid before this average!
+      // TODO: this will make avg_edge_sclr obsolete?
+      libmpdataxx::formulae::refined::spatial_average_ref2reg<real_t>(this->mem->refinee(this->ix_r2r.at(ix::tht)), this->ijk_r2r, this->mem->n_ref/2, this->mem->distmem.grid_size_ref, true);
+      this->r2r_avg(this->ijk) = this->mem->refinee(this->ix_r2r.at(ix::tht))(this->ijk_r2r); 
+
+      this->mem->barrier();
+      if (this->rank == 0)
+      {
+        //this->record_aux_dsc_refined("tht interpolated and averaged", this->mem->refinee(this->ix_r2r.at(ix::tht)));
+        this->record_aux_dsc("tht averaged from interpolated refined grid", this->r2r_avg);
       }
       this->mem->barrier();
     }
@@ -88,7 +122,8 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     parent_t(args, p),
     hscale(p.hscale),
     iles_cdrag(p.iles_cdrag),
-    tke(args.mem->tmp[__FILE__][0][0])
+    tke(args.mem->tmp[__FILE__][0][0]),
+    r2r_avg(args.mem->tmp[__FILE__][0][1])
   {}
 
   static void alloc(
@@ -96,6 +131,6 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
     const int &n_iters
   ) {
     parent_t::alloc(mem, n_iters);
-    parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // tke
+    parent_t::alloc_tmp_sclr(mem, __FILE__, 2); // tke
   }
 };
