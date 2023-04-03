@@ -171,7 +171,7 @@ namespace libmpdataxx
           auto rand = std::bind(dis, gen);
           std::generate(this->d_j(this->ijk_ref_with_halo).begin(), this->d_j(this->ijk_ref_with_halo).end(), rand);
           this->d_j(this->ijk_ref_with_halo) = formulae::fractal::d_of_CDF_fctr<real_t>{}(this->d_j(this->ijk_ref_with_halo));
-          this->mem->barrier();
+          xchng_ref(this->d_j, this->ijk_ref); // xchng to have the same values of d_j in the distmem halo region
         }
 
         // calculate refined points using (tri?)linear interpolation
@@ -211,6 +211,8 @@ namespace libmpdataxx
           assert(opts::isset(ct_params_t::fractal_recon, opts::bit(e)));
           const int halo_size = 2;
           const int e_ref = this->ix_r2r.at(e);
+
+//          std::cerr << "reconstructing: e = " << e << " e_ref = " << e_ref << std::endl;
 
           //// TEMPORARY
           //this->mem->psi_ref[e_ref] = -1000;
