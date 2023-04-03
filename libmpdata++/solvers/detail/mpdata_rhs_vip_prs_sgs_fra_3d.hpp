@@ -57,6 +57,8 @@ namespace libmpdataxx
         // TODO: move to bcond or sth? would be filled only by remote bcond
         void fill_refinee_r2r_distmem_halos(const int e, const int halo_size)
         {
+          if(this->mem->distmem.size() == 1) return; // no distmem
+
           const int e_ref = this->ix_r2r.at(e);
           // TODO: we only need to xchng along distmem direction (x)
           this->xchng(e);
