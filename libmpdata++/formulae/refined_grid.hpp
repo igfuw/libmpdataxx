@@ -50,6 +50,12 @@ namespace libmpdataxx
                     real_t w = 1; // weight
                     if(volume_avg)
                     {
+                      // refined cells that are on the edge of the domain
+                      if(i+id == 0 || i+id == grid_size[0]-1) w/=2.;
+                      if(j+jd == 0 || j+jd == grid_size[1]-1) w/=2.;
+                      if(k+kd == 0 || k+kd == grid_size[2]-1) w/=2.;
+
+                      // refined cells that are half-between two resolved cells
                       if(id==-dist || id == dist) w/=2.;
                       if(jd==-dist || jd == dist) w/=2.;
                       if(kd==-dist || kd == dist) w/=2.;
