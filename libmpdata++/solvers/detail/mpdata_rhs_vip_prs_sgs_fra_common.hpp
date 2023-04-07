@@ -11,6 +11,7 @@
 #pragma once
 
 #include <libmpdata++/solvers/mpdata_rhs_vip_prs_sgs.hpp>
+#include <libmpdata++/formulae/refined_grid.hpp>
 //#include <numeric>
 //#include <libmpdata++/formulae/idxperm.hpp>
 #include <random>
