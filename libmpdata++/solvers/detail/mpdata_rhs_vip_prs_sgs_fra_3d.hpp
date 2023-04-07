@@ -122,42 +122,6 @@ namespace libmpdataxx
           }
         }
 
-        void avg_edge_sclr_ref(typename parent_t::arr_t &arr,
-                       const idx_t<3> &range_ijk
-        ) 
-        {
-          this->mem->barrier();
-
-          for (auto &bc : this->bcs_ref[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
-//          barrier_if_single_threaded_bc0(); // not necessary?
-          for (auto &bc : this->bcs_ref[1]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[2], range_ijk[0]);
-          for (auto &bc : this->bcs_ref[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
-          this->mem->barrier(); // wait for all threads to copy edge to halo before modifying edge. 
-          // NOTE: averaging this way gives different weights to different points in corners depending on the order (corners are averaged twice and each averaging is dividing by 2)
-          for (auto &bc : this->bcs_ref[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
-          for (auto &bc : this->bcs_ref[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[2], range_ijk[0]);
-          for (auto &bc : this->bcs_ref[2]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0], range_ijk[1]);
-
-          this->mem->barrier();
-        }
-
-        // compute arr_reg as average from cells of arr_ref that are overlapping with the arr_reg cell
-        // NOTE: modifies arr_ref too!
-        void spatial_average_ref2reg(typename parent_t::arr_t &arr_ref, typename parent_t::arr_t &arr_reg)
-        {
-          this->xchng_ref(arr_ref, this->ijk_ref); // fill distmem halos of arr_ref
- //   std::cerr << "rx_ref(ijk_ref) after xchng_ref: " << rx_ref(this->ijk_ref) << std::endl;
- //   std::cerr << "rx_ref after xchng_ref: " << rx_ref << std::endl;
-          libmpdataxx::formulae::refined::spatial_average_ref2reg<real_t>(arr_ref, this->ijk_r2r, this->mem->n_ref/2, this->mem->distmem.grid_size_ref, true); // calculate the average and store in arr_ref
- //   std::cerr << "rx_ref(ijk_ref) after spatial average: " << rx_ref(this->ijk_ref) << std::endl;
-          arr_reg(this->ijk) = arr_ref(this->ijk_r2r); // copy to arr_reg
-   // std::cerr << "rx(ijk) after copy from refined: " << rx(this->ijk) << std::endl;
-          nancheck(arr_reg(this->ijk), "arr_reg after copying from arr_ref in spatial_average_ref2reg");
-//    rx(this->ijk) *= 4./3. * 1000. * 3.14159; // get mixing ratio [kg/kg]
-          this->mem->barrier();
-          this->avg_edge_sclr(arr_reg, this->ijk); // in case of cyclic bcond, arr_reg on edges needs to be the same
-        }
-
         void refinement_ranges(const int iter, const int halo_size)
         {
           // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
@@ -197,6 +161,42 @@ namespace libmpdataxx
         }
 
         protected:
+
+        void avg_edge_sclr_ref(typename parent_t::arr_t &arr,
+                       const idx_t<3> &range_ijk
+        ) 
+        {
+          this->mem->barrier();
+
+          for (auto &bc : this->bcs_ref[0]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
+//          barrier_if_single_threaded_bc0(); // not necessary?
+          for (auto &bc : this->bcs_ref[1]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs_ref[2]) bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[0], range_ijk[1]);
+          this->mem->barrier(); // wait for all threads to copy edge to halo before modifying edge. 
+          // NOTE: averaging this way gives different weights to different points in corners depending on the order (corners are averaged twice and each averaging is dividing by 2)
+          for (auto &bc : this->bcs_ref[0]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
+          for (auto &bc : this->bcs_ref[1]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs_ref[2]) bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[0], range_ijk[1]);
+
+          this->mem->barrier();
+        }
+
+        // compute arr_reg as average from cells of arr_ref that are overlapping with the arr_reg cell
+        // NOTE: modifies arr_ref too!
+        void spatial_average_ref2reg(typename parent_t::arr_t &arr_ref, typename parent_t::arr_t &arr_reg)
+        {
+          this->xchng_ref(arr_ref, this->ijk_ref); // fill distmem halos of arr_ref
+ //   std::cerr << "rx_ref(ijk_ref) after xchng_ref: " << rx_ref(this->ijk_ref) << std::endl;
+ //   std::cerr << "rx_ref after xchng_ref: " << rx_ref << std::endl;
+          libmpdataxx::formulae::refined::spatial_average_ref2reg<real_t>(arr_ref, this->ijk_r2r, this->mem->n_ref/2, this->mem->distmem.grid_size_ref, true); // calculate the average and store in arr_ref
+ //   std::cerr << "rx_ref(ijk_ref) after spatial average: " << rx_ref(this->ijk_ref) << std::endl;
+          arr_reg(this->ijk) = arr_ref(this->ijk_r2r); // copy to arr_reg
+   // std::cerr << "rx(ijk) after copy from refined: " << rx(this->ijk) << std::endl;
+          nancheck(arr_reg(this->ijk), "arr_reg after copying from arr_ref in spatial_average_ref2reg");
+//    rx(this->ijk) *= 4./3. * 1000. * 3.14159; // get mixing ratio [kg/kg]
+          this->mem->barrier();
+          this->avg_edge_sclr(arr_reg, this->ijk); // in case of cyclic bcond, arr_reg on edges needs to be the same
+        }
 
         // TODO: stretching parameters at the overlaps of the reconstructed and resolved arrays (ijk_r2r) are not used, do not generate them
         //       also not all parameters in the halo are needed (but some are!)
