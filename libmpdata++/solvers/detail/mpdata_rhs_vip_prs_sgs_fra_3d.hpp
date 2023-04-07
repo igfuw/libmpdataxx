@@ -192,7 +192,6 @@ namespace libmpdataxx
  //   std::cerr << "rx_ref(ijk_ref) after spatial average: " << rx_ref(this->ijk_ref) << std::endl;
           arr_reg(this->ijk) = arr_ref(this->ijk_r2r); // copy to arr_reg
    // std::cerr << "rx(ijk) after copy from refined: " << rx(this->ijk) << std::endl;
-          nancheck(arr_reg(this->ijk), "arr_reg after copying from arr_ref in spatial_average_ref2reg");
 //    rx(this->ijk) *= 4./3. * 1000. * 3.14159; // get mixing ratio [kg/kg]
           this->mem->barrier();
           this->avg_edge_sclr(arr_reg, this->ijk); // in case of cyclic bcond, arr_reg on edges needs to be the same
