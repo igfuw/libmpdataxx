@@ -238,7 +238,7 @@ namespace libmpdataxx
             formulae::fractal::intrp<2, real_t>(this->mem->psi_ref[e_ref], mid_ijk_r2r_2, ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
           }
           this->mem->barrier();
-//          avg_edge_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref); // just to make sure that with cyclic bconds, corresponding refined values are the same; TODO: not needed?
+          avg_edge_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref); // just to make sure that with cyclic bconds, corresponding refined values are the same; TODO: not needed?
         }
 
         // TODO: now that we have xchng_ref, use halo (other than distmem halos) in reconstruction?
@@ -276,7 +276,7 @@ namespace libmpdataxx
             formulae::fractal::rcnstrct<2, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_2)        , ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride, this->c_j, this->d_j, this->f_j);
           }
           this->mem->barrier();
-//          avg_edge_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref); // just to make sure that with cyclic bconds, corresponding refined values are the same; TODO: not needed?
+          avg_edge_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref); // just to make sure that with cyclic bconds, corresponding refined values are the same; TODO: not needed?
         }
 
         void xchng_ref(
