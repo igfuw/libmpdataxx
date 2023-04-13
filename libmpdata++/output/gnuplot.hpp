@@ -77,16 +77,16 @@ namespace libmpdataxx
                 << "set ticslevel " << p.gnuplot_ticslevel << "\n";
             if (p.gnuplot_xyplane_at != "") *gp << "set xyplane at " << p.gnuplot_xyplane_at << "\n";
             if (p.gnuplot_yrange != "[*:*]")
-              throw std::runtime_error("gnupot_yrange was specified for a 1D splot where Y axis represents time");
+              throw std::runtime_error("libmpdata++: gnupot_yrange was specified for a 1D splot where Y axis represents time");
 
             if (p.gnuplot_ylabel == "") *gp << "set ylabel 't/dt'\n";
           }
           else if (p.gnuplot_command == "plot")
           {
-            if (p.gnuplot_with != "histeps") throw std::runtime_error("histeps is the only meaningfull style for 1D plots");
+            if (p.gnuplot_with != "histeps") throw std::runtime_error("libmpdata++: histeps is the only meaningfull style for 1D plots");
             *gp << "set yrange " << p.gnuplot_yrange << "\n";
           }
-          else throw std::runtime_error("gnuplot_command must equal plot or splot");
+          else throw std::runtime_error("libmpdata++: gnuplot_command must equal plot or splot");
 
           *gp
              << "set output '" << p.gnuplot_output;

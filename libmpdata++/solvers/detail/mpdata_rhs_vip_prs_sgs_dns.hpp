@@ -56,7 +56,7 @@ namespace libmpdataxx
           parent_t(args, p),
           eta(p.eta)
         {
-          if (eta == 0) throw std::runtime_error("eta == 0");
+          if (eta == 0) throw std::runtime_error("libmpdata++: eta == 0");
         }
       };
     } // namespace detail

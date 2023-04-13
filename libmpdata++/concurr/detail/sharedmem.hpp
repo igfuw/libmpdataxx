@@ -104,7 +104,7 @@ namespace libmpdataxx
           }
 
           if (size > grid_size[0])
-            throw std::runtime_error("number of subdomains greater than number of gridpoints");
+            throw std::runtime_error("libmpdata++: number of subdomains greater than number of gridpoints");
 
           if (n_dims != 1)
             sumtmp.reset(new blitz::Array<double, 1>(this->grid_size[shmem_decomp_dim])); 
@@ -374,7 +374,7 @@ namespace libmpdataxx
         {
           // a sanity check
           if (this->G.get() == nullptr)
-            throw std::runtime_error("g_factor() called with nug option unset?");
+            throw std::runtime_error("libmpdata++: g_factor() called with nug option unset?");
 
           // the same logic as in advectee() - see above
           return (*this->G)(
@@ -459,7 +459,7 @@ namespace libmpdataxx
         {
           // a sanity check
           if (this->G.get() == nullptr)
-            throw std::runtime_error("g_factor() called with nug option unset?");
+            throw std::runtime_error("libmpdata++: g_factor() called with nug option unset?");
 
           // the same logic as in advectee() - see above
           return (*this->G)(
@@ -472,7 +472,7 @@ namespace libmpdataxx
         {
           // a sanity check
           if (this->vab_coeff.get() == nullptr)
-            throw std::runtime_error("vab_coeff() called with option vip_vab unset?");
+            throw std::runtime_error("libmpdata++: vab_coeff() called with option vip_vab unset?");
 
           // the same logic as in advectee() - see above
           return (*this->vab_coeff)(
@@ -486,7 +486,7 @@ namespace libmpdataxx
           assert(d == 0 || d== 1);
           // a sanity check
           if (this->vab_coeff.get() == nullptr)
-            throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
+            throw std::runtime_error("libmpdata++: vab_relaxed_state() called with option vip_vab unset?");
           // the same logic as in advectee() - see above
           return this->vab_relax[d](
             this->grid_size[0],
@@ -580,7 +580,7 @@ namespace libmpdataxx
         {
           // a sanity check
           if (this->G.get() == nullptr)
-            throw std::runtime_error("g_factor() called with nug option unset?");
+            throw std::runtime_error("libmpdata++: g_factor() called with nug option unset?");
 
           // the same logic as in advectee() - see above
           return (*this->G)(
@@ -594,7 +594,7 @@ namespace libmpdataxx
         {
           // a sanity check
           if (this->vab_coeff.get() == nullptr)
-            throw std::runtime_error("vab_coeff() called with option vip_vab unset?");
+            throw std::runtime_error("libmpdata++: vab_coeff() called with option vip_vab unset?");
 
           // the same logic as in advectee() - see above
           return (*this->vab_coeff)(
@@ -609,7 +609,7 @@ namespace libmpdataxx
           assert(d == 0 || d == 1 || d == 2);
           // a sanity check
           if (this->vab_coeff.get() == nullptr)
-            throw std::runtime_error("vab_relaxed_state() called with option vip_vab unset?");
+            throw std::runtime_error("libmpdata++: vab_relaxed_state() called with option vip_vab unset?");
           // the same logic as in advectee() - see above
           return this->vab_relax[d](
             this->grid_size[0],

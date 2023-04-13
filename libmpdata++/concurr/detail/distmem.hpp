@@ -173,7 +173,7 @@ public: // TODO: just a temp measure, make it private again
             std::getenv("OMPI_COMM_WORLD_RANK") != NULL && std::atoi(std::getenv("OMPI_COMM_WORLD_SIZE")) > 1 ||
             // lam
             std::getenv("LAMRANK") != NULL && std::atoi(std::getenv("LAMSIZE")) > 1
-          ) throw std::runtime_error("mpirun environment variable detected but libmpdata++ was compiled with MPI disabled");
+          ) throw std::runtime_error("libmpdata++: mpirun environment variable detected but libmpdata++ was compiled with MPI disabled");
 #else
           // init mpi here, since distmem is constructed before hdf5
           // will be finalized in slvr_common dtor, since distmem is destructed before hdf5;
@@ -188,7 +188,7 @@ public: // TODO: just a temp measure, make it private again
           }
           if (boost::mpi::environment::thread_level() != boost::mpi::threading::multiple)
           {
-            throw std::runtime_error("failed to initialise MPI environment with MPI_THREAD_MULTIPLE");
+            throw std::runtime_error("libmpdata++: failed to initialise MPI environment with MPI_THREAD_MULTIPLE");
           }
           mpicom = boost::mpi::communicator(MPI_COMM_WORLD, boost::mpi::comm_duplicate); // use a duplicate of MPI_COMM_WORLD, can't construct it before MPI_Init call (?)
 #endif
