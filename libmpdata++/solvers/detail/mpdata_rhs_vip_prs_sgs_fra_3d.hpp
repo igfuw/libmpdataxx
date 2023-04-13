@@ -232,10 +232,13 @@ namespace libmpdataxx
           {
             refinement_ranges(i, halo_size);
 
+          this->mem->barrier();
             formulae::fractal::intrp<0, real_t>(this->mem->psi_ref[e_ref], mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
             this->mem->barrier();
             formulae::fractal::intrp<1, real_t>(this->mem->psi_ref[e_ref], mid_ijk_r2r_1, ijk_r2r_2_h, ijk_r2r_0_h_with_halo, hstride);
+          this->mem->barrier();
             formulae::fractal::intrp<2, real_t>(this->mem->psi_ref[e_ref], mid_ijk_r2r_2, ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride);
+          this->mem->barrier();
           }
           this->mem->barrier();
           avg_edge_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref); // just to make sure that with cyclic bconds, corresponding refined values are the same; TODO: not needed?
@@ -270,10 +273,13 @@ namespace libmpdataxx
           {
             refinement_ranges(i, halo_size);
 
+          this->mem->barrier();
             formulae::fractal::rcnstrct<0, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h,           ijk_r2r_2_h,                                 hstride, this->c_j, this->d_j, this->f_j);
             this->mem->barrier();
             formulae::fractal::rcnstrct<1, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_1)        , ijk_r2r_2_h,           ijk_r2r_0_h_with_halo,                       hstride, this->c_j, this->d_j, this->f_j); // NOTE: rng_dbl_stride(mid_ijk_r2r_1) gives overlapping ranges between thread subdomains... however it seems to work and naive fixes didnt work; UPDATE: are the ranges really overlapping? it looks good at the second look...
+          this->mem->barrier();
             formulae::fractal::rcnstrct<2, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_2)        , ijk_r2r_0_h_with_halo, this->rng_merge(ijk_r2r_1_h, mid_ijk_r2r_1), hstride, this->c_j, this->d_j, this->f_j);
+          this->mem->barrier();
           }
           this->mem->barrier();
           avg_edge_sclr_ref(this->mem->psi_ref[e_ref], this->ijk_ref); // just to make sure that with cyclic bconds, corresponding refined values are the same; TODO: not needed?
