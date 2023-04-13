@@ -213,7 +213,7 @@ namespace libmpdataxx
             real_t max_abs_div = max_abs_vctr_div(this->mem->GC);
 
             if (max_abs_div > this->max_abs_div_eps)
-              throw std::runtime_error("initial advector field is divergent");
+              throw std::runtime_error("libmpdata++: initial advector field is divergent");
           }
         }
 

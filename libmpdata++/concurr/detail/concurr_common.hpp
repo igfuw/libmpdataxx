@@ -201,7 +201,7 @@ namespace libmpdataxx
         {
           // sanity check - polar coords do not work with MPI yet
           if (type == bcond::polar && mem->distmem.size() > 1)
-            throw std::runtime_error("Polar boundary conditions do not work with MPI.");
+            throw std::runtime_error("libmpdata++: Polar boundary conditions do not work with MPI.");
 
           // distmem overrides
           if (mem->distmem.size() > 1 && dim == 0)

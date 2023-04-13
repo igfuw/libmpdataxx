@@ -243,7 +243,7 @@ namespace libmpdataxx
           // run-time sanity checks
           for (int d = 0; d < n_dims; ++d)
             if (p.grid_size[d] < 1)
-              throw std::runtime_error("bogus grid size");
+              throw std::runtime_error("libmpdata++: bogus grid size");
         }
 
         // dtor

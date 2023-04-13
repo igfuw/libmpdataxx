@@ -121,7 +121,7 @@ namespace libmpdataxx
             if (iters > 10000) // going beyond 10000 iters means something is really wrong,
                                // usually boundary conditions but not always !
             {
-              throw std::runtime_error("stuck in pressure solver");
+              throw std::runtime_error("libmpdata++: stuck in pressure solver");
             }
           }
 

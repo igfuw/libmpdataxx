@@ -73,7 +73,7 @@ namespace libmpdataxx
           c_m(p.c_m),
           k_m(args.mem->tmp[__FILE__][0][0])
         {
-          if (smg_c == 0) throw std::runtime_error("smg_c == 0");
+          if (smg_c == 0) throw std::runtime_error("libmpdata++: smg_c == 0");
         }
 
         static void alloc(
