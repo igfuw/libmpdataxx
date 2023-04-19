@@ -185,10 +185,10 @@ namespace libmpdataxx
         // NOTE: modifies arr_ref too!
         void spatial_average_ref2reg(typename parent_t::arr_t &arr_ref, typename parent_t::arr_t &arr_reg)
         {
-          this->xchng_ref(arr_ref, this->ijk_ref); // fill distmem halos of arr_ref
+//          this->xchng_ref(arr_ref, this->ijk_ref); // fill distmem halos of arr_ref
 // //   std::cerr << "rx_ref(ijk_ref) after xchng_ref: " << rx_ref(this->ijk_ref) << std::endl;
 // //   std::cerr << "rx_ref after xchng_ref: " << rx_ref << std::endl;
-          libmpdataxx::formulae::refined::spatial_average_ref2reg<real_t>(arr_ref, this->ijk_r2r, this->mem->n_ref/2, this->mem->distmem.grid_size_ref, true); // calculate the average and store in arr_ref
+//          libmpdataxx::formulae::refined::spatial_average_ref2reg<real_t>(arr_ref, this->ijk_r2r, this->mem->n_ref/2, this->mem->distmem.grid_size_ref, true); // calculate the average and store in arr_ref
  //   std::cerr << "rx_ref(ijk_ref) after spatial average: " << rx_ref(this->ijk_ref) << std::endl;
           arr_reg(this->ijk) = arr_ref(this->ijk_r2r); // copy to arr_reg
    // std::cerr << "rx(ijk) after copy from refined: " << rx(this->ijk) << std::endl;
