@@ -16,7 +16,8 @@ namespace libmpdataxx
     {
       namespace stretching_parameters
       {
-        namespace Akinlabi // stretching parameters from a fit to the E. Akinlabi data (these are from DNS?)
+        // stretching parameters from a fit to the E. Akinlabi data (the data is in the stretching_parameter_data subdirectory)
+        namespace Akinlabi 
         {
           // CDF of stretching parameter d; assuming CDF = A d^B + C under condition that CDF(0.5)=0 and CDF(1)=1
           template<class real_t>
