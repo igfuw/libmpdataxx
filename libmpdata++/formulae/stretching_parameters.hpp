@@ -14,8 +14,17 @@ namespace libmpdataxx
   {
     namespace fractal
     {
-      namespace stretching_parameters
+      namespace stretch_params
       {
+        // available distributions of the stretching parameter
+        enum class d_distro_t {
+          DNS_vel,
+          LES_rv_subsaturated, 
+          LES_rv_supersaturated, 
+          LES_th_subsaturated, 
+          LES_th_supersaturated
+        };
+
         // stretching parameters for velocity from DNS
         // the function used is a fit to the E. Akinlabi data 
         // the data is in the stretching_parameter_data subdirectory
@@ -48,10 +57,6 @@ namespace libmpdataxx
         // stretching parameters for potential temperature in a LES of marine cumulus
         namespace LES_th_rv
         {
-          // available distributions of the stretching parameter
-          // TODO: move to libmpdata++ opts?
-          enum class d_distro {rv_subsaturated, rv_supersaturated, th_subsaturated, th_supersaturated};
-          
           template<class real_t>
           class d_of_CDF_fctr_LES
           {
@@ -59,15 +64,15 @@ namespace libmpdataxx
 
             public:
 
-            d_of_CDF_fctr_LES(d_distro dd)
+            d_of_CDF_fctr_LES(d_distro_t dd)
             {
               switch(dd)
               {
-                case th_subsaturated:
+                case d_distro_t::LES_th_subsaturated:
                   d_CDF_th_subsaturated(d_CDF_vctr);
                   break;
                 default:
-                  std::runtime_error("libmpdata++: invalid d_distro type");
+                  std::runtime_error("libmpdata++: invalid d_distro_t type in the constructor of d_of_CDF_fctr_LES");
               }
             };
 

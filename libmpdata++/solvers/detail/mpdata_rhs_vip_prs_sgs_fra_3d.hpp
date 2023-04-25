@@ -15,6 +15,8 @@ namespace libmpdataxx
   {
     namespace detail
     {
+      using formulae::fractal::stretch_params::d_distro_t;
+
       template<typename ct_params_t, int minhalo, class enableif = void>
       class mpdata_rhs_vip_prs_sgs_fra_dim
       {
@@ -199,14 +201,30 @@ namespace libmpdataxx
 
         // TODO: stretching parameters at the overlaps of the reconstructed and resolved arrays (ijk_r2r) are not used, do not generate them
         //       also not all parameters in the halo are needed (but some are!)
-        void generate_stretching_parameters(const typename gen_t::result_type rng_seed)
+        void generate_stretching_parameters(const typename gen_t::result_type rng_seed, const d_distro_t &dd = d_distro_t::DNS_vel)
         {
           gen_t gen(rng_seed); 
-          std::uniform_real_distribution<> dis(-1, 1); // [-1,1), but whatever
+          std::uniform_real_distribution<> dis(dd == d_distro_t::DNS_vel ? -1 : 0, 1); // [min,max) instead of [min,max], but whatever
           auto rand = std::bind(dis, gen);
           std::generate(this->d_j(this->ijk_ref_with_halo).begin(), this->d_j(this->ijk_ref_with_halo).end(), rand);
-          this->d_j(this->ijk_ref_with_halo) = formulae::fractal::d_of_CDF_fctr<real_t>{}(this->d_j(this->ijk_ref_with_halo));
+
+          // different stretchnig parameter distributions
+          switch(dd)
+          {
+            case d_distro_t::DNS_vel:
+              using formulae::fractal::stretch_params::DNS_vel::d_of_CDF_fctr_DNS;
+              this->d_j(this->ijk_ref_with_halo) = d_of_CDF_fctr_DNS<real_t>{}(this->d_j(this->ijk_ref_with_halo));
+              break;
+            case d_distro_t::LES_th_subsaturated:
+              this->d_j(this->ijk_ref_with_halo) = this->d_of_CDF_fctr_LES_th_subsaturated(this->d_j(this->ijk_ref_with_halo));
+              break;
+            default:
+              std::runtime_error("libmpdata++: invalid d_distro_t type in generate_stretching_parameters");
+          }
+
           xchng_ref(this->d_j, this->ijk_ref); // xchng to have the same values of d_j in the distmem halo region
+
+          std::cerr << "generated stretching params: " << this->d_j(this->ijk_ref_with_halo) << std::endl;
         }
 
         // calculate refined points using (tri?)linear interpolation

@@ -789,7 +789,7 @@ namespace libmpdataxx
         }
         {
           auto dset = group.createDataSet("tht_e", flttype_output, sspace);
-          record_dsc_helper(dset, this->tht_e);
+          record_dsc_hlpr(dset, this->tht_e);
         }
       }
 
@@ -804,7 +804,7 @@ namespace libmpdataxx
         }
         {
           auto dset = group.createDataSet("mix_len", flttype_output, sspace);
-          record_dsc_helper(dset, this->mix_len);
+          record_dsc_hlpr(dset, this->mix_len);
         }
       }
 

@@ -65,7 +65,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
       // output tht refined with fractal reconstruction
       //this->generate_stretching_parameters(std::random_device{}());
       //this->reconstruct_refinee(ix::w);
-      this->generate_stretching_parameters(std::random_device{}());
+      this->generate_stretching_parameters(std::random_device{}(), libmpdataxx::formulae::fractal::stretch_params::d_distro_t::LES_th_subsaturated);
       this->reconstruct_refinee(ix::tht);
 
       this->mem->barrier();
