@@ -7,6 +7,7 @@
 #pragma once
 
 #include <libmpdata++/formulae/idxperm.hpp>
+#include <libmpdata++/formulae/stretching_parameter_data/Waclawczyk_LES/cdf_th_subsaturated.hpp>
 
 namespace libmpdataxx
 {
@@ -16,8 +17,10 @@ namespace libmpdataxx
     {
       namespace stretching_parameters
       {
-        // stretching parameters from a fit to the E. Akinlabi data (the data is in the stretching_parameter_data subdirectory)
-        namespace Akinlabi 
+        // stretching parameters for velocity from DNS
+        // the function used is a fit to the E. Akinlabi data 
+        // the data is in the stretching_parameter_data subdirectory
+        namespace DNS_vel 
         {
           // CDF of stretching parameter d; assuming CDF = A d^B + C under condition that CDF(0.5)=0 and CDF(1)=1
           template<class real_t>
@@ -34,13 +37,51 @@ namespace libmpdataxx
             return pow((1.-pow(0.5,B))*CDF + pow(0.5,B), 1./B);
           }
           template<class real_t>
-          struct d_of_CDF_fctr
+          struct d_of_CDF_fctr_DNS
           {
             real_t operator()(const real_t &CDF) const
             {
               return CDF < 0 ? -d_of_CDF(-CDF) : d_of_CDF(CDF);
             }
-            BZ_DECLARE_FUNCTOR(d_of_CDF_fctr);
+            BZ_DECLARE_FUNCTOR(d_of_CDF_fctr_DNS);
+          };
+        };
+        // stretching parameters for potential temperature in a LES of marine cumulus
+        namespace LES_th_rv
+        {
+          // available distributions of the stretching parameter
+          // TODO: move to libmpdata++ opts?
+          enum class d_distro {rv_subsaturated, rv_supersaturated, th_subsaturated, th_supersaturated};
+          
+          template<class real_t>
+          class d_of_CDF_fctr_LES
+          {
+            std::vector<std::pair<real_t, real_t>> d_CDF_vctr;
+
+            public:
+
+            d_of_CDF_fctr_LES(d_distro dd)
+            {
+              switch(dd)
+              {
+                case th_subsaturated:
+                  d_CDF_th_subsaturated(d_CDF_vctr);
+                  break;
+                default:
+                  std::runtime_error("libmpdata++: invalid d_distro type");
+              }
+            };
+
+            real_t operator()(const real_t &CDF) const
+            {
+              auto pos = std::lower_bound(d_CDF_vctr.begin(), d_CDF_vctr.end(), CDF, 
+                [](const std::pair<real_t, real_t> &pair, real_t val)
+                {
+                  return pair.second < val;
+                });
+              return pos->first;
+            }
+            BZ_DECLARE_FUNCTOR(d_of_CDF_fctr_LES);
           };
         };
       };

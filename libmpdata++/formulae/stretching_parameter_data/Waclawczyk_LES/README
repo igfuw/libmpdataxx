@@ -1,2 +1,7 @@
-Files contain CDF of th/rv from LES of a marine cumulus (RICO setup) done using UWLCM.
+Files contain CDF of th/rv from LES of a marine cumulus done using UWLCM.
 Stertching parameters calculated by Marta Waclawczyk, simulations done by P. Dziekan.
+
+setup: RICO
+resolution: 50m x 50m x 20m
+height at which parameters are calculated: near cloud base, 800m (?)
+
