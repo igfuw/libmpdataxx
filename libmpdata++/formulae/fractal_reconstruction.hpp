@@ -14,29 +14,34 @@ namespace libmpdataxx
   {
     namespace fractal
     {
-      // CDF of stretching parameter d; assuming CDF = A d^B + C under condition that CDF(0.5)=0 and CDF(1)=1
-      template<class real_t>
-      static real_t CDF_of_d(const real_t &d)
+      namespace stretching_parameters
       {
-        const real_t B = -0.39091161; // comes from a fit to the E. Akinlabi data
-        return (pow(d,B) - pow(0.5,B)) / (1. - pow(0.5,B));
-      }
-      // inverse function: d of a CDF
-      template<class real_t>
-      static real_t d_of_CDF(const real_t &CDF)
-      {
-        const real_t B = -0.39091161; // comes from a fit to the E. Akinlabi data
-        return pow((1.-pow(0.5,B))*CDF + pow(0.5,B), 1./B);
-      }
-
-      template<class real_t>
-      struct d_of_CDF_fctr
-      {
-        real_t operator()(const real_t &CDF) const
+        namespace Akinlabi // stretching parameters from a fit to the E. Akinlabi data (these are from DNS?)
         {
-          return CDF < 0 ? -d_of_CDF(-CDF) : d_of_CDF(CDF);
-        }
-        BZ_DECLARE_FUNCTOR(d_of_CDF_fctr);
+          // CDF of stretching parameter d; assuming CDF = A d^B + C under condition that CDF(0.5)=0 and CDF(1)=1
+          template<class real_t>
+          static real_t CDF_of_d(const real_t &d)
+          {
+            const real_t B = -0.39091161; 
+            return (pow(d,B) - pow(0.5,B)) / (1. - pow(0.5,B));
+          }
+          // inverse function: d of a CDF
+          template<class real_t>
+          static real_t d_of_CDF(const real_t &CDF)
+          {
+            const real_t B = -0.39091161; 
+            return pow((1.-pow(0.5,B))*CDF + pow(0.5,B), 1./B);
+          }
+          template<class real_t>
+          struct d_of_CDF_fctr
+          {
+            real_t operator()(const real_t &CDF) const
+            {
+              return CDF < 0 ? -d_of_CDF(-CDF) : d_of_CDF(CDF);
+            }
+            BZ_DECLARE_FUNCTOR(d_of_CDF_fctr);
+          };
+        };
       };
 
       // (tri-)linear interpolation
