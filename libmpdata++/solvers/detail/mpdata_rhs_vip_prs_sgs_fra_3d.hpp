@@ -218,13 +218,20 @@ namespace libmpdataxx
             case d_distro_t::LES_th_subsaturated:
               this->d_j(this->ijk_ref_with_halo) = this->d_of_CDF_fctr_LES_th_subsaturated(this->d_j(this->ijk_ref_with_halo));
               break;
+            case d_distro_t::LES_th_supersaturated:
+              this->d_j(this->ijk_ref_with_halo) = this->d_of_CDF_fctr_LES_th_supersaturated(this->d_j(this->ijk_ref_with_halo));
+              break;
+            case d_distro_t::LES_rv_subsaturated:
+              this->d_j(this->ijk_ref_with_halo) = this->d_of_CDF_fctr_LES_rv_subsaturated(this->d_j(this->ijk_ref_with_halo));
+              break;
+            case d_distro_t::LES_rv_supersaturated:
+              this->d_j(this->ijk_ref_with_halo) = this->d_of_CDF_fctr_LES_rv_supersaturated(this->d_j(this->ijk_ref_with_halo));
+              break;
             default:
               std::runtime_error("libmpdata++: invalid d_distro_t type in generate_stretching_parameters");
           }
 
           xchng_ref(this->d_j, this->ijk_ref); // xchng to have the same values of d_j in the distmem halo region
-
-          std::cerr << "generated stretching params: " << this->d_j(this->ijk_ref_with_halo) << std::endl;
         }
 
         // calculate refined points using (tri?)linear interpolation

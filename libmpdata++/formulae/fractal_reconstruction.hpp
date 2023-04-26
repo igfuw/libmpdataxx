@@ -7,7 +7,6 @@
 #pragma once
 
 #include <libmpdata++/formulae/idxperm.hpp>
-#include <libmpdata++/formulae/stretching_parameter_data/Waclawczyk_LES/cdf_th_subsaturated.hpp>
 
 namespace libmpdataxx
 {

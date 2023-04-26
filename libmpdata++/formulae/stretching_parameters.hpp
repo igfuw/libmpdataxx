@@ -7,6 +7,9 @@
 #pragma once
 
 #include <libmpdata++/formulae/stretching_parameter_data/Waclawczyk_LES/cdf_th_subsaturated.hpp>
+#include <libmpdata++/formulae/stretching_parameter_data/Waclawczyk_LES/cdf_th_supersaturated.hpp>
+#include <libmpdata++/formulae/stretching_parameter_data/Waclawczyk_LES/cdf_rv_subsaturated.hpp>
+#include <libmpdata++/formulae/stretching_parameter_data/Waclawczyk_LES/cdf_rv_supersaturated.hpp>
 
 namespace libmpdataxx
 {
@@ -70,6 +73,15 @@ namespace libmpdataxx
               {
                 case d_distro_t::LES_th_subsaturated:
                   d_CDF_th_subsaturated(d_CDF_vctr);
+                  break;
+                case d_distro_t::LES_th_supersaturated:
+                  d_CDF_th_supersaturated(d_CDF_vctr);
+                  break;
+                case d_distro_t::LES_rv_subsaturated:
+                  d_CDF_rv_subsaturated(d_CDF_vctr);
+                  break;
+                case d_distro_t::LES_rv_supersaturated:
+                  d_CDF_rv_supersaturated(d_CDF_vctr);
                   break;
                 default:
                   std::runtime_error("libmpdata++: invalid d_distro_t type in the constructor of d_of_CDF_fctr_LES");
