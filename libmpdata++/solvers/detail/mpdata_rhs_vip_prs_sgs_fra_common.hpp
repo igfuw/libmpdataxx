@@ -192,7 +192,7 @@ namespace libmpdataxx
           ijk_r2r{
             {this->ijk[0].first() * n_ref, this->ijk[1].first() * n_ref, this->ijk[2].first() * n_ref}, // lbound
             {this->ijk[0].last() * n_ref, this->ijk[1].last() * n_ref, this->ijk[2].last() * n_ref},    // ubound
-            {n_ref, n_ref, n_ref}, // stride
+            {2*n_ref, 2*n_ref, 2*n_ref}, // stride
             },
           d_of_CDF_fctr_LES_th_subsaturated(formulae::fractal::stretch_params::d_distro_t::LES_th_subsaturated),
           d_of_CDF_fctr_LES_th_supersaturated(formulae::fractal::stretch_params::d_distro_t::LES_th_supersaturated),

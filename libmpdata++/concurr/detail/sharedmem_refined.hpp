@@ -55,7 +55,7 @@ namespace libmpdataxx
           // NOTE: fix this with proper halos (cyclic is easy, but what about rigid?)
           // NOTE2: this is actually a requirement for fractal reconstruction, not for any grid refinement, so move this somewhere else
           for (int d = 0; d < n_dims; ++d)
-            if((grid_size[d] - 3) % 2 != 0) throw std::runtime_error("Fractal grid refinement requires nx/ny/nz = 3 + 2 * i, where i = 0,1,2,3,...");
+            if((grid_size[d] - 5) % 4 != 0) throw std::runtime_error("Fractal grid refinement requires nx/ny/nz = 5 + 4 * i, where i = 0,1,2,3,...");
 
           for (int d = 0; d < n_dims; ++d)
           {

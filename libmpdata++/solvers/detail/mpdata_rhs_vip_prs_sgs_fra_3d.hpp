@@ -57,6 +57,7 @@ namespace libmpdataxx
         // fill distmem halos of refinee, only at points overlapping with resolved points
         // and not outside of the modeled domain (e.g. in periodic case)
         // TODO: move to bcond or sth? would be filled only by remote bcond
+        // TODO: with reconstruction based on 2*dx and not on dx, this will probably not work - to fix this probably a larger halo is needed?
         void fill_refinee_r2r_distmem_halos(const int e, const int halo_size)
         {
           if(this->mem->distmem.size() == 1) return; // no distmem
@@ -199,7 +200,7 @@ namespace libmpdataxx
           this->avg_edge_sclr(arr_reg, this->ijk); // in case of cyclic bcond, arr_reg on edges needs to be the same
         }
 
-        // TODO: stretching parameters at the overlaps of the reconstructed and resolved arrays (ijk_r2r) are not used, do not generate them
+        // TODO: (some?) stretching parameters at the overlaps of the reconstructed and resolved arrays (ijk_r2r) are not used, do not generate them
         //       also not all parameters in the halo are needed (but some are!)
         void generate_stretching_parameters(const typename gen_t::result_type rng_seed, const d_distro_t &dd = d_distro_t::DNS_vel)
         {
