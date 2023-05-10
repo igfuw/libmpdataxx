@@ -125,17 +125,17 @@ namespace libmpdataxx
           }
         }
 
-        void refinement_ranges(const int iter, const int halo_size)
+        void refinement_ranges(const int iter, const int halo_size, const idxs_t<ct_params_t::n_dims> ijk_r2r)
         {
           // messy, because in domain decomposition (sharedmem and distmem) some refined scalars are on the edge of the subdomain...
           if(iter==0)
           {
-            mid_ijk_r2r_0 = this->rng_midpoints(this->ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
-            mid_ijk_r2r_1 = this->rng_midpoints_in_out(this->ijk_r2r[1], this->rank, this->mem->size); // different because we dont want overlapping ranges in y 
-            mid_ijk_r2r_2 = this->rng_midpoints(this->ijk_r2r[2]);
+            mid_ijk_r2r_0 = this->rng_midpoints(ijk_r2r[0], this->mem->distmem.rank(), this->mem->distmem.size());
+            mid_ijk_r2r_1 = this->rng_midpoints_in_out(ijk_r2r[1], this->rank, this->mem->size); // different because we dont want overlapping ranges in y 
+            mid_ijk_r2r_2 = this->rng_midpoints(ijk_r2r[2]);
 
-            ijk_r2r_1_h = this->ijk_r2r[1];
-            ijk_r2r_2_h = this->ijk_r2r[2];
+            ijk_r2r_1_h = ijk_r2r[1];
+            ijk_r2r_2_h = ijk_r2r[2];
           }
           else
           {
@@ -157,8 +157,8 @@ namespace libmpdataxx
           hstride = stride / 2;
 
           ijk_r2r_0_h_with_halo = rng_t(
-            this->mem->distmem.rank() == 0                             ? this->ijk_r2r[0].first() : this->ijk_r2r[0].first() - halo_size * this->mem->n_ref,
-            this->mem->distmem.rank() == this->mem->distmem.size() - 1 ? this->ijk_r2r[0].last()  : this->ijk_r2r[0].last()  + halo_size * this->mem->n_ref,
+            this->mem->distmem.rank() == 0                             ? ijk_r2r[0].first() : ijk_r2r[0].first() - halo_size * this->mem->n_ref,
+            this->mem->distmem.rank() == this->mem->distmem.size() - 1 ? ijk_r2r[0].last()  : ijk_r2r[0].last()  + halo_size * this->mem->n_ref,
             hstride
           );
         }
@@ -256,7 +256,7 @@ namespace libmpdataxx
 
           for(int i=0; i<this->n_fra_iter; ++i)
           {
-            refinement_ranges(i, halo_size);
+            refinement_ranges(i, halo_size, this->ijk_r2r);
 
           this->mem->barrier();
             formulae::fractal::intrp<0, real_t>(this->mem->psi_ref[e_ref], mid_ijk_r2r_0, ijk_r2r_1_h, ijk_r2r_2_h, hstride);
@@ -290,14 +290,14 @@ namespace libmpdataxx
           fill_refinee_r2r_distmem_halos(e, halo_size);
 
           // fill refined array at position where it overlaps with the resolved array
-          this->mem->refinee(e_ref)(this->ijk_r2r) = this->mem->advectee(e)(this->ijk);
+          this->mem->refinee(e_ref)(this->ijk_r2r_2nd) = this->mem->advectee(e)(this->ijk_2nd);
 
 //          generate_stretching_parameters();
 //          this->mem->barrier();
 
-          for(int i=0; i<this->n_fra_iter; ++i)
+          for(int i=0; i<this->n_fra_iter+1; ++i) // one more iteration, because we reconstruct from every second resolved point
           {
-            refinement_ranges(i, halo_size);
+            refinement_ranges(i, halo_size, this->ijk_r2r_2nd);
 
           this->mem->barrier();
             formulae::fractal::rcnstrct<0, real_t>(this->mem->psi_ref[e_ref], this->rng_dbl_stride(mid_ijk_r2r_0), ijk_r2r_1_h,           ijk_r2r_2_h,                                 hstride, this->c_j, this->d_j, this->f_j);

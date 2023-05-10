@@ -71,7 +71,9 @@ namespace libmpdataxx
         idx_t<ct_params_t::n_dims>  ijk_ref,           // range of refinee handled by given solver
                                     ijkm_ref,          // same but starting at 1 to the left
                                     ijk_ref_with_halo; // as ijk_ref but with a halo in x direction between MPI processes
-        const idxs_t<ct_params_t::n_dims> ijk_r2r; // resolved to refined; refined scalars at the same position as resolved scalars
+        const idxs_t<ct_params_t::n_dims> ijk_2nd,     // every second resolved point 
+                                          ijk_r2r,     // resolved to refined; refined scalars at the same position as resolved scalars
+                                          ijk_r2r_2nd; // same, but for every second point
 
         // boundary conditions for refined arrays
         bcs_ref_t bcs_ref;
@@ -192,6 +194,20 @@ namespace libmpdataxx
           ijk_r2r{
             {this->ijk[0].first() * n_ref, this->ijk[1].first() * n_ref, this->ijk[2].first() * n_ref}, // lbound
             {this->ijk[0].last() * n_ref, this->ijk[1].last() * n_ref, this->ijk[2].last() * n_ref},    // ubound
+            {n_ref, n_ref, n_ref}, // stride
+            },
+          ijk_2nd{
+            {this->ijk[0].first() /* for MPI we will need some conditions here ? */, 
+             this->ijk[1].first() % 2 == 0 ? this->ijk[1].first() : this->ijk[1].first()+1,
+             this->ijk[2].first() }, // lbound
+            {this->ijk[0].last() /* for MPI we will need some conditions here ? */, 
+             this->ijk[1].last() % 2 == 0 ? this->ijk[1].last() : this->ijk[1].last()-1, 
+             this->ijk[2].last() },    // ubound
+            {2, 2, 2}, // stride
+            },
+          ijk_r2r_2nd{
+            {ijk_2nd[0].first() * n_ref, ijk_2nd[1].first() * n_ref, ijk_2nd[2].first() * n_ref}, // lbound
+            {ijk_2nd[0].last()  * n_ref, ijk_2nd[1].last()  * n_ref, ijk_2nd[2].last()  * n_ref},    // ubound
             {2*n_ref, 2*n_ref, 2*n_ref}, // stride
             },
           d_of_CDF_fctr_LES_th_subsaturated(formulae::fractal::stretch_params::d_distro_t::LES_th_subsaturated),

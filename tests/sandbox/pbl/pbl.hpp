@@ -63,11 +63,12 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
       if (this->rank == 0) std::cout << this->timestep << std::endl;
 
       // output tht refined with fractal reconstruction
-      //this->generate_stretching_parameters(std::random_device{}());
-      //this->reconstruct_refinee(ix::w);
+      this->generate_stretching_parameters(std::random_device{}(), libmpdataxx::formulae::fractal::stretch_params::d_distro_t::DNS_vel);
+      this->reconstruct_refinee(ix::w);
+
 //      this->generate_stretching_parameters(std::random_device{}(), libmpdataxx::formulae::fractal::stretch_params::d_distro_t::LES_rv_supersaturated);
-      this->generate_stretching_parameters(std::random_device{}(), libmpdataxx::formulae::fractal::stretch_params::d_distro_t::LES_th_subsaturated);
-      this->reconstruct_refinee(ix::tht);
+//      this->generate_stretching_parameters(std::random_device{}(), libmpdataxx::formulae::fractal::stretch_params::d_distro_t::LES_th_supersaturated);
+//      this->reconstruct_refinee(ix::tht);
 
       this->mem->barrier();
       if (this->rank == 0)
@@ -77,8 +78,20 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
           this->record_aux_dsc("tke", this->tke);
         }
         this->record_aux_dsc("p", this->Phi);
-        //this->record_aux_dsc_refined("w reconstructed", this->mem->refinee(this->ix_r2r.at(ix::w)));
-        this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(this->ix_r2r.at(ix::tht)));
+        this->record_aux_dsc_refined("w reconstructed using DNS_vel", this->mem->refinee(this->ix_r2r.at(ix::w)));
+//        this->record_aux_dsc_refined("tht reconstructed", this->mem->refinee(this->ix_r2r.at(ix::tht)));
+      }
+      this->mem->barrier();
+
+      // another reconstruction of w using different stretchin parameteres
+
+      this->generate_stretching_parameters(std::random_device{}(), libmpdataxx::formulae::fractal::stretch_params::d_distro_t::LES_th_supersaturated);
+      this->reconstruct_refinee(ix::w);
+
+      this->mem->barrier();
+      if (this->rank == 0)
+      {
+        this->record_aux_dsc_refined("w reconstructed using LES_th_supersaturated", this->mem->refinee(this->ix_r2r.at(ix::w)));
       }
       this->mem->barrier();
 

@@ -33,13 +33,13 @@ void set_sgs_specific(params_t &p, smg_tag)
   p.smg_c = 0.165;
   p.prandtl_num = 0.42;
   p.cdrag = 0.1;
-  p.n_fra_iter = 4;
+  p.n_fra_iter = 2;
 }
 
 template <typename sgs_t>
 void test(const std::string &dirname, const int np, const int nt)
 {
-  const int nx = np, ny = np, nz = 51;
+  const int nx = np, ny = np, nz = 53;
 
   struct ct_params_t : ct_params_default_t
   {
