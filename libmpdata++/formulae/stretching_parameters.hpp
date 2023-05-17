@@ -24,8 +24,10 @@ namespace libmpdataxx
           DNS_vel,
           LES_rv_subsaturated, 
           LES_rv_supersaturated, 
+          LES_rv_supersaturated_halved, 
           LES_th_subsaturated, 
-          LES_th_supersaturated
+          LES_th_supersaturated,
+          LES_th_supersaturated_halved
         };
 
         // stretching parameters for velocity from DNS
@@ -64,23 +66,26 @@ namespace libmpdataxx
           class d_of_CDF_fctr_LES
           {
             std::vector<std::pair<real_t, real_t>> d_CDF_vctr;
+            const d_distro_t dd;
 
             public:
 
-            d_of_CDF_fctr_LES(d_distro_t dd)
+            d_of_CDF_fctr_LES(d_distro_t _dd): dd(_dd)
             {
-              switch(dd)
+              switch(_dd)
               {
                 case d_distro_t::LES_th_subsaturated:
                   d_CDF_th_subsaturated(d_CDF_vctr);
                   break;
                 case d_distro_t::LES_th_supersaturated:
+                case d_distro_t::LES_th_supersaturated_halved:
                   d_CDF_th_supersaturated(d_CDF_vctr);
                   break;
                 case d_distro_t::LES_rv_subsaturated:
                   d_CDF_rv_subsaturated(d_CDF_vctr);
                   break;
                 case d_distro_t::LES_rv_supersaturated:
+                case d_distro_t::LES_rv_supersaturated_halved:
                   d_CDF_rv_supersaturated(d_CDF_vctr);
                   break;
                 default:
@@ -95,7 +100,10 @@ namespace libmpdataxx
                 {
                   return pair.second < val;
                 });
-              return pos->first;
+              if(dd == d_distro_t::LES_th_supersaturated_halved || dd == d_distro_t::LES_rv_supersaturated_halved)
+                return pos->first / real_t(2);
+              else
+                return pos->first;
             }
             BZ_DECLARE_FUNCTOR(d_of_CDF_fctr_LES);
           };

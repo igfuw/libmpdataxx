@@ -41,12 +41,14 @@ namespace libmpdataxx
         protected:
 
         // types of stretching parameters that need to be instantiated at the beginning od the simulation
-        // all are instantiated even not or all used, but they do not use much memory
+        // all are instantiated even if not or all used, but they do not use much memory and we don't know which will be used
         formulae::fractal::stretch_params::LES_th_rv::d_of_CDF_fctr_LES<real_t>
           d_of_CDF_fctr_LES_th_subsaturated,
           d_of_CDF_fctr_LES_th_supersaturated,
+          d_of_CDF_fctr_LES_th_supersaturated_halved,
           d_of_CDF_fctr_LES_rv_subsaturated,
-          d_of_CDF_fctr_LES_rv_supersaturated;
+          d_of_CDF_fctr_LES_rv_supersaturated,
+          d_of_CDF_fctr_LES_rv_supersaturated_halved;
 
         typename parent_t::arr_t c_j, d_j, f_j; // parameters used in fractal reconstruction, Akinlabi et al. 2019
 
@@ -196,8 +198,10 @@ namespace libmpdataxx
             },
           d_of_CDF_fctr_LES_th_subsaturated(formulae::fractal::stretch_params::d_distro_t::LES_th_subsaturated),
           d_of_CDF_fctr_LES_th_supersaturated(formulae::fractal::stretch_params::d_distro_t::LES_th_supersaturated),
+          d_of_CDF_fctr_LES_th_supersaturated_halved(formulae::fractal::stretch_params::d_distro_t::LES_th_supersaturated_halved),
           d_of_CDF_fctr_LES_rv_subsaturated(formulae::fractal::stretch_params::d_distro_t::LES_rv_subsaturated),
-          d_of_CDF_fctr_LES_rv_supersaturated(formulae::fractal::stretch_params::d_distro_t::LES_rv_supersaturated)
+          d_of_CDF_fctr_LES_rv_supersaturated(formulae::fractal::stretch_params::d_distro_t::LES_rv_supersaturated),
+          d_of_CDF_fctr_LES_rv_supersaturated_halved(formulae::fractal::stretch_params::d_distro_t::LES_rv_supersaturated_halved)
         {
           assert(p.n_fra_iter > 0);
           assert(n_ref % 2 == 0);
