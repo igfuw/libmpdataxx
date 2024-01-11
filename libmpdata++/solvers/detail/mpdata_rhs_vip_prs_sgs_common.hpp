@@ -135,7 +135,8 @@ namespace libmpdataxx
                                                                                             *this->mem->G,
                                                                                             this->ijk,
                                                                                             this->dijk,
-                                                                                            real_t(2.0));
+                                                                                            real_t(2.0)); // factor of 2 because it is multiplied by 0.5 * dt in vip_rhs_apply (?)
+
           }
           else
           {
