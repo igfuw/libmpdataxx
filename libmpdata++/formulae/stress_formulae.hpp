@@ -138,7 +138,7 @@ namespace libmpdataxx
         rhs[2](ijk) += coeff * (drv[2](ijk) + drv[5](ijk) + drv[8](ijk));
       }
 
-      // Total deformation
+      // Total deformation (divided by 2?)
       // 2D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq(
@@ -362,7 +362,7 @@ namespace libmpdataxx
         );
       }
 
-      // Total deformation
+      // Total deformation (divided by 2?)
       // 2D version
       template <int nd, class arrvec_t, class ijk_t>
       inline auto calc_tdef_sq_cmpct(
