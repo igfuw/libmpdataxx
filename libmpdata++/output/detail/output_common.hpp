@@ -29,7 +29,7 @@ namespace libmpdataxx
 
         int do_record_cnt = 0;
         typename parent_t::real_t record_time;
-        const typename parent_t::advance_arg_t outfreq;
+        const typename parent_t::advance_arg_t outfreq, outstart;
         const int outwindow;
         const std::string outdir;
 
@@ -158,7 +158,7 @@ namespace libmpdataxx
               record_time = this->time;
               for (int t = 0; t < outwindow; ++t)
               {
-                if ((this->timestep - t) % static_cast<int>(outfreq) == 0) record_all();
+                if ((this->timestep - t) % static_cast<int>(outfreq) == 0 && this->timestep > static_cast<int>(outstart)) record_all();
               }
             }
           }
@@ -170,7 +170,8 @@ namespace libmpdataxx
 
         struct rt_params_t : parent_t::rt_params_t
         {
-          typename parent_t::advance_arg_t outfreq = 1;
+          typename parent_t::advance_arg_t outfreq = 1,
+                                           outstart = 0; // TODO: make it work for var_dt
           int outwindow = 1;
           std::map<int, info_t> outvars;
           std::string outdir;
@@ -184,11 +185,15 @@ namespace libmpdataxx
         ) :
           parent_t(args, p),
           outfreq(p.outfreq),
+          outstart(p.outstart),
           outwindow(p.outwindow),
           outvars(p.outvars),
           outdir(p.outdir),
           intrp_vars(args.mem->tmp[__FILE__][0])
         {
+          assert(int(outstart) % int(outfreq) == 0);
+          assert(int(outstart)==0 || this->var_dt==0);
+
           // default value for outvars
           if (this->outvars.size() == 0 && parent_t::n_eqns == 1)
             outvars = {{0, {"", ""}}};
