@@ -199,7 +199,7 @@ namespace libmpdataxx
             // T
             {
               const hsize_t
-                nt_out = (nt - this->outstart) / this->outfreq + 1; // incl. t=0
+                nt_out = (nt - this->outstart) / this->outfreq + 2; // incl. t=0 and t=outstart
               float dt = this->dt;
 
               blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
