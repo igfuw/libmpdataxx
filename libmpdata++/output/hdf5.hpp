@@ -366,6 +366,22 @@ namespace libmpdataxx
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
       }
 
+      // for 1-D arrays
+      void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, hsize_t size, H5::H5File hdf)
+      {
+        assert(this->rank == 0);
+
+        auto aux = hdf.createDataSet(
+          name,
+          flttype_output,
+          H5::DataSpace(1, &size)
+        );
+
+        auto space = aux.getSpace();
+        space.selectHyperslab(H5S_SELECT_SET, &size, &zero);
+        aux.write(data, flttype_solver, H5::DataSpace(1, &size), space, dxpl_id);
+      }
+
       // for discontiguous array with halos
       void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc = false)
       {
@@ -519,6 +535,12 @@ namespace libmpdataxx
       {
         H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
         record_aux_hlpr(name, data, hdfcp);
+      }
+
+      void record_aux_const(const std::string &name, typename solver_t::real_t *data, const int &size)
+      {
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR); 
+        record_aux_hlpr(name, data, size, hdfcp);
       }
 
       void record_aux_const(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
