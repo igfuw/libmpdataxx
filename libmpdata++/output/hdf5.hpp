@@ -198,13 +198,21 @@ namespace libmpdataxx
 
             // T
             {
-              const hsize_t
-                nt_out = (nt - this->outstart) / this->outfreq + 2; // incl. t=0 and t=outstart
+              // incl. t=0 and t=outstart
+              const hsize_t nt_out = this->outstart == 0 ? 
+                (nt - this->outstart) / this->outfreq + 1 :
+                (nt - this->outstart) / this->outfreq + 2;  // for outstart>0 we still want to store t=0
+
               float dt = this->dt;
 
               blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
-              coord(blitz::Range(1,nt_out-1)) = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * (blitz::firstIndex() + this->outstart/this->outfreq);
-              coord(0)=0;
+              if(this->outstart == 0)
+                coord(blitz::Range(0,nt_out-1)) = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * (blitz::firstIndex() + this->outstart/this->outfreq);
+              else
+              {
+                coord(blitz::Range(1,nt_out-1)) = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * (blitz::firstIndex() + this->outstart/this->outfreq);
+                coord(0)=0;
+              }
 
               auto curr_dim = (*hdfp).createDataSet("T", flttype_output, H5::DataSpace(1, &nt_out));
 
