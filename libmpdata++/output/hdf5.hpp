@@ -541,13 +541,21 @@ namespace libmpdataxx
       // has to be called after const file was created (i.e. after start())
       void record_aux_const(const std::string &name, typename solver_t::real_t *data)
       {
-        H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
+#if defined(USE_MPI)
+          , H5P_DEFAULT, fapl_id
+#endif
+        ); // reopen the const file
         record_aux_hlpr(name, data, hdfcp);
       }
 
       void record_aux_const(const std::string &name, typename solver_t::real_t *data, const int &size)
       {
-        H5::H5File hdfcp(const_file, H5F_ACC_RDWR); 
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
+#if defined(USE_MPI)
+          , H5P_DEFAULT, fapl_id
+#endif
+        ); // reopen the const file
         record_aux_hlpr(name, data, size, hdfcp);
       }
 
