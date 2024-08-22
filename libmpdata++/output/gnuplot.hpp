@@ -100,6 +100,7 @@ namespace libmpdataxx
 
           for (int t = 0; t <= nt; t+=p.outfreq)
           {
+            if(t > 0 && t < p.outstart) continue;
             for (const auto &v : this->outvars)
             {
               *gp << ", '-'";
