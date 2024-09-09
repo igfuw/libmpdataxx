@@ -199,11 +199,17 @@ namespace libmpdataxx
             // T
             {
               const hsize_t
-                nt_out = nt / this->outfreq + 1; // incl. t=0
+                nt_out =   (nt / this->outfreq + 1) * this->outwindow   // incl. t=0
+                         - (this->outwindow - (nt % this->outfreq) - 1);  // timsteps from outwindow that go beyond nt
               float dt = this->dt;
 
               blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
-              coord = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * blitz::firstIndex();
+
+              for(int i=0; i<nt_out; ++i)
+              {
+                int timestep = int(i / this->outwindow) * this->outfreq + (i % this->outwindow);
+                coord(i) = timestep * (this->var_dt ? this->outfreq : this->outfreq * this->dt);
+              }
 
               auto curr_dim = (*hdfp).createDataSet("T", flttype_output, H5::DataSpace(1, &nt_out));
 
