@@ -199,17 +199,18 @@ namespace libmpdataxx
             // T
             {
               // incl. t=0 and t=outstart
-              const hsize_t nt_out = ((nt - this->outstart) / this->outfreq + (this->outstart == 0 ? 1 : 2)) * this->outwindow // for outstart>0 we still want to store t=0
-                - (this->outwindow - (nt % this->outfreq) - 1);  // timsteps from outwindow that go beyond nt
+              const hsize_t nt_out = ((nt - this->outstart) / this->outfreq + 1) * this->outwindow
+                + (this->outstart == 0 ? 0 : 1) // for outstart>0 we still want to store t=0
+                - std::max(0, this->outwindow - (nt % this->outfreq) - 1);  // timsteps from outwindow that go beyond nt
 
               float dt = this->dt;
 
               blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
               if(this->outstart == 0)
-                coord(blitz::Range(0,nt_out-1)) = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * (floor(blitz::firstIndex() / this->outwindow) * this->outfreq + fmod(blitz::firstIndex(), this->outwindow) + this->outstart/this->outfreq);
+                coord(blitz::Range(0,nt_out-1)) = (this->var_dt ? 1 : this->dt) * (floor(blitz::firstIndex() / this->outwindow) * this->outfreq + fmod(blitz::firstIndex(), this->outwindow));
               else
               {
-                coord(blitz::Range(1,nt_out-1)) = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * (floor(blitz::firstIndex() / this->outwindow) * this->outfreq + fmod(blitz::firstIndex(), this->outwindow) + this->outstart/this->outfreq);
+                coord(blitz::Range(1,nt_out-1)) = (this->var_dt ? 1 : this->dt) * (floor(blitz::firstIndex() / this->outwindow) * this->outfreq + fmod(blitz::firstIndex(), this->outwindow) + this->outstart);
                 coord(0)=0;
               }
 
