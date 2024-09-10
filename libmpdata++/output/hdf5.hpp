@@ -201,7 +201,7 @@ namespace libmpdataxx
               // incl. t=0 and t=outstart
               const hsize_t nt_out = ((nt - this->outstart) / this->outfreq + 1) * this->outwindow
                 + (this->outstart == 0 ? 0 : 1) // for outstart>0 we still want to store t=0
-                - std::max(0, this->outwindow - (nt % this->outfreq) - 1);  // timsteps from outwindow that go beyond nt
+                - std::max(0, this->outwindow - int(std::fmod(nt, this->outfreq)) - 1);  // timsteps from outwindow that go beyond nt
 
               float dt = this->dt;
 
