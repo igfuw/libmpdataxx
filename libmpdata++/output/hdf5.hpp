@@ -198,12 +198,21 @@ namespace libmpdataxx
 
             // T
             {
-              const hsize_t
-                nt_out = nt / this->outfreq + 1; // incl. t=0
+              // incl. t=0 and t=outstart
+              const hsize_t nt_out = ((nt - this->outstart) / this->outfreq + 1) * this->outwindow
+                + (this->outstart == 0 ? 0 : 1) // for outstart>0 we still want to store t=0
+                - std::max(0, this->outwindow - int(std::fmod(nt, this->outfreq)) - 1);  // timsteps from outwindow that go beyond nt
+
               float dt = this->dt;
 
               blitz::Array<typename solver_t::real_t, 1> coord(nt_out);
-              coord = (this->var_dt ? this->outfreq : this->outfreq * this->dt) * blitz::firstIndex();
+              if(this->outstart == 0)
+                coord(blitz::Range(0,nt_out-1)) = (this->var_dt ? 1 : this->dt) * (floor(blitz::firstIndex() / this->outwindow) * this->outfreq + fmod(blitz::firstIndex(), this->outwindow));
+              else
+              {
+                coord(blitz::Range(1,nt_out-1)) = (this->var_dt ? 1 : this->dt) * (floor(blitz::firstIndex() / this->outwindow) * this->outfreq + fmod(blitz::firstIndex(), this->outwindow) + this->outstart);
+                coord(0)=0;
+              }
 
               auto curr_dim = (*hdfp).createDataSet("T", flttype_output, H5::DataSpace(1, &nt_out));
 
@@ -365,6 +374,22 @@ namespace libmpdataxx
         aux.write(data, flttype_solver, H5::DataSpace(parent_t::n_dims, shape.data()), space, dxpl_id);
       }
 
+      // for 1-D arrays
+      void record_aux_hlpr(const std::string &name, typename solver_t::real_t *data, hsize_t size, H5::H5File hdf)
+      {
+        assert(this->rank == 0);
+
+        auto aux = hdf.createDataSet(
+          name,
+          flttype_output,
+          H5::DataSpace(1, &size)
+        );
+
+        auto space = aux.getSpace();
+        space.selectHyperslab(H5S_SELECT_SET, &size, &zero);
+        aux.write(data, flttype_solver, H5::DataSpace(1, &size), space, dxpl_id);
+      }
+
       // for discontiguous array with halos
       void record_aux_dsc_hlpr(const std::string &name, const typename solver_t::arr_t &arr, H5::H5File hdf, bool srfc = false)
       {
@@ -516,8 +541,22 @@ namespace libmpdataxx
       // has to be called after const file was created (i.e. after start())
       void record_aux_const(const std::string &name, typename solver_t::real_t *data)
       {
-        H5::H5File hdfcp(const_file, H5F_ACC_RDWR); // reopen the const file
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
+#if defined(USE_MPI)
+          , H5P_DEFAULT, fapl_id
+#endif
+        ); // reopen the const file
         record_aux_hlpr(name, data, hdfcp);
+      }
+
+      void record_aux_const(const std::string &name, typename solver_t::real_t *data, const int &size)
+      {
+        H5::H5File hdfcp(const_file, H5F_ACC_RDWR
+#if defined(USE_MPI)
+          , H5P_DEFAULT, fapl_id
+#endif
+        ); // reopen the const file
+        record_aux_hlpr(name, data, size, hdfcp);
       }
 
       void record_aux_const(const std::string &name, const std::string &group_name, typename solver_t::real_t data)
