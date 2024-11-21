@@ -493,9 +493,32 @@ namespace libmpdataxx
       }
 
       // multiplication of compact vector components by variable anisotropic eddy viscosity
-      // 3D version
       // TODO: when used in tensor multiplication, it is not clear which eddy viscosity components should be used for each term; see Simon and Chow 2021 p. 17
       //       we opt to use the same approach as therein, i.e. horizontal for all diagonal components; this is controlled by the flag vh
+      // 2D version
+      template <int nd, opts_t opts, class arrvec_t, class real_t, class arr_t, class ijk_t>
+      inline void multiply_vctr_cmpct(const arrvec_t &av,
+                                      real_t coeff,
+                                      const arrvec_t & k_ma,
+                                      const arr_t & rho,
+                                      const ijk_t &ijk,
+                                      const bool vh = false,
+                                      typename std::enable_if<nd == 2>::type* = 0)
+      {
+        av[0](ijk[0] + h, ijk[1]) *= coeff *
+                           real_t(0.5) * (k_ma[0](ijk[0] + 1, ijk[1]) + k_ma[0](ijk[0], ijk[1])) *
+                           real_t(0.5) * (G<opts, 0>(rho, ijk[0] + 1, ijk[1]) + G<opts, 0>(rho, ijk[0], ijk[1]));
+
+        if(!vh)
+          av[1](ijk[0], ijk[1] + h) *= coeff *
+                           real_t(0.5) * (k_ma[1](ijk[0], ijk[1] + 1) + k_ma[1](ijk[0], ijk[1])) *
+                           real_t(0.5) * (G<opts, 0>(rho, ijk[0], ijk[1] + 1) + G<opts, 0>(rho, ijk[0], ijk[1]));
+        else
+          av[1](ijk[0], ijk[1] + h) *= coeff *
+                           real_t(0.5) * (k_ma[0](ijk[0], ijk[1] + 1) + k_ma[0](ijk[0], ijk[1])) *
+                           real_t(0.5) * (G<opts, 0>(rho, ijk[0], ijk[1] + 1) + G<opts, 0>(rho, ijk[0], ijk[1]));
+      }
+      // 3D version
       template <int nd, opts_t opts, class arrvec_t, class real_t, class arr_t, class ijk_t>
       inline void multiply_vctr_cmpct(const arrvec_t &av,
                                       real_t coeff,
@@ -619,9 +642,32 @@ namespace libmpdataxx
       }
 
       // multiplication of compact tensor components by variable anisotropic eddy viscosity
-      // 3D version
       // TODO: it is not clear which eddy viscosity components should be used for each term; see Simon and Chow 2021 p. 17
       //       we opt to use the same approach as therein
+      // 2D version
+      template <int nd, opts_t opts, class arrvec_t, class real_t, class arr_t, class ijk_t>
+      inline void multiply_tnsr_cmpct(const arrvec_t &av,
+                                      const real_t coeff,
+                                      const arrvec_t &k_ma,
+                                      const arr_t &rho,
+                                      const ijk_t &ijk,
+                                      typename std::enable_if<nd == 2>::type* = 0)
+      {
+        multiply_vctr_cmpct<nd, opts>(av, coeff, k_ma, rho, ijk, true);
+        av[2](ijk[0] + h, ijk[1] + h) *= coeff *
+                                         real_t(0.25) * ( k_ma[1](ijk[0] + 1, ijk[1]    )
+                                                        + k_ma[1](ijk[0]    , ijk[1]    )
+                                                        + k_ma[1](ijk[0] + 1, ijk[1] + 1)
+                                                        + k_ma[1](ijk[0]    , ijk[1] + 1)
+                                                        ) *
+                                         real_t(0.25) * ( G<opts, 0>(rho, ijk[0] + 1, ijk[1]    )
+                                                        + G<opts, 0>(rho, ijk[0]    , ijk[1]    )
+                                                        + G<opts, 0>(rho, ijk[0] + 1, ijk[1] + 1)
+                                                        + G<opts, 0>(rho, ijk[0]    , ijk[1] + 1)
+                                                        );
+      }
+
+      // 3D version
       template <int nd, opts_t opts, class arrvec_t, class real_t, class arr_t, class ijk_t>
       inline void multiply_tnsr_cmpct(const arrvec_t &av,
                                       const real_t coeff,
