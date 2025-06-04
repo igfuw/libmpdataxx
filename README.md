@@ -27,6 +27,11 @@ Compilation of programs that use libmpdata++ requires:
 - HDF5 and gnuplot-iostream libraries
   (optional, depending on the type of output mechanism chosen)
 
+
+Singularity images for building libmpdata++ are available at:
+
+https://zenodo.org/records/15591478
+
 During development of libmpdata++, we are continuously testing
 the code on Linux using GCC and LLVM/Clang as well as on OSX
 using Apple/Clang - these are considered the supported platforms.
