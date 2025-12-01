@@ -22,9 +22,10 @@ namespace libmpdataxx
         using real_t = typename ct_params_t::real_t;
 
         protected:
+         
         // member fields
         real_t prandtl_num;
-        typename parent_t::arr_t &rcdsn_num, &full_tht, &tdef_sq, &mix_len, &hflux_srfc;
+        typename parent_t::arr_t &rcdsn_num, &full_tht, &tdef_sq, &mix_len, &mix_len_h, &mix_len_v, &hflux_srfc;
         arrvec_t<typename parent_t::arr_t> &grad_tht;
 
         template <int nd = ct_params_t::n_dims>
@@ -74,20 +75,48 @@ namespace libmpdataxx
 
           calc_rcdsn_num();
 
-          this->k_m(this->ijk) = where(
+          if constexpr (static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == smg)
+            this->k_m(this->ijk) = where(
                                        rcdsn_num(this->ijk) / prandtl_num < 1,
                                        pow(this->smg_c * mix_len(this->ijk), 2)
                                        * sqrt(tdef_sq(this->ijk) * (1 - rcdsn_num(this->ijk) / prandtl_num)),
                                        0
                                       );
+          else // smgani
+          {
+            this->k_m[0](this->ijk) = where(
+                                       rcdsn_num(this->ijk) / prandtl_num < 1,
+                                       pow(this->smg_c * mix_len_h(this->ijk), 2)
+                                       * sqrt(tdef_sq(this->ijk) * (1 - rcdsn_num(this->ijk) / prandtl_num)),
+                                       0
+                                      );
+            this->k_m[1](this->ijk) = where(
+                                       rcdsn_num(this->ijk) / prandtl_num < 1,
+                                       pow(this->smg_c * mix_len_v(this->ijk), 2)
+                                       * sqrt(tdef_sq(this->ijk) * (1 - rcdsn_num(this->ijk) / prandtl_num)),
+                                       0
+                                      );
+          }
           // one level above surface
           auto ijp1 = this->ijk;
           ijp1.lbound(ct_params_t::n_dims - 1) = 1;
           ijp1.ubound(ct_params_t::n_dims - 1) = 1;
 
-          this->k_m(ij) = this->k_m(ijp1);
+          if constexpr (static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == smg)
+            this->k_m(ij) = this->k_m(ijp1);
+          else
+          {
+            this->k_m[0](ij) = this->k_m[0](ijp1);
+            this->k_m[1](ij) = this->k_m[1](ijp1);
+          }
 
-          this->xchng_sclr(this->k_m, this->ijk, 1);
+          if constexpr (static_cast<sgs_scheme_t>(ct_params_t::sgs_scheme) == smg)
+            this->xchng_sclr(this->k_m, this->ijk, 1);
+          else
+          {
+            this->xchng_sclr(this->k_m[0], this->ijk, 1);
+            this->xchng_sclr(this->k_m[1], this->ijk, 1);
+          }
 
           // havo to use modified ijkm due to shared-memory parallelisation, otherwise overlapping ranges
           // would lead to double multiplications
@@ -129,10 +158,12 @@ namespace libmpdataxx
           prandtl_num(p.prandtl_num),
           rcdsn_num(args.mem->tmp[__FILE__][0][0]),
           full_tht(args.mem->tmp[__FILE__][1][0]),
-          tdef_sq(args.mem->tmp[__FILE__][2][0]),
-          mix_len(args.mem->tmp[__FILE__][3][0]),
-          grad_tht(args.mem->tmp[__FILE__][4]),
-          hflux_srfc(args.mem->tmp[__FILE__][5][0])
+          mix_len(args.mem->tmp[__FILE__][2][0]),
+          mix_len_h(args.mem->tmp[__FILE__][3][0]),
+          mix_len_v(args.mem->tmp[__FILE__][4][0]),
+          grad_tht(args.mem->tmp[__FILE__][5]),
+          hflux_srfc(args.mem->tmp[__FILE__][6][0]),
+          tdef_sq(args.mem->tmp[__FILE__][7][0])
         {
           //assert(prandtl_num != 0);
         }
@@ -142,10 +173,12 @@ namespace libmpdataxx
           parent_t::alloc(mem, n_iters);
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // rcdsn_num
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // full_tht
-          parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // tdef_sq
-          parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len");
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len"); // used in smg
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len_h"); // used in smganiso, needs to be named; TODO: separate smg and smagni into two classes to avoid allocating too much memory
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len_v"); // ditto
           parent_t::alloc_tmp_vctr(mem, __FILE__); // grad_tht
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "", true); // hflux_srfc
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // tdef_sq
         }
       };
     } // namespace detail
