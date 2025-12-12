@@ -9,18 +9,18 @@ on:
 jobs:
   # run unit tests
   unit:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         build_type: ["Debug", "Release"]
         mpi: ["none", "mvapich2"]
         include:
         - mpi: "none"
-          tag: "ubuntu_20_04_cuda_11_4"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0"
           cxx: "g++"
           ctest_options: ""
         - mpi: "mvapich2"
-          tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0_mvapich2"
           cxx: "mpic++"
           ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
     steps:
@@ -43,18 +43,18 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
       
   sandbox:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         build_type: ["Release"] # Debug would be too slow
         mpi: ["none", "mvapich2"]
         include:
         - mpi: "none"
-          tag: "ubuntu_20_04_cuda_11_4"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0"
           cxx: "g++"
           ctest_options: ""
         - mpi: "mvapich2"
-          tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0_mvapich2"
           cxx: "mpic++"
           ctest_options: "-LE SlowWithMpi"  
 
@@ -82,7 +82,7 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
       
   sandbox_slow_tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         build_type: ["Release"] # Debug would be too slow
@@ -90,7 +90,7 @@ jobs:
         tests: ["pbl_smg_short", "pbl_iles_short", "shear_layer", "convergence_adv_diffusion"]
         include:
         - mpi: "mvapich2"
-          tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0_mvapich2"
           cxx: "mpic++"
 
     steps:
@@ -114,17 +114,17 @@ jobs:
 
   # run tests from the 2015 GMD paper
   paper:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         build_type: ["Release"] 
         mpi: ["none", "mvapich2"]
         include:
         - mpi: "none"
-          tag: "ubuntu_20_04_cuda_11_4"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0"
           cxx: "g++"
         - mpi: "mvapich2"
-          tag: "ubuntu_20_04_cuda_11_4_mvapich2_v1"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0_mvapich2"
           cxx: "mpic++"
           ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
 
@@ -148,14 +148,14 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
 
   nair_jablonowski_2008:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         build_type: ["Release"] 
         mpi: ["none"]
         include:
         - mpi: "none"
-          tag: "ubuntu_20_04_cuda_11_4"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0"
           cxx: "g++"
 
     steps:
@@ -178,14 +178,14 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest || cat Testing/Temporary/LastTest.log /"
 
   elliptic_drop:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         build_type: ["Release"] 
         mpi: ["none"]
         include:
         - mpi: "none"
-          tag: "ubuntu_20_04_cuda_11_4"
+          tag: "uwlcm_ubuntu_24_04_cuda_12_9_0"
           cxx: "g++"
 
     steps:
