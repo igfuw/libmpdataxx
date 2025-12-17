@@ -174,7 +174,7 @@ namespace libmpdataxx
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // rcdsn_num
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1); // full_tht
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len"); // used in smg
-          parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len_h"); // used in smganiso, needs to be named; TODO: separate smg and smagni into two classes to avoid allocating too much memory
+          parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len_h"); // used in smganiso, needs to be named; TODO: separate smg and smgani into two classes to avoid allocating too much memory
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "mix_len_v"); // ditto
           parent_t::alloc_tmp_vctr(mem, __FILE__); // grad_tht
           parent_t::alloc_tmp_sclr(mem, __FILE__, 1, "", true); // hflux_srfc

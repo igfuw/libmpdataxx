@@ -28,7 +28,7 @@ class pbl : public libmpdataxx::output::hdf5_xdmf<libmpdataxx::solvers::boussine
   {
     parent_t::multiply_sgs_visc();
 
-    if constexpr(static_cast<libmpdataxx::solvers::sgs_scheme_t>(ct_params_t::sgs_scheme) == libmpdataxx::solvers::smg)
+    if constexpr (static_cast<libmpdataxx::solvers::sgs_scheme_t>(ct_params_t::sgs_scheme) == libmpdataxx::solvers::smg)
       if (this->timestep % static_cast<int>(this->outfreq) == 0)    
       {
         tke(this->ijk) = pow2(this->k_m(this->ijk) / (this->c_m * this->mix_len(this->ijk)));

@@ -30,15 +30,15 @@ namespace libmpdataxx
 
         void multiply_sgs_visc()
         {
-          static_assert(ct_params_t::n_dims > 1, "limpdata++: anisotropic smagorinsky doesn't work in 1D");
-          static_assert(static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact, "limpdata++: anisotropic smagorinsky requires compact stress differencing");
+          static_assert(ct_params_t::n_dims > 1, "libmpdata++: anisotropic smagorinsky doesn't work in 1D");
+          static_assert(static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact, "libmpdata++: anisotropic smagorinsky requires compact stress differencing");
 
           const auto dlta_h = std::accumulate(this->dijk.begin(), this->dijk.end()-1, real_t(0.)) / (ct_params_t::n_dims-1);
           const auto dlta_v = this->dijk[ct_params_t::n_dims-1];
 
           // Simon and Chow 2021, eqs. 9 and 10
           k_m[0](this->ijk) = pow(smg_c * dlta_h, 2) * formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk)(this->ijk); // tdef_sq could be cached, but creating a tdef_sq array without similar one in isotropic smg messes with derived classes that do cache tdef_sq also in isotropic... (e.g. boussinesq)
-          k_m[0](this->ijk) = pow(smg_c * dlta_v, 2) * formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk)(this->ijk);
+          k_m[1](this->ijk) = pow(smg_c * dlta_v, 2) * formulae::stress::calc_tdef_sq_cmpct<ct_params_t::n_dims>(this->tau, this->ijk)(this->ijk);
 
           formulae::stress::multiply_tnsr_cmpct<ct_params_t::n_dims, ct_params_t::opts>(this->tau,
                                                                                         real_t(1.0),
