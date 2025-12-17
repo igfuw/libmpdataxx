@@ -24,7 +24,7 @@ jobs:
           cxx: "mpic++"
           ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
  
     - name: Install libmpdata++
       uses: igfuw/libmpdataxx_install@v0.1
@@ -59,7 +59,7 @@ jobs:
           ctest_options: "-LE SlowWithMpi"  
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
       uses: igfuw/libmpdataxx_install@v0.1
@@ -94,7 +94,7 @@ jobs:
           cxx: "mpic++"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
       uses: igfuw/libmpdataxx_install@v0.1
@@ -129,7 +129,7 @@ jobs:
           ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
       uses: igfuw/libmpdataxx_install@v0.1
@@ -159,7 +159,7 @@ jobs:
           cxx: "g++"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
       uses: igfuw/libmpdataxx_install@v0.1
@@ -189,7 +189,7 @@ jobs:
           cxx: "g++"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
       uses: igfuw/libmpdataxx_install@v0.1
@@ -202,7 +202,7 @@ jobs:
         cxx: ${{ matrix.cxx }}
 
     - name: checkout elliptic_drop
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
       with:
         repository: igfuw/shallow-water-elliptic-drop 
         path: shallow-water-elliptic-drop
