@@ -24,10 +24,10 @@ jobs:
           cxx: "mpic++"
           ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
  
     - name: Install libmpdata++
-      uses: igfuw/libmpdataxx_install@v0.1
+      uses: igfuw/libmpdataxx_install@v0.5
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -59,10 +59,10 @@ jobs:
           ctest_options: "-LE SlowWithMpi"  
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
-      uses: igfuw/libmpdataxx_install@v0.1
+      uses: igfuw/libmpdataxx_install@v0.5
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -94,10 +94,10 @@ jobs:
           cxx: "mpic++"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
-      uses: igfuw/libmpdataxx_install@v0.1
+      uses: igfuw/libmpdataxx_install@v0.5
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -129,10 +129,10 @@ jobs:
           ctest_options: "-LE SlowWithMpi"  # exclude tests with the label SlowWithMpi
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
-      uses: igfuw/libmpdataxx_install@v0.1
+      uses: igfuw/libmpdataxx_install@v0.5
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -159,10 +159,10 @@ jobs:
           cxx: "g++"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
-      uses: igfuw/libmpdataxx_install@v0.1
+      uses: igfuw/libmpdataxx_install@v0.5
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -189,10 +189,10 @@ jobs:
           cxx: "g++"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     - name: Install libmpdata++
-      uses: igfuw/libmpdataxx_install@v0.1
+      uses: igfuw/libmpdataxx_install@v0.5
       with:
         build_type: ${{matrix.build_type}}
         threads: ${{matrix.threads}}
@@ -202,7 +202,7 @@ jobs:
         cxx: ${{ matrix.cxx }}
 
     - name: checkout elliptic_drop
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
       with:
         repository: igfuw/shallow-water-elliptic-drop 
         path: shallow-water-elliptic-drop
