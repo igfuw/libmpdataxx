@@ -64,6 +64,8 @@ namespace libmpdataxx
         edge_velocity(pi<d>(0, j, k)) = a(pi<d>(this->left_edge_sclr, j, k));
       }
 
+      void save_edge_val(const arr_t &, const arr_t &, const rng_t &, const rng_t &) {}
+
       void set_edge_pres(arr_t &a, const rng_t &j, const rng_t &k, int sign)
       {
         using namespace idxperm;
@@ -186,6 +188,8 @@ namespace libmpdataxx
         if(d != 0) edge_velocity.reindexSelf({a.lbound(0), 0, 0});
         edge_velocity(pi<d>(0, j, k)) = a(pi<d>(this->rght_edge_sclr, j, k));
       }
+
+      void save_edge_val(const arr_t &, const arr_t &, const rng_t &, const rng_t &) {}
 
       void set_edge_pres(arr_t &a, const rng_t &j, const rng_t &k, int sign)
       {

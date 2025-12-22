@@ -14,7 +14,7 @@ namespace libmpdataxx
   {
     using namespace arakawa_c;
 
-    enum bcond_e { null, cyclic, polar, open, rigid, remote, gndsky, custom };
+    enum bcond_e { null, cyclic, polar, open, rigid, remote, gndsky, fixed, custom };
     enum drctn_e { left, rght };
 
     template<
@@ -81,6 +81,11 @@ namespace libmpdataxx
           assert(false && "bcond::save_edge_vel() called!");
         };
 
+        virtual void save_edge_val(const arr_2d_t &, const arr_2d_t &, const rng_t &)
+        {
+          assert(false && "bcond::save_edge_vel() called!");
+        };
+
         virtual void set_edge_pres(arr_2d_t &, const rng_t &, int)
         {
           assert(false && "bcond::set_edge() called!");
@@ -143,6 +148,11 @@ namespace libmpdataxx
         };
 
         virtual void save_edge_vel(const arr_3d_t &, const rng_t &, const rng_t &)
+        {
+          assert(false && "bcond::save_edge_vel() called!");
+        };
+
+        virtual void save_edge_val(const arr_3d_t &, const rng_t &, const rng_t &)
         {
           assert(false && "bcond::save_edge_vel() called!");
         };
