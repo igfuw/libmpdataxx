@@ -71,6 +71,8 @@ namespace libmpdataxx
 
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
 
+      void save_edge_val(const arr_t &, const arr_t &, const rng_t &, const rng_t &) {}
+
       void set_edge_pres(arr_t &, const rng_t &, const rng_t &, int) {}
 
 
@@ -219,6 +221,8 @@ namespace libmpdataxx
       }
 
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
+
+      void save_edge_val(const arr_t &, const arr_t &, const rng_t &, const rng_t &) {}
 
       void set_edge_pres(arr_t &, const rng_t &, const rng_t &, int) {}
 
