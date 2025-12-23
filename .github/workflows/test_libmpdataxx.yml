@@ -19,7 +19,7 @@ jobs:
     - name: load UWLCM Singularity image
       uses: igfuw/load_UWLCM_singularity_image@main
       with:
-        path: ${{ github.workspace }}/libmpdata++
+        path: ${{ github.workspace }}/libmpdata++/singularity_images
         tag: ${{ matrix.tag }} 
 
   # run unit tests
