@@ -11,6 +11,7 @@
 #include <libmpdata++/solvers/mpdata_rhs_vip_prs.hpp>
 #include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_sgs_dns.hpp>
 #include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_sgs_smg.hpp>
+#include <libmpdata++/solvers/detail/mpdata_rhs_vip_prs_sgs_smgani.hpp>
 
 namespace libmpdataxx
 {
@@ -20,18 +21,21 @@ namespace libmpdataxx
     {
       iles,
       dns,
-      smg
+      smg,
+      smgani
     };
 
     const std::map<sgs_scheme_t, std::string> sgs2string = {
       {iles, "iles"},
       {dns , "dns" },
-      {smg , "smg" }
+      {smg , "smg" },
+      {smgani , "smgani" }
     };
 
     struct mpdata_rhs_vip_prs_sgs_family_tag {};
     struct mpdata_rhs_vip_prs_sgs_dns_family_tag {};
     struct mpdata_rhs_vip_prs_sgs_smg_family_tag {};
+    struct mpdata_rhs_vip_prs_sgs_smgani_family_tag {};
 
     template<typename ct_params_t, int minhalo = 0, class enableif = void>
     class mpdata_rhs_vip_prs_sgs;
@@ -70,6 +74,19 @@ namespace libmpdataxx
 
       protected:
       using solver_family = mpdata_rhs_vip_prs_sgs_smg_family_tag;
+    };
+
+    template<typename ct_params_t, int minhalo>
+    class mpdata_rhs_vip_prs_sgs<
+      ct_params_t, minhalo,
+      typename std::enable_if<(int)ct_params_t::sgs_scheme == (int)smgani>::type
+    > : public detail::mpdata_rhs_vip_prs_sgs_smgani<ct_params_t, minhalo>
+    {
+      using parent_t = detail::mpdata_rhs_vip_prs_sgs_smgani<ct_params_t, minhalo>;
+      using parent_t::parent_t; // inheriting constructors
+
+      protected:
+      using solver_family = mpdata_rhs_vip_prs_sgs_smgani_family_tag;
     };
   } // namespace solvers
 } // namespace libmpdataxx

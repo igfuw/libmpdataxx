@@ -23,7 +23,7 @@ def reading_modeloutput(dir, time):
 
 def plotting_3D(X, Y, Z):
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     ax.plot_surface(X, Y, Z, rstride=10, cstride=10, alpha=0.2)
     cset = ax.contourf(X, Y, Z, zdir='z', offset=-0.1, cmap=cm.Blues)
     fig.colorbar(cset)

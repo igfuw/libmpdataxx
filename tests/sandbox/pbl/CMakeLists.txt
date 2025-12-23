@@ -16,6 +16,7 @@ add_test(pbl_smg_budget bash -c "
 ")
 
 libmpdataxx_add_test(pbl_smg_short)
+libmpdataxx_add_test(pbl_smgani_short)
 libmpdataxx_add_test(pbl_iles_short)
 
 add_test(pbl_iles_short_profiles bash -c "
@@ -23,6 +24,9 @@ add_test(pbl_iles_short_profiles bash -c "
 ")
 add_test(pbl_smg_short_profiles bash -c "
     python3  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_smg_short
+")
+add_test(pbl_smgani_short_profiles bash -c "
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_smgani_short
 ")
 
 add_test(pbl_iles_short_prof_diff
@@ -35,6 +39,9 @@ add_test(pbl_iles_short_budget bash -c "
 ")
 add_test(pbl_smg_short_budget bash -c "
     python3  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_smg_short
+")
+add_test(pbl_smgani_short_budget bash -c "
+    python3  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_smgani_short
 ")
 
 add_test(pbl_iles_short_budget_diff

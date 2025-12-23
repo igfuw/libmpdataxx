@@ -39,7 +39,7 @@ endfunction()
 
 enable_testing()
 
-add_subdirectory(kahan_sum)
+# add_subdirectory(kahan_sum) # disabled, because since uwlcm_ubuntu_24_04_cuda_12_9_0.sif, blitz::sum gives the same results as kahan sum; failed e.g. in uwlcm_ubuntu_20_04_cuda_11_4.sif
 add_subdirectory(cone_bugs)
 add_subdirectory(shallow_water)
 add_subdirectory(concurrent_1d)
