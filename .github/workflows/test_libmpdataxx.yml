@@ -7,8 +7,24 @@ on:
     branches: [ master ]
 
 jobs:
+  #fetch Apptainer images
+  fetch_images:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        tag: ["uwlcm_ubuntu_24_04_cuda_12_9_0", "uwlcm_ubuntu_24_04_cuda_12_9_0_mvapich2"]
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: load UWLCM Singularity image
+      uses: igfuw/load_UWLCM_singularity_image@main
+      with:
+        path: ${{ github.workspace }}/libmpdata++
+        tag: ${{ matrix.tag }} 
+
   # run unit tests
   unit:
+    needs: fetch_images
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -30,7 +46,7 @@ jobs:
       uses: igfuw/libmpdataxx_install@master
       with:
         build_type: ${{matrix.build_type}}
-        threads: ${{matrix.threads}}
+        # threads: ${{matrix.threads}}
         path: ${{ github.workspace }}/libmpdata++
         install_prefix: ${{ github.workspace }}/installed 
         tag: ${{ matrix.tag }}
@@ -43,6 +59,7 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
       
   sandbox:
+    needs: fetch_images
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -65,7 +82,7 @@ jobs:
       uses: igfuw/libmpdataxx_install@master
       with:
         build_type: ${{matrix.build_type}}
-        threads: ${{matrix.threads}}
+        # threads: ${{matrix.threads}}
         path: ${{ github.workspace }}/libmpdata++
         install_prefix: ${{ github.workspace }}/installed 
         tag: ${{ matrix.tag }}
@@ -82,6 +99,7 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
       
   sandbox_slow_tests:
+    needs: fetch_images
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -100,7 +118,7 @@ jobs:
       uses: igfuw/libmpdataxx_install@master
       with:
         build_type: ${{matrix.build_type}}
-        threads: ${{matrix.threads}}
+        # threads: ${{matrix.threads}}
         path: ${{ github.workspace }}/libmpdata++
         install_prefix: ${{ github.workspace }}/installed 
         tag: ${{ matrix.tag }}
@@ -114,6 +132,7 @@ jobs:
 
   # run tests from the 2015 GMD paper
   paper:
+    needs: fetch_images
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -135,7 +154,7 @@ jobs:
       uses: igfuw/libmpdataxx_install@master
       with:
         build_type: ${{matrix.build_type}}
-        threads: ${{matrix.threads}}
+        # threads: ${{matrix.threads}}
         path: ${{ github.workspace }}/libmpdata++
         install_prefix: ${{ github.workspace }}/installed 
         tag: ${{ matrix.tag }}
@@ -148,6 +167,7 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
 
   nair_jablonowski_2008:
+    needs: fetch_images
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -165,7 +185,7 @@ jobs:
       uses: igfuw/libmpdataxx_install@master
       with:
         build_type: ${{matrix.build_type}}
-        threads: ${{matrix.threads}}
+        # threads: ${{matrix.threads}}
         path: ${{ github.workspace }}/libmpdata++
         install_prefix: ${{ github.workspace }}/installed 
         tag: ${{ matrix.tag }}
@@ -178,6 +198,7 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest || cat Testing/Temporary/LastTest.log /"
 
   elliptic_drop:
+    needs: fetch_images
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -195,7 +216,7 @@ jobs:
       uses: igfuw/libmpdataxx_install@master
       with:
         build_type: ${{matrix.build_type}}
-        threads: ${{matrix.threads}}
+        # threads: ${{matrix.threads}}
         path: ${{ github.workspace }}/libmpdata++
         install_prefix: ${{ github.workspace }}/installed 
         tag: ${{ matrix.tag }}
@@ -214,6 +235,7 @@ jobs:
       run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec -B ${{ github.workspace }}/installed/ $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} -Dlibmpdata++_DIR=${{ github.workspace }}/installed/share/libmpdata++ && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest || cat Testing/Temporary/LastTest.log /"
 
   call_test_uwlcm_hlpr:
+    needs: fetch_images
     uses: igfuw/UWLCM/.github/workflows/test_uwlcm_hlpr.yml@master
     with:
       UWLCM_sha: "master"
