@@ -1,5 +1,6 @@
 libmpdataxx_add_test(pbl_iles)
 libmpdataxx_add_test(pbl_smg)
+#TODO: pbl_smgani
 
 add_test(pbl_iles_profiles bash -c "
     python3  ${CMAKE_CURRENT_SOURCE_DIR}/profiles.py out_pbl_iles
@@ -33,6 +34,7 @@ add_test(pbl_iles_short_prof_diff
         zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/profiles_pbl_iles_short.txt.gz profiles_pbl_iles_short.txt)
 add_test(pbl_smg_short_prof_diff
         zdiff ${CMAKE_CURRENT_SOURCE_DIR}/refdata/profiles_pbl_smg_short.txt.gz profiles_pbl_smg_short.txt)
+#TODO: _diff tests for smgani
 
 add_test(pbl_iles_short_budget bash -c "
     python3  ${CMAKE_CURRENT_SOURCE_DIR}/budget.py out_pbl_iles_short
@@ -83,6 +85,10 @@ add_test(pbl_smg_short_diff bash -c "
 
 # test labels
 #set_property(TEST pbl_iles       pbl_smg       pbl_iles_budget       pbl_smg_budget       pbl_iles_profiles       pbl_smg_profiles       PROPERTY LABELS NotInCI)
+# with GA MPI, even _short tests are slow, so we run them as separate actions
+set_property(TEST pbl_iles_short   pbl_iles_short_diff pbl_iles_short_profiles   pbl_iles_short_prof_diff  pbl_iles_short_budget   pbl_iles_short_budget_diff PROPERTY LABELS SlowWithMpi)
+set_property(TEST pbl_smg_short    pbl_smg_short_diff  pbl_smg_short_profiles    pbl_smg_short_prof_diff   pbl_smg_short_budget    pbl_smg_short_budget_diff  PROPERTY LABELS SlowWithMpi)
+set_property(TEST pbl_smgani_short                     pbl_smgani_short_profiles                           pbl_smgani_short_budget                            PROPERTY LABELS SlowWithMpi)
 set_property(TEST pbl_iles       pbl_smg       pbl_iles_budget       pbl_smg_budget       pbl_iles_profiles       pbl_smg_profiles       PROPERTY LABELS SlowWithMpi)
 #set_property(TEST pbl_iles_short pbl_smg_short pbl_iles_short_budget pbl_smg_short_budget pbl_iles_short_profiles pbl_smg_short_profiles PROPERTY LABELS SlowWithMpi ShorterVersion)
 #set_property(TEST pbl_iles_short_diff pbl_smg_short_diff pbl_iles_short_budget_diff pbl_smg_short_budget_diff pbl_iles_short_prof_diff pbl_smg_short_prof_diff PROPERTY LABELS SlowWithMpi ShorterVersion)
