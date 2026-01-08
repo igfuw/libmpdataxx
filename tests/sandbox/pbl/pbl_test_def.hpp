@@ -13,6 +13,7 @@
 using namespace libmpdataxx;
 
 struct smg_tag {};
+struct smgani_tag {};
 struct iles_tag {};
 
 // set parameters specific to the sgs model
@@ -34,6 +35,12 @@ void set_sgs_specific(params_t &p, smg_tag)
   p.cdrag = 0.1;
 }
 
+template <typename params_t>
+void set_sgs_specific(params_t &p, smgani_tag)
+{
+  set_sgs_specific(p, smg_tag{});
+}
+
 template <typename sgs_t>
 void test(const std::string &dirname, const int np, const int nt)
 {
@@ -48,7 +55,7 @@ void test(const std::string &dirname, const int np, const int nt)
     enum { vip_vab = solvers::impl };
     enum { prs_scheme = solvers::cr };
     enum { stress_diff = solvers::compact };
-    enum { sgs_scheme = std::is_same<sgs_t, smg_tag>::value ? solvers::smg : solvers::iles};
+    enum { sgs_scheme = std::is_same<sgs_t, smg_tag>::value ? solvers::smg : std::is_same<sgs_t, smgani_tag>::value ? solvers::smgani : solvers::iles};
     enum { impl_tht = true };
     struct ix { enum {
       u, v, w, tht,
@@ -154,16 +161,24 @@ void test(const std::string &dirname, const int np, const int nt)
       slv.vab_relaxed_state(1) = 0;
       slv.vab_relaxed_state(2) = 0;
       
-      if (std::is_same<sgs_t, iles_tag>::value)
+      if constexpr (std::is_same<sgs_t, iles_tag>::value)
       {
         // iles prescribed heat flux forcing
         slv.sclr_array("hflux_frc") = 0.01 * 1. / p.hscale * exp(- k * p.dk / p.hscale);
       }
-      else
+      else if constexpr (std::is_same<sgs_t, smg_tag>::value)
       {
         auto dlta = (p.di + p.dj + p.dk) / 3;
         // smagorinsky mixing length
         slv.sclr_array("mix_len") = min(max(k, 1) * p.dk * 0.845, dlta); 
+      }
+      else if constexpr (std::is_same<sgs_t, smgani_tag>::value)
+      {
+        // anisotropic smagorinsky mixing length
+        auto dlta = (p.di + p.dj) / 2;
+        slv.sclr_array("mix_len_h") = min(max(k, 1) * p.dk * 0.845, dlta); 
+        dlta = p.dk;
+        slv.sclr_array("mix_len_v") = min(max(k, 1) * p.dk * 0.845, dlta); 
       }
     }
   }
