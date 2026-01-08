@@ -741,13 +741,20 @@ namespace libmpdataxx
         }
       }
 
+      // as above but for solvers with the smgani subgrid model
+      void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_smgani_family_tag)
+      {
+        record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_smg_family_tag{});
+      }
+
       // as above but for the boussinesq solver
       void record_params(const H5::H5File &hdfcp, typename solvers::mpdata_boussinesq_family_tag)
       {
-        record_params(hdfcp, typename std::conditional<static_cast<solvers::sgs_scheme_t>
-                                                        (parent_t::ct_params_t_::sgs_scheme) == solvers::iles,
-                                                       typename solvers::mpdata_rhs_vip_prs_family_tag,
-                                                       typename solvers::mpdata_rhs_vip_prs_sgs_smg_family_tag>::type{});
+        if      constexpr (static_cast<solvers::sgs_scheme_t> (parent_t::ct_params_t_::sgs_scheme) == solvers::iles)   record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_family_tag{});
+        else if constexpr (static_cast<solvers::sgs_scheme_t> (parent_t::ct_params_t_::sgs_scheme) == solvers::dns)    record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_family_tag{});
+        else if constexpr (static_cast<solvers::sgs_scheme_t> (parent_t::ct_params_t_::sgs_scheme) == solvers::smg)    record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_smg_family_tag{});
+        else if constexpr (static_cast<solvers::sgs_scheme_t> (parent_t::ct_params_t_::sgs_scheme) == solvers::smgani) record_params(hdfcp, typename solvers::mpdata_rhs_vip_prs_sgs_smgani_family_tag{});
+
         hdfcp.createGroup("boussinesq");
         const auto &group = hdfcp.openGroup("boussinesq");
         {
