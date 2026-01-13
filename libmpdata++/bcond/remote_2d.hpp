@@ -41,6 +41,8 @@ namespace libmpdataxx
 
       void save_edge_vel(const arr_t &, const rng_t &) {}
 
+      void save_edge_val(const arr_t &, const arr_t &, const rng_t &) {}
+
       void set_edge_pres(arr_t &, const rng_t &, int) {}
 
       // we require that given process calculates its internal vectors + the nearest vector to the left, TODO: how to enforce this?
@@ -158,6 +160,8 @@ namespace libmpdataxx
       }
 
       void save_edge_vel(const arr_t &, const rng_t &) {}
+
+      void save_edge_val(const arr_t &, const arr_t &, const rng_t &) {}
 
       void set_edge_pres(arr_t &, const rng_t &, int) {}
 
