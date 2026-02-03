@@ -1,6 +1,6 @@
 // 2D fixed (Dirichlet) boundary conditions for libmpdata++
 //
-// licensing: GPU GPL v3
+// licensing: GNU GPL v3
 // copyright: University of Warsaw
 
 #pragma once

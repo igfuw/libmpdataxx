@@ -81,7 +81,7 @@ namespace libmpdataxx
           assert(false && "bcond::save_edge_vel() called!");
         };
 
-        virtual void save_edge_val(const arr_2d_t &, const arr_2d_t &, const rng_t &)
+        virtual void save_edge_val(const arr_2d_t &edge, const arr_2d_t &val, const rng_t &rng)
         {
           assert(false && "bcond::save_edge_val() called!");
         };

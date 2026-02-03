@@ -1,6 +1,6 @@
 // 3D fixed (Dirichlet) boundary conditions for libmpdata++
 //
-// licensing: GPU GPL v3
+// licensing: GNU GPL v3
 // copyright: University of Warsaw
 
 #pragma once
@@ -95,9 +95,12 @@ namespace libmpdataxx
         auto s = a.shape();
         s[d] = 1;
         edge_values.emplace(&a, arr_t(s));
-        if constexpr (d == 0)      edge_values[&a].reindexSelf({0, a.lbound(1), a.lbound(2)});
-        else if constexpr (d == 1) edge_values[&a].reindexSelf({a.lbound(0), 0, a.lbound(2)});
-        else if constexpr (d == 2) edge_values[&a].reindexSelf({a.lbound(0), a.lbound(1), 0});
+        if constexpr (d == 0)
+          edge_values[&a].reindexSelf({0, a.lbound(1), a.lbound(2)});
+        else if constexpr (d == 1)
+          edge_values[&a].reindexSelf({a.lbound(0), 0, a.lbound(2)});
+        else if constexpr (d == 2)
+          edge_values[&a].reindexSelf({a.lbound(0), a.lbound(1), 0});
         edge_values[&a](pi<d>(0, j, k)) = val(pi<d>(this->rght_edge_sclr, j, k));
       }
     };
