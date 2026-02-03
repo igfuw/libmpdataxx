@@ -48,7 +48,7 @@ namespace libmpdataxx
         // assert(a.shape() == val.shape());
         auto s = a.shape();
         s[d] = 1;
-        edge_values.emplace(&a, arr_t(s));
+        edge_values.try_emplace(&a, arr_t(s));
         if constexpr(d == 0)      edge_values[&a].reindexSelf({0, a.lbound(1)});
         else if constexpr(d == 1) edge_values[&a].reindexSelf({a.lbound(0), 0});
         edge_values[&a](pi<d>(0, j)) = val(pi<d>(this->left_edge_sclr, j));
@@ -88,7 +88,7 @@ namespace libmpdataxx
         // assert(a.shape() == val.shape());
         auto s = a.shape();
         s[d] = 1;
-        edge_values.emplace(&a, arr_t(s));
+        edge_values.try_emplace(&a, arr_t(s));
         if constexpr (d == 0)     edge_values[&a].reindexSelf({0, a.lbound(1)});
         else if constexpr(d == 1) edge_values[&a].reindexSelf({a.lbound(0), 0});
         edge_values[&a](pi<d>(0, j)) = val(pi<d>(this->rght_edge_sclr, j));
