@@ -190,19 +190,15 @@ namespace libmpdataxx
 
         // save edge value for all variables (e.g. for fixed bcond)
         virtual void save_edges(
+          typename parent_t::arr_t &name,
+          typename parent_t::arr_t &data,
           const idx_t<2> &range_ijk
         ) final
         {
           this->mem->barrier();
-          for (int e = 0; e < parent_t::n_eqns; ++e) // equations
-          {
-            for (int n = 0; n < parent_t::n_tlev; ++n) // time levels
-            {
-              for (auto &bc : this->bcs[0]) bc->save_edge_val(this->mem->psi[e][n], this->mem->psi[e][0], range_ijk[1]);
-              for (auto &bc : this->bcs[1]) bc->save_edge_val(this->mem->psi[e][n], this->mem->psi[e][0], range_ijk[0]);
-              this->mem->barrier();
-            }
-          }              
+          for (auto &bc : this->bcs[0]) bc->save_edge_val(name, data, range_ijk[1]);
+          for (auto &bc : this->bcs[1]) bc->save_edge_val(name, data, range_ijk[0]);
+          this->mem->barrier();
         }
 
         virtual void avg_edge_sclr(typename parent_t::arr_t &arr,
