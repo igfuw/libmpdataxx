@@ -31,9 +31,16 @@ namespace libmpdataxx
 
       void fill_halos_sclr(arr_t &a, const rng_t &j, const bool deriv = false)
       {
-        #if !defined(NDEBUG)
-          assert(edge_values.find(&a) != edge_values.end() && "fixed bcond: edge values not saved before filling halos");
-        #endif
+        // #if !defined(NDEBUG)
+        //   assert(edge_values.find(&a) != edge_values.end() && "fixed bcond: edge values not saved before filling halos");
+        // #endif
+
+        // if edge values are not saved, use open boundary (done to fix sgs eddy viscosity k_m)
+        if(edge_values.find(&a) == edge_values.end())
+        {
+          parent_t::fill_halos_sclr(a, j, deriv);
+          return;
+        }
 
         using namespace idxperm;
         for (int i = this->left_halo_sclr.first(); i <= this->left_halo_sclr.last(); ++i)
@@ -73,26 +80,28 @@ namespace libmpdataxx
 
       public:
 
-      void fill_halos_sclr(arr_t &a, const rng_t &j, const bool deriv = false)
-      {
-        using namespace idxperm;
-        for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
-        {
-          a(pi<d>(i, j)) = edge_values[&a](pi<d>(0, j));
-        }
-      }
+      // TODO
 
-      void save_edge_val(const arr_t &a, const arr_t &val, const rng_t &j)
-      {
-        using namespace idxperm;
-        // assert(a.shape() == val.shape());
-        auto s = a.shape();
-        s[d] = 1;
-        edge_values.try_emplace(&a, arr_t(s));
-        if constexpr (d == 0)     edge_values[&a].reindexSelf({0, a.lbound(1)});
-        else if constexpr(d == 1) edge_values[&a].reindexSelf({a.lbound(0), 0});
-        edge_values[&a](pi<d>(0, j)) = val(pi<d>(this->rght_edge_sclr, j));
-      }
+      // void fill_halos_sclr(arr_t &a, const rng_t &j, const bool deriv = false)
+      // {
+      //   using namespace idxperm;
+      //   for (int i = this->rght_halo_sclr.first(); i <= this->rght_halo_sclr.last(); ++i)
+      //   {
+      //     a(pi<d>(i, j)) = edge_values[&a](pi<d>(0, j));
+      //   }
+      // }
+
+      // void save_edge_val(const arr_t &a, const arr_t &val, const rng_t &j)
+      // {
+      //   using namespace idxperm;
+      //   // assert(a.shape() == val.shape());
+      //   auto s = a.shape();
+      //   s[d] = 1;
+      //   edge_values.try_emplace(&a, arr_t(s));
+      //   if constexpr (d == 0)     edge_values[&a].reindexSelf({0, a.lbound(1)});
+      //   else if constexpr(d == 1) edge_values[&a].reindexSelf({a.lbound(0), 0});
+      //   edge_values[&a](pi<d>(0, j)) = val(pi<d>(this->rght_edge_sclr, j));
+      // }
     };
   } // namespace bcond
 } // namespace libmpdataxx

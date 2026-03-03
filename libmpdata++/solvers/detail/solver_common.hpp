@@ -196,13 +196,13 @@ namespace libmpdataxx
           // fill halos in velocity field
           this->xchng_vctr_alng(mem->GC);
 
-          // save initial edge values for fixed bcond
-          for (int e = 0; e < n_eqns; ++e) // equations
-            for (int n = 0; n < n_tlev; ++n) // time levels
-              this->save_edges(this->mem->psi[e][n], this->mem->psi[e][0], this->ijk);
-
-          if (opts::isset(ct_params_t::opts, opts::nug))
-            this->save_edges(*this->mem->G, *this->mem->G, this->ijk);
+//          // save initial edge values for fixed bcond
+//          for (int e = 0; e < n_eqns; ++e) // equations
+//            for (int n = 0; n < n_tlev; ++n) // time levels
+//              this->save_edges(this->mem->psi[e][n], this->mem->psi[e][0], this->ijk);
+//
+//          if (opts::isset(ct_params_t::opts, opts::nug))
+//            this->save_edges(*this->mem->G, *this->mem->G, this->ijk);
 
           // adaptive timestepping - for constant in time velocity it suffices
           // to change the timestep once and do a simple scaling of advector
