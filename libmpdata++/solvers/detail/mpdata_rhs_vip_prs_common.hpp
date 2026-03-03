@@ -63,6 +63,7 @@ namespace libmpdataxx
               lap_tmp[d](this->ijk) -= tmp_uvw[d](this->ijk);
             }
           }
+          this->set_edges(lap_tmp, this->ijk, err_init ? -1 : 0);
           if (this->mem->G)
           {
             for (int d = 0; d < parent_t::n_dims; ++d)
@@ -71,7 +72,6 @@ namespace libmpdataxx
             }
           }
           if (!simple) this->normalize_vip(lap_tmp);
-          this->set_edges(lap_tmp, this->ijk, err_init ? -1 : 0);
           for (int d = 0; d < parent_t::n_dims; ++d)
           {
             this->xchng_pres(lap_tmp[d], ijk);
