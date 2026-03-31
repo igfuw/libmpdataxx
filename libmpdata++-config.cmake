@@ -141,6 +141,18 @@ unset(msg)
 unset(status)
 unset(output)
 
+# MPI - multithreading support
+if(USE_MPI)
+  option(LIBMPDATAXX_MPI_THREAD_MULTIPLE "Use multithreaded MPI calls" ON)
+  if(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
+    set(libmpdataxx_CXX_FLAGS_DEBUG "${libmpdataxx_CXX_FLAGS_DEBUG} -DLIBMPDATAXX_MPI_THREAD_MULTIPLE")
+    set(libmpdataxx_CXX_FLAGS_RELEASE "${libmpdataxx_CXX_FLAGS_RELEASE} -DLIBMPDATAXX_MPI_THREAD_MULTIPLE")
+    message(STATUS "libmpdata++ will be built with multithreaded MPI calls enabled (MPI_THREAD_MULTIPLE). Set -DLIBMPDATAXX_MPI_THREAD_MULTIPLE=OFF to use MPI_THREAD_SERIALIZED instead.")
+  else()
+    message(STATUS "libmpdata++ will be built with serialized MPI calls (MPI_THREAD_SERIALIZED). Set -DLIBMPDATAXX_MPI_THREAD_MULTIPLE=ON to use MPI_THREAD_MULTIPLE instead.")
+  endif()
+endif()
+
 ############################################################################################
 # Boost libraries
 set(Boost_DETAILED_FAILURE_MSG ON)

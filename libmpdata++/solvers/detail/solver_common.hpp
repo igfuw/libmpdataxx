@@ -105,6 +105,7 @@ namespace libmpdataxx
           // leftmost node must send left first, as
           // rightmost node is waiting
           // if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() == 0)
+          // with serialized MPI, matching left/right calls need to be done in order, doesn't hurt in multithreaded case as well
           if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() % 2 == 0)
             std::swap(bcl, bcr);
 
