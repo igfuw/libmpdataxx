@@ -104,7 +104,8 @@ namespace libmpdataxx
           // with distributed memory and cyclic boundary conditions,
           // leftmost node must send left first, as
           // rightmost node is waiting
-          if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() == 0)
+          // if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() == 0)
+          if (d == 0 && this->mem->distmem.size() > 0 && this->mem->distmem.rank() % 2 == 0)
             std::swap(bcl, bcr);
 
           bcs[d][0] = std::move(bcl);
