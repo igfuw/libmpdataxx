@@ -57,7 +57,7 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[0])
           {
             bc->single_threaded ? bc->fill_halos_sclr(arr, range_ijk[1]^ext, range_ijk[2]^ext, deriv) : bc->fill_halos_sclr(arr, range_ijk_1__ext, range_ijk[2]^ext, deriv);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier(); // to avoid simultaneous MPI calls (not needed if MPI_THREADS_MULTIPLE is supported and used, but many MPI implementations do not support it), as each bcond is handled by different thread
             #endif
           }
@@ -78,7 +78,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0]) //bc->fill_halos_vctr_alng(arrvec, j, k, ad);
             {
               bc->single_threaded ? bc->fill_halos_vctr_alng(arrvec, j, k, ad) : bc->fill_halos_vctr_alng(arrvec, j, k, ad);
-              #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
                 if(this->mem->distmem.size() > 0) this->mem->barrier();
               #endif
             }
@@ -91,7 +91,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0]) //bc->fill_halos_vctr_alng_cyclic(arrvec, j, k, ad);
             {
               bc->single_threaded ? bc->fill_halos_vctr_alng_cyclic(arrvec, j, k, ad) : bc->fill_halos_vctr_alng_cyclic(arrvec, j, k, ad);
-              #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
                 if(this->mem->distmem.size() > 0) this->mem->barrier();
               #endif
             }
@@ -107,7 +107,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) {
             bc->fill_halos_flux(arrvec, j, k);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -128,7 +128,7 @@ namespace libmpdataxx
           barrier_if_single_threaded_bc0(); // to make sure that all threads have filled range_ijk[2]^h before it is used to fill along x 
           for (auto &bc : this->bcs[0]) {
             bc->fill_halos_sgs_div(arr, range_ijk[1], range_ijk[2]^h);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -143,7 +143,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) {
             bc->fill_halos_sgs_vctr(av, b, range_ijk[1], range_ijk[2]);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -162,7 +162,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) {
             bc->fill_halos_sgs_tnsr(av, w, vip_div, range_ijk[1], range_ijk[2], this->dijk[0]);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -184,7 +184,7 @@ namespace libmpdataxx
           {
             bc->fill_halos_sgs_vctr(av, bv[0], range_ijkm[1], range_ijk[2]^1, 3);
             bc->fill_halos_sgs_vctr(av, bv[1], range_ijk[1]^1, range_ijkm[2], 4);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -233,7 +233,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0]) // bc->single_threaded ? bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1) : bc->fill_halos_vctr_nrml(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
             {
               bc->single_threaded ? bc->fill_halos_vctr_nrml(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1) : bc->fill_halos_vctr_nrml(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
-              #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
                 if(this->mem->distmem.size() > 0) this->mem->barrier();
               #endif
             }
@@ -245,7 +245,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0]) //bc->single_threaded ? bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h) : bc->fill_halos_vctr_nrml(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
             {
               bc->single_threaded ? bc->fill_halos_vctr_nrml(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h) : bc->fill_halos_vctr_nrml(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
-              #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
                 if(this->mem->distmem.size() > 0) this->mem->barrier();
               #endif
             }
@@ -262,7 +262,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0]) // bc->single_threaded ? bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1) : bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
             {
               bc->single_threaded ? bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk[1]^ext^h, range_ijk[2]^ext^1) : bc->fill_halos_vctr_nrml_cyclic(arrvec[1], range_ijk_1__ext_h, range_ijk[2]^ext^1);
-              #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
                 if(this->mem->distmem.size() > 0) this->mem->barrier();
               #endif
             }
@@ -274,7 +274,7 @@ namespace libmpdataxx
             for (auto &bc : this->bcs[0]) // bc->single_threaded ? bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h) : bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
             {
               bc->single_threaded ? bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk[1]^ext^1, range_ijk[2]^ext^h) : bc->fill_halos_vctr_nrml_cyclic(arrvec[2], range_ijk_1__ext_1, range_ijk[2]^ext^h);
-              #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
                 if(this->mem->distmem.size() > 0) this->mem->barrier();
               #endif
             }
@@ -296,7 +296,7 @@ namespace libmpdataxx
           for (auto &bc : this->bcs[0]) // bc->single_threaded ? bc->fill_halos_pres(arr, range_ijk[1]^ext, range_ijk[2]^ext) : bc->fill_halos_pres(arr, range_ijk_1__ext, range_ijk[2]^ext);
           {
             bc->single_threaded ? bc->fill_halos_pres(arr, range_ijk[1]^ext, range_ijk[2]^ext) : bc->fill_halos_pres(arr, range_ijk_1__ext, range_ijk[2]^ext);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -315,7 +315,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) {
             bc->set_edge_pres(av[0], range_ijk[1], range_ijk[2], sign);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -333,7 +333,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) {
             bc->save_edge_vel(av[0], range_ijk[1], range_ijk[2]);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -351,7 +351,7 @@ namespace libmpdataxx
 
           for (auto &bc : this->bcs[0]) {
             bc->copy_edge_sclr_to_halo1_cyclic(arr, range_ijk[1], range_ijk[2]);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -362,7 +362,7 @@ namespace libmpdataxx
           // NOTE: averaging this way gives different weights to different points in corners depending on the order (corners are averaged twice and each averaging is dividing by 2)
           for (auto &bc : this->bcs[0]) {
             bc->avg_edge_and_halo1_sclr_cyclic(arr, range_ijk[1], range_ijk[2]);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }

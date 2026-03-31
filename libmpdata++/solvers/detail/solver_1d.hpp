@@ -41,7 +41,7 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) {
             bc->fill_halos_sclr(arr, deriv);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
@@ -67,7 +67,7 @@ namespace libmpdataxx
           {
             for (auto &bc : this->bcs[0]) {
               bc->fill_halos_vctr_alng(arrvec, ad);
-              #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
                 if(this->mem->distmem.size() > 0) this->mem->barrier();
               #endif
             }
@@ -76,7 +76,7 @@ namespace libmpdataxx
           {
             for (auto &bc : this->bcs[0]) {
               bc->fill_halos_vctr_alng_cyclic(arrvec, ad);
-              #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
                 if(this->mem->distmem.size() > 0) this->mem->barrier();
               #endif
             }
@@ -89,13 +89,13 @@ namespace libmpdataxx
           this->mem->barrier();
           for (auto &bc : this->bcs[0]) {
             bc->copy_edge_sclr_to_halo1_cyclic(arr);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
           for (auto &bc : this->bcs[0]) {
             bc->avg_edge_and_halo1_sclr_cyclic(arr);
-            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+            #if !defined(LIBMPDATAXX_MPI_THREAD_MULTIPLE)
               if(this->mem->distmem.size() > 0) this->mem->barrier();
             #endif
           }
