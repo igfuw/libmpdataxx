@@ -273,7 +273,8 @@ if(HDF5_FOUND)
     if (status EQUAL 0)                                                       
       message(FATAL_ERROR "${pfx}: compilation failed\n status: ${status}\n copy file error: ${copy_error}\n output: ${error}")                               
     endif()                                                                       
-    message(STATUS "${msg} - compilation OK")
+      message(STATUS "${msg}: compilation OK, status: ${status}")                               
+    #    message(STATUS "${msg} - compilation OK")
 
     execute_process(
       COMMAND "mpiexec" "-np" "1" "./test_hdf5_mpi" 
@@ -299,9 +300,10 @@ if(HDF5_FOUND)
       ERROR_VARIABLE error
     )
     if (NOT status EQUAL 0)                                                       
-      message(FATAL_ERROR "TODO: ${status}\n ${error}")
+      message(WARNING "mpirun --np 2 failed, this could be normal e.g. if compilation is done in a job that has only 1 process allocated: ${status}\n ${error}")
+    else()
+      message(STATUS "${msg} - mpirun execution OK")
     endif()
-    message(STATUS "${msg} - mpirun execution OK")
 
     unset(status)
     unset(pfx)
