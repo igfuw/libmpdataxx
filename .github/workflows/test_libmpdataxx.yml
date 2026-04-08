@@ -64,7 +64,7 @@ jobs:
  
     - name: configure,make and run unit tests #all in one call, because singularity always creates a sandbox, what takes ca. 1 min. TODO: fix this (newer singularity from apt?)
       working-directory: ${{ github.workspace }}/tests/unit
-      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} && cmake --build build --config ${{matrix.build_type}} ${{matrix.cmake_options}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
+      run: VERBOSE=1 OMP_NUM_THREADS=4 singularity exec $SI bash -c "cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}} ${{matrix.cmake_options}} && cmake --build build --config ${{matrix.build_type}} -j4 && cd build && ctest ${{matrix.ctest_options}} || cat Testing/Temporary/LastTest.log /"
       
   sandbox:
     needs: fetch_images
