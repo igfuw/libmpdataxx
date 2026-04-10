@@ -192,7 +192,7 @@ public: // TODO: just a temp measure, make it private again
             #endif
               &th_lvl_provided);
           }
-          if (boost::mpi::environment::thread_level() != 
+          if (boost::mpi::environment::thread_level() < 
             #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
               boost::mpi::threading::multiple
             #else
@@ -200,6 +200,7 @@ public: // TODO: just a temp measure, make it private again
             #endif
           )
           {
+            std::cerr << "provided thread level: " << boost::mpi::environment::thread_level() << std::endl;
             #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
               throw std::runtime_error("libmpdata++: failed to initialise MPI environment with MPI_THREAD_MULTIPLE");
             #else
