@@ -184,11 +184,28 @@ public: // TODO: just a temp measure, make it private again
           {
             mpi_initialized_before = false;
             int th_lvl_provided;
-            MPI_Init_thread(nullptr, nullptr, MPI_THREAD_MULTIPLE, &th_lvl_provided);
+            MPI_Init_thread(nullptr, nullptr, 
+            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              MPI_THREAD_MULTIPLE,
+            #else
+              MPI_THREAD_SERIALIZED,
+            #endif
+              &th_lvl_provided);
           }
-          if (boost::mpi::environment::thread_level() != boost::mpi::threading::multiple)
+          if (boost::mpi::environment::thread_level() < 
+            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              boost::mpi::threading::multiple
+            #else
+              boost::mpi::threading::serialized
+            #endif
+          )
           {
-            throw std::runtime_error("libmpdata++: failed to initialise MPI environment with MPI_THREAD_MULTIPLE");
+            std::cerr << "provided thread level: " << boost::mpi::environment::thread_level() << std::endl;
+            #ifdef LIBMPDATAXX_MPI_THREAD_MULTIPLE
+              throw std::runtime_error("libmpdata++: failed to initialise MPI environment with MPI_THREAD_MULTIPLE");
+            #else
+              throw std::runtime_error("libmpdata++: failed to initialise MPI environment with MPI_THREAD_SERIALIZED");
+            #endif
           }
           mpicom = boost::mpi::communicator(MPI_COMM_WORLD, boost::mpi::comm_duplicate); // use a duplicate of MPI_COMM_WORLD, can't construct it before MPI_Init call (?)
 #endif
