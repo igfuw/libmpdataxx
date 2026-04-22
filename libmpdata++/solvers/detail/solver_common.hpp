@@ -99,6 +99,8 @@ namespace libmpdataxx
 
         virtual void xchng_vctr_alng(arrvec_t<arr_t>&, const bool ad = false, const bool cyclic = false) = 0;
 
+        virtual void save_edges(arr_t &name, arr_t &data, const idx_t<n_dims> &range_ijk) {} // default: do nothing (e.g. for 0D and 1D, for which fixed bconds are not implemented)
+
         void set_bcs(const int &d, bcp_t &bcl, bcp_t &bcr)
         {
           // with distributed memory and cyclic boundary conditions,
@@ -195,6 +197,14 @@ namespace libmpdataxx
 #endif
           // fill halos in velocity field
           this->xchng_vctr_alng(mem->GC);
+
+//          // save initial edge values for fixed bcond
+//          for (int e = 0; e < n_eqns; ++e) // equations
+//            for (int n = 0; n < n_tlev; ++n) // time levels
+//              this->save_edges(this->mem->psi[e][n], this->mem->psi[e][0], this->ijk);
+//
+//          if (opts::isset(ct_params_t::opts, opts::nug))
+//            this->save_edges(*this->mem->G, *this->mem->G, this->ijk);
 
           // adaptive timestepping - for constant in time velocity it suffices
           // to change the timestep once and do a simple scaling of advector

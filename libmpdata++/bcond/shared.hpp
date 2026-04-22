@@ -32,6 +32,9 @@ namespace libmpdataxx
       virtual void save_edge_vel(const arr_2d_t &, const rng_t &) { };
       virtual void save_edge_vel(const arr_3d_t &, const rng_t &, const rng_t &) { };
 
+      virtual void save_edge_val(const arr_2d_t &, const arr_2d_t &, const rng_t &) override { };
+      virtual void save_edge_val(const arr_3d_t &, const arr_3d_t &, const rng_t &, const rng_t &) override { };
+
       virtual void set_edge_pres(arr_2d_t &, const rng_t &, int) { };
       virtual void set_edge_pres(arr_3d_t &, const rng_t &, const rng_t &, int) { };
 
