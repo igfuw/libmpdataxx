@@ -102,8 +102,8 @@ namespace libmpdataxx
           using namespace arakawa_c;
 
           // TODO: get rid of superfluous barriers
-          for (auto& vip : this->vips())
-            this->xchng_sclr(vip, this->ijk, 1);
+          for (int d = 0; d < parent_t::n_dims; ++d)
+            this->xchng_sclr(this->state(this->vip_ixs[d]), this->ijk, 1);
 
           if (static_cast<stress_diff_t>(ct_params_t::stress_diff) == compact)
           {
@@ -176,6 +176,14 @@ namespace libmpdataxx
           }
         }
 
+        void hook_ante_loop(const typename parent_t::advance_arg_t nt) override
+        {
+          parent_t::hook_ante_loop(nt);
+
+          for (int d = 0; d < parent_t::n_dims; ++d)
+            this->save_edges(this->state(this->vip_ixs[d]), this->state(this->vip_ixs[d]), this->ijk);
+        }
+  
         public:
 
         struct rt_params_t : parent_t::rt_params_t

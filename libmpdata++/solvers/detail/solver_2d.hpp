@@ -236,6 +236,7 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
+        // save edge values for velocity
         virtual void save_edges(
           const arrvec_t<typename parent_t::arr_t> &av,
           const idx_t<2> &range_ijk
@@ -249,6 +250,19 @@ namespace libmpdataxx
             #endif
           }
           for (auto &bc : this->bcs[1]) bc->save_edge_vel(av[1], range_ijk[0]);
+          this->mem->barrier();
+        }
+
+        // save edge value for all variables (e.g. for fixed bcond)
+        virtual void save_edges(
+          typename parent_t::arr_t &name,
+          typename parent_t::arr_t &data,
+          const idx_t<2> &range_ijk
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->save_edge_val(name, data, range_ijk[1]);
+          for (auto &bc : this->bcs[1]) bc->save_edge_val(name, data, range_ijk[0]);
           this->mem->barrier();
         }
 

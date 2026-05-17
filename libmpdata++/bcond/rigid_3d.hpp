@@ -49,6 +49,8 @@ namespace libmpdataxx
 
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
 
+      void save_edge_val(const arr_t &, const arr_t &, const rng_t &, const rng_t &) {}
+
       void set_edge_pres(arr_t &a, const rng_t &j, const rng_t &k, int)
       {
         using namespace idxperm;
@@ -135,6 +137,8 @@ namespace libmpdataxx
 
 
       void save_edge_vel(const arr_t &, const rng_t &, const rng_t &) {}
+
+      void save_edge_val(const arr_t &, const arr_t &, const rng_t &, const rng_t &) {}
 
       void fill_halos_pres(arr_t &a, const rng_t &j, const rng_t &k)
       {

@@ -343,6 +343,21 @@ namespace libmpdataxx
           this->mem->barrier();
         }
 
+        // save edge value for all variables (e.g. for fixed bcond)
+        virtual void save_edges(
+          typename parent_t::arr_t &name,
+          typename parent_t::arr_t &data,
+          const idx_t<3> &range_ijk
+        ) final
+        {
+          this->mem->barrier();
+          for (auto &bc : this->bcs[0]) bc->save_edge_val(name, data, range_ijk[1], range_ijk[2]);
+          barrier_if_single_threaded_bc0();
+          for (auto &bc : this->bcs[1]) bc->save_edge_val(name, data, range_ijk[2], range_ijk[0]);
+          for (auto &bc : this->bcs[2]) bc->save_edge_val(name, data, range_ijk[0], range_ijk[1]);
+          this->mem->barrier();
+        }
+
         virtual void avg_edge_sclr(typename parent_t::arr_t &arr,
                        const idx_t<3> &range_ijk
         ) final

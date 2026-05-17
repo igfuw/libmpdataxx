@@ -32,7 +32,10 @@
 #include <libmpdata++/bcond/remote_1d.hpp>
 #include <libmpdata++/bcond/remote_2d.hpp>
 #include <libmpdata++/bcond/remote_3d.hpp>
+#include <libmpdata++/bcond/gndsky_2d.hpp>
 #include <libmpdata++/bcond/gndsky_3d.hpp>
+#include <libmpdata++/bcond/fixed_2d.hpp>
+#include <libmpdata++/bcond/fixed_3d.hpp>
 
 namespace libmpdataxx
 {
